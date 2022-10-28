@@ -211,6 +211,9 @@ export default class PipelineProgramFundingSource extends Component {
                                             }, {
                                                 title: i18n.t('static.inventory.fundingSource'),
                                                 type: 'hidden',
+                                                // title: 'A',
+                                                // type: 'text',
+                                                // visible: false,
                                                 readonly: true
                                             }
                                         ],

@@ -1190,10 +1190,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 {
                     title: 'duplicate',
                     type: 'hidden'//J9
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'regionId',
                     type: 'hidden'//K10
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
 
 

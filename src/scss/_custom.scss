@@ -3933,6 +3933,12 @@ h6 {
   font-weight: 700;
 }
 
+.consumptionDataEntryTable .jexcel_content {
+  // max-height: calc(100vh - 262px)!important;
+  max-height: calc(100vh - 300px) !important;
+  // overflow: scroll !important;
+  overflow-x: auto;
+}
 
 //multiselect css
 
@@ -4580,517 +4586,722 @@ h6 {
 .werehousecapacitySearchposition {
   margin-top: -49px;
 }
-  .TemplateItem, .InfoTemplate, .CursorFrame, .CursorBadge, .HighlightFrame, .HighlightBadgePlaceholder, .HighlightBadge, .DepartmentTemplate, .DepartmentTemplate .DepartmentTitleBackground, .DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle, .ContactTemplate, .ContactTemplate .ContactTitleBackground, .ContactTemplate .ContactTitleBackground .ContactTitle, .ContactTemplate .ContactPhotoFrame, .ContactTemplate .ContactPhone, .ContactTemplate .ContactEmail, .ContactTemplate .ContactDescription, .ContactTemplate .ContactLabel, .ContactTemplate .ContactCheckboxElement, .ContactTemplate .ContactCheckboxElement .ContactCheckboxCaption, .PERTTemplate, .PERTTemplate .PERTTitleBackground, .PERTTemplate .PERTTitleBackground .PERTTitle, .PERTTemplate .PERTETTitle, .PERTTemplate .PERTLTTitle, .PERTTemplate .PERTET, .PERTTemplate .PERTLT, .PERTTemplate .PERTVerticalLine, .PERTTemplate .PERTHorizontalLine, .xlTemplate, .xlTemplate .xlTitleBackground, .xlTemplate .xlTitleBackground .xlTitle, .xlTemplate .xlPhotoFrame, .xlTemplate .xlPhone, .xlTemplate .xlEmail, .xlTemplate .xlDescription, .lgTemplate, .lgTemplate .lgTitleBackground, .lgTemplate .lgTitleBackground .lgTitle, .lgTemplate .lgPhotoFrame, .lgTemplate .lgEmail, .lgTemplate .lgDescription, .mdTemplate, .mdTemplate .mdPhotoFrame, .mdTemplate .mdTitle, .mdTemplate .mdDescription, .smTemplate, .smTemplate .smTitle, .smTemplate .smDescription, .xsTemplate, .xsTemplate .xsTitle {
-    position: absolute;
-    font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    box-sizing: content-box; }
-  
-  .TemplateCornerAll, .InfoTemplate, .CursorFrame, .HighlightFrame, .DepartmentTemplate, .DepartmentTemplate .DepartmentTitleBackground, .ContactTemplate, .ContactTemplate .ContactTitleBackground, .PERTTemplate, .PERTTemplate .PERTTitleBackground, .xlTemplate, .xlTemplate .xlTitleBackground, .lgTemplate, .lgTemplate .lgTitleBackground, .mdTemplate, .smTemplate, .xsTemplate {
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -khtml-border-radius: 4px;
-    border-radius: 4px; 
-  }
-  
-  .TemplateItemFrame, .InfoTemplate, .DepartmentTemplate, .DepartmentTemplate .DepartmentTitleBackground, .ContactTemplate, .ContactTemplate .ContactTitleBackground, .PERTTemplate, .PERTTemplate .PERTTitleBackground, .xlTemplate, .xlTemplate .xlTitleBackground, .lgTemplate, .lgTemplate .lgTitleBackground, .mdTemplate, .smTemplate, .xsTemplate {
-    border: 1px solid #dddddd;
-    background: #eeeeee;
-    color: #333333; }
-  
-  .TemplateTitle, .DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle, .ContactTemplate .ContactTitleBackground .ContactTitle, .PERTTemplate .PERTTitleBackground .PERTTitle, .xlTemplate .xlTitleBackground .xlTitle, .lgTemplate .lgTitleBackground .lgTitle {
-    text-overflow: ellipsis;
-    -o-text-overflow: ellipsis;
-    // white-space: nowrap;
-    white-space: pre-wrap;
-    font-size: 14px;
-    line-height: 16px;
-    color: white;
-    padding: 0; }
-  
-  .TemplatePhotoFrame, .ContactTemplate .ContactPhotoFrame, .xlTemplate .xlPhotoFrame, .lgTemplate .lgPhotoFrame, .mdTemplate .mdPhotoFrame {
-    border: 1px solid #cccccc;
-    background: #f6f6f6;
-    color: #1c94c4; }
-  
-  .InfoTemplate {
-    text-align: center;
-    font-size: 14px;
-    width: 100%;
-    height: 100%;
-    left: -1px;
-    top: -1px; }
-    .BadgeSymbol {
-      -moz-border-radius: 10px;
-      -webkit-border-radius: 10px;
-      -khtml-border-radius: 10px;
-      border-radius: 10px;
-      font-size: 12px;
-      line-height: 20px;
-      text-align: center;
-      text-decoration: none;
-      vertical-align: middle;
-      font-weight: bold;
-      font-family: Arial;
-      padding: 0px;
-      float: left;
-      width: 20px;
-      height: 20px;
-      background-color: #BA0C2F;
-      color: white; }
-    
-    .CursorFrame {
-      border: 2px solid #fbd850;
-      background: #ffffff;
-      color: #eb8f00;
-      width: 100%;
-      height: 100%;
-      left: -2px;
-      top: -2px; }
-    
-    .CursorBadge {
-      -moz-border-radius: 16px;
-      -webkit-border-radius: 16px;
-      -khtml-border-radius: 16px;
-      border-radius: 16px;
-      font-size: 18px;
-      line-height: 18px;
-      text-align: center;
-      text-decoration: none;
-      vertical-align: middle;
-      font-weight: bold;
-      font-family: Arial;
-      padding: 4px;
-      float: left;
-      width: 16px;
-      height: 16px;
-      top: 45px;
-      left: 114px;
-      z-index: 1000;
-      background-color: green;
-      color: white; }
-    
-    .HighlightFrame {
-      border: 2px solid #fbcb09;
-      background: white;
-      color: #c77405;
-      width: 100%;
-      height: 100%;
-      left: -2px;
-      top: -2px; }
-    
-    .HighlightBadgePlaceholder {
-      right: 0px;
-      top: 45px; }
-    
-    .HighlightBadge {
-      -moz-border-radius: 16px;
-      -webkit-border-radius: 16px;
-      -khtml-border-radius: 16px;
-      border-radius: 16px;
-      font-size: 18px;
-      line-height: 18px;
-      text-align: center;
-      text-decoration: none;
-      vertical-align: middle;
-      font-weight: bold;
-      font-family: Arial;
-      padding: 4px;
-      float: left;
-      width: 16px;
-      height: 16px;
-      top: 0px;
-      left: -10px;
-      z-index: 1000;
-      background-color: green;
-      color: white; }
-    
-    .DepartmentTemplate {
-      width: 100%;
-      height: 100%;
-      left: -1px;
-      top: -1px; }
-      .DepartmentTemplate .DepartmentTitleBackground {
-        top: 2px;
-        left: 2px;
-        width: 196px;
-        height: 25px; }
-        .DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle {
-          top: 3px;
-          left: 3px;
-          width: 188px;
-          height: 23px;
-          text-align: center; }
-    
-    .ContactTemplate {
-      width: 100%;
-      height: 100%;
-      left: -1px;
-      top: -1px; }
-      .ContactTemplate .ContactTitleBackground {
-        top: 2px;
-        left: 2px;
-        right: 2px;
-        height: 20px; }
-        .ContactTemplate .ContactTitleBackground .ContactTitle {
-          top: 2px;
-          left: 2px;
-          right: 2px;
-          height: 16px; }
-      .ContactTemplate .ContactPhotoFrame {
-        top: 26px;
-        left: 2px;
-        width: 50px;
-        height: 60px; }
-        .ContactTemplate .ContactPhotoFrame .ContactPhoto {
-          height: 60px;
-          width: 50px; }
-      .ContactTemplate .ContactPhone {
-        overflow: hidden;
-        // top: 26px;
-        top:34px!important;
-        left: 56px;
-        height: 16px;
-        bottom: 2px;
-        font-size: 12px; }
-      .ContactTemplate .ContactEmail {
-        overflow: hidden;
-        top: 44px;
-        left: 56px;
-        height: 16px;
-        bottom: 2px;
-        font-size: 12px; }
-      .ContactTemplate .ContactDescription {
-        overflow: hidden;
-        top: 62px;
-        left: 56px;
-        right: 2px;
-        bottom: 2px;
-        font-size: 12px; }
-      .ContactTemplate .ContactLabel {
-        text-align: center;
-        top: -20px;
-        left: 2px;
-        right: 2px;
-        height: 16px; }
-      .ContactTemplate .ContactCheckboxElement {
-        overflow: hidden;
-        height: 16x;
-        left: 2px;
-        right: 2px;
-        bottom: 2px;
-        font-size: 12px;
-        z-index: 100; }
-        .ContactTemplate .ContactCheckboxElement .ContactCheckboxCaption {
-          overflow: hidden;
-          padding-bottom: 2px; }
-    
-    .InLayoutLabel {
-      text-align: center; }
-    
-    .PERTTemplate {
-      width: 100%;
-      height: 100%;
-      left: -1px;
-      top: -1px; }
-      .PERTTemplate .PERTTitleBackground {
-        top: 2px;
-        left: 2px;
-        right: 2px;
-        height: 20px; }
-        .PERTTemplate .PERTTitleBackground .PERTTitle {
-          top: 2px;
-          left: 2px;
-          height: 18px;
-          width: 88px; }
-      .PERTTemplate .PERTETTitle {
-        overflow: hidden;
-        top: 20px;
-        left: 0px;
-        width: 50px;
-        height: 20px;
-        padding: 4px;
-        font-size: 12px; }
-      .PERTTemplate .PERTLTTitle {
-        overflow: hidden;
-        top: 20px;
-        left: 50px;
-        width: 50px;
-        height: 20px;
-        padding: 4px;
-        font-size: 12px; }
-      .PERTTemplate .PERTET {
-        overflow: hidden;
-        top: 40px;
-        left: 0px;
-        width: 50px;
-        height: 20px;
-        padding: 4px;
-        font-size: 12px; }
-      .PERTTemplate .PERTLT {
-        overflow: hidden;
-        top: 40px;
-        left: 50px;
-        width: 50px;
-        height: 20px;
-        padding: 4px;
-        font-size: 12px; }
-      .PERTTemplate .PERTVerticalLine {
-        line-height: 0px;
-        border-left: 1px solid gray;
-        top: 24px;
-        left: 50px;
-        width: 1px;
-        height: 32px; }
-      .PERTTemplate .PERTHorizontalLine {
-        line-height: 0px;
-        border-top: 1px solid gray;
-        top: 40px;
-        left: 4px;
-        width: 92px;
-        height: 1px; }
-    
-    .xlTemplate {
-      width: 100%;
-      height: 100%;
-      left: -1px;
-      top: -1px; }
-      .xlTemplate .xlTitleBackground {
-        top: 2px;
-        left: 2px;
-        right: 2px;
-        height: 20px; }
-        .xlTemplate .xlTitleBackground .xlTitle {
-          top: 2px;
-          left: 2px;
-          right: 2px;
-          height: 16px; }
-      .xlTemplate .xlPhotoFrame {
-        top: 26px;
-        left: 2px;
-        width: 50px;
-        height: 60px; }
-        .xlTemplate .xlPhotoFrame .Photo {
-          height: 60px;
-          width: 50px; }
-      .xlTemplate .xlPhone {
-        overflow: hidden;
-        top: 26px;
-        left: 56px;
-        height: 16px;
-        bottom: 2px;
-        font-size: 12px; }
-      .xlTemplate .xlEmail {
-        overflow: hidden;
-        top: 44px;
-        left: 56px;
-        height: 16px;
-        bottom: 2px;
-        font-size: 12px; }
-      .xlTemplate .xlDescription {
-        overflow: hidden;
-        top: 62px;
-        left: 56px;
-        right: 2px;
-        bottom: 2px;
-        font-size: 12px; }
-    
-    .lgTemplate {
-      width: 100%;
-      height: 100%;
-      left: -1px;
-      top: -1px; }
-      .lgTemplate .lgTitleBackground {
-        top: 2px;
-        left: 2px;
-        right: 2px;
-        height: 18px; }
-        .lgTemplate .lgTitleBackground .lgTitle {
-          top: 2px;
-          left: 2px;
-          width: 152px;
-          height: 14px;
-          font-size: 12px;
-          overflow: hidden;
-          text-overflow: ellipsis; }
-      .lgTemplate .lgPhotoFrame {
-        top: 22px;
-        left: 2px;
-        width: 50px;
-        height: 60px; }
-        .lgTemplate .lgPhotoFrame .lgPhoto {
-          height: 60px;
-          width: 50px; }
-      .lgTemplate .lgEmail {
-        overflow: hidden;
-        top: 22px;
-        left: 56px;
-        width: 98px;
-        height: 13px;
-        font-size: 11px;
-        overflow: hidden;
-        text-overflow: ellipsis; }
-      .lgTemplate .lgDescription {
-        overflow: hidden;
-        top: 37px;
-        left: 56px;
-        width: 98px;
-        font-size: 11px; }
-    
-    .mdTemplate {
-      width: 100%;
-      height: 100%;
-      left: -1px;
-      top: -1px; }
-      .mdTemplate .mdPhotoFrame {
-        top: 2px;
-        left: 2px;
-        width: 25px;
-        height: 30px; }
-        .mdTemplate .mdPhotoFrame .mdPhoto {
-          width: 25px;
-          height: 30px; }
-      .mdTemplate .mdTitle {
-        top: 2px;
-        left: 31px;
-        width: 98px;
-        height: 14px;
-        font-size: 12px;
-        overflow: hidden;
-        text-overflow: ellipsis; }
-      .mdTemplate .mdDescription {
-        overflow: hidden;
-        top: 18px;
-        left: 31px;
-        width: 98px;
-        height: 25px;
-        font-size: 11px; }
-    
-    .smTemplate {
-      width: 100%;
-      height: 100%;
-      left: -1px;
-      top: -1px; }
-      .smTemplate .smTitle {
-        top: 2px;
-        left: 2px;
-        width: 98px;
-        height: 14px;
-        font-size: 12px;
-        overflow: hidden;
-        text-overflow: ellipsis; }
-      .smTemplate .smDescription {
-        overflow: hidden;
-        top: 18px;
-        left: 2px;
-        width: 98px;
-        height: 12px;
-        font-size: 10px; }
-    
-    .xsTemplate {
-      width: 100%;
-      height: 100%;
-      left: -1px;
-      top: -1px; }
-      .xsTemplate .xsTitle {
-        top: 2px;
-        left: 2px;
-        width: 80px;
-        height: 14px;
-        font-size: 11px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        text-align: center; }
-    
-        .legendDeleteCleanupText{
-          padding: 0px 0px 0px 8px;
-        }
-        .CleanUpIcon{
-          border: 2px solid #000000a8;
-            border-radius: 3px;
-        }
-        .DeleteIcon{
-          padding: 1px 2px;
-          border: 2px solid #000000a8;
-          border-radius: 3px;
-        }
-        label.arrow_label:before {
-          margin: -2px 1em 0 -2em!important;
-          font-size: 18px!important;
-      }
-      .DeleteIcontree {
-        padding: 1px 2px;
-        border: 2px solid #000000a8;
-        border-radius: 3px;
-        font-size: 10px;
-        cursor: pointer;
-    }
-    .btn-danger {
-      color: #fff;
-      background-color: #BA0C2F!important;
-      border-color: #BA0C2F!important;
-  }
-    .btn-danger:hover {
-      color: #fff;
-      background-color: #D20E35!important;
-      border-color: #D20E35!important;
-  }
-        .ContactTemplate .ContactPhone {
-          overflow: inherit!important;
-        }
-        .modalWidthUsagepopup{
-          width: 90%;
-        }
-        .card-header-action a i:hover {
-          font-size: 25px;
-          color: #4AB7DE;
-      }
-      .jexcel_pagination_dropdown:hover {
-        color: #fff !important;
-        background-color: #4AB7DE !important;
-        border-color: #4AB7DE !important;
-        margin-left: 5px;
-        margin-top: -2px;
-        height: calc(1.5em + 0.5rem + 2px);
-        padding: 0.25rem 0.5rem;
-        font-size: 0.76562rem;
-        line-height: 1.5;
-        border-radius: 0.2rem;
-    }
 
-    // .fuNodeAutocomplete .MuiInputBase-fullWidth {
-    //     width: 78% !important;
-    // }
-    
-    .listtreetable .jexcel > thead > tr >td:nth-child(4) {
-      text-align: center!important;
-  }
-  .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(4).readonly {
-    text-align: center!important;
+.TemplateItem,
+.InfoTemplate,
+.CursorFrame,
+.CursorBadge,
+.HighlightFrame,
+.HighlightBadgePlaceholder,
+.HighlightBadge,
+.DepartmentTemplate,
+.DepartmentTemplate .DepartmentTitleBackground,
+.DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle,
+.ContactTemplate,
+.ContactTemplate .ContactTitleBackground,
+.ContactTemplate .ContactTitleBackground .ContactTitle,
+.ContactTemplate .ContactPhotoFrame,
+.ContactTemplate .ContactPhone,
+.ContactTemplate .ContactEmail,
+.ContactTemplate .ContactDescription,
+.ContactTemplate .ContactLabel,
+.ContactTemplate .ContactCheckboxElement,
+.ContactTemplate .ContactCheckboxElement .ContactCheckboxCaption,
+.PERTTemplate,
+.PERTTemplate .PERTTitleBackground,
+.PERTTemplate .PERTTitleBackground .PERTTitle,
+.PERTTemplate .PERTETTitle,
+.PERTTemplate .PERTLTTitle,
+.PERTTemplate .PERTET,
+.PERTTemplate .PERTLT,
+.PERTTemplate .PERTVerticalLine,
+.PERTTemplate .PERTHorizontalLine,
+.xlTemplate,
+.xlTemplate .xlTitleBackground,
+.xlTemplate .xlTitleBackground .xlTitle,
+.xlTemplate .xlPhotoFrame,
+.xlTemplate .xlPhone,
+.xlTemplate .xlEmail,
+.xlTemplate .xlDescription,
+.lgTemplate,
+.lgTemplate .lgTitleBackground,
+.lgTemplate .lgTitleBackground .lgTitle,
+.lgTemplate .lgPhotoFrame,
+.lgTemplate .lgEmail,
+.lgTemplate .lgDescription,
+.mdTemplate,
+.mdTemplate .mdPhotoFrame,
+.mdTemplate .mdTitle,
+.mdTemplate .mdDescription,
+.smTemplate,
+.smTemplate .smTitle,
+.smTemplate .smDescription,
+.xsTemplate,
+.xsTemplate .xsTitle {
+  position: absolute;
+  font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  box-sizing: content-box;
 }
+
+.TemplateCornerAll,
+.InfoTemplate,
+.CursorFrame,
+.HighlightFrame,
+.DepartmentTemplate,
+.DepartmentTemplate .DepartmentTitleBackground,
+.ContactTemplate,
+.ContactTemplate .ContactTitleBackground,
+.PERTTemplate,
+.PERTTemplate .PERTTitleBackground,
+.xlTemplate,
+.xlTemplate .xlTitleBackground,
+.lgTemplate,
+.lgTemplate .lgTitleBackground,
+.mdTemplate,
+.smTemplate,
+.xsTemplate {
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.TemplateItemFrame,
+.InfoTemplate,
+.DepartmentTemplate,
+.DepartmentTemplate .DepartmentTitleBackground,
+.ContactTemplate,
+.ContactTemplate .ContactTitleBackground,
+.PERTTemplate,
+.PERTTemplate .PERTTitleBackground,
+.xlTemplate,
+.xlTemplate .xlTitleBackground,
+.lgTemplate,
+.lgTemplate .lgTitleBackground,
+.mdTemplate,
+.smTemplate,
+.xsTemplate {
+  border: 1px solid #dddddd;
+  background: #eeeeee;
+  color: #333333;
+}
+
+.TemplateTitle,
+.DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle,
+.ContactTemplate .ContactTitleBackground .ContactTitle,
+.PERTTemplate .PERTTitleBackground .PERTTitle,
+.xlTemplate .xlTitleBackground .xlTitle,
+.lgTemplate .lgTitleBackground .lgTitle {
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  // white-space: nowrap;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 16px;
+  color: white;
+  padding: 0;
+}
+
+.TemplatePhotoFrame,
+.ContactTemplate .ContactPhotoFrame,
+.xlTemplate .xlPhotoFrame,
+.lgTemplate .lgPhotoFrame,
+.mdTemplate .mdPhotoFrame {
+  border: 1px solid #cccccc;
+  background: #f6f6f6;
+  color: #1c94c4;
+}
+
+.InfoTemplate {
+  text-align: center;
+  font-size: 14px;
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.BadgeSymbol {
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -khtml-border-radius: 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: Arial;
+  padding: 0px;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background-color: #BA0C2F;
+  color: white;
+}
+
+.CursorFrame {
+  border: 2px solid #fbd850;
+  background: #ffffff;
+  color: #eb8f00;
+  width: 100%;
+  height: 100%;
+  left: -2px;
+  top: -2px;
+}
+
+.CursorBadge {
+  -moz-border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -khtml-border-radius: 16px;
+  border-radius: 16px;
+  font-size: 18px;
+  line-height: 18px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: Arial;
+  padding: 4px;
+  float: left;
+  width: 16px;
+  height: 16px;
+  top: 45px;
+  left: 114px;
+  z-index: 1000;
+  background-color: green;
+  color: white;
+}
+
+.HighlightFrame {
+  border: 2px solid #fbcb09;
+  background: white;
+  color: #c77405;
+  width: 100%;
+  height: 100%;
+  left: -2px;
+  top: -2px;
+}
+
+.HighlightBadgePlaceholder {
+  right: 0px;
+  top: 45px;
+}
+
+.HighlightBadge {
+  -moz-border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -khtml-border-radius: 16px;
+  border-radius: 16px;
+  font-size: 18px;
+  line-height: 18px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: Arial;
+  padding: 4px;
+  float: left;
+  width: 16px;
+  height: 16px;
+  top: 0px;
+  left: -10px;
+  z-index: 1000;
+  background-color: green;
+  color: white;
+}
+
+.DepartmentTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.DepartmentTemplate .DepartmentTitleBackground {
+  top: 2px;
+  left: 2px;
+  width: 196px;
+  height: 25px;
+}
+
+.DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle {
+  top: 3px;
+  left: 3px;
+  width: 188px;
+  height: 23px;
+  text-align: center;
+}
+
+.ContactTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.ContactTemplate .ContactTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 20px;
+}
+
+.ContactTemplate .ContactTitleBackground .ContactTitle {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 16px;
+}
+
+.ContactTemplate .ContactPhotoFrame {
+  top: 26px;
+  left: 2px;
+  width: 50px;
+  height: 60px;
+}
+
+.ContactTemplate .ContactPhotoFrame .ContactPhoto {
+  height: 60px;
+  width: 50px;
+}
+
+.ContactTemplate .ContactPhone {
+  overflow: hidden;
+  // top: 26px;
+  top: 34px !important;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.ContactTemplate .ContactEmail {
+  overflow: hidden;
+  top: 44px;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.ContactTemplate .ContactDescription {
+  overflow: hidden;
+  top: 62px;
+  left: 56px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.ContactTemplate .ContactLabel {
+  text-align: center;
+  top: -20px;
+  left: 2px;
+  right: 2px;
+  height: 16px;
+}
+
+.ContactTemplate .ContactCheckboxElement {
+  overflow: hidden;
+  height: 16x;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 12px;
+  z-index: 100;
+}
+
+.ContactTemplate .ContactCheckboxElement .ContactCheckboxCaption {
+  overflow: hidden;
+  padding-bottom: 2px;
+}
+
+.InLayoutLabel {
+  text-align: center;
+}
+
+.PERTTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.PERTTemplate .PERTTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 20px;
+}
+
+.PERTTemplate .PERTTitleBackground .PERTTitle {
+  top: 2px;
+  left: 2px;
+  height: 18px;
+  width: 88px;
+}
+
+.PERTTemplate .PERTETTitle {
+  overflow: hidden;
+  top: 20px;
+  left: 0px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTLTTitle {
+  overflow: hidden;
+  top: 20px;
+  left: 50px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTET {
+  overflow: hidden;
+  top: 40px;
+  left: 0px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTLT {
+  overflow: hidden;
+  top: 40px;
+  left: 50px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTVerticalLine {
+  line-height: 0px;
+  border-left: 1px solid gray;
+  top: 24px;
+  left: 50px;
+  width: 1px;
+  height: 32px;
+}
+
+.PERTTemplate .PERTHorizontalLine {
+  line-height: 0px;
+  border-top: 1px solid gray;
+  top: 40px;
+  left: 4px;
+  width: 92px;
+  height: 1px;
+}
+
+.xlTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.xlTemplate .xlTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 20px;
+}
+
+.xlTemplate .xlTitleBackground .xlTitle {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 16px;
+}
+
+.xlTemplate .xlPhotoFrame {
+  top: 26px;
+  left: 2px;
+  width: 50px;
+  height: 60px;
+}
+
+.xlTemplate .xlPhotoFrame .Photo {
+  height: 60px;
+  width: 50px;
+}
+
+.xlTemplate .xlPhone {
+  overflow: hidden;
+  top: 26px;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.xlTemplate .xlEmail {
+  overflow: hidden;
+  top: 44px;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.xlTemplate .xlDescription {
+  overflow: hidden;
+  top: 62px;
+  left: 56px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.lgTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.lgTemplate .lgTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 18px;
+}
+
+.lgTemplate .lgTitleBackground .lgTitle {
+  top: 2px;
+  left: 2px;
+  width: 152px;
+  height: 14px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lgTemplate .lgPhotoFrame {
+  top: 22px;
+  left: 2px;
+  width: 50px;
+  height: 60px;
+}
+
+.lgTemplate .lgPhotoFrame .lgPhoto {
+  height: 60px;
+  width: 50px;
+}
+
+.lgTemplate .lgEmail {
+  overflow: hidden;
+  top: 22px;
+  left: 56px;
+  width: 98px;
+  height: 13px;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lgTemplate .lgDescription {
+  overflow: hidden;
+  top: 37px;
+  left: 56px;
+  width: 98px;
+  font-size: 11px;
+}
+
+.mdTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.mdTemplate .mdPhotoFrame {
+  top: 2px;
+  left: 2px;
+  width: 25px;
+  height: 30px;
+}
+
+.mdTemplate .mdPhotoFrame .mdPhoto {
+  width: 25px;
+  height: 30px;
+}
+
+.mdTemplate .mdTitle {
+  top: 2px;
+  left: 31px;
+  width: 98px;
+  height: 14px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mdTemplate .mdDescription {
+  overflow: hidden;
+  top: 18px;
+  left: 31px;
+  width: 98px;
+  height: 25px;
+  font-size: 11px;
+}
+
+.smTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.smTemplate .smTitle {
+  top: 2px;
+  left: 2px;
+  width: 98px;
+  height: 14px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.smTemplate .smDescription {
+  overflow: hidden;
+  top: 18px;
+  left: 2px;
+  width: 98px;
+  height: 12px;
+  font-size: 10px;
+}
+
+.xsTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.xsTemplate .xsTitle {
+  top: 2px;
+  left: 2px;
+  width: 80px;
+  height: 14px;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.legendDeleteCleanupText {
+  padding: 0px 0px 0px 8px;
+}
+
+.CleanUpIcon {
+  border: 2px solid #000000a8;
+  border-radius: 3px;
+}
+
+.DeleteIcon {
+  padding: 1px 2px;
+  border: 2px solid #000000a8;
+  border-radius: 3px;
+}
+
+label.arrow_label:before {
+  margin: -2px 1em 0 -2em !important;
+  font-size: 18px !important;
+}
+
+.DeleteIcontree {
+  padding: 1px 2px;
+  border: 2px solid #000000a8;
+  border-radius: 3px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #BA0C2F !important;
+  border-color: #BA0C2F !important;
+}
+
+.btn-danger:hover {
+  color: #fff;
+  background-color: #D20E35 !important;
+  border-color: #D20E35 !important;
+}
+
+.ContactTemplate .ContactPhone {
+  overflow: inherit !important;
+}
+
+.modalWidthUsagepopup {
+  width: 90%;
+}
+
+.card-header-action a i:hover {
+  font-size: 25px;
+  color: #4AB7DE;
+}
+
+.jexcel_pagination_dropdown:hover {
+  color: #fff !important;
+  background-color: #4AB7DE !important;
+  border-color: #4AB7DE !important;
+  margin-left: 5px;
+  margin-top: -2px;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+// .fuNodeAutocomplete .MuiInputBase-fullWidth {
+//     width: 78% !important;
+// }
+
+.listtreetable .jexcel>thead>tr>td:nth-child(4) {
+  text-align: center !important;
+}
+
+.listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(4).readonly {
+  text-align: center !important;
+}
+
 .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td.readonly {
   cursor: pointer;
 }
+
 .TreeTemplateTable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td.readonly {
   cursor: pointer;
 }
-.boxContactTemplate{
-    opacity: 1!important;
-    background-color: #fefefe!important;
-    border: 1px solid transparent;
-    // border-bottom-color: #ddd;
-    // border-left-color: #ddd;
-    // border-right-color: #ddd;
-    border-radius: 1px!important;
-    box-shadow: 0 4px 7px #0000001f !important;
-    // box-shadow: 0 8px 16px #0000001f!important;
-    cursor: pointer;
+
+.boxContactTemplate {
+  opacity: 1 !important;
+  background-color: #fefefe !important;
+  border: 1px solid transparent;
+  // border-bottom-color: #ddd;
+  // border-left-color: #ddd;
+  // border-right-color: #ddd;
+  border-radius: 1px !important;
+  box-shadow: 0 4px 7px #0000001f !important;
+  // box-shadow: 0 8px 16px #0000001f!important;
+  cursor: pointer;
 }
 
 .TemplateItem,
@@ -5822,34 +6033,179 @@ label.arrow_label:before {
   background-color: orange;
 }
 
+.TemplateItem,
+.InfoTemplate,
+.CursorFrame,
+.CursorBadge,
+.HighlightFrame,
+.HighlightBadgePlaceholder,
+.HighlightBadge,
+.DepartmentTemplate,
+.DepartmentTemplate .DepartmentTitleBackground,
+.DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle,
+.ContactTemplate,
+.ContactTemplate .ContactTitleBackground,
+.ContactTemplate .ContactTitleBackground .ContactTitle,
+.ContactTemplate .ContactPhotoFrame,
+.ContactTemplate .ContactPhone,
+.ContactTemplate .ContactEmail,
+.ContactTemplate .ContactDescription,
+.ContactTemplate .ContactLabel,
+.ContactTemplate .ContactCheckboxElement,
+.ContactTemplate .ContactCheckboxElement .ContactCheckboxCaption,
+.PERTTemplate,
+.PERTTemplate .PERTTitleBackground,
+.PERTTemplate .PERTTitleBackground .PERTTitle,
+.PERTTemplate .PERTETTitle,
+.PERTTemplate .PERTLTTitle,
+.PERTTemplate .PERTET,
+.PERTTemplate .PERTLT,
+.PERTTemplate .PERTVerticalLine,
+.PERTTemplate .PERTHorizontalLine,
+.xlTemplate,
+.xlTemplate .xlTitleBackground,
+.xlTemplate .xlTitleBackground .xlTitle,
+.xlTemplate .xlPhotoFrame,
+.xlTemplate .xlPhone,
+.xlTemplate .xlEmail,
+.xlTemplate .xlDescription,
+.lgTemplate,
+.lgTemplate .lgTitleBackground,
+.lgTemplate .lgTitleBackground .lgTitle,
+.lgTemplate .lgPhotoFrame,
+.lgTemplate .lgEmail,
+.lgTemplate .lgDescription,
+.mdTemplate,
+.mdTemplate .mdPhotoFrame,
+.mdTemplate .mdTitle,
+.mdTemplate .mdDescription,
+.smTemplate,
+.smTemplate .smTitle,
+.smTemplate .smDescription,
+.xsTemplate,
+.xsTemplate .xsTitle {
+  position: absolute;
+  font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  box-sizing: content-box;
+}
+
 .problemList-yellow {
   background-color: yellow;
 }
 
-.pipelineimportfile {
-  margin-top: -10px;
+.TemplateCornerAll,
+.InfoTemplate,
+.CursorFrame,
+.HighlightFrame,
+.DepartmentTemplate,
+.DepartmentTemplate .DepartmentTitleBackground,
+.ContactTemplate,
+.ContactTemplate .ContactTitleBackground,
+.PERTTemplate,
+.PERTTemplate .PERTTitleBackground,
+.xlTemplate,
+.xlTemplate .xlTitleBackground,
+.lgTemplate,
+.lgTemplate .lgTitleBackground,
+.mdTemplate,
+.smTemplate,
+.xsTemplate {
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
 }
 
-.custom-file-input-btn {
-  color: #fff !important;
-  background-color: #20a8d8 !important;
-  border-radius: 0px 5px 5px 0px;
+.TemplateItemFrame,
+.InfoTemplate,
+.DepartmentTemplate,
+.DepartmentTemplate .DepartmentTitleBackground,
+.ContactTemplate,
+.ContactTemplate .ContactTitleBackground,
+.PERTTemplate,
+.PERTTemplate .PERTTitleBackground,
+.xlTemplate,
+.xlTemplate .xlTitleBackground,
+.lgTemplate,
+.lgTemplate .lgTitleBackground,
+.mdTemplate,
+.smTemplate,
+.xsTemplate {
+  border: 1px solid #dddddd;
+  background: #eeeeee;
+  color: #333333;
 }
 
-.problemListSelectField {
-  width: 165px;
+.TemplateTitle,
+.DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle,
+.ContactTemplate .ContactTitleBackground .ContactTitle,
+.PERTTemplate .PERTTitleBackground .PERTTitle,
+.xlTemplate .xlTitleBackground .xlTitle,
+.lgTemplate .lgTitleBackground .lgTitle {
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  // white-space: nowrap;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 16px;
+  color: white;
+  padding: 0;
 }
 
-.greenColor {
-  color: #118b70;
+.TemplatePhotoFrame,
+.ContactTemplate .ContactPhotoFrame,
+.xlTemplate .xlPhotoFrame,
+.lgTemplate .lgPhotoFrame,
+.mdTemplate .mdPhotoFrame {
+  border: 1px solid #cccccc;
+  background: #f6f6f6;
+  color: #1c94c4;
 }
 
-.redColor {
-  color: #BA0C2F;
+.InfoTemplate {
+  text-align: center;
+  font-size: 14px;
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
 }
 
-.jexcel_filter {
-  border-top: 0px !important;
+.BadgeSymbol {
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -khtml-border-radius: 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: Arial;
+  padding: 0px;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background-color: #BA0C2F;
+  color: white;
+}
+
+.CursorFrame {
+  border: 2px solid #fbd850;
+  background: #ffffff;
+  color: #eb8f00;
+  width: 100%;
+  height: 100%;
+  left: -2px;
+  top: -2px;
 }
 
 .TemplateTitleBg {
@@ -5888,6 +6244,565 @@ label.arrow_label:before {
   left: 0 !important;
   right: 0 !important;
   text-align: center;
+}
+
+.jexcel_content {
+  box-shadow: none !important;
+}
+
+.CursorBadge {
+  -moz-border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -khtml-border-radius: 16px;
+  border-radius: 16px;
+  font-size: 18px;
+  line-height: 18px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: Arial;
+  padding: 4px;
+  float: left;
+  width: 16px;
+  height: 16px;
+  top: 45px;
+  left: 114px;
+  z-index: 1000;
+  background-color: green;
+  color: white;
+}
+
+.HighlightFrame {
+  border: 2px solid #fbcb09;
+  background: white;
+  color: #c77405;
+  width: 100%;
+  height: 100%;
+  left: -2px;
+  top: -2px;
+}
+
+.HighlightBadgePlaceholder {
+  right: 0px;
+  top: 45px;
+}
+
+.HighlightBadge {
+  -moz-border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -khtml-border-radius: 16px;
+  border-radius: 16px;
+  font-size: 18px;
+  line-height: 18px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: Arial;
+  padding: 4px;
+  float: left;
+  width: 16px;
+  height: 16px;
+  top: 0px;
+  left: -10px;
+  z-index: 1000;
+  background-color: green;
+  color: white;
+}
+
+.DepartmentTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.DepartmentTemplate .DepartmentTitleBackground {
+  top: 2px;
+  left: 2px;
+  width: 196px;
+  height: 25px;
+}
+
+.DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle {
+  top: 3px;
+  left: 3px;
+  width: 188px;
+  height: 23px;
+  text-align: center;
+}
+
+.ContactTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.ContactTemplate .ContactTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 20px;
+}
+
+.ContactTemplate .ContactTitleBackground .ContactTitle {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 16px;
+}
+
+.ContactTemplate .ContactPhotoFrame {
+  top: 26px;
+  left: 2px;
+  width: 50px;
+  height: 60px;
+}
+
+.ContactTemplate .ContactPhotoFrame .ContactPhoto {
+  height: 60px;
+  width: 50px;
+}
+
+.ContactTemplate .ContactPhone {
+  overflow: hidden;
+  // top: 26px;
+  top: 34px !important;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.ContactTemplate .ContactEmail {
+  overflow: hidden;
+  top: 44px;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.ContactTemplate .ContactDescription {
+  overflow: hidden;
+  top: 62px;
+  left: 56px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.ContactTemplate .ContactLabel {
+  text-align: center;
+  top: -20px;
+  left: 2px;
+  right: 2px;
+  height: 16px;
+}
+
+.ContactTemplate .ContactCheckboxElement {
+  overflow: hidden;
+  height: 16x;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 12px;
+  z-index: 100;
+}
+
+.ContactTemplate .ContactCheckboxElement .ContactCheckboxCaption {
+  overflow: hidden;
+  padding-bottom: 2px;
+}
+
+.InLayoutLabel {
+  text-align: center;
+}
+
+.PERTTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.PERTTemplate .PERTTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 20px;
+}
+
+.PERTTemplate .PERTTitleBackground .PERTTitle {
+  top: 2px;
+  left: 2px;
+  height: 18px;
+  width: 88px;
+}
+
+.PERTTemplate .PERTETTitle {
+  overflow: hidden;
+  top: 20px;
+  left: 0px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTLTTitle {
+  overflow: hidden;
+  top: 20px;
+  left: 50px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTET {
+  overflow: hidden;
+  top: 40px;
+  left: 0px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTLT {
+  overflow: hidden;
+  top: 40px;
+  left: 50px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTVerticalLine {
+  line-height: 0px;
+  border-left: 1px solid gray;
+  top: 24px;
+  left: 50px;
+  width: 1px;
+  height: 32px;
+}
+
+.PERTTemplate .PERTHorizontalLine {
+  line-height: 0px;
+  border-top: 1px solid gray;
+  top: 40px;
+  left: 4px;
+  width: 92px;
+  height: 1px;
+}
+
+.xlTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.xlTemplate .xlTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 20px;
+}
+
+.xlTemplate .xlTitleBackground .xlTitle {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 16px;
+}
+
+.xlTemplate .xlPhotoFrame {
+  top: 26px;
+  left: 2px;
+  width: 50px;
+  height: 60px;
+}
+
+.xlTemplate .xlPhotoFrame .Photo {
+  height: 60px;
+  width: 50px;
+}
+
+.xlTemplate .xlPhone {
+  overflow: hidden;
+  top: 26px;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.xlTemplate .xlEmail {
+  overflow: hidden;
+  top: 44px;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.xlTemplate .xlDescription {
+  overflow: hidden;
+  top: 62px;
+  left: 56px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.lgTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.lgTemplate .lgTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 18px;
+}
+
+.lgTemplate .lgTitleBackground .lgTitle {
+  top: 2px;
+  left: 2px;
+  width: 152px;
+  height: 14px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lgTemplate .lgPhotoFrame {
+  top: 22px;
+  left: 2px;
+  width: 50px;
+  height: 60px;
+}
+
+.lgTemplate .lgPhotoFrame .lgPhoto {
+  height: 60px;
+  width: 50px;
+}
+
+.lgTemplate .lgEmail {
+  overflow: hidden;
+  top: 22px;
+  left: 56px;
+  width: 98px;
+  height: 13px;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lgTemplate .lgDescription {
+  overflow: hidden;
+  top: 37px;
+  left: 56px;
+  width: 98px;
+  font-size: 11px;
+}
+
+.mdTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.mdTemplate .mdPhotoFrame {
+  top: 2px;
+  left: 2px;
+  width: 25px;
+  height: 30px;
+}
+
+.mdTemplate .mdPhotoFrame .mdPhoto {
+  width: 25px;
+  height: 30px;
+}
+
+.mdTemplate .mdTitle {
+  top: 2px;
+  left: 31px;
+  width: 98px;
+  height: 14px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mdTemplate .mdDescription {
+  overflow: hidden;
+  top: 18px;
+  left: 31px;
+  width: 98px;
+  height: 25px;
+  font-size: 11px;
+}
+
+.smTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.smTemplate .smTitle {
+  top: 2px;
+  left: 2px;
+  width: 98px;
+  height: 14px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.smTemplate .smDescription {
+  overflow: hidden;
+  top: 18px;
+  left: 2px;
+  width: 98px;
+  height: 12px;
+  font-size: 10px;
+}
+
+.xsTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.xsTemplate .xsTitle {
+  top: 2px;
+  left: 2px;
+  width: 80px;
+  height: 14px;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.legendDeleteCleanupText {
+  padding: 0px 0px 0px 8px;
+}
+
+.CleanUpIcon {
+  border: 2px solid #000000a8;
+  border-radius: 3px;
+}
+
+.DeleteIcon {
+  padding: 1px 2px;
+  border: 2px solid #000000a8;
+  border-radius: 3px;
+}
+
+label.arrow_label:before {
+  margin: -2px 1em 0 -2em !important;
+  font-size: 18px !important;
+}
+
+.DeleteIcontree {
+  padding: 1px 2px;
+  border: 2px solid #000000a8;
+  border-radius: 3px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #BA0C2F !important;
+  border-color: #BA0C2F !important;
+}
+
+.btn-danger:hover {
+  color: #fff;
+  background-color: #D20E35 !important;
+  border-color: #D20E35 !important;
+}
+
+.ContactTemplate .ContactPhone {
+  overflow: inherit !important;
+}
+
+.modalWidthUsagepopup {
+  width: 90%;
+}
+
+.card-header-action a i:hover {
+  font-size: 25px;
+  color: #4AB7DE;
+}
+
+.jexcel_pagination_dropdown:hover {
+  color: #fff !important;
+  background-color: #4AB7DE !important;
+  border-color: #4AB7DE !important;
+  margin-left: 5px;
+  margin-top: -2px;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+// .fuNodeAutocomplete .MuiInputBase-fullWidth {
+//     width: 78% !important;
+// }
+
+.listtreetable .jexcel>thead>tr>td:nth-child(4) {
+  text-align: center !important;
+}
+
+.listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(4).readonly {
+  text-align: center !important;
+}
+
+.problemList-yellow {
+  background-color: yellow;
+}
+
+.pipelineimportfile {
+  margin-top: -10px;
+}
+
+.custom-file-input-btn {
+  color: #fff !important;
+  background-color: #20a8d8 !important;
+  border-radius: 0px 5px 5px 0px;
+}
+
+.problemListSelectField {
+  width: 165px;
+}
+
+.greenColor {
+  color: #118b70;
+}
+
+.redColor {
+  color: #BA0C2F;
+}
+
+.jexcel_filter {
+  border-top: 0px !important;
 }
 
 .jexcel_content {
@@ -5962,6 +6877,44 @@ label.arrow_label:before {
   height: 34px;
   margin-top: -45px;
   margin-left: -39px;
+}
+
+.TemplateTitleBg {
+  background: #a7c6ed !important;
+  // background: #eee!important;
+  border: none !important;
+  border-radius: 0px !important;
+  padding: 0px 0px 1px 0px !important;
+  top: 0px !important;
+  left: 0px !important;
+  right: 0px !important;
+  height: 33px !important;
+}
+
+.TemplateTitleBgblue {
+  background: #002f6c !important;
+  // background: #eee!important;
+  border: none !important;
+  border-radius: 0px !important;
+  padding: 0px 0px 1px 0px !important;
+  top: 0px !important;
+  left: 0px !important;
+  right: 0px !important;
+  height: 33px !important;
+}
+
+.TitleColorWhite {
+  color: #fff !important;
+  font-weight: bold !important;
+  margin-left: 1px;
+}
+
+.ContactPhoneValue {
+  color: rgb(0, 0, 0);
+  margin-top: 0px;
+  left: 0 !important;
+  right: 0 !important;
+  text-align: center;
 }
 
 .img-right {
@@ -6101,6 +7054,21 @@ label.arrow_label:before {
 }
 
 .shipmentDataEntryTable .jexcel_content {
+  max-height: calc(100vh - 213px) !important;
+  overflow: scroll !important;
+}
+
+.consumptionDataEntryTable .jss_content {
+  max-height: calc(100vh - 262px) !important;
+  overflow: scroll !important;
+}
+
+.inventoryDataEntryTable .jss_content {
+  max-height: calc(100vh - 230px) !important;
+  overflow: scroll !important;
+}
+
+.shipmentDataEntryTable .jss_content {
   max-height: calc(100vh - 213px) !important;
   overflow: scroll !important;
 }
@@ -7470,13 +8438,13 @@ label.arrow_label:before {
 //   cursor: pointer;
 // }
 .TreeIconStyle {
-  width: 23px;
-  height: 23px;
+  // width: 23px;
+  // height: 23px;
   color: #002f6c;
   outline: none !important;
   border: none !important;
   background: none;
-  padding-top: 6px;
+  padding-top: 1px;
   margin-left: -2px;
 }
 
@@ -8688,30 +9656,597 @@ legend.scheduler-border {
 
   .CreateTreeTemplateHeight {
     min-height: calc(100vh - 427px) !important;
-
-  }
-
-  .Secondcolum {
-    width: 150px;
-    left: 51px;
-    z-index: 3;
-    min-width: 150px;
-    max-width: 150px;
-  }
-
-  .Thirdcolum {
-    left: 200px;
-    z-index: 4;
-    /* z-index: 999; */
-    width: 200px;
-    /* position: sticky; */
-    /* left: 210px; */
-    /* z-index: 4; */
-    min-width: 200px;
-    max-width: 200px;
-    /* left: 200px; */
   }
 }
+
+
+.TemplateItemFrame,
+.InfoTemplate,
+.DepartmentTemplate,
+.DepartmentTemplate .DepartmentTitleBackground,
+.ContactTemplate,
+.ContactTemplate .ContactTitleBackground,
+.PERTTemplate,
+.PERTTemplate .PERTTitleBackground,
+.xlTemplate,
+.xlTemplate .xlTitleBackground,
+.lgTemplate,
+.lgTemplate .lgTitleBackground,
+.mdTemplate,
+.smTemplate,
+.xsTemplate {
+  border: 1px solid #dddddd;
+  background: #eeeeee;
+  color: #333333;
+}
+
+.TemplateTitle,
+.DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle,
+.ContactTemplate .ContactTitleBackground .ContactTitle,
+.PERTTemplate .PERTTitleBackground .PERTTitle,
+.xlTemplate .xlTitleBackground .xlTitle,
+.lgTemplate .lgTitleBackground .lgTitle {
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  // white-space: nowrap;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 16px;
+  color: white;
+  padding: 0;
+}
+
+.TemplatePhotoFrame,
+.ContactTemplate .ContactPhotoFrame,
+.xlTemplate .xlPhotoFrame,
+.lgTemplate .lgPhotoFrame,
+.mdTemplate .mdPhotoFrame {
+  border: 1px solid #cccccc;
+  background: #f6f6f6;
+  color: #1c94c4;
+}
+
+.InfoTemplate {
+  text-align: center;
+  font-size: 14px;
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.BadgeSymbol {
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -khtml-border-radius: 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: Arial;
+  padding: 0px;
+  float: left;
+  width: 20px;
+  height: 20px;
+  background-color: #BA0C2F;
+  color: white;
+}
+
+.CursorFrame {
+  border: 2px solid #fbd850;
+  background: #ffffff;
+  color: #eb8f00;
+  width: 100%;
+  height: 100%;
+  left: -2px;
+  top: -2px;
+}
+
+.CursorBadge {
+  -moz-border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -khtml-border-radius: 16px;
+  border-radius: 16px;
+  font-size: 18px;
+  line-height: 18px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: Arial;
+  padding: 4px;
+  float: left;
+  width: 16px;
+  height: 16px;
+  top: 45px;
+  left: 114px;
+  z-index: 1000;
+  background-color: green;
+  color: white;
+}
+
+.HighlightFrame {
+  border: 2px solid #fbcb09;
+  background: white;
+  color: #c77405;
+  width: 100%;
+  height: 100%;
+  left: -2px;
+  top: -2px;
+}
+
+.HighlightBadgePlaceholder {
+  right: 0px;
+  top: 45px;
+}
+
+.HighlightBadge {
+  -moz-border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -khtml-border-radius: 16px;
+  border-radius: 16px;
+  font-size: 18px;
+  line-height: 18px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: bold;
+  font-family: Arial;
+  padding: 4px;
+  float: left;
+  width: 16px;
+  height: 16px;
+  top: 0px;
+  left: -10px;
+  z-index: 1000;
+  background-color: green;
+  color: white;
+}
+
+.DepartmentTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.DepartmentTemplate .DepartmentTitleBackground {
+  top: 2px;
+  left: 2px;
+  width: 196px;
+  height: 25px;
+}
+
+.DepartmentTemplate .DepartmentTitleBackground .DepartmentTitle {
+  top: 3px;
+  left: 3px;
+  width: 188px;
+  height: 23px;
+  text-align: center;
+}
+
+.ContactTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.ContactTemplate .ContactTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 20px;
+}
+
+.ContactTemplate .ContactTitleBackground .ContactTitle {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 16px;
+}
+
+.ContactTemplate .ContactPhotoFrame {
+  top: 26px;
+  left: 2px;
+  width: 50px;
+  height: 60px;
+}
+
+.ContactTemplate .ContactPhotoFrame .ContactPhoto {
+  height: 60px;
+  width: 50px;
+}
+
+.ContactTemplate .ContactPhone {
+  overflow: hidden;
+  // top: 26px;
+  top: 34px !important;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.ContactTemplate .ContactEmail {
+  overflow: hidden;
+  top: 44px;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.ContactTemplate .ContactDescription {
+  overflow: hidden;
+  top: 62px;
+  left: 56px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.ContactTemplate .ContactLabel {
+  text-align: center;
+  top: -20px;
+  left: 2px;
+  right: 2px;
+  height: 16px;
+}
+
+.ContactTemplate .ContactCheckboxElement {
+  overflow: hidden;
+  height: 16x;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 12px;
+  z-index: 100;
+}
+
+.ContactTemplate .ContactCheckboxElement .ContactCheckboxCaption {
+  overflow: hidden;
+  padding-bottom: 2px;
+}
+
+.InLayoutLabel {
+  text-align: center;
+}
+
+.PERTTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.PERTTemplate .PERTTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 20px;
+}
+
+.PERTTemplate .PERTTitleBackground .PERTTitle {
+  top: 2px;
+  left: 2px;
+  height: 18px;
+  width: 88px;
+}
+
+.PERTTemplate .PERTETTitle {
+  overflow: hidden;
+  top: 20px;
+  left: 0px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTLTTitle {
+  overflow: hidden;
+  top: 20px;
+  left: 50px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTET {
+  overflow: hidden;
+  top: 40px;
+  left: 0px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTLT {
+  overflow: hidden;
+  top: 40px;
+  left: 50px;
+  width: 50px;
+  height: 20px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.PERTTemplate .PERTVerticalLine {
+  line-height: 0px;
+  border-left: 1px solid gray;
+  top: 24px;
+  left: 50px;
+  width: 1px;
+  height: 32px;
+}
+
+.PERTTemplate .PERTHorizontalLine {
+  line-height: 0px;
+  border-top: 1px solid gray;
+  top: 40px;
+  left: 4px;
+  width: 92px;
+  height: 1px;
+}
+
+.xlTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.xlTemplate .xlTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 20px;
+}
+
+.xlTemplate .xlTitleBackground .xlTitle {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 16px;
+}
+
+.xlTemplate .xlPhotoFrame {
+  top: 26px;
+  left: 2px;
+  width: 50px;
+  height: 60px;
+}
+
+.xlTemplate .xlPhotoFrame .Photo {
+  height: 60px;
+  width: 50px;
+}
+
+.xlTemplate .xlPhone {
+  overflow: hidden;
+  top: 26px;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.xlTemplate .xlEmail {
+  overflow: hidden;
+  top: 44px;
+  left: 56px;
+  height: 16px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.xlTemplate .xlDescription {
+  overflow: hidden;
+  top: 62px;
+  left: 56px;
+  right: 2px;
+  bottom: 2px;
+  font-size: 12px;
+}
+
+.lgTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.lgTemplate .lgTitleBackground {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 18px;
+}
+
+.lgTemplate .lgTitleBackground .lgTitle {
+  top: 2px;
+  left: 2px;
+  width: 152px;
+  height: 14px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lgTemplate .lgPhotoFrame {
+  top: 22px;
+  left: 2px;
+  width: 50px;
+  height: 60px;
+}
+
+.lgTemplate .lgPhotoFrame .lgPhoto {
+  height: 60px;
+  width: 50px;
+}
+
+.lgTemplate .lgEmail {
+  overflow: hidden;
+  top: 22px;
+  left: 56px;
+  width: 98px;
+  height: 13px;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lgTemplate .lgDescription {
+  overflow: hidden;
+  top: 37px;
+  left: 56px;
+  width: 98px;
+  font-size: 11px;
+}
+
+.mdTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.mdTemplate .mdPhotoFrame {
+  top: 2px;
+  left: 2px;
+  width: 25px;
+  height: 30px;
+}
+
+.mdTemplate .mdPhotoFrame .mdPhoto {
+  width: 25px;
+  height: 30px;
+}
+
+.mdTemplate .mdTitle {
+  top: 2px;
+  left: 31px;
+  width: 98px;
+  height: 14px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mdTemplate .mdDescription {
+  overflow: hidden;
+  top: 18px;
+  left: 31px;
+  width: 98px;
+  height: 25px;
+  font-size: 11px;
+}
+
+.smTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.smTemplate .smTitle {
+  top: 2px;
+  left: 2px;
+  width: 98px;
+  height: 14px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.smTemplate .smDescription {
+  overflow: hidden;
+  top: 18px;
+  left: 2px;
+  width: 98px;
+  height: 12px;
+  font-size: 10px;
+}
+
+.xsTemplate {
+  width: 100%;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+}
+
+.xsTemplate .xsTitle {
+  top: 2px;
+  left: 2px;
+  width: 80px;
+  height: 14px;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.legendDeleteCleanupText {
+  padding: 0px 0px 0px 8px;
+}
+
+.CleanUpIcon {
+  border: 2px solid #000000a8;
+  border-radius: 3px;
+}
+
+.DeleteIcon {
+  padding: 1px 2px;
+  border: 2px solid #000000a8;
+  border-radius: 3px;
+}
+
+label.arrow_label:before {
+  margin: -2px 1em 0 -2em !important;
+  font-size: 18px !important;
+}
+
+.DeleteIcontree {
+  padding: 1px 2px;
+  border: 2px solid #000000a8;
+  border-radius: 3px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #BA0C2F !important;
+  border-color: #BA0C2F !important;
+}
+
+.Secondcolum {
+  width: 150px;
+  left: 51px;
+  z-index: 3;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+.Thirdcolum {
+  left: 200px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px; */
+}
+
 
 .CreateTreeTemplateHeight {
   min-height: calc(100vh - 645px) !important;
@@ -8724,6 +10259,12 @@ legend.scheduler-border {
 
 .MarginTopMonthSelector {
   margin-top: -20px;
+}
+
+.Firstcolum1 {
+  width: 120px;
+  left: 0;
+  z-index: 3;
 }
 
 .MarginTopCreateTreeBtn {
@@ -9057,7 +10598,7 @@ legend.scheduler-border {
   color: #002f6c;
 }
 
-.infoIconStockStatus::after{
+.infoIconStockStatus::after {
   font-family: 'FontAwesome';
   content: '\f05a';
   position: relative;
@@ -9305,6 +10846,248 @@ legend.scheduler-border {
   padding-right: 33px !important;
 }
 
+.jexcel>tbody>tr>td.readonly.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: #BA0C2F !important;
+  font-weight: bold !important;
+}
+
+.jexcel>tbody>tr>td.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: red !important;
+  font-weight: bold !important;
+}
+
+.jexcel>tbody>tr>td.readonly.commitConflict {
+  background-color: yellow !important;
+}
+
+.jss>tbody>tr>td.historyBold {
+  font-weight: bold;
+  ;
+}
+
+.jexcel>tbody>tr>td.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel>tbody>tr>td.readonly.commitLocal {
+  background-color: #86cd99 !important;
+}
+
+.jexcel>tbody>tr>td.commitLocal {
+  background-color: #86cd99 !important;
+}
+
+.jexcel>tbody>tr>td.readonly.notLowestError {
+  color: #000000 !important;
+}
+
+.jexcel>tbody>tr>td.readonly.commitServer {
+  background-color: #e5edf5 !important;
+}
+
+.jexcel>tbody>tr>td.commitServer {
+  background-color: #e5edf5 !important;
+}
+
+.jss>tbody>tr>td.readonlyForecast {
+  background-color: #CFCDC9 !important;
+}
+
+.jexcel>tbody>tr>td.readonly.commitNoChange {
+  background-color: transparent !important;
+}
+
+.jss>tbody>tr>td.readonly.notSelectedForecast {
+  background-color: transparent !important;
+}
+
+.rightClickColors .jcontextmenu>div:nth-of-type(2) {
+  background-color: #86cd99;
+}
+
+.rightClickColors .jcontextmenu>div:nth-of-type(3) {
+  background-color: #e5edf5;
+}
+
+.RemoveStriped .jexcel_content .jexcel .draggable .jexcel_nested td:nth-child(4) {
+  background-color: #86cd99 !important;
+
+}
+
+.RemoveStriped .jexcel_content .jexcel .draggable .jexcel_nested td:nth-child(5) {
+  background-color: #e5edf5 !important;
+
+}
+
+.ERPLinkTable .jexcel {
+  width: unset !important;
+}
+
+.ARUMarginTop {
+  margin-top: -22px;
+}
+
+.Theadtablesticky {
+  position: sticky;
+  top: 0;
+}
+
+.fixTableHead1 {
+  // overflow-y: auto;
+  max-height: calc(100vh - 100px) !important;
+  overflow-x: auto;
+  border-top: 1px solid #c8ced3;
+}
+
+.fixTableHeadSupplyPlan {
+  max-height: calc(100vh - 300px) !important;
+  overflow: scroll;
+}
+
+.CleanUpSize {
+  width: 16px;
+  height: 16px;
+}
+
+.loadProgramHeight {
+  max-height: calc(100vh - 100px) !important;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.jexcel>tbody>tr>td.historyBold {
+  font-weight: bold;
+}
+
+.jss>tbody>tr>td.readonly.notSelectedForecast {
+  background-color: transparent !important;
+}
+
+.jexcelRedCell {
+  color: #BA0C2F !important;
+}
+
+.PUNodemarginTop {
+  margin-top: -65px;
+}
+
+.jexcel>tbody>tr>td.readonly.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: #BA0C2F !important;
+  font-weight: bold !important;
+}
+
+.jexcel>tbody>tr>td.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: red !important;
+  font-weight: bold !important;
+}
+
+.jexcel>tbody>tr>td.readonly.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel>tbody>tr>td.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel>tbody>tr>td.readonly.commitLocal {
+  background-color: #86cd99 !important;
+}
+
+.jexcel>tbody>tr>td.commitLocal {
+  background-color: #86cd99 !important;
+}
+
+.jexcel>tbody>tr>td.readonly.commitServer {
+  background-color: #e5edf5 !important;
+}
+
+.jexcel>tbody>tr>td.commitServer {
+  background-color: #e5edf5 !important;
+}
+
+.jexcel>tbody>tr>td.readonly.commitNoChange {
+  background-color: transparent !important;
+}
+
+.jexcel>tbody>tr>td.commitNoChange {
+  background-color: transparent !important;
+}
+
+.rightClickColors .jcontextmenu>div:nth-of-type(2) {
+  background-color: #86cd99;
+}
+
+.rightClickColors .jcontextmenu>div:nth-of-type(3) {
+  background-color: #e5edf5;
+}
+
+.ERPLinkTable .jexcel {
+  width: unset !important;
+}
+
+.formula-img-mr-showGuidance1 {
+  border: 1px solid #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.CleanUpSize {
+  width: 16px;
+  height: 16px;
+}
+
+.ProblemListTableBorder .jexcel>tbody>tr>td {
+  border-top: 1px solid #212721 !important;
+  border-left: 1px solid #212721 !important;
+  border-right: 1px solid transparent !important;
+  border-bottom: 1px solid transparent !important;
+  white-space: nowrap;
+  box-sizing: border-box;
+  padding: 4px;
+  line-height: 1em;
+  height: 23px;
+}
+
+.ProblemListTableBorder .jss>tbody>tr>td {
+  border-top: 1px solid #212721 !important;
+  border-left: 1px solid #212721 !important;
+  border-right: 1px solid transparent !important;
+  border-bottom: 1px solid transparent !important;
+  white-space: nowrap;
+  box-sizing: border-box;
+  padding: 4px;
+  line-height: 1em;
+  height: 23px;
+}
+
+.ProblemListDashboardBorder .table-borderedproblemListDashboar th,
+.table-borderedproblemListDashboar td {
+  // border: 1px solid #222127;
+  // border-top: 1px solid #212721!important;
+  // border-left: 1px solid #212721!important;
+  border-right: 1px solid #212721 !important;
+  border-bottom: 1px solid #212721 !important;
+}
+
+.ProblemListDashboardBorder .table-borderedproblemListDashboar {
+  border-top: 1px solid #212721 !important;
+  border-left: 1px solid #212721;
+  border-collapse: inherit !important;
+  text-indent: initial !important;
+  border-spacing: 0px !important;
+}
+
+.ProblemListDashboardBorder .table th,
+.table td {
+  padding: 0.75rem;
+  vertical-align: top;
+  border-top: 0px solid #c8ced3 !important;
+}
+
 .compareAndSelect .jexcel>tbody>tr>td:nth-child(5) {
   text-align: left !important;
 }
@@ -9340,11 +11123,55 @@ legend.scheduler-border {
   font-size: 14px;
 }
 
+.ProblemListTableBorder .jss>thead>tr>td {
+  border-top: 1px solid #212721 !important;
+  border-left: 1px solid #212721 !important;
+}
+
+.ProblemListTableBorder .jss {
+  border-right: 1px solid #212721 !important;
+  border-bottom: 1px solid #212721 !important;
+}
+
+.EditStatusTable .jexcel>tbody>tr>td {
+  border-top: 1px solid #212721 !important;
+  border-left: 1px solid #212721 !important;
+  border-right: 1px solid transparent !important;
+  border-bottom: 1px solid transparent !important;
+  white-space: nowrap;
+  box-sizing: border-box;
+  padding: 4px;
+  line-height: 1em;
+  height: 23px;
+}
+
+.EditStatusTable .jexcel>thead>tr>td {
+  border-top: 1px solid #212721 !important;
+  border-left: 1px solid #212721 !important;
+}
+
+.EditStatusTable .jss>tbody>tr>td {
+  border-top: 1px solid #212721 !important;
+  border-left: 1px solid #212721 !important;
+  border-right: 1px solid transparent !important;
+  border-bottom: 1px solid transparent !important;
+  white-space: nowrap;
+  box-sizing: border-box;
+  padding: 4px;
+  line-height: 1em;
+  height: 23px;
+}
+
+.EditStatusTable .jss>thead>tr>td {
+  border-top: 1px solid #212721 !important;
+  border-left: 1px solid #212721 !important;
+}
+
 .jss>tbody>tr>td.readonly {
   color: #212721 !important;
 }
 
-.jss > tbody > tr > td.historyBold {
+.jss>tbody>tr>td.historyBold {
   font-weight: bold;
   ;
 }
@@ -9377,113 +11204,60 @@ legend.scheduler-border {
   color: #BA0C2F !important;
 }
 
-.formula-img-mr-showGuidance1 {
-  border: 1px solid #fff;
-  padding: 10px;
-  border-radius: 5px;
+.jexcel>tbody>tr>td.readonly.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: #BA0C2F !important;
+  font-weight: bold !important;
 }
 
-.CleanUpSize {
-  width: 16px;
-  height: 16px;
+.jexcel>tbody>tr>td.commitShipmentAlreadyLinkedToOtherPro {
+  background-color: yellow !important;
+  color: red !important;
+  font-weight: bold !important;
 }
 
-.ProblemListTableBorder .jexcel>tbody>tr>td {
-  border-top: 1px solid #212721 !important;
-  border-left: 1px solid #212721 !important;
-  border-right: 1px solid transparent !important;
-  ;
-  border-bottom: 1px solid transparent !important;
-  ;
-  white-space: nowrap;
-  box-sizing: border-box;
-  padding: 4px;
-  line-height: 1em;
-  height: 23px;
+.jexcel>tbody>tr>td.readonly.commitConflict {
+  background-color: yellow !important;
 }
 
-.ProblemListTableBorder .jss>tbody>tr>td {
-  border-top: 1px solid #212721 !important;
-  border-left: 1px solid #212721 !important;
-  border-right: 1px solid transparent !important;
-  ;
-  border-bottom: 1px solid transparent !important;
-  ;
-  white-space: nowrap;
-  box-sizing: border-box;
-  padding: 4px;
-  line-height: 1em;
-  height: 23px;
+.jexcel>tbody>tr>td.commitConflict {
+  background-color: yellow !important;
 }
 
-.ProblemListDashboardBorder .table-borderedproblemListDashboar th,
-.table-borderedproblemListDashboar td {
-  // border: 1px solid #222127;
-  // border-top: 1px solid #212721!important;
-  // border-left: 1px solid #212721!important;
-  border-right: 1px solid #212721 !important;
-  border-bottom: 1px solid #212721 !important;
+.jexcel>tbody>tr>td.readonly.commitLocal {
+  background-color: #86cd99 !important;
 }
 
-.ProblemListDashboardBorder .table-borderedproblemListDashboar {
-  border-top: 1px solid #212721 !important;
-  border-left: 1px solid #212721;
-  border-collapse: inherit !important;
-  text-indent: initial !important;
-  border-spacing: 0px !important;
+.jexcel>tbody>tr>td.commitLocal {
+  background-color: #86cd99 !important;
 }
 
-.ProblemListDashboardBorder .table th,
-.table td {
-  padding: 0.75rem;
-  vertical-align: top;
-  border-top: 0px solid #c8ced3 !important;
+.jexcel>tbody>tr>td.readonly.commitServer {
+  background-color: #e5edf5 !important;
 }
 
-.ProblemListTableBorder .jss>thead>tr>td {
-  border-top: 1px solid #212721 !important;
-  border-left: 1px solid #212721 !important;
+.jexcel>tbody>tr>td.commitServer {
+  background-color: #e5edf5 !important;
 }
 
-.ProblemListTableBorder .jss {
-  border-right: 1px solid #212721!important;
-  border-bottom:1px solid #212721!important;
+.jexcel>tbody>tr>td.readonly.commitNoChange {
+  background-color: transparent !important;
 }
 
-.EditStatusTable .jexcel>tbody>tr>td {
-  border-top: 1px solid #212721 !important;
-  border-left: 1px solid #212721 !important;
-  border-right: 1px solid transparent !important;
-  border-bottom: 1px solid transparent !important;
-  white-space: nowrap;
-  box-sizing: border-box;
-  padding: 4px;
-  line-height: 1em;
-  height: 23px;
+.jexcel>tbody>tr>td.commitNoChange {
+  background-color: transparent !important;
 }
 
-.EditStatusTable .jexcel>thead>tr>td {
-  border-top: 1px solid #212721 !important;
-  border-left: 1px solid #212721 !important;
+.rightClickColors .jcontextmenu>div:nth-of-type(2) {
+  background-color: #86cd99;
 }
 
-.EditStatusTable .jss>tbody>tr>td {
-  border-top: 1px solid #212721 !important;
-  border-left: 1px solid #212721 !important;
-  border-right: 1px solid transparent !important;
-  ;
-  border-bottom: 1px solid transparent !important;
-  ;
-  white-space: nowrap;
-  box-sizing: border-box;
-  padding: 4px;
-  line-height: 1em;
-  height: 23px;
+.rightClickColors .jcontextmenu>div:nth-of-type(3) {
+  background-color: #e5edf5;
 }
 
-.EditStatusTable .jss>thead>tr>td {
-  border-top: 1px solid #212721 !important;
-  border-left: 1px solid #212721 !important;
+.ERPLinkTable .jexcel {
+  width: unset !important;
 }
 
 .SupplierLeadTable .jexcel>thead {
@@ -9549,138 +11323,158 @@ legend.scheduler-border {
   left: 0px !important;
   right: 0px !important;
 }
-.jexcel > tbody > tr > td.readonly.commitShipmentAlreadyLinkedToOtherPro {
+
+.jexcel>tbody>tr>td.readonly.commitShipmentAlreadyLinkedToOtherPro {
   background-color: yellow !important;
-  color: #BA0C2F!important;
-  font-weight: bold!important;
+  color: #BA0C2F !important;
+  font-weight: bold !important;
 }
 
-.jexcel > tbody > tr > td.commitShipmentAlreadyLinkedToOtherPro {
+.jexcel>tbody>tr>td.commitShipmentAlreadyLinkedToOtherPro {
   background-color: yellow !important;
-  color: red!important;
-  font-weight: bold!important;
+  color: red !important;
+  font-weight: bold !important;
 }
 
-.jexcel > tbody > tr > td.readonly.commitConflict {
-  background-color: yellow !important;
-}
-
-.jexcel > tbody > tr > td.commitConflict {
+.jexcel>tbody>tr>td.readonly.commitConflict {
   background-color: yellow !important;
 }
 
-.jexcel > tbody > tr > td.readonly.commitLocal {
+.jexcel>tbody>tr>td.commitConflict {
+  background-color: yellow !important;
+}
+
+.jexcel>tbody>tr>td.readonly.commitLocal {
   background-color: #86cd99 !important;
 }
 
-.jexcel > tbody > tr > td.commitLocal {
+.jexcel>tbody>tr>td.commitLocal {
   background-color: #86cd99 !important;
 }
 
-.jexcel > tbody > tr > td.readonly.commitServer {
+.jexcel>tbody>tr>td.readonly.commitServer {
   background-color: #e5edf5 !important;
 }
 
-.jexcel > tbody > tr > td.commitServer {
+.jexcel>tbody>tr>td.commitServer {
   background-color: #e5edf5 !important;
 }
 
-.jexcel > tbody > tr > td.readonly.commitNoChange {
+.jexcel>tbody>tr>td.readonly.commitNoChange {
   background-color: transparent !important;
 }
 
-.jexcel > tbody > tr > td.commitNoChange {
+.jexcel>tbody>tr>td.commitNoChange {
   background-color: transparent !important;
 }
 
-.rightClickColors .jcontextmenu > div:nth-of-type(2){
+.rightClickColors .jcontextmenu>div:nth-of-type(2) {
   background-color: #86cd99;
 }
 
-.rightClickColors .jcontextmenu > div:nth-of-type(3){
+.rightClickColors .jcontextmenu>div:nth-of-type(3) {
   background-color: #e5edf5;
 }
-.ERPLinkTable .jexcel{
-  width: unset!important;
+
+.ERPLinkTable .jexcel {
+  width: unset !important;
 }
 
 .jss>tbody>tr>td.readonly.legendColor0 {
   background-color: #BA0C2F !important;
-  font-weight: bold!important;
-  color: #FFF!important;
+  font-weight: bold !important;
+  color: #FFF !important;
 }
 
 .jss>tbody>tr>td.legendColor0 {
   background-color: #BA0C2F !important;
-  font-weight: bold!important;
-  color: #FFF!important;
+  font-weight: bold !important;
+  color: #FFF !important;
 }
 
 .jss>tbody>tr>td.readonly.legendColor1 {
   background-color: #f48521 !important;
-  font-weight: bold!important;
-  color: #FFF!important;
+  font-weight: bold !important;
+  color: #FFF !important;
 }
 
 .jss>tbody>tr>td.legendColor1 {
   background-color: #f48521 !important;
-  font-weight: bold!important;
-  color: #FFF!important;
+  font-weight: bold !important;
+  color: #FFF !important;
 }
 
 .jss>tbody>tr>td.readonly.legendColor2 {
   background-color: #118b70 !important;
-  font-weight: bold!important;
-  color: #FFF!important;
+  font-weight: bold !important;
+  color: #FFF !important;
 }
 
 .jss>tbody>tr>td.legendColor2 {
   background-color: #118b70 !important;
-  font-weight: bold!important;
-  color: #FFF!important;
+  font-weight: bold !important;
+  color: #FFF !important;
 }
 
 .jss>tbody>tr>td.readonly.legendColor3 {
   background-color: #edb944 !important;
-  font-weight: bold!important;
-  color: #FFF!important;
+  font-weight: bold !important;
+  color: #FFF !important;
 }
 
 .jss>tbody>tr>td.legendColor3 {
   background-color: #edb944 !important;
-  font-weight: bold!important;
-  color: #FFF!important;
+  font-weight: bold !important;
+  color: #FFF !important;
 }
 
 .jss>tbody>tr>td.readonly.legendColor4 {
   background-color: #cfcdc9 !important;
-  font-weight: bold!important;
-  color: #000!important;
+  font-weight: bold !important;
+  color: #000 !important;
 }
 
 .jss>tbody>tr>td.legendColor4 {
   background-color: #cfcdc9 !important;
-  font-weight: bold!important;
-  color: #000!important;
+  font-weight: bold !important;
+  color: #000 !important;
 }
 
-.jss>thead>tr>td.InfoTrAsteriskTheadtrTdImage::after {
-  content: "";
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAASCAMAAACQGyXoAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAASlQTFRF////npu0f4q0j6bM7M/AVz5yHQBtIQB3RGC/37WZLwttNlq/usyzSwNtNB6s+f3///z1Sh5tLjiddIOTNQptPFjN+/er0wAezEHSv4N4KgCKg9n//dqPzQBn4c3I3wAv1pbe7XtVziS2gDtsQ2nh+v/JYQ1sU5Lv+sGP1B85wwBKywA6yxw6wwBE0kGtYRlsIA12SHrhRXPh7KGQ1h45wgAiwQBE02Cg/PX7cSRsSXzm/LNrxQAzzm6t3zZA1Y2n1AAoxACSoF9wIgB3a7L97qDe/v/y1wAd0mnf8cDv8LeYKQBtP13N3u37/v/65OW8UgBtNQCs7pqs+u76n2h0d3+rJgCBcrT4j2h6IQBtJQCBaqfp8eflb2KJMzFyIw12MTqKW3zD/P7/NhSGVQAAAMBJREFUeJxjYKAuYGRixiXFwsoGBOwcWCU5udjYuHl42dj4+DElBQSBGoWERYCkKFxQTFwCwpBkgwMpaYiQjKycvIKiEoipDBRWYVBVA0mrQ2Q1NLW0dXT1QEx9oKiBIUTWCGqwsYmpmbkFiGUJElaByFpBJK1tbO3sHRxBTCeErLMLVK+rm7sHgyeI5eXNxubj6+cfwMYWiPBJUDCUEQL0UGgo0Eth4diCIyIS7J+oaKyBxRATGxefkJiEXZJqAAAsLBYrUJJjawAAAABJRU5ErkJggg==')!important;
-  background-repeat: no-repeat!important;
-  background-position: top right!important;
-  width: 30px;
-  height: 25px;
-  position:absolute;
-  right: 0px;
-}
-
-.jss>thead>tr>td.InfoTrAsteriskTheadtrTdImage{
-  padding-right:16px!important;
-}
-.react-confirm-alert-button-group > .dangerColor {
+.react-confirm-alert-button-group>.dangerColor {
   background: #BA0C2F !important;
   font-weight: 550 !important;
   font-size: 14px !important;
 }
 
+.ModalBodyPadding {
+  padding: 0px !important;
+}
+
+.jss>thead>tr>td.InfoTrAsteriskTheadtrTdImage::after {
+  content: "";
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAASCAMAAACQGyXoAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAASlQTFRF////npu0f4q0j6bM7M/AVz5yHQBtIQB3RGC/37WZLwttNlq/usyzSwNtNB6s+f3///z1Sh5tLjiddIOTNQptPFjN+/er0wAezEHSv4N4KgCKg9n//dqPzQBn4c3I3wAv1pbe7XtVziS2gDtsQ2nh+v/JYQ1sU5Lv+sGP1B85wwBKywA6yxw6wwBE0kGtYRlsIA12SHrhRXPh7KGQ1h45wgAiwQBE02Cg/PX7cSRsSXzm/LNrxQAzzm6t3zZA1Y2n1AAoxACSoF9wIgB3a7L97qDe/v/y1wAd0mnf8cDv8LeYKQBtP13N3u37/v/65OW8UgBtNQCs7pqs+u76n2h0d3+rJgCBcrT4j2h6IQBtJQCBaqfp8eflb2KJMzFyIw12MTqKW3zD/P7/NhSGVQAAAMBJREFUeJxjYKAuYGRixiXFwsoGBOwcWCU5udjYuHl42dj4+DElBQSBGoWERYCkKFxQTFwCwpBkgwMpaYiQjKycvIKiEoipDBRWYVBVA0mrQ2Q1NLW0dXT1QEx9oKiBIUTWCGqwsYmpmbkFiGUJElaByFpBJK1tbO3sHRxBTCeErLMLVK+rm7sHgyeI5eXNxubj6+cfwMYWiPBJUDCUEQL0UGgo0Eth4diCIyIS7J+oaKyBxRATGxefkJiEXZJqAAAsLBYrUJJjawAAAABJRU5ErkJggg==') !important;
+  background-repeat: no-repeat !important;
+  background-position: top right !important;
+  width: 30px;
+  height: 25px;
+  position: absolute;
+  right: 0px;
+}
+
+.jss>thead>tr>td.InfoTrAsteriskTheadtrTdImage {
+  padding-right: 16px !important;
+}
+
+.react-confirm-alert-button-group>.dangerColor {
+  background: #BA0C2F !important;
+  font-weight: 550 !important;
+  font-size: 14px !important;
+}
+.EditStatusTable .jss>thead>tr>td {
+  border-top: 1px solid #212721 !important;
+  border-left: 1px solid #212721 !important;
+}
+
+.MarginTopCustformonth{
+  margin-top: 32px;
+}

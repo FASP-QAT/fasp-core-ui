@@ -116,7 +116,8 @@ class usageTemplate extends Component {
             usagePeriodDisplayList: [],
             dimensionList: [],
             isChanged1: false,
-            dataEl: ''
+            dataEl: '',
+            lang: localStorage.getItem('lang')
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -909,6 +910,9 @@ class usageTemplate extends Component {
                 {
                     title: 'usageTemplateId',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false,
                     readOnly: true //0 A
                 },
                 {
@@ -1033,18 +1037,30 @@ class usageTemplate extends Component {
                 {
                     title: 'isChange',
                     type: 'hidden' //17 R
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'addNewRow',
                     type: 'hidden'//18 S
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: 'typeId',
                     type: 'hidden'//19 T
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // width: 400 //20 U
                 },
                 {
@@ -1057,6 +1073,9 @@ class usageTemplate extends Component {
                 {
                     title: 'createdBy',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // width: 400 //22 W
                 },
 
@@ -4908,7 +4927,7 @@ class usageTemplate extends Component {
                                 {this.state.isChanged1 &&
                                     <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 }
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>
                         }

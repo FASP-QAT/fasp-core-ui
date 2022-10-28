@@ -465,6 +465,9 @@ class ListTracerCategoryComponent extends Component {
                 {
                     title: 'tracerCategoryId',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true
                 },
                 {

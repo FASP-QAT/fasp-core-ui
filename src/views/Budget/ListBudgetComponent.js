@@ -779,6 +779,9 @@ class ListBudgetComponent extends Component {
         {
           title: 'budgetId',
           type: 'hidden',
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         },
         {
           title: i18n.t('static.budget.program'),
@@ -858,14 +861,23 @@ class ListBudgetComponent extends Component {
         {
           title: i18n.t('static.budget.budgetamount'),
           type: 'hidden',
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         },
         {
           title: i18n.t('static.budget.availableAmt'),
           type: 'hidden',
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         },
         {
           title: 'Date',
           type: 'hidden',
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         },
 
       ],

@@ -251,10 +251,16 @@ class ProgramIntegration extends Component {
                                                             {
                                                                 title: 'integrationProgramId',
                                                                 type: 'hidden'
+                                                                // title: 'A',
+                                                                // type: 'text',
+                                                                // visible: false
                                                             },
                                                             {
                                                                 title: 'isChange',
-                                                                type: 'hidden'
+                                                                type: 'hidden',
+                                                                // title: 'A',
+                                                                // type: 'text',
+                                                                // visible: false
                                                             }
 
                                                         ],
@@ -1020,7 +1026,7 @@ class ProgramIntegration extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>
                         </CardFooter>

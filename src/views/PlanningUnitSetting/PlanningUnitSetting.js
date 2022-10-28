@@ -105,6 +105,7 @@ export default class PlanningUnitSetting extends Component {
             productCategoryList: [],
             productCategoryListNew: [],
             planningUnitList: [],
+            lang: localStorage.getItem('lang')
 
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
@@ -2070,8 +2071,8 @@ export default class PlanningUnitSetting extends Component {
             outPutListArray[count] = data;
             count++;
             indexVar = indexVar + 1;
-        }   console.log("outPutListArray---->", outPutListArray);
-        
+        } console.log("outPutListArray---->", outPutListArray);
+
         if (outPutList.length == 0) {
             data = [];
             data[0] = -1;
@@ -2194,31 +2195,49 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: 'programPlanningUnitId',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //9J
                 },
                 {
                     title: 'isChange',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //10K
                 },
                 {
                     title: 'isNewRowAdded',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //11L
                 },
                 {
                     title: 'selected forecast map',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //12M
                 },
                 {
                     title: 'indexVar',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //13N
                 },
                 {
                     title: 'treeForecast',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //14O
                 },
                 {
@@ -2235,6 +2254,9 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: 'active',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true //17R
                 },
             ],
@@ -2825,12 +2847,13 @@ export default class PlanningUnitSetting extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                    datasetDetailsRequestJson.changed = 1;
-                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    datasetDetailsRequest1.onsuccess = function (event) {
-                  }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
                     // this.props.updateStepOneData("color", "green");
                     // this.setState({
@@ -2938,12 +2961,13 @@ export default class PlanningUnitSetting extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                    datasetDetailsRequestJson.changed = 1;
-                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    datasetDetailsRequest1.onsuccess = function (event) {
-                  }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     console.log("Data update success");
                     // alert("success");
                 }.bind(this);
@@ -3076,12 +3100,13 @@ export default class PlanningUnitSetting extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                    datasetDetailsRequestJson.changed = 1;
-                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    datasetDetailsRequest1.onsuccess = function (event) {
-                  }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
                     // this.props.updateStepOneData("color", "green");
                     // this.setState({
@@ -3218,7 +3243,7 @@ export default class PlanningUnitSetting extends Component {
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
                                                 {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
-                                                <PopoverBody>If you dont see the desired program(s), please load them first.</PopoverBody>
+                                                <PopoverBody>{i18n.t('static.common.loadProgramFirst')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-3">
@@ -3314,7 +3339,7 @@ export default class PlanningUnitSetting extends Component {
                                     {this.state.isChanged1 &&
                                         <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     }
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                     &nbsp;
                                 </FormGroup>
                             }

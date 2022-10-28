@@ -721,10 +721,14 @@ class ListProcurementAgentComponent extends Component {
                 {
                     title: 'procurementAgentId',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.realm.realm'),
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                    // visible: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? true : false),
                     // readOnly: true
                 },
                 {
@@ -760,6 +764,9 @@ class ListProcurementAgentComponent extends Component {
                 {
                     title: i18n.t('static.procurementAgent.localProcurementAgent'),
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
