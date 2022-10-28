@@ -582,6 +582,9 @@ class RegionListComponent extends Component {
                 {
                     title: 'regionListId',
                     type: 'hidden',
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                     // readOnly: true
                 },
                 {
@@ -1019,7 +1022,7 @@ class RegionListComponent extends Component {
                                     </div>
                                 </Form>
 
-                                <div className="werehousecapacitySearchposition" >
+                                <div className="werehousecapacitySearchposition consumptionDataEntryTable" >
                                     <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }} className="jexcelremoveReadonlybackground"> </div>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>

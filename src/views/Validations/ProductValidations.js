@@ -449,13 +449,13 @@ class ProductValidation extends Component {
                         selectedText1 = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang)
                     }
                 } catch (error) {
-                console.log("error--->", error)    
+                    console.log("error--->", error)
                     selectedText1 = "";
                 }
-                console.log("selectedText1",selectedText1)
+                console.log("selectedText1", selectedText1)
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
                     console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
-                    var upListFiltered = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
+                    var upListFiltered = this.state.upList.filter(c => finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod!=null && c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
                     if (upListFiltered.length > 0) {
                         selectedText2 = getLabelText(upListFiltered[0].label, this.state.lang);
                     }
@@ -485,7 +485,7 @@ class ProductValidation extends Component {
                     var usageFrequency;
 
                     usageTypeId = finalData[i].parentNodeNodeDataMap.fuNode.usageType.id;
-                    usagePeriodId = finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId;
+                    usagePeriodId = finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod!=null?finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId:"";
                     usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
                     var noOfMonthsInUsagePeriod = 0;
                     if (usagePeriodId != null && usagePeriodId != "") {
@@ -569,21 +569,21 @@ class ProductValidation extends Component {
                 data[9] = 0;
 
                 dataArray.push(data);
-                if (parentId != finalData[i].parentNodeFlatItem.id || i == finalData.length - 1) {
-                    data = [];
-                    data[0] = "";
-                    data[1] = "";
-                    data[2] = "";
-                    data[3] = "";
-                    data[4] = "";
-                    data[5] = "";
-                    data[6] = "";
-                    data[7] = i18n.t('static.productValidation.subTotal');
-                    data[8] = totalCost.toFixed(2);
-                    data[9] = 1;
-                    totalCost = 0;
-                    dataArray.push(data);
-                }
+                // if (parentId != finalData[i].parentNodeFlatItem.id || i == finalData.length - 1) {
+                //     data = [];
+                //     data[0] = "";
+                //     data[1] = "";
+                //     data[2] = "";
+                //     data[3] = "";
+                //     data[4] = "";
+                //     data[5] = "";
+                //     data[6] = "";
+                //     data[7] = i18n.t('static.productValidation.subTotal');
+                //     data[8] = totalCost.toFixed(2);
+                //     data[9] = 1;
+                //     totalCost = 0;
+                //     dataArray.push(data);
+                // }
             }
             console.log("DataArray+++", dataArray)
             this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -634,6 +634,9 @@ class ProductValidation extends Component {
                     {
                         title: "IsTotal",
                         type: 'hidden'
+                        // title: 'A',
+                        // type: 'text',
+                        // visible: false
                     },
                 ],
                 // text: {
@@ -1173,7 +1176,7 @@ class ProductValidation extends Component {
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
-        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
+        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1216,6 +1219,7 @@ class ProductValidation extends Component {
             }, this);
 
         const { versionList } = this.state;
+        console.log("versionList111", versionList)
         let versions = versionList.length > 0
             && versionList.map((item, i) => {
                 return (
