@@ -2860,5 +2860,7 @@
     "static.compareVersion.selectedForecastTitle": "Método de previsão que foi selecionado para a previsão final. As previsões são selecionadas na tela Comparar e Selecionar Previsão.",
     "static.compareVersion.selectedForecastQtyTitle": "Quantidade prevista para todo o período de previsão.",
     "static.importIntoSP.versionTitle": "Se o último mês da sua previsão tiver mais de 6 meses, ele não aparecerá na lista suspensa de versões. Considere importar dados de previsão para meses futuros.",
-    "static.common.refreshPage": "Atualizar a página"
+    "static.common.refreshPage": "Atualizar a página",
+    "static.dataset.BranchTreeTemplate": "Modelo de Filial"
+    
 }

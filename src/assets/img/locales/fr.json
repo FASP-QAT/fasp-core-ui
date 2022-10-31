@@ -2864,5 +2864,6 @@
     "static.compareVersion.selectedForecastTitle": "Méthode de prévision sélectionnée pour la prévision finale. Les prévisions sont sélectionnées dans l`écran Comparer et sélectionner les prévisions.",
     "static.compareVersion.selectedForecastQtyTitle": "Prévision de quantité pour toute la période de prévision.",
     "static.importIntoSP.versionTitle": "Si le dernier mois de votre prévision date de plus de 6 mois, il n`apparaîtra pas dans la liste déroulante des versions. Veuillez envisager d`importer les données de prévision pour les mois à venir.",
-    "static.common.refreshPage": "Rafraîchir la page"
+    "static.common.refreshPage": "Rafraîchir la page",
+    "static.dataset.BranchTreeTemplate": "Modèle de branche"
 }
