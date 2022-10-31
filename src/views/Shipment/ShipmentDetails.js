@@ -880,8 +880,8 @@ export default class ShipmentDetails extends React.Component {
                                     var planningUnitIdProp = '';
                                     if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
                                         planningUnitIdProp = this.props.match.params.planningUnitId;
-                                        var proListFiltered=proList.filter(c => c.value == planningUnitIdProp);
-                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined && proListFiltered.length>0) {
+                                        var proListFiltered = proList.filter(c => c.value == planningUnitIdProp);
+                                        if (planningUnitIdProp != '' && planningUnitIdProp != undefined && proListFiltered.length > 0) {
                                             var planningUnit = [{ value: planningUnitIdProp, label: proListFiltered[0].label }];
                                             this.setState({
                                                 planningUnit: planningUnit,
@@ -893,10 +893,10 @@ export default class ShipmentDetails extends React.Component {
                                     else if (localStorage.getItem("sesPlanningUnitIdMulti") != '' && localStorage.getItem("sesPlanningUnitIdMulti") != undefined) {
                                         planningUnitIdProp = localStorage.getItem("sesPlanningUnitIdMulti");
                                         if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                            var planningUnitIdSession=JSON.parse(planningUnitIdProp);
-                                            var updatePlanningUnitList=[];
-                                            for(var pu=0;pu<planningUnitIdSession.length;pu++){
-                                                if(proList.filter(c=>c.value==planningUnitIdSession[pu].value).length>0){
+                                            var planningUnitIdSession = JSON.parse(planningUnitIdProp);
+                                            var updatePlanningUnitList = [];
+                                            for (var pu = 0; pu < planningUnitIdSession.length; pu++) {
+                                                if (proList.filter(c => c.value == planningUnitIdSession[pu].value).length > 0) {
                                                     updatePlanningUnitList.push(planningUnitIdSession[pu]);
                                                 }
                                             }
@@ -1366,7 +1366,7 @@ export default class ShipmentDetails extends React.Component {
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             {this.state.shipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipments()}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}&nbsp;
                             {this.refs.shipmentChild != undefined && <Button id="addRowButtonId" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}&nbsp;
-                            <a style={{marginTop:"-1.5px"}} className="float-right mr-1" href="javascript:void();" title={i18n.t("static.supplyPlan.planMultiplePusByDate")} onClick={this.toggleReplan}><i className="fa fa-calendar fa-3x"></i></a>
+                            <a style={{ marginTop: "-1.5px" }} className="float-right mr-1" href="javascript:void();" title={i18n.t("static.supplyPlan.planMultiplePusByDate")} onClick={this.toggleReplan}><i className="fa fa-calendar fa-3x"></i></a>
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
@@ -1747,7 +1747,7 @@ export default class ShipmentDetails extends React.Component {
 
 
                                             console.log("ProgramJson@@@@@@@@@@", programJson);
-                                            var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-"+this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
+                                            var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-" + this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
                                             var sstd = {}
                                             if (programPlanningUnit.planBasedOn == 1) {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
@@ -1764,9 +1764,9 @@ export default class ShipmentDetails extends React.Component {
                                                 var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2, 'months').format("YYYY-MM"));
-                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
 
                                                 var suggestShipment = false;
                                                 var useMax = false;
@@ -1815,9 +1815,9 @@ export default class ShipmentDetails extends React.Component {
                                                 var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
-                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
                                                 var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
                                                 var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
                                                 var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
@@ -2015,7 +2015,7 @@ export default class ShipmentDetails extends React.Component {
                                             var programId = (document.getElementById("programId").value)
                                             var puList = [...new Set(this.state.planningUnitIdsPlan.map(ele => ele.value))];
                                             if (puList.length > 0 && showPlanningUnitAndQtyList.length > 0) {
-                                                calculateSupplyPlan(programId, 0, 'programData', 'shipment1', this, puList, moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-"+this.state.singleValue.month) + "-01").format("YYYY-MM-DD"));
+                                                calculateSupplyPlan(programId, 0, 'programData', 'shipment1', this, puList, moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-" + this.state.singleValue.month) + "-01").format("YYYY-MM-DD"));
                                             } else {
                                                 this.setState({
                                                     showPlanningUnitAndQtyList: [],
