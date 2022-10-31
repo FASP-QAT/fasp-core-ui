@@ -2134,7 +2134,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
     formulaChanged3 = function (instance, executions) {
         var executions = executions;
         for (var e = 0; e < executions.length; e++) {
-            this.this.shipmentQtyChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
+            this.shipmentQtyChanged(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
         }
     }
 
