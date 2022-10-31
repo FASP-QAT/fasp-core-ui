@@ -667,6 +667,7 @@ export default class ShipmentDetails extends React.Component {
     }
 
     componentDidMount = function () {
+        document.getElementById("shipmentsDetailsTableDiv").closest('.card').classList.add("removeCardwrap");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
