@@ -247,7 +247,7 @@ export default class SupplyPlanComponent extends React.Component {
         csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
         if (this.state.planBasedOn == 1) {
             csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
-        }else{
+        } else {
             csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
         }
 
@@ -420,7 +420,7 @@ export default class SupplyPlanComponent extends React.Component {
                         doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 150, {
                             align: 'left'
                         })
-                    }else{
+                    } else {
                         doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(this.state.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
                             align: 'left'
                         })
@@ -1470,9 +1470,9 @@ export default class SupplyPlanComponent extends React.Component {
                                     var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
                                     var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
-                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
+                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
+                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
 
                                     var suggestShipment = false;
                                     var useMax = false;
@@ -1531,14 +1531,14 @@ export default class SupplyPlanComponent extends React.Component {
                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
-                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
+                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
+                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
 
                                     var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
                                     var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
                                     var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
-                                    var unmetDemandForMonth1=spd1.length > 0 ? spd1[0].unmetDemand : 0;
+                                    var unmetDemandForMonth1 = spd1.length > 0 ? spd1[0].unmetDemand : 0;
 
                                     var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;
                                     var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;

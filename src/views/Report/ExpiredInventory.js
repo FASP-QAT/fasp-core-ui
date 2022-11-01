@@ -80,7 +80,8 @@ export default class ExpiredInventory extends Component {
             programId: '',
             versionId: '',
             ledgerForBatch: [],
-            expiredStockModal: false
+            expiredStockModal: false,
+            lang: localStorage.getItem('lang')
         }
     }
 

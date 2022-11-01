@@ -745,10 +745,10 @@ export default class CompareVersionTableCompareVersion extends Component {
             tr.children[6].classList.add('InfoTr');
             tr.children[7].classList.add('InfoTr');
 
-            tr.children[3].title = "Forecast method that was selected for the final forecast. Forecasts are selected in the Compare and Select Forecast screen.";
-            tr.children[4].title = "Quantity forecasted for the entire forecast period.";
-            tr.children[6].title = "Forecast method that was selected for the final forecast. Forecasts are selected in the Compare and Select Forecast screen.";
-            tr.children[7].title = "Quantity forecasted for the entire forecast period.";
+            tr.children[3].title = i18n.t('static.compareVersion.selectedForecastTitle');
+            tr.children[4].title = i18n.t('static.compareVersion.selectedForecastQtyTitle');
+            tr.children[6].title = i18n.t('static.compareVersion.selectedForecastTitle');
+            tr.children[7].title = i18n.t('static.compareVersion.selectedForecastQtyTitle');
         }
     }
 

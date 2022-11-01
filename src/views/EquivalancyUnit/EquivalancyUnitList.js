@@ -68,6 +68,7 @@ class EquivalancyUnit extends Component {
             isChanged: false,
             isChanged1: false,
             countVar: 0,
+            lang: localStorage.getItem('lang')
         }
 
         this.cancelClicked = this.cancelClicked.bind(this);
