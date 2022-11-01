@@ -479,7 +479,7 @@ export default class SupplyPlanComponent extends React.Component {
         csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
         if (this.state.planBasedOn == 1) {
             csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
-        }else{
+        } else {
             csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
         }
 
@@ -599,7 +599,7 @@ export default class SupplyPlanComponent extends React.Component {
             csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + ele.info.reorderFrequency + "\"")
             if (ele.planBasedOn == 1) {
                 csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + ele.info.maxStockMoSQty + "\"")
-            }else{
+            } else {
                 csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + ele.distributionLeadTime + "\"")
             }
 
@@ -734,7 +734,7 @@ export default class SupplyPlanComponent extends React.Component {
                         doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 150, {
                             align: 'left'
                         })
-                    }else{
+                    } else {
                         doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(this.state.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
                             align: 'left'
                         })
@@ -977,7 +977,7 @@ export default class SupplyPlanComponent extends React.Component {
                 doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + ele.info.maxStockMoSQty, doc.internal.pageSize.width / 10, 150, {
                     align: 'left'
                 })
-            }else{
+            } else {
                 doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(ele.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
                     align: 'left'
                 })
@@ -1220,7 +1220,7 @@ export default class SupplyPlanComponent extends React.Component {
         var chartOptions = {
             title: {
                 display: true,
-                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label +" (Local)" + " - " + this.state.planningUnit.label : entityname
+                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " (Local)" + " - " + this.state.planningUnit.label : entityname
             },
             scales: {
                 yAxes: [{
@@ -1303,7 +1303,7 @@ export default class SupplyPlanComponent extends React.Component {
         var chartOptions1 = {
             title: {
                 display: true,
-                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label+" (Local)" + " - " + this.state.planningUnit.label : entityname
+                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " (Local)" + " - " + this.state.planningUnit.label : entityname
             },
             scales: {
                 yAxes: [{
@@ -1565,7 +1565,7 @@ export default class SupplyPlanComponent extends React.Component {
                         {/* </Row> */}
                         <div className="table-scroll mt-2">
                             <div className="table-wrap table-responsive fixTableHeadSupplyPlan">
-                                <Table className="table-bordered text-center overflowhide main-table "  size="sm" options={this.options}>
+                                <Table className="table-bordered text-center overflowhide main-table " size="sm" options={this.options}>
                                     <thead>
                                         <tr>
                                             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
@@ -2979,92 +2979,92 @@ export default class SupplyPlanComponent extends React.Component {
                                                 }
                                             }
                                             var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
-                                        var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
-                                        var rcpuRequest = rcpuOs.getAll();
-                                        rcpuRequest.onsuccess = function (event) {
-                                            var rcpuResult = [];
-                                            rcpuResult = rcpuRequest.result;
-                                            this.setState({
-                                                planningUnitList: proList.sort(function (a, b) {
-                                                    a = a.label.toLowerCase();
-                                                    b = b.label.toLowerCase();
-                                                    return a < b ? -1 : a > b ? 1 : 0;
-                                                }),
-                                                procurementAgentListPlan: procurementAgentListPlan.filter(c => c.active.toString() == "true").sort(function (a, b) {
-                                                    a = a.procurementAgentCode.toLowerCase();
-                                                    b = b.procurementAgentCode.toLowerCase();
-                                                    return a < b ? -1 : a > b ? 1 : 0;
-                                                }),
-                                                fundingSourceListPlan: fundingSourceListPlan.filter(c => c.active.toString() == "true").sort(function (a, b) {
-                                                    a = a.fundingSourceCode.toLowerCase();
-                                                    b = b.fundingSourceCode.toLowerCase();
-                                                    return a < b ? -1 : a > b ? 1 : 0;
-                                                }),
-                                                budgetListPlanAll: budgetListPlan.filter(c => c.active.toString() == "true").sort(function (a, b) {
-                                                    a = a.budgetCode.toLowerCase();
-                                                    b = b.budgetCode.toLowerCase();
-                                                    return a < b ? -1 : a > b ? 1 : 0;
-                                                }),
+                                            var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
+                                            var rcpuRequest = rcpuOs.getAll();
+                                            rcpuRequest.onsuccess = function (event) {
+                                                var rcpuResult = [];
+                                                rcpuResult = rcpuRequest.result;
+                                                this.setState({
+                                                    planningUnitList: proList.sort(function (a, b) {
+                                                        a = a.label.toLowerCase();
+                                                        b = b.label.toLowerCase();
+                                                        return a < b ? -1 : a > b ? 1 : 0;
+                                                    }),
+                                                    procurementAgentListPlan: procurementAgentListPlan.filter(c => c.active.toString() == "true").sort(function (a, b) {
+                                                        a = a.procurementAgentCode.toLowerCase();
+                                                        b = b.procurementAgentCode.toLowerCase();
+                                                        return a < b ? -1 : a > b ? 1 : 0;
+                                                    }),
+                                                    fundingSourceListPlan: fundingSourceListPlan.filter(c => c.active.toString() == "true").sort(function (a, b) {
+                                                        a = a.fundingSourceCode.toLowerCase();
+                                                        b = b.fundingSourceCode.toLowerCase();
+                                                        return a < b ? -1 : a > b ? 1 : 0;
+                                                    }),
+                                                    budgetListPlanAll: budgetListPlan.filter(c => c.active.toString() == "true").sort(function (a, b) {
+                                                        a = a.budgetCode.toLowerCase();
+                                                        b = b.budgetCode.toLowerCase();
+                                                        return a < b ? -1 : a > b ? 1 : 0;
+                                                    }),
 
-                                                programPlanningUnitList: myResult,
-                                                planningUnitListAll: myResult,
-                                                regionList: regionList.sort(function (a, b) {
-                                                    a = a.name.toLowerCase();
-                                                    b = b.name.toLowerCase();
-                                                    return a < b ? -1 : a > b ? 1 : 0;
-                                                }),
-                                                generalProgramJson: programJson,
-                                                planningUnitDataList: planningUnitDataList,
-                                                dataSourceListAll: dataSourceListAll,
-                                                realmCountryPlanningUnitListAll:rcpuResult,
-                                                planningUnitListForConsumption: planningUnitListForConsumption,
-                                                loading: false
-                                            }, () => {
-                                                // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
-                                                var planningUnitIdProp = '';
-                                                if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined && proList.filter(c => c.value == this.props.match.params.planningUnitId).length > 0) {
-                                                    planningUnitIdProp = this.props.match.params.planningUnitId;
-                                                } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined && proList.filter(c => c.value == localStorage.getItem("sesPlanningUnitId")).length > 0) {
-                                                    planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
-                                                } else if (proList.length == 1) {
-                                                    planningUnitIdProp = proList[0].value;
-                                                }
-                                                if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                                    var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label } : { value: "", label: "" };
-                                                    // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                                                    var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
-                                                    var programJson = {};
-                                                    if (planningUnitDataFilter.length > 0) {
-                                                        var planningUnitData = planningUnitDataFilter[0]
-                                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                        programJson = JSON.parse(programData);
-                                                    } else {
-                                                        programJson = {
-                                                            consumptionList: [],
-                                                            inventoryList: [],
-                                                            shipmentList: [],
-                                                            batchInfoList: [],
-                                                            supplyPlan: []
-                                                        }
+                                                    programPlanningUnitList: myResult,
+                                                    planningUnitListAll: myResult,
+                                                    regionList: regionList.sort(function (a, b) {
+                                                        a = a.name.toLowerCase();
+                                                        b = b.name.toLowerCase();
+                                                        return a < b ? -1 : a > b ? 1 : 0;
+                                                    }),
+                                                    generalProgramJson: programJson,
+                                                    planningUnitDataList: planningUnitDataList,
+                                                    dataSourceListAll: dataSourceListAll,
+                                                    realmCountryPlanningUnitListAll: rcpuResult,
+                                                    planningUnitListForConsumption: planningUnitListForConsumption,
+                                                    loading: false
+                                                }, () => {
+                                                    // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
+                                                    var planningUnitIdProp = '';
+                                                    if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined && proList.filter(c => c.value == this.props.match.params.planningUnitId).length > 0) {
+                                                        planningUnitIdProp = this.props.match.params.planningUnitId;
+                                                    } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined && proList.filter(c => c.value == localStorage.getItem("sesPlanningUnitId")).length > 0) {
+                                                        planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
+                                                    } else if (proList.length == 1) {
+                                                        planningUnitIdProp = proList[0].value;
                                                     }
-                                                    var actualProgramId = this.state.programList.filter(c => c.value == document.getElementById("programId").value)[0].programId;
-                                                    var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == planningUnitIdProp))[0];
-                                                    this.setState({
-                                                        planningUnit: planningUnit,
-                                                        planningUnitId: planningUnitIdProp,
-                                                        programJson: programJson,
-                                                        planBasedOn: programPlanningUnit.planBasedOn,
-                                                        minQtyPpu: programPlanningUnit.minQty,
-                                                        distributionLeadTime: programPlanningUnit.distributionLeadTime
-                                                    })
-                                                    console.log("Mohit form submit 23")
-                                                    this.formSubmit(planningUnit, this.state.monthCount);
-                                                }
-                                            })
+                                                    if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                                        var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label } : { value: "", label: "" };
+                                                        // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
+                                                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
+                                                        var programJson = {};
+                                                        if (planningUnitDataFilter.length > 0) {
+                                                            var planningUnitData = planningUnitDataFilter[0]
+                                                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                            programJson = JSON.parse(programData);
+                                                        } else {
+                                                            programJson = {
+                                                                consumptionList: [],
+                                                                inventoryList: [],
+                                                                shipmentList: [],
+                                                                batchInfoList: [],
+                                                                supplyPlan: []
+                                                            }
+                                                        }
+                                                        var actualProgramId = this.state.programList.filter(c => c.value == document.getElementById("programId").value)[0].programId;
+                                                        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == planningUnitIdProp))[0];
+                                                        this.setState({
+                                                            planningUnit: planningUnit,
+                                                            planningUnitId: planningUnitIdProp,
+                                                            programJson: programJson,
+                                                            planBasedOn: programPlanningUnit.planBasedOn,
+                                                            minQtyPpu: programPlanningUnit.minQty,
+                                                            distributionLeadTime: programPlanningUnit.distributionLeadTime
+                                                        })
+                                                        console.log("Mohit form submit 23")
+                                                        this.formSubmit(planningUnit, this.state.monthCount);
+                                                    }
+                                                })
 
+                                            }.bind(this);
                                         }.bind(this);
-                                    }.bind(this);
                                     }.bind(this);
                                 }.bind(this);
                             }.bind(this)
@@ -3710,6 +3710,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 // inventoryArrayForRegion = inventoryArrayForRegion.concat(jsonList[0].inventoryArrayForRegion);
                                 var sstd = {}
                                 if (this.state.planBasedOn == 1) {
+                                    console.log("In If for plan based on Mohit")
                                     var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                     var compare = (m[n].startDate >= currentMonth);
                                     // var stockInHand = jsonList[0].closingBalance;
@@ -3717,9 +3718,9 @@ export default class SupplyPlanComponent extends React.Component {
                                     var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
                                     var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
-                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
+                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
+                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
 
                                     var suggestShipment = false;
                                     var useMax = false;
@@ -3778,14 +3779,14 @@ export default class SupplyPlanComponent extends React.Component {
                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
-                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                    var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
+                                    var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
+                                    var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
 
                                     var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
                                     var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
                                     var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
-                                    var unmetDemandForMonth1=spd1.length > 0 ? spd1[0].unmetDemand : 0;
+                                    var unmetDemandForMonth1 = spd1.length > 0 ? spd1[0].unmetDemand : 0;
 
                                     var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;
                                     var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;
@@ -4537,21 +4538,21 @@ export default class SupplyPlanComponent extends React.Component {
         }
         var seaFreightPercentage = this.state.generalProgramJson.seaFreightPerc;
         var freightCost = Number(catalogPrice) * Number(suggestedShipmentList[0].suggestedOrderQty) * (Number(Number(seaFreightPercentage) / 100));
-        var rcpuFilter=this.state.realmCountryPlanningUnitListAll.filter(c=>c.planningUnit.id==document.getElementById("planningUnitId").value);
-        var rcpuObject={
-            id:"",
-            multiplier:""
+        var rcpuFilter = this.state.realmCountryPlanningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+        var rcpuObject = {
+            id: "",
+            multiplier: ""
         }
-        if(rcpuFilter.length==1){
-            rcpuObject={
-                id:rcpuFilter[0].realmCountryPlanningUnitId,
-                multiplier:rcpuFilter[0].multiplier
+        if (rcpuFilter.length == 1) {
+            rcpuObject = {
+                id: rcpuFilter[0].realmCountryPlanningUnitId,
+                multiplier: rcpuFilter[0].multiplier
             }
         }
-        console.log("rcpuObject Mohit",rcpuObject);
+        console.log("rcpuObject Mohit", rcpuObject);
         var json = {
             shipmentQty: suggestedShipmentList[0].suggestedOrderQty,
-            shipmentRcpuQty: rcpuFilter.length==1?suggestedShipmentList[0].suggestedOrderQty/rcpuObject.multiplier:suggestedShipmentList[0].suggestedOrderQty,
+            shipmentRcpuQty: rcpuFilter.length == 1 ? suggestedShipmentList[0].suggestedOrderQty / rcpuObject.multiplier : suggestedShipmentList[0].suggestedOrderQty,
             index: -1,
             suggestedQty: suggestedShipmentList[0].suggestedOrderQty,
             emergencyOrder: emergencyOrder,
@@ -4583,7 +4584,7 @@ export default class SupplyPlanComponent extends React.Component {
             planningUnit: {
                 id: document.getElementById("planningUnitId").value
             },
-            realmCountryPlanningUnit:rcpuObject,
+            realmCountryPlanningUnit: rcpuObject,
             rate: catalogPrice,
             freightCost: freightCost
         }
@@ -5616,9 +5617,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
-                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
 
                                                 var suggestShipment = false;
                                                 var useMax = false;
@@ -5676,13 +5677,13 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
-                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
                                                 var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
                                                 var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
                                                 var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
-                                                var unmetDemandForMonth1=spd1.length > 0 ? spd1[0].unmetDemand : 0;
+                                                var unmetDemandForMonth1 = spd1.length > 0 ? spd1[0].unmetDemand : 0;
 
                                                 var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;
                                                 var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;
@@ -6077,7 +6078,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     var chartOptions = {
                                         title: {
                                             display: true,
-                                            text: (this.state.programSelect).label+" (Local)" + " - " + getLabelText(programPlanningUnit.planningUnit.label, this.state.lang)
+                                            text: (this.state.programSelect).label + " (Local)" + " - " + getLabelText(programPlanningUnit.planningUnit.label, this.state.lang)
                                         },
                                         scales: {
                                             yAxes: (jsonArrForGraph.length > 0 && jsonArrForGraph[0].planBasedOn == 1 ? [{
@@ -6380,7 +6381,7 @@ export default class SupplyPlanComponent extends React.Component {
 
 
                                             console.log("ProgramJson@@@@@@@@@@", programJson);
-                                            var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-"+this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
+                                            var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-" + this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
                                             var sstd = {}
                                             if (programPlanningUnit.planBasedOn == 1) {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
@@ -6397,9 +6398,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2, 'months').format("YYYY-MM"));
-                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
 
                                                 var suggestShipment = false;
                                                 var useMax = false;
@@ -6448,13 +6449,13 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
-                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos : 0;
-                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos : 0;
-                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos : 0;
+                                                var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
+                                                var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
                                                 var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
                                                 var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
                                                 var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
-                                                var unmetDemandForMonth1=spd1.length > 0 ? spd1[0].unmetDemand : 0;
+                                                var unmetDemandForMonth1 = spd1.length > 0 ? spd1[0].unmetDemand : 0;
 
                                                 var maxStockForMonth1 = spd1.length > 0 ? spd1[0].maxStock : 0;//
                                                 var minStockForMonth1 = spd1.length > 0 ? spd1[0].minStock : 0;
@@ -6650,7 +6651,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             var programId = (document.getElementById("programId").value)
                                             var puList = [...new Set(this.state.planningUnitIdsPlan.map(ele => ele.value))];
                                             if (puList.length > 0 && showPlanningUnitAndQtyList.length > 0) {
-                                                calculateSupplyPlan(programId, 0, 'programData', 'shipment1', this, puList, moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-"+this.state.singleValue.month) + "-01").format("YYYY-MM-DD"));
+                                                calculateSupplyPlan(programId, 0, 'programData', 'shipment1', this, puList, moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-" + this.state.singleValue.month) + "-01").format("YYYY-MM-DD"));
                                             } else {
                                                 this.setState({
                                                     showPlanningUnitAndQtyList: [],
