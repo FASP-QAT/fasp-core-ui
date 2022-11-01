@@ -936,7 +936,7 @@ class ForecastOutput extends Component {
             this.setState({
                 graphConsumptionData: graphConsumptionData
             }, () => {
-                // console.log("graphConsumptionData--------->", this.state.graphConsumptionData);
+                console.log("graphConsumptionData--------->", this.state.graphConsumptionData);
             })
 
 
@@ -3797,7 +3797,8 @@ class ForecastOutput extends Component {
                                                                             <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id, item.region.regionId)} /></td>
                                                                             <td className="" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
                                                                             {/* <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.display && <i class="fa fa-circle" style={{ color: backgroundColor[countVar] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td> */}
-                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
+                                                                            {/* <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td> */}
+                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
                                                                             <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</td>
@@ -3826,7 +3827,8 @@ class ForecastOutput extends Component {
                                                                             <td className="" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
                                                                             {/* <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.display && <i class="fa fa-circle" style={{ color: backgroundColor[countVar1] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td> */}
                                                                             {/* <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[item.graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td> */}
-                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
+                                                                            {/* <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td> */}
+                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
                                                                             <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
@@ -3884,14 +3886,15 @@ class ForecastOutput extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceforecastOutputEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceforecastOutputFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceforecastOutputSp :
-                  showguidanceforecastOutputPr
-              } } />
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceforecastOutputEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceforecastOutputFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceforecastOutputSp :
+                                            showguidanceforecastOutputPr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.dashboard.monthlyForecast')}</h3>
                             </div>
