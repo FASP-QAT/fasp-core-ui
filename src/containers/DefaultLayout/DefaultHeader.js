@@ -106,7 +106,7 @@ class DefaultHeader extends Component {
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6',marginTop:'-17px' }}>{this.props.notificationCount}</span>}
+                {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px' }}>{this.props.notificationCount}</span>}
                 <img src={imageNotificationCount} onClick={this.props.shipmentLinkingAlerts} className="HomeIcon icon-anim-pulse text-primary" title={i18n.t('static.mt.shipmentLinkingNotification')} style={{ width: '30px', height: '30px', marginTop: '4px' }} />
               </NavLink>
             </NavItem>}
@@ -123,11 +123,11 @@ class DefaultHeader extends Component {
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&
                   // <img src={iconsDownarrowRed} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F',lineHeight:'57px' }} ></i>
+                  <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F', lineHeight: '57px' }} ></i>
                 }
                 {/* {localStorage.getItem("sesLatestProgram") == "false" &&
                   <img src={iconsDownarrowBlue} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />} */}
-                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed',lineHeight:'57px' }} ></i>}
+                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed', lineHeight: '57px' }} ></i>}
               </NavLink>
             </NavItem>
           }
@@ -139,12 +139,12 @@ class DefaultHeader extends Component {
 
                 {this.props.changeIcon &&
                   // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F',lineHeight:'57px' }}></i>
+                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F', lineHeight: '57px' }}></i>
 
                 }
                 {!this.props.changeIcon &&
                   // <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#a7c6ed',lineHeight:'57px' }}></i>
+                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#a7c6ed', lineHeight: '57px' }}></i>
 
                 }
               </NavLink>
@@ -159,11 +159,11 @@ class DefaultHeader extends Component {
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&
                   // <img src={iconsDownarrowRed} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F',lineHeight:'57px' }} ></i>
+                  <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F', lineHeight: '57px' }} ></i>
                 }
                 {/* {localStorage.getItem("sesLatestProgram") == "false" &&
                   <img src={iconsDownarrowBlue} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />} */}
-                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed',lineHeight:'57px' }} ></i>}
+                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed', lineHeight: '57px' }} ></i>}
               </NavLink>
             </NavItem>
           }
@@ -175,12 +175,12 @@ class DefaultHeader extends Component {
 
                 {this.props.fuChangeIcon &&
                   // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgramFC} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F',lineHeight:'57px' }}></i>
+                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgramFC} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F', lineHeight: '57px' }}></i>
 
                 }
                 {!this.props.fuChangeIcon &&
                   // <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgramFC} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#a7c6ed',lineHeight:'57px' }}></i>
+                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgramFC} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#a7c6ed', lineHeight: '57px' }}></i>
 
                 }
               </NavLink>
@@ -195,7 +195,7 @@ class DefaultHeader extends Component {
             </span>
           </NavItem> */}
 
-{this.props.activeModule == 1 && <NavItem className="">
+          {this.props.activeModule == 1 && <NavItem className="">
             <span className="nav-link">
               <a href={localStorage.getItem('lang') == 'en' ?
                 "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceEn.html" :
@@ -210,7 +210,7 @@ class DefaultHeader extends Component {
               </a>
             </span>
           </NavItem>
-  }
+          }
 
           <NavItem className="">
             <span className="nav-link">
@@ -219,11 +219,11 @@ class DefaultHeader extends Component {
               </a>
             </span>
           </NavItem>
-          <NavItem className="" title={'Refresh page'}>
+          <NavItem className="" title={i18n.t('static.common.refreshPage')}>
             <span className="nav-link">
-            <svg  onClick={this.refreshPage} style={{cursor: 'pointer', width: '28px', height: '28px', color:'#a7c6ed' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon icon-xxl" role="img"><path fill="var(--ci-primary-color, currentColor)" d="M265.614,206.387H456V16H424V149.887L397.863,123.75c-79.539-79.539-208.96-79.54-288.5,0s-79.539,208.96,0,288.5a204.232,204.232,0,0,0,288.5,0l-22.627-22.627c-67.063,67.063-176.182,67.063-243.244,0s-67.063-176.183,0-243.246,176.182-67.063,243.245,0l28.01,28.01H265.614Z" class="ci-primary"></path></svg>
+              <svg onClick={this.refreshPage} style={{ cursor: 'pointer', width: '28px', height: '28px', color: '#a7c6ed' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon icon-xxl" role="img"><path fill="var(--ci-primary-color, currentColor)" d="M265.614,206.387H456V16H424V149.887L397.863,123.75c-79.539-79.539-208.96-79.54-288.5,0s-79.539,208.96,0,288.5a204.232,204.232,0,0,0,288.5,0l-22.627-22.627c-67.063,67.063-176.182,67.063-243.244,0s-67.063-176.183,0-243.246,176.182-67.063,243.245,0l28.01,28.01H265.614Z" class="ci-primary"></path></svg>
             </span>
-            </NavItem>
+          </NavItem>
 
           <NavItem className="">
             <NavLink to="#" className="nav-link">

@@ -2856,5 +2856,13 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.loadDelDataset.keepLatestVersionDeleteOldVersion": "Keep latest version and delete older versions.",
+    "static.loadDelDataset.deleteVersion": "Delete the version",
+    "static.common.loadProgramFirst": "If you dont see the desired program(s), please load them first.",
+    "static.common.encryptData": "Do you want to encrypt data?",
+    "static.compareVersion.selectedForecastTitle": "Forecast method that was selected for the final forecast. Forecasts are selected in the Compare and Select Forecast screen.",
+    "static.compareVersion.selectedForecastQtyTitle": "Quantity forecast for the entire forecast period.",
+    "static.importIntoSP.versionTitle": "If the last month of your forecast is more than 6 months old, it will not appear in the version dropdown. Please consider importing forecast data for future months.",
+    "static.common.refreshPage": "Refresh page"
 }
