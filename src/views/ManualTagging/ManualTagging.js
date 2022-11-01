@@ -109,7 +109,8 @@ export default class ManualTagging extends Component {
             roPrimeLineNoForTab3: "",
             planningUnitsBasedOnTracerCategory: [],
             test: 0,
-            showAllShipments: false
+            showAllShipments: false,
+            lang: localStorage.getItem('lang')
 
         }
 
@@ -611,10 +612,11 @@ export default class ManualTagging extends Component {
             }
             shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
             shipmentList = shipmentList.filter(c => (
-                // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
-                // ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (
-                // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
-                SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
+
+                (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD")) &&
+                ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (
+                    (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD")) &&
+                    SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
             var listArray = shipmentList;
             listArray.sort((a, b) => {
                 var itemLabelA = a.shipmentId;
@@ -3003,10 +3005,10 @@ export default class ManualTagging extends Component {
                     if (this.state.active1) {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "false" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID && SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString()));
                         shipmentList = shipmentList.filter(c => (
-                            // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
-                            // ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (
-                            // moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") && 
-                            SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
+                            (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") < moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD")) &&
+                            ([3, 4, 5, 6, 9]).includes(c.shipmentStatus.id.toString())) || (
+                                (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(Date.now()).subtract(6, 'months').format("YYYY-MM-DD")) &&
+                                SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
                     } else if (this.state.active2) {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID);
                         console.log("ShipmentList@@@@@@@@@@@@@@@", shipmentList);
@@ -3871,7 +3873,7 @@ export default class ManualTagging extends Component {
                     data[0] = manualTaggingList[j].shipmentId
                     data[1] = manualTaggingList[j].shipmentTransId
                     data[2] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
-                    data[3] = manualTaggingList[j].expectedDeliveryDate
+                    data[3] = manualTaggingList[j].receivedDate != "" && manualTaggingList[j].receivedDate != null && manualTaggingList[j].receivedDate != undefined && manualTaggingList[j].receivedDate != "Invalid date" ? manualTaggingList[j].receivedDate : manualTaggingList[j].expectedDeliveryDate;//F
                     data[4] = getLabelText(manualTaggingList[j].shipmentStatus.label, this.state.lang)
                     data[5] = manualTaggingList[j].procurementAgent.code
                     data[6] = manualTaggingList[j].orderNo

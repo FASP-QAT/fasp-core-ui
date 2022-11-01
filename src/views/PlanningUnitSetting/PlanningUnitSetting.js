@@ -105,6 +105,7 @@ export default class PlanningUnitSetting extends Component {
             productCategoryList: [],
             productCategoryListNew: [],
             planningUnitList: [],
+            lang: localStorage.getItem('lang')
 
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
@@ -2070,8 +2071,8 @@ export default class PlanningUnitSetting extends Component {
             outPutListArray[count] = data;
             count++;
             indexVar = indexVar + 1;
-        }   console.log("outPutListArray---->", outPutListArray);
-        
+        } console.log("outPutListArray---->", outPutListArray);
+
         if (outPutList.length == 0) {
             data = [];
             data[0] = -1;
@@ -2825,12 +2826,13 @@ export default class PlanningUnitSetting extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                    datasetDetailsRequestJson.changed = 1;
-                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    datasetDetailsRequest1.onsuccess = function (event) {
-                  }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
                     // this.props.updateStepOneData("color", "green");
                     // this.setState({
@@ -2938,12 +2940,13 @@ export default class PlanningUnitSetting extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                    datasetDetailsRequestJson.changed = 1;
-                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    datasetDetailsRequest1.onsuccess = function (event) {
-                  }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     console.log("Data update success");
                     // alert("success");
                 }.bind(this);
@@ -3076,12 +3079,13 @@ export default class PlanningUnitSetting extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                    datasetDetailsRequestJson.changed = 1;
-                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    datasetDetailsRequest1.onsuccess = function (event) {
-                  }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
                     // this.props.updateStepOneData("color", "green");
                     // this.setState({
@@ -3218,7 +3222,7 @@ export default class PlanningUnitSetting extends Component {
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
                                                 {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
-                                                <PopoverBody>If you dont see the desired program(s), please load them first.</PopoverBody>
+                                                <PopoverBody>{i18n.t('static.common.loadProgramFirst')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-3">

@@ -46,7 +46,8 @@ class ListRealmCountryComponent extends Component {
             realmCountryList: [],
             message: '',
             selRealmCountry: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
         }
         this.editProcurementAgent = this.editProcurementAgent.bind(this);
         this.filterData = this.filterData.bind(this);

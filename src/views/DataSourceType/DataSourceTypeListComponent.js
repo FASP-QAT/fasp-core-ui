@@ -359,7 +359,8 @@ export default class DataSourceTypeListComponent extends Component {
             dataSourceList: [],
             message: '',
             selSource: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
         }
 
         this.editDataSourceType = this.editDataSourceType.bind(this);
