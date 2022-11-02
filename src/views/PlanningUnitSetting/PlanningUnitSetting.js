@@ -2195,50 +2195,32 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: 'programPlanningUnitId',
                     type: 'hidden',
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
-                    // readOnly: true //9J
+                    readOnly: true //9J
                 },
                 {
                     title: 'isChange',
                     type: 'hidden',
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
-                    // readOnly: true //10K
+                    readOnly: true //10K
                 },
                 {
                     title: 'isNewRowAdded',
                     type: 'hidden',
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
-                    // readOnly: true //11L
+                    readOnly: true //11L
                 },
                 {
                     title: 'selected forecast map',
                     type: 'hidden',
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
-                    // readOnly: true //12M
+                    readOnly: true //12M
                 },
                 {
                     title: 'indexVar',
                     type: 'hidden',
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
-                    // readOnly: true //13N
+                    readOnly: true //13N
                 },
                 {
                     title: 'treeForecast',
                     type: 'hidden',
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
-                    // readOnly: true //14O
+                    readOnly: true //14O
                 },
                 {
                     title: i18n.t('static.program.notes'),
@@ -2254,10 +2236,7 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: 'active',
                     type: 'hidden',
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false
-                    // readOnly: true //17R
+                    readOnly: true //17R
                 },
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
