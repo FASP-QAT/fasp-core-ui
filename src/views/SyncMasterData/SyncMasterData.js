@@ -242,11 +242,11 @@ export default class SyncMasterData extends Component {
                 }
             }
             var lastSyncDate = date;
-            if (this.props.location.state != undefined) {
-                if (this.props.location.state.programIds.includes(programList[pl].programId)) {
+            // if (this.props.location.state != undefined) {
+                // if (this.props.location.state.programIds.includes(programList[pl].id)) {
                     lastSyncDate = moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")
-                }
-            }
+                // }
+            // }
             jsonForNewShipmentSync.push({
                 roAndRoPrimeLineNoList: listOfRoNoAndRoPrimeLineNo,
                 programId: programList[pl].programId,
@@ -268,7 +268,7 @@ export default class SyncMasterData extends Component {
                 if (commitRequestResponse.status == 200) {
                     var commitRequestResponseData = commitRequestResponse.data;
                     MasterSyncService.getNewShipmentSyncApi(jsonForNewShipmentSync).then(shipmentSyncResponse => {
-                        console.log("Shipment sync reponse=========================>", shipmentSyncResponse)
+                        console.log("Response from api Test", shipmentSyncResponse)
                         for (var i = 0; i < programList.length; i++) {
                             AuthenticationService.setupAxiosInterceptors();
                             // this.refs.problemListChild.qatProblemActions(programList[i].id);
@@ -326,15 +326,17 @@ export default class SyncMasterData extends Component {
                                             //     }
                                             // }
                                             var linkedShipmentsList = generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList.filter(c => c.active == true) : [];
+                                            console.log("Linked Shipment list from loaded program Test",linkedShipmentsList)
                                             console.log("LinkedShipmentsList=========================>", linkedShipmentsList)
                                             var linkedShipmentsListFilter = linkedShipmentsList.filter(c => roNoAndRoPrimeLineNoSetFromAPI.includes(c.roNo + "|" + c.roPrimeLineNo));
+                                            console.log("Linked Shipments List filter from api Test",linkedShipmentsListFilter)
                                             planningUnitList = [...new Set(linkedShipmentsListFilter).map(ele => ele.qatPlanningUnitId)];
                                             for (var ppl = 0; ppl < pplModified.length; ppl++) {
                                                 if (!planningUnitList.includes(pplModified[ppl].planningUnit.id)) {
                                                     planningUnitList.push(pplModified[ppl].planningUnit.id);
                                                 }
                                             }
-                                            console.log("planningUnitList=========================>", planningUnitList);
+                                            console.log("planningUnitList Test", planningUnitList);
                                             for (var pu = 0; pu < planningUnitList.length; pu++) {
                                                 var ppuObject = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitList[pu] && c.program.id == response.data.programId)[0];
                                                 var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitList[pu]);
@@ -357,18 +359,20 @@ export default class SyncMasterData extends Component {
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var batchInfoList = programJson.batchInfoList;
                                                 var shipArrayForPlanningUnit = linkedShipmentsListFilter.filter(c => c.qatPlanningUnitId == planningUnitList[pu]);
+                                                console.log("Ship array from planning Unit Test",shipArrayForPlanningUnit)
                                                 var uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId = [...new Set(shipArrayForPlanningUnit).map(ele => ele.roNo + "|" + ele.roPrimeLineNo)];
+                                                console.log("Unique Ro and Ro Prime Line No Test",uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId);
                                                 for (var j = 0; j < uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId.length; j++) {
-                                                    console.log("Ship Array filter=========================>", shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]))
+                                                    console.log("Ship Array filter Test=========================>", shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]))
                                                     var uniqueKnShipmentNo = [...new Set(shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j])).map(ele => ele.orderNo + "|" + ele.primeLineNo + "|" + ele.knShipmentNo)];
                                                     var knShipmentNoThatExistsInLinkedShipmentsList = linkedShipmentsListFilter.filter(x => x.roNo + "|" + x.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && !uniqueKnShipmentNo.includes(x.orderNo + "|" + x.primeLineNo + "|" + x.knShipmentNo));
 
-                                                    console.log("knShipmentNoThatExistsInLinkedShipmentsList=========================>", knShipmentNoThatExistsInLinkedShipmentsList);
-                                                    console.log("uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId=========================>", uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]);
+                                                    console.log("knShipmentNoThatExistsInLinkedShipmentsList Test=========================>", knShipmentNoThatExistsInLinkedShipmentsList);
+                                                    console.log("uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId Test=========================>", uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]);
                                                     console.log("UniqueKnShipmentNo=========================>", uniqueKnShipmentNo);
                                                     for (var u = 0; u < uniqueKnShipmentNo.length; u++) {
                                                         var checkIfAlreadyExists = linkedShipmentsList.findIndex(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo + "|" + c.primeLineNo + "|" + c.knShipmentNo == uniqueKnShipmentNo[u]);
-                                                        console.log("checkIfAlreadyExists=========================>", checkIfAlreadyExists)
+                                                        console.log("checkIfAlreadyExists Test=========================>", checkIfAlreadyExists)
                                                         if (checkIfAlreadyExists == -1) {
                                                             var linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo = linkedShipmentsList.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]);
                                                             var index = shipmentDataList.findIndex(c => linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].childShipmentId > 0 ? linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].childShipmentId == c.shipmentId : linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].tempChildShipmentId == c.tempShipmentId);
@@ -516,6 +520,7 @@ export default class SyncMasterData extends Component {
                                                         } else {
                                                             var index = shipmentDataList.findIndex(c => linkedShipmentsList[checkIfAlreadyExists].childShipmentId > 0 ? linkedShipmentsList[checkIfAlreadyExists].childShipmentId == c.shipmentId : linkedShipmentsList[checkIfAlreadyExists].tempChildShipmentId == c.tempShipmentId);
                                                             var shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo = shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo + "|" + c.primeLineNo + "|" + c.knShipmentNo == uniqueKnShipmentNo[u])
+                                                            console.log("Ship Array based on ro and ro prime line no Test",shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo)
                                                             var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo + "|" + c.primeLineNo + "|" + c.knShipmentNo == uniqueKnShipmentNo[u]);
                                                             var shipmentQty = 0;
                                                             var shipmentARUQty = 0;
@@ -524,7 +529,7 @@ export default class SyncMasterData extends Component {
                                                             var curUser = AuthenticationService.getLoggedInUserId();
                                                             var username = AuthenticationService.getLoggedInUsername();
                                                             shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo.map(item => {
-                                                                console.log("Item@@@@@@@@@@@@@@@@", item)
+                                                                console.log("Item@@@@@@@@@@@@@@@@Test", item)
                                                                 shipmentQty += Number(item.erpQty) * Number(linkedShipmentsList[checkIfAlreadyExists].conversionFactor) * Number(shipmentDataList[index].realmCountryPlanningUnit.multiplier);
                                                                 shipmentARUQty += Number(item.erpQty) * Number(linkedShipmentsList[checkIfAlreadyExists].conversionFactor);
                                                                 var batchNo = item.batchNo;
@@ -603,12 +608,12 @@ export default class SyncMasterData extends Component {
                                                     }
                                                     for (var u = 0; u < knShipmentNoThatExistsInLinkedShipmentsList.length; u++) {
                                                         var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo == knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo && c.orderNo == knShipmentNoThatExistsInLinkedShipmentsList[u].orderNo && c.primeLineNo == knShipmentNoThatExistsInLinkedShipmentsList[u].primeLineNo);
-                                                        var linkedShipmentsListFilter = linkedShipmentsList.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo == knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo && c.orderNo == knShipmentNoThatExistsInLinkedShipmentsList[u].orderNo && c.primeLineNo == knShipmentNoThatExistsInLinkedShipmentsList[u].primeLineNo);
+                                                        var linkedShipmentsListFilter1 = linkedShipmentsList.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.knShipmentNo == knShipmentNoThatExistsInLinkedShipmentsList[u].knShipmentNo && c.orderNo == knShipmentNoThatExistsInLinkedShipmentsList[u].orderNo && c.primeLineNo == knShipmentNoThatExistsInLinkedShipmentsList[u].primeLineNo);
                                                         linkedShipmentsList[linkedShipmentsListIndex].active = false;
                                                         linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
                                                         linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
                                                         linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
-                                                        var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active == true);
+                                                        var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter1[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter1[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter1[0].tempParentShipmentId) && c.active == true);
                                                         var activateParentShipment = false;
                                                         if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
                                                             activateParentShipment = true;
@@ -625,7 +630,7 @@ export default class SyncMasterData extends Component {
                                                             minDate = moment(shipmentDataList[shipmentIndex].receivedDate).format("YYYY-MM-DD");
                                                         }
                                                         if (activateParentShipment) {
-                                                            var parentShipmentIndex = shipmentDataList.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
+                                                            var parentShipmentIndex = shipmentDataList.findIndex(c => linkedShipmentsListFilter1[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter1[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter1[0].tempParentShipmentId);
                                                             shipmentDataList[parentShipmentIndex].active = true;
                                                             shipmentDataList[parentShipmentIndex].erpFlag = false;
                                                             shipmentDataList[parentShipmentIndex].lastModifiedBy.userId = curUser;
@@ -640,7 +645,7 @@ export default class SyncMasterData extends Component {
                                                             }
 
                                                             // Activate linked parent shipment Id
-                                                            var linkedParentShipmentIdList = shipmentDataList.filter(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? (c.parentLinkedShipmentId == linkedShipmentsListFilter[0].parentShipmentId) : (c.tempParentLinkedShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId));
+                                                            var linkedParentShipmentIdList = shipmentDataList.filter(c => linkedShipmentsListFilter1[0].parentShipmentId > 0 ? (c.parentLinkedShipmentId == linkedShipmentsListFilter1[0].parentShipmentId) : (c.tempParentLinkedShipmentId == linkedShipmentsListFilter1[0].tempParentShipmentId));
                                                             for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
                                                                 var parentShipmentIndex1 = shipmentDataList.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
                                                                 shipmentDataList[parentShipmentIndex1].active = true;
