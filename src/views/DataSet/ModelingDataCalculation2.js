@@ -524,6 +524,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             }
                                             usageFrequency = nodeDataMapForScenario.fuNode.usageFrequency;
                                             var noOfMonthsInUsagePeriod = 0;
+                                            var noFURequired = 0;
                                             if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
                                                 var convertToMonth = (props.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
                                                 if (usageTypeId == 2) {
@@ -550,7 +551,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                         convertToMonth = 0;
                                                     }
                                                 }
-                                                var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (nodeDataMapForScenario.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+                                                noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (nodeDataMapForScenario.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                             } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                                 if (payload.nodeType.id == 4) {
                                                     noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");

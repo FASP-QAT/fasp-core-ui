@@ -1292,9 +1292,8 @@ class usageTemplate extends Component {
                         var typeId = rowData[19];
                         var userId = rowData[22];
                         var curUser = AuthenticationService.getLoggedInUserId();
-                        // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-                        // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
-                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                        // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0)))) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && !roleArray.includes('ROLE_REALM_ADMIN')) && (typeId == -1 && typeId != 0)) {
 
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -1433,9 +1432,8 @@ class usageTemplate extends Component {
                         var typeId = rowData[19];
                         var userId = rowData[22];
                         var curUser = AuthenticationService.getLoggedInUserId();
-                        // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-                        // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
-                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+                        // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0)))) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && !roleArray.includes('ROLE_REALM_ADMIN')) && (typeId == -1 && typeId != 0)) {
 
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -2748,9 +2746,8 @@ class usageTemplate extends Component {
             let roleArray = this.state.roleArray;
             var userId = rowData[22];
 
-            // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-            // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || (roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0)))) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && (typeId == -1 && typeId != 0)) || (!roleArray.includes('ROLE_REALM_ADMIN') && (typeId == -1 && typeId != 0 || userId != ""))) {
+            // if ((roleArray.includes('ROLE_DATASET_ADMIN') && (typeId == -1 && typeId != 0)) || (!roleArray.includes('ROLE_REALM_ADMIN') && (typeId == -1 && typeId != 0 || userId != ""))) {
+            if ((roleArray.includes('ROLE_DATASET_ADMIN') && !roleArray.includes('ROLE_REALM_ADMIN')) && (typeId == -1 && typeId != 0)) {
 
                 // console.log("roleArrayinsideIf--------->onchangepage", roleArray, "---", userId);
 
@@ -2957,9 +2954,8 @@ class usageTemplate extends Component {
             var typeId = rowData[19];
             var userId = rowData[22];
             var curUser = AuthenticationService.getLoggedInUserId();
-            // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
-            // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+            // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
+            if ((roleArray.includes('ROLE_DATASET_ADMIN') && !roleArray.includes('ROLE_REALM_ADMIN')) && (typeId == -1 && typeId != 0)) {
 
                 // console.log("roleArrayinsideIf--------->2", elInstance);
 
@@ -3040,7 +3036,7 @@ class usageTemplate extends Component {
     // -----------start of changed function
 
     changed = function (instance, cell, x, y, value) {
-        console.log("onchange------------------>", value);
+        // console.log("onchange------------------>", value);
 
         // if (x == 8 || x == 11) {
         //     this.el.setValueFromCoords(13, y, `=ROUND(L${parseInt(y) + 1}/I${parseInt(y) + 1},2)`, true);
