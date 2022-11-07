@@ -27,7 +27,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -851,7 +851,8 @@ export default class BuildTree extends Component {
             momJexcelLoader: false,
             lastRowDeleted: false,
             showDate: false,
-            modelingChanged: false
+            modelingChanged: false,
+            missingPUList: []
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -987,6 +988,128 @@ export default class BuildTree extends Component {
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.getNodeTransferList = this.getNodeTransferList.bind(this);
         this.generateBranchFromTemplate = this.generateBranchFromTemplate.bind(this);
+        this.buildMissingPUJexcel = this.buildMissingPUJexcel.bind(this);
+    }
+
+    buildMissingPUJexcel() {
+        var missingPUList = this.state.missingPUList;
+        console.log("missingPUList--->", missingPUList);
+        var dataArray = [];
+        let count = 0;
+        if (missingPUList.length > 0) {
+            for (var j = 0; j < missingPUList.length; j++) {
+                data = [];
+                // data[0] = missingPUList[j].month
+                // data[1] = missingPUList[j].startValue
+                data[0] = getLabelText(missingPUList[j].productCategory.label, this.state.lang)
+                data[1] = getLabelText(missingPUList[j].planningUnit.label, this.state.lang) + " | " + missingPUList[j].planningUnit.id
+                dataArray[count] = data;
+                count++;
+            }
+        }
+        this.el = jexcel(document.getElementById("missingPUJexcel"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("missingPUJexcel"), true);
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [20, 80],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    // 0
+                    title: i18n.t('static.productCategory.productCategory'),
+                    type: 'test',
+                    // readOnly: true
+                },
+                {
+                    // 1
+                    title: i18n.t('static.product.product'),
+                    type: 'text',
+                    // readOnly: true
+
+                }
+
+            ],
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
+            onload: this.loadedMissingPU,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: false,
+            columnSorting: true,
+            // tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+
+        };
+        var missingPUJexcel = jexcel(document.getElementById("missingPUJexcel"), options);
+        this.el = missingPUJexcel;
+        this.setState({
+            missingPUJexcel
+        }
+        );
+    }
+
+    loadedMissingPU = function (instance, cell, x, y, value) {
+        console.log("loaded 2---", document.getElementsByClassName('jexcel'));
+        jExcelLoadedFunctionOnlyHideRow(instance, 1);
+    }
+
+    getMissingPuListBranchTemplate() {
+        console.log("In function Test@@@@@@@@@")
+        var missingPUList = [];
+        var json;
+        var treeTemplate = this.state.branchTemplateList.filter(x => x.treeTemplateId == this.state.branchTemplateId)[0];
+        console.log("dataset Id template---", this.state.datasetIdModal);
+        // if (1==1) {
+        // var dataset = this.state.datasetList.filter(x => x.id == this.state.datasetIdModal)[0];
+        // console.log("dataset---", dataset);
+        console.log("treeTemplate---", treeTemplate);
+        var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
+        console.log("puNodeList---", puNodeList);
+        console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
+        var planningUnitList = this.state.updatedPlanningUnitList;
+        for (let i = 0; i < puNodeList.length; i++) {
+            console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
+            if (planningUnitList.filter(x => x.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
+                var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
+                console.log("parentNodeData---", parentNodeData);
+                json = {
+                    productCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory,
+                    planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
+                };
+                missingPUList.push(json);
+            }
+        }
+        // }
+        console.log("missingPUList---", missingPUList);
+        if (missingPUList.length > 0) {
+            missingPUList = missingPUList.filter((v, i, a) => a.findIndex(v2 => (v2.planningUnit.id === v.planningUnit.id)) === i)
+        }
+        this.setState({
+            missingPUList
+        }, () => {
+            this.buildMissingPUJexcel();
+        });
     }
 
     getMomValueForDateRange(startDate) {
@@ -6648,7 +6771,9 @@ export default class BuildTree extends Component {
         // items.push(...flatList);
         this.setState({
             items,
-            isBranchTemplateModalOpen: false
+            isBranchTemplateModalOpen: false,
+            branchTemplateId: "",
+            missingPUList: []
         }, () => {
             console.log("Branch items---", this.state.items);
             this.calculateMOMData(0, 2);
@@ -7147,7 +7272,8 @@ export default class BuildTree extends Component {
 
         if (event.target.name === "branchTemplateId") {
             this.setState({ branchTemplateId: event.target.value }, () => {
-
+                console.log("In data change Test@@@@@@@")
+                this.getMissingPuListBranchTemplate();
             });
         }
         if (event.target.name === "currentEndValue") {
@@ -11700,7 +11826,7 @@ export default class BuildTree extends Component {
                 className={'modal-md ' + this.props.className}>
                 <ModalHeader>
                     <strong>{i18n.t('static.dataset.BranchTreeTemplate')}</strong>
-                    <Button size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false }) }} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    <Button size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false, branchTemplateId: "", missingPUList: [] }) }} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody className='pb-lg-0'>
                     {/* <h6 className="red" id="div3"></h6> */}
@@ -11767,11 +11893,17 @@ export default class BuildTree extends Component {
 
                                                     </FormGroup>
 
+                                                    <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                        <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
+                                                            <div id="missingPUJexcel" className="RowClickable">
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
                                                 </div>
                                             </div>
                                             <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
-                                                <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={() => { this.setState({ isBranchTemplateModalOpen: false, branchTemplateId: "", missingPUList: [] }) }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllBranch(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                 &nbsp;
 
