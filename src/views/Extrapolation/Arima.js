@@ -4,7 +4,7 @@ import i18n from "../../i18n";
 import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 
-export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, seasonality, page, regionId) {
+export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, seasonality, page, regionId, planningUnitId) {
     console.log("inputData@@@@@@", inputData);
     console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
@@ -47,8 +47,11 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                     count += 1;
                     output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecast[j] == 'NA' ? null : responseData.forecast[j] > 0 ? responseData.forecast[j] : 0, ci: responseData.ci[j] > 0 ? responseData.ci[j] : 0 })
                 }
-                if (page == "DataEntry" || page == "ImportFromSupplyPlan") {
+                if (page == "DataEntry") {
                     var arimaData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                    props.updateArimaData(arimaData);
+                } else if (page == "importFromQATSP") {
+                    var arimaData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
                     props.updateArimaData(arimaData);
                 } else {
                     console.log("OutPutArima@@@@@@@@@@@@@@@@@@@@@@", output)
@@ -62,8 +65,11 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
             // if (!isTreeExtrapolation) {
             console.log("ErrorArima@@@@@@", error.status)
             console.log("ErrorArima@@@@@@1", error.response.status == 500)
-            if (page == "DataEntry" || page == "ImportFromSupplyPlan") {
+            if (page == "DataEntry") {
                 var arimaData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                props.updateArimaData(arimaData);
+            } else if (page == "importFromQATSP") {
+                var arimaData = { "data": [], "PlanningUnitId": planningUnitId, "regionId": regionId }
                 props.updateArimaData(arimaData);
             } else {
                 props.updateState("loading", false);
