@@ -1728,7 +1728,9 @@ export default class ManualTagging extends Component {
                 this.setState({
                     planningUnits: [],
                     planningUnitsBasedOnTracerCategory: [],
-                    notLinkedShipments: []
+                    notLinkedShipments: [],
+                    outputList:[],
+                    selectedShipment:[]
                 })
             }
         })
@@ -2520,11 +2522,12 @@ export default class ManualTagging extends Component {
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             // roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0)
             var json = {
-                programId: programId,
+                programId: this.state.active1 ? programId : 0,
                 versionId: versionId,
                 shipmentPlanningUnitId: this.state.active3 ? this.state.outputListAfterSearch[0].erpPlanningUnit.id : shipmentPlanningUnitId,
                 roNo: roNoOrderNo == 0 ? "" : roNoOrderNo,
                 filterPlanningUnitId: erpPlanningUnitId,
+                realmCountryId: this.state.active1 ? 0 : this.state.countryId
 
             }
             console.log("JsonMohit tab 3@@@@@@@@@@@@@@@@@@@", json)
