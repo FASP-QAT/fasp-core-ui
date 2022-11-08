@@ -15,6 +15,7 @@ import {
     InputGroupAddon, InputGroupText
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants';
 
 
 const initialValues = {
@@ -103,7 +104,8 @@ export default class PipelineProgramDataStepOne extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -175,35 +177,35 @@ export default class PipelineProgramDataStepOne extends Component {
                             isValid,
                             setTouched
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmForm'>
+                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmForm'>
 
-                                    <FormGroup>
-                                        <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            valid={!errors.realmId}
-                                            invalid={touched.realmId && !!errors.realmId}
-                                            bsSize="sm"
-                                            className="col-md-6"
-                                            onBlur={handleBlur}
-                                            type="select" name="realmId" id="realmId"
-                                            value={this.props.realmId}
-                                        // onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getDependentLists(e) }}
-                                        >
-                                            {/* <option value="">{i18n.t('static.common.select')}</option> */}
-                                            {realms}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
-                                        {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-                                        &nbsp;
-                                    </FormGroup>
+                                <FormGroup>
+                                    <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        valid={!errors.realmId}
+                                        invalid={touched.realmId && !!errors.realmId}
+                                        bsSize="sm"
+                                        className="col-md-6"
+                                        onBlur={handleBlur}
+                                        type="select" name="realmId" id="realmId"
+                                        value={this.props.realmId}
+                                    // onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getDependentLists(e) }}
+                                    >
+                                        {/* <option value="">{i18n.t('static.common.select')}</option> */}
+                                        {realms}
+                                    </Input>
+                                    <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
+                                    &nbsp;
+                                </FormGroup>
 
-                                    <FormGroup>
-                                        {/* <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepOne}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                    </FormGroup>
+                                <FormGroup>
+                                    {/* <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
+                                    <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepOne}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                </FormGroup>
 
-                                </Form>
-                            )} />
+                            </Form>
+                        )} />
 
             </>
         );

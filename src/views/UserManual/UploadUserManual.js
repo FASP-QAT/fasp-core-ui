@@ -13,6 +13,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import bsCustomFileInput from 'bs-custom-file-input'
 import AuthenticationService from '../Common/AuthenticationService';
 import UserManualService from '../../api/UserManualService';
+import { API_URL } from '../../Constants';
 
 const entityname = i18n.t('static.dashboard.uploadUserManual')
 export default class uploadUserManual extends Component {
@@ -70,7 +71,8 @@ export default class uploadUserManual extends Component {
                     }).catch(error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 color: '#BA0C2F',
                                 loading: false
                             }, () => {
@@ -163,7 +165,7 @@ export default class uploadUserManual extends Component {
                                 <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                 <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 &nbsp;
-                                                </FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Form>
                 </Card>

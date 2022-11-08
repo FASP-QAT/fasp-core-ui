@@ -12,7 +12,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProductService from '../../api/ProductService';
 import RealmService from '../../api/RealmService';
-import { SPACE_REGEX } from '../../Constants';
+import { API_URL, SPACE_REGEX } from '../../Constants';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.forecastingunit.forecastingunit"))
 let summaryText_2 = "Add Forecasting Unit"
@@ -194,7 +194,8 @@ export default class ForecastingUnitTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -253,7 +254,7 @@ export default class ForecastingUnitTicketComponent extends Component {
                         forecastingUnit
                     }, () => {
 
-                        this.getProductCategoryByRealmId(this.props.items.userRealmId);                        
+                        this.getProductCategoryByRealmId(this.props.items.userRealmId);
 
                     })
                 }
@@ -261,7 +262,8 @@ export default class ForecastingUnitTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -313,7 +315,8 @@ export default class ForecastingUnitTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -362,7 +365,8 @@ export default class ForecastingUnitTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -424,8 +428,8 @@ export default class ForecastingUnitTicketComponent extends Component {
         forecastingUnit.notes = '';
         this.setState({
             forecastingUnit: forecastingUnit,
-            realmId: this.props.items.userRealmId,            
-            unitId: '',            
+            realmId: this.props.items.userRealmId,
+            unitId: '',
             tracerCategoryId: '',
             productCategoryId: ''
         },
@@ -464,7 +468,7 @@ export default class ForecastingUnitTicketComponent extends Component {
         const { productCategories } = this.state;
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
-                if(item.level > 1) {
+                if (item.level > 1) {
                     return (
                         <option key={i} value={item.payloadId}>
                             {getLabelText(item.payload.label, this.state.lang)}
@@ -472,7 +476,7 @@ export default class ForecastingUnitTicketComponent extends Component {
                     )
                 } else {
                     return (
-                        <option key={i} value={item.payloadId} style={{color: "gray"}}>
+                        <option key={i} value={item.payloadId} style={{ color: "gray" }}>
                             {getLabelText(item.payload.label, this.state.lang)}
                         </option>
                     )
@@ -529,7 +533,8 @@ export default class ForecastingUnitTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -579,128 +584,128 @@ export default class ForecastingUnitTicketComponent extends Component {
                                 setTouched,
                                 handleReset
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.forecastingUnit.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.forecastingUnit.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="realm">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realm" id="realm"
-                                                bsSize="sm"
-                                                valid={!errors.realm && this.state.forecastingUnit.realm != ''}
-                                                invalid={touched.realm && !!errors.realm}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getProductCategoryByRealmId(e.target.value) }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.realm}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="tracerCategory">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="tracerCategory" id="tracerCategory"
-                                                bsSize="sm"
-                                                valid={!errors.tracerCategory && this.state.forecastingUnit.tracerCategory != ''}
-                                                invalid={touched.tracerCategory && !!errors.tracerCategory}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.tracerCategoryId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {tracerCategoryList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.tracerCategory}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="productCategory">{i18n.t('static.productcategory.productcategory')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="productCategory" id="productCategory"
-                                                bsSize="sm"
-                                                valid={!errors.productCategory && this.state.forecastingUnit.productCategory != ''}
-                                                invalid={touched.productCategory && !!errors.productCategory}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.productCategoryId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {productCategoryList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.productCategory}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="forecastingUnitDesc">{i18n.t('static.forecastingUnit.forecastingUnitName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="forecastingUnitDesc" id="forecastingUnitDesc"
-                                                bsSize="sm"
-                                                valid={!errors.forecastingUnitDesc && this.state.forecastingUnit.forecastingUnitDesc != ''}
-                                                invalid={touched.forecastingUnitDesc && !!errors.forecastingUnitDesc}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.forecastingUnit.forecastingUnitDesc}
-                                                required />
-                                            <FormFeedback className="red">{errors.forecastingUnitDesc}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="genericName">{i18n.t('static.product.productgenericname')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="genericName" id="genericName"
-                                                bsSize="sm"
-                                                valid={!errors.genericName && this.state.forecastingUnit.genericName != ''}
-                                                invalid={touched.genericName && !!errors.genericName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.forecastingUnit.genericName}
-                                                required />
-                                            <FormFeedback className="red">{errors.genericName}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="unit">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="unit" id="unit"
-                                                bsSize="sm"
-                                                valid={!errors.unit && this.state.forecastingUnit.unit != ''}
-                                                invalid={touched.unit && !!errors.unit}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.unitId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {unitList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.unit}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.forecastingUnit.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.forecastingUnit.notes}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                        {/* <br></br><br></br>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.forecastingUnit.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.forecastingUnit.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="realm">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="realm" id="realm"
+                                            bsSize="sm"
+                                            valid={!errors.realm && this.state.forecastingUnit.realm != ''}
+                                            invalid={touched.realm && !!errors.realm}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getProductCategoryByRealmId(e.target.value) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.realm}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="tracerCategory">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="tracerCategory" id="tracerCategory"
+                                            bsSize="sm"
+                                            valid={!errors.tracerCategory && this.state.forecastingUnit.tracerCategory != ''}
+                                            invalid={touched.tracerCategory && !!errors.tracerCategory}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.tracerCategoryId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {tracerCategoryList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.tracerCategory}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="productCategory">{i18n.t('static.productcategory.productcategory')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="productCategory" id="productCategory"
+                                            bsSize="sm"
+                                            valid={!errors.productCategory && this.state.forecastingUnit.productCategory != ''}
+                                            invalid={touched.productCategory && !!errors.productCategory}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.productCategoryId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {productCategoryList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.productCategory}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="forecastingUnitDesc">{i18n.t('static.forecastingUnit.forecastingUnitName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="forecastingUnitDesc" id="forecastingUnitDesc"
+                                            bsSize="sm"
+                                            valid={!errors.forecastingUnitDesc && this.state.forecastingUnit.forecastingUnitDesc != ''}
+                                            invalid={touched.forecastingUnitDesc && !!errors.forecastingUnitDesc}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.forecastingUnit.forecastingUnitDesc}
+                                            required />
+                                        <FormFeedback className="red">{errors.forecastingUnitDesc}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="genericName">{i18n.t('static.product.productgenericname')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="genericName" id="genericName"
+                                            bsSize="sm"
+                                            valid={!errors.genericName && this.state.forecastingUnit.genericName != ''}
+                                            invalid={touched.genericName && !!errors.genericName}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.forecastingUnit.genericName}
+                                            required />
+                                        <FormFeedback className="red">{errors.genericName}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="unit">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="unit" id="unit"
+                                            bsSize="sm"
+                                            valid={!errors.unit && this.state.forecastingUnit.unit != ''}
+                                            invalid={touched.unit && !!errors.unit}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.unitId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {unitList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.unit}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.forecastingUnit.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={600}
+                                            value={this.state.forecastingUnit.notes}
+                                        // required 
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
-                                    </Form>
-                                )} />
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

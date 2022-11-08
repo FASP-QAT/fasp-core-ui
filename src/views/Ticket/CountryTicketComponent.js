@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import CurrencyService from '../../api/CurrencyService';
-import { LABEL_REGEX, ALPHABETS_REGEX, SPACE_REGEX } from '../../Constants';
+import { LABEL_REGEX, ALPHABETS_REGEX, SPACE_REGEX, API_URL } from '../../Constants';
 
 const initialValues = {
     summary: "Add Country",
@@ -157,7 +157,8 @@ export default class CountryTicketComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -289,91 +290,91 @@ export default class CountryTicketComponent extends Component {
                                 setTouched,
                                 handleReset
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.country.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.country.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="countryName">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="countryName" id="countryName"
-                                                bsSize="sm"
-                                                valid={!errors.countryName && this.state.country.countryName != ''}
-                                                invalid={touched.countryName && !!errors.countryName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.country.countryName}
-                                                required />
-                                            <FormFeedback className="red">{errors.countryName}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="countryCode">{i18n.t('static.country.countrycode')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="countryCode" id="countryCode"
-                                                bsSize="sm"
-                                                valid={!errors.countryCode && this.state.country.countryCode != ''}
-                                                invalid={touched.countryCode && !!errors.countryCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.country.countryCode}
-                                                required />
-                                            <FormFeedback className="red">{errors.countryCode}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="countryCode2">{i18n.t('static.country.countrycode')}2<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="countryCode2" id="countryCode2"
-                                                bsSize="sm"
-                                                valid={!errors.countryCode2 && this.state.country.countryCode2 != ''}
-                                                invalid={touched.countryCode2 && !!errors.countryCode2}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.country.countryCode2}
-                                                required />
-                                            <FormFeedback className="red">{errors.countryCode2}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="currency">{i18n.t('static.currency.currencyName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="currency" id="currency"
-                                                bsSize="sm"
-                                                valid={!errors.currency && this.state.country.currency != ''}
-                                                invalid={touched.currency && !!errors.currency}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.currencyId}
-                                                required>
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {currencyItems}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.currency}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.country.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.country.notes}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pr-0 pb-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className=" mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                    </Form>
-                                )} />
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.country.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.country.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="countryName">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="countryName" id="countryName"
+                                            bsSize="sm"
+                                            valid={!errors.countryName && this.state.country.countryName != ''}
+                                            invalid={touched.countryName && !!errors.countryName}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.country.countryName}
+                                            required />
+                                        <FormFeedback className="red">{errors.countryName}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="countryCode">{i18n.t('static.country.countrycode')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="countryCode" id="countryCode"
+                                            bsSize="sm"
+                                            valid={!errors.countryCode && this.state.country.countryCode != ''}
+                                            invalid={touched.countryCode && !!errors.countryCode}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.country.countryCode}
+                                            required />
+                                        <FormFeedback className="red">{errors.countryCode}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="countryCode2">{i18n.t('static.country.countrycode')}2<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="countryCode2" id="countryCode2"
+                                            bsSize="sm"
+                                            valid={!errors.countryCode2 && this.state.country.countryCode2 != ''}
+                                            invalid={touched.countryCode2 && !!errors.countryCode2}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.country.countryCode2}
+                                            required />
+                                        <FormFeedback className="red">{errors.countryCode2}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="currency">{i18n.t('static.currency.currencyName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="currency" id="currency"
+                                            bsSize="sm"
+                                            valid={!errors.currency && this.state.country.currency != ''}
+                                            invalid={touched.currency && !!errors.currency}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.currencyId}
+                                            required>
+                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            {currencyItems}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.currency}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.country.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={600}
+                                            value={this.state.country.notes}
+                                        // required 
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <ModalFooter className="pr-0 pb-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className=" mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

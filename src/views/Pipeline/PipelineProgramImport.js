@@ -95,7 +95,7 @@ export default class PipelineProgramImport extends Component {
         }, 30000);
     }
     showPipelineProgramInfo() {
-        
+
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
             message: i18n.t('static.message.negativeInventoryMessage'),
@@ -108,12 +108,12 @@ export default class PipelineProgramImport extends Component {
                         // alert(myJson);
                         // alert(fileName);
                         // AuthenticationService.setupAxiosInterceptors();
-                        this.setState({loading:true});
+                        this.setState({ loading: true });
                         PipelineService.savePipelineJson(myJson, fileName)
                             .then(response => {
                                 console.log("response--------->", response);
                                 console.log("messageCode-->", response.data.messageCode);
-                                
+
                                 if (response.status == 200) {
                                     this.props.history.push('/pipeline/pieplineProgramList/' + 'green/' + i18n.t('static.message.pipelineProgramImportSuccess'))
                                 }
@@ -132,7 +132,8 @@ export default class PipelineProgramImport extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -253,7 +254,7 @@ export default class PipelineProgramImport extends Component {
                                     <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                     <Button onClick={this.showPipelineProgramInfo} type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     &nbsp;
-                                    </FormGroup>
+                                </FormGroup>
                             </CardFooter>
                         </Card>
                     </Col>
@@ -274,7 +275,7 @@ export default class PipelineProgramImport extends Component {
                             <FormGroup className="mb-lg-0">
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.toggleModalView}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 &nbsp;
-                                    </FormGroup>
+                            </FormGroup>
                         </ModalFooter>
                     </div>
                 </Modal>

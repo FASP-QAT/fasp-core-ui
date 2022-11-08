@@ -9,7 +9,7 @@ import AuthenticationService from '../../Common/AuthenticationService.js';
 import { Online } from "react-detect-offline";
 import bcrypt from 'bcryptjs';
 import jwt_decode from 'jwt-decode'
-import { SECRET_KEY } from '../../../Constants.js'
+import { API_URL, SECRET_KEY } from '../../../Constants.js'
 import UserService from '../../../api/UserService'
 import moment from 'moment';
 import i18n from '../../../i18n'
@@ -160,7 +160,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                 UserService.updateExpiredPassword(this.props.location.state.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
                                                         var decoded = jwt_decode(response.data.token);
-                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage","sessionType"];
+                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage", "sessionType"];
                                                         keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                                         decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -180,7 +180,10 @@ class UpdateExpiredPasswordComponent extends Component {
                                                     .catch(
                                                         error => {
                                                             if (error.message === "Network Error") {
-                                                                this.setState({ message: error.message }, () => {
+                                                                this.setState({
+                                                                    //  message: error.message 
+                                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                                }, () => {
                                                                     console.log("inside412");
                                                                     document.getElementById('div1').style.display = 'block';
                                                                     this.hideFirstComponent();
@@ -237,66 +240,66 @@ class UpdateExpiredPasswordComponent extends Component {
                                                 isValid,
                                                 setTouched
                                             }) => (
-                                                    <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
-                                                        <CardBody>
-                                                            <Input type="text"
-                                                                name="emailId"
-                                                                id="emailId"
+                                                <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
+                                                    <CardBody>
+                                                        <Input type="text"
+                                                            name="emailId"
+                                                            id="emailId"
+                                                            onChange={handleChange}
+                                                            hidden
+                                                        />
+                                                        <FormGroup>
+                                                            <Label for="oldPassword">{i18n.t('static.user.oldPasswordLabel')}</Label>
+                                                            <Input type="password"
+                                                                name="oldPassword"
+                                                                id="oldPassword"
+                                                                bsSize="sm"
+                                                                valid={!errors.oldPassword}
+                                                                invalid={touched.oldPassword && !!errors.oldPassword}
                                                                 onChange={handleChange}
-                                                                hidden
+                                                                onBlur={handleBlur}
+                                                                required
                                                             />
-                                                            <FormGroup>
-                                                                <Label for="oldPassword">{i18n.t('static.user.oldPasswordLabel')}</Label>
-                                                                <Input type="password"
-                                                                    name="oldPassword"
-                                                                    id="oldPassword"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.oldPassword}
-                                                                    invalid={touched.oldPassword && !!errors.oldPassword}
-                                                                    onChange={handleChange}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                />
-                                                                <FormFeedback>{errors.oldPassword}</FormFeedback>
-                                                            </FormGroup>
-                                                            <FormGroup>
-                                                                <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
-                                                                <Input type="password"
-                                                                    name="newPassword"
-                                                                    id="newPassword"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.newPassword}
-                                                                    invalid={touched.newPassword && !!errors.newPassword}
-                                                                    onChange={handleChange}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                />
-                                                                <FormFeedback>{errors.newPassword}</FormFeedback>
-                                                            </FormGroup>
-                                                            <FormGroup>
-                                                                <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
-                                                                <Input type="password"
-                                                                    name="confirmNewPassword"
-                                                                    id="confirmNewPassword"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.confirmNewPassword}
-                                                                    invalid={touched.confirmNewPassword && !!errors.confirmNewPassword}
-                                                                    onChange={handleChange}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                />
-                                                                <FormFeedback>{errors.confirmNewPassword}</FormFeedback>
-                                                            </FormGroup>
-                                                        </CardBody>
-                                                        <CardFooter>
-                                                            <FormGroup>
-                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i>{i18n.t('static.common.logout')}</Button>
-                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                                &nbsp;
-                          </FormGroup>
-                                                        </CardFooter>
-                                                    </Form>
-                                                )} />
+                                                            <FormFeedback>{errors.oldPassword}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup>
+                                                            <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
+                                                            <Input type="password"
+                                                                name="newPassword"
+                                                                id="newPassword"
+                                                                bsSize="sm"
+                                                                valid={!errors.newPassword}
+                                                                invalid={touched.newPassword && !!errors.newPassword}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                            />
+                                                            <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup>
+                                                            <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
+                                                            <Input type="password"
+                                                                name="confirmNewPassword"
+                                                                id="confirmNewPassword"
+                                                                bsSize="sm"
+                                                                valid={!errors.confirmNewPassword}
+                                                                invalid={touched.confirmNewPassword && !!errors.confirmNewPassword}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                            />
+                                                            <FormFeedback>{errors.confirmNewPassword}</FormFeedback>
+                                                        </FormGroup>
+                                                    </CardBody>
+                                                    <CardFooter>
+                                                        <FormGroup>
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i>{i18n.t('static.common.logout')}</Button>
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+                                                        </FormGroup>
+                                                    </CardFooter>
+                                                </Form>
+                                            )} />
                                 </Card>
                             </Col>
                         </Row>

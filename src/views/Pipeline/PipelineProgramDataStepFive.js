@@ -13,6 +13,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
+import { API_URL } from '../../Constants';
 
 const initialValuesFour = {
     regionId: []
@@ -104,7 +105,8 @@ export default class PipelineProgramDataStepFive extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -150,7 +152,7 @@ export default class PipelineProgramDataStepFive extends Component {
                         for (var i = 0; i < healthAreaId.length; i++) {
                             healthAreaCode += response.data.filter(c => (c.healthAreaId == healthAreaId[i]))[0].healthAreaCode + "/";
                         }
-                        this.props.generateHealthAreaCode(healthAreaCode.slice(0,-1));
+                        this.props.generateHealthAreaCode(healthAreaCode.slice(0, -1));
 
                         // let healthAreaCode = response.data.filter(c => (c.healthAreaId == healthAreaIdd))[0].healthAreaCode;
                         // this.props.generateHealthAreaCode(healthAreaCode);
@@ -163,7 +165,8 @@ export default class PipelineProgramDataStepFive extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -216,7 +219,8 @@ export default class PipelineProgramDataStepFive extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {

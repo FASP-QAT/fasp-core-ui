@@ -11,6 +11,7 @@ import {
     Form, FormGroup, Label, Input,
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants';
 
 const initialValuesFour = {
     organisationId: ''
@@ -107,7 +108,8 @@ export default class StepFour extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -185,35 +187,35 @@ export default class StepFour extends Component {
                             setTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='organisationForm'>
-                                    <FormGroup>
-                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            valid={!errors.organisationId && this.props.items.program.organisation.id != ''}
-                                            invalid={touched.organisationId && !!errors.organisationId}
-                                            onBlur={handleBlur}
-                                            bsSize="sm"
-                                            type="select"
-                                            name="organisationId"
-                                            id="organisationId"
-                                            className="col-md-4"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.generateOrganisationCode(e) }}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {realmOrganisation}
+                            <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='organisationForm'>
+                                <FormGroup>
+                                    <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        valid={!errors.organisationId && this.props.items.program.organisation.id != ''}
+                                        invalid={touched.organisationId && !!errors.organisationId}
+                                        onBlur={handleBlur}
+                                        bsSize="sm"
+                                        type="select"
+                                        name="organisationId"
+                                        id="organisationId"
+                                        className="col-md-4"
+                                        onChange={(e) => { handleChange(e); this.props.dataChange(e); this.generateOrganisationCode(e) }}
+                                    >
+                                        <option value="">{i18n.t('static.common.select')}</option>
+                                        {realmOrganisation}
 
-                                        </Input>
+                                    </Input>
 
-                                        <FormFeedback className="red">{errors.organisationId}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="reset" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                        &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                        &nbsp;
-                                    </FormGroup>
-                                </Form>
-                            )} />
+                                    <FormFeedback className="red">{errors.organisationId}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Button color="info" size="md" className="float-left mr-1" type="reset" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    &nbsp;
+                                </FormGroup>
+                            </Form>
+                        )} />
 
 
             </>
