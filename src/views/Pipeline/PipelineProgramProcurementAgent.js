@@ -10,7 +10,7 @@ import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import { textFilter } from 'react-bootstrap-table2-filter';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 export default class PipelineProgramProcurementAgent extends Component {
     constructor(props) {
         super(props);
@@ -261,7 +261,8 @@ export default class PipelineProgramProcurementAgent extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
@@ -304,7 +305,8 @@ export default class PipelineProgramProcurementAgent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {

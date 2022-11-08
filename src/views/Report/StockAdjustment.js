@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -100,7 +100,8 @@ class StockAdjustmentComponent extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -451,7 +452,8 @@ class StockAdjustmentComponent extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -961,7 +963,8 @@ class StockAdjustmentComponent extends Component {
                             });
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -1366,8 +1369,8 @@ class StockAdjustmentComponent extends Component {
                         </div>
 
                         <div className='ProgramListSearchAlignment'>
-                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

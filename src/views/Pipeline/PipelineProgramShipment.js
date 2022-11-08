@@ -16,7 +16,7 @@ import { Button } from 'reactstrap';
 import FundingSourceService from '../../api/FundingSourceService';
 import { Link } from 'react-router-dom';
 import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_LONG, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT, JEXCEL_PRO_KEY, JEXCEL_INTEGER_REGEX_LONG } from '../../Constants.js'
+import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_LONG, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT, JEXCEL_PRO_KEY, JEXCEL_INTEGER_REGEX_LONG, API_URL } from '../../Constants.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_PAGINATION_OPTION, SHIPMENT_DATA_SOURCE_TYPE } from '../../Constants.js';
 
@@ -691,7 +691,8 @@ export default class PipelineProgramShipment extends Component {
                                                                                         error => {
                                                                                             if (error.message === "Network Error") {
                                                                                                 this.setState({
-                                                                                                    message: 'static.unkownError',
+                                                                                                    // message: 'static.unkownError',
+                                                                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                                                     loading: false
                                                                                                 });
                                                                                             } else {
@@ -737,7 +738,8 @@ export default class PipelineProgramShipment extends Component {
                                                                             error => {
                                                                                 if (error.message === "Network Error") {
                                                                                     this.setState({
-                                                                                        message: 'static.unkownError',
+                                                                                        // message: 'static.unkownError',
+                                                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                                         loading: false
                                                                                     });
                                                                                 } else {
@@ -784,7 +786,8 @@ export default class PipelineProgramShipment extends Component {
                                                                 error => {
                                                                     if (error.message === "Network Error") {
                                                                         this.setState({
-                                                                            message: 'static.unkownError',
+                                                                            // message: 'static.unkownError',
+                                                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                             loading: false
                                                                         });
                                                                     } else {
@@ -831,7 +834,8 @@ export default class PipelineProgramShipment extends Component {
                                                     error => {
                                                         if (error.message === "Network Error") {
                                                             this.setState({
-                                                                message: 'static.unkownError',
+                                                                // message: 'static.unkownError',
+                                                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 loading: false
                                                             });
                                                         } else {
@@ -879,7 +883,8 @@ export default class PipelineProgramShipment extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.unkownError',
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
@@ -925,7 +930,8 @@ export default class PipelineProgramShipment extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
@@ -972,7 +978,8 @@ export default class PipelineProgramShipment extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1276,7 +1283,8 @@ export default class PipelineProgramShipment extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1387,7 +1395,8 @@ export default class PipelineProgramShipment extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -1473,7 +1482,8 @@ export default class PipelineProgramShipment extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {

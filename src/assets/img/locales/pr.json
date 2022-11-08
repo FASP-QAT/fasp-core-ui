@@ -2858,10 +2858,13 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Máx = Menor entre ([Maior entre (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
-    "static.treeList.confirmAlert": "A versão do servidor levará algum tempo para carregar. Tem certeza de que deseja carregar a versão do servidor?",    
+    "static.treeList.confirmAlert": "A versão do servidor levará algum tempo para carregar. Tem certeza de que deseja carregar a versão do servidor?",
     "static.compareVersion.selectedForecastQtyTitle": "Quantidade prevista para todo o período de previsão.",
-    "static.dataset.BranchTreeTemplate": "Modelo de Filial",    
+    "static.dataset.BranchTreeTemplate": "Modelo de Filial",
+    "static.dashboard.deleteThisProgram": "Excluir este programa",
+    "static.dashboard.programDeletedSuccessfully": "Programa excluído com sucesso.",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
-    "static.dashboard.deleteThisProgram":"Excluir este programa",
-    "static.dashboard.programDeletedSuccessfully":"Programa excluído com sucesso."
+    "static.common.uatNetworkErrorMessage": "Erro de rede. Verifique sua conexão com a Internet ou entre em contato com o departamento de TI organizacional para garantir que uat-api.quantificationanalytics.org/# e uat.quantificationanalytics.org/# estejam na lista de permissões para acesso ao firewall.",
+    "static.common.demoNetworkErrorMessage": "Erro de rede. Verifique sua conexão com a Internet ou entre em contato com o departamento de TI organizacional para garantir que demo-api.quantificationanalytics.org/# e demo.quantificationanalytics.org/# estejam na lista de permissões para acesso ao firewall.",
+    "static.common.prodNetworkErrorMessage": "Erro de rede. Verifique sua conexão com a Internet ou entre em contato com o departamento de TI organizacional para garantir que api.quantificationanalytics.org/# e www.quantificationanalytics.org/# estejam na lista de permissões para acesso ao firewall."
 }

@@ -16,7 +16,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js';
 import CryptoJS from 'crypto-js';
 import {
     Card,
@@ -352,7 +352,11 @@ class AnnualShipmentCost extends Component {
                                     loading: false
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message, loading: false });
+                                    this.setState({
+                                        // message: error.message, 
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -406,7 +410,10 @@ class AnnualShipmentCost extends Component {
                             programs: []
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                // message: error.message 
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1093,7 +1100,10 @@ class AnnualShipmentCost extends Component {
                                     planningUnits: [],
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({
+                                        // message: error.message 
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -1131,7 +1141,10 @@ class AnnualShipmentCost extends Component {
                         productCategories: []
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            // message: error.message 
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -1172,7 +1185,10 @@ class AnnualShipmentCost extends Component {
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                //  message: error.message
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1253,7 +1269,10 @@ class AnnualShipmentCost extends Component {
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                // message: error.message 
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1321,7 +1340,10 @@ class AnnualShipmentCost extends Component {
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                // message: error.message
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:

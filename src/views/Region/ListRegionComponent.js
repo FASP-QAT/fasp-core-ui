@@ -346,7 +346,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import { MultiSelect } from 'react-multi-select-component';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 
 
 const entityname = i18n.t('static.region.region');
@@ -702,7 +702,8 @@ class RegionListComponent extends Component {
                         })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -890,7 +891,8 @@ class RegionListComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {

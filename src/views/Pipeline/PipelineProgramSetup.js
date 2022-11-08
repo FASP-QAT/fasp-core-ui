@@ -19,7 +19,7 @@ import PipelineProgramInventory from './PipelineProgramInventory.js';
 import PipelineProgramPlanningUnits from './PipelineProgramPlanningUnits.js';
 import PipelineProgramProcurementAgent from './PipelineProgramProcurementAgent';
 import PipelineProgramShipment from './PipelineProgramShipment';
-import { MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC } from "../../Constants";
+import { MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, API_URL } from "../../Constants";
 
 export default class PipelineProgramSetup extends Component {
     constructor(props) {
@@ -104,7 +104,7 @@ export default class PipelineProgramSetup extends Component {
             healthAreaCode: '',
             programInfoStatus: false,
             programInfoRegionStatus: false,
-            programInfoHealthAreaStatus:false
+            programInfoHealthAreaStatus: false
 
             // pipelineConsumptionList: []
         }
@@ -133,7 +133,7 @@ export default class PipelineProgramSetup extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
-        this.updateFieldDataHealthArea=this.updateFieldDataHealthArea.bind(this);
+        this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
 
         this.generateCountryCode = this.generateCountryCode.bind(this);
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
@@ -151,7 +151,7 @@ export default class PipelineProgramSetup extends Component {
     }
 
     endProgramInfoStepOne() {
-        this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false ,programInfoHealthAreaStatus:true});
+        this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false, programInfoHealthAreaStatus: true });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'block';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -161,7 +161,7 @@ export default class PipelineProgramSetup extends Component {
 
     }
     endProgramInfoStepTwo() {
-        this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false ,programInfoHealthAreaStatus:false});
+        this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'block';
@@ -170,7 +170,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     endProgramInfoStepThree() {
-        this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false,programInfoHealthAreaStatus:false });
+        this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -179,7 +179,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     endProgramInfoStepFour() {
-        this.setState({ progressPer: 100, programInfoStatus: true, programInfoRegionStatus: false,programInfoHealthAreaStatus:false });
+        this.setState({ progressPer: 100, programInfoStatus: true, programInfoRegionStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -216,7 +216,8 @@ export default class PipelineProgramSetup extends Component {
                     this.refs.programInfoChild.stopLoading();
                     this.refs.programInfoChild.setErrorMessage(i18n.t('static.unkownError'));
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -291,8 +292,8 @@ export default class PipelineProgramSetup extends Component {
                     //     if (response.status == "200") {
                     this.refs.child.stopLoading();
                     if (checkValidation == true) {
-                        var realmCountryId=document.getElementById("realmCountryId").value;
-                        PipelineService.createRealmCountryPlanningUnits(this.props.match.params.pipelineId,realmCountryId).
+                        var realmCountryId = document.getElementById("realmCountryId").value;
+                        PipelineService.createRealmCountryPlanningUnits(this.props.match.params.pipelineId, realmCountryId).
                             then(response => {
                                 console.log("createdRealmCountryPlanningUnit Response===>", response)
                             });
@@ -580,7 +581,7 @@ export default class PipelineProgramSetup extends Component {
     }
 
     backToprogramInfoStepOne() {
-        this.setState({ progressPer: 0, programInfoRegionStatus: false, programInfoStatus: false ,programInfoHealthAreaStatus:false});
+        this.setState({ progressPer: 0, programInfoRegionStatus: false, programInfoStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'block';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -589,7 +590,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     backToprogramInfoStepTwo() {
-        this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false ,programInfoHealthAreaStatus:true});
+        this.setState({ progressPer: 25, programInfoRegionStatus: false, programInfoStatus: false, programInfoHealthAreaStatus: true });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'block';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -598,7 +599,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     backToprogramInfoStepThree() {
-        this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false,programInfoHealthAreaStatus:false });
+        this.setState({ progressPer: 50, programInfoRegionStatus: false, programInfoStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'block';
@@ -607,7 +608,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
     }
     backToprogramInfoStepFour() {
-        this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false,programInfoHealthAreaStatus:false });
+        this.setState({ progressPer: 75, programInfoRegionStatus: true, programInfoStatus: false, programInfoHealthAreaStatus: false });
         document.getElementById('pipelineProgramDataStepOne').style.display = 'none';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
@@ -632,7 +633,7 @@ export default class PipelineProgramSetup extends Component {
             dataSourceStatus: false,
             fundingSourceStatus: false,
             procurmentAgnetStatus: false,
-            programInfoRegionStatus: false,programInfoHealthAreaStatus:false, programInfoStatus: true
+            programInfoRegionStatus: false, programInfoHealthAreaStatus: false, programInfoStatus: true
         });
         document.getElementById('stepOne').style.display = 'block';
         document.getElementById('stepTwo').style.display = 'none';
@@ -862,7 +863,8 @@ export default class PipelineProgramSetup extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -931,7 +933,8 @@ export default class PipelineProgramSetup extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -1001,7 +1004,8 @@ export default class PipelineProgramSetup extends Component {
                                                 error => {
                                                     if (error.message === "Network Error") {
                                                         this.setState({
-                                                            message: 'static.unkownError',
+                                                            // message: 'static.unkownError',
+                                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                             loading: false
                                                         });
                                                     } else {
@@ -1066,7 +1070,8 @@ export default class PipelineProgramSetup extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -1117,7 +1122,8 @@ export default class PipelineProgramSetup extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1414,7 +1420,7 @@ export default class PipelineProgramSetup extends Component {
                                                     <PipelineProgramDataStepTwo realmId={this.state.program.realmCountry.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne} items={this.state} dataChange={this.dataChange} getRegionList={this.getRegionList} generateCountryCode={this.generateCountryCode}></PipelineProgramDataStepTwo>
                                                 </div>
                                                 <div id="pipelineProgramDataStepTwo">
-                                                {this.state.programInfoHealthAreaStatus && <PipelineProgramDataStepThree endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} items={this.state} updateFieldDataHealthArea={this.updateFieldDataHealthArea} generateHealthAreaCode={this.generateHealthAreaCode}></PipelineProgramDataStepThree>}
+                                                    {this.state.programInfoHealthAreaStatus && <PipelineProgramDataStepThree endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} items={this.state} updateFieldDataHealthArea={this.updateFieldDataHealthArea} generateHealthAreaCode={this.generateHealthAreaCode}></PipelineProgramDataStepThree>}
                                                 </div>
                                                 <div id="pipelineProgramDataStepThree">
                                                     <PipelineProgramDataStepFour endProgramInfoStepThree={this.endProgramInfoStepThree} backToprogramInfoStepTwo={this.backToprogramInfoStepTwo} items={this.state} dataChange={this.dataChange} generateOrganisationCode={this.generateOrganisationCode}></PipelineProgramDataStepFour>

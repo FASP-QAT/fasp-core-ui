@@ -25,7 +25,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { FORECAST_DATEPICKER_START_MONTH, FORECAST_DATEPICKER_MONTH_DIFF, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY } from '../../Constants.js';
+import { FORECAST_DATEPICKER_START_MONTH, FORECAST_DATEPICKER_MONTH_DIFF, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY, API_URL } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import csvicon from '../../assets/img/csv.png';
@@ -277,7 +277,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -614,7 +615,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false, color: 'red'
                                 });
                             } else {

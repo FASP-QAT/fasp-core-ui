@@ -7,7 +7,7 @@ import DataSourceService from '../../api/DataSourceService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, API_URL, SPACE_REGEX } from '../../Constants.js';
 
 const entityname = i18n.t('static.datasource.datasource');
 let initialValues = {
@@ -188,7 +188,8 @@ export default class UpdateDataSourceComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -278,7 +279,8 @@ export default class UpdateDataSourceComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -349,7 +351,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         id="programId"
                                                         bsSize="sm"
                                                         readOnly
-                                                        value={this.state.dataSource.program!=null?this.state.dataSource.program.code:null}
+                                                        value={this.state.dataSource.program != null ? this.state.dataSource.program.code : null}
                                                     >
                                                     </Input>
                                                 </FormGroup>
@@ -466,7 +468,8 @@ export default class UpdateDataSourceComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {

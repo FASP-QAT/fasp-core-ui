@@ -2866,6 +2866,9 @@
     "static.treeList.confirmAlert": "La version du serveur prendra un certain temps à se charger. Êtes-vous sûr de vouloir charger la version du serveur ?",
     "static.dataset.BranchTreeTemplate": "Modèle de branche",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.dashboard.deleteThisProgram":"Supprimer ce programme",
-    "static.dashboard.programDeletedSuccessfully":"Programme supprimé avec succès."
+    "static.dashboard.deleteThisProgram": "Supprimer ce programme",
+    "static.dashboard.programDeletedSuccessfully": "Programme supprimé avec succès.",
+    "static.common.uatNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que uat-api.quantificationanalytics.org/# et uat.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu.",
+    "static.common.demoNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que demo-api.quantificationanalytics.org/# et demo.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu.",
+    "static.common.prodNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que api.quantificationanalytics.org/# et www.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu."
 }

@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, API_URL, } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -2050,7 +2050,8 @@ class ForecastSummary extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -2250,7 +2251,8 @@ class ForecastSummary extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -3032,13 +3034,14 @@ class ForecastSummary extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(id);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                      var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                      datasetDetailsRequestJson.changed = 1;
-                      var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                      datasetDetailsRequest1.onsuccess = function (event) {
-                           
-                          }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+
+                        }
+                    }
                     this.setState({
                         isChanged1: false,
                         message1: i18n.t('static.compareAndSelect.dataSaved'),

@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP } from '../../Constants.js'
+import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -4317,7 +4317,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -4427,7 +4428,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -4841,7 +4843,8 @@ export default class CreateTreeTemplate extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -5150,12 +5153,12 @@ export default class CreateTreeTemplate extends Component {
             }
             tempArray.push(tempJson);
             // if (scenarioList.length > 0) {
-                // for (let i = 0; i < scenarioList.length; i++) {
+            // for (let i = 0; i < scenarioList.length; i++) {
             nodeDataMap[0] = tempArray;
             (nodeDataMap[0])[0].nodeDataId = maxNodeDataId;
-                    console.log("Branch nodeDataMap---", nodeDataMap);
-                    maxNodeDataId++;
-                // }
+            console.log("Branch nodeDataMap---", nodeDataMap);
+            maxNodeDataId++;
+            // }
             // }
             flatList[i].payload.nodeDataMap = nodeDataMap;
             items.push(JSON.parse(JSON.stringify(flatList[i])));
@@ -5226,7 +5229,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5291,7 +5295,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5342,7 +5347,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5393,7 +5399,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5445,7 +5452,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5498,7 +5506,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5550,7 +5559,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5704,7 +5714,8 @@ export default class CreateTreeTemplate extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -9392,7 +9403,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     render() {
-        console.log("Forecats method test",this.state.treeTemplate.forecastMethod)
+        console.log("Forecats method test", this.state.treeTemplate.forecastMethod)
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
@@ -9632,7 +9643,7 @@ export default class CreateTreeTemplate extends Component {
                                     <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                 </button>}
                         </>}
-                        {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.state.treeTemplate.forecastMethod.id!=""&& this.state.treeTemplate.forecastMethod.id!=undefined &&
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.state.treeTemplate.forecastMethod.id != "" && this.state.treeTemplate.forecastMethod.id != undefined &&
 
                         <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -10033,7 +10044,8 @@ export default class CreateTreeTemplate extends Component {
                                                         error => {
                                                             if (error.message === "Network Error") {
                                                                 this.setState({
-                                                                    message: 'static.unkownError',
+                                                                    // message: 'static.unkownError',
+                                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                     loading: false
                                                                 });
                                                             } else {
@@ -10121,7 +10133,8 @@ export default class CreateTreeTemplate extends Component {
                                                     error => {
                                                         if (error.message === "Network Error") {
                                                             this.setState({
-                                                                message: 'static.unkownError',
+                                                                // message: 'static.unkownError',
+                                                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 loading: false
                                                             });
                                                         } else {

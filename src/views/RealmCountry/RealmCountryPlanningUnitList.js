@@ -20,7 +20,7 @@ import ProgramService from '../../api/ProgramService';
 import { MultiSelect } from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER } from '../../Constants';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER, API_URL } from '../../Constants';
 const entityname = i18n.t('static.dashboad.planningunitcountry');
 export default class RealmCountryPlanningUnitList extends Component {
 
@@ -272,7 +272,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     color: "#BA0C2F",
                                     loading: false
                                 });
@@ -1139,7 +1140,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                                     error => {
                                         if (error.message === "Network Error") {
                                             this.setState({
-                                                message: 'static.unkownError',
+                                                // message: 'static.unkownError',
+                                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                 loading: false
                                             });
                                         } else {
@@ -1179,7 +1181,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
@@ -1219,7 +1222,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1319,7 +1323,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                     })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {

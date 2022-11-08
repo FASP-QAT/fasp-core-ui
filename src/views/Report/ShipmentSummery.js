@@ -46,7 +46,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -606,7 +606,10 @@ class ShipmentSummery extends Component {
                             fundingSources: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                //  message: error.message
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -691,7 +694,10 @@ class ShipmentSummery extends Component {
                             budgets: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                // message: error.message 
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1033,7 +1039,8 @@ class ShipmentSummery extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1385,7 +1392,8 @@ class ShipmentSummery extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -1897,7 +1905,8 @@ class ShipmentSummery extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {

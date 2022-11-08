@@ -19,7 +19,7 @@ import HealthAreaService from "../../api/HealthAreaService"
 import ProgramService from "../../api/ProgramService"
 import getLabelText from '../../CommonComponent/getLabelText'
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import i18n from '../../i18n';
@@ -92,7 +92,8 @@ class Program extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.common.networkError',
+                            // message: 'static.common.networkError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false,
                             color: "#BA0C2F"
                         }, () => {
@@ -197,7 +198,8 @@ class Program extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.common.networkError',
+                                // message: 'static.common.networkError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false,
                                 color: "#BA0C2F"
                             }, () => {
@@ -361,7 +363,8 @@ class Program extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.common.networkError',
+                                            // message: 'static.common.networkError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false,
                                             color: "#BA0C2F"
                                         }, () => {
@@ -453,7 +456,8 @@ class Program extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.common.networkError',
+                                // message: 'static.common.networkError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false,
                                 color: "#BA0C2F"
                             }, () => {
@@ -606,7 +610,7 @@ class Program extends Component {
         console.log(">>>", changed);
         confirmAlert({
             title: i18n.t('static.program.confirm'),
-            message: changed == 1 ?  i18n.t('static.loadDelDataset.changesNotSaved') : i18n.t('static.loadDelDataset.deleteThisLocalVersion'),
+            message: changed == 1 ? i18n.t('static.loadDelDataset.changesNotSaved') : i18n.t('static.loadDelDataset.deleteThisLocalVersion'),
             buttons: [
                 {
                     label: i18n.t('static.program.yes'),
@@ -695,13 +699,13 @@ class Program extends Component {
                             </CardHeader> */}
                             <CardBody className="pb-lg-2 pt-lg-2">
                                 <div>
-                                <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
-                                    <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
-                                    <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
-                                    <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
-                                    <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">{i18n.t('static.loadDelDataset.keepLatestVersionDeleteOldVersion')}</span></li>
-                                    <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">{i18n.t('static.loadDelDataset.deleteVersion')}</span></li>
-                                </ul>
+                                    <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
+                                        <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
+                                        <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.latestVersion')} </span></li>
+                                        <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.notDownloaded')} </span></li>
+                                        <li><span><img width="18" title="Clean up" src={cleanUp} className="CleanUpIcon"></img></span> <span className="legendDeleteCleanupText">{i18n.t('static.loadDelDataset.keepLatestVersionDeleteOldVersion')}</span></li>
+                                        <li><span className=""><i title="Delete" className="fa fa-trash DeleteIcon"></i></span> <span className="legendDeleteCleanupText">{i18n.t('static.loadDelDataset.deleteVersion')}</span></li>
+                                    </ul>
                                 </div>
                                 <Col md="3 pl-0" id="realmDiv">
                                     <FormGroup>
@@ -731,7 +735,7 @@ class Program extends Component {
                         <Card>
                             <CardBody> */}
                                 <div style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div className="table-responsive loadProgramHeight" id="treeDiv" style={{ display: "none"}}>
+                                    <div className="table-responsive loadProgramHeight" id="treeDiv" style={{ display: "none" }}>
                                         <ul className="tree">
                                             <li>
                                                 <input type="checkbox" id="c1" />
@@ -777,7 +781,7 @@ class Program extends Component {
                                                                                     {/* {console.log("Item1------------>", item1), console.log("Item1------------>", item.realmCountry.id, "---------", "fpm".concat(item.realmCountry.id).concat(item1.id))} */}
                                                                                     <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
                                                                                     <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                                                    {this.state.programList.filter(c => c.programId == item2.program.id).length > 1 ? <img onClick={() => this.deleteCleanUpIcon(item2.program.id)} src={cleanUp} className="DeleteIcontree CleanUpSize ml-1" width="16" title="Clean Up"/> : ""}
+                                                                                    {this.state.programList.filter(c => c.programId == item2.program.id).length > 1 ? <img onClick={() => this.deleteCleanUpIcon(item2.program.id)} src={cleanUp} className="DeleteIcontree CleanUpSize ml-1" width="16" title="Clean Up" /> : ""}
                                                                                     <ul>
                                                                                         {
                                                                                             this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
@@ -1417,7 +1421,8 @@ class Program extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.common.networkError',
+                                    // message: 'static.common.networkError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false,
                                     color: "#BA0C2F"
                                 }, () => {

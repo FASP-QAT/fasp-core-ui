@@ -14,6 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
+import { API_URL } from '../../Constants';
 
 const initialValuesFour = {
     regionId: []
@@ -114,7 +115,8 @@ export default class StepFive extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -178,44 +180,44 @@ export default class StepFive extends Component {
                             setFieldTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='regionForm'>
-                                    <FormGroup className="Selectcontrol-bdrNone">
-                                        <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
-                                        <Select
-                                            className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
-                                                { 'is-valid': !errors.regionId && this.props.items.program.regionArray.length != 0 },
-                                                { 'is-invalid': (touched.regionId && !!errors.regionId) }
-                                            )}
-                                            onChange={(e) => {
-                                                handleChange(e);
-                                                setFieldValue("regionId", e);
-                                                this.props.updateFieldData(e);
-                                            }}
-                                            onBlur={() => setFieldTouched("regionId", true)}
-                                            // onChange={(e) => { this.props.updateFieldData(e) }}
-                                            // className="col-md-4"
-                                            bsSize="sm"
-                                            name="regionId"
-                                            id="regionId"
-                                            multi
-                                            options={this.state.regionList}
-                                            // value={this.state.regionId}
-                                            value={this.props.items.program.regionArray}
-                                        // onChange={(e) => { handleChange(e); this.props.updateFieldData(e) }}
-                                        />
+                            <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='regionForm'>
+                                <FormGroup className="Selectcontrol-bdrNone">
+                                    <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
+                                    <Select
+                                        className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
+                                            { 'is-valid': !errors.regionId && this.props.items.program.regionArray.length != 0 },
+                                            { 'is-invalid': (touched.regionId && !!errors.regionId) }
+                                        )}
+                                        onChange={(e) => {
+                                            handleChange(e);
+                                            setFieldValue("regionId", e);
+                                            this.props.updateFieldData(e);
+                                        }}
+                                        onBlur={() => setFieldTouched("regionId", true)}
+                                        // onChange={(e) => { this.props.updateFieldData(e) }}
+                                        // className="col-md-4"
+                                        bsSize="sm"
+                                        name="regionId"
+                                        id="regionId"
+                                        multi
+                                        options={this.state.regionList}
+                                        // value={this.state.regionId}
+                                        value={this.props.items.program.regionArray}
+                                    // onChange={(e) => { handleChange(e); this.props.updateFieldData(e) }}
+                                    />
 
-                                        <FormFeedback className="red">{errors.regionId}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="reset" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                        {/* <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button> */}
-                                        &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                        {/* <Button color="info" size="md" className="float-left mr-1" type="button" name="regionSub" id="regionSub" onClick={this.props.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-                                        &nbsp;
-                                    </FormGroup>
-                                </Form>
-                            )} />
+                                    <FormFeedback className="red">{errors.regionId}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Button color="info" size="md" className="float-left mr-1" type="reset" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                    {/* <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button> */}
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    {/* <Button color="info" size="md" className="float-left mr-1" type="button" name="regionSub" id="regionSub" onClick={this.props.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button> */}
+                                    &nbsp;
+                                </FormGroup>
+                            </Form>
+                        )} />
 
 
                 {/* 
