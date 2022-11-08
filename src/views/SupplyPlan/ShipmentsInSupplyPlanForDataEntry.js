@@ -2627,9 +2627,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                     } else {
-                        var col = ("D").concat(parseInt(y) + 1);
-                        var cell = elInstance.getCell(col)
-                        cell.classList.add('readonly');
+                        var col1 = ("D").concat(parseInt(y) + 1);
+                        var cell1 = elInstance.getCell(col1)
+                        cell1.classList.add('readonly');
                     }
                     // var cell = elInstance.getCell(`M${parseInt(i) + 1}`)
                     // cell.classList.add('shipmentEntryEmergency');
@@ -2644,9 +2644,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                         } else {
-                            var col = ("D").concat(parseInt(y) + 1);
-                            var cell = elInstance.getCell(col)
-                            cell.classList.add('readonly');
+                            var col2 = ("D").concat(parseInt(y) + 1);
+                            var cell2 = elInstance.getCell(col2)
+                            cell2.classList.add('readonly');
                         }
                         // var cell = elInstance.getCell(`M${parseInt(i) + 1}`)
                         // cell.classList.add('shipmentEntryDoNotInclude');
@@ -2661,9 +2661,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                         } else {
-                            var col = ("D").concat(parseInt(y) + 1);
-                            var cell = elInstance.getCell(col)
-                            cell.classList.add('readonly');
+                            var col3 = ("D").concat(parseInt(y) + 1);
+                            var cell3 = elInstance.getCell(col3)
+                            cell3.classList.add('readonly');
                         }
                         // cell.classList.add('readonly');
                         // var cell = elInstance.getCell(`M${parseInt(i) + 1}`)
@@ -2683,9 +2683,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                         } else {
-                            var col = ("D").concat(parseInt(y) + 1);
-                            var cell = elInstance.getCell(col)
-                            cell.classList.add('readonly');
+                            var col4 = ("D").concat(parseInt(y) + 1);
+                            var cell4 = elInstance.getCell(col4)
+                            cell4.classList.add('readonly');
                         }
                         // var cell = elInstance.getCell(`M${parseInt(i) + 1}`)
                         // cell.classList.add('shipmentEntryEmergency');
@@ -2698,9 +2698,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
 
                         } else {
-                            var col = ("D").concat(parseInt(y) + 1);
-                            var cell = elInstance.getCell(col)
-                            cell.classList.add('readonly');
+                            var col5 = ("D").concat(parseInt(y) + 1);
+                            var cell5 = elInstance.getCell(col5)
+                            cell5.classList.add('readonly');
                         }
                         // var cell = elInstance.getCell(`M${parseInt(i) + 1}`)
                         // cell.classList.remove('shipmentEntryEmergency');
