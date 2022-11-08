@@ -2861,6 +2861,9 @@ export default class BuildTree extends Component {
 
     }
     setStartAndStopDateOfProgram(programId) {
+        this.setState({
+            scenarioList: []
+        })
         console.log("programId>>>", this.state.datasetList);
         var proList = [];
         localStorage.setItem("sesDatasetId", programId);
