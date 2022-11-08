@@ -567,7 +567,7 @@ const routes = [
   { path: '/supplyPlan/:programId/:planningUnitId/:batchNo/:expiryDate', exact: true, name: 'static.dashboard.supplyPlan', component: SupplyPlan },
 
   { path: '/report/whatIf', name: 'static.dashboard.whatIf', component: WhatIfReport },
-  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging',exact:true, component: ManualTagging },
+  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging', exact: true, component: ManualTagging },
   { path: '/shipment/manualTagging/:tab', name: 'static.dashboard.manualTagging', component: ManualTagging },
   { path: '/shipment/delinking', name: 'static.dashboard.delinking', component: ShipmentDelinking },
   { path: '/supplyPlanFormulas', name: 'static.supplyplan.supplyplanformula', component: SupplyPlanFormulas },
@@ -877,7 +877,7 @@ class DefaultLayout extends Component {
     //   window.location.reload();
     // } else {
     //   // "The specific word doesn't exist";
-      localStorage.setItem("loginOnline", false);
+    localStorage.setItem("loginOnline", false);
     //   window.location.reload();
     // }
     // window.location.reload();
@@ -1147,14 +1147,14 @@ class DefaultLayout extends Component {
         var programDatasetChanged = 0;
         console.log(" programDatasetChanged@@@!", programDatasetChanged);
         console.log("myResult@@@!", myResult);
-          
+
         for (var i = 0; i < myResult.length; i++) {
           console.log("userId@@@!", userId);
-          console.log("myResult[i].userId==userId@@@1", myResult[i].userId==userId);
-            
+          console.log("myResult[i].userId==userId@@@1", myResult[i].userId == userId);
+
           if (myResult[i].userId == userId) {
             console.log("myResult[i].changed@@@!", myResult[i].changed);
-            
+
             if (myResult[i].changed == 1) {
               programDatasetChanged = 1;
               break;
@@ -3492,7 +3492,7 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
 
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
 
@@ -3507,17 +3507,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          // {
-                          //   name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
-                          //   url: '/planningUnitSetting/listPlanningUnitSetting',
-                          //   icon: 'fa fa-cubes',
-                          //   attributes: {
-                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true),
-                          //     onClick: e => {
-                          //       this.refreshPage();
-                          //     }
-                          //   }
-                          // },
+                          {
+                            name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
+                            url: '/planningUnitSetting/listPlanningUnitSetting',
+                            icon: 'fa fa-cubes',
+                            attributes: {
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
 
                           {
                             name: 'Import Program',

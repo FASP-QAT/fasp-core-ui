@@ -1621,116 +1621,149 @@ export default class PlanningUnitSetting extends Component {
 
             // PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId())
             // PlanningUnitService.getActivePlanningUnitList()
-            PlanningUnitService.getPlanningUnitForProductCategory(-1)
-                .then(response => {
-                    console.log("RESP----->pu", response.data);
+            if (isSiteOnline()) {
+                PlanningUnitService.getPlanningUnitForProductCategory(-1)
+                    .then(response => {
+                        console.log("RESP----->pu", response.data);
 
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
 
-                    let tempList = [];
-                    if (listArray.length > 0) {
-                        for (var i = 0; i < listArray.length; i++) {
-                            var paJson = {
-                                // name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
-                                // id: parseInt(listArray[i].planningUnitId),
-                                // active: listArray[i].active,
-                                // forecastingUnit: listArray[i].forecastingUnit,
-                                // label: listArray[i].label
+                        let tempList = [];
+                        if (listArray.length > 0) {
+                            for (var i = 0; i < listArray.length; i++) {
+                                var paJson = {
+                                    // name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
+                                    // id: parseInt(listArray[i].planningUnitId),
+                                    // active: listArray[i].active,
+                                    // forecastingUnit: listArray[i].forecastingUnit,
+                                    // label: listArray[i].label
 
-                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].id),
-                                id: parseInt(listArray[i].id),
-                                // active: listArray[i].active,
-                                // forecastingUnit: listArray[i].forecastingUnit,
-                                label: listArray[i].label
+                                    name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].id),
+                                    id: parseInt(listArray[i].id),
+                                    // active: listArray[i].active,
+                                    // forecastingUnit: listArray[i].forecastingUnit,
+                                    label: listArray[i].label
+                                }
+                                tempList[i] = paJson
                             }
-                            tempList[i] = paJson
                         }
-                    }
-                    this.setState({
-                        allPlanningUnitList: tempList,
-                        originalPlanningUnitList: response.data,
-                        planningUnitList: response.data,
+                        this.setState({
+                            allPlanningUnitList: tempList,
+                            originalPlanningUnitList: response.data,
+                            planningUnitList: response.data,
+                        }, () => {
+                            console.log("List------->pu123", this.state.allPlanningUnitList.filter(c => c.id == 915));
+
+                            let forecastStartDate = selectedForecastProgram.forecastStartDate;
+                            let forecastStopDate = selectedForecastProgram.forecastStopDate;
+
+                            let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                            beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
+                            localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
+                            localStorage.setItem("sesForecastVersionIdReport", parseInt(versionId));
+
+                            this.setState(
+                                {
+                                    // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+                                    rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
+                                    // startDateDisplay: (forecastStartDate == '' ? '' : months[new Date(forecastStartDate).getMonth()] + ' ' + new Date(forecastStartDate).getFullYear()),
+                                    startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY"))),
+                                    // endDateDisplay: (forecastStopDate == '' ? '' : months[new Date(forecastStopDate).getMonth()] + ' ' + new Date(forecastStopDate).getFullYear()),
+                                    endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY"))),
+                                    beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
+                                    forecastProgramId: parseInt(programId),
+                                    forecastProgramVersionId: parseInt(versionId),
+                                    datasetId: selectedForecastProgram.id,
+
+                                }, () => {
+                                    // console.log("d----------->0", d1);
+                                    // console.log("d----------->00", (d1.getMonth()));
+                                    // console.log("d----------->1", this.state.startDateDisplay);
+                                    // console.log("d----------->2", this.state.endDateDisplay);
+                                    // console.log("d----------->3", this.state.beforeEndDateDisplay);
+                                    // this.productCategoryList();
+                                    this.filterData();
+                                })
+                        });
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            } else {
+                let forecastStartDate = selectedForecastProgram.forecastStartDate;
+                let forecastStopDate = selectedForecastProgram.forecastStopDate;
+
+                let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
+                localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
+                localStorage.setItem("sesForecastVersionIdReport", parseInt(versionId));
+
+                this.setState(
+                    {
+                        // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+                        rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
+                        // startDateDisplay: (forecastStartDate == '' ? '' : months[new Date(forecastStartDate).getMonth()] + ' ' + new Date(forecastStartDate).getFullYear()),
+                        startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY"))),
+                        // endDateDisplay: (forecastStopDate == '' ? '' : months[new Date(forecastStopDate).getMonth()] + ' ' + new Date(forecastStopDate).getFullYear()),
+                        endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY"))),
+                        beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
+                        forecastProgramId: parseInt(programId),
+                        forecastProgramVersionId: parseInt(versionId),
+                        datasetId: selectedForecastProgram.id,
+
                     }, () => {
-                        console.log("List------->pu123", this.state.allPlanningUnitList.filter(c => c.id == 915));
-
-                        let forecastStartDate = selectedForecastProgram.forecastStartDate;
-                        let forecastStopDate = selectedForecastProgram.forecastStopDate;
-
-                        let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
-                        beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
-
-                        localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
-                        localStorage.setItem("sesForecastVersionIdReport", parseInt(versionId));
-
-                        this.setState(
-                            {
-                                // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-                                rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
-                                // startDateDisplay: (forecastStartDate == '' ? '' : months[new Date(forecastStartDate).getMonth()] + ' ' + new Date(forecastStartDate).getFullYear()),
-                                startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY"))),
-                                // endDateDisplay: (forecastStopDate == '' ? '' : months[new Date(forecastStopDate).getMonth()] + ' ' + new Date(forecastStopDate).getFullYear()),
-                                endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY"))),
-                                beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
-                                forecastProgramId: parseInt(programId),
-                                forecastProgramVersionId: parseInt(versionId),
-                                datasetId: selectedForecastProgram.id,
-
-                            }, () => {
-                                // console.log("d----------->0", d1);
-                                // console.log("d----------->00", (d1.getMonth()));
-                                // console.log("d----------->1", this.state.startDateDisplay);
-                                // console.log("d----------->2", this.state.endDateDisplay);
-                                // console.log("d----------->3", this.state.beforeEndDateDisplay);
-                                // this.productCategoryList();
-                                this.filterData();
-                            })
-                    });
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
-
+                        // console.log("d----------->0", d1);
+                        // console.log("d----------->00", (d1.getMonth()));
+                        console.log("d----------->1", this.state.startDateDisplay);
+                        console.log("d----------->2", this.state.endDateDisplay);
+                        console.log("d----------->3", this.state.beforeEndDateDisplay);
+                        // this.productCategoryList();
+                        this.filterData();
+                    })
+            }
 
 
 
