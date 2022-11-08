@@ -837,7 +837,8 @@ export default class ShipmentDetails extends React.Component {
                                         if (myResult[i].program.id == programId && myResult[i].active == true) {
                                             var productJson = {
                                                 label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                                value: myResult[i].planningUnit.id
+                                                value: myResult[i].planningUnit.id,
+                                                actualLabel:myResult[i].planningUnit.label
                                             }
                                             proList.push(productJson)
                                             var productJson1 = {
@@ -1916,7 +1917,7 @@ export default class ShipmentDetails extends React.Component {
                                                         notes: i18n.t('static.supplyPlan.planByDateNote'),
                                                         planningUnit: {
                                                             id: planningUnitsIds[pu].value,
-                                                            label: (this.state.planningUnitList.filter(c => c.value == planningUnitsIds[pu].value)[0]).label
+                                                            label: (this.state.planningUnitList.filter(c => c.value == planningUnitsIds[pu].value)[0]).actualLabel
                                                         },
                                                         procurementAgent: {
                                                             id: this.state.procurementAgentId,
