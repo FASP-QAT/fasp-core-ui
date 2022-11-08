@@ -88,7 +88,7 @@ class ManualTaggingSerice {
     }
 
     getOrderDetails(json) {
-        return axios.post(`${API_URL}/api/erpLinking/notLinkedErpShipments/tab1`, json, {
+        return axios.post(`${API_URL}/api/erpLinking/notLinkedErpShipments`, json, {
         });
     }
 

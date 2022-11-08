@@ -852,7 +852,8 @@ export default class BuildTree extends Component {
             lastRowDeleted: false,
             showDate: false,
             modelingChanged: false,
-            missingPUList: []
+            missingPUList: [],
+            autoCalculate: true
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -989,6 +990,7 @@ export default class BuildTree extends Component {
         this.getNodeTransferList = this.getNodeTransferList.bind(this);
         this.generateBranchFromTemplate = this.generateBranchFromTemplate.bind(this);
         this.buildMissingPUJexcel = this.buildMissingPUJexcel.bind(this);
+        this.autoCalculate = this.autoCalculate.bind(this);
     }
 
     buildMissingPUJexcel() {
@@ -1462,8 +1464,9 @@ export default class BuildTree extends Component {
         treeData[findTreeIndex] = curTreeObj;
         programData.treeList = treeData;
         dataSetObj.programData = programData;
-        console.log("dataSetDecrypt>>>", dataSetObj);
-        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false, false);
+        console.log("dataSetDecrypt 2121>>>", dataSetObj);
+        console.log("Before modeling data calculation Test")
+        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false, false, this.state.autoCalculate);
         // }
     }
     fetchTracerCategoryList(programData) {
@@ -2418,7 +2421,8 @@ export default class BuildTree extends Component {
                     // dataSetObjCopy.programData = programData;
                     // dataSetObj.programData = programData;
                     console.log("dataSetDecrypt>>>", programData);
-                    calculateModelingData(dataSetObjCopy, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false, false);
+                    console.log("Before modeling data calculation Test 1")
+                    calculateModelingData(dataSetObjCopy, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false, false, this.state.autoCalculate);
                     // store update object in indexdb
                     //     var db1;
                     //     getDatabase();
@@ -6302,6 +6306,52 @@ export default class BuildTree extends Component {
         this.setState({
             showModelingValidation: e.target.checked == true ? false : true
         })
+    }
+
+    autoCalculate(e) {
+        console.log("Inside function test", e.target.checked)
+        var val = (e.target.checked);
+        console.log("val test", val)
+        var prevVal = this.state.autoCalculate;
+        console.log("prev val test", prevVal)
+        this.setState({
+            autoCalculate: val
+        }, () => {
+            if (val == true && prevVal == false) {
+                this.setState({
+                    loading: true
+                })
+                this.calculateMOMData(0, 2);
+            }
+        })
+    }
+
+    recalculate(nodeId, type) {
+        this.setState({
+            loading: true
+        })
+        let { curTreeObj } = this.state;
+        let { treeData } = this.state;
+        let { dataSetObj } = this.state;
+        var items = this.state.items;
+        var programData = dataSetObj.programData;
+        console.log("program data>>> 1", programData);
+        console.log("program data treeData>>> 1.1", treeData);
+        console.log("program data curTreeObj>>> 1.1", curTreeObj);
+        programData.treeList = treeData;
+        console.log("program data>>> 2", programData);
+        // alert("27---")
+
+        curTreeObj.tree.flatList = items;
+        curTreeObj.scenarioList = this.state.scenarioList;
+        var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+        treeData[findTreeIndex] = curTreeObj;
+        programData.treeList = treeData;
+        dataSetObj.programData = programData;
+        console.log("dataSetDecrypt 2121>>>", dataSetObj);
+        console.log("Before modeling data calculation Test")
+        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false, false, true);
+        // }
     }
 
     filterPlanningUnitNode(e) {
@@ -11734,7 +11784,7 @@ export default class BuildTree extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-6" >
+                                            <FormGroup className="col-md-2" >
                                                 <div className="check inline  pl-lg-0 pt-lg-0">
                                                     <div>
                                                         <Input
@@ -11749,6 +11799,25 @@ export default class BuildTree extends Component {
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                             <b>{'Hide Tree Validation'}</b>
+                                                        </Label>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-4" >
+                                                <div className="check inline  pl-lg-0 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="active8"
+                                                            name="active8"
+                                                            checked={this.state.autoCalculate}
+                                                            onClick={(e) => { this.autoCalculate(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{'Auto Calculate'}</b>
                                                         </Label>
                                                     </div>
                                                 </div>
@@ -11772,6 +11841,7 @@ export default class BuildTree extends Component {
                                                                                     openTreeDataModal: true
                                                                                 })
                                                                             }}><i className="fa fa-cog"></i></a> */}
+                                                                {this.state.selectedScenario > 0 && <a style={{ marginRight: '7px' }} href="javascript:void();" title={i18n.t('static.qpl.recalculate')} onClick={() => this.recalculate(0, 2)}><i className="fa fa-refresh"></i></a>}
                                                                 {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
                                                                     onClick={() => this.exportPDF()}
                                                                 />}
