@@ -11,7 +11,7 @@ import {
 } from 'reactstrap';
 import * as Yup from 'yup';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED, SPECIAL_CHARECTER_WITH_NUM, API_URL } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -1434,7 +1434,8 @@ export default class syncPage extends Component {
               if (error.message === "Network Error") {
                 // console.log("+++in catch 1")
                 this.setState({
-                  message: 'static.common.networkError',
+                  // message: 'static.common.networkError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false,
                   statuses: [],
                 });
@@ -1558,7 +1559,8 @@ export default class syncPage extends Component {
         if (error.message === "Network Error") {
           // console.log("+++in catch 1")
           this.setState({
-            message: 'static.common.networkError',
+            // message: 'static.common.networkError',
+            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
             loading: false,
             statuses: [],
           });
@@ -2916,7 +2918,8 @@ export default class syncPage extends Component {
                 if (error.message === "Network Error") {
                   // console.log("+++in catch 3")
                   this.setState({
-                    message: 'static.common.networkError',
+                    // message: 'static.common.networkError',
+                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                     loading: false
                   });
                 } else {
@@ -2972,7 +2975,8 @@ export default class syncPage extends Component {
             if (error.message === "Network Error") {
               // console.log("+++in catch 5")
               this.setState({
-                message: 'static.common.networkError',
+                // message: 'static.common.networkError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -3344,7 +3348,7 @@ export default class syncPage extends Component {
     // console.log("In resolve conflicts@@@@@@@@@@@@")
     var elInstance = instance;
     var jsonData = elInstance.getJson();
-    var jsonLength=jsonData.length;
+    var jsonLength = jsonData.length;
 
     // if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
     //   jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
@@ -3370,10 +3374,10 @@ export default class syncPage extends Component {
           var col = (colArr[j]).concat(parseInt(c) + 1);
           // elInstance.setStyle(col, "background-color", "transparent");
           // elInstance.setStyle(col, "background-color", "red");
-          try{
-          var cell = elInstance.getCell(col);
-          cell.classList.add('commitShipmentAlreadyLinkedToOtherPro');
-          }catch(err){
+          try {
+            var cell = elInstance.getCell(col);
+            cell.classList.add('commitShipmentAlreadyLinkedToOtherPro');
+          } catch (err) {
 
           }
         }
@@ -3389,24 +3393,24 @@ export default class syncPage extends Component {
             var col = (colArr[j]).concat(parseInt(c) + 1);
             // elInstance.setStyle(col, "background-color", "transparent");
             // elInstance.setStyle(col, "background-color", "yellow");
-            try{
-            var cell = elInstance.getCell(col);
-            cell.classList.add('commitConflict');
-          }catch(err){
-            
-          }
+            try {
+              var cell = elInstance.getCell(col);
+              cell.classList.add('commitConflict');
+            } catch (err) {
+
+            }
           }
         } else {
           if ((jsonData[c])[15] === "" && (jsonData[c])[14] === 0) {
             elInstance.setValueFromCoords(17, c, 2, true);
             for (var i = 0; i < colArr.length; i++) {
               var col = (colArr[i]).concat(parseInt(c) + 1);
-              try{
-              var cell = elInstance.getCell(col);
-              cell.classList.add('commitLocal');
-            }catch(err){
-            
-            }
+              try {
+                var cell = elInstance.getCell(col);
+                cell.classList.add('commitLocal');
+              } catch (err) {
+
+              }
 
             }
             this.setState({
@@ -3417,12 +3421,12 @@ export default class syncPage extends Component {
             elInstance.setValueFromCoords(17, c, 3, true);
             for (var i = 0; i < colArr.length; i++) {
               var col = (colArr[i]).concat(parseInt(c) + 1);
-              try{
-              var cell = elInstance.getCell(col);
-              cell.classList.add('commitServer');
-            }catch(err){
-            
-            }
+              try {
+                var cell = elInstance.getCell(col);
+                cell.classList.add('commitServer');
+              } catch (err) {
+
+              }
 
             }
             this.setState({
@@ -3433,12 +3437,12 @@ export default class syncPage extends Component {
               if ((jsonData[c])[7] == (jsonData[c])[25]) {
                 elInstance.setValueFromCoords(17, c, 3, true);
                 var col = (colArr[13]).concat(parseInt(c) + 1);
-                try{
-                var cell = elInstance.getCell(col);
-                cell.classList.add('commitServer');
-              }catch(err){
-            
-              }
+                try {
+                  var cell = elInstance.getCell(col);
+                  cell.classList.add('commitServer');
+                } catch (err) {
+
+                }
                 this.setState({
                   isChanged: true
                 })
@@ -3446,12 +3450,12 @@ export default class syncPage extends Component {
               } else if ((jsonData[c])[13] == (jsonData[c])[25]) {
                 elInstance.setValueFromCoords(17, c, 3, true);
                 var col = (colArr[7]).concat(parseInt(c) + 1);
-                try{
-                var cell = elInstance.getCell(col);
-                cell.classList.add('commitLocal');
-              }catch(err){
-            
-              }
+                try {
+                  var cell = elInstance.getCell(col);
+                  cell.classList.add('commitLocal');
+                } catch (err) {
+
+                }
                 this.setState({
                   isChanged: true
                 })
@@ -3459,12 +3463,12 @@ export default class syncPage extends Component {
             } else {
               for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(c) + 1);
-                try{
-                var cell = elInstance.getCell(col);
-                cell.classList.add('commitNoChange');
-              }catch(err){
-            
-              }
+                try {
+                  var cell = elInstance.getCell(col);
+                  cell.classList.add('commitNoChange');
+                } catch (err) {
+
+                }
               }
             }
           } else if ((jsonData[c])[15] !== "" && (jsonData[c])[14] !== "" && (jsonData[c])[14] !== (jsonData[c])[15]) {
@@ -3475,12 +3479,12 @@ export default class syncPage extends Component {
             elInstance.setValueFromCoords(17, c, 1, true);
             for (var j = 0; j < colArr.length; j++) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
-              try{
-              var cell = elInstance.getCell(col);
-              cell.classList.add('commitConflict');
-            }catch(err){
-            
-            }
+              try {
+                var cell = elInstance.getCell(col);
+                cell.classList.add('commitConflict');
+              } catch (err) {
+
+              }
             }
           }
         }
@@ -4651,7 +4655,8 @@ export default class syncPage extends Component {
                     if (error.message === "Network Error") {
                       // console.log("+++in catch 7")
                       this.setState({
-                        message: 'static.common.networkError',
+                        // message: 'static.common.networkError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         color: "red",
                         loading: false
                       }, () => {

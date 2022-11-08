@@ -10,6 +10,7 @@ import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { API_URL } from '../../Constants';
 const entityname = i18n.t('static.program.realmcountry');
 const initialValues = {
     realmId: [],
@@ -155,7 +156,8 @@ class AddRealmCountryComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -212,7 +214,8 @@ class AddRealmCountryComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -302,7 +305,8 @@ class AddRealmCountryComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -351,97 +355,97 @@ class AddRealmCountryComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
-                                                <CardBody>
-                                                    <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="lg"
-                                                            valid={!errors.realmId}
-                                                            invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                        >
-                                                            <option value="">{i18n.t('static.common.pleaseSelect')}</option>
-                                                            {realmList}
-                                                        </Input>
-                                                        <FormFeedback>{errors.realmId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="countryId">{i18n.t('static.report.country')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="countryId"
-                                                            id="countryId"
-                                                            bsSize="lg"
-                                                            valid={!errors.countryId}
-                                                            invalid={touched.countryId && !!errors.countryId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                        >
-                                                            <option value="">{i18n.t('static.common.pleaseSelect')}</option>
-                                                            {realmList}
-                                                        </Input>
-                                                        <FormFeedback>{errors.countryId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="procurementAgentCode">{i18n.t('static.report.procurementagentcode')}</Label>
-                                                        <Input type="text"
-                                                            name="procurementAgentCode"
-                                                            id="procurementAgentCode"
-                                                            valid={!errors.procurementAgentCode}
-                                                            invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            maxLength={6}
-                                                            value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
-                                                        />
-                                                        <FormFeedback>{errors.procurementAgentCode}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="procurementAgentName">{i18n.t('static.procurementAgent.procurementAgentName')}</Label>
-                                                        <Input type="text"
-                                                            name="procurementAgentName"
-                                                            id="procurementAgentName"
-                                                            valid={!errors.procurementAgentName}
-                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.Capitalize(this.state.procurementAgent.label.label_en)}
-                                                        />
-                                                        <FormFeedback>{errors.procurementAgentName}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.program.submittoapproveleadtime')}</Label>
-                                                        <Input type="number"
-                                                            name="submittedToApprovedLeadTime"
-                                                            id="submittedToApprovedLeadTime"
-                                                            valid={!errors.submittedToApprovedLeadTime}
-                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            min={1}
-                                                        />
-                                                        <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
-                                                    </FormGroup>
-                                                </CardBody>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                        <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
+                                            <CardBody>
+                                                <FormGroup>
+                                                    <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}</Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="realmId"
+                                                        id="realmId"
+                                                        bsSize="lg"
+                                                        valid={!errors.realmId}
+                                                        invalid={touched.realmId && !!errors.realmId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                    >
+                                                        <option value="">{i18n.t('static.common.pleaseSelect')}</option>
+                                                        {realmList}
+                                                    </Input>
+                                                    <FormFeedback>{errors.realmId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="countryId">{i18n.t('static.report.country')}</Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="countryId"
+                                                        id="countryId"
+                                                        bsSize="lg"
+                                                        valid={!errors.countryId}
+                                                        invalid={touched.countryId && !!errors.countryId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                    >
+                                                        <option value="">{i18n.t('static.common.pleaseSelect')}</option>
+                                                        {realmList}
+                                                    </Input>
+                                                    <FormFeedback>{errors.countryId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="procurementAgentCode">{i18n.t('static.report.procurementagentcode')}</Label>
+                                                    <Input type="text"
+                                                        name="procurementAgentCode"
+                                                        id="procurementAgentCode"
+                                                        valid={!errors.procurementAgentCode}
+                                                        invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        maxLength={6}
+                                                        value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
+                                                    />
+                                                    <FormFeedback>{errors.procurementAgentCode}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="procurementAgentName">{i18n.t('static.procurementAgent.procurementAgentName')}</Label>
+                                                    <Input type="text"
+                                                        name="procurementAgentName"
+                                                        id="procurementAgentName"
+                                                        valid={!errors.procurementAgentName}
+                                                        invalid={touched.procurementAgentName && !!errors.procurementAgentName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.Capitalize(this.state.procurementAgent.label.label_en)}
+                                                    />
+                                                    <FormFeedback>{errors.procurementAgentName}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="submittedToApprovedLeadTime">{i18n.t('static.program.submittoapproveleadtime')}</Label>
+                                                    <Input type="number"
+                                                        name="submittedToApprovedLeadTime"
+                                                        id="submittedToApprovedLeadTime"
+                                                        valid={!errors.submittedToApprovedLeadTime}
+                                                        invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        min={1}
+                                                    />
+                                                    <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.submit')}</Button>
+                                                    <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                         </Card>
                     </Col>

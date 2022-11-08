@@ -12,7 +12,7 @@ import Select from 'react-select';
 import ForecastMethodService from "../../api/ForecastMethodService";
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
-import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
+import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABET_NUMBER_REGEX, API_URL } from '../../Constants';
 import getLabelText from '../../CommonComponent/getLabelText';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.forecastMethod.forecastMethod"))
@@ -175,7 +175,8 @@ export default class OrganisationTypeTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false,
                             color: "#BA0C2F",
                         });
@@ -299,7 +300,8 @@ export default class OrganisationTypeTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {

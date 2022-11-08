@@ -2870,7 +2870,10 @@
     "static.programPU.monthsInFutureTooltip": "How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the past if the past data is more reliable and predicts the future.",
     "static.message.addBranchTemplate": "Branch Template Added Successfully",
     "static.message.editBranchTemplate": "Branch Template Updated Successfully",
-   "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-   "static.dashboard.deleteThisProgram":"Delete this Program",
-    "static.dashboard.programDeletedSuccessfully":"Program delete successfully."
+    "static.dashboard.deleteThisProgram": "Delete this Program",
+    "static.dashboard.programDeletedSuccessfully": "Program delete successfully.",
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.common.uatNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure uat-api.quantificationanalytics.org/# and uat.quantificationanalytics.org/# are whitelisted for firewall access.",
+    "static.common.demoNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure demo-api.quantificationanalytics.org/# and demo.quantificationanalytics.org/# are whitelisted for firewall access.",
+    "static.common.prodNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure api.quantificationanalytics.org/# and www.quantificationanalytics.org/# are whitelisted for firewall access."
 }

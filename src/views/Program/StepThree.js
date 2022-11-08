@@ -13,6 +13,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
+import { API_URL } from '../../Constants';
 
 const initialValuesThree = {
     healthAreaId: []
@@ -86,7 +87,7 @@ export default class StepThree extends Component {
         for (var i = 0; i < healthAreaId.length; i++) {
             healthAreaCode += this.state.healthAreaList.filter(c => (c.value == healthAreaId[i].value))[0].healthAreaCode + "/";
         }
-        this.props.generateHealthAreaCode(healthAreaCode.slice(0,-1));
+        this.props.generateHealthAreaCode(healthAreaCode.slice(0, -1));
     }
 
     getHealthAreaList() {
@@ -98,7 +99,7 @@ export default class StepThree extends Component {
                     var json = response.data;
                     var haList = [];
                     for (var i = 0; i < json.length; i++) {
-                        haList[i] = { healthAreaCode:json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                        haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
                     }
 
                     var listArray = haList;
@@ -120,7 +121,8 @@ export default class StepThree extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
