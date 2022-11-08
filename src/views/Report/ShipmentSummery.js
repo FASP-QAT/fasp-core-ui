@@ -2286,7 +2286,7 @@ class ShipmentSummery extends Component {
             },
             {
                 label: i18n.t('static.supplyPlan.ordered'),
-                backgroundColor: '#0067B9',
+                backgroundColor: '#118b70',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
