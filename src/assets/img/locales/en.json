@@ -2870,5 +2870,7 @@
     "static.programPU.monthsInFutureTooltip": "How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the past if the past data is more reliable and predicts the future.",
     "static.message.addBranchTemplate": "Branch Template Added Successfully",
     "static.message.editBranchTemplate": "Branch Template Updated Successfully",
-   "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+   "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+   "static.dashboard.deleteThisProgram":"Delete this Program",
+    "static.dashboard.programDeletedSuccessfully":"Program delete successfully."
 }
