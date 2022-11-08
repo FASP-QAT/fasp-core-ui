@@ -275,7 +275,7 @@ class ApplicationDashboard extends Component {
     // console.log(">>>", changed);
     confirmAlert({
       title: i18n.t('static.program.confirm'),
-      message: "Delete this program",
+      message: i18n.t("static.dashboard.deleteThisProgram"),
       buttons: [
         {
           label: i18n.t('static.program.yes'),
@@ -307,7 +307,7 @@ class ApplicationDashboard extends Component {
                   deleteRequest2.onsuccess = function (event) {
                     this.setState({
                       loading: false,
-                      message: "Program delete succesfully.",
+                      message: i18n.t("static.dashboard.programDeletedSuccessfully"),
                       color: 'green'
                     }, () => {
                       this.hideSecondComponent()
@@ -342,7 +342,7 @@ class ApplicationDashboard extends Component {
     // console.log(">>>", changed);
     confirmAlert({
       title: i18n.t('static.program.confirm'),
-      message: "Delete this program",
+      message: i18n.t("static.dashboard.deleteThisProgram"),
       buttons: [
         {
           label: i18n.t('static.program.yes'),
@@ -375,7 +375,7 @@ class ApplicationDashboard extends Component {
                   deleteRequest2.onsuccess = function (event) {
                     this.setState({
                       loading: false,
-                      message: "Dataset delete succesfully.",
+                      message: i18n.t("static.loadDelDataset.datasetDeleteSuccessfully"),
                       color: 'green'
                     }, () => {
                       this.hideSecondComponent()
@@ -1614,10 +1614,10 @@ class ApplicationDashboard extends Component {
                             <DropdownToggle caret className="p-0" color="transparent">
                             </DropdownToggle>
                             <DropdownMenu right>
-                              <DropdownItem onClick={() => this.deleteProgram(item.programId, item.versionId)}>{'Delete'}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/versionSettings", item.programId, item.versionId, 1)}>{'Version Settings'}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/listTree", item.programId, item.versionId, 2)}>{'Tree'}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataentry/consumptionDataEntryAndAdjustment", item.programId, item.versionId, 2)}>{'Consumption'}</DropdownItem>
+                              <DropdownItem onClick={() => this.deleteProgram(item.programId, item.versionId)}>{i18n.t("static.common.delete")}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/versionSettings", item.programId, item.versionId, 1)}>{i18n.t("static.versionSettings.versionSettings")}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/listTree", item.programId, item.versionId, 2)}>{i18n.t("static.forecastMethod.tree")}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataentry/consumptionDataEntryAndAdjustment", item.programId, item.versionId, 2)}>{i18n.t("static.supplyPlan.consumption")}</DropdownItem>
                               {/*<DropdownItem onClick={() => this.redirectToCrud(/report/problemList / 1 / + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem> */}
                             </DropdownMenu>
                           </Dropdown>
@@ -1665,7 +1665,7 @@ class ApplicationDashboard extends Component {
                             <DropdownToggle caret className="p-0" color="transparent">
                             </DropdownToggle>
                             <DropdownMenu right>
-                              <DropdownItem onClick={() => this.deleteSupplyPlanProgram(item.programId, item.versionId)}>{'Delete'}</DropdownItem>
+                              <DropdownItem onClick={() => this.deleteSupplyPlanProgram(item.programId, item.versionId)}>{i18n.t("static.common.delete")}</DropdownItem>
                               <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>{i18n.t('static.qpl.calculate')}</DropdownItem>
                               <DropdownItem onClick={() => this.redirectToCrud(`/report/problemList/1/` + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
                             </DropdownMenu>
