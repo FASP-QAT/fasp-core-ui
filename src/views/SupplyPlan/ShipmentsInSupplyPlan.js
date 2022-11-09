@@ -226,7 +226,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             multiplier: rcpuResult[k].multiplier,
                             active: rcpuResult[k].active,
                             label: rcpuResult[k].label,
-                            planningUnit:rcpuResult[k].planningUnit
+                            planningUnit: rcpuResult[k].planningUnit
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
@@ -481,7 +481,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 paginationArray = JEXCEL_PAGINATION_OPTION;
                                                 filterOption = true;
                                             }
-                                            var erpType = "hidden";
+                                            var erpType = "text";
+                                            var erpVisible = false;
                                             shipmentList = shipmentList.sort(function (a, b) { return ((new Date(a.receivedDate != "" && a.receivedDate != null && a.receivedDate != undefined && a.receivedDate != "Invalid date" ? a.receivedDate : a.expectedDeliveryDate) - new Date(b.receivedDate != "" && b.receivedDate != null && b.receivedDate != undefined && b.receivedDate != "Invalid date" ? b.receivedDate : b.expectedDeliveryDate))) });
                                             var yForBatch = -1;
                                             if (shipmentList.length == 0) {
@@ -510,9 +511,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 }
                                                 if (shipmentList[i].erpFlag.toString() == "true" && this.props.shipmentPage != "shipmentDataEntry") {
                                                     erpType = "text";
+                                                    erpVisible = true
                                                 }
                                                 if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentTypeIds).includes(2)) {
                                                     erpType = "text";
+                                                    erpVisible = true
                                                 }
 
                                                 if (this.props.shipmentPage != "shipmentDataEntry" && shipmentList[i].erpFlag.toString() == "true") {
@@ -643,16 +646,21 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data: shipmentsArr,
                                                 columns: [
                                                     { type: 'checkbox', title: i18n.t('static.common.active'), width: 80, readOnly: !shipmentEditable },
-                                                    { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'hidden', readOnly: true, title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
+                                                    { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'text', visible: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? true : false, readOnly: true, title: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? i18n.t('static.supplyPlan.erpFlag') : "", width: 80, autoCasting: false },
                                                     { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150, readOnly: true },
+                                                    {
+                                                        type: 'text',
+                                                        visible:false,
+                                                        // title: i18n.t('static.supplyPlan.qatProduct'), 
+                                                        width: 150, readOnly: true, autoCasting: false
+                                                    },
                                                     { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
                                                     { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT, validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 150 },
                                                     { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                     { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
                                                     { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80, readOnly: !shipmentEditable },
                                                     { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
-                                                    { type: erpType, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100, readOnly: true },
+                                                    { type: erpType, visible: erpVisible, title: erpVisible ? i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo') : "", width: 100, readOnly: true, autoCasting: false },
                                                     { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                                                     { type: 'numeric', title: i18n.t("static.shipment.shipmentQtyARU"), width: 130, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                     { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.00', decimal: '.', width: 90, readOnly: true },
@@ -668,20 +676,64 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     // { type: 'hidden', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                     { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
                                                     { type: 'text', title: i18n.t('static.program.notes'), width: 400 },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), width: 0, readOnly: true },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.lastshipmentStatus'), width: 0, readOnly: true },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0, readOnly: true },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 200, readOnly: true },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.totalQtyBatchInfo'), width: 0, readOnly: true },
-                                                    { type: 'hidden', title: i18n.t('static.supplyPlan.shipmentDatesJson'), width: 0, readOnly: true },
-                                                    { type: 'hidden', title: "Suggested order Qty", readOnly: true },
-                                                    { type: 'hidden', title: "Is changed", readOnly: true },
-                                                    { title: i18n.t('static.inventory.active'), type: 'hidden', width: 0, readOnly: true },
-                                                    { type: 'hidden', readOnly: true },
-                                                    { type: 'hidden', readOnly: true },
-                                                    { type: 'hidden', readOnly: true },
-                                                    { type: 'hidden', readOnly: true },
-                                                    { type: 'hidden', readOnly: true }
+                                                    {
+                                                        type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.createdDate'), 
+                                                        width: 0, readOnly: true,
+                                                        visible: false, autoCasting: false
+                                                    },
+                                                    {
+                                                        type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.lastshipmentStatus'), 
+                                                        visible: false,
+                                                        width: 0, readOnly: true, autoCasting: false
+                                                    },
+                                                    {
+                                                        type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.index'), 
+                                                        visible: false,
+                                                        width: 0, readOnly: true, autoCasting: false
+                                                    },
+                                                    {
+                                                        type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.batchInfo'), 
+                                                        visible: false,
+                                                        width: 200, readOnly: true, autoCasting: false
+                                                    },
+                                                    {
+                                                        type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.totalQtyBatchInfo'), 
+                                                        visible: false,
+                                                        width: 0, readOnly: true, autoCasting: false
+                                                    },
+                                                    {
+                                                        type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.shipmentDatesJson'), 
+                                                        visible: false,
+                                                        width: 0, readOnly: true, autoCasting: false
+                                                    },
+                                                    {
+                                                        type: 'text',
+                                                        // title: "Suggested order Qty", 
+                                                        visible: false,
+                                                        readOnly: true, autoCasting: false
+                                                    },
+                                                    {
+                                                        type: 'text',
+                                                        // title: "Is changed", 
+                                                        visible: false,
+                                                        readOnly: true, autoCasting: false
+                                                    },
+                                                    {
+                                                        // title: i18n.t('static.inventory.active'), 
+                                                        visible: false,
+                                                        type: 'text', width: 0, readOnly: true, autoCasting: false
+                                                    },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false }
                                                 ],
                                                 editable: true,
                                                 pagination: paginationOption,
@@ -4135,7 +4187,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 data: json,
                 columnDrag: true,
                 columns: [
-                    { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'hidden', source: adjustedOrderQty, width: 120,readOnly:true },
+                    { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'hidden', source: adjustedOrderQty, width: 120, readOnly: true },
                     { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'hidden', textEditor: true, mask: '#,##', width: 120, readOnly: true },
                     { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', textEditor: true, mask: '#,##', width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
@@ -4210,13 +4262,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     data: json1,
                     columnDrag: true,
                     columns: [
-                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
-                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120,readOnly:true },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.moq'), mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro1'), mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.procurementAgentPlanningUnit.unitPerPalletEuro2'), mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.procurementUnit.unitsPerContainer'), mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro1'), mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfPalletsEuro2'), mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.supplyPlan.noOfContainers'), mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
                         { type: 'hidden', readOnly: true },
                         { type: 'hidden', readOnly: true },
                         { type: 'hidden', readOnly: true },
