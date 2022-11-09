@@ -522,7 +522,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                 if (usageTypeId == 1) {
                                                     oneTimeUsage = nodeDataMapForScenario.fuNode.oneTimeUsage;
                                                 }
-                                                if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage != "" && oneTimeUsage.toString() == "false")) {
+                                                if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage !== "" && oneTimeUsage.toString() == "false")) {
                                                     usagePeriodId = nodeDataMapForScenario.fuNode.usagePeriod.usagePeriodId;
                                                 }
                                                 usageFrequency = nodeDataMapForScenario.fuNode.usageFrequency;
