@@ -2864,7 +2864,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.treeList.confirmAlert": "La versión del servidor tardará un tiempo en cargarse. ¿Está seguro de que desea cargar la versión del servidor?",
     "static.compareVersion.selectedForecastQtyTitle": "Pronóstico de cantidad para todo el período de pronóstico.",
-    "static.dataset.BranchTreeTemplate": " Plantilla de rama",
+    "static.dataset.BranchTreeTemplate": "Plantilla de rama",
     "static.dashboard.deleteThisProgram": "Eliminar este programa",
     "static.dashboard.programDeletedSuccessfully": "Eliminación del programa con éxito.",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
