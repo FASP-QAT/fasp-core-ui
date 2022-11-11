@@ -54,6 +54,7 @@
     "static.message.login.disabled": "User account is disabled",
     "static.QATForecastImport.ImportColumn": "Use the Import? column to de-select any forecasts that you do NOT want to import into the supply plan. If checked, the Converted Forecasted Consumption will override the Supply Plan forecast. If unchecked, the current Supply Plan forecast will remain.",
     "static.quantimed.existingconsupmtionqty": "Current QAT Forecasted Consumption",
+    "static.common.demoNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure demo-api.quantificationanalytics.org/# and demo.quantificationanalytics.org/# are whitelisted for firewall access.",
     "static.message.user.disabled": "User account is disabled. Contact QAT administrator.",
     "static.tooltip.CopyFromTemplate": "Use a template to fill in all subsquent fields. Edit these in the Program Management > Usage Template screen.",
     "static.problemReport.addressedDesc": "Problem has been manually marked by either reviewer or user as 'Addressed'. The user applies this status when they cannot resolve the problem through data entry. This status must be accompanied by a note. The reviewer uses this status if this problem cannot be resolved this review period, but will be resolved in the future, most likely in a few periods, rather than before the next review.",
@@ -125,6 +126,7 @@
     "static.pipelineProgram.importDate": " Import Date",
     "static.program.downloadsuccess": "Program loaded successfully",
     "static.mt.dataReceivedOn": "Data Received On",
+    "static.common.uatNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure uat-api.quantificationanalytics.org/# and uat.quantificationanalytics.org/# are whitelisted for firewall access.",
     "static.realmcountry.arrivedToDeliveredLeadTimetext": "Enter `Arrived to Delivered` lead time (in months)",
     "static.ticket.addUpdateUser": "Add / Update User",
     "static.planningUnit.labelMultiplier": "Conversion Factor (Planning to Forecasting)",
@@ -1073,6 +1075,7 @@
     "static.ForecastSummary.RegionalViewText": "Use this view to see your forecast across planning units and regions. Directly update the forecast method for every region-planning unit combination and add notes in the table, if desired. Forecast selections can also be updated in the",
     "static.procurementagent.procurementagentsubmittoapprovetimeLabel": "`Submitted to Approved` Lead Time (months)",
     "static.dashboard.product": "Planning unit",
+    "static.common.prodNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure api.quantificationanalytics.org/# and www.quantificationanalytics.org/# are whitelisted for firewall access.",
     "static.dataEntryAndAdjustments.DesiredReview": "Select the forecast program and the desired review period. By default, QAT pre-selects a date range of 36 months prior to the start of the forecasting period. A non-editable table and all products related to this forecast program are displayed, along with their adjusted consumption data if you have previously entered that data;",
     "static.extrapolation.EnterActualValues": "In the table, enter any actual values and reporting rates for your past data. From this input, QAT will calculate adjusted historical values.",
     "static.shipment.shipmentDates": "Shipment Dates",
@@ -2872,10 +2875,5 @@
     "static.programPU.monthsInFutureTooltip": "How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the past if the past data is more reliable and predicts the future.",
     "static.message.addBranchTemplate": "Branch Template Added Successfully",
     "static.message.editBranchTemplate": "Branch Template Updated Successfully",
-    "static.dashboard.deleteThisProgram": "Delete this Program",
-    "static.dashboard.programDeletedSuccessfully": "Program delete successfully.",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.common.uatNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure uat-api.quantificationanalytics.org/# and uat.quantificationanalytics.org/# are whitelisted for firewall access.",
-    "static.common.demoNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure demo-api.quantificationanalytics.org/# and demo.quantificationanalytics.org/# are whitelisted for firewall access.",
-    "static.common.prodNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure api.quantificationanalytics.org/# and www.quantificationanalytics.org/# are whitelisted for firewall access."
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
 }
