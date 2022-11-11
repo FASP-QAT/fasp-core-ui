@@ -2147,7 +2147,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
                       actualConsumption = c.amount;
                       daysOfStockOut = c.daysOfStockOut;
-                      qty = (Number(actualConsumption) / Number(reportingRate) / Number(1 - (Number(daysOfStockOut) / Number(noOfDays)))) * 100;
+                      qty = Math.round((Number(actualConsumption) / Number(reportingRate) / Number(1 - (Math.round(daysOfStockOut) / Number(noOfDays)))) * 100);
                       qty = qty.toFixed(2)
                       var multiplier = 0;
                       if (planningUnitList[cul].consumptionDataType == 1) {
