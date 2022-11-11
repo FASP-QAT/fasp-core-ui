@@ -513,8 +513,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
           var forecastMinDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
           var forecastMaxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-          const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD")>moment(forecastMaxDate).format("YYYY-MM-DD")?moment(maxDate).format("YYYY-MM-DD"):moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD")<moment(forecastMinDate).format("YYYY-MM-DD")?moment(minDate).format("YYYY-MM-DD"):moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
-          const noOfMonthsForProjection = (monthsDiff+1) - inputDataMovingAvg.length;
+          const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD") > moment(forecastMaxDate).format("YYYY-MM-DD") ? moment(maxDate).format("YYYY-MM-DD") : moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD") < moment(forecastMinDate).format("YYYY-MM-DD") ? moment(minDate).format("YYYY-MM-DD") : moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
+          const noOfMonthsForProjection = (monthsDiff + 1) - inputDataMovingAvg.length;
 
           if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
             count++;
@@ -561,19 +561,19 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       console.log("countRecivedMov", this.state.countRecived)
       console.log("countMov", this.state.count)
 
-console.log("outSide****",(this.state.jsonDataMovingAvg.length
-  + this.state.jsonDataSemiAverage.length
-  + this.state.jsonDataLinearRegression.length
-  + this.state.jsonDataTes.length
-  + this.state.jsonDataArima.length
-  == this.state.count))
+      console.log("outSide****", (this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count))
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
         + this.state.jsonDataTes.length
         + this.state.jsonDataArima.length
         == this.state.count) {
-          console.log("inside if")
+        console.log("inside if")
         this.saveForecastConsumptionExtrapolation();
       }
     })
@@ -592,12 +592,12 @@ console.log("outSide****",(this.state.jsonDataMovingAvg.length
     }, () => {
       console.log("countRecivedSemi", this.state.countRecived)
       console.log("countSemi", this.state.count)
-console.log("Semi outside if", this.state.jsonDataMovingAvg.length
-+ this.state.jsonDataSemiAverage.length
-+ this.state.jsonDataLinearRegression.length
-+ this.state.jsonDataTes.length
-+ this.state.jsonDataArima.length
-== this.state.count)
+      console.log("Semi outside if", this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count)
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
@@ -619,12 +619,12 @@ console.log("Semi outside if", this.state.jsonDataMovingAvg.length
     }, () => {
       console.log("countRecivedL", this.state.countRecived)
       console.log("countL", this.state.count)
-console.log("linear outside***",this.state.jsonDataMovingAvg.length
-+ this.state.jsonDataSemiAverage.length
-+ this.state.jsonDataLinearRegression.length
-+ this.state.jsonDataTes.length
-+ this.state.jsonDataArima.length
-== this.state.count)
+      console.log("linear outside***", this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count)
 
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
@@ -647,12 +647,12 @@ console.log("linear outside***",this.state.jsonDataMovingAvg.length
     }, () => {
       console.log("countRecivedT", this.state.countRecived)
       console.log("countT", this.state.count)
-console.log("TES",this.state.jsonDataMovingAvg.length
-+ this.state.jsonDataSemiAverage.length
-+ this.state.jsonDataLinearRegression.length
-+ this.state.jsonDataTes.length
-+ this.state.jsonDataArima.length
-== this.state.count)
+      console.log("TES", this.state.jsonDataMovingAvg.length
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count)
 
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
@@ -676,11 +676,11 @@ console.log("TES",this.state.jsonDataMovingAvg.length
       console.log("countRecivedA", this.state.countRecived)
       console.log("countA", this.state.count)
       console.log("Arima", this.state.jsonDataMovingAvg.length
-      + this.state.jsonDataSemiAverage.length
-      + this.state.jsonDataLinearRegression.length
-      + this.state.jsonDataTes.length
-      + this.state.jsonDataArima.length
-      == this.state.count)
+        + this.state.jsonDataSemiAverage.length
+        + this.state.jsonDataLinearRegression.length
+        + this.state.jsonDataTes.length
+        + this.state.jsonDataArima.length
+        == this.state.count)
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
@@ -1000,6 +1000,8 @@ console.log("TES",this.state.jsonDataMovingAvg.length
       stockDayStart += 8;
       adjustedConsumption += 8;
     }
+    console.log("possibleStockDayY===", possibleStockDayY)
+
     var elInstance = this.state.dataEl;
     if (possibleActualConsumptionY.includes(y.toString())) {
       value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
@@ -1077,6 +1079,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
         this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setValueFromCoords(x, y, Math.round(value), true)
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
       }
@@ -1423,7 +1426,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
                       userId: curUser
                     },
                     createdDate: curDate,
-                    daysOfStockOut: daysOfStockOutValue!==""?Math.round(daysOfStockOutValue):daysOfStockOutValue,
+                    daysOfStockOut: daysOfStockOutValue !== "" ? Math.round(daysOfStockOutValue) : daysOfStockOutValue,
                     exculde: false,
                     forecastConsumptionId: 0,
                     month: moment(monthArray[i].date).startOf('month').format("YYYY-MM-DD"),
@@ -1480,7 +1483,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
           //     datasetDetailsRequestJson.changed = 1;
           //     var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
           //     datasetDetailsRequest1.onsuccess = function (event) {
-                   
+
           //         }}
           // }      
           putRequest.onerror = function (event) {
@@ -1496,13 +1499,14 @@ console.log("TES",this.state.jsonDataMovingAvg.length
             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
             var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-            datasetDetailsRequest.onsuccess = function (e) {         
+            datasetDetailsRequest.onsuccess = function (e) {
               var datasetDetailsRequestJson = datasetDetailsRequest.result;
               datasetDetailsRequestJson.changed = 1;
               var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
               datasetDetailsRequest1.onsuccess = function (event) {
-                   
-                  }}
+
+              }
+            }
 
             this.setState({
               // dataEl: "",
@@ -1511,7 +1515,7 @@ console.log("TES",this.state.jsonDataMovingAvg.length
               message: i18n.t('static.compareAndSelect.dataSaved'),
               messageColor: "green",
               consumptionChanged: false,
-              datasetJson:datasetJson
+              datasetJson: datasetJson
             }, () => {
               this.ExtrapolatedParameters();
               this.getDatasetData();
@@ -3365,13 +3369,13 @@ console.log("TES",this.state.jsonDataMovingAvg.length
     // console.log("stop----", new Date())
 
   }
- 
+
   formulaChanged = function (instance, executions) {
     var executions = executions;
     for (var e = 0; e < executions.length; e++) {
-        this.changed(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
+      this.changed(instance, executions[e].cell, executions[e].x, executions[e].y, executions[e].v)
     }
-}
+  }
   buildJexcel() {
     var data = [];
     let dataArray1 = [];
