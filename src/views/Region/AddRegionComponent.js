@@ -9,6 +9,7 @@ import RealmCountryService from "../../api/RealmCountryService.js";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { API_URL } from '../../Constants';
 
 const entityname = i18n.t('static.region.region');
 
@@ -126,7 +127,8 @@ class AddRegionComponent extends Component {
         error => {
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -208,7 +210,8 @@ class AddRegionComponent extends Component {
                       error => {
                         if (error.message === "Network Error") {
                           this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                           });
                         } else {
@@ -258,62 +261,62 @@ class AddRegionComponent extends Component {
                     setTouched,
                     handleReset
                   }) => (
-                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='regionForm'>
-                        <CardBody>
-                          <FormGroup>
-                            <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}<span className="red Reqasterisk">*</span></Label>
-                            {/* <InputGroupAddon addonType="prepend"> */}
-                            {/* <InputGroupText><i className="fa fa-globe"></i></InputGroupText> */}
-                            <Input
-                              type="select"
-                              name="realmCountryId"
-                              id="realmCountryId"
-                              bsSize="sm"
-                              valid={!errors.realmCountryId && this.state.region.realmCountry.realmCountryId != ''}
-                              invalid={touched.realmCountryId && !!errors.realmCountryId}
-                              onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                              onBlur={handleBlur}
-                              required
-                              value={this.state.region.realmCountry.realmCountryId}
-                            >
-                              <option value="">{i18n.t('static.common.select')}</option>
-                              {realmCountryList}
-                            </Input>
-                            {/* </InputGroupAddon> */}
-                            <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
-                          </FormGroup>
+                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='regionForm'>
+                      <CardBody>
+                        <FormGroup>
+                          <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}<span className="red Reqasterisk">*</span></Label>
+                          {/* <InputGroupAddon addonType="prepend"> */}
+                          {/* <InputGroupText><i className="fa fa-globe"></i></InputGroupText> */}
+                          <Input
+                            type="select"
+                            name="realmCountryId"
+                            id="realmCountryId"
+                            bsSize="sm"
+                            valid={!errors.realmCountryId && this.state.region.realmCountry.realmCountryId != ''}
+                            invalid={touched.realmCountryId && !!errors.realmCountryId}
+                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                            onBlur={handleBlur}
+                            required
+                            value={this.state.region.realmCountry.realmCountryId}
+                          >
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {realmCountryList}
+                          </Input>
+                          {/* </InputGroupAddon> */}
+                          <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
+                        </FormGroup>
 
-                          <FormGroup>
+                        <FormGroup>
 
-                            <Label for="region">{i18n.t('static.region.region')}<span className="red Reqasterisk">*</span></Label>
-                            {/* <InputGroupAddon addonType="prepend"> */}
-                            {/* <InputGroupText><i className="fa fa-pie-chart"></i></InputGroupText> */}
-                            <Input type="text"
-                              name="region"
-                              id="region"
-                              bsSize="sm"
-                              valid={!errors.region && this.state.region.label.label_en != ''}
-                              invalid={touched.region && !!errors.region}
-                              onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                              onBlur={handleBlur}
-                              value={this.state.region.label.label_en}
-                              required />
-                            {/* </InputGroupAddon> */}
-                            <FormFeedback className="red">{errors.region}</FormFeedback>
+                          <Label for="region">{i18n.t('static.region.region')}<span className="red Reqasterisk">*</span></Label>
+                          {/* <InputGroupAddon addonType="prepend"> */}
+                          {/* <InputGroupText><i className="fa fa-pie-chart"></i></InputGroupText> */}
+                          <Input type="text"
+                            name="region"
+                            id="region"
+                            bsSize="sm"
+                            valid={!errors.region && this.state.region.label.label_en != ''}
+                            invalid={touched.region && !!errors.region}
+                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                            onBlur={handleBlur}
+                            value={this.state.region.label.label_en}
+                            required />
+                          {/* </InputGroupAddon> */}
+                          <FormFeedback className="red">{errors.region}</FormFeedback>
 
-                          </FormGroup>
-                        </CardBody>
-                        <CardFooter>
-                          <FormGroup>
-                            {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
-                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            &nbsp;
-                          </FormGroup>
-                        </CardFooter>
-                      </Form>
-                    )} />
+                        </FormGroup>
+                      </CardBody>
+                      <CardFooter>
+                        <FormGroup>
+                          {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
+                          <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                          <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
+                          <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                          &nbsp;
+                        </FormGroup>
+                      </CardFooter>
+                    </Form>
+                  )} />
             </Card>
           </Col>
         </Row>

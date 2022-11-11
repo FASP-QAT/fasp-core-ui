@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
+import { LABEL_REGEX, ALPHABETS_REGEX, API_URL } from '../../Constants.js';
 import { SPECIAL_CHARECTER_WITHOUT_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 
@@ -159,7 +159,8 @@ export default class EditLanguageComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -247,7 +248,8 @@ export default class EditLanguageComponent extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.unkownError',
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
@@ -297,115 +299,115 @@ export default class EditLanguageComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='languageForm' autocomplete="off">
-                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label for="languageName">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            // invalid={touched.languageName && !!errors.languageName || this.state.language.languageName == ''}
-                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            maxLength={100}
-                                                            value={this.state.language.label.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="languageCode">{i18n.t('static.language.languageCode')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="languageCode"
-                                                            id="languageCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.languageCode}
-                                                            // invalid={touched.languageCode && !!errors.languageCode || this.state.language.languageCode == ''}
-                                                            invalid={(touched.languageCode && !!errors.languageCode) || !!errors.languageCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.language.languageCode}
-                                                            required
-                                                            maxLength={2}
+                                        <Form onSubmit={handleSubmit} noValidate name='languageForm' autocomplete="off">
+                                            <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label for="languageName">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="label"
+                                                        id="label"
+                                                        bsSize="sm"
+                                                        valid={!errors.label}
+                                                        // invalid={touched.languageName && !!errors.languageName || this.state.language.languageName == ''}
+                                                        invalid={(touched.label && !!errors.label) || !!errors.label}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        maxLength={100}
+                                                        value={this.state.language.label.label_en}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="languageCode">{i18n.t('static.language.languageCode')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="languageCode"
+                                                        id="languageCode"
+                                                        bsSize="sm"
+                                                        valid={!errors.languageCode}
+                                                        // invalid={touched.languageCode && !!errors.languageCode || this.state.language.languageCode == ''}
+                                                        invalid={(touched.languageCode && !!errors.languageCode) || !!errors.languageCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.language.languageCode}
+                                                        required
+                                                        maxLength={2}
+                                                    />
+                                                    <FormFeedback className="red">{errors.languageCode}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="countryCode">{i18n.t('static.language.countryCode')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="countryCode"
+                                                        id="countryCode"
+                                                        bsSize="sm"
+                                                        valid={!errors.countryCode}
+                                                        invalid={touched.countryCode && !!errors.countryCode || !!errors.countryCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.language.countryCode}
+                                                        required
+                                                        maxLength={2}
+                                                    />
+                                                    <FormFeedback className="red">{errors.countryCode}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active1"
+                                                            name="active"
+                                                            value={true}
+                                                            checked={this.state.language.active === true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         />
-                                                        <FormFeedback className="red">{errors.languageCode}</FormFeedback>
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio1">
+                                                            {i18n.t('static.common.active')}
+                                                        </Label>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="countryCode">{i18n.t('static.language.countryCode')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="countryCode"
-                                                            id="countryCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.countryCode}
-                                                            invalid={touched.countryCode && !!errors.countryCode || !!errors.countryCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.language.countryCode}
-                                                            required
-                                                            maxLength={2}
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="active"
+                                                            value={false}
+                                                            checked={this.state.language.active === false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         />
-                                                        <FormFeedback className="red">{errors.countryCode}</FormFeedback>
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.common.disabled')}
+                                                        </Label>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="active"
-                                                                value={true}
-                                                                checked={this.state.language.active === true}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="active"
-                                                                value={false}
-                                                                checked={this.state.language.active === false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    </FormGroup>
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
                         </Card>
                     </Col>
                 </Row>
@@ -430,7 +432,8 @@ export default class EditLanguageComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {

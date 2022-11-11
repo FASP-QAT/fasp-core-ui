@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import DimensionService from '../../api/DimensionService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { UNIT_LABEL_REGEX, SPACE_REGEX } from '../../Constants';
+import { UNIT_LABEL_REGEX, SPACE_REGEX, API_URL } from '../../Constants';
 
 const initialValues = {
     summary: "Add Unit",
@@ -152,7 +152,8 @@ export default class UnitsTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -264,7 +265,8 @@ export default class UnitsTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -314,82 +316,82 @@ export default class UnitsTicketComponent extends Component {
                                 setTouched,
                                 handleReset
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.units.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.units.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="dimension">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="dimension" id="dimension"
-                                                bsSize="sm"
-                                                valid={!errors.dimension && this.state.units.dimension != ''}
-                                                invalid={touched.dimension && !!errors.dimension}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.dimensionId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {dimensionList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.dimension}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="unit">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="unit" id="unit"
-                                                bsSize="sm"
-                                                valid={!errors.unit && this.state.units.unit != ''}
-                                                invalid={touched.unit && !!errors.unit}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.units.unit}
-                                                required />
-                                            <FormFeedback className="red">{errors.unit}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="unitCode">{i18n.t('static.unit.unitCode')}</Label>
-                                            <Input type="text" name="unitCode" id="unitCode"
-                                                bsSize="sm"
-                                                // valid={!errors.unitCode && this.state.units.unitCode != ''}
-                                                // invalid={touched.unitCode && !!errors.unitCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.units.unitCode}
-                                                required />
-                                            <FormFeedback className="red">{errors.unitCode}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.units.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.units.notes}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className=" mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                        {/* <br></br><br></br>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.units.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.units.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="dimension">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="dimension" id="dimension"
+                                            bsSize="sm"
+                                            valid={!errors.dimension && this.state.units.dimension != ''}
+                                            invalid={touched.dimension && !!errors.dimension}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.dimensionId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {dimensionList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.dimension}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="unit">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="unit" id="unit"
+                                            bsSize="sm"
+                                            valid={!errors.unit && this.state.units.unit != ''}
+                                            invalid={touched.unit && !!errors.unit}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.units.unit}
+                                            required />
+                                        <FormFeedback className="red">{errors.unit}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="unitCode">{i18n.t('static.unit.unitCode')}</Label>
+                                        <Input type="text" name="unitCode" id="unitCode"
+                                            bsSize="sm"
+                                            // valid={!errors.unitCode && this.state.units.unitCode != ''}
+                                            // invalid={touched.unitCode && !!errors.unitCode}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.units.unitCode}
+                                            required />
+                                        <FormFeedback className="red">{errors.unitCode}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.units.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.units.notes}
+                                        // required 
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className=" mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                     <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
-                                    </Form>
-                                )} />
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

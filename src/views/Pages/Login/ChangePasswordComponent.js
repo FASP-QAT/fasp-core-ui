@@ -9,7 +9,7 @@ import AuthenticationService from '../../Common/AuthenticationService.js';
 import { Online } from "react-detect-offline";
 import bcrypt from 'bcryptjs';
 import jwt_decode from 'jwt-decode'
-import { SECRET_KEY } from '../../../Constants.js'
+import { API_URL, SECRET_KEY } from '../../../Constants.js'
 import UserService from '../../../api/UserService'
 import i18n from '../../../i18n'
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -75,14 +75,14 @@ class ChangePasswordComponent extends Component {
         this.state = {
             message: '',
             username: "",
-loading:false
+            loading: false
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.showPopUp = this.showPopUp.bind(this);
     }
     showPopUp() {
-        alert("1) "+i18n.t("static.message.newPasswordMinLength")+"\n2) "+i18n.t("static.message.newPasswordPassString")+"\n3) "+i18n.t("static.message.newPasswordSpecialChar")+"\n4) "+i18n.t("static.message.newPasswordNumber")+"\n5) "+i18n.t("static.message.newPasswordUppercase")+"\n6) "+i18n.t("static.message.newPasswordStartAlphabet")+"\n7) "+i18n.t("static.message.newPasswordNotSameAsUsername")+"\n8) "+i18n.t("static.message.newPasswordNotSameAsOldPassword"));
+        alert("1) " + i18n.t("static.message.newPasswordMinLength") + "\n2) " + i18n.t("static.message.newPasswordPassString") + "\n3) " + i18n.t("static.message.newPasswordSpecialChar") + "\n4) " + i18n.t("static.message.newPasswordNumber") + "\n5) " + i18n.t("static.message.newPasswordUppercase") + "\n6) " + i18n.t("static.message.newPasswordStartAlphabet") + "\n7) " + i18n.t("static.message.newPasswordNotSameAsUsername") + "\n8) " + i18n.t("static.message.newPasswordNotSameAsOldPassword"));
         // confirmAlert({
         //     message: "Anchal&lt;br /&gt;Bhashkar",
         //     buttons: [
@@ -93,9 +93,9 @@ loading:false
         //   });
     }
     hideFirstComponent() {
-//        setTimeout(function () {
-  //          document.getElementById('div1').style.display = 'none';
-    //    }, 8000);
+        //        setTimeout(function () {
+        //          document.getElementById('div1').style.display = 'none';
+        //    }, 8000);
 
         // setTimeout(function () {
         //     this.setState({
@@ -174,27 +174,30 @@ loading:false
                                             })
                                             .catch(
                                                 error => {
-                                                    console.log("error---",error);
+                                                    console.log("error---", error);
                                                     if (error.message === "Network Error") {
-                                                        this.setState({ message: error.message }, () => {
+                                                        this.setState({
+                                                            // message: error.message 
+                                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                        }, () => {
                                                             console.log("inside412");
                                                             document.getElementById('div1').style.display = 'block';
                                                             this.hideFirstComponent();
                                                         });
                                                     } else {
-                                                        switch (error.response ? error.response.status : "" ){
+                                                        switch (error.response ? error.response.status : "") {
                                                             case 500:
                                                             case 401:
                                                             case 403:
                                                             case 404:
                                                             case 406:
                                                             case 412:
-                                                      //          console.log("error.response.data.messageCode 111 ---", error.response);
+                                                                //          console.log("error.response.data.messageCode 111 ---", error.response);
                                                                 console.log("error.response.data.messageCode ---", error.response.data.messageCode);
                                                                 this.setState({ message: error.response.data.messageCode },
                                                                     () => {
-                                                                        console.log("inside412->",this.state.message);
-                                                                       // document.getElementById('div1').style.display = 'block';
+                                                                        console.log("inside412->", this.state.message);
+                                                                        // document.getElementById('div1').style.display = 'block';
                                                                         this.hideFirstComponent();
                                                                     });
 
@@ -203,7 +206,7 @@ loading:false
                                                                 this.setState({ message: 'static.unkownError' },
                                                                     () => {
                                                                         console.log("inside412");
-                                                                       //  document.getElementById('div1').style.display = 'block';
+                                                                        //  document.getElementById('div1').style.display = 'block';
                                                                         this.hideFirstComponent();
                                                                     });
                                                                 break;
@@ -235,76 +238,76 @@ loading:false
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
-                                                <CardBody>
-                                                    <Input type="text"
-                                                        name="username"
-                                                        id="username"
+                                        <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
+                                            <CardBody>
+                                                <Input type="text"
+                                                    name="username"
+                                                    id="username"
+                                                    onChange={handleChange}
+                                                    value={this.state.username}
+                                                    hidden
+                                                />
+                                                <FormGroup>
+                                                    <Label for="oldPassword">{i18n.t('static.user.oldPasswordLabel')}</Label>
+                                                    <Input type="password"
+                                                        name="oldPassword"
+                                                        id="oldPassword"
+                                                        bsSize="sm"
+                                                        valid={!errors.oldPassword}
+                                                        invalid={touched.oldPassword && !!errors.oldPassword}
                                                         onChange={handleChange}
-                                                        value={this.state.username}
-                                                        hidden
+                                                        onBlur={handleBlur}
+                                                        required
                                                     />
-                                                    <FormGroup>
-                                                        <Label for="oldPassword">{i18n.t('static.user.oldPasswordLabel')}</Label>
+                                                    <FormFeedback>{errors.oldPassword}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+
+                                                    <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
+                                                    <InputGroup>
                                                         <Input type="password"
-                                                            name="oldPassword"
-                                                            id="oldPassword"
+                                                            name="newPassword"
+                                                            id="newPassword"
                                                             bsSize="sm"
-                                                            valid={!errors.oldPassword}
-                                                            invalid={touched.oldPassword && !!errors.oldPassword}
+                                                            valid={!errors.newPassword}
+                                                            invalid={touched.newPassword && !!errors.newPassword}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
                                                             required
                                                         />
-                                                        <FormFeedback>{errors.oldPassword}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-
-                                                        <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
-                                                        <InputGroup>
-                                                            <Input type="password"
-                                                                name="newPassword"
-                                                                id="newPassword"
-                                                                bsSize="sm"
-                                                                valid={!errors.newPassword}
-                                                                invalid={touched.newPassword && !!errors.newPassword}
-                                                                onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                            />
-                                                            <InputGroupAddon addonType="append">
-                                                                <InputGroupText><i class="fa fa-info-circle icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
-                                                            </InputGroupAddon>
-                                                            <FormFeedback>{errors.newPassword}</FormFeedback>
-                                                        </InputGroup>
+                                                        <InputGroupAddon addonType="append">
+                                                            <InputGroupText><i class="fa fa-info-circle icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                        </InputGroupAddon>
+                                                        <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                    </InputGroup>
 
 
 
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
-                                                        <Input type="password"
-                                                            name="confirmNewPassword"
-                                                            id="confirmNewPassword"
-                                                            bsSize="sm"
-                                                            valid={!errors.confirmNewPassword}
-                                                            invalid={touched.confirmNewPassword && !!errors.confirmNewPassword}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                        />
-                                                        <FormFeedback>{errors.confirmNewPassword}</FormFeedback>
-                                                    </FormGroup>
-                                                </CardBody>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        &nbsp;
-                          </FormGroup>
-                                                </CardFooter>
-                                            </Form>
-                                        )} />
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
+                                                    <Input type="password"
+                                                        name="confirmNewPassword"
+                                                        id="confirmNewPassword"
+                                                        bsSize="sm"
+                                                        valid={!errors.confirmNewPassword}
+                                                        invalid={touched.confirmNewPassword && !!errors.confirmNewPassword}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                    />
+                                                    <FormFeedback>{errors.confirmNewPassword}</FormFeedback>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
+                                    )} />
                         </Card>
                     </Col>
                 </Row>

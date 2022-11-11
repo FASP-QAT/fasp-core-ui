@@ -10,6 +10,7 @@ import {
     Form, FormGroup, Label, Input,
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants';
 
 const initialValuesTwo = {
     realmCountryId: ''
@@ -113,7 +114,8 @@ export default class PipelineProgramDataStepTwo extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -185,33 +187,33 @@ export default class PipelineProgramDataStepTwo extends Component {
                             isValid,
                             setTouched
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmCountryForm'>
-                                    <FormGroup>
-                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            valid={!errors.realmCountryId && this.props.items.program.realmCountry.realmCountryId != ''}
-                                            invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                            // onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
-                                            bsSize="sm"
-                                            className="col-md-4"
-                                            onBlur={handleBlur}
-                                            value={this.props.items.program.realmCountry.realmCountryId}
-                                            type="select" name="realmCountryId" id="realmCountryId">
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {realmCountries}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
-                                        <span className="red">{this.props.items.validationFailedMessage}</span>
-                                    </FormGroup>
+                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmCountryForm'>
+                                <FormGroup>
+                                    <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        valid={!errors.realmCountryId && this.props.items.program.realmCountry.realmCountryId != ''}
+                                        invalid={touched.realmCountryId && !!errors.realmCountryId}
+                                        // onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
+                                        onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
+                                        bsSize="sm"
+                                        className="col-md-4"
+                                        onBlur={handleBlur}
+                                        value={this.props.items.program.realmCountry.realmCountryId}
+                                        type="select" name="realmCountryId" id="realmCountryId">
+                                        <option value="">{i18n.t('static.common.select')}</option>
+                                        {realmCountries}
+                                    </Input>
+                                    <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
+                                    <span className="red">{this.props.items.validationFailedMessage}</span>
+                                </FormGroup>
 
-                                    <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllTwo(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                        {/* <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepOne}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                <FormGroup>
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllTwo(setTouched, errors)}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    {/* <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepOne}>Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp; */}
-                                    </FormGroup>
-                                </Form>
-                            )} />
+                                </FormGroup>
+                            </Form>
+                        )} />
 
             </>
         );

@@ -12,7 +12,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProductService from '../../api/ProductService';
 import RealmService from '../../api/RealmService';
-import { SPACE_REGEX } from '../../Constants';
+import { API_URL, SPACE_REGEX } from '../../Constants';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 
 import Select from 'react-select';
@@ -119,13 +119,13 @@ export default class EditForecastingUnitTicketComponent extends Component {
                 forecastingUnitId: ''
             });
         } else {
-            let { forecastingUnit } = this.state;        
+            let { forecastingUnit } = this.state;
             var outText = "";
-            if(event.value !== "") {
+            if (event.value !== "") {
                 var forecastingUnitT = this.state.forecastingUnits.filter(c => c.forecastingUnitId == event.value)[0];
                 outText = forecastingUnitT.realm.label.label_en + " | " + forecastingUnitT.label.label_en;
             }
-            forecastingUnit.forecastingUnitName = outText;            
+            forecastingUnit.forecastingUnitName = outText;
             this.setState({
                 forecastingUnit: forecastingUnit,
                 forecastingUnitId: event.value
@@ -193,7 +193,8 @@ export default class EditForecastingUnitTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -264,7 +265,8 @@ export default class EditForecastingUnitTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -379,7 +381,8 @@ export default class EditForecastingUnitTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -431,22 +434,22 @@ export default class EditForecastingUnitTicketComponent extends Component {
                                 setFieldValue,
                                 setFieldTouched
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.forecastingUnit.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.forecastingUnit.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="forecastingUnitName">{i18n.t('static.forecastingunit.forecastingunit')}<span class="red Reqasterisk">*</span></Label>
-                                            {/* <Input type="select" name="forecastingUnitName" id="forecastingUnitName"
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.forecastingUnit.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.forecastingUnit.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="forecastingUnitName">{i18n.t('static.forecastingunit.forecastingunit')}<span class="red Reqasterisk">*</span></Label>
+                                        {/* <Input type="select" name="forecastingUnitName" id="forecastingUnitName"
                                                 bsSize="sm"
                                                 valid={!errors.forecastingUnitName && this.state.forecastingUnit.forecastingUnitName != ''}
                                                 invalid={touched.forecastingUnitName && !!errors.forecastingUnitName}
@@ -458,55 +461,55 @@ export default class EditForecastingUnitTicketComponent extends Component {
                                                 {forecastingUnitList}
                                             </Input> */}
 
-                                            <Select
-                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                    { 'is-valid': !errors.forecastingUnitName && this.state.forecastingUnit.forecastingUnitName != '' },
-                                                    { 'is-invalid': (touched.forecastingUnitName && !!errors.forecastingUnitName) }
-                                                )}
-                                                bsSize="sm"
-                                                name="forecastingUnitName"
-                                                id="forecastingUnitName"
-                                                isClearable={false}
-                                                onChange={(e) => {
-                                                    handleChange(e);
-                                                    setFieldValue("forecastingUnitName", e);
-                                                    this.changeForecastingUnit(e);
-                                                }}
-                                                onBlur={() => setFieldTouched("forecastingUnitName", true)}                                                                                          
-                                                required
-                                                min={1}
-                                                options={this.state.forecastingUnitList}
-                                                value={this.state.forecastingUnitId}
-                                            />
+                                        <Select
+                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.forecastingUnitName && this.state.forecastingUnit.forecastingUnitName != '' },
+                                                { 'is-invalid': (touched.forecastingUnitName && !!errors.forecastingUnitName) }
+                                            )}
+                                            bsSize="sm"
+                                            name="forecastingUnitName"
+                                            id="forecastingUnitName"
+                                            isClearable={false}
+                                            onChange={(e) => {
+                                                handleChange(e);
+                                                setFieldValue("forecastingUnitName", e);
+                                                this.changeForecastingUnit(e);
+                                            }}
+                                            onBlur={() => setFieldTouched("forecastingUnitName", true)}
+                                            required
+                                            min={1}
+                                            options={this.state.forecastingUnitList}
+                                            value={this.state.forecastingUnitId}
+                                        />
 
-                                            <FormFeedback className="red">{errors.forecastingUnitName}</FormFeedback>
-                                        </FormGroup>
+                                        <FormFeedback className="red">{errors.forecastingUnitName}</FormFeedback>
+                                    </FormGroup>
 
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.forecastingUnit.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.forecastingUnit.notes}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                        {/* <br></br><br></br>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.forecastingUnit.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={600}
+                                            value={this.state.forecastingUnit.notes}
+                                        // required 
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
-                                    </Form>
-                                )} />
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

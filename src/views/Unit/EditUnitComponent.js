@@ -9,7 +9,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SPECIAL_CHARECTER_WITH_NUM, UNIT_LABEL_REGEX } from '../../Constants.js';
+import { API_URL, SPECIAL_CHARECTER_WITH_NUM, UNIT_LABEL_REGEX } from '../../Constants.js';
 
 let initialValues = {
     unit: ""
@@ -161,7 +161,8 @@ export default class EditUnitComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -249,7 +250,8 @@ export default class EditUnitComponent extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.unkownError',
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
@@ -299,120 +301,120 @@ export default class EditUnitComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='unitForm' autocomplete="off">
-                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                        <Form onSubmit={handleSubmit} noValidate name='unitForm' autocomplete="off">
+                                            <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="text"
+                                                        bsSize="sm"
+                                                        name="dimensionId"
+                                                        id="dimensionId"
+                                                        valid={!errors.dimensionId}
+                                                        // invalid={touched.dimensionId && !!errors.dimensionId || this.state.unit.dimension.dimensionId == ''}
+                                                        invalid={(touched.dimensionId && !!errors.dimensionId) || !!errors.dimensionId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        readOnly={true}
+                                                        value={getLabelText(this.state.unit.dimension.label, this.state.lang)}
+                                                    >
+
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.dimensionId}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label for="unitName">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="unitName"
+                                                        id="unitName"
+                                                        bsSize="sm"
+                                                        valid={!errors.unitName}
+                                                        // invalid={touched.unitName && !!errors.unitName || this.state.unit.label.label_en == ''}
+                                                        invalid={(touched.unitName && !!errors.unitName) || !!errors.unitName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.unit.label.label_en}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.unitName}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="unitCode">{i18n.t('static.unit.unitCode')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="unitCode"
+                                                        id="unitCode"
+                                                        bsSize="sm"
+                                                        valid={!errors.unitCode}
+                                                        // invalid={touched.unitCode && !!errors.unitCode || this.state.unit.unitCode == ''}
+                                                        invalid={(touched.unitCode && !!errors.unitCode) || !!errors.unitCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.unit.unitCode}
+                                                    />
+                                                    <FormFeedback className="red">{errors.unitCode}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
+                                                    <FormGroup check inline>
                                                         <Input
-                                                            type="text"
-                                                            bsSize="sm"
-                                                            name="dimensionId"
-                                                            id="dimensionId"
-                                                            valid={!errors.dimensionId}
-                                                            // invalid={touched.dimensionId && !!errors.dimensionId || this.state.unit.dimension.dimensionId == ''}
-                                                            invalid={(touched.dimensionId && !!errors.dimensionId) || !!errors.dimensionId}
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active1"
+                                                            name="active"
+                                                            value={true}
+                                                            checked={this.state.unit.active === true}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            readOnly={true}
-                                                            value={getLabelText(this.state.unit.dimension.label, this.state.lang)}
-                                                        >
-
-                                                        </Input>
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.dimensionId}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="unitName">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="unitName"
-                                                            id="unitName"
-                                                            bsSize="sm"
-                                                            valid={!errors.unitName}
-                                                            // invalid={touched.unitName && !!errors.unitName || this.state.unit.label.label_en == ''}
-                                                            invalid={(touched.unitName && !!errors.unitName) || !!errors.unitName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.unit.label.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.unitName}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="unitCode">{i18n.t('static.unit.unitCode')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="unitCode"
-                                                            id="unitCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.unitCode}
-                                                            // invalid={touched.unitCode && !!errors.unitCode || this.state.unit.unitCode == ''}
-                                                            invalid={(touched.unitCode && !!errors.unitCode) || !!errors.unitCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.unit.unitCode}
                                                         />
-                                                        <FormFeedback className="red">{errors.unitCode}</FormFeedback>
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio1">
+                                                            {i18n.t('static.common.active')}
+                                                        </Label>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="active"
-                                                                value={true}
-                                                                checked={this.state.unit.active === true}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="active"
-                                                                value={false}
-                                                                checked={this.state.unit.active === false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
-                                                            </Label>
-                                                        </FormGroup>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="active"
+                                                            value={false}
+                                                            checked={this.state.unit.active === false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.common.disabled')}
+                                                        </Label>
                                                     </FormGroup>
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
                         </Card>
                     </Col>
                 </Row>
@@ -439,7 +441,8 @@ export default class EditUnitComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
