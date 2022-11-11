@@ -343,11 +343,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !inventoryEditable },
-                            { title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', width: 0,readOnly:true },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0,readOnly:true },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 50,readOnly:true },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0,readOnly:true },
-                            { type: 'hidden', width: 0,readOnly:true },
+                            { title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', width: 0, readOnly: true },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0, readOnly: true },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 50, readOnly: true },
+                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0, readOnly: true },
+                            { type: 'hidden', width: 0, readOnly: true },
                         ],
                         pagination: paginationOption,
                         paginationOptions: paginationArray,
@@ -885,7 +885,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var rowData = elInstance.getRowData(y);
         this.props.updateState("inventoryError", "");
         this.props.updateState("inventoryDuplicateError", "");
-        this.props.updateState("inventoryChangedFlag", 1);
+        if (x == 0 || x == 1 || x == 2 || x == 3 || x == 5 || x == 6 || x == 10 || x == 11) {
+            this.props.updateState("inventoryChangedFlag", 1);
+        }
         if (x == 0 || x == 14 || x == 11) {
             var rowData = elInstance.getRowData(y);
             console.log("RowData+++", rowData)
