@@ -1245,7 +1245,7 @@
     "static.budget.stopdatetext": "Enter budget end date",
     "static.consumption.planningunit": "Planning Unit",
     "static.program.noOfDaysInMonth": "# Of Days In Month",
-    "static.masterDataSync.masterDataSyncFailed": "Master data sync failed",
+    "static.masterDataSync.masterDataSyncFailed": "Master data sync failed. Please ensure your computer has access to internet and try again.",
     "static.ModelingTransfer.Examples": "Examples",
     "static.problemReport.inComplianceExample": "A planning unit is missing actual consumption in the last 3 months. A user enters actual consumption data for the last 3 months. QAT automatically marks this as ‘In-Compliance’.",
     "static.role.businessfunctiontext": "Select Business Function",
@@ -2875,5 +2875,6 @@
     "static.programPU.monthsInFutureTooltip": "How many months should be used for calculating the average monthly consumption (AMC)? Include more months in the past if the past data is more reliable and predicts the future.",
     "static.message.addBranchTemplate": "Branch Template Added Successfully",
     "static.message.editBranchTemplate": "Branch Template Updated Successfully",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.tooltip.autoCalculate": "If QAT is slow while editing your tree, uncheck the auto-calculate box to stop calculations. Note that all calculated numbers may be wrong. To update the calculations, either re-check the ‘auto-calculate’ checkbox, or click the recalculate icon."
 }

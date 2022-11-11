@@ -991,6 +991,7 @@ export default class BuildTree extends Component {
         this.generateBranchFromTemplate = this.generateBranchFromTemplate.bind(this);
         this.buildMissingPUJexcel = this.buildMissingPUJexcel.bind(this);
         this.autoCalculate = this.autoCalculate.bind(this);
+        this.toggleTooltipAuto=this.toggleTooltipAuto.bind(this);
     }
 
     buildMissingPUJexcel() {
@@ -1800,6 +1801,12 @@ export default class BuildTree extends Component {
     toggleSenariotree() {
         this.setState({
             popoverOpenSenariotree: !this.state.popoverOpenSenariotree,
+        });
+    }
+
+    toggleTooltipAuto() {
+        this.setState({
+            popoverTooltipAuto: !this.state.popoverTooltipAuto,
         });
     }
 
@@ -3649,10 +3656,13 @@ export default class BuildTree extends Component {
                 if (this.state.currentTransferData == "") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? -1 : 1, true);
                 }
+                var startDate = this.state.currentCalculatorStartDate;
+                var endDate = this.state.currentCalculatorStopDate;
+                var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(7, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? parseFloat(this.state.currentTargetChangeNumber * -1) : parseFloat(this.state.currentTargetChangeNumber), true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? parseFloat(parseFloat(this.state.currentTargetChangeNumber / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat(this.state.currentTargetChangeNumber / monthDifference).toFixed(4)), true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             } else if (this.state.currentModelingType == 3) { //Linear %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
@@ -3714,7 +3724,7 @@ export default class BuildTree extends Component {
         var targetChangeNumber = '';
         var targetChangePer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
-            targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
+            targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))).toFixed(4);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
             percentForOneMonth = targetChangePer;
         }
@@ -11803,6 +11813,11 @@ export default class BuildTree extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
+                                            <div>
+                                        <Popover placement="top" isOpen={this.state.popoverTooltipAuto} target="PopoverAuto" trigger="hover" toggle={this.toggleTooltipAuto}>
+                                            <PopoverBody>{i18n.t('static.tooltip.autoCalculate')}</PopoverBody>
+                                        </Popover>
+                                    </div>
                                             <FormGroup className="col-md-4" >
                                                 <div className="check inline  pl-lg-0 pt-lg-0">
                                                     <div>
@@ -11817,7 +11832,7 @@ export default class BuildTree extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Auto Calculate'}</b>
+                                                            <b>{'Auto Calculate'}</b><i class="fa fa-info-circle icons pl-lg-2" id="PopoverAuto" onClick={this.toggleTooltipAuto} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                         </Label>
                                                     </div>
                                                 </div>
