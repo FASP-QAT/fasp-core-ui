@@ -13,7 +13,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
-import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX, API_URL } from '../../Constants.js';
 
 const entityname = i18n.t('static.healtharea.healtharea');
 
@@ -130,7 +130,8 @@ export default class AddHealthAreaComponent extends Component {
             error => {
               if (error.message === "Network Error") {
                 this.setState({
-                  message: 'static.unkownError',
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
@@ -182,7 +183,8 @@ export default class AddHealthAreaComponent extends Component {
             error => {
               if (error.message === "Network Error") {
                 this.setState({
-                  message: 'static.unkownError',
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
@@ -298,7 +300,8 @@ export default class AddHealthAreaComponent extends Component {
         error => {
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -351,7 +354,8 @@ export default class AddHealthAreaComponent extends Component {
         error => {
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -473,7 +477,8 @@ export default class AddHealthAreaComponent extends Component {
           error => {
             if (error.message === "Network Error") {
               this.setState({
-                message: 'static.unkownError',
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -585,7 +590,8 @@ export default class AddHealthAreaComponent extends Component {
                         error => {
                           if (error.message === "Network Error") {
                             this.setState({
-                              message: 'static.unkownError',
+                              // message: 'static.unkownError',
+                              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                               loading: false
                             });
                           } else {
@@ -642,103 +648,103 @@ export default class AddHealthAreaComponent extends Component {
                     setFieldValue,
                     setFieldTouched
                   }) => (
-                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='healthAreaForm' autocomplete="off">
-                        <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
+                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='healthAreaForm' autocomplete="off">
+                      <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
 
-                          <FormGroup>
-                            <Label htmlFor="select">{i18n.t('static.healtharea.realm')}<span class="red Reqasterisk">*</span></Label>
-                            <Input
-                              bsSize="sm"
-                              value={this.state.healthArea.realm.id}
-                              valid={!errors.realmId && this.state.healthArea.realm.id != ''}
-                              invalid={touched.realmId && !!errors.realmId}
-                              onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
-                              onBlur={handleBlur}
-                              type="select" name="realmId" id="realmId">
-                              <option value="">{i18n.t('static.common.select')}</option>
-                              {realmList}
-                            </Input>
-                            <FormFeedback>{errors.realmId}</FormFeedback>
-                          </FormGroup>
+                        <FormGroup>
+                          <Label htmlFor="select">{i18n.t('static.healtharea.realm')}<span class="red Reqasterisk">*</span></Label>
+                          <Input
+                            bsSize="sm"
+                            value={this.state.healthArea.realm.id}
+                            valid={!errors.realmId && this.state.healthArea.realm.id != ''}
+                            invalid={touched.realmId && !!errors.realmId}
+                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
+                            onBlur={handleBlur}
+                            type="select" name="realmId" id="realmId">
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {realmList}
+                          </Input>
+                          <FormFeedback>{errors.realmId}</FormFeedback>
+                        </FormGroup>
 
-                          <FormGroup className="Selectcontrol-bdrNone">
-                            <Label htmlFor="realmCountryId">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                            <Select
-                              className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                { 'is-valid': !errors.realmCountryId && this.state.healthArea.realmCountryArray.length != 0 },
-                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
-                              )}
-                              bsSize="sm"
-                              name="realmCountryId"
-                              id="realmCountryId"
-                              onChange={(e) => {
-                                handleChange(e);
-                                setFieldValue("realmCountryId", e);
-                                this.updateFieldData(e);
-                              }}
-                              onBlur={() => setFieldTouched("realmCountryId", true)}
-                              multi
-                              options={this.state.realmCountryList}
-                              value={this.state.realmCountryId}
-                            // value={this.state.healthArea.realmCountryArray}
-                            />
-                            <FormFeedback>{errors.realmCountryId}</FormFeedback>
-                          </FormGroup>
+                        <FormGroup className="Selectcontrol-bdrNone">
+                          <Label htmlFor="realmCountryId">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                          <Select
+                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                              { 'is-valid': !errors.realmCountryId && this.state.healthArea.realmCountryArray.length != 0 },
+                              { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
+                            )}
+                            bsSize="sm"
+                            name="realmCountryId"
+                            id="realmCountryId"
+                            onChange={(e) => {
+                              handleChange(e);
+                              setFieldValue("realmCountryId", e);
+                              this.updateFieldData(e);
+                            }}
+                            onBlur={() => setFieldTouched("realmCountryId", true)}
+                            multi
+                            options={this.state.realmCountryList}
+                            value={this.state.realmCountryId}
+                          // value={this.state.healthArea.realmCountryArray}
+                          />
+                          <FormFeedback>{errors.realmCountryId}</FormFeedback>
+                        </FormGroup>
 
-                          <FormGroup>
-                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
-                            <Input
-                              bsSize="sm"
-                              type="text" name="healthAreaName" valid={!errors.healthAreaName && this.state.healthArea.label.label_en != ''}
-                              invalid={touched.healthAreaName && !!errors.healthAreaName}
-                              onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                              // onBlur={handleBlur}
-                              onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
-                              value={this.state.healthArea.label.label_en}
-                              id="healthAreaName" />
-                            <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
-                          </FormGroup>
+                        <FormGroup>
+                          <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
+                          <Input
+                            bsSize="sm"
+                            type="text" name="healthAreaName" valid={!errors.healthAreaName && this.state.healthArea.label.label_en != ''}
+                            invalid={touched.healthAreaName && !!errors.healthAreaName}
+                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                            // onBlur={handleBlur}
+                            onBlur={(e) => { handleBlur(e); this.getDisplayName() }}
+                            value={this.state.healthArea.label.label_en}
+                            id="healthAreaName" />
+                          <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
+                        </FormGroup>
 
-                          <FormGroup>
-                            <Label htmlFor="company">{i18n.t('static.technicalArea.technicalAreaDisplayName')}<span class="red Reqasterisk">*</span> </Label>
-                            <Input
-                              bsSize="sm"
-                              type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
-                              invalid={touched.healthAreaCode && !!errors.healthAreaCode}
-                              onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                              onBlur={handleBlur}
-                              maxLength={6}
-                              value={this.state.healthArea.healthAreaCode}
-                              id="healthAreaCode" />
-                            <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
-                          </FormGroup>
+                        <FormGroup>
+                          <Label htmlFor="company">{i18n.t('static.technicalArea.technicalAreaDisplayName')}<span class="red Reqasterisk">*</span> </Label>
+                          <Input
+                            bsSize="sm"
+                            type="text" name="healthAreaCode" valid={!errors.healthAreaCode && this.state.healthArea.healthAreaCode != ''}
+                            invalid={touched.healthAreaCode && !!errors.healthAreaCode}
+                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                            onBlur={handleBlur}
+                            maxLength={6}
+                            value={this.state.healthArea.healthAreaCode}
+                            id="healthAreaCode" />
+                          <FormFeedback className="red">{errors.healthAreaCode}</FormFeedback>
+                        </FormGroup>
 
-                        </CardBody>
-                        <div style={{ display: this.state.loading ? "block" : "none" }}>
-                          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                            <div class="align-items-center">
-                              <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                      </CardBody>
+                      <div style={{ display: this.state.loading ? "block" : "none" }}>
+                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                          <div class="align-items-center">
+                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                              <div class="spinner-border blue ml-4" role="status">
+                            <div class="spinner-border blue ml-4" role="status">
 
-                              </div>
                             </div>
                           </div>
                         </div>
+                      </div>
 
-                        <CardFooter>
-                          <FormGroup>
-                            <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                            {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
-                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                      <CardFooter>
+                        <FormGroup>
+                          <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                          <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                          {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
+                          <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
-                            &nbsp;
-                                                  </FormGroup>
-                        </CardFooter>
-                      </Form>
+                          &nbsp;
+                        </FormGroup>
+                      </CardFooter>
+                    </Form>
 
-                    )} />
+                  )} />
 
             </Card>
           </Col>

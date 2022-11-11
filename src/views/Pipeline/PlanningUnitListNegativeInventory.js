@@ -7,7 +7,7 @@ import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { Card, CardHeader, CardBody, CardFooter, Button } from 'reactstrap';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { JEXCEL_PRO_KEY } from '../../Constants';
+import { API_URL, JEXCEL_PRO_KEY } from '../../Constants';
 
 export default class PlanningUnitListNegativeInventory extends Component {
 
@@ -88,7 +88,8 @@ export default class PlanningUnitListNegativeInventory extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {

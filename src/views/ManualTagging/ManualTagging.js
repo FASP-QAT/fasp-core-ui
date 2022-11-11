@@ -7,7 +7,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, PSM_PROCUREMENT_AGENT_ID, DELIVERED_SHIPMENT_STATUS, BATCH_PREFIX, SHIPMENT_MODIFIED, NONE_SELECTED_DATA_SOURCE_ID, USD_CURRENCY_ID, TBD_FUNDING_SOURCE, JEXCEL_DATE_FORMAT_WITHOUT_DATE } from '../../Constants.js';
+import { STRING_TO_DATE_FORMAT, JEXCEL_DATE_FORMAT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, PSM_PROCUREMENT_AGENT_ID, DELIVERED_SHIPMENT_STATUS, BATCH_PREFIX, SHIPMENT_MODIFIED, NONE_SELECTED_DATA_SOURCE_ID, USD_CURRENCY_ID, TBD_FUNDING_SOURCE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, API_URL } from '../../Constants.js';
 import moment from 'moment';
 import BudgetServcie from '../../api/BudgetService';
 import FundingSourceService from '../../api/FundingSourceService';
@@ -493,7 +493,8 @@ export default class ManualTagging extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
                             this.hideSecondComponent()
@@ -643,7 +644,8 @@ export default class ManualTagging extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
                             this.hideSecondComponent()
@@ -1333,7 +1335,8 @@ export default class ManualTagging extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 }, () => {
                                     this.hideSecondComponent()
@@ -1440,7 +1443,8 @@ export default class ManualTagging extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
                             this.hideSecondComponent()
@@ -2534,7 +2538,8 @@ export default class ManualTagging extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             }, () => {
                                 this.hideSecondComponent()
@@ -2668,7 +2673,8 @@ export default class ManualTagging extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
                             this.hideSecondComponent()
@@ -2781,7 +2787,8 @@ export default class ManualTagging extends Component {
                         document.getElementById('div2').style.display = 'block';
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             }, () => {
                                 this.hideSecondComponent()
@@ -2877,7 +2884,8 @@ export default class ManualTagging extends Component {
                                     document.getElementById('div2').style.display = 'block';
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         }, () => {
                                             this.hideSecondComponent()
@@ -2941,7 +2949,8 @@ export default class ManualTagging extends Component {
                                     document.getElementById('div2').style.display = 'block';
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         }, () => {
                                             this.hideSecondComponent()
@@ -3123,7 +3132,8 @@ export default class ManualTagging extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
                             this.hideSecondComponent()
@@ -3190,7 +3200,8 @@ export default class ManualTagging extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             }, () => {
                                 this.hideSecondComponent()
@@ -3296,7 +3307,8 @@ export default class ManualTagging extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         }, () => {
                             this.hideSecondComponent()
@@ -4353,7 +4365,8 @@ export default class ManualTagging extends Component {
                                                 error => {
                                                     if (error.message === "Network Error") {
                                                         this.setState({
-                                                            message: 'static.unkownError',
+                                                            // message: 'static.unkownError',
+                                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                             loading: false
                                                         }, () => {
                                                             this.hideSecondComponent()
@@ -4775,7 +4788,8 @@ export default class ManualTagging extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             }, () => {
                                 this.hideSecondComponent()
@@ -4921,7 +4935,8 @@ export default class ManualTagging extends Component {
                         console.log("Loading 1 Mohit in catch#############", error)
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             }, () => {
                                 this.hideSecondComponent()

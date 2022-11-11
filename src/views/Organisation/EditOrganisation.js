@@ -15,7 +15,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
-import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX, API_URL } from '../../Constants.js';
 
 let initialValues = {
     realmId: '',
@@ -231,7 +231,8 @@ export default class EditOrganisationComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -298,7 +299,8 @@ export default class EditOrganisationComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -361,7 +363,8 @@ export default class EditOrganisationComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -402,7 +405,8 @@ export default class EditOrganisationComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -546,7 +550,8 @@ export default class EditOrganisationComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -599,165 +604,165 @@ export default class EditOrganisationComponent extends Component {
                                         setFieldValue,
                                         setFieldTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='organisationForm' autocomplete="off">
-                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                        <Form onSubmit={handleSubmit} noValidate name='organisationForm' autocomplete="off">
+                                            <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
 
-                                                    <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                <FormGroup>
+                                                    <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        bsSize="sm"
+                                                        value={this.state.organisation.realm.id}
+                                                        valid={!errors.realmId}
+                                                        invalid={touched.realmId && !!errors.realmId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        disabled
+                                                        type="select" name="realmId" id="realmId">
+                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                        {realmList}
+                                                    </Input>
+                                                    <FormFeedback>{errors.realmId}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup className="Selectcontrol-bdrNone">
+                                                    <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Select
+                                                        bsSize="sm"
+                                                        // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                        //     { 'is-valid': !errors.realmCountryId },
+                                                        //     { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.organisation.realmCountryArray.length == 0) }
+                                                        // )}
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.realmCountryId },
+                                                            { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || !!errors.realmCountryId) }
+                                                        )}
+                                                        name="realmCountryId"
+                                                        id="realmCountryId"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("realmCountryId", e);
+                                                            this.updateFieldData(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("realmCountryId", true)}
+                                                        multi
+                                                        options={this.state.realmCountryList}
+                                                        value={this.state.organisation.realmCountryArray}
+                                                    />
+                                                    <FormFeedback>{errors.realmCountryId}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label htmlFor="organisationTypeId">{i18n.t('static.organisationType.organisationType')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="organisationTypeId"
+                                                        id="organisationTypeId"
+                                                        bsSize="sm"
+                                                        valid={!errors.organisationTypeId && this.state.organisation.organisationType.id != ''}
+                                                        invalid={touched.organisationTypeId && !!errors.organisationTypeId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        // disabled
+                                                        value={this.state.organisation.organisationType.id}
+                                                        required
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {organisationTypes}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.organisationTypeId}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span> </Label>
+                                                    <Input
+                                                        bsSize="sm"
+                                                        type="text" name="organisationName" valid={!errors.organisationName}
+                                                        // invalid={touched.organisationName && !!errors.organisationName || this.state.organisation.label.label_en == ''}
+                                                        invalid={(touched.organisationName && !!errors.organisationName) || !!errors.organisationName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.organisation.label.label_en}
+                                                        id="organisationName" />
+                                                    <FormFeedback className="red">{errors.organisationName}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} <span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        bsSize="sm"
+                                                        // readOnly
+                                                        type="text" name="organisationCode" valid={!errors.organisationCode}
+                                                        // invalid={touched.organisationCode && !!errors.organisationCode}
+                                                        invalid={(touched.organisationCode && !!errors.organisationCode) || !!errors.organisationCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.organisation.organisationCode}
+                                                        id="organisationCode" required />
+                                                    <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
+                                                    <FormGroup check inline>
                                                         <Input
-                                                            bsSize="sm"
-                                                            value={this.state.organisation.realm.id}
-                                                            valid={!errors.realmId}
-                                                            invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            disabled
-                                                            type="select" name="realmId" id="realmId">
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {realmList}
-                                                        </Input>
-                                                        <FormFeedback>{errors.realmId}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup className="Selectcontrol-bdrNone">
-                                                        <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Select
-                                                            bsSize="sm"
-                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            //     { 'is-valid': !errors.realmCountryId },
-                                                            //     { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || this.state.organisation.realmCountryArray.length == 0) }
-                                                            // )}
-                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                                { 'is-valid': !errors.realmCountryId },
-                                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId || !!errors.realmCountryId) }
-                                                            )}
-                                                            name="realmCountryId"
-                                                            id="realmCountryId"
-                                                            onChange={(e) => {
-                                                                handleChange(e);
-                                                                setFieldValue("realmCountryId", e);
-                                                                this.updateFieldData(e);
-                                                            }}
-                                                            onBlur={() => setFieldTouched("realmCountryId", true)}
-                                                            multi
-                                                            options={this.state.realmCountryList}
-                                                            value={this.state.organisation.realmCountryArray}
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active1"
+                                                            name="active"
+                                                            value={true}
+                                                            checked={this.state.organisation.active === true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         />
-                                                        <FormFeedback>{errors.realmCountryId}</FormFeedback>
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio1">
+                                                            {i18n.t('static.common.active')}
+                                                        </Label>
                                                     </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="organisationTypeId">{i18n.t('static.organisationType.organisationType')}<span class="red Reqasterisk">*</span></Label>
+                                                    <FormGroup check inline>
                                                         <Input
-                                                            type="select"
-                                                            name="organisationTypeId"
-                                                            id="organisationTypeId"
-                                                            bsSize="sm"
-                                                            valid={!errors.organisationTypeId && this.state.organisation.organisationType.id != ''}
-                                                            invalid={touched.organisationTypeId && !!errors.organisationTypeId}
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="active"
+                                                            value={false}
+                                                            checked={this.state.organisation.active === false}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            // disabled
-                                                            value={this.state.organisation.organisationType.id}
-                                                            required
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {organisationTypes}
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.organisationTypeId}</FormFeedback>
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.common.disabled')}
+                                                        </Label>
                                                     </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span> </Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            type="text" name="organisationName" valid={!errors.organisationName}
-                                                            // invalid={touched.organisationName && !!errors.organisationName || this.state.organisation.label.label_en == ''}
-                                                            invalid={(touched.organisationName && !!errors.organisationName) || !!errors.organisationName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.organisation.label.label_en}
-                                                            id="organisationName" />
-                                                        <FormFeedback className="red">{errors.organisationName}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} <span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            bsSize="sm"
-                                                            // readOnly
-                                                            type="text" name="organisationCode" valid={!errors.organisationCode}
-                                                            // invalid={touched.organisationCode && !!errors.organisationCode}
-                                                            invalid={(touched.organisationCode && !!errors.organisationCode) || !!errors.organisationCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.organisation.organisationCode}
-                                                            id="organisationCode" required />
-                                                        <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="active"
-                                                                value={true}
-                                                                checked={this.state.organisation.active === true}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="active"
-                                                                value={false}
-                                                                checked={this.state.organisation.active === false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    </FormGroup>
+                                                </FormGroup>
 
 
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                         </Card>
                     </Col>
@@ -793,7 +798,8 @@ export default class EditOrganisationComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -851,7 +857,8 @@ export default class EditOrganisationComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -892,7 +899,8 @@ export default class EditOrganisationComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {

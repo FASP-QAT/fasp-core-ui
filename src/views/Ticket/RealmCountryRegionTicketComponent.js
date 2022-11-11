@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmCountryService from '../../api/RealmCountryService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { SPACE_REGEX } from '../../Constants';
+import { API_URL, SPACE_REGEX } from '../../Constants';
 import ProgramService from '../../api/ProgramService';
 import HealthAreaService from '../../api/HealthAreaService';
 import Select from 'react-select';
@@ -136,7 +136,7 @@ export default class RealmCountryRegionTicketComponent extends Component {
         }, () => { })
     };
 
-    changeRealmCountry(event){
+    changeRealmCountry(event) {
         if (event === null) {
             let { realmCountryRegion } = this.state;
             realmCountryRegion.realmCountryId = ''
@@ -176,7 +176,7 @@ export default class RealmCountryRegionTicketComponent extends Component {
                             countryList[i] = { value: listArray[i].realmCountryId, label: getLabelText(listArray[i].country.label, this.state.lang) }
                         }
                         this.setState({
-                            realmCountries: listArray, 
+                            realmCountries: listArray,
                             countryList: countryList,
                             loading: false
                         })
@@ -189,7 +189,8 @@ export default class RealmCountryRegionTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -294,7 +295,8 @@ export default class RealmCountryRegionTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -354,7 +356,7 @@ export default class RealmCountryRegionTicketComponent extends Component {
         realmCountryRegion.notes = '';
         this.setState({
             realmCountryRegion: realmCountryRegion,
-            realmCountryId: '',            
+            realmCountryId: '',
             realmId: this.props.items.userRealmId
         },
             () => { });
@@ -431,7 +433,8 @@ export default class RealmCountryRegionTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -483,37 +486,37 @@ export default class RealmCountryRegionTicketComponent extends Component {
                                 setFieldValue,
                                 setFieldTouched
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.realmCountryRegion.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmCountryRegion.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="realmId">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmId" id="realmId"
-                                                bsSize="sm"
-                                                valid={!errors.realmId && this.state.realmCountryRegion.realmId != ''}
-                                                invalid={touched.realmId && !!errors.realmId}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e.target.value) }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realms}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="realmCountryId">{i18n.t('static.dashboard.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                                            {/* <Input type="select" name="realmCountryId" id="realmCountryId"
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.realmCountryRegion.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmCountryRegion.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="realmId">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="realmId" id="realmId"
+                                            bsSize="sm"
+                                            valid={!errors.realmId && this.state.realmCountryRegion.realmId != ''}
+                                            invalid={touched.realmId && !!errors.realmId}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e.target.value) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realms}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="realmCountryId">{i18n.t('static.dashboard.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                                        {/* <Input type="select" name="realmCountryId" id="realmCountryId"
                                                 bsSize="sm"
                                                 valid={!errors.realmCountryId && this.state.realmCountryRegion.realmCountryId != ''}
                                                 invalid={touched.realmCountryId && !!errors.realmCountryId}
@@ -525,89 +528,89 @@ export default class RealmCountryRegionTicketComponent extends Component {
                                                 {realmCountryList}
                                             </Input> */}
 
-                                            <Select
-                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                    { 'is-valid': !errors.realmCountryId && this.state.realmCountryRegion.realmCountryId != '' },
-                                                    { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
-                                                )}
-                                                bsSize="sm"
-                                                name="realmCountryId"
-                                                id="realmCountryId"
-                                                isClearable={false}
-                                                onChange={(e) => {
-                                                    handleChange(e);
-                                                    setFieldValue("realmCountryId", e);
-                                                    this.changeRealmCountry(e)
-                                                }}
-                                                onBlur={() => setFieldTouched("realmCountryId", true)}
-                                                required
-                                                min={1}
-                                                options={this.state.countryList}
-                                                value={this.state.realmCountryId}
-                                            />
-                                            <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="regionId">{i18n.t('static.region.regionName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="regionId" id="regionId"
-                                                bsSize="sm"
-                                                valid={!errors.regionId && this.state.realmCountryRegion.regionId != ''}
-                                                invalid={touched.regionId && !!errors.regionId}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmCountryRegion.regionId}
-                                                required />
-                                            <FormFeedback className="red">{errors.regionId}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="capacity">{i18n.t('static.region.capacitycbm')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="number" name="capacity" id="capacity"
-                                                bsSize="sm"
-                                                valid={!errors.capacity && this.state.realmCountryRegion.capacity != ''}
-                                                invalid={touched.capacity && !!errors.capacity}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmCountryRegion.capacity}
-                                                required />
-                                            <FormFeedback className="red">{errors.capacity}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="glnCode">{i18n.t('static.region.gln')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="glnCode" id="glnCode"
-                                                bsSize="sm"
-                                                valid={!errors.glnCode && this.state.realmCountryRegion.glnCode != ''}
-                                                invalid={touched.glnCode && !!errors.glnCode}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmCountryRegion.glnCode}
-                                                required />
-                                            <FormFeedback className="red">{errors.glnCode}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.realmCountryRegion.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.realmCountryRegion.notes}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check "></i> {i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                        {/* <br></br><br></br>
+                                        <Select
+                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.realmCountryId && this.state.realmCountryRegion.realmCountryId != '' },
+                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
+                                            )}
+                                            bsSize="sm"
+                                            name="realmCountryId"
+                                            id="realmCountryId"
+                                            isClearable={false}
+                                            onChange={(e) => {
+                                                handleChange(e);
+                                                setFieldValue("realmCountryId", e);
+                                                this.changeRealmCountry(e)
+                                            }}
+                                            onBlur={() => setFieldTouched("realmCountryId", true)}
+                                            required
+                                            min={1}
+                                            options={this.state.countryList}
+                                            value={this.state.realmCountryId}
+                                        />
+                                        <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="regionId">{i18n.t('static.region.regionName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="regionId" id="regionId"
+                                            bsSize="sm"
+                                            valid={!errors.regionId && this.state.realmCountryRegion.regionId != ''}
+                                            invalid={touched.regionId && !!errors.regionId}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmCountryRegion.regionId}
+                                            required />
+                                        <FormFeedback className="red">{errors.regionId}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="capacity">{i18n.t('static.region.capacitycbm')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number" name="capacity" id="capacity"
+                                            bsSize="sm"
+                                            valid={!errors.capacity && this.state.realmCountryRegion.capacity != ''}
+                                            invalid={touched.capacity && !!errors.capacity}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmCountryRegion.capacity}
+                                            required />
+                                        <FormFeedback className="red">{errors.capacity}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="glnCode">{i18n.t('static.region.gln')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="glnCode" id="glnCode"
+                                            bsSize="sm"
+                                            valid={!errors.glnCode && this.state.realmCountryRegion.glnCode != ''}
+                                            invalid={touched.glnCode && !!errors.glnCode}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmCountryRegion.glnCode}
+                                            required />
+                                        <FormFeedback className="red">{errors.glnCode}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.realmCountryRegion.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={600}
+                                            value={this.state.realmCountryRegion.notes}
+                                        // required 
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check "></i> {i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
-                                    </Form>
-                                )} />
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

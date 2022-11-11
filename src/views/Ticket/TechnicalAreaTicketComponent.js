@@ -14,7 +14,7 @@ import CountryService from '../../api/CountryService';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
-import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABET_NUMBER_REGEX } from '../../Constants';
+import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABET_NUMBER_REGEX, API_URL } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
@@ -183,7 +183,8 @@ export default class TechnicalAreaTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -243,7 +244,8 @@ export default class TechnicalAreaTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -324,7 +326,8 @@ export default class TechnicalAreaTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -420,7 +423,8 @@ export default class TechnicalAreaTicketComponent extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -472,7 +476,8 @@ export default class TechnicalAreaTicketComponent extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -574,7 +579,8 @@ export default class TechnicalAreaTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {

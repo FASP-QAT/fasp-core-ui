@@ -11,7 +11,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { SketchPicker } from 'react-color';
 import reactCSS from 'reactcss'
 import getLabelText from '../../CommonComponent/getLabelText';
-import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX, API_URL } from '../../Constants.js';
 import ProgramService from "../../api/ProgramService";
 import Select from 'react-select';
 import classNames from 'classnames';
@@ -307,7 +307,8 @@ class EditProcurementAgentComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -382,7 +383,8 @@ class EditProcurementAgentComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -446,7 +448,8 @@ class EditProcurementAgentComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -577,7 +580,8 @@ class EditProcurementAgentComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -877,7 +881,8 @@ class EditProcurementAgentComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {

@@ -12,6 +12,7 @@ import image1 from '../../../assets/img/QAT-login-logo.png';
 import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
+import { API_URL } from '../../../Constants';
 
 const initialValues = {
     emailId: ""
@@ -137,7 +138,10 @@ class ForgotPasswordComponent extends Component {
 
                                                             console.log(error)
                                                             if (error.message === "Network Error") {
-                                                                this.setState({ message: error.message });
+                                                                this.setState({
+                                                                    // message: error.message 
+                                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                                });
                                                             } else {
                                                                 switch (error.response ? error.response.status : "") {
                                                                     case 404:
@@ -184,33 +188,33 @@ class ForgotPasswordComponent extends Component {
                                                 isValid,
                                                 setTouched
                                             }) => (
-                                                    <Form onSubmit={handleSubmit} noValidate name='forgotPasswordForm'>
-                                                        <CardBody className="p-4">
+                                                <Form onSubmit={handleSubmit} noValidate name='forgotPasswordForm'>
+                                                    <CardBody className="p-4">
 
-                                                            <FormGroup>
-                                                                <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
-                                                                <Input type="text"
-                                                                    name="emailId"
-                                                                    id="emailId"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.emailId}
-                                                                    invalid={touched.emailId && !!errors.emailId}
-                                                                    onChange={handleChange}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                />
-                                                                <FormFeedback>{errors.emailId}</FormFeedback>
-                                                            </FormGroup>
-                                                        </CardBody>
-                                                        <CardFooter>
-                                                            <FormGroup>
-                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                                &nbsp;
-                          </FormGroup>
-                                                        </CardFooter>
-                                                    </Form>
-                                                )} />
+                                                        <FormGroup>
+                                                            <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
+                                                            <Input type="text"
+                                                                name="emailId"
+                                                                id="emailId"
+                                                                bsSize="sm"
+                                                                valid={!errors.emailId}
+                                                                invalid={touched.emailId && !!errors.emailId}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                            />
+                                                            <FormFeedback>{errors.emailId}</FormFeedback>
+                                                        </FormGroup>
+                                                    </CardBody>
+                                                    <CardFooter>
+                                                        <FormGroup>
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+                                                        </FormGroup>
+                                                    </CardFooter>
+                                                </Form>
+                                            )} />
                                 </Card>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

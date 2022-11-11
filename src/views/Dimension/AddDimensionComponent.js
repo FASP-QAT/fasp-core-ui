@@ -10,7 +10,7 @@ import 'react-select/dist/react-select.min.css';
 import DimensionService from '../../api/DimensionService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SPACE_REGEX } from '../../Constants.js';
+import { API_URL, SPACE_REGEX } from '../../Constants.js';
 
 const initialValues = {
     label: ""
@@ -163,7 +163,8 @@ export default class AddDimensionComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -218,52 +219,52 @@ export default class AddDimensionComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                                <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
+                                        <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                            <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
 
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label && this.state.dimension.label.label_en != ''}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.dimension.label.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="label"
+                                                        id="label"
+                                                        bsSize="sm"
+                                                        valid={!errors.label && this.state.dimension.label.label_en != ''}
+                                                        invalid={touched.label && !!errors.label}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.dimension.label.label_en}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
 
-                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        &nbsp;
+                                                    <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    &nbsp;
 
-                                                        {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp; */}
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
-                                        )}
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
+                                    )}
 
                             />
 

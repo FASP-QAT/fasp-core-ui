@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP } from '../../Constants.js'
+import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -2772,7 +2772,7 @@ export default class CreateTreeTemplate extends Component {
             data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
             data[10] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture;
             data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? fuPerMonth : 1;
-            data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id==2?fuPerMonth:this.state.noFURequired) : 1;
+            data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? fuPerMonth : this.state.noFURequired) : 1;
             data[12] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 var dataValue = 0;
@@ -4233,7 +4233,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -4343,7 +4344,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -4757,7 +4759,8 @@ export default class CreateTreeTemplate extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -4959,7 +4962,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5024,7 +5028,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5075,7 +5080,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5126,7 +5132,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5178,7 +5185,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5231,7 +5239,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5283,7 +5292,8 @@ export default class CreateTreeTemplate extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -5437,7 +5447,8 @@ export default class CreateTreeTemplate extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -8891,11 +8902,11 @@ export default class CreateTreeTemplate extends Component {
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[0][0].notes}>
-                     <div className={itemConfig.payload.nodeType.id == 5
-                        || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length<=20?"ContactTitleBackground TemplateTitleBgblueSingle":"ContactTitleBackground TemplateTitleBgblue") :
-                        (itemConfig.payload.label.label_en.length<=20?"ContactTitleBackground TemplateTitleBgSingle":"ContactTitleBackground TemplateTitleBg")}
+                    <div className={itemConfig.payload.nodeType.id == 5
+                        || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
+                        (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
                     >
-                    {/* <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
+                        {/* <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
                     > */}
                         <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
                             {/* <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '137px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div> */}
@@ -9500,7 +9511,8 @@ export default class CreateTreeTemplate extends Component {
                                                         error => {
                                                             if (error.message === "Network Error") {
                                                                 this.setState({
-                                                                    message: 'static.unkownError',
+                                                                    // message: 'static.unkownError',
+                                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                     loading: false
                                                                 });
                                                             } else {
@@ -9588,7 +9600,8 @@ export default class CreateTreeTemplate extends Component {
                                                     error => {
                                                         if (error.message === "Network Error") {
                                                             this.setState({
-                                                                message: 'static.unkownError',
+                                                                // message: 'static.unkownError',
+                                                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 loading: false
                                                             });
                                                         } else {

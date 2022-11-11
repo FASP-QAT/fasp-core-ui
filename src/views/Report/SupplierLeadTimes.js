@@ -19,7 +19,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Online } from 'react-detect-offline';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, API_URL } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 
@@ -514,7 +514,8 @@ class SupplierLeadTimes extends Component {
                         })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -601,7 +602,8 @@ class SupplierLeadTimes extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -903,7 +905,8 @@ class SupplierLeadTimes extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -1005,7 +1008,8 @@ class SupplierLeadTimes extends Component {
                         }, () => { this.consolidatedProcurementAgentList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1180,7 +1184,8 @@ class SupplierLeadTimes extends Component {
                                 })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {

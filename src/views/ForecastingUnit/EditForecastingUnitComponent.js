@@ -8,7 +8,7 @@ import ForecastingUnitService from '../../api/ForecastingUnitService.js';
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { SPACE_REGEX } from '../../Constants.js';
+import { API_URL, SPACE_REGEX } from '../../Constants.js';
 
 let initialValues = {
     label: ''
@@ -215,7 +215,8 @@ export default class EditForecastingUnitComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -304,7 +305,8 @@ export default class EditForecastingUnitComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -355,148 +357,148 @@ export default class EditForecastingUnitComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='forecastingUnitForm' autocomplete="off">
-                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={getLabelText(this.state.forecastingUnit.realm.label, this.state.lang)}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="tracerCategoryId">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="tracerCategoryId"
-                                                            id="tracerCategoryId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={getLabelText(this.state.forecastingUnit.tracerCategory.label, this.state.lang)}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="productCategoryId">{i18n.t('static.productcategory.productcategory')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="productCategoryId"
-                                                            id="productCategoryId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={getLabelText(this.state.forecastingUnit.productCategory.label, this.state.lang)}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            // invalid={touched.label && !!errors.label || this.state.forecastingUnit.label.label_en == ''}
-                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.forecastingUnit.label.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}</Label>
-                                                        <Input type="text"
-                                                            name="genericLabel"
-                                                            id="genericLabel"
-                                                            bsSize="sm"
-                                                            valid={!errors.genericLabel}
-                                                            // invalid={touched.genericLabel && !!errors.genericLabel || this.state.forecastingUnit.genericLabel.label_en == ''}
-                                                            invalid={(touched.genericLabel && !!errors.genericLabel) || !!errors.genericLabel}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.forecastingUnit.genericLabel.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.genericLabel}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="unitId"
-                                                            id="unitId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={getLabelText(this.state.forecastingUnit.unit.label, this.state.lang)}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
+                                        <Form onSubmit={handleSubmit} noValidate name='forecastingUnitForm' autocomplete="off">
+                                            <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="realmId"
+                                                        id="realmId"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        value={getLabelText(this.state.forecastingUnit.realm.label, this.state.lang)}
+                                                    >
+                                                    </Input>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="tracerCategoryId">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="tracerCategoryId"
+                                                        id="tracerCategoryId"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        value={getLabelText(this.state.forecastingUnit.tracerCategory.label, this.state.lang)}
+                                                    >
+                                                    </Input>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="productCategoryId">{i18n.t('static.productcategory.productcategory')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="productCategoryId"
+                                                        id="productCategoryId"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        value={getLabelText(this.state.forecastingUnit.productCategory.label, this.state.lang)}
+                                                    >
+                                                    </Input>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="label"
+                                                        id="label"
+                                                        bsSize="sm"
+                                                        valid={!errors.label}
+                                                        // invalid={touched.label && !!errors.label || this.state.forecastingUnit.label.label_en == ''}
+                                                        invalid={(touched.label && !!errors.label) || !!errors.label}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.forecastingUnit.label.label_en}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="genericLabel">{i18n.t('static.product.productgenericname')}</Label>
+                                                    <Input type="text"
+                                                        name="genericLabel"
+                                                        id="genericLabel"
+                                                        bsSize="sm"
+                                                        valid={!errors.genericLabel}
+                                                        // invalid={touched.genericLabel && !!errors.genericLabel || this.state.forecastingUnit.genericLabel.label_en == ''}
+                                                        invalid={(touched.genericLabel && !!errors.genericLabel) || !!errors.genericLabel}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.forecastingUnit.genericLabel.label_en}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.genericLabel}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="unitId"
+                                                        id="unitId"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        value={getLabelText(this.state.forecastingUnit.unit.label, this.state.lang)}
+                                                    >
+                                                    </Input>
+                                                </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}  </Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="active"
-                                                                value={true}
-                                                                checked={this.state.forecastingUnit.active === true}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="active"
-                                                                value={false}
-                                                                checked={this.state.forecastingUnit.active === false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
-                                                            </Label>
-                                                        </FormGroup>
+                                                <FormGroup>
+                                                    <Label>{i18n.t('static.common.status')}  </Label>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active1"
+                                                            name="active"
+                                                            value={true}
+                                                            checked={this.state.forecastingUnit.active === true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio1">
+                                                            {i18n.t('static.common.active')}
+                                                        </Label>
                                                     </FormGroup>
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="active"
+                                                            value={false}
+                                                            checked={this.state.forecastingUnit.active === false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.common.disabled')}
+                                                        </Label>
+                                                    </FormGroup>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
 
-                                                        &nbsp;
+                                                    &nbsp;
 
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                         </Card>
                     </Col>
@@ -524,7 +526,8 @@ export default class EditForecastingUnitComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {

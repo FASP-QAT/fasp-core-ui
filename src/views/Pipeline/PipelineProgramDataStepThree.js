@@ -13,6 +13,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
+import { API_URL } from '../../Constants';
 
 const initialValuesThree = {
     healthAreaId: ''
@@ -119,7 +120,8 @@ export default class PipelineProgramDataStepThree extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -173,7 +175,7 @@ export default class PipelineProgramDataStepThree extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     enableReinitialize={true}
-                    initialValues={{ 
+                    initialValues={{
                         healthAreaId: this.props.items.program.healthAreaArray
                     }}
                     validate={validateThree(validationSchemaThree)}

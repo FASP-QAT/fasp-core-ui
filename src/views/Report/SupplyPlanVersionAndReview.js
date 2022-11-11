@@ -19,7 +19,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, SPV_REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, SPV_REPORT_DATEPICKER_START_MONTH, API_URL } from '../../Constants.js';
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -395,7 +395,8 @@ class SupplyPlanVersionAndReview extends Component {
                     })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -502,7 +503,8 @@ class SupplyPlanVersionAndReview extends Component {
                         })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -586,7 +588,8 @@ class SupplyPlanVersionAndReview extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -645,7 +648,8 @@ class SupplyPlanVersionAndReview extends Component {
                 })
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -747,7 +751,8 @@ class SupplyPlanVersionAndReview extends Component {
                             })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {

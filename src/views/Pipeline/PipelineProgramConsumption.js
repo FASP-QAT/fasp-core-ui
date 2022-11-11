@@ -9,7 +9,7 @@ import DataSourceService from '../../api/DataSourceService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionPipeline, checkValidtion, inValid, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions';
-import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_INTEGER_REGEX_LONG } from '../../Constants';
+import { ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_INTEGER_REGEX_LONG, API_URL } from '../../Constants';
 import RealmCountryService from '../../api/RealmCountryService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_INTEGER_REGEX } from '../../Constants.js';
@@ -667,7 +667,8 @@ export default class PipelineProgramConsumption extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -708,7 +709,8 @@ export default class PipelineProgramConsumption extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
@@ -748,7 +750,8 @@ export default class PipelineProgramConsumption extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -789,7 +792,8 @@ export default class PipelineProgramConsumption extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -829,7 +833,8 @@ export default class PipelineProgramConsumption extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {

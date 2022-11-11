@@ -7,7 +7,7 @@ import { Formik } from 'formik';
 import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
-import { DECIMAL_NO_REGEX, ALPHABETS_REGEX, SPACE_REGEX } from '../../Constants';
+import { DECIMAL_NO_REGEX, ALPHABETS_REGEX, SPACE_REGEX, API_URL } from '../../Constants';
 
 const initialValues = {
     summary: "Add Currency",
@@ -193,7 +193,8 @@ export default class CurrencyTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
