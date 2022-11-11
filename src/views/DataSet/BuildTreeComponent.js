@@ -955,6 +955,7 @@ export default class BuildTree extends Component {
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.getNodeTransferList = this.getNodeTransferList.bind(this);
         this.autoCalculate = this.autoCalculate.bind(this);
+        this.toggleTooltipAuto=this.toggleTooltipAuto.bind(this);
     }
 
     getMomValueForDateRange(startDate) {
@@ -1643,6 +1644,12 @@ export default class BuildTree extends Component {
     toggleSenariotree() {
         this.setState({
             popoverOpenSenariotree: !this.state.popoverOpenSenariotree,
+        });
+    }
+
+    toggleTooltipAuto() {
+        this.setState({
+            popoverTooltipAuto: !this.state.popoverTooltipAuto,
         });
     }
 
@@ -11118,6 +11125,11 @@ export default class BuildTree extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
+                                            <div>
+                                        <Popover placement="top" isOpen={this.state.popoverTooltipAuto} target="PopoverAuto" trigger="hover" toggle={this.toggleTooltipAuto}>
+                                            <PopoverBody>{i18n.t('static.tooltip.autoCalculate')}</PopoverBody>
+                                        </Popover>
+                                    </div>
                                             <FormGroup className="col-md-4" >
                                                 <div className="check inline  pl-lg-0 pt-lg-0">
                                                     <div>
@@ -11132,7 +11144,7 @@ export default class BuildTree extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Auto Calculate'}</b>
+                                                            <b>{'Auto Calculate'}</b><i class="fa fa-info-circle icons pl-lg-2" id="PopoverAuto" onClick={this.toggleTooltipAuto} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                         </Label>
                                                     </div>
                                                 </div>
