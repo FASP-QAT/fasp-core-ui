@@ -1242,7 +1242,7 @@
     "static.budget.stopdatetext": "Enter budget end date",
     "static.consumption.planningunit": "Planning Unit",
     "static.program.noOfDaysInMonth": "# Of Days In Month",
-    "static.masterDataSync.masterDataSyncFailed": "Master data sync failed",
+    "static.masterDataSync.masterDataSyncFailed": "Master data sync failed. Please ensure your computer has access to internet and try again.",
     "static.ModelingTransfer.Examples": "Examples",
     "static.problemReport.inComplianceExample": "A planning unit is missing actual consumption in the last 3 months. A user enters actual consumption data for the last 3 months. QAT automatically marks this as ‘In-Compliance’.",
     "static.role.businessfunctiontext": "Select Business Function",
