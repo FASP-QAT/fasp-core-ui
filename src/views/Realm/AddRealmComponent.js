@@ -7,6 +7,7 @@ import RealmService from '../../api/RealmService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { API_URL } from '../../Constants';
 
 
 const entityname = i18n.t('static.realm.realm');
@@ -260,7 +261,8 @@ export default class AddRealmComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -313,127 +315,127 @@ export default class AddRealmComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='realmForm' autocomplete="off">
-                                                <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
+                                        <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='realmForm' autocomplete="off">
+                                            <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
 
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label && this.state.realm.label.label_en != ''}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.label.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="realmCode"
-                                                            id="realmCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.realmCode && this.state.realm.realmCode != ''}
-                                                            invalid={touched.realmCode && !!errors.realmCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.realmCode}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.realmCode}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="number"
-                                                            name="minMosMinGaurdrail"
-                                                            id="minMosMinGaurdrail"
-                                                            bsSize="sm"
-                                                            valid={!errors.minMosMinGaurdrail && this.state.realm.minMosMinGaurdrail != ''}
-                                                            invalid={touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.minMosMinGaurdrail}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.minMosMinGaurdrail}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="number"
-                                                            // min="0"
-                                                            name="minMosMaxGaurdrail"
-                                                            id="minMosMaxGaurdrail"
-                                                            bsSize="sm"
-                                                            valid={!errors.minMosMaxGaurdrail && this.state.realm.minMosMaxGaurdrail != ''}
-                                                            invalid={touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.minMosMaxGaurdrail}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.minMosMaxGaurdrail}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="number"
-                                                            // min="0"
-                                                            name="maxMosMaxGaurdrail"
-                                                            id="maxMosMaxGaurdrail"
-                                                            bsSize="sm"
-                                                            valid={!errors.maxMosMaxGaurdrail && this.state.realm.maxMosMaxGaurdrail != ''}
-                                                            invalid={touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.maxMosMaxGaurdrail}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.maxMosMaxGaurdrail}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="minQplTolerance">{i18n.t('static.realm.minQplTolerance')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="number"
-                                                            // min="0"
-                                                            name="minQplTolerance"
-                                                            id="minQplTolerance"
-                                                            bsSize="sm"
-                                                            valid={!errors.minQplTolerance && this.state.realm.minQplTolerance != ''}
-                                                            invalid={touched.minQplTolerance && !!errors.minQplTolerance}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.minQplTolerance}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.minQplTolerance}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="minQplToleranceCutOff">{i18n.t('static.realm.minQplToleranceCutOff')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="number"
-                                                            // min="0"
-                                                            name="minQplToleranceCutOff"
-                                                            id="minQplToleranceCutOff"
-                                                            bsSize="sm"
-                                                            valid={!errors.minQplToleranceCutOff && this.state.realm.minQplToleranceCutOff != ''}
-                                                            invalid={touched.minQplToleranceCutOff && !!errors.minQplToleranceCutOff}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.minQplToleranceCutOff}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.minQplToleranceCutOff}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="maxQplTolerance">{i18n.t('static.realm.maxQplTolerance')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="number"
-                                                            // min="0"
-                                                            name="maxQplTolerance"
-                                                            id="maxQplTolerance"
-                                                            bsSize="sm"
-                                                            valid={!errors.maxQplTolerance && this.state.realm.maxQplTolerance != ''}
-                                                            invalid={touched.maxQplTolerance && !!errors.maxQplTolerance}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.maxQplTolerance}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.maxQplTolerance}</FormFeedback>
-                                                    </FormGroup>
-                                                    {/*  <FormGroup>
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="label"
+                                                        id="label"
+                                                        bsSize="sm"
+                                                        valid={!errors.label && this.state.realm.label.label_en != ''}
+                                                        invalid={touched.label && !!errors.label}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.label.label_en}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="realmCode">{i18n.t('static.realm.realmCode')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="realmCode"
+                                                        id="realmCode"
+                                                        bsSize="sm"
+                                                        valid={!errors.realmCode && this.state.realm.realmCode != ''}
+                                                        invalid={touched.realmCode && !!errors.realmCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.realmCode}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.realmCode}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="minMosMinGaurdrail">{i18n.t('static.realm.minMosMinGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        name="minMosMinGaurdrail"
+                                                        id="minMosMinGaurdrail"
+                                                        bsSize="sm"
+                                                        valid={!errors.minMosMinGaurdrail && this.state.realm.minMosMinGaurdrail != ''}
+                                                        invalid={touched.minMosMinGaurdrail && !!errors.minMosMinGaurdrail}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.minMosMinGaurdrail}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.minMosMinGaurdrail}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="minMosMaxGaurdrail">{i18n.t('static.realm.minMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        // min="0"
+                                                        name="minMosMaxGaurdrail"
+                                                        id="minMosMaxGaurdrail"
+                                                        bsSize="sm"
+                                                        valid={!errors.minMosMaxGaurdrail && this.state.realm.minMosMaxGaurdrail != ''}
+                                                        invalid={touched.minMosMaxGaurdrail && !!errors.minMosMaxGaurdrail}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.minMosMaxGaurdrail}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.minMosMaxGaurdrail}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="maxMosMaxGaurdrail">{i18n.t('static.realm.maxMosMaxGaurdraillabel')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        // min="0"
+                                                        name="maxMosMaxGaurdrail"
+                                                        id="maxMosMaxGaurdrail"
+                                                        bsSize="sm"
+                                                        valid={!errors.maxMosMaxGaurdrail && this.state.realm.maxMosMaxGaurdrail != ''}
+                                                        invalid={touched.maxMosMaxGaurdrail && !!errors.maxMosMaxGaurdrail}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.maxMosMaxGaurdrail}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.maxMosMaxGaurdrail}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="minQplTolerance">{i18n.t('static.realm.minQplTolerance')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        // min="0"
+                                                        name="minQplTolerance"
+                                                        id="minQplTolerance"
+                                                        bsSize="sm"
+                                                        valid={!errors.minQplTolerance && this.state.realm.minQplTolerance != ''}
+                                                        invalid={touched.minQplTolerance && !!errors.minQplTolerance}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.minQplTolerance}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.minQplTolerance}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="minQplToleranceCutOff">{i18n.t('static.realm.minQplToleranceCutOff')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        // min="0"
+                                                        name="minQplToleranceCutOff"
+                                                        id="minQplToleranceCutOff"
+                                                        bsSize="sm"
+                                                        valid={!errors.minQplToleranceCutOff && this.state.realm.minQplToleranceCutOff != ''}
+                                                        invalid={touched.minQplToleranceCutOff && !!errors.minQplToleranceCutOff}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.minQplToleranceCutOff}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.minQplToleranceCutOff}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="maxQplTolerance">{i18n.t('static.realm.maxQplTolerance')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        // min="0"
+                                                        name="maxQplTolerance"
+                                                        id="maxQplTolerance"
+                                                        bsSize="sm"
+                                                        valid={!errors.maxQplTolerance && this.state.realm.maxQplTolerance != ''}
+                                                        invalid={touched.maxQplTolerance && !!errors.maxQplTolerance}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.maxQplTolerance}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.maxQplTolerance}</FormFeedback>
+                                                </FormGroup>
+                                                {/*  <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
                                                         <Input type="number"
                                                             name="monthInPastForAmc"
@@ -475,65 +477,65 @@ export default class AddRealmComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
                                                   </FormGroup>*/}
-                                                    <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="defaultRealm"
-                                                                value={true}
-                                                                checked={this.state.realm.defaultRealm === true}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.realm.yes')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="defaultRealm"
-                                                                value={false}
-                                                                checked={this.state.realm.defaultRealm === false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.realm.no')}
-                                                            </Label>
-                                                        </FormGroup>
+                                                <FormGroup>
+                                                    <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active1"
+                                                            name="defaultRealm"
+                                                            value={true}
+                                                            checked={this.state.realm.defaultRealm === true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio1">
+                                                            {i18n.t('static.realm.yes')}
+                                                        </Label>
                                                     </FormGroup>
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="defaultRealm"
+                                                            value={false}
+                                                            checked={this.state.realm.defaultRealm === false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.realm.no')}
+                                                        </Label>
+                                                    </FormGroup>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" color="warning" size="md" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" color="warning" size="md" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                         </Card>
                     </Col>

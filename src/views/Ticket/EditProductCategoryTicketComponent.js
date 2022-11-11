@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { SPACE_REGEX } from '../../Constants';
+import { API_URL, SPACE_REGEX } from '../../Constants';
 import PoroductCategoryService from '../../api/PoroductCategoryService';
 
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.product.productcategory"))
@@ -166,7 +166,8 @@ export default class EditProductCategoryTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -206,7 +207,7 @@ export default class EditProductCategoryTicketComponent extends Component {
 
     getProductCategory(realmId) {
         // AuthenticationService.setupAxiosInterceptors();        
-        
+
         if (realmId !== "") {
             PoroductCategoryService.getProductCategoryListByRealmId(realmId)
 
@@ -229,7 +230,8 @@ export default class EditProductCategoryTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -309,7 +311,7 @@ export default class EditProductCategoryTicketComponent extends Component {
 
         let planningUnitCategoryList = planningUnitCategories.length > 0
             && planningUnitCategories.map((item, i) => {
-                if(item.level > 1) {
+                if (item.level > 1) {
                     return (
                         <option key={i} value={item.payloadId}>
                             {getLabelText(item.payload.label, this.state.lang)}
@@ -321,7 +323,7 @@ export default class EditProductCategoryTicketComponent extends Component {
                             {getLabelText(item.payload.label, this.state.lang)}
                         </option>
                     )
-                }                
+                }
             }, this);
 
 
@@ -371,7 +373,8 @@ export default class EditProductCategoryTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -421,74 +424,74 @@ export default class EditProductCategoryTicketComponent extends Component {
                                 setTouched,
                                 handleReset
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.planningUnitCategory.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.planningUnitCategory.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmName" id="realmName"
-                                                bsSize="sm"
-                                                valid={!errors.realmName && this.state.planningUnitCategory.realmName != ''}
-                                                invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getProductCategory(e.target.value) }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="planningUnitCategoryName">{i18n.t('static.product.productcategory')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="planningUnitCategoryName" id="planningUnitCategoryName"
-                                                bsSize="sm"
-                                                valid={!errors.planningUnitCategoryName && this.state.planningUnitCategory.planningUnitCategoryName != ''}
-                                                invalid={touched.planningUnitCategoryName && !!errors.planningUnitCategoryName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.planningUnitCategoryId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {planningUnitCategoryList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.planningUnitCategoryName}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.planningUnitCategory.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.planningUnitCategory.notes}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                        {/* <br></br><br></br>
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.planningUnitCategory.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.planningUnitCategory.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="realmName">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="realmName" id="realmName"
+                                            bsSize="sm"
+                                            valid={!errors.realmName && this.state.planningUnitCategory.realmName != ''}
+                                            invalid={touched.realmName && !!errors.realmName}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getProductCategory(e.target.value) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.realmName}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="planningUnitCategoryName">{i18n.t('static.product.productcategory')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="planningUnitCategoryName" id="planningUnitCategoryName"
+                                            bsSize="sm"
+                                            valid={!errors.planningUnitCategoryName && this.state.planningUnitCategory.planningUnitCategoryName != ''}
+                                            invalid={touched.planningUnitCategoryName && !!errors.planningUnitCategoryName}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.planningUnitCategoryId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {planningUnitCategoryList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.planningUnitCategoryName}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.planningUnitCategory.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={600}
+                                            value={this.state.planningUnitCategory.notes}
+                                        // required 
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
-                                    </Form>
-                                )} />
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

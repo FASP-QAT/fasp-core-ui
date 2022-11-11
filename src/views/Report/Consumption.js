@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -191,7 +191,8 @@ class Consumption extends Component {
                 error => {
                   if (error.message === "Network Error") {
                     this.setState({
-                      message: 'static.unkownError',
+                      // message: 'static.unkownError',
+                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                       loading: false
                     });
                   } else {
@@ -240,7 +241,8 @@ class Consumption extends Component {
             error => {
               if (error.message === "Network Error") {
                 this.setState({
-                  message: 'static.unkownError',
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
@@ -638,7 +640,7 @@ class Consumption extends Component {
               if (!a[consumptionDate])
                 a[consumptionDate] = Object.assign({}, { consumptionId, consumptionDate, actualFlag, consumptionQty });
               else
-              a[consumptionDate].consumptionQty += Number(consumptionQty);
+                a[consumptionDate].consumptionQty += Number(consumptionQty);
               return a;
             }, {}));
             console.log("resultTrue---->", resultTrue);
@@ -649,7 +651,7 @@ class Consumption extends Component {
               if (!a[consumptionDate])
                 a[consumptionDate] = Object.assign({}, { consumptionId, consumptionDate, actualFlag, consumptionQty });
               else
-              a[consumptionDate].consumptionQty += Number(consumptionQty);
+                a[consumptionDate].consumptionQty += Number(consumptionQty);
               return a;
             }, {}));
             console.log("resultFalse---->", resultFalse);
@@ -747,7 +749,8 @@ class Consumption extends Component {
             error => {
               if (error.message === "Network Error") {
                 this.setState({
-                  message: 'static.unkownError',
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
@@ -814,7 +817,8 @@ class Consumption extends Component {
             }, () => { this.consolidatedProgramList() })
             if (error.message === "Network Error") {
               this.setState({
-                message: 'static.unkownError',
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -1036,7 +1040,8 @@ class Consumption extends Component {
               })
               if (error.message === "Network Error") {
                 this.setState({
-                  message: 'static.unkownError',
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {

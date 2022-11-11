@@ -43,7 +43,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
+import { API_URL, SECRET_KEY } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -56,7 +56,7 @@ import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
 import TracerCategoryService from '../../api/TracerCategoryService';
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
@@ -545,7 +545,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           });
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -726,7 +727,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             })
             if (error.message === "Network Error") {
               this.setState({
-                message: 'static.unkownError',
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -891,7 +893,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           })
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -975,7 +978,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       error => {
         if (error.message === "Network Error") {
           this.setState({
-            message: 'static.unkownError',
+            // message: 'static.unkownError',
+            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
             loading: false
           });
         } else {
@@ -1063,7 +1067,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           })
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -1352,44 +1357,44 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                   </div>
                   <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
                     <div className="col-md-12">
-                    <div className=''>
-                      <div className="fixTableHead1">
+                      <div className=''>
+                        <div className="fixTableHead1">
 
-                        {this.state.data.length > 0 && 
-                        <Table className="table-striped  table-fixed  table-bordered text-center">
-
-
-                          <thead>
-                            <tr>
-                              <th className="text-center Firstcolum1" style={{ width: '27%' }}>{i18n.t('static.planningunit.planningunit')}</th>
-                              {
-                                this.state.programLst.map(ele => { return (<th className="text-center" style={{ width: ((100 - 27) / this.state.programLst.length) + '%' }}>{ele}</th>) })}
-                            </tr>
-                          </thead>
-
-                          <tbody>
-                            {
-                              this.state.planningUnits.map(
-                                ele => {
-                                  return <tr><td className='sticky-col first-col clone Firstcolum'>{getLabelText(ele.label, this.state.lang)}</td>{
-                                    this.state.programLst.map(ele1 => {
-                                      return (this.state.data.filter(c => c.planningUnit.id == ele.id)).map(
-                                        item => {
-                                          return (item.programData.filter(c => c.program.code === ele1).length == 0 ? <td></td> : <td className="text-center" style={this.cellstyleWithData(item.programData.filter(c => c.program.code == ele1)[0])}>{item.programData.filter(c => c.program.code == ele1)[0].mos != null ? this.roundN(item.programData.filter(c => c.program.code == ele1)[0].mos) : i18n.t("static.supplyPlanFormula.na")}</td>)
-                                        }
-
-                                      )
-                                    })
-                                  }</tr>
-
-                                }
-                              )}
+                          {this.state.data.length > 0 &&
+                            <Table className="table-striped  table-fixed  table-bordered text-center">
 
 
-                          </tbody>
-                        </Table>}
+                              <thead>
+                                <tr>
+                                  <th className="text-center Firstcolum1" style={{ width: '27%' }}>{i18n.t('static.planningunit.planningunit')}</th>
+                                  {
+                                    this.state.programLst.map(ele => { return (<th className="text-center" style={{ width: ((100 - 27) / this.state.programLst.length) + '%' }}>{ele}</th>) })}
+                                </tr>
+                              </thead>
 
-                      </div>
+                              <tbody>
+                                {
+                                  this.state.planningUnits.map(
+                                    ele => {
+                                      return <tr><td className='sticky-col first-col clone Firstcolum'>{getLabelText(ele.label, this.state.lang)}</td>{
+                                        this.state.programLst.map(ele1 => {
+                                          return (this.state.data.filter(c => c.planningUnit.id == ele.id)).map(
+                                            item => {
+                                              return (item.programData.filter(c => c.program.code === ele1).length == 0 ? <td></td> : <td className="text-center" style={this.cellstyleWithData(item.programData.filter(c => c.program.code == ele1)[0])}>{item.programData.filter(c => c.program.code == ele1)[0].mos != null ? this.roundN(item.programData.filter(c => c.program.code == ele1)[0].mos) : i18n.t("static.supplyPlanFormula.na")}</td>)
+                                            }
+
+                                          )
+                                        })
+                                      }</tr>
+
+                                    }
+                                  )}
+
+
+                              </tbody>
+                            </Table>}
+
+                        </div>
                       </div>
 
 

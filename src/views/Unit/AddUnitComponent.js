@@ -10,7 +10,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { SPECIAL_CHARECTER_WITH_NUM, UNIT_LABEL_REGEX } from '../../Constants.js';
+import { API_URL, SPECIAL_CHARECTER_WITH_NUM, UNIT_LABEL_REGEX } from '../../Constants.js';
 
 
 const initialValues = {
@@ -163,7 +163,8 @@ class AddUnitComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -250,7 +251,8 @@ class AddUnitComponent extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.unkownError',
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
@@ -300,83 +302,83 @@ class AddUnitComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                                <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                        <Input
-                                                            type="select"
-                                                            bsSize="sm"
-                                                            name="dimensionId"
-                                                            id="dimensionId"
-                                                            valid={!errors.dimensionId && this.state.unit.dimension.id != ''}
-                                                            invalid={touched.dimensionId && !!errors.dimensionId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.unit.dimension.id}
-                                                            required
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {dimensionList}
-                                                        </Input>
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.dimensionId}</FormFeedback>
-                                                    </FormGroup>
+                                        <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                            <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="select"
+                                                        bsSize="sm"
+                                                        name="dimensionId"
+                                                        id="dimensionId"
+                                                        valid={!errors.dimensionId && this.state.unit.dimension.id != ''}
+                                                        invalid={touched.dimensionId && !!errors.dimensionId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.unit.dimension.id}
+                                                        required
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {dimensionList}
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.dimensionId}</FormFeedback>
+                                                </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label for="unitName">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="unitName"
-                                                            id="unitName"
-                                                            bsSize="sm"
-                                                            valid={!errors.unitName && this.state.unit.label.label_en != ''}
-                                                            invalid={touched.unitName && !!errors.unitName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.Capitalize(this.state.unit.label.label_en)}
+                                                <FormGroup>
+                                                    <Label for="unitName">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="unitName"
+                                                        id="unitName"
+                                                        bsSize="sm"
+                                                        valid={!errors.unitName && this.state.unit.label.label_en != ''}
+                                                        invalid={touched.unitName && !!errors.unitName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.Capitalize(this.state.unit.label.label_en)}
 
-                                                            required />
-                                                        <FormFeedback className="red">{errors.unitName}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="unitCode">{i18n.t('static.unit.unitCode')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="unitCode"
-                                                            id="unitCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.unitCode && this.state.unit.unitCode != ''}
-                                                            invalid={touched.unitCode && !!errors.unitCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.unit.unitCode}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.unitCode}</FormFeedback>
-                                                    </FormGroup>
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                        required />
+                                                    <FormFeedback className="red">{errors.unitName}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="unitCode">{i18n.t('static.unit.unitCode')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="unitCode"
+                                                        id="unitCode"
+                                                        bsSize="sm"
+                                                        valid={!errors.unitCode && this.state.unit.unitCode != ''}
+                                                        invalid={touched.unitCode && !!errors.unitCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.unit.unitCode}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.unitCode}</FormFeedback>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
-                                        )} />
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
+                                    )} />
                         </Card>
                     </Col>
                 </Row>
