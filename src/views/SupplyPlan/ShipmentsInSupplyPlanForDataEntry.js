@@ -2710,7 +2710,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 }
             }
         }
-        this.props.updateState("shipmentChangedFlag", 1);
+        if (x == 0 || x == 3 || x == 4 || x == 5 || x == 6 || x == 7 || x == 8 || x == 9 || x == 11 || x == 12 || x == 15 || x == 16 || x == 17 || x == 18 || x == 19 || x == 21 || x == 23 || x == 24) {
+            this.props.updateState("shipmentChangedFlag", 1);
+        }
         // this.showOnlyErrors();
     }
 

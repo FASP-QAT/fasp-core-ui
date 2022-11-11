@@ -129,7 +129,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
 
     componentDidMount() {
-        
+
         document.getElementById("adjustmentsTableDiv").closest('.card').classList.add("removeCardwrap");
 
     }
@@ -949,7 +949,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var rowData = elInstance.getRowData(y);
         this.props.updateState("inventoryError", "");
         this.props.updateState("inventoryDuplicateError", "");
-        this.props.updateState("inventoryChangedFlag", 1);
+        if (x == 0 || x == 1 || x == 2 || x == 3 || x == 5 || x == 6 || x == 10 || x == 11) {
+            this.props.updateState("inventoryChangedFlag", 1);
+        }
         if (x == 0 || x == 14 || x == 11) {
             var rowData = elInstance.getRowData(y);
             console.log("RowData+++", rowData)
