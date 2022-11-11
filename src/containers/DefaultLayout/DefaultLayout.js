@@ -573,7 +573,7 @@ const routes = [
   { path: '/supplyPlan/:programId/:planningUnitId/:batchNo/:expiryDate', exact: true, name: 'static.dashboard.supplyPlan', component: SupplyPlan },
 
   { path: '/report/whatIf', name: 'static.dashboard.whatIf', component: WhatIfReport },
-  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging',exact:true, component: ManualTagging },
+  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging', exact: true, component: ManualTagging },
   { path: '/shipment/manualTagging/:tab', name: 'static.dashboard.manualTagging', component: ManualTagging },
   { path: '/shipment/delinking', name: 'static.dashboard.delinking', component: ShipmentDelinking },
   { path: '/supplyPlanFormulas', name: 'static.supplyplan.supplyplanformula', component: SupplyPlanFormulas },
@@ -805,12 +805,12 @@ class DefaultLayout extends Component {
     // }, 500);
     // console.log('page to reload')
     // this.componentDidMount()
-}
- 
+  }
+
   // refreshPage() {
-    // setTimeout(() => {
-    // window.location.reload(false);
-    // }, 0);
+  // setTimeout(() => {
+  // window.location.reload(false);
+  // }, 0);
   // }
 
   checkEvent = (e) => {
@@ -891,7 +891,7 @@ class DefaultLayout extends Component {
     //   window.location.reload();
     // } else {
     //   // "The specific word doesn't exist";
-      localStorage.setItem("loginOnline", false);
+    localStorage.setItem("loginOnline", false);
     //   window.location.reload();
     // }
     // window.location.reload();
@@ -932,7 +932,9 @@ class DefaultLayout extends Component {
       }
       this.setState({ businessFunctions: bfunction });
     }
-    // console.log("has business function---", this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM'));
+    console.log("has business function---", this.state.businessFunctions);
+    console.log("has business function---", this.state.activeTab);
+
     if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
       let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
       let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
@@ -1161,14 +1163,14 @@ class DefaultLayout extends Component {
         var programDatasetChanged = 0;
         console.log(" programDatasetChanged@@@!", programDatasetChanged);
         console.log("myResult@@@!", myResult);
-          
+
         for (var i = 0; i < myResult.length; i++) {
           console.log("userId@@@!", userId);
-          console.log("myResult[i].userId==userId@@@1", myResult[i].userId==userId);
-            
+          console.log("myResult[i].userId==userId@@@1", myResult[i].userId == userId);
+
           if (myResult[i].userId == userId) {
             console.log("myResult[i].changed@@@!", myResult[i].changed);
-            
+
             if (myResult[i].changed == 1) {
               programDatasetChanged = 1;
               break;
