@@ -1432,7 +1432,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
         tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[12].classList.add('AsteriskTheadtrTd');
+        tr.children[13].classList.add('AsteriskTheadtrTd');
         tr.children[17].classList.add('AsteriskTheadtrTd');
+        tr.children[22].classList.add('AsteriskTheadtrTd');
         tr.children[23].classList.add('AsteriskTheadtrTd');
         tr.children[15].classList.add('AsteriskTheadtrTd');
         // tr.children[18].classList.add('AsteriskTheadtrTd');
