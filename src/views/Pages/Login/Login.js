@@ -602,7 +602,7 @@ class Login extends Component {
                                   required />
                                 <FormFeedback>{errors.password}</FormFeedback>
                               </InputGroup>
-                              <Row>
+                              {isSiteOnline() && <Row>
                                 <InputGroup check inline className="mb-4 ml-3">
                                   <Input
                                     type="checkbox"
@@ -622,7 +622,7 @@ class Login extends Component {
                                     <b>{i18n.t('static.login.loginOnline')}</b>
                                   </Label>
                                 </InputGroup>
-                              </Row>
+                              </Row>}
                               <Row>
                                 <Col xs="6">
                                   <Button type="submit" color="primary" className="px-4" onClick={() => { this.touchAll(setTouched, errors); this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
