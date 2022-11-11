@@ -4743,10 +4743,18 @@ export default class ManualTagging extends Component {
                                     planningUnit: c.planningUnit
                                 })
                             })
+                            console.log("List Array Test",listArray)
+                            console.log("Test planning unit Id",listArray.filter(c=>c.planningUnit.id==document.getElementById("planningUnitId1").value).length)
+                            if(listArray.filter(c=>c.planningUnit.id==document.getElementById("planningUnitId1").value).length==0){
+                                document.getElementById("planningUnitId1").value=-1;
+                            }
                             this.setState({
                                 planningUnitsBasedOnTracerCategory: listArray,
                                 realmCountryPlanningUnitList: rcpuList
                             }, () => {
+                                if(this.state.active3){
+                                    this.displayShipmentData();
+                                }
                                 this.getNotLinkedShipments();
                                 if (!this.state.active3) {
                                     this.getPlanningUnitArray();
