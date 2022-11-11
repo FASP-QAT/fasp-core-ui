@@ -932,8 +932,6 @@ class DefaultLayout extends Component {
       }
       this.setState({ businessFunctions: bfunction });
     }
-    console.log("has business function---", this.state.businessFunctions);
-    console.log("has business function---", this.state.activeTab);
 
     if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
       let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -1354,6 +1352,8 @@ class DefaultLayout extends Component {
     // console.log('in I18n defaultlayout')
     let events = ["keydown", "mousedown"];
     const checkOnline = localStorage.getItem('sessionType');
+    console.log("business function ----", this.state.businessFunctions)
+    console.log("business function ----", this.state.activeTab)
     return (
       <div className="app">
         {/* {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>} */}
