@@ -13,7 +13,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import HealthAreaService from '../../api/HealthAreaService';
 import classNames from 'classnames';
-import { SPACE_REGEX } from '../../Constants';
+import { API_URL, SPACE_REGEX } from '../../Constants';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster"))
 let summaryText_2 = "Add Program"
@@ -246,7 +246,7 @@ export default class ProgramTicketComponent extends Component {
         }, () => { })
     };
 
-    changeRealmCountry(event){
+    changeRealmCountry(event) {
         if (event === null) {
             let { program } = this.state;
             program.realmCountryId = ''
@@ -293,7 +293,8 @@ export default class ProgramTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -344,7 +345,7 @@ export default class ProgramTicketComponent extends Component {
                             countryList[i] = { value: listArray[i].realmCountryId, label: getLabelText(listArray[i].country.label, this.state.lang) }
                         }
                         this.setState({
-                            realmCountryList: listArray, 
+                            realmCountryList: listArray,
                             countryList: countryList,
                             loading: false
                         })
@@ -357,7 +358,8 @@ export default class ProgramTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -415,7 +417,8 @@ export default class ProgramTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -473,7 +476,8 @@ export default class ProgramTicketComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -541,7 +545,8 @@ export default class ProgramTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -655,7 +660,7 @@ export default class ProgramTicketComponent extends Component {
                             program
                         }, () => {
 
-                            this.getDependentLists(this.props.items.userRealmId);                            
+                            this.getDependentLists(this.props.items.userRealmId);
 
                         })
                     }
@@ -668,7 +673,8 @@ export default class ProgramTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -739,8 +745,8 @@ export default class ProgramTicketComponent extends Component {
         program.notes = '';
         this.setState({
             program: program,
-            realmId: this.props.items.userRealmId,            
-            realmCountryId: '',            
+            realmId: this.props.items.userRealmId,
+            realmCountryId: '',
             organisationId: '',
             healthAreaId: '',
             programManagerId: '',
@@ -885,7 +891,8 @@ export default class ProgramTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -937,37 +944,37 @@ export default class ProgramTicketComponent extends Component {
                                 setFieldValue,
                                 setFieldTouched
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.program.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.program.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="realmId">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmId" id="realmId"
-                                                bsSize="sm"
-                                                valid={!errors.realmId && this.state.program.realmId != ''}
-                                                invalid={touched.realmId && !!errors.realmId}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e.target.value) }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realms}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="realmCountryId">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                                            {/* <Input type="select" name="realmCountryId" id="realmCountryId"
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.program.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.program.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="realmId">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="realmId" id="realmId"
+                                            bsSize="sm"
+                                            valid={!errors.realmId && this.state.program.realmId != ''}
+                                            invalid={touched.realmId && !!errors.realmId}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e.target.value) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realms}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="realmCountryId">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                                        {/* <Input type="select" name="realmCountryId" id="realmCountryId"
                                                 bsSize="sm"
                                                 valid={!errors.realmCountryId && this.state.program.realmCountryId != ''}
                                                 invalid={touched.realmCountryId && !!errors.realmCountryId}
@@ -979,253 +986,253 @@ export default class ProgramTicketComponent extends Component {
                                                 {realmCountries}
                                             </Input> */}
 
-                                            <Select
-                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                    { 'is-valid': !errors.realmCountryId && this.state.program.realmCountryId != '' },
-                                                    { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
-                                                )}
-                                                bsSize="sm"
-                                                name="realmCountryId"
-                                                id="realmCountryId"
-                                                isClearable={false}
-                                                onChange={(e) => {
-                                                    handleChange(e);
-                                                    setFieldValue("realmCountryId", e);
-                                                    this.changeRealmCountry(e); this.getRegionList(e); this.getProgramDisplayCode()
-                                                }}
-                                                onBlur={() => setFieldTouched("realmCountryId", true)}
-                                                required
-                                                min={1}
-                                                options={this.state.countryList}
-                                                value={this.state.realmCountryId}
-                                            />
+                                        <Select
+                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.realmCountryId && this.state.program.realmCountryId != '' },
+                                                { 'is-invalid': (touched.realmCountryId && !!errors.realmCountryId) }
+                                            )}
+                                            bsSize="sm"
+                                            name="realmCountryId"
+                                            id="realmCountryId"
+                                            isClearable={false}
+                                            onChange={(e) => {
+                                                handleChange(e);
+                                                setFieldValue("realmCountryId", e);
+                                                this.changeRealmCountry(e); this.getRegionList(e); this.getProgramDisplayCode()
+                                            }}
+                                            onBlur={() => setFieldTouched("realmCountryId", true)}
+                                            required
+                                            min={1}
+                                            options={this.state.countryList}
+                                            value={this.state.realmCountryId}
+                                        />
 
-                                            <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="healthAreaId">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="healthAreaId" id="healthAreaId"
-                                                bsSize="sm"
-                                                valid={!errors.healthAreaId && this.state.program.healthAreaId != ''}
-                                                invalid={touched.healthAreaId && !!errors.healthAreaId}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getProgramDisplayCode() }}
-                                                onBlur={handleBlur}
-                                                value={this.state.healthAreaId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmHealthArea}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="organisationId">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="organisationId" id="organisationId"
-                                                bsSize="sm"
-                                                valid={!errors.organisationId && this.state.program.organisationId != ''}
-                                                invalid={touched.organisationId && !!errors.organisationId}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getProgramDisplayCode() }}
-                                                onBlur={handleBlur}
-                                                value={this.state.organisationId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmOrganisation}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.organisationId}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup className="Selectcontrol-bdrNone">
-                                            <Label for="regionId">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
-                                            <Select
-                                                className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                    { 'is-valid': !errors.regionId && this.state.program.regionId.length != 0 },
-                                                    { 'is-invalid': (touched.regionId && !!errors.regionId) }
-                                                )}
-                                                name="regionId" id="regionId"
-                                                bsSize="sm"
-                                                onChange={(e) => { handleChange(e); setFieldValue("regionId", e); this.updateFieldData(e) }}
-                                                onBlur={() => setFieldTouched("regionId", true)}
-                                                multi
-                                                options={this.state.regionList}
-                                                value={this.state.regionId}
-                                                required />
-                                            <FormFeedback className="red">{errors.regionId}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="programName">{i18n.t('static.program.programName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="programName" id="programName"
-                                                bsSize="sm"
-                                                valid={!errors.programName && this.state.program.programName != ''}
-                                                invalid={touched.programName && !!errors.programName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.program.programName}
-                                                required />
-                                            <FormFeedback className="red">{errors.programName}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="company">{i18n.t('static.program.programDisplayName')}</Label>
-                                            <Input
-                                                type="text" name="programCode"
-                                                // valid={!errors.programCode}
-                                                bsSize="sm"
-                                                // invalid={touched.programCode && !!errors.programCode || this.state.program.programCode == ''}
-                                                readOnly
-                                                onBlur={handleBlur}
-                                                value={this.state.program.programCode}
-                                                id="programCode" />
-                                            <FormFeedback>{errors.programCode}</FormFeedback>
-                                        </FormGroup>
-                                        < FormGroup >
-                                            <Label for="programManager">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="programManager" id="programManager"
-                                                bsSize="sm"
-                                                valid={!errors.programManager && this.state.program.programManager != ''}
-                                                invalid={touched.programManager && !!errors.programManager}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.programManagerId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {programManagers}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.programManager}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%) <span class="red ">*</span></Label>
-                                            <Input
-                                                value={this.state.program.airFreightPerc}
-                                                bsSize="sm"
-                                                valid={!errors.airFreightPerc && this.state.program.airFreightPerc != ''}
-                                                invalid={touched.airFreightPerc && !!errors.airFreightPerc}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                onBlur={handleBlur}
-                                                type="number"
-                                                min="0"
-                                                name="airFreightPerc" id="airFreightPerc" />
-                                            <FormFeedback>{errors.airFreightPerc}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} (%) <span class="red ">*</span></Label>
-                                            <Input
-                                                value={this.state.program.seaFreightPerc}
-                                                bsSize="sm"
-                                                valid={!errors.seaFreightPerc && this.state.program.seaFreightPerc != ''}
-                                                invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                onBlur={handleBlur}
-                                                type="number"
-                                                min="0"
-                                                name="seaFreightPerc" id="seaFreightPerc" />
-                                            <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                value={this.state.program.plannedToSubmittedLeadTime}
-                                                bsSize="sm"
-                                                valid={!errors.plannedToSubmittedLeadTime && this.state.program.plannedToSubmittedLeadTime != ''}
-                                                invalid={touched.plannedToSubmittedLeadTime && !!errors.plannedToSubmittedLeadTime}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                onBlur={handleBlur}
-                                                type="number"
-                                                min="0"
-                                                name="plannedToSubmittedLeadTime" id="plannedToSubmittedLeadTime" />
-                                            <FormFeedback>{errors.plannedToSubmittedLeadTime}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                value={this.state.program.submittedToApprovedLeadTime}
-                                                bsSize="sm"
-                                                valid={!errors.submittedToApprovedLeadTime && this.state.program.submittedToApprovedLeadTime != ''}
-                                                invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                onBlur={handleBlur}
-                                                type="number"
-                                                min="0"
-                                                name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" />
-                                            <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                value={this.state.program.approvedToShippedLeadTime}
-                                                bsSize="sm"
-                                                valid={!errors.approvedToShippedLeadTime && this.state.program.approvedToShippedLeadTime != ''}
-                                                invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                onBlur={handleBlur}
-                                                type="number"
-                                                min="0"
-                                                name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" />
-                                            <FormFeedback>{errors.approvedToShippedLeadTime}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                value={this.state.program.shippedToArrivedByAirLeadTime}
-                                                bsSize="sm"
-                                                valid={!errors.shippedToArrivedByAirLeadTime && this.state.program.shippedToArrivedByAirLeadTime != ''}
-                                                invalid={touched.shippedToArrivedByAirLeadTime && !!errors.shippedToArrivedByAirLeadTime}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                onBlur={handleBlur}
-                                                type="number"
-                                                min="0"
-                                                name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" />
-                                            <FormFeedback>{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                value={this.state.program.shippedToArrivedBySeaLeadTime}
-                                                bsSize="sm"
-                                                valid={!errors.shippedToArrivedBySeaLeadTime && this.state.program.shippedToArrivedBySeaLeadTime != ''}
-                                                invalid={touched.shippedToArrivedBySeaLeadTime && !!errors.shippedToArrivedBySeaLeadTime}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                onBlur={handleBlur}
-                                                type="number"
-                                                min="0"
-                                                name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" />
-                                            <FormFeedback>{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="company">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input
-                                                value={this.state.program.arrivedToDeliveredLeadTime}
-                                                bsSize="sm"
-                                                valid={!errors.arrivedToDeliveredLeadTime && this.state.program.arrivedToDeliveredLeadTime != ''}
-                                                invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                onBlur={handleBlur}
-                                                type="number"
-                                                min="0"
-                                                name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
-                                            <FormFeedback>{errors.arrivedToDeliveredLeadTime}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}</Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.program.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.program.notes}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                        {/* <br></br><br></br>
+                                        <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="healthAreaId">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="healthAreaId" id="healthAreaId"
+                                            bsSize="sm"
+                                            valid={!errors.healthAreaId && this.state.program.healthAreaId != ''}
+                                            invalid={touched.healthAreaId && !!errors.healthAreaId}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getProgramDisplayCode() }}
+                                            onBlur={handleBlur}
+                                            value={this.state.healthAreaId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmHealthArea}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="organisationId">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="organisationId" id="organisationId"
+                                            bsSize="sm"
+                                            valid={!errors.organisationId && this.state.program.organisationId != ''}
+                                            invalid={touched.organisationId && !!errors.organisationId}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getProgramDisplayCode() }}
+                                            onBlur={handleBlur}
+                                            value={this.state.organisationId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmOrganisation}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.organisationId}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup className="Selectcontrol-bdrNone">
+                                        <Label for="regionId">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
+                                        <Select
+                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.regionId && this.state.program.regionId.length != 0 },
+                                                { 'is-invalid': (touched.regionId && !!errors.regionId) }
+                                            )}
+                                            name="regionId" id="regionId"
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); setFieldValue("regionId", e); this.updateFieldData(e) }}
+                                            onBlur={() => setFieldTouched("regionId", true)}
+                                            multi
+                                            options={this.state.regionList}
+                                            value={this.state.regionId}
+                                            required />
+                                        <FormFeedback className="red">{errors.regionId}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="programName">{i18n.t('static.program.programName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="programName" id="programName"
+                                            bsSize="sm"
+                                            valid={!errors.programName && this.state.program.programName != ''}
+                                            invalid={touched.programName && !!errors.programName}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.program.programName}
+                                            required />
+                                        <FormFeedback className="red">{errors.programName}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.programDisplayName')}</Label>
+                                        <Input
+                                            type="text" name="programCode"
+                                            // valid={!errors.programCode}
+                                            bsSize="sm"
+                                            // invalid={touched.programCode && !!errors.programCode || this.state.program.programCode == ''}
+                                            readOnly
+                                            onBlur={handleBlur}
+                                            value={this.state.program.programCode}
+                                            id="programCode" />
+                                        <FormFeedback>{errors.programCode}</FormFeedback>
+                                    </FormGroup>
+                                    < FormGroup >
+                                        <Label for="programManager">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="programManager" id="programManager"
+                                            bsSize="sm"
+                                            valid={!errors.programManager && this.state.program.programManager != ''}
+                                            invalid={touched.programManager && !!errors.programManager}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.programManagerId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {programManagers}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.programManager}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%) <span class="red ">*</span></Label>
+                                        <Input
+                                            value={this.state.program.airFreightPerc}
+                                            bsSize="sm"
+                                            valid={!errors.airFreightPerc && this.state.program.airFreightPerc != ''}
+                                            invalid={touched.airFreightPerc && !!errors.airFreightPerc}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            type="number"
+                                            min="0"
+                                            name="airFreightPerc" id="airFreightPerc" />
+                                        <FormFeedback>{errors.airFreightPerc}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} (%) <span class="red ">*</span></Label>
+                                        <Input
+                                            value={this.state.program.seaFreightPerc}
+                                            bsSize="sm"
+                                            valid={!errors.seaFreightPerc && this.state.program.seaFreightPerc != ''}
+                                            invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            type="number"
+                                            min="0"
+                                            name="seaFreightPerc" id="seaFreightPerc" />
+                                        <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            value={this.state.program.plannedToSubmittedLeadTime}
+                                            bsSize="sm"
+                                            valid={!errors.plannedToSubmittedLeadTime && this.state.program.plannedToSubmittedLeadTime != ''}
+                                            invalid={touched.plannedToSubmittedLeadTime && !!errors.plannedToSubmittedLeadTime}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            type="number"
+                                            min="0"
+                                            name="plannedToSubmittedLeadTime" id="plannedToSubmittedLeadTime" />
+                                        <FormFeedback>{errors.plannedToSubmittedLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            value={this.state.program.submittedToApprovedLeadTime}
+                                            bsSize="sm"
+                                            valid={!errors.submittedToApprovedLeadTime && this.state.program.submittedToApprovedLeadTime != ''}
+                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            type="number"
+                                            min="0"
+                                            name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" />
+                                        <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            value={this.state.program.approvedToShippedLeadTime}
+                                            bsSize="sm"
+                                            valid={!errors.approvedToShippedLeadTime && this.state.program.approvedToShippedLeadTime != ''}
+                                            invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            type="number"
+                                            min="0"
+                                            name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" />
+                                        <FormFeedback>{errors.approvedToShippedLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            value={this.state.program.shippedToArrivedByAirLeadTime}
+                                            bsSize="sm"
+                                            valid={!errors.shippedToArrivedByAirLeadTime && this.state.program.shippedToArrivedByAirLeadTime != ''}
+                                            invalid={touched.shippedToArrivedByAirLeadTime && !!errors.shippedToArrivedByAirLeadTime}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            type="number"
+                                            min="0"
+                                            name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" />
+                                        <FormFeedback>{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            value={this.state.program.shippedToArrivedBySeaLeadTime}
+                                            bsSize="sm"
+                                            valid={!errors.shippedToArrivedBySeaLeadTime && this.state.program.shippedToArrivedBySeaLeadTime != ''}
+                                            invalid={touched.shippedToArrivedBySeaLeadTime && !!errors.shippedToArrivedBySeaLeadTime}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            type="number"
+                                            min="0"
+                                            name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" />
+                                        <FormFeedback>{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            value={this.state.program.arrivedToDeliveredLeadTime}
+                                            bsSize="sm"
+                                            valid={!errors.arrivedToDeliveredLeadTime && this.state.program.arrivedToDeliveredLeadTime != ''}
+                                            invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            type="number"
+                                            min="0"
+                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
+                                        <FormFeedback>{errors.arrivedToDeliveredLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}</Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.program.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={600}
+                                            value={this.state.program.notes}
+                                        // required 
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                    {/* <br></br><br></br>
                                     <div className={this.props.className}>
                                         <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
                                     </div> */}
-                                    </Form>
-                                )} />
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

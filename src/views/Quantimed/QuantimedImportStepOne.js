@@ -20,7 +20,7 @@ import ProgramService from '../../api/ProgramService';
 import QuantimedImportService from '../../api/QuantimedImportService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
 import CryptoJS from 'crypto-js'
 
 
@@ -278,7 +278,8 @@ class QuantimedImportStepOne extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.unkownError',
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
@@ -335,66 +336,66 @@ class QuantimedImportStepOne extends Component {
                             isValid,
                             setTouched
                         }) => (
-                                <div className="animated fadeIn">
-                                    <AuthenticationServiceComponent history={this.props.history} />
-                                    <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
-                                    <div style={{ display: this.state.loading ? "none" : "block" }}>
-                                        <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programForm'>
-                                            <CardBody>
+                            <div className="animated fadeIn">
+                                <AuthenticationServiceComponent history={this.props.history} />
+                                <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
+                                <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programForm'>
+                                        <CardBody>
 
-                                                <FormGroup id="fileImportDiv">
-                                                    <Col md="4">
-                                                        <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.quantimed.quantimedImportSelectFileLabel')}<span class="red Reqasterisk">*</span></Label>
-                                                    </Col>
-                                                    <Col xs="12" md="4" className="custom-file">
-                                                        {/* <Input type="file" id="file-input" name="file-input" /> */}
-                                                        <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".xml" onChange={(e) => { handleChange(e); this.dataChange(e) }} />
-                                                        <label className="custom-file-label" id="file-input" data-browse={i18n.t('static.uploadfile.Browse')}>{i18n.t('static.chooseFile.chooseFile')}</label>
-                                                    </Col>
-                                                </FormGroup>
-                                                <FormGroup>
-                                                    <Label htmlFor="select">{i18n.t('static.quantimed.quantimedImportSelectProgramLabel')}<span class="red Reqasterisk">*</span></Label>
-                                                    <Input
-                                                        valid={!errors.programId}
-                                                        invalid={touched.programId && !!errors.programId}
-                                                        bsSize="sm"
-                                                        className="col-md-4"
-                                                        onBlur={handleBlur}
-                                                        type="select" name="programId" id="programId"
-                                                        value={this.state.program.programId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                    >
-                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                        {programList}
-                                                    </Input>
-                                                    <FormFeedback className="red">{errors.programId}</FormFeedback>
-                                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
+                                            <FormGroup id="fileImportDiv">
+                                                <Col md="4">
+                                                    <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.quantimed.quantimedImportSelectFileLabel')}<span class="red Reqasterisk">*</span></Label>
+                                                </Col>
+                                                <Col xs="12" md="4" className="custom-file">
+                                                    {/* <Input type="file" id="file-input" name="file-input" /> */}
+                                                    <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".xml" onChange={(e) => { handleChange(e); this.dataChange(e) }} />
+                                                    <label className="custom-file-label" id="file-input" data-browse={i18n.t('static.uploadfile.Browse')}>{i18n.t('static.chooseFile.chooseFile')}</label>
+                                                </Col>
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <Label htmlFor="select">{i18n.t('static.quantimed.quantimedImportSelectProgramLabel')}<span class="red Reqasterisk">*</span></Label>
+                                                <Input
+                                                    valid={!errors.programId}
+                                                    invalid={touched.programId && !!errors.programId}
+                                                    bsSize="sm"
+                                                    className="col-md-4"
+                                                    onBlur={handleBlur}
+                                                    type="select" name="programId" id="programId"
+                                                    value={this.state.program.programId}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                >
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {programList}
+                                                </Input>
+                                                <FormFeedback className="red">{errors.programId}</FormFeedback>
+                                                {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
 
-                                                </FormGroup>
-                                                {/* </CardBody>
+                                            </FormGroup>
+                                            {/* </CardBody>
                                             <CardFooter className="pb-0 pr-0"> */}
-                                                <br></br>
-                                                <FormGroup className="">
-                                                    <Button color="info" size="md" className="float-right " type="submit" disabled={!isValid} onClick={() => this.touchAll(setTouched, errors)}>Import </Button>
-                                                </FormGroup>
+                                            <br></br>
+                                            <FormGroup className="">
+                                                <Button color="info" size="md" className="float-right " type="submit" disabled={!isValid} onClick={() => this.touchAll(setTouched, errors)}>Import </Button>
+                                            </FormGroup>
 
-                                                {/* </CardFooter> */}
-                                            </CardBody>
-                                        </Form>
-                                    </div>
-                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                            <div class="align-items-center">
-                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                            {/* </CardFooter> */}
+                                        </CardBody>
+                                    </Form>
+                                </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                <div class="spinner-border blue ml-4" role="status">
+                                            <div class="spinner-border blue ml-4" role="status">
 
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            )} />
+                            </div>
+                        )} />
 
             </>
         );

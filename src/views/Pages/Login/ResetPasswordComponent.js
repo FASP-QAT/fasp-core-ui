@@ -10,6 +10,7 @@ import i18n from '../../../i18n'
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../../assets/img/QAT-login-logo.png';
 import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
+import { API_URL } from '../../../Constants';
 
 
 const validationSchema = function (values) {
@@ -71,7 +72,7 @@ class ResetPasswordComponent extends Component {
         this.showPopUp = this.showPopUp.bind(this);
     }
     showPopUp() {
-        alert("1) "+i18n.t("static.message.newPasswordMinLength")+"\n2) "+i18n.t("static.message.newPasswordPassString")+"\n3) "+i18n.t("static.message.newPasswordSpecialChar")+"\n4) "+i18n.t("static.message.newPasswordNumber")+"\n5) "+i18n.t("static.message.newPasswordUppercase")+"\n6) "+i18n.t("static.message.newPasswordStartAlphabet")+"\n7) "+i18n.t("static.message.newPasswordNotSameAsUsername")+"\n8) "+i18n.t("static.message.newPasswordNotSameAsOldPassword"));
+        alert("1) " + i18n.t("static.message.newPasswordMinLength") + "\n2) " + i18n.t("static.message.newPasswordPassString") + "\n3) " + i18n.t("static.message.newPasswordSpecialChar") + "\n4) " + i18n.t("static.message.newPasswordNumber") + "\n5) " + i18n.t("static.message.newPasswordUppercase") + "\n6) " + i18n.t("static.message.newPasswordStartAlphabet") + "\n7) " + i18n.t("static.message.newPasswordNotSameAsUsername") + "\n8) " + i18n.t("static.message.newPasswordNotSameAsOldPassword"));
         // confirmAlert({
         //     message: "Anchal&lt;br /&gt;Bhashkar",
         //     buttons: [
@@ -135,7 +136,10 @@ class ResetPasswordComponent extends Component {
                 error => {
                     console.log("Reset password 1 error---", error)
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            // message: error.message
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        });
                     } else {
                         switch (error.response.status) {
                             case 500:
@@ -187,7 +191,7 @@ class ResetPasswordComponent extends Component {
                                                 console.log("Reset password on submit email id---", this.state.emailId)
                                                 console.log("Reset password on submit token---", this.state.token)
                                                 console.log("Reset password on submit newPassword---", values.newPassword)
-                                                console.log("button clicked value---",this.state.buttonClicked);
+                                                console.log("button clicked value---", this.state.buttonClicked);
                                                 if (!this.state.buttonClicked) {
                                                     console.log("button inside if")
                                                     UserService.updatePassword(this.state.emailId, this.state.token, values.newPassword)
@@ -213,7 +217,10 @@ class ResetPasswordComponent extends Component {
                                                                 });
                                                                 console.log("Reset password error---", error)
                                                                 if (error.message === "Network Error") {
-                                                                    this.setState({ message: error.message });
+                                                                    this.setState({
+                                                                        // message: error.message
+                                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                                    });
                                                                     document.getElementById('div1').style.display = 'block';
                                                                     this.hideFirstComponent();
                                                                 } else {
@@ -266,60 +273,60 @@ class ResetPasswordComponent extends Component {
                                                 isValid,
                                                 setTouched
                                             }) => (
-                                                    <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
+                                                <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
 
-                                                        <CardBody>
-                                                            <Input type="text"
-                                                                name="username"
-                                                                id="username"
-                                                                onChange={handleChange}
-                                                                value={this.state.username}
-                                                                hidden
-                                                            />
-                                                            <FormGroup>
-                                                                <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
-                                                                <InputGroup>
-                                                                    <Input type="password"
-                                                                        name="newPassword"
-                                                                        id="newPassword"
-                                                                        bsSize="sm"
-                                                                        valid={!errors.newPassword}
-                                                                        invalid={touched.newPassword && !!errors.newPassword}
-                                                                        onChange={handleChange}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                    />
-                                                                    <InputGroupAddon addonType="append">
-                                                                        <InputGroupText><i class="fa fa-info-circle icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
-                                                                    </InputGroupAddon>
-                                                                    <FormFeedback>{errors.newPassword}</FormFeedback>
-                                                                </InputGroup>
-                                                            </FormGroup>
-                                                            <FormGroup>
-                                                                <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
+                                                    <CardBody>
+                                                        <Input type="text"
+                                                            name="username"
+                                                            id="username"
+                                                            onChange={handleChange}
+                                                            value={this.state.username}
+                                                            hidden
+                                                        />
+                                                        <FormGroup>
+                                                            <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
+                                                            <InputGroup>
                                                                 <Input type="password"
-                                                                    name="confirmNewPassword"
-                                                                    id="confirmNewPassword"
+                                                                    name="newPassword"
+                                                                    id="newPassword"
                                                                     bsSize="sm"
-                                                                    valid={!errors.confirmNewPassword}
-                                                                    invalid={touched.confirmNewPassword && !!errors.confirmNewPassword}
+                                                                    valid={!errors.newPassword}
+                                                                    invalid={touched.newPassword && !!errors.newPassword}
                                                                     onChange={handleChange}
                                                                     onBlur={handleBlur}
                                                                     required
                                                                 />
-                                                                <FormFeedback>{errors.confirmNewPassword}</FormFeedback>
-                                                            </FormGroup>
-                                                        </CardBody>
-                                                        <CardFooter>
-                                                            <FormGroup>
-                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                                &nbsp;
-                          </FormGroup>
-                                                        </CardFooter>
+                                                                <InputGroupAddon addonType="append">
+                                                                    <InputGroupText><i class="fa fa-info-circle icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
+                                                                </InputGroupAddon>
+                                                                <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                            </InputGroup>
+                                                        </FormGroup>
+                                                        <FormGroup>
+                                                            <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
+                                                            <Input type="password"
+                                                                name="confirmNewPassword"
+                                                                id="confirmNewPassword"
+                                                                bsSize="sm"
+                                                                valid={!errors.confirmNewPassword}
+                                                                invalid={touched.confirmNewPassword && !!errors.confirmNewPassword}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                            />
+                                                            <FormFeedback>{errors.confirmNewPassword}</FormFeedback>
+                                                        </FormGroup>
+                                                    </CardBody>
+                                                    <CardFooter>
+                                                        <FormGroup>
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+                                                        </FormGroup>
+                                                    </CardFooter>
 
-                                                    </Form>
-                                                )} />
+                                                </Form>
+                                            )} />
                                 </Card>}
                             </Col>
                         </Row>

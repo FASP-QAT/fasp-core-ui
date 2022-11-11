@@ -2866,5 +2866,8 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.common.uatNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que uat-api.quantificationanalytics.org/# et uat.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu.",
+    "static.common.demoNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que demo-api.quantificationanalytics.org/# et demo.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu.",
+    "static.common.prodNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que api.quantificationanalytics.org/# et www.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu."
 }

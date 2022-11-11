@@ -2866,5 +2866,8 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.common.uatNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure uat-api.quantificationanalytics.org/# and uat.quantificationanalytics.org/# are whitelisted for firewall access.",
+    "static.common.demoNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure demo-api.quantificationanalytics.org/# and demo.quantificationanalytics.org/# are whitelisted for firewall access.",
+    "static.common.prodNetworkErrorMessage": "Network error. Please check your internet connection or contact your organizational IT department to ensure api.quantificationanalytics.org/# and www.quantificationanalytics.org/# are whitelisted for firewall access."
 }

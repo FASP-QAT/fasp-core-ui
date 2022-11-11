@@ -12,7 +12,7 @@ import 'react-select/dist/react-select.min.css';
 import LanguageService from '../../api/LanguageService.js'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
+import { LABEL_REGEX, ALPHABETS_REGEX, API_URL } from '../../Constants.js';
 import { SPECIAL_CHARECTER_WITHOUT_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import eventBus from '../../containers/DefaultLayout/eventBus';
 
@@ -77,8 +77,8 @@ class AddLanguageComponent extends Component {
             },
             message: '',
             loading: true,
-            openModal:false,
-            responseMessage:''
+            openModal: false,
+            responseMessage: ''
         }
 
         // this.Capitalize = this.Capitalize.bind(this);
@@ -88,7 +88,7 @@ class AddLanguageComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.testAsync = this.testAsync.bind(this);
-        this.toggleLarge=this.toggleLarge.bind(this);
+        this.toggleLarge = this.toggleLarge.bind(this);
     }
 
     dataChange(event) {
@@ -121,8 +121,8 @@ class AddLanguageComponent extends Component {
     //         })
     // }
 
-    toggleLarge(){
-        this.setState({openModal:false});
+    toggleLarge() {
+        this.setState({ openModal: false });
     }
 
     Capitalize(str) {
@@ -211,7 +211,8 @@ class AddLanguageComponent extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.unkownError',
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
@@ -261,64 +262,64 @@ class AddLanguageComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <div>
-                                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                                    <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
-                                                        <FormGroup>
-                                                            <Label for="languageName">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
-                                                            <Input type="text"
-                                                                // autocomplete="off"
-                                                                name="label"
-                                                                id="label"
-                                                                bsSize="sm"
-                                                                valid={!errors.label && this.state.language.label.label_en != ''}
-                                                                invalid={touched.label && !!errors.label}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                                onBlur={handleBlur}
-                                                                maxLength={100}
-                                                                value={this.state.language.label.label_en}
-                                                                required />
-                                                            <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup>
-                                                            <Label for="languageCode">{i18n.t('static.language.languageCode')}<span class="red Reqasterisk">*</span></Label>
-                                                            <Input type="text"
-                                                                name="languageCode"
-                                                                id="languageCode"
-                                                                bsSize="sm"
-                                                                valid={!errors.languageCode && this.state.language.languageCode != ''}
-                                                                invalid={touched.languageCode && !!errors.languageCode}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.language.languageCode}
-                                                                required
-                                                                maxLength={2}
-                                                            />
-                                                            <FormFeedback className="red">{errors.languageCode}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup>
-                                                            <Label for="countryCode">{i18n.t('static.language.countryCode')}<span class="red Reqasterisk">*</span></Label>
-                                                            <Input type="text"
-                                                                name="countryCode"
-                                                                id="countryCode"
-                                                                bsSize="sm"
-                                                                valid={!errors.countryCode && this.state.language.countryCode != ''}
-                                                                invalid={touched.countryCode && !!errors.countryCode}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.language.countryCode}
-                                                                required
-                                                                maxLength={2}
-                                                            />
-                                                            <FormFeedback className="red">{errors.countryCode}</FormFeedback>
-                                                        </FormGroup>
-                                                    </CardBody>
-                                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                            <div class="align-items-center">
-                                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                        <div>
+                                            <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                                <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
+                                                    <FormGroup>
+                                                        <Label for="languageName">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            // autocomplete="off"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label && this.state.language.label.label_en != ''}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            maxLength={100}
+                                                            value={this.state.language.label.label_en}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="languageCode">{i18n.t('static.language.languageCode')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="languageCode"
+                                                            id="languageCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.languageCode && this.state.language.languageCode != ''}
+                                                            invalid={touched.languageCode && !!errors.languageCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.language.languageCode}
+                                                            required
+                                                            maxLength={2}
+                                                        />
+                                                        <FormFeedback className="red">{errors.languageCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="countryCode">{i18n.t('static.language.countryCode')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="countryCode"
+                                                            id="countryCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.countryCode && this.state.language.countryCode != ''}
+                                                            invalid={touched.countryCode && !!errors.countryCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.language.countryCode}
+                                                            required
+                                                            maxLength={2}
+                                                        />
+                                                        <FormFeedback className="red">{errors.countryCode}</FormFeedback>
+                                                    </FormGroup>
+                                                </CardBody>
+                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                        <div class="align-items-center">
+                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                                <div class="spinner-border blue ml-4" role="status">
+                                                            <div class="spinner-border blue ml-4" role="status">
 
                                                             </div>
                                                         </div>
@@ -330,7 +331,7 @@ class AddLanguageComponent extends Component {
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.testAsync} ><i className="fa fa-check"></i>Test Async</Button>
-                                                            &nbsp;
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

@@ -11,7 +11,7 @@ import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import ProgramService from "../../api/ProgramService";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
+import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -154,7 +154,8 @@ class AddprogramPlanningUnit extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false, color: '#BA0C2F'
                         });
                     } else {
@@ -439,8 +440,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     decimal: '.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip:i18n.t("static.programPU.localProcurementAgentTooltip"),
-                                                                    width:120
+                                                                    tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
+                                                                    width: 120
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.product.distributionLeadTime'),
@@ -458,8 +459,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     // decimal:'.',
                                                                     mask: '#,##',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip:i18n.t("static.programPU.shelfLifeTooltip"),
-                                                                    width:120
+                                                                    tooltip: i18n.t("static.programPU.shelfLifeTooltip"),
+                                                                    width: 120
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -468,8 +469,8 @@ class AddprogramPlanningUnit extends Component {
                                                                     // decimal:'.',
                                                                     mask: '#,##.00',
                                                                     disabledMaskOnEdition: true,
-                                                                    tooltip:i18n.t("static.programPU.catalogPriceTooltip"),
-                                                                    width:120
+                                                                    tooltip: i18n.t("static.programPU.catalogPriceTooltip"),
+                                                                    width: 120
                                                                 },
                                                                 {
                                                                     title: 'Id',
@@ -789,7 +790,8 @@ class AddprogramPlanningUnit extends Component {
                                                     error => {
                                                         if (error.message === "Network Error") {
                                                             this.setState({
-                                                                message: 'static.unkownError',
+                                                                // message: 'static.unkownError',
+                                                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 loading: false, color: '#BA0C2F'
                                                             });
                                                         } else {
@@ -833,7 +835,8 @@ class AddprogramPlanningUnit extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.unkownError',
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false, color: '#BA0C2F'
                                                 });
                                             } else {
@@ -880,7 +883,8 @@ class AddprogramPlanningUnit extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false, color: '#BA0C2F'
                                     });
                                 } else {
@@ -928,7 +932,8 @@ class AddprogramPlanningUnit extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false, color: '#BA0C2F'
                         });
                     } else {
@@ -1845,7 +1850,8 @@ class AddprogramPlanningUnit extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false, color: '#BA0C2F'
                             });
                         } else {

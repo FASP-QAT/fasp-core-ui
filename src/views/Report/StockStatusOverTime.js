@@ -17,10 +17,10 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-import {MultiSelect} from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
 import ReportService from '../../api/ReportService';
 import moment from "moment";
 import {
@@ -305,7 +305,8 @@ class StockStatusOverTime extends Component {
                     })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -382,7 +383,8 @@ class StockStatusOverTime extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -775,7 +777,8 @@ class StockStatusOverTime extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -1157,7 +1160,8 @@ class StockStatusOverTime extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -1767,53 +1771,53 @@ class StockStatusOverTime extends Component {
                         <div className="row mt-4" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div className="col-md-12">
                                 {this.state.show && this.state.matricsList.length > 0 &&
-                                <div className='table-responsive fixTableHead'>
-                                    <Table className="table-striped table-bordered text-center">
+                                    <div className='table-responsive fixTableHead'>
+                                        <Table className="table-striped table-bordered text-center">
 
-                                        <thead>
-                                            <tr>
-                                                <th className="text-center" style={{ width: '10%' }}> {i18n.t('static.common.month')} </th>
-                                                <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.planningunit.planningunit')}</th>
-                                                <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.stock')}</th>
-                                                <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.consupmtionqty')}</th>
-                                                <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.amc')}</th>
-                                                <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.noofmonth')}</th>
-                                                <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.mos')}</th>
-                                            </tr>
-                                        </thead>
+                                            <thead>
+                                                <tr>
+                                                    <th className="text-center" style={{ width: '10%' }}> {i18n.t('static.common.month')} </th>
+                                                    <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.planningunit.planningunit')}</th>
+                                                    <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.stock')}</th>
+                                                    <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.consupmtionqty')}</th>
+                                                    <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.amc')}</th>
+                                                    <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.noofmonth')}</th>
+                                                    <th className="text-center" style={{ width: '10%' }}>{i18n.t('static.report.mos')}</th>
+                                                </tr>
+                                            </thead>
 
-                                        <tbody>
-                                            {this.state.matricsList.length > 0
-                                                &&
-                                                this.state.matricsList.map(item =>
+                                            <tbody>
+                                                {this.state.matricsList.length > 0
+                                                    &&
+                                                    this.state.matricsList.map(item =>
 
-                                                    <tr id="addr0" >
+                                                        <tr id="addr0" >
 
-                                                        <td>{this.dateFormatter(item.dt)}</td>
-                                                        <td>
-                                                            {getLabelText(item.planningUnit.label, this.state.lang)}
-                                                        </td>
-                                                        <td>
-                                                            {this.formatter(item.stock)}
-                                                        </td>
-                                                        <td>
-                                                            {this.formatter(item.consumptionQty)}
-                                                        </td>
-                                                        <td>
-                                                            {this.formatter(this.formatAmc(item.amc))}
-                                                        </td>
-                                                        <td>
-                                                            {this.formatter(item.amcMonthCount)}
-                                                        </td>
-                                                        <td>
-                                                            {item.mos != null ? this.roundN(item.mos) : i18n.t("static.supplyPlanFormula.na")}
-                                                        </td>
+                                                            <td>{this.dateFormatter(item.dt)}</td>
+                                                            <td>
+                                                                {getLabelText(item.planningUnit.label, this.state.lang)}
+                                                            </td>
+                                                            <td>
+                                                                {this.formatter(item.stock)}
+                                                            </td>
+                                                            <td>
+                                                                {this.formatter(item.consumptionQty)}
+                                                            </td>
+                                                            <td>
+                                                                {this.formatter(this.formatAmc(item.amc))}
+                                                            </td>
+                                                            <td>
+                                                                {this.formatter(item.amcMonthCount)}
+                                                            </td>
+                                                            <td>
+                                                                {item.mos != null ? this.roundN(item.mos) : i18n.t("static.supplyPlanFormula.na")}
+                                                            </td>
 
-                                                    </tr>)}
+                                                        </tr>)}
 
 
-                                        </tbody>
-                                    </Table>
+                                            </tbody>
+                                        </Table>
                                     </div>}
 
                             </div>

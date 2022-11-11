@@ -631,7 +631,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import getLabelText from '../../CommonComponent/getLabelText';
-import { LABEL_REGEX, ALPHABETS_REGEX } from '../../Constants.js';
+import { LABEL_REGEX, ALPHABETS_REGEX, API_URL } from '../../Constants.js';
 import { SPECIAL_CHARECTER_WITHOUT_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 
 
@@ -869,7 +869,8 @@ export default class UpdateCountryComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -911,7 +912,8 @@ export default class UpdateCountryComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1013,7 +1015,8 @@ export default class UpdateCountryComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -1064,64 +1067,64 @@ export default class UpdateCountryComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='countryForm' autocomplete="off">
-                                                <CardBody className="pt-2 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-globe"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            valid={!errors.label}
-                                                            bsSize="sm"
-                                                            // invalid={touched.label && !!errors.label || this.state.country.label.label_en == ''}
-                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.country.label.label_en}
-                                                            required />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="countryCode">{i18n.t('static.country.countrycode')}<span class="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            name="countryCode"
-                                                            id="countryCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.countryCode}
-                                                            // invalid={touched.countryCode && !!errors.countryCode || this.state.country.countryCode == ''}
-                                                            invalid={(touched.countryCode && !!errors.countryCode) || !!errors.countryCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.country.countryCode}
-                                                            required
-                                                            maxLength={3}
-                                                        />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.countryCode}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="countryCode">{i18n.t('static.country.countrycode2')}<span class="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            name="countryCode2"
-                                                            id="countryCode2"
-                                                            bsSize="sm"
-                                                            valid={!errors.countryCode2}
-                                                            // invalid={touched.countryCode2 && !!errors.countryCode2 || this.state.country.countryCode2 == ''}
-                                                            invalid={(touched.countryCode2 && !!errors.countryCode2) || !!errors.countryCode2}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.country.countryCode2}
-                                                            required
-                                                            maxLength={2}
-                                                        />
-                                                        {/* <Input type="text"
+                                        <Form onSubmit={handleSubmit} noValidate name='countryForm' autocomplete="off">
+                                            <CardBody className="pt-2 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-globe"></i></InputGroupText> */}
+                                                    <Input type="text"
+                                                        name="label"
+                                                        id="label"
+                                                        valid={!errors.label}
+                                                        bsSize="sm"
+                                                        // invalid={touched.label && !!errors.label || this.state.country.label.label_en == ''}
+                                                        invalid={(touched.label && !!errors.label) || !!errors.label}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.country.label.label_en}
+                                                        required />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="countryCode">{i18n.t('static.country.countrycode')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                    <Input type="text"
+                                                        name="countryCode"
+                                                        id="countryCode"
+                                                        bsSize="sm"
+                                                        valid={!errors.countryCode}
+                                                        // invalid={touched.countryCode && !!errors.countryCode || this.state.country.countryCode == ''}
+                                                        invalid={(touched.countryCode && !!errors.countryCode) || !!errors.countryCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.country.countryCode}
+                                                        required
+                                                        maxLength={3}
+                                                    />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.countryCode}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="countryCode">{i18n.t('static.country.countrycode2')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                    <Input type="text"
+                                                        name="countryCode2"
+                                                        id="countryCode2"
+                                                        bsSize="sm"
+                                                        valid={!errors.countryCode2}
+                                                        // invalid={touched.countryCode2 && !!errors.countryCode2 || this.state.country.countryCode2 == ''}
+                                                        invalid={(touched.countryCode2 && !!errors.countryCode2) || !!errors.countryCode2}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.country.countryCode2}
+                                                        required
+                                                        maxLength={2}
+                                                    />
+                                                    {/* <Input type="text"
                                                             name="countryCode2"
                                                             id="countryCode2"
                                                             bsSize="sm"
@@ -1131,14 +1134,14 @@ export default class UpdateCountryComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode2}
                                                             required /> */}
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.countryCode2}</FormFeedback>
-                                                    </FormGroup>
-                                                    {/* <FormGroup>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.countryCode2}</FormFeedback>
+                                                </FormGroup>
+                                                {/* <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.country.language')}<span class="red Reqasterisk">*</span></Label> */}
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa fa-language"></i></InputGroupText> */}
-                                                    {/* <Input
+                                                {/* <InputGroupAddon addonType="prepend"> */}
+                                                {/* <InputGroupText><i className="fa fa-language"></i></InputGroupText> */}
+                                                {/* <Input
                                                             type="select"
                                                             name="languageId"
                                                             id="languageId"
@@ -1153,90 +1156,90 @@ export default class UpdateCountryComponent extends Component {
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {languageItems}
                                                         </Input> */}
-                                                    {/* </InputGroupAddon> */}
-                                                    {/* <FormFeedback className="red">{errors.languageId}</FormFeedback>
+                                                {/* </InputGroupAddon> */}
+                                                {/* <FormFeedback className="red">{errors.languageId}</FormFeedback>
                                                     </FormGroup> */}
-                                                    <FormGroup>
-                                                        <Label htmlFor="currencyId">{i18n.t('static.country.currency')}<span class="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
+                                                <FormGroup>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.country.currency')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="select"
+                                                        name="currencyId"
+                                                        id="currencyId"
+                                                        bsSize="sm"
+                                                        valid={!errors.currencyId}
+                                                        // invalid={touched.currencyId && !!errors.currencyId || this.state.country.currency.id == ''}
+                                                        invalid={(touched.currencyId && !!errors.currencyId) || !!errors.currencyId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.country.currency.id}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {currencyItems}
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.currencyId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
+                                                    <FormGroup check inline>
                                                         <Input
-                                                            type="select"
-                                                            name="currencyId"
-                                                            id="currencyId"
-                                                            bsSize="sm"
-                                                            valid={!errors.currencyId}
-                                                            // invalid={touched.currencyId && !!errors.currencyId || this.state.country.currency.id == ''}
-                                                            invalid={(touched.currencyId && !!errors.currencyId) || !!errors.currencyId}
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active1"
+                                                            name="active"
+                                                            value={true}
+                                                            checked={this.state.country.active === true}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.country.currency.id}
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {currencyItems}
-                                                        </Input>
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.currencyId}</FormFeedback>
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio1">
+                                                            {i18n.t('static.common.active')}
+                                                        </Label>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="active"
-                                                                value={true}
-                                                                checked={this.state.country.active === true}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="active"
-                                                                value={false}
-                                                                checked={this.state.country.active === false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
-                                                            </Label>
-                                                        </FormGroup>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="active"
+                                                            value={false}
+                                                            checked={this.state.country.active === false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.common.disabled')}
+                                                        </Label>
                                                     </FormGroup>
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>  {i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>  {i18n.t('static.common.update')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                         </Card>
                     </Col>
@@ -1270,7 +1273,8 @@ export default class UpdateCountryComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1322,7 +1326,8 @@ export default class UpdateCountryComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1364,7 +1369,8 @@ export default class UpdateCountryComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {

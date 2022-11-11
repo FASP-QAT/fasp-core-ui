@@ -19,13 +19,13 @@ import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ReportService from '../../api/ReportService';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -210,7 +210,11 @@ class Budgets extends Component {
                             fundingSources: [], loading: false
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                // message: error.message, 
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -627,7 +631,8 @@ class Budgets extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -723,7 +728,8 @@ class Budgets extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -878,7 +884,7 @@ class Budgets extends Component {
     }
     roundN = num => {
         return Number(Math.round((num / 1000000) * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
-       
+
     }
     filterVersion = () => {
         // let programId = document.getElementById("programId").value;
@@ -1518,16 +1524,16 @@ class Budgets extends Component {
                                                         <ClearSearchButton {...props.searchProps} />*/}
                                                     </div>
                                                     <div className='fixTableHead'>
-                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                        // pagination={paginationFactory(options)}
-                                                        rowEvents={{
-                                                            onClick: (e, row, rowIndex) => {
-                                                                console.log("***row", row);
-                                                                window.open(window.location.origin + `/#/report/shipmentSummery/${row.budget.id}/${row.budget.code}`);
-                                                            }
-                                                        }}
-                                                        {...props.baseProps}
-                                                    />
+                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            // pagination={paginationFactory(options)}
+                                                            rowEvents={{
+                                                                onClick: (e, row, rowIndex) => {
+                                                                    console.log("***row", row);
+                                                                    window.open(window.location.origin + `/#/report/shipmentSummery/${row.budget.id}/${row.budget.code}`);
+                                                                }
+                                                            }}
+                                                            {...props.baseProps}
+                                                        />
                                                     </div>
                                                 </div>
                                             )

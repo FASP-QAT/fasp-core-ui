@@ -13,7 +13,7 @@ import LabelsService from '../../api/LabelService.js';
 import LanguageService from '../../api/LanguageService';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 
 const entityname = i18n.t('static.label.labelTranslations');
 export default class DatabaseTranslations extends React.Component {
@@ -134,7 +134,8 @@ export default class DatabaseTranslations extends React.Component {
                         console.log("Error+++", error)
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false,
                                 color: '#BA0C2F'
                             });
@@ -189,7 +190,8 @@ export default class DatabaseTranslations extends React.Component {
                 console.log("Error1+++", error)
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false,
                         color: '#BA0C2F'
                     });
@@ -294,7 +296,8 @@ export default class DatabaseTranslations extends React.Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false,
                             color: '#BA0C2F'
                         });
