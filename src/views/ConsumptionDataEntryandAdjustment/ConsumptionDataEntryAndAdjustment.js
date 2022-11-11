@@ -1012,6 +1012,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       stockDayStart += 8;
       adjustedConsumption += 8;
     }
+    console.log("possibleStockDayY===", possibleStockDayY)
+
     var elInstance = this.state.dataEl;
     if (possibleActualConsumptionY.includes(y.toString())) {
       value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
@@ -1089,6 +1091,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setValueFromCoords(x, y, Math.round(value), true)
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
       }
