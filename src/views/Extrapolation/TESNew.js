@@ -4,7 +4,7 @@ import i18n from "../../i18n";
 import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 
-export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, page, regionId) {
+export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, page, regionId,planningUnitId) {
     console.log("inputData@@@@@@", inputData);
     console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
@@ -49,8 +49,11 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
 
                 console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
                 // calculateCI(output, Number(confidenceLevel), "tesData", props)
-                if (page == "DataEntry" || page == "ImportFromSupplyPlan") {
+                if (page == "DataEntry") {
                     var tesData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                    props.updateTESData(tesData);
+                } else if (page == "importFromQATSP") {
+                    var tesData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
                     props.updateTESData(tesData);
                 } else {
                     props.updateState("tesData", output);
@@ -59,8 +62,11 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
             }
         }).catch(error => {
             console.log("Error@@@@@@", error)
-            if (page == "DataEntry" || page == "ImportFromSupplyPlan") {
+            if (page == "DataEntry") {
                 var tesData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                props.updateTESData(tesData);
+            } else if (page == "importFromQATSP") {
+                var tesData = { "data": [], "PlanningUnitId": planningUnitId, "regionId": regionId }
                 props.updateTESData(tesData);
             } else {
                 if (!isTreeExtrapolation) {
