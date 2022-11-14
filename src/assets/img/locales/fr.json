@@ -58,6 +58,7 @@
     "static.message.login.disabled": "Compte utilisateur désactivé",
     "static.QATForecastImport.ImportColumn": "la colonne Utiliser l'Importation ? permet de désélectionner les prévisions que vous ne souhaitez pas importer dans le plan d'approvisionnement. Si cette case est cochée, la consommation prévue convertie remplacera la prévision du plan d'approvisionnement. Si elle n'est pas cochée, la prévision actuelle du plan d'approvisionnement sera conservée.",
     "static.quantimed.existingconsupmtionqty": "Consommation actuelle estimée par QAT",
+    "static.common.demoNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que demo-api.quantificationanalytics.org/# et demo.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu.",
     "static.message.user.disabled": "Compte utilisateur désactivé. Contacter l`administrateur QAT.",
     "static.tooltip.CopyFromTemplate": "Utiliser un modèle pour remplir tous les champs ci-après. Modifiez-les sur l'écran Gestion des programmes > Modèle d'utilisation.",
     "static.problemReport.addressedDesc": "Le problème a été marqué manuellement par le réviseur ou l`utilisateur comme `adressé`. L`utilisateur applique ce statut lorsqu`il ne peut pas résoudre le problème via la saisie de données. Ce statut doit être accompagné d`une note. Le réviseur utilise ce statut si ce problème ne peut pas être résolu au cours de la période d`examen, mais sera résolu à l`avenir, très probablement dans quelques périodes, plutôt qu`avant le prochain examen.",
@@ -130,6 +131,7 @@
     "static.pipelineProgram.importDate": "Date d`importation",
     "static.program.downloadsuccess": "Programme chargé avec succès",
     "static.mt.dataReceivedOn": "Données reçues le",
+    "static.common.uatNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que uat-api.quantificationanalytics.org/# et uat.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu.",
     "static.realmcountry.arrivedToDeliveredLeadTimetext": "Entrez le délai «Arrivé à livré» (en mois)",
     "static.ticket.addUpdateUser": "Ajouter / mettre à jour un utilisateur",
     "static.planningUnit.labelMultiplier": "Facteur de conversion (de la planification à la prévision)\n",
@@ -1083,6 +1085,7 @@
     "static.ForecastSummary.RegionalViewText": "Utiliser cette vue pour afficher vos prévisions dans les unités de planification et les régions. Mettre directement à jour la méthode de prévision pour chaque combinaison région-unité de planification et ajouter des notes dans le tableau, si vous le souhaiter. Les sélections de prévisions peuvent également être mises à jour dans",
     "static.procurementagent.procurementagentsubmittoapprovetimeLabel": "Délai entre la soumission et l`approbation «Soumis à approuvé» (en mois)",
     "static.dashboard.product": "Unité de planification",
+    "static.common.prodNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que api.quantificationanalytics.org/# et www.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu.",
     "static.dataEntryAndAdjustments.DesiredReview": "Sélectionner le programme de prévision et la période souhaitée de revue. Par défaut, QAT présélectionne une période de 36 mois avant le début de la période de prévision. Un tableau non modifiable et tous les produits liés à ce programme de prévision sont affichés, ainsi que leurs données de consommation si vous avez préalablement saisi ces données ;",
     "static.extrapolation.EnterActualValues": "Dans le tableau, entrer n'importe quelle valeur réelle ainsi que les taux de rapportage pour vos données historiques. À partir de cette saisie, QAT calculera les valeurs historiques ajustées.",
     "static.shipment.shipmentDates": "Dates d`expédition",
@@ -2867,10 +2870,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.treeList.confirmAlert": "La version du serveur prendra un certain temps à se charger. Êtes-vous sûr de vouloir charger la version du serveur ?",
     "static.dataset.BranchTreeTemplate": "Modèle de branche",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.dashboard.deleteThisProgram": "Supprimer ce programme",
-    "static.dashboard.programDeletedSuccessfully": "Programme supprimé avec succès.",
-    "static.common.uatNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que uat-api.quantificationanalytics.org/# et uat.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu.",
-    "static.common.demoNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que demo-api.quantificationanalytics.org/# et demo.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu.",
-    "static.common.prodNetworkErrorMessage": "Erreur réseau. Veuillez vérifier votre connexion Internet ou contacter le service informatique de votre organisation pour vous assurer que api.quantificationanalytics.org/# et www.quantificationanalytics.org/# sont sur liste blanche pour l`accès au pare-feu."
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
 }
