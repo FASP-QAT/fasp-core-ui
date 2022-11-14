@@ -599,6 +599,8 @@ class ShipmentSummery extends Component {
                     });
                     this.setState({
                         fundingSources: listArray
+                    }, () => {
+                        this.getBudgetList();
                     })
                 }).catch(
                     error => {
@@ -649,6 +651,8 @@ class ShipmentSummery extends Component {
                             b = b.fundingSourceCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
+                    }, () => {
+                        this.getBudgetList();
                     });
 
                 }.bind(this)
@@ -662,11 +666,13 @@ class ShipmentSummery extends Component {
 
     getBudgetList() {
         const { budgets } = this.state
+        var programId = localStorage.getItem("sesProgramIdReport");
+        console.log("programId=========>", programId)
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             BudgetService.getBudgetList()
                 .then(response => {
-                    var listArray = response.data.filter(b => b.program.id == this.state.programId);
+                    var listArray = response.data.filter(b => b.program.id == programId);
                     listArray.sort((a, b) => {
                         var itemLabelA = a.budgetCode.toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = b.budgetCode.toUpperCase(); // ignore upper and lowercase                   
@@ -687,6 +693,8 @@ class ShipmentSummery extends Component {
                         budgetLabels: budgetLabelsFromProps,
                         budgets: listArray,
                         filteredBudgetList: listArray
+                    }, () => {
+                        this.getPrograms();
                     })
                 }).catch(
                     error => {
@@ -740,7 +748,7 @@ class ShipmentSummery extends Component {
                     }
                     console.log("budgetValuesFromProps offline===>", budgetValuesFromProps);
 
-                    fSourceResult = fSourceRequest.result.filter(b => b.program.id == this.state.programId);
+                    fSourceResult = fSourceRequest.result.filter(b => b.program.id == programId);
                     console.log("budget list offline--->", fSourceResult);
                     this.setState({
                         budgetValues: budgetValuesFromProps,
@@ -755,6 +763,8 @@ class ShipmentSummery extends Component {
                             b = b.budgetCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
+                    }, () => {
+                        this.getPrograms();
                     });
 
                 }.bind(this)
@@ -1164,7 +1174,7 @@ class ShipmentSummery extends Component {
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
                         this.filterVersion();
-                        this.getBudgetList();
+                        // this.getBudgetList();
                     })
                 } else {
                     this.setState({
@@ -1473,7 +1483,7 @@ class ShipmentSummery extends Component {
 
 
     componentDidMount() {
-        this.getPrograms();
+        // this.getPrograms();
         this.getFundingSourceList();
         // this.getBudgetList();
     }
