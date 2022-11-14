@@ -3600,19 +3600,24 @@ export default class BuildTree extends Component {
         var momValue = ''
         if (this.state.currentModelingType == 2) {
             // momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(4);
-            momValue = getValue;
+            momValue = parseFloat(getValue / monthDifference).toFixed(4);
         }
         if (this.state.currentModelingType == 3) {
             // momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(4);
-            momValue = getValue;
+            momValue = parseFloat(getValue / monthDifference).toFixed(4);
         }
         if (this.state.currentModelingType == 4) {
             // momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(4);
-            momValue = getValue;
+            momValue = parseFloat(getValue / monthDifference).toFixed(4);
+        }
+        var targetChangePer = '';
+        if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
+            targetChangePer = (parseFloat(momValue / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
         }
         this.setState({
             currentEndValue: getValue != '' ? targetEndValue.toFixed(4) : '',
-            currentCalculatedMomChange: getValue != '' ? momValue : ''
+            currentCalculatedMomChange: getValue != '' ? momValue : '',
+            currentTargetChangePercentage: getValue != '' ? targetChangePer : ''
         });
     }
 
