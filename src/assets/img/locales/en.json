@@ -2876,5 +2876,7 @@
     "static.message.addBranchTemplate": "Branch Template Added Successfully",
     "static.message.editBranchTemplate": "Branch Template Updated Successfully",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.tooltip.autoCalculate": "If QAT is slow while editing your tree, uncheck the auto-calculate box to stop calculations. Note that all calculated numbers may be wrong. To update the calculations, either re-check the ‘auto-calculate’ checkbox, or click the recalculate icon."
+    "static.tooltip.autoCalculate": "If QAT is slow while editing your tree, uncheck the auto-calculate box to stop calculations. Note that all calculated numbers may be wrong. To update the calculations, either re-check the ‘auto-calculate’ checkbox, or click the recalculate icon.",
+    "static.dataEntry.validationFailedAndCannotInterpolate":"Validation failed so cannot interpolate",
+    "static.dataEntry.daysOfStockOutMustBeLessInCaseOfActualConsumption":"Please enter value lesser than number of days when you have an actual consumption greater than 0 or update the actual consumption to 0."
 }
