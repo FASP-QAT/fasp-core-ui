@@ -154,6 +154,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.cancelClicked = this.cancelClicked.bind(this);
     this.consumptionDataChanged = this.consumptionDataChanged.bind(this);
     this.checkValidationConsumption = this.checkValidationConsumption.bind(this);
+    this.checkValidationInterpolate = this.checkValidationInterpolate.bind(this);
     this.filterList = this.filterList.bind(this)
     this.resetClicked = this.resetClicked.bind(this)
     this.buildJexcel = this.buildJexcel.bind(this);
@@ -1065,7 +1066,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
       value = value.replaceAll(',', '');
       var stockOutdays = elInstance.getColumnData(x)[0];
+      console.log("Actual consumption value@@@@@@@@", elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true))
       if (value == "") {
+      } else if (elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true) > 0 && value == stockOutdays) {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setStyle(col, "background-color", "yellow");
+        // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        elInstance.setComments(col, i18n.t('static.dataEntry.daysOfStockOutMustBeLessInCaseOfActualConsumption'));
+
       } else if (value < 0 || value > stockOutdays) {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
@@ -1084,6 +1093,67 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setComments(col, "");
       }
     }
+  }
+
+  checkValidationInterpolate() {
+    var valid = true;
+    var elInstance = this.state.dataEl;
+    var json = elInstance.getJson(null, false);
+    var possibleActualConsumptionY = [];
+    var possibleReportRateY = [];
+    var possibleStockDayY = [];
+    var actualConsumptionStart = 2;
+    var reportRateStart = 3;
+    var stockDayStart = 4;
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
+    var regionList = this.state.regionList;
+    var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_2_DECIMAL;
+
+    for (var i = 0; i < regionList.length; i++) {
+      possibleActualConsumptionY.push(actualConsumptionStart.toString());
+      possibleReportRateY.push(reportRateStart.toString());
+      possibleStockDayY.push(stockDayStart.toString());
+      actualConsumptionStart += 8;
+      reportRateStart += 8;
+      stockDayStart += 8;
+    }
+    for (var y = 0; y < json.length; y++) {
+      for (var x = 1; x <= this.state.monthArray.length; x++) {
+        var value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
+        value = value.replaceAll(',', '');
+        if (possibleStockDayY.includes(y.toString())) {
+          var stockOutdays = elInstance.getColumnData(x)[0];
+          if (value == "") {
+          } else if (elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true) > 0 && value == stockOutdays) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            elInstance.setComments(col, i18n.t('static.dataEntry.daysOfStockOutMustBeLessInCaseOfActualConsumption'));
+            valid = false;
+          }
+          else if (value < 0 || value > stockOutdays) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            elInstance.setComments(col, "Please enter positive value lesser than number of days.");
+            valid = false;
+          } else if (!(reg.test(value))) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
+            valid = false;
+          } else {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setComments(col, "");
+          }
+        }
+      }
+    }
+    return valid;
   }
 
   checkValidationConsumption() {
@@ -1167,7 +1237,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         if (possibleStockDayY.includes(y.toString())) {
           var stockOutdays = elInstance.getColumnData(x)[0];
           if (value == "") {
-          } else if (value < 0 || value > stockOutdays) {
+          } else if (elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true) > 0 && value == stockOutdays) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            elInstance.setComments(col, i18n.t('static.dataEntry.daysOfStockOutMustBeLessInCaseOfActualConsumption'));
+            valid = false;
+          }
+          else if (value < 0 || value > stockOutdays) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
@@ -1193,152 +1271,164 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   interpolationMissingActualConsumption() {
-    var notes = document.getElementById("consumptionNotes").value;
-    var monthArray = this.state.monthArray;
-    var regionList = this.state.regionList;
-    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-    var curUser = AuthenticationService.getLoggedInUserId();
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
-    var consumptionUnit = this.state.selectedConsumptionUnitObject;
-    var rangeValue = this.state.singleValue2;
-    console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-    var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
-    var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
-    var fullConsumptionList = this.state.tempConsumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
-    var elInstance = this.state.dataEl;
-    for (var i = 0; i < monthArray.length; i++) {
-      var columnData = elInstance.getColumnData([i + 1]);
-      var actualConsumptionCount = 2;
-      var reportingRateCount = 3;
-      var daysOfStockOutCount = 4;
-      var adjustedAmountCount = 6;
-      var puAmountCount = 7;
+    var checkValidation = this.checkValidationInterpolate();
+    if (checkValidation) {
+      var notes = document.getElementById("consumptionNotes").value;
+      var monthArray = this.state.monthArray;
+      var regionList = this.state.regionList;
+      var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+      var curUser = AuthenticationService.getLoggedInUserId();
+      var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
+      var consumptionUnit = this.state.selectedConsumptionUnitObject;
+      var rangeValue = this.state.singleValue2;
+      console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
+      var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+      var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
+      var fullConsumptionList = this.state.tempConsumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
+      var elInstance = this.state.dataEl;
+      for (var i = 0; i < monthArray.length; i++) {
+        var columnData = elInstance.getColumnData([i + 1]);
+        var actualConsumptionCount = 2;
+        var reportingRateCount = 3;
+        var daysOfStockOutCount = 4;
+        var adjustedAmountCount = 6;
+        var puAmountCount = 7;
 
+        for (var r = 0; r < regionList.length; r++) {
+          console.log("&&&&&&&&&&MonthList", monthArray[i]);
+          var index = 0;
+          index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
+          var actualConsumptionValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount) + 1}`, true).replaceAll(",", "");
+          var reportingRateValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(reportingRateCount) + 1}`, true);
+          var daysOfStockOutValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(daysOfStockOutCount) + 1}`, true);
+          var adjustedAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(adjustedAmountCount) + 1}`, true).replaceAll(",", "");;
+          var puAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(puAmountCount) + 1}`, true).replaceAll(",", "");;
+          console.log("&&&&&&&&&&ActualConsumptionValue", actualConsumptionValue);
+          if (actualConsumptionValue !== "") {
+            if (index != -1) {
+              fullConsumptionList[index].amount = actualConsumptionValue;
+              fullConsumptionList[index].reportingRate = reportingRateValue;
+              fullConsumptionList[index].daysOfStockOut = daysOfStockOutValue;
+              fullConsumptionList[index].adjustedAmount = adjustedAmountValue;
+              fullConsumptionList[index].puAmount = puAmountValue;
+            } else {
+              var json = {
+                amount: actualConsumptionValue,
+                adjustedAmount: adjustedAmountValue !== "" ? adjustedAmountValue : 0,
+                puAmount: puAmountValue !== "" ? puAmountValue : 0,
+                planningUnit: {
+                  id: consumptionUnit.planningUnit.id,
+                  label: consumptionUnit.planningUnit.label
+                },
+                createdBy: {
+                  userId: curUser
+                },
+                createdDate: curDate,
+                daysOfStockOut: daysOfStockOutValue,
+                exculde: false,
+                forecastConsumptionId: 0,
+                month: moment(monthArray[i].date).startOf('month').format("YYYY-MM-DD"),
+                region: {
+                  id: regionList[r].regionId,
+                  label: regionList[r].label
+                },
+                reportingRate: reportingRateValue
+              }
+              fullConsumptionList.push(json);
+            }
+          }
+          actualConsumptionCount += 8;
+          reportingRateCount += 8;
+          daysOfStockOutCount += 8;
+          adjustedAmountCount += 8;
+          puAmountCount += 8;
+        }
+      }
+      var interpolatedRegionsAndMonths = [];
+      // notes += " Interpolated data for: "
       for (var r = 0; r < regionList.length; r++) {
-        console.log("&&&&&&&&&&MonthList", monthArray[i]);
-        var index = 0;
-        index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
-        var actualConsumptionValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount) + 1}`, true).replaceAll(",", "");
-        var reportingRateValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(reportingRateCount) + 1}`, true);
-        var daysOfStockOutValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(daysOfStockOutCount) + 1}`, true);
-        var adjustedAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(adjustedAmountCount) + 1}`, true).replaceAll(",", "");;
-        var puAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(puAmountCount) + 1}`, true).replaceAll(",", "");;
-        console.log("&&&&&&&&&&ActualConsumptionValue", actualConsumptionValue);
-        if (actualConsumptionValue !== "") {
-          if (index != -1) {
-            fullConsumptionList[index].amount = actualConsumptionValue;
-            fullConsumptionList[index].reportingRate = reportingRateValue;
-            fullConsumptionList[index].daysOfStockOut = daysOfStockOutValue;
-            fullConsumptionList[index].adjustedAmount = adjustedAmountValue;
-            fullConsumptionList[index].puAmount = puAmountValue;
-          } else {
-            var json = {
-              amount: actualConsumptionValue,
-              adjustedAmount: adjustedAmountValue !== "" ? adjustedAmountValue : 0,
-              puAmount: puAmountValue !== "" ? puAmountValue : 0,
-              planningUnit: {
-                id: consumptionUnit.planningUnit.id,
-                label: consumptionUnit.planningUnit.label
-              },
-              createdBy: {
-                userId: curUser
-              },
-              createdDate: curDate,
-              daysOfStockOut: daysOfStockOutValue,
-              exculde: false,
-              forecastConsumptionId: 0,
-              month: moment(monthArray[i].date).startOf('month').format("YYYY-MM-DD"),
-              region: {
-                id: regionList[r].regionId,
-                label: regionList[r].label
-              },
-              reportingRate: reportingRateValue
-            }
-            fullConsumptionList.push(json);
-          }
-        }
-        actualConsumptionCount += 8;
-        reportingRateCount += 8;
-        daysOfStockOutCount += 8;
-        adjustedAmountCount += 8;
-        puAmountCount += 8;
-      }
-    }
-    var interpolatedRegionsAndMonths = [];
-    // notes += " Interpolated data for: "
-    for (var r = 0; r < regionList.length; r++) {
-      for (var j = 0; j < monthArray.length; j++) {
-        var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0);
-        if (consumptionData.length == 0) {
-          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0)
-            .sort(function (a, b) {
-              return new Date(a.month) - new Date(b.month);
-            });
-          var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0)
-            .sort(function (a, b) {
-              return new Date(a.month) - new Date(b.month);
-            });
+        for (var j = 0; j < monthArray.length; j++) {
+          var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0);
+          if (consumptionData.length == 0) {
+            var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0)
+              .sort(function (a, b) {
+                return new Date(a.month) - new Date(b.month);
+              });
+            var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0)
+              .sort(function (a, b) {
+                return new Date(a.month) - new Date(b.month);
+              });
 
-          if (startValList.length > 0 && endValList.length > 0) {
-            var startVal = startValList[startValList.length - 1].adjustedAmount != undefined ? startValList[startValList.length - 1].adjustedAmount : startValList[startValList.length - 1].amount;
-            var startMonthVal = startValList[startValList.length - 1].month;
-            var endVal = endValList[0].adjustedAmount != undefined ? endValList[0].adjustedAmount : endValList[0].amount;
-            var endMonthVal = endValList[0].month;
-            interpolatedRegionsAndMonths.push({ region: regionList[r], month: moment(monthArray[j].date).format("YYYY-MM") });
-            //y=y1+(x-x1)*(y2-y1)/(x2-x1);
-            const monthDifference = moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
-            const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
-            var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
-            var json = {
-              amount: missingActualConsumption.toFixed(0),
-              planningUnit: {
-                id: consumptionUnit.planningUnit.id,
-                label: consumptionUnit.planningUnit.label
-              },
-              createdBy: {
-                userId: curUser
-              },
-              createdDate: curDate,
-              daysOfStockOut: columnData[daysOfStockOutCount],
-              exculde: false,
-              forecastConsumptionId: 0,
-              month: moment(monthArray[j].date).format("YYYY-MM-DD"),
-              region: {
-                id: regionList[r].regionId,
-                label: regionList[r].label
-              },
-              reportingRate: columnData[reportingRateCount]
+            if (startValList.length > 0 && endValList.length > 0) {
+              var startVal = startValList[startValList.length - 1].adjustedAmount != undefined ? startValList[startValList.length - 1].adjustedAmount : startValList[startValList.length - 1].amount;
+              var startMonthVal = startValList[startValList.length - 1].month;
+              var endVal = endValList[0].adjustedAmount != undefined ? endValList[0].adjustedAmount : endValList[0].amount;
+              var endMonthVal = endValList[0].month;
+              interpolatedRegionsAndMonths.push({ region: regionList[r], month: moment(monthArray[j].date).format("YYYY-MM") });
+              //y=y1+(x-x1)*(y2-y1)/(x2-x1);
+              const monthDifference = moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
+              const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
+              var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
+              var json = {
+                amount: missingActualConsumption.toFixed(0),
+                planningUnit: {
+                  id: consumptionUnit.planningUnit.id,
+                  label: consumptionUnit.planningUnit.label
+                },
+                createdBy: {
+                  userId: curUser
+                },
+                createdDate: curDate,
+                daysOfStockOut: columnData[daysOfStockOutCount],
+                exculde: false,
+                forecastConsumptionId: 0,
+                month: moment(monthArray[j].date).format("YYYY-MM-DD"),
+                region: {
+                  id: regionList[r].regionId,
+                  label: regionList[r].label
+                },
+                reportingRate: columnData[reportingRateCount]
+              }
+              fullConsumptionList.push(json);
             }
-            fullConsumptionList.push(json);
           }
         }
       }
-    }
-    // document.getElementById("consumptionNotes").value = document.getElementById("consumptionNotes").value.concat(notes).concat("filled in with interpolated");
-    if (interpolatedRegionsAndMonths.length == 0) {
-      window.alert(i18n.t('static.consumptionDataEntryAndAdjustment.nothingToInterpolate'));
-    } else {
-      var interpolatedRegions = [...new Set(interpolatedRegionsAndMonths.map(ele => (ele.region.regionId)))];
-      var cont = false;
-      var cf = window.confirm(i18n.t('static.consumptionDataEntryAndAdjustment.interpolatedDataFor') + interpolatedRegions.map(item => (
-        "\r\n\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
-      )));
-      if (cf == true) {
-        cont = true;
+      // document.getElementById("consumptionNotes").value = document.getElementById("consumptionNotes").value.concat(notes).concat("filled in with interpolated");
+      if (interpolatedRegionsAndMonths.length == 0) {
+        window.alert(i18n.t('static.consumptionDataEntryAndAdjustment.nothingToInterpolate'));
       } else {
+        var interpolatedRegions = [...new Set(interpolatedRegionsAndMonths.map(ele => (ele.region.regionId)))];
+        var cont = false;
+        var cf = window.confirm(i18n.t('static.consumptionDataEntryAndAdjustment.interpolatedDataFor') + interpolatedRegions.map(item => (
+          "\r\n\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+        )));
+        if (cf == true) {
+          cont = true;
+        } else {
 
-      }
+        }
 
-      if (cont == true) {
-        document.getElementById("consumptionNotes").value = notes + (notes != "" ? "\r\n" : "") + "Interpolated data for: " + interpolatedRegions.map(item => (
-          "\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
-        ));
-        this.setState({
-          tempConsumptionList: fullConsumptionList,
-          consumptionChanged: true
-        })
-        this.buildDataJexcel(this.state.selectedConsumptionUnitId, 1);
+        if (cont == true) {
+          document.getElementById("consumptionNotes").value = notes + (notes != "" ? "\r\n" : "") + "Interpolated data for: " + interpolatedRegions.map(item => (
+            "\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+          ));
+          this.setState({
+            tempConsumptionList: fullConsumptionList,
+            consumptionChanged: true,
+            loading: false,
+            message: "",
+            messageColor: ""
+          })
+          this.buildDataJexcel(this.state.selectedConsumptionUnitId, 1);
+        }
       }
+    } else {
+      this.setState({
+        loading: false,
+        message: i18n.t('static.dataEntry.validationFailedAndCannotInterpolate'),
+        messageColor: "red"
+      })
     }
   }
 
