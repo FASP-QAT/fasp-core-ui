@@ -1020,7 +1020,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
-                            console.log("Inside If IF $$$$$$$$$$ myResult", myResult)
+                            console.log("$$$$$$$$$$ myResult", myResult)
 
                             // var programId = (document.getElementById("programId").value).split("_")[0];
                             var proList = []
@@ -1030,10 +1030,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     proList[i] = myResult[i]
                                 }
                             }
+                            console.log("$$$$$$$$$$ proList",proList)
+                            
                             var proListDataFilter = proList.filter(c => c.forecastingUnit.id == forecastingUnitId);
-                            console.log("proListDataFilter", proListDataFilter);
+                            console.log("$$$$$$$$$$ proListDataFilter", proListDataFilter);
                             planningUnitIdList = proListDataFilter.map(c => c.planningUnit.id)
-                            console.log("planningUnitIdList", planningUnitIdList);
+                            console.log("$$$$$$$$$$ planningUnitIdList", planningUnitIdList);
 
                             //****************************************************************************************************************** */
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1071,9 +1073,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 supplyPlan: []
                                             }
                                         }
-                                        consumptionList = (programJson.consumptionList);
+                                        consumptionList= consumptionList.concat(programJson.consumptionList);
                                     }
-                                    console.log("consumptionList---", consumptionList);
+                                    console.log("$$$$$$$$$$ consumptionList---", consumptionList);
                                     var monthArray = [];
                                     var curDate = startDate;
                                     var monthstartfrom = this.state.rangeValue.from.month
@@ -1097,8 +1099,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             var auCount=0;
                                             var fuCount=0;
                                             curDate = year + "-" + String(month).padStart(2, '0') + "-01";
-                                            console.log("@@@@NewDevelopement@@@ curDate--->",curDate)
-                                            console.log("@@@@NewDevelopement@@@ monthInCalc--->",monthInCalc)       
+                                            console.log("@@@@NewDevelopement@@@FU curDate--->",curDate)
+                                            console.log("@@@@NewDevelopement@@@FU monthInCalc--->",monthInCalc)       
                                             for (var i = month, j = 0; j <= monthInCalc; i--, j++) { 
                                             
                                                 if (i == 0) {
@@ -1106,12 +1108,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                     year = year - 1
                                                 }
                                                 var dt = year + "-" + String(i).padStart(2, '0') + "-01";
-                                                console.log("@@@@NewDevelopement@@@ dt--->",dt);
+                                                console.log("@@@@NewDevelopement@@@FU dt--->",dt);
                                                 var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                                                console.log("@@@@NewDevelopement@@@ conlist--->",conlist);
+                                                console.log("@@@@NewDevelopement@@@FU conlist--->",conlist);
         
                                                 var noOfDays = moment(dt, "YYYY-MM").daysInMonth();
-                                                console.log("@@@@NewDevelopement@@@ noOfDays--->",noOfDays);
+                                                console.log("@@@@NewDevelopement@@@FU noOfDays--->",noOfDays);
         
                                                 // For TIME WINDOW
                                                 var regionData = [];
@@ -1123,34 +1125,37 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 var consumptionQtyOutOfStockData="";
         
                                                 for (let k = 0; k < regionList.length; k++) {
-                                                    var forecastQty="";
-                                                    var actualQty="";
-                                                   
+                                                    var forecastQty=0;
+                                                    var actualQty=0;
+
                                                    consumptionforecastQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
-                                                   console.log("@@@@NewDevelopement@@@ consumptionforecastQty--->",consumptionforecastQty);
+                                                   console.log("@@@@NewDevelopement@@@FU consumptionforecastQty--->",consumptionforecastQty);
            
                                                    if (consumptionforecastQty.length >= 0) {
                                                         for (var con = 0; con < consumptionforecastQty.length; con++) {
                                                             if(consumptionforecastQty[con].consumptionQty>=0){
                                                                 fuCount+=1;  
                                                             }
-                                                            forecastQty += consumptionforecastQty[con].consumptionQty;
-                                                            fumultiplier = consumptionforecastQty[con].multiplier;            
+                                                            var multiplierFu = proListDataFilter.filter(c => c.planningUnit.id==consumptionforecastQty[con].planningUnit.id)[0].multiplier;
+                                                            forecastQty = Number(forecastQty) + Number(Number(consumptionforecastQty[con].consumptionQty) * Number(multiplierFu));      
                                                         }
-                                                    } 
+                                                    }
                                                     consumptionactualQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
-                                                    console.log("@@@@NewDevelopement@@@ consumptionactualQty--->",consumptionactualQty);
+                                                    console.log("@@@@NewDevelopement@@@FU consumptionactualQty--->",consumptionactualQty);
            
                                                     if (consumptionactualQty.length >= 0) {
                                                         for (var con = 0; con < consumptionactualQty.length; con++) {
                                                             if(consumptionactualQty[con].consumptionQty>=0){
                                                                 auCount+=1;  
                                                             }
-                                                            actualQty += consumptionAdjForStockOutId? consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays :consumptionactualQty[con].consumptionQty;
-                                                            // actualQty += consumptionactualQty[con].consumptionQty;
-                                                            // daysOfStockOut += consumptionactualQty[con].dayOfStockOut;
-                                                            // consumptionQtyOutOfStockData += consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
-                                                            aumultiplier = consumptionactualQty[con].multiplier;    
+                                                            var multiplierAu = proListDataFilter.filter(c => c.planningUnit.id==consumptionactualQty[con].planningUnit.id)[0].multiplier;
+                                                            if(consumptionAdjForStockOutId){
+                                                                var consumptionQtyOutOfStockData= (consumptionactualQty[con].consumptionQty*multiplierAu) / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
+                                                                actualQty = Number(actualQty) + Number(consumptionQtyOutOfStockData);
+                                                            }else{
+                                                                actualQty =Number(actualQty)+ Number(consumptionactualQty[con].consumptionQty)*multiplierAu;
+                                                            }
+                                                            // actualQty += consumptionAdjForStockOutId? Number(consumptionQtyOutOfStockData) :Number(consumptionactualQty[con].consumptionQty);
                                                         }
                                                     }    
                                                 var region = { id: regionList[k].regionId, lable: regionList[k].label };
@@ -1161,30 +1166,36 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                     // daysOfStockOut: daysOfStockOut,
                                                     // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
                                                 });
+                                                console.log("@@@@NewDevelopement@@@FU Region actualQty--->",actualQty);
+                                                console.log("@@@@NewDevelopement@@@FU Region forecastQty--->",forecastQty);
+                                                
                                                 regionTotalforecastQty=regionTotalforecastQty+Number(forecastQty);
                                                 regionTotalactualQty=regionTotalactualQty+Number(actualQty);
-                                                }
-                                                adjustedActualConsumption=adjustedActualConsumption+Number(regionTotalactualQty)*aumultiplier;
-                                                forecastedConsumption=forecastedConsumption+Number(regionTotalforecastQty)*fumultiplier;
-                                                console.log("@@@@NewDevelopement@@@ Region auCount--->",auCount);
-                                                console.log("@@@@NewDevelopement@@@ Region fuCount--->",fuCount);
+                                                console.log("@@@@NewDevelopement@@@FU Region auCount--->",auCount);
+                                                console.log("@@@@NewDevelopement@@@FU Region fuCount--->",fuCount);
+                                                    
+                                            }
+                                                adjustedActualConsumption=adjustedActualConsumption+Number(regionTotalactualQty);
+                                                forecastedConsumption=forecastedConsumption+Number(regionTotalforecastQty);
+                                                console.log("@@@@NewDevelopement@@@FU Region auCount--->",auCount);
+                                                console.log("@@@@NewDevelopement@@@FU Region fuCount--->",fuCount);
                                                 
                                             }
-                                            console.log("@@@@NewDevelopement@@@ adjustedActualConsumption--->",adjustedActualConsumption);
-                                            console.log("@@@@NewDevelopement@@@ forecastedConsumption--->",forecastedConsumption);
-                                            console.log("@@@@NewDevelopement@@@ auCount--->",auCount);
-                                            console.log("@@@@NewDevelopement@@@ fuCount--->",fuCount);
-                                            console.log("@@@@NewDevelopement@@@ aumultiplier--->",aumultiplier);
-                                            console.log("@@@@NewDevelopement@@@ fumultiplier--->",fumultiplier);
+                                            console.log("@@@@NewDevelopement@@@FU adjustedActualConsumption--->",adjustedActualConsumption);
+                                            console.log("@@@@NewDevelopement@@@FU forecastedConsumption--->",forecastedConsumption);
+                                            console.log("@@@@NewDevelopement@@@FU auCount--->",auCount);
+                                            console.log("@@@@NewDevelopement@@@FU fuCount--->",fuCount);
+                                            console.log("@@@@NewDevelopement@@@FU aumultiplier--->",aumultiplier);
+                                            console.log("@@@@NewDevelopement@@@FU fumultiplier--->",fumultiplier);
              
                                             
-                                            adjustedActualConsumption=(adjustedActualConsumption/(Number(auCount)))*aumultiplier;                                   
-                                            forecastedConsumption=(forecastedConsumption/(Number(fuCount)))*fumultiplier;
-                                            console.log("@@@@NewDevelopement@@@ AVg adjustedActualConsumption--->",adjustedActualConsumption);
-                                            console.log("@@@@NewDevelopement@@@ AVg forecastedConsumption--->",forecastedConsumption);
+                                            adjustedActualConsumption=(adjustedActualConsumption/(Number(auCount)));                                   
+                                            forecastedConsumption=(forecastedConsumption/(Number(fuCount)));
+                                            console.log("@@@@NewDevelopement@@@FU AVg adjustedActualConsumption--->",adjustedActualConsumption);
+                                            console.log("@@@@NewDevelopement@@@FU AVg forecastedConsumption--->",forecastedConsumption);
            
                                             var absEbar = (Math.abs(forecastedConsumption - adjustedActualConsumption)) / adjustedActualConsumption;
-                                            console.log("@@@@NewDevelopement@@@ absEbar--->",absEbar);
+                                            console.log("@@@@NewDevelopement@@@FU absEbar--->",absEbar);
            
                                             var errorPerc = absEbar;
                                          
@@ -1198,14 +1209,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 // consumptionQtyStockedOut: totalConsumptionQtyOutOfStockData
                                             });
                                         }
-                                        console.log("@@@@NewDevelopement@@@ dataList--->",dataList)
+                                        console.log("@@@@NewDevelopement@@@FU dataList--->",dataList)
                                         this.setState({
                                         monthArray: monthArray,
                                         dataList: dataList,
                                         consumptionAdjForStockOutId: consumptionAdjForStockOutId
                                         })
                                     }
-                                    console.log("@@@@NewDevelopement@@@ dataList--->",dataList)
+                                    console.log("@@@@NewDevelopement@@@FU dataList--->",dataList)
                                     console.log("Complete dataList----------------------", dataList);
                                     this.setState({
                                         monthArray: monthArray,
@@ -1241,6 +1252,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         }.bind(this);
                         programRequest.onsuccess = function (event) {
                             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                            console.log("planningUnitDataList--->",planningUnitDataList)
                             var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
                             var programJson = {};
                             if (planningUnitDataFilter.length > 0) {
@@ -1323,7 +1335,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         fuCount+=1;  
                                                     }
                                                     forecastQty += consumptionforecastQty[con].consumptionQty;
-                                                    fumultiplier = consumptionforecastQty[con].multiplier;            
                                                 }
                                             } 
                                             consumptionactualQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
@@ -1334,11 +1345,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                     if(consumptionactualQty[con].consumptionQty>=0){
                                                         auCount+=1;  
                                                     }
-                                                    actualQty += consumptionAdjForStockOutId? consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays :consumptionactualQty[con].consumptionQty;
-                                                    // actualQty += consumptionactualQty[con].consumptionQty;
-                                                    // daysOfStockOut += consumptionactualQty[con].dayOfStockOut;
-                                                    // consumptionQtyOutOfStockData += consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
-                                                    aumultiplier = consumptionactualQty[con].multiplier;    
+                                                    actualQty += consumptionAdjForStockOutId? consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays :consumptionactualQty[con].consumptionQty; 
                                                 }
                                             }    
                                         var region = { id: regionList[k].regionId, lable: regionList[k].label };
