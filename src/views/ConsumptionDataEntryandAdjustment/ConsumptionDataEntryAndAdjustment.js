@@ -1068,7 +1068,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var stockOutdays = elInstance.getColumnData(x)[0];
       console.log("Actual consumption value@@@@@@@@", elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true))
       if (value == "") {
-      } else if (elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true) > 0 && value == stockOutdays) {
+      } else if (elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true) >= 0 && value == stockOutdays) {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
@@ -1124,7 +1124,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         if (possibleStockDayY.includes(y.toString())) {
           var stockOutdays = elInstance.getColumnData(x)[0];
           if (value == "") {
-          } else if (elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true) > 0 && value == stockOutdays) {
+          } else if (elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true) >= 0 && value == stockOutdays) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
@@ -1237,7 +1237,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         if (possibleStockDayY.includes(y.toString())) {
           var stockOutdays = elInstance.getColumnData(x)[0];
           if (value == "") {
-          } else if (elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true) > 0 && value == stockOutdays) {
+          } else if (elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true) >= 0 && value == stockOutdays) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
