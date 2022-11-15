@@ -477,11 +477,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   //.................................................................. Extrapolate..................................
   ExtrapolatedParameters() {
-    console.log("datasetJson--------> inside", this.state.selectedConsumptionUnitId);
+    console.log("datasetJson--------> inside Test", this.state.selectedConsumptionUnitId);
     if (this.state.selectedConsumptionUnitId > 0) {
       this.setState({ loading: true })
       var datasetJson = this.state.datasetJson;
-      console.log("datasetJson**********", datasetJson)
+      console.log("datasetJson********** Test", datasetJson)
       // Need to filter
       var regionList = this.state.regionList;
       var count = 0;
@@ -497,8 +497,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var inputDataTes = [];
           var inputDataArima = [];
 
-          console.log("minDate", moment(minDate).format("YYYY-MM"));
-          console.log("maxDate", moment(maxDate).format("YYYY-MM"));
+          console.log("minDate Test", moment(minDate).format("YYYY-MM"));
+          console.log("maxDate Test", moment(maxDate).format("YYYY-MM"));
           for (var j = 0; moment(curDate).format("YYYY-MM") < moment(maxDate).format("YYYY-MM"); j++) {
             curDate = moment(minDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
             console.log("curdate", curDate)
@@ -540,8 +540,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
       this.setState({
         count: count,
-        showDetailTable: true,
-        loading: false
+        
       })
     }
   }
@@ -558,10 +557,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       jsonDataMovingAvg: jsonDataMovingAvg,
       countRecived: countR + 1
     }, () => {
-      console.log("countRecivedMov", this.state.countRecived)
-      console.log("countMov", this.state.count)
+      console.log("countRecivedMov Test", this.state.countRecived)
+      console.log("countMov Test", this.state.count)
 
-      console.log("outSide****", (this.state.jsonDataMovingAvg.length
+      console.log("outSide**** Test", (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
         + this.state.jsonDataTes.length
@@ -573,7 +572,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         + this.state.jsonDataTes.length
         + this.state.jsonDataArima.length
         == this.state.count) {
-        console.log("inside if")
+        console.log("inside if Test")
         this.saveForecastConsumptionExtrapolation();
       }
     })
@@ -582,7 +581,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   updateSemiAveragesData(data) {
     var jsonDataSemiAverage = this.state.jsonDataSemiAverage;
     jsonDataSemiAverage.push(data);
-    console.log("jsonDataSemiAverage--->", jsonDataSemiAverage)
+    console.log("jsonDataSemiAverage---> Test", jsonDataSemiAverage)
     var countR = this.state.countRecived
     console.log("countR--->", countR)
 
@@ -590,9 +589,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       jsonDataSemiAverage: jsonDataSemiAverage,
       countRecived: countR + 1
     }, () => {
-      console.log("countRecivedSemi", this.state.countRecived)
-      console.log("countSemi", this.state.count)
-      console.log("Semi outside if", this.state.jsonDataMovingAvg.length
+      console.log("countRecivedSemi Test", this.state.countRecived)
+      console.log("countSemi Test", this.state.count)
+      console.log("Semi outside if Test", this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
         + this.state.jsonDataTes.length
@@ -612,14 +611,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   updateLinearRegressionData(data) {
     var jsonDataLinearRegression = this.state.jsonDataLinearRegression;
     jsonDataLinearRegression.push(data);
-    console.log("jsonDataLinearRegression--->", jsonDataLinearRegression)
+    console.log("jsonDataLinearRegression---> Test", jsonDataLinearRegression)
     this.setState({
       jsonDataLinearRegression: jsonDataLinearRegression,
       countRecived: this.state.countRecived++
     }, () => {
-      console.log("countRecivedL", this.state.countRecived)
-      console.log("countL", this.state.count)
-      console.log("linear outside***", this.state.jsonDataMovingAvg.length
+      console.log("countRecivedL Test", this.state.countRecived)
+      console.log("countL Test", this.state.count)
+      console.log("linear outside*** Test", this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
         + this.state.jsonDataTes.length
@@ -645,9 +644,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       jsonDataTes: jsonDataTes,
       countRecived: this.state.countRecived++
     }, () => {
-      console.log("countRecivedT", this.state.countRecived)
-      console.log("countT", this.state.count)
-      console.log("TES", this.state.jsonDataMovingAvg.length
+      console.log("countRecivedT Test", this.state.countRecived)
+      console.log("countT Test", this.state.count)
+      console.log("TES Test", this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
         + this.state.jsonDataTes.length
@@ -668,14 +667,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   updateArimaData(data) {
     var jsonDataArima = this.state.jsonDataArima;
     jsonDataArima.push(data);
-    console.log("jsonDataArima--->", jsonDataArima)
+    console.log("jsonDataArima---> Test", jsonDataArima)
     this.setState({
       jsonDataArima: jsonDataArima,
       countRecived: this.state.countRecived++
     }, () => {
-      console.log("countRecivedA", this.state.countRecived)
-      console.log("countA", this.state.count)
-      console.log("Arima", this.state.jsonDataMovingAvg.length
+      console.log("countRecivedA Test", this.state.countRecived)
+      console.log("countA Test", this.state.count)
+      console.log("Arima Test", this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
         + this.state.jsonDataTes.length
@@ -693,7 +692,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   saveForecastConsumptionExtrapolation() {
-    console.log("inside saveForecastConsumptionExtrapolation")
+    console.log("inside saveForecastConsumptionExtrapolation Test")
     this.setState({
       loading: true
     })
@@ -727,12 +726,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
           var datasetJson = JSON.parse(datasetData);
           var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
-          console.log("consumptionExtrapolationDataUnFiltered@@@@@@@@@@", consumptionExtrapolationDataUnFiltered);
-          console.log("this.state.planningUnitId@@@@@@@@@@", this.state.planningUnitId);
+          console.log("consumptionExtrapolationDataUnFiltered@@@@@@@@@@ Test", consumptionExtrapolationDataUnFiltered);
+          console.log("this.state.planningUnitId@@@@@@@@@@ Test", this.state.planningUnitId);
           var regionList = this.state.regionList;
           for (var r = 0; r < regionList.length; r++) {
-            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[i].regionId);
-            console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList);
+            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId || (c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id != regionList[i].regionId));
+            console.log("consumptionExtrapolationList@@@@@@@@@@ Test", consumptionExtrapolationList);
             var consumptionExtrapolationData = -1//Semi Averages
             var consumptionExtrapolationMovingData = -1//Moving averages
             var consumptionExtrapolationRegression = -1//Linear Regression
@@ -938,6 +937,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
           datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
           console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
+          console.log("Test DatasetJson@@",datasetJson)
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
@@ -957,7 +957,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               message: i18n.t('static.compareAndSelect.dataSaved'),
               extrapolateClicked: false,
               countRecived: 0,
-              count: 0
+              count: 0,
+              showDetailTable: true,
+              jsonDataMovingAvg:[],
+              jsonDataSemiAverage:[],
+              jsonDataLinearRegression:[],
+              jsonDataTes:[],
+              jsonDataArima:[],
+              datasetJson:datasetJson
             }, () => {
               this.hideFirstComponent();
               this.componentDidMount()
@@ -1467,7 +1474,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
           datasetJson.actualConsumptionList = fullConsumptionList;
           datasetJson.planningUnitList = planningUnitList;
-          datasetJson.consumptionExtrapolation = [];
+          // datasetJson.consumptionExtrapolation = [];
           console.log("datasetJson----------->925", datasetJson);
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
@@ -1517,9 +1524,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               consumptionChanged: false,
               datasetJson: datasetJson
             }, () => {
+              console.log("Above extrapolated parameteres Test")
               this.ExtrapolatedParameters();
-              this.getDatasetData();
-              this.hideFirstComponent();
             })
           }.bind(this)
         }.bind(this)
