@@ -1228,7 +1228,7 @@ export default class BuildTree extends Component {
             levelNo = data.context.levels[0]
             if (levelListFiltered.length > 0) {
                 name = levelListFiltered[0].label.label_en;
-                unit = levelListFiltered[0].unit != null ? levelListFiltered[0].unit.id : "";
+                unit = levelListFiltered[0].unit != null && levelListFiltered[0].unit.id != null ? levelListFiltered[0].unit.id : "";
             }
             console.log("Name@@@@###########", name);
             console.log("Unit@@@@###########", unit);
