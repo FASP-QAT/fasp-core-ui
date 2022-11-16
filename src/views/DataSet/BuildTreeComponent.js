@@ -853,7 +853,8 @@ export default class BuildTree extends Component {
             showDate: false,
             modelingChanged: false,
             missingPUList: [],
-            autoCalculate: true
+            autoCalculate: true,
+            hideActionButtons:false,
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -1227,7 +1228,7 @@ export default class BuildTree extends Component {
             levelNo = data.context.levels[0]
             if (levelListFiltered.length > 0) {
                 name = levelListFiltered[0].label.label_en;
-                unit = levelListFiltered[0].unit != null ? levelListFiltered[0].unit.id : "";
+                unit = levelListFiltered[0].unit != null && levelListFiltered[0].unit.id != null ? levelListFiltered[0].unit.id : "";
             }
             console.log("Name@@@@###########", name);
             console.log("Unit@@@@###########", unit);
@@ -6369,6 +6370,12 @@ export default class BuildTree extends Component {
         // }
     }
 
+    hideActionButtons(e) {
+        this.setState({
+            hideActionButtons: e.target.checked
+        })
+    }
+
     filterPlanningUnitNode(e) {
         console.log(">>>", e.target.checked);
         var itemsList = this.state.items;
@@ -11034,7 +11041,7 @@ export default class BuildTree extends Component {
                     {itemConfig.parent != null &&
 
                         <>
-                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                            {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
 
                                 <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                     onClick={(event) => {
@@ -11044,7 +11051,7 @@ export default class BuildTree extends Component {
                                     <i class="fa fa-clone" aria-hidden="true"></i>
                                 </button>
                             }
-                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                            {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
                                 <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                     onClick={(event) => {
                                         event.stopPropagation();
@@ -11069,7 +11076,7 @@ export default class BuildTree extends Component {
                                 </button>}
 
                         </>}
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                    {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
 
                         <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -11080,7 +11087,7 @@ export default class BuildTree extends Component {
                             <i class="fa fa-sitemap" aria-hidden="true"></i>
                         </button>
                     }
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                    {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
@@ -11823,7 +11830,7 @@ export default class BuildTree extends Component {
                                             <PopoverBody>{i18n.t('static.tooltip.autoCalculate')}</PopoverBody>
                                         </Popover>
                                     </div>
-                                            <FormGroup className="col-md-4" >
+                                            <FormGroup className="col-md-2" >
                                                 <div className="check inline  pl-lg-0 pt-lg-0">
                                                     <div>
                                                         <Input
@@ -11838,6 +11845,26 @@ export default class BuildTree extends Component {
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                             <b>{'Auto Calculate'}</b><i class="fa fa-info-circle icons pl-lg-2" id="PopoverAuto" onClick={this.toggleTooltipAuto} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                        </Label>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-2" >
+                                                <div className="check inline  pl-lg-0 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="hideButtons"
+                                                            name="hideButtons"
+                                                            checked={this.state.hideActionButtons}
+                                                            // checked={false}
+                                                            onClick={(e) => { this.hideActionButtons(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{'Hide Action Buttons'}</b>
                                                         </Label>
                                                     </div>
                                                 </div>
