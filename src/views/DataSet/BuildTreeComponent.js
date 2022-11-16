@@ -11917,7 +11917,7 @@ export default class BuildTree extends Component {
                 </ModalHeader>
                 <ModalBody>
                     <FormGroup>
-                        <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
+                        <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}</Label>
                         <Input type="text"
                             id="levelName"
                             name="levelName"
