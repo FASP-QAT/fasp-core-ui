@@ -536,10 +536,10 @@ class AddBudgetComponent extends Component {
                                     let budget1 = this.state.budget;
                                     var getCurrencyId = this.state.budget.currency.currencyId;
                                     var currencyId = getCurrencyId.split("~");
-                                    // budget.currency.currencyId = currencyId[0];
+                                    budget.currency.currencyId = currencyId[0];
 
                                     var amount = this.state.budget.budgetAmt.replace(/,/g, '');
-                                    // budget.budgetAmt = amount;
+                                    budget.budgetAmt = amount;
 
                                     // alert("hiiiiii");
                                     // this.setState({ budget: budget });
