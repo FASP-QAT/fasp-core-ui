@@ -620,21 +620,22 @@ class VersionSettingsComponent extends Component {
                             var programRequest = programTransaction.put(program);
                             console.log("---hurrey---");
                         })
-                        
-                       transaction.oncomplete = function (event) {
-                        console.log("in side datasetDetails")
-                        db1 = e.target.result;
-                        var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                        var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                        programs.forEach(program => {
-                         var datasetDetailsRequest = datasetDetailsTransaction.get(program.id);
-                         datasetDetailsRequest.onsuccess = function (e) {         
-                             var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                             datasetDetailsRequestJson.changed = 1;
-                             var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                             datasetDetailsRequest1.onsuccess = function (event) {                               
-                                 }}                         
-                            console.log("---hurrey---");
+
+                        transaction.oncomplete = function (event) {
+                            console.log("in side datasetDetails")
+                            db1 = e.target.result;
+                            var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                            var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                            programs.forEach(program => {
+                                var datasetDetailsRequest = datasetDetailsTransaction.get(program.id);
+                                datasetDetailsRequest.onsuccess = function (e) {
+                                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                    datasetDetailsRequestJson.changed = 1;
+                                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                    datasetDetailsRequest1.onsuccess = function (event) {
+                                    }
+                                }
+                                console.log("---hurrey---");
                             })
 
                             this.setState({
@@ -1189,8 +1190,8 @@ class VersionSettingsComponent extends Component {
                     // visible: false
                 },
                 {
-                    // title: 'datasetData',
-                    // type: 'hidden',//17 R
+                    title: 'datasetData',
+                    type: 'hidden',//18 S
                 },
 
             ],
