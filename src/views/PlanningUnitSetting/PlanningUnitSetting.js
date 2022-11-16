@@ -1925,12 +1925,12 @@ export default class PlanningUnitSetting extends Component {
         }.bind(this)
     }
 
-    filterData() {
+    filterData(addRowInJexcel) {
 
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         var forecastProgramId = this.state.forecastProgramId;
-        console.log("forecastProgramId--------->", forecastProgramId);
+        console.log("addRowInJexcel--------->", addRowInJexcel);
 
         if (forecastProgramId > 0) {
 
@@ -1954,7 +1954,7 @@ export default class PlanningUnitSetting extends Component {
                     // let planningUnitIds = this.state.allPlanningUnitList.map(ele => ele.id);
                     // console.log("selectedForecastProgram---------->11", planningUnitIds);
                     // this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitIds);
-                    this.buildJExcel();
+                    this.buildJExcel(addRowInJexcel);
 
                 })
         } else {
@@ -2005,7 +2005,7 @@ export default class PlanningUnitSetting extends Component {
     }
 
 
-    buildJExcel() {
+    buildJExcel(addRowInJexcel) {
         let outPutList = this.state.selsource;
         console.log("outPutList---->", outPutList);
         console.log("RESP----->2ProductCategoryServcie", outPutList);
@@ -2276,7 +2276,8 @@ export default class PlanningUnitSetting extends Component {
                             items.push({
                                 title: i18n.t('static.common.addRow'),
                                 onclick: function () {
-                                    this.addRow();
+                                    // this.addRow();
+                                    this.getPlanningUnitList();
                                 }.bind(this)
                             });
                         }
@@ -2317,6 +2318,10 @@ export default class PlanningUnitSetting extends Component {
         this.el = languageEl;
         this.setState({
             languageEl: languageEl, loading: false, allowAdd: true
+        }, () => {
+            if (addRowInJexcel) {
+                this.addRow();
+            }
         })
     }
 
@@ -3159,7 +3164,7 @@ export default class PlanningUnitSetting extends Component {
                             datasetId: selectedForecastProgram.id,
 
                         }, () => {
-                            this.filterData();
+                            this.filterData(1);
                         })
                 });
             }).catch(
@@ -3401,7 +3406,9 @@ export default class PlanningUnitSetting extends Component {
                                     {this.state.isChanged1 &&
                                         <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     }
-                                    {isSiteOnline() && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                    {/* {isSiteOnline() && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>} */}
+                                    {isSiteOnline() && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.getPlanningUnitList()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+
                                     &nbsp;
                                 </FormGroup>
                             }
