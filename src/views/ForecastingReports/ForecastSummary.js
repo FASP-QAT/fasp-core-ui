@@ -2138,9 +2138,13 @@ class ForecastSummary extends Component {
                     totalForecast = tsListFilter.totalForecast;
                 } else {
                     var flatList = tsListFilter.flatList;
-                    var flatListFilter = flatList.filter(c => c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
-
-                    var nodeDataMomList = flatListFilter[0].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM-DD"));
+                    console.log("Flat List @@@@@@@ Test", flatList)
+                    var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
+                    console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
+                    var nodeDataMomList = [];
+                    for (var fl = 0; fl < flatListFilter.length; fl++) {
+                        nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM")));
+                    }
                     nodeDataMomList.map(ele => {
                         totalForecast += Number(ele.calculatedMmdValue);
                     });

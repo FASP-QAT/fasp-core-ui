@@ -3033,7 +3033,7 @@ class DefaultLayout extends Component {
                               //   }
                               // },
                               {
-                                name: 'Forecast Error (Monthly) (New)',
+                                name: 'Forecast Error (Monthly)',
                                 url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {

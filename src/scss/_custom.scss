@@ -4785,7 +4785,7 @@ h6 {
   border: 2px solid #fbcb09;
   background: white;
   color: #c77405;
-  width: 100%;
+  width: 84% !important;
   height: 100%;
   left: -2px;
   top: -2px;
@@ -5502,7 +5502,7 @@ label.arrow_label:before {
   border: 2px solid #fbcb09;
   background: white;
   color: #c77405;
-  width: 100%;
+  width: 84% !important;
   height: 100%;
   left: -2px;
   top: -2px;
@@ -9075,6 +9075,15 @@ legend.scheduler-border {
   line-height: 22px;
   color: #212721;
 }
+.HighlightFrame {
+  border: 2px solid #fbcb09;
+  background: white;
+  color: #c77405;
+  width: 84% !important;
+  height: 100%;
+  left: -2px;
+  top: -2px;
+}
 
 .MorginTopMonth {
   margin-top: 48px;
@@ -9654,6 +9663,19 @@ legend.scheduler-border {
 
 .ModelingTableMargin {
   margin: 0 auto;
+}
+.HighlightFrame {
+  border: 0px solid #fbcb09 !important;
+  background: transparent !important;
+  color: transparent !important;
+  border-radius: 0px !important;
+  width: 84% !important;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+  padding-bottom: 0px;
+  box-shadow: 0 8px 16px #0000001f !important;
+
 }
 
 @media (min-width: 1920px) {

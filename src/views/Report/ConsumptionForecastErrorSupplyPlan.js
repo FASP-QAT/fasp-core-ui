@@ -15,6 +15,7 @@ import CryptoJS from 'crypto-js'
 import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import NumberFormat from 'react-number-format';
 import i18n from '../../i18n'
 import Picker from 'react-month-picker'
@@ -109,7 +110,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnitId: "",
             forecastingUnitId: "",
             equivalencyUnitId: "",
-            dataList:[],
+            dataList: [],
             show: false
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
@@ -129,7 +130,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    console.log("ProgramList", JSON.stringify(response.data))
                     this.setState({
                         programs: response.data, loading: false, show: false
                     }, () => { this.consolidatedProgramList() })
@@ -444,7 +445,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     }
                 }
                 this.setState({
-                    regions: regionList,
+                    regions: regionList
                 }, () => {
                     this.getPlanningUnitAndForcastingUnit();
                 })
@@ -553,6 +554,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         console.log("CheckPU------------------>2", forcastingUnitList);
+                        console.log("listArray------------------>2", listArray);
+               
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -805,7 +808,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         } else {
 
                             document.getElementById("equivelencyUnitDiv").style.display = "none";
-                            this.setState({ message: "No equivalency unit data available for the selected forcecasting Unit ", equivalencyUnitList: [] });
+                            this.setState({ message: "No equivalency unit data available for the selected forecasting unit ", equivalencyUnitList: [] });
                             console.log("No FU associated");
                         }
                         console.log("filteredEQUnit---Result-->", filteredEQUnit);
@@ -845,7 +848,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         var listArray = response.data;
                         if (listArray.length == 0) {
                             document.getElementById("equivelencyUnitDiv").style.display = "none";
-                            this.setState({ message: 'No equivalency unit data available for the selected forcecasting unit' });
+                            this.setState({ message: 'No equivalency unit data available for the selected forecasting unit' });
                         } else {
                             var listArray = response.data;
                             listArray.sort((a, b) => {
@@ -983,6 +986,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         console.log("viewById----", viewById)
         let regionIds = this.state.regionValues.map(ele => (ele.value).toString())
         let regionList = this.state.regions;
+        let monthInCalc = document.getElementById("timeWindow").value;
         var dataList = [];
         let equivalencyUnitId = -1;
         let planningUnitId = -1;
@@ -1000,8 +1004,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 this.setState({ loading: true })
                 var db1;
                 getDatabase();
-                console.log("Inside If IF", forecastingUnitId)
-                if (forecastingUnitId > 0) {
+                if (forecastingUnitId > 0) // View by forecastingUnit 
+                {
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
                         this.setState({
@@ -1019,7 +1023,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
-                            console.log("Inside If IF $$$$$$$$$$ myResult", myResult)
+                            console.log("$$$$$$$$$$ myResult", myResult)
 
                             // var programId = (document.getElementById("programId").value).split("_")[0];
                             var proList = []
@@ -1029,10 +1033,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     proList[i] = myResult[i]
                                 }
                             }
+                            console.log("$$$$$$$$$$ proList",proList)
+                            
                             var proListDataFilter = proList.filter(c => c.forecastingUnit.id == forecastingUnitId);
-                            console.log("proListDataFilter", proListDataFilter);
+                            console.log("$$$$$$$$$$ proListDataFilter", proListDataFilter);
                             planningUnitIdList = proListDataFilter.map(c => c.planningUnit.id)
-                            console.log("planningUnitIdList", planningUnitIdList);
+                            console.log("$$$$$$$$$$ planningUnitIdList", planningUnitIdList);
 
                             //****************************************************************************************************************** */
                             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1070,73 +1076,150 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 supplyPlan: []
                                             }
                                         }
-                                        consumptionList = (programJson.consumptionList);
+                                        consumptionList= consumptionList.concat(programJson.consumptionList);
                                     }
-                                    console.log("consumptionList---", consumptionList);
+                                    console.log("$$$$$$$$$$ consumptionList---", consumptionList);
                                     var monthArray = [];
                                     var curDate = startDate;
+                                    var monthstartfrom = this.state.rangeValue.from.month
+                                    var monthArray = [];
+                                    var monthstartfrom = this.state.rangeValue.from.month;
+                                    
                                     for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
                                         curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
                                         var noOfDays = moment(curDate, "YYYY-MM").daysInMonth();
                                         monthArray.push({ date: curDate, noOfDays: noOfDays })
-                                        // var totalConsumptionQtyOutOfStockData = "";
-                                        var totalActualQty = "";
-                                        var totalForecastQty = "";
-                                        var errorPerc = "";
-                                        var regionData = [];
+                                    }  
+                                    for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                                        for (var month = monthstartfrom; month <= 12; month++) {
+                                            var curDate ;     
+                                        
+                                            var year = from;
+                                            var adjustedActualConsumption=0;
+                                            var forecastedConsumption=0;
+                                            var aumultiplier="";
+                                            var fumultiplier="";
+                                            var auCount=0;
+                                            var fuCount=0;
+                                            curDate = year + "-" + String(month).padStart(2, '0') + "-01";
+                                            console.log("@@@@NewDevelopement@@@FU curDate--->",curDate)
+                                            console.log("@@@@NewDevelopement@@@FU monthInCalc--->",monthInCalc)       
+                                            for (var i = month, j = 0; j <= monthInCalc; i--, j++) { 
+                                            
+                                                if (i == 0) {
+                                                    i = 12;
+                                                    year = year - 1
+                                                }
+                                                var dt = year + "-" + String(i).padStart(2, '0') + "-01";
+                                                console.log("@@@@NewDevelopement@@@FU dt--->",dt);
+                                                var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                                                console.log("@@@@NewDevelopement@@@FU conlist--->",conlist);
+        
+                                                var noOfDays = moment(dt, "YYYY-MM").daysInMonth();
+                                                console.log("@@@@NewDevelopement@@@FU noOfDays--->",noOfDays);
+        
+                                                // For TIME WINDOW
+                                                var regionData = [];
+                                                var consumptionforecastQty="";
+                                                var regionTotalforecastQty="";
+                                                var consumptionactualQty="";
+                                                var regionTotalactualQty="";
+                                                var daysOfStockOut="";
+                                                var consumptionQtyOutOfStockData="";
+        
+                                                for (let k = 0; k < regionList.length; k++) {
+                                                    var forecastQty=0;
+                                                    var actualQty=0;
 
-                                        for (let k = 0; k < regionList.length; k++) {
-                                            var consumptionactualQty = "";
-                                            var consumptionforecastQty = "";
-                                            var actualQty = "";
-                                            var forecastQty = "";
-                                            var daysOfStockOut = "";
-                                            var consumptionQtyOutOfStockData = "";
-                                            consumptionforecastQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
-                                            if (consumptionforecastQty.length > 0) {
-                                                for (var con = 0; con < consumptionforecastQty.length; con++) {
-                                                    forecastQty += consumptionforecastQty[con].consumptionQty * consumptionforecastQty[con].multiplier;
-                                                }
-                                            } else {
-                                                forecastQty = "";
+                                                   consumptionforecastQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
+                                                   console.log("@@@@NewDevelopement@@@FU consumptionforecastQty--->",consumptionforecastQty);
+           
+                                                   if (consumptionforecastQty.length >= 0) {
+                                                        for (var con = 0; con < consumptionforecastQty.length; con++) {
+                                                            if(consumptionforecastQty[con].consumptionQty>=0){
+                                                                fuCount+=1;  
+                                                            }
+                                                            var multiplierFu = proListDataFilter.filter(c => c.planningUnit.id==consumptionforecastQty[con].planningUnit.id)[0].multiplier;
+                                                            forecastQty = Number(forecastQty) + Number(Number(consumptionforecastQty[con].consumptionQty) * Number(multiplierFu));      
+                                                        }
+                                                    }
+                                                    consumptionactualQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
+                                                    console.log("@@@@NewDevelopement@@@FU consumptionactualQty--->",consumptionactualQty);
+           
+                                                    if (consumptionactualQty.length >= 0) {
+                                                        for (var con = 0; con < consumptionactualQty.length; con++) {
+                                                            if(consumptionactualQty[con].consumptionQty>=0){
+                                                                auCount+=1;  
+                                                            }
+                                                            var multiplierAu = proListDataFilter.filter(c => c.planningUnit.id==consumptionactualQty[con].planningUnit.id)[0].multiplier;
+                                                            if(consumptionAdjForStockOutId){
+                                                                var consumptionQtyOutOfStockData= (consumptionactualQty[con].consumptionQty*multiplierAu) / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
+                                                                actualQty = Number(actualQty) + Number(consumptionQtyOutOfStockData);
+                                                            }else{
+                                                                actualQty =Number(actualQty)+ Number(consumptionactualQty[con].consumptionQty)*multiplierAu;
+                                                            }
+                                                            // actualQty += consumptionAdjForStockOutId? Number(consumptionQtyOutOfStockData) :Number(consumptionactualQty[con].consumptionQty);
+                                                        }
+                                                    }    
+                                                var region = { id: regionList[k].regionId, lable: regionList[k].label };
+                                                regionData.push({
+                                                    region: region,
+                                                    actualQty: actualQty,
+                                                    forecastQty: forecastQty
+                                                    // daysOfStockOut: daysOfStockOut,
+                                                    // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
+                                                });
+                                                console.log("@@@@NewDevelopement@@@FU Region actualQty--->",actualQty);
+                                                console.log("@@@@NewDevelopement@@@FU Region forecastQty--->",forecastQty);
+                                                
+                                                regionTotalforecastQty=regionTotalforecastQty+Number(forecastQty);
+                                                regionTotalactualQty=regionTotalactualQty+Number(actualQty);
+                                                console.log("@@@@NewDevelopement@@@FU Region auCount--->",auCount);
+                                                console.log("@@@@NewDevelopement@@@FU Region fuCount--->",fuCount);
+                                                    
                                             }
-                                            consumptionactualQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
-                                            if (consumptionactualQty.length > 0) {
-                                                for (var con = 0; con < consumptionactualQty.length; con++) {
-                                                    actualQty += consumptionactualQty[con].consumptionQty * consumptionactualQty[con].multiplier;
-                                                    daysOfStockOut += consumptionactualQty[con].dayOfStockOut;
-                                                    // consumptionQtyOutOfStockData += consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
-                                                }
-                                            } else {
-                                                actualQty = "";
-                                                daysOfStockOut = "";
-                                                // consumptionQtyOutOfStockData = "";
+                                                adjustedActualConsumption=adjustedActualConsumption+Number(regionTotalactualQty);
+                                                forecastedConsumption=forecastedConsumption+Number(regionTotalforecastQty);
+                                                console.log("@@@@NewDevelopement@@@FU Region auCount--->",auCount);
+                                                console.log("@@@@NewDevelopement@@@FU Region fuCount--->",fuCount);
+                                                
                                             }
-                                            totalActualQty += actualQty;
-                                            totalForecastQty += forecastQty;
-                                            // totalConsumptionQtyOutOfStockData += consumptionQtyOutOfStockData;
-                                            var region = { id: regionList[k].regionId, lable: regionList[k].label };
-                                            regionData.push({
-                                                region: region,
-                                                actualQty: actualQty,
-                                                forecastQty: forecastQty,
-                                                daysOfStockOut: daysOfStockOut
-                                                // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
+                                            console.log("@@@@NewDevelopement@@@FU adjustedActualConsumption--->",adjustedActualConsumption);
+                                            console.log("@@@@NewDevelopement@@@FU forecastedConsumption--->",forecastedConsumption);
+                                            console.log("@@@@NewDevelopement@@@FU auCount--->",auCount);
+                                            console.log("@@@@NewDevelopement@@@FU fuCount--->",fuCount);
+                                            console.log("@@@@NewDevelopement@@@FU aumultiplier--->",aumultiplier);
+                                            console.log("@@@@NewDevelopement@@@FU fumultiplier--->",fumultiplier);
+             
+                                            
+                                            adjustedActualConsumption=(adjustedActualConsumption/(Number(auCount)));                                   
+                                            forecastedConsumption=(forecastedConsumption/(Number(fuCount)));
+                                            console.log("@@@@NewDevelopement@@@FU AVg adjustedActualConsumption--->",adjustedActualConsumption);
+                                            console.log("@@@@NewDevelopement@@@FU AVg forecastedConsumption--->",forecastedConsumption);
+           
+                                            var absEbar = (Math.abs(forecastedConsumption - adjustedActualConsumption)) / adjustedActualConsumption;
+                                            console.log("@@@@NewDevelopement@@@FU absEbar--->",absEbar);
+           
+                                            var errorPerc = absEbar;
+                                         
+                                            dataList.push({
+                                                month: moment(curDate).format("YYYY-MM-DD"),
+                                                regionData: regionData,
+                                                actualQty: adjustedActualConsumption,
+                                                forecastQty: forecastedConsumption,
+                                                errorPerc: errorPerc
+                                                // consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                                                // consumptionQtyStockedOut: totalConsumptionQtyOutOfStockData
                                             });
                                         }
-                                        var absEbar = (Math.abs(totalForecastQty - totalActualQty)) / totalActualQty;
-                                        errorPerc = absEbar * 100;
-                                        dataList.push({
-                                            month: moment(curDate).format("YYYY-MM"),
-                                            regionData: regionData,
-                                            actualQty: totalActualQty,
-                                            forecastQty: totalForecastQty,
-                                            errorPerc: errorPerc,
-                                            noOfDays: noOfDays
-                                            // consumptionAdjForStockOutId: consumptionAdjForStockOutId,
-                                            // consumptionQtyStockedOut: totalConsumptionQtyOutOfStockData
-                                        });
+                                        console.log("@@@@NewDevelopement@@@FU dataList--->",dataList)
+                                        this.setState({
+                                        monthArray: monthArray,
+                                        dataList: dataList,
+                                        consumptionAdjForStockOutId: consumptionAdjForStockOutId
+                                        })
                                     }
+                                    console.log("@@@@NewDevelopement@@@FU dataList--->",dataList)
                                     console.log("Complete dataList----------------------", dataList);
                                     this.setState({
                                         monthArray: monthArray,
@@ -1147,7 +1230,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             }.bind(this);
                         }.bind(this);
                     }.bind(this);
-                } else {
+                } else if(planningUnitId > 0)// View by planningUnit
+                {
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
                         this.setState({
@@ -1171,6 +1255,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         }.bind(this);
                         programRequest.onsuccess = function (event) {
                             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                            console.log("planningUnitDataList--->",planningUnitDataList)
                             var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
                             var programJson = {};
                             if (planningUnitDataFilter.length > 0) {
@@ -1187,83 +1272,142 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     supplyPlan: []
                                 }
                             }
-                            var consumptionList = (programJson.consumptionList);
-                            console.log("consumptionList---", consumptionList);
+                            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+                            var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                            var monthstartfrom = this.state.rangeValue.from.month
                             var monthArray = [];
+                            var monthstartfrom = this.state.rangeValue.from.month;
                             var curDate = startDate;
                             for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
+                                console.log("@@@@NewDevelopement@@@ monthArray BEfore 1263--->",monthArray)
+                          
                                 curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
                                 var noOfDays = moment(curDate, "YYYY-MM").daysInMonth();
                                 monthArray.push({ date: curDate, noOfDays: noOfDays })
-                                // var totalConsumptionQtyOutOfStockData = "";
-                                var totalActualQty = "";
-                                var totalForecastQty = "";
-                                var errorPerc = "";
+                            }  
+                            console.log("@@@@NewDevelopement@@@ monthArray BEfore--->",monthArray)
+                            
+                            
+                            for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+                                for (var month = monthstartfrom; month <= 12; month++) {
+                                    var curDate ;     
+                                
+                                    var year = from;
+                                    var adjustedActualConsumption=0;
+                                    var forecastedConsumption=0;
+                                    var aumultiplier="";
+                                    var fumultiplier="";
+                                    var auCount=0;
+                                    var fuCount=0;
+                                    curDate = year + "-" + String(month).padStart(2, '0') + "-01";
+                                    console.log("@@@@NewDevelopement@@@ curDate--->",curDate)
+                                    console.log("@@@@NewDevelopement@@@ monthInCalc--->",monthInCalc)       
+                                    for (var i = month, j = 0; j <= monthInCalc; i--, j++) { 
+                                    
+                                        if (i == 0) {
+                                            i = 12;
+                                            year = year - 1
+                                        }
+                                        var dt = year + "-" + String(i).padStart(2, '0') + "-01";
+                                        console.log("@@@@NewDevelopement@@@ dt--->",dt);
+                                        var conlist = consumptionList.filter(c => c.consumptionDate === dt)
+                                        console.log("@@@@NewDevelopement@@@ conlist--->",conlist);
 
-                                var regionData = [];
-                                for (let k = 0; k < regionList.length; k++) {
-                                    var consumptionactualQty = "";
-                                    var consumptionforecastQty = "";
-                                    var actualQty = "";
-                                    var forecastQty = "";
-                                    var daysOfStockOut = "";
-                                    var consumptionQtyOutOfStockData = "";
-                                    consumptionforecastQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
-                                    if (consumptionforecastQty.length > 0) {
-                                        for (var con = 0; con < consumptionforecastQty.length; con++) {
-                                            forecastQty += consumptionforecastQty[con].consumptionQty;
+                                        var noOfDays = moment(dt, "YYYY-MM").daysInMonth();
+                                        console.log("@@@@NewDevelopement@@@ noOfDays--->",noOfDays);
+
+                                        // For TIME WINDOW
+                                        var regionData = [];
+                                        var consumptionforecastQty="";
+                                        var regionTotalforecastQty="";
+                                        var consumptionactualQty="";
+                                        var regionTotalactualQty="";
+                                        var daysOfStockOut="";
+                                        var consumptionQtyOutOfStockData="";
+
+                                        for (let k = 0; k < regionList.length; k++) {
+                                            var forecastQty="";
+                                            var actualQty="";
+                                           
+                                           consumptionforecastQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
+                                           console.log("@@@@NewDevelopement@@@ consumptionforecastQty--->",consumptionforecastQty);
+   
+                                           if (consumptionforecastQty.length >= 0) {
+                                                for (var con = 0; con < consumptionforecastQty.length; con++) {
+                                                    if(consumptionforecastQty[con].consumptionQty>=0){
+                                                        fuCount+=1;  
+                                                    }
+                                                    forecastQty += consumptionforecastQty[con].consumptionQty;
+                                                }
+                                            } 
+                                            consumptionactualQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
+                                            console.log("@@@@NewDevelopement@@@ consumptionactualQty--->",consumptionactualQty);
+   
+                                            if (consumptionactualQty.length >= 0) {
+                                                for (var con = 0; con < consumptionactualQty.length; con++) {
+                                                    if(consumptionactualQty[con].consumptionQty>=0){
+                                                        auCount+=1;  
+                                                    }
+                                                    actualQty += consumptionAdjForStockOutId? consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays :consumptionactualQty[con].consumptionQty; 
+                                                }
+                                            }    
+                                        var region = { id: regionList[k].regionId, lable: regionList[k].label };
+                                        regionData.push({
+                                            region: region,
+                                            actualQty: actualQty,
+                                            forecastQty: forecastQty
+                                            // daysOfStockOut: daysOfStockOut,
+                                            // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
+                                        });
+                                        regionTotalforecastQty=regionTotalforecastQty+Number(forecastQty);
+                                        regionTotalactualQty=regionTotalactualQty+Number(actualQty);
                                         }
-                                    } else {
-                                        forecastQty = "";
+                                        adjustedActualConsumption=adjustedActualConsumption+Number(regionTotalactualQty);
+                                        forecastedConsumption=forecastedConsumption+Number(regionTotalforecastQty);
+                                        console.log("@@@@NewDevelopement@@@ Region auCount--->",auCount);
+                                        console.log("@@@@NewDevelopement@@@ Region fuCount--->",fuCount);
+                                        
                                     }
-                                    consumptionactualQty = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
-                                    if (consumptionactualQty.length > 0) {
-                                        for (var con = 0; con < consumptionactualQty.length; con++) {
-                                            actualQty += consumptionactualQty[con].consumptionQty;
-                                            daysOfStockOut += consumptionactualQty[con].dayOfStockOut;
-                                            // consumptionQtyOutOfStockData += consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
-                                        }
-                                    } else {
-                                        actualQty = "";
-                                        daysOfStockOut = "";
-                                        // consumptionQtyOutOfStockData = "";
-                                    }
-                                    totalActualQty += actualQty;
-                                    totalForecastQty += forecastQty;
-                                    // totalConsumptionQtyOutOfStockData += consumptionQtyOutOfStockData;
-                                    var region = { id: regionList[k].regionId, lable: regionList[k].label };
-                                    regionData.push({
-                                        region: region,
-                                        actualQty: actualQty,
-                                        forecastQty: forecastQty,
-                                        daysOfStockOut: daysOfStockOut
-                                        // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
+                                    console.log("@@@@NewDevelopement@@@ adjustedActualConsumption--->",adjustedActualConsumption);
+                                    console.log("@@@@NewDevelopement@@@ forecastedConsumption--->",forecastedConsumption);
+                                    console.log("@@@@NewDevelopement@@@ auCount--->",auCount);
+                                    console.log("@@@@NewDevelopement@@@ fuCount--->",fuCount);
+                                    
+                                    adjustedActualConsumption=(adjustedActualConsumption/(Number(auCount)));                                   
+                                    forecastedConsumption=(forecastedConsumption/(Number(fuCount)));
+                                    console.log("@@@@NewDevelopement@@@ AVg adjustedActualConsumption--->",adjustedActualConsumption);
+                                    console.log("@@@@NewDevelopement@@@ AVg forecastedConsumption--->",forecastedConsumption);
+   
+                                    var absEbar = (Math.abs(forecastedConsumption - adjustedActualConsumption)) / adjustedActualConsumption;
+                                    console.log("@@@@NewDevelopement@@@ absEbar--->",absEbar);
+   
+                                    var errorPerc = absEbar;
+                                 
+                                    dataList.push({
+                                        month: moment(curDate).format("YYYY-MM-DD"),
+                                        regionData: regionData,
+                                        actualQty: adjustedActualConsumption,
+                                        forecastQty: forecastedConsumption,
+                                        errorPerc: errorPerc
+                                        // consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                                        // consumptionQtyStockedOut: totalConsumptionQtyOutOfStockData
                                     });
                                 }
-                                var absEbar = (Math.abs(totalForecastQty - totalActualQty)) / totalActualQty;
-                                errorPerc = absEbar * 100;
-                                dataList.push({
-                                    month: moment(curDate).format("YYYY-MM"),
-                                    regionData: regionData,
-                                    actualQty: totalActualQty,
-                                    forecastQty: totalForecastQty,
-                                    errorPerc: errorPerc,
-                                    noOfDays: noOfDays
-                                    // consumptionAdjForStockOutId: consumptionAdjForStockOutId,
-                                    // consumptionQtyStockedOut: totalConsumptionQtyOutOfStockData
-                                });
-                            }
-                            console.log("Complete dataList----------------------", dataList);
-                            this.setState({
+                                console.log("@@@@NewDevelopement@@@ dataList--->",dataList)
+                                console.log("@@@@NewDevelopement@@@ monthArray--->",monthArray)
+                                
+                                this.setState({
                                 monthArray: monthArray,
                                 dataList: dataList,
                                 consumptionAdjForStockOutId: consumptionAdjForStockOutId
-                            })
-                            // , () => {
-                            //     this.hideFirstComponent();
-                            // }).bind(this)
+                                })
+                            }
+                            console.log("DATALIST--->", this.state.dataList)
                         }.bind(this);
                     }.bind(this);
+                }if(equivalencyUnitId>0) // View by EquivalencyUnit 
+                {
+
                 }
             } else {
                 this.setState({
@@ -1278,13 +1422,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
                 var inputjson = {
                     programId: programId,
-                    versionId: versionId,
-                    viewBy: equivalencyUnitId != '' ? 3 : viewById,
-                    unitId: equivalencyUnitId != '' ? equivalencyUnitId : viewById == 1 ? planningUnitId : forecastingUnitId,
+                    versionId: versionId, // Can be -1 for the latest Program
+                    unitId: equivalencyUnitId != '' ? equivalencyUnitId : viewById == 1 ? planningUnitId : forecastingUnitId, // PU or FU based on viewBy
                     startDate: startDate,
                     stopDate: stopDate,
-                    equivalencyUnitId: equivalencyUnitId,
-                    regionIds: regionIds
+                    viewBy: equivalencyUnitId != '' ? 3 : viewById, // 1 for PU and 2 for FU
+                    regionIds: regionIds, // empty if all Regions
+                    equivalencyUnitId: equivalencyUnitId, // If the output is to be in EquivalencyUnit then this is a non zero id
+                    previusMonths: monthInCalc, // The number of months that we need to average the Consumption for WAPE. Does not include current month which is always included.
+                    daysOfStockOut: true // Boolean field that if true means we should consider the Days of Stock Out valued and adjust the consumption accordingly. Only adjusts for Actual Consumption.                            
                 }
                 console.log("JSON INPUT---------->", inputjson);
                 ReportService.forecastError(inputjson)
@@ -1871,7 +2017,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {item.programCode}
                     </option>
                 )
             }, this);
@@ -1891,7 +2038,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}  ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
@@ -1909,7 +2056,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var chartOptions = {
             title: {
                 display: true,
-                text: 'Monthly Forecast - ' + (this.state.viewById == 1 ?
+                text: (this.state.viewById == 1 ?
                     this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId).length > 0 ?
                         this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label.label_en : '' :
                     this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId).length > 0 ?
@@ -1962,13 +2109,13 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 cell1 += ' %';
                                 return cell1;
                             },
-                            max:100
+                            max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
                         },
                         position: 'right',
-                        
+
                     }
                 ],
                 xAxes: [{
@@ -2110,8 +2257,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success" id="div2">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red" id="div1">{i18n.t(this.state.message)}</h5>
+                <SupplyPlanFormulas ref="formulaeChild" />
                 <Card>
                     <div className="Card-header-reporticon pb-2">
+                        <div className="card-header-actions">
+                            <a className="card-header-action">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleForecastMatrix() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                            </a>
+                        </div>
                         {this.state.dataList.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
@@ -2136,20 +2289,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            // onChange={this.filterVersion}
-                                                            onChange={(e) => { this.setProgramId(e) }}
+                                                            // onChange={(e) => { this.filterVersion(); this.updateMonthsforAMCCalculations() }}
+                                                            onChange={(e) => { this.setProgramId(e); }}
                                                             value={this.state.programId}
+
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {programs.length > 0
-                                                                && programs.map((item, i) => {
-                                                                    return (
-                                                                        <option key={i} value={item.programId}>
-                                                                            {getLabelText(item.label, this.state.lang)}
-                                                                        </option>
-                                                                    )
-                                                                }, this)}
+                                                            {programList}
                                                         </Input>
+
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -2175,22 +2323,23 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.period.selectPeriod')}</Label>
-                                                <div className="controls  edit">
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        //theme="light"
-                                                        key={JSON.stringify(rangeValue)}
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.timeWindow')}</Label>
+                                                <div className="controls">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="timeWindow"
+                                                            id="timeWindow"
+                                                            bsSize="sm"
+                                                        // onChange={this.fetchData}
+                                                        >
+                                                            <option value="5">6 {i18n.t('static.dashboard.months')}</option>
+                                                            <option value="2">3 {i18n.t('static.dashboard.months')}</option>
+                                                            <option value="8">9 {i18n.t('static.dashboard.months')}</option>
+                                                            <option value="11">12 {i18n.t('static.dashboard.months')}</option>
+                                                        </Input>
+                                                    </InputGroup>
                                                 </div>
-
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
@@ -2208,6 +2357,25 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         labelledBy={i18n.t('static.common.select')}
                                                     />
                                                 </div>
+                                            </FormGroup>
+
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.period.selectPeriod')}</Label>
+                                                <div className="controls  edit">
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        //theme="light"
+                                                        key={JSON.stringify(rangeValue)}
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={this.makeText(rangeValue.from) + ' ~ ' + this.makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
+                                                </div>
+
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
@@ -2307,6 +2475,25 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
+                                                <div className="tab-ml-1 ml-lg-3" style={{ marginTop: '30px' }}>
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="checkbox"
+                                                        id="consumptionAdjusted"
+                                                        name="consumptionAdjusted"
+                                                        // checked={true}
+                                                        // checked={this.state.yaxisEquUnit}
+                                                        onClick={(e) => { this.consumptionStockOutCheckbox(e); }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        Show consumption adjusted for stock out?
+                                                    </Label>
+                                                </div>
+                                            </FormGroup>
+
+                                            <FormGroup className="col-md-3">
                                                 <div className="tab-ml-1" style={{ marginTop: '30px' }}>
                                                     <Input
                                                         className="form-check-input checkboxMargin"
@@ -2343,25 +2530,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         </Input>
 
                                                     </InputGroup>
-                                                </div>
-                                            </FormGroup>
-
-                                            <FormGroup className="col-md-3">
-                                                <div className="tab-ml-1 ml-lg-3" style={{ marginTop: '30px' }}>
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="checkbox"
-                                                        id="consumptionAdjusted"
-                                                        name="consumptionAdjusted"
-                                                        // checked={true}
-                                                        // checked={this.state.yaxisEquUnit}
-                                                        onClick={(e) => { this.consumptionStockOutCheckbox(e); }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        Show consumption adjusted for stock out?
-                                                    </Label>
                                                 </div>
                                             </FormGroup>
                                         </div>
@@ -2404,10 +2572,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalError += isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : data[0].errorPerc;
                                                                     countError += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].errorPerc)}</td>)
+                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].errorPerc)}</b></td>)
 
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{this.PercentageFormatter(totalError / countError)}</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{this.PercentageFormatter(totalError / countError)}</b></td>
                                                             </tr>
                                                             <tr className="hoverTd">
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
@@ -2418,10 +2586,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalForcaste += Number(data[0].forecastQty);
                                                                     countForcaste += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} /> {(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} /> {(Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
 
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                             </tr>
                                                             {this.state.regions.map(r => {
                                                                 var totalRegion = 0;
@@ -2446,11 +2614,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     // actualQty/(noOfDays - dayOfStockOut) * noOfDays
-                                                                    totalActal += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty);
+                                                                    // totalActal += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty);
+                                                                    totalActal += data[0].actualQty;
                                                                     countActal += 1;
-                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number((data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left">{(Number(totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                             </tr>
                                                             {this.state.regions.map(r => {
                                                                 var totalRegion = 0;
@@ -2460,10 +2629,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
                                                                     {this.state.monthArray.map((item1, count) => {
                                                                         var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                        totalRegion += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : data[0].actualQty);
+                                                                        // totalRegion += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : data[0].actualQty);
+                                                                        totalRegion += Number(data[0].actualQty);
                                                                         totalRegionCount += 1;
                                                                         totalDaysOfStockOut += data[0].daysOfStockOut;
-                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number((data[0].actualQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                     })}
                                                                     <td className="sticky-col first-col clone text-left">{(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                 </tr>)
@@ -2475,9 +2645,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 <td className="sticky-col first-col clone hoverTd" align="left"><b>Difference</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    return (<td style={{ color: (data[0].actualQty - data[0].forecastQty) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    return (<td style={{ color: (data[0].actualQty - data[0].forecastQty) < 0 ? 'red' : 'black' }}><b><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number(data[0].actualQty - data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left" style={{ color: ((totalActal / countActal) - (totalForcaste / countForcaste)) < 0 ? 'red' : 'black' }} >{(Number((totalActal / countActal) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left" style={{ color: ((totalActal / countActal) - (totalForcaste / countForcaste)) < 0 ? 'red' : 'black' }} ><b>{(Number((totalActal / countActal) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                             </tr>
                                                             {this.state.regions.map(r => {
                                                                 var totalRegion = 0;
