@@ -1120,7 +1120,7 @@ export default class SyncMasterData extends Component {
                                     var datasetList = datasetRequest.result;
                                     console.log("###DatasetList+++", datasetList)
                                     var datasetListFiltered = [];
-                                    if (this.props.location.state != undefined) {
+                                    if (this.props.location.state != undefined && this.props.location.state.programIds!=undefined) {
                                         datasetListFiltered = datasetList.filter(c => (this.props.location.state.programIds).includes(c.id));
                                     }
                                     datasetList.filter(c => c.userId == userId).map(program => {
@@ -1139,7 +1139,7 @@ export default class SyncMasterData extends Component {
                                         var datasetDataServerList = ddatasetDataServerRequest.result;
                                         console.log("###datasetDataServerList+++", datasetDataServerList)
                                         var datasetDataServerListFiltered = [];
-                                        if (this.props.location.state != undefined) {
+                                        if (this.props.location.state != undefined && this.props.location.state.programIds!=undefined) {
                                             datasetDataServerListFiltered = datasetDataServerList.filter(c => (this.props.location.state.programIds).includes(c.id));
                                         }
                                         datasetDataServerList.filter(c => c.userId == userId).map(program => {
