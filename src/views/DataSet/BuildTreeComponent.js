@@ -6180,6 +6180,7 @@ export default class BuildTree extends Component {
         }
     }
     touchAllNodeData(setTouched, errors) {
+        console.log("Inside>>>>> touchAllNodeData")
         setTouched({
             nodeTypeId: true,
             nodeTitle: true,
@@ -6210,14 +6211,21 @@ export default class BuildTree extends Component {
         this.validateFormNodeData(errors)
     }
     validateFormNodeData(errors) {
+        console.log("Inside>>>>> validateFormNodeData")
         this.findFirstErrorNodeData('nodeDataForm', (fieldName) => {
+            console.log("Inside>>>>> Boolean(errors[fieldName])  ",Boolean(errors[fieldName]))
             return Boolean(errors[fieldName])
         })
     }
     findFirstErrorNodeData(formName, hasError) {
+        console.log("Inside>>>>> findFirstErrorNodeData>>> formName",formName, " hasError>>>>",hasError)        
+        
         const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
+        for (let i = 0; i < form.length; i++) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+            console.log("Inside>>>>> form[i].name",form[i].name)        
             if (hasError(form[i].name)) {
+
+            console.log("Inside>>>>> hasError(form[i].name)",hasError(form[i].name))                                                                                                                                                                    
                 form[i].focus()
                 break
             }
@@ -8095,11 +8103,15 @@ export default class BuildTree extends Component {
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            console.log("all ok>>>", this.state.currentItemConfig);
+                            console.log("Inside>>>>>   all ok>>>", this.state.currentItemConfig);
                             if (!this.state.isSubmitClicked) {
+                                console.log("Inside>>>>> !this.state.isSubmitClicked", !this.state.isSubmitClicked);
+                            
                                 this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
                                     setTimeout(() => {
                                         console.log("inside set timeout on submit")
+                                        console.log("Inside>>>>> this.state.addNodeFlag>>>",this.state.addNodeFlag);
+                                        
                                         if (this.state.addNodeFlag) {
                                             this.onAddButtonClick(this.state.currentItemConfig, false, null)
                                         } else {
