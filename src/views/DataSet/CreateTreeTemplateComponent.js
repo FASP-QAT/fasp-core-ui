@@ -5057,7 +5057,7 @@ export default class CreateTreeTemplate extends Component {
                     nodeTypeList.push(nodeType.allowedChildList[i]);
                 }
                 // console.log("Branch nodeType list---", nodeTypeList);
-                var fullBranchTemplateList = myResult.filter(x => x.active == true && x.forecastMethod.id == this.state.treeTemplate.forecastMethod.id);
+                var fullBranchTemplateList = myResult.filter(x => x.active == true);
                 var branchTemplateList = [];
                 // console.log("Branch branchTemplateList---", fullBranchTemplateList);
                 for (let i = 0; i < fullBranchTemplateList.length; i++) {
@@ -9654,7 +9654,7 @@ export default class CreateTreeTemplate extends Component {
                                     <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                 </button>}
                         </>}
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.state.treeTemplate.forecastMethod.id != "" && this.state.treeTemplate.forecastMethod.id != undefined &&
+                        {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&
 
                         <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
