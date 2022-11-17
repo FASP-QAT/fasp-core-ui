@@ -743,7 +743,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           console.log("this.state.planningUnitId@@@@@@@@@@ Test", this.state.planningUnitId);
           var regionList = this.state.regionList;
           for (var r = 0; r < regionList.length; r++) {
-            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId || (c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id != regionList[i].regionId));
+            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId || (c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id != regionList[r].regionId));
             console.log("consumptionExtrapolationList@@@@@@@@@@ Test", consumptionExtrapolationList);
             var consumptionExtrapolationData = -1//Semi Averages
             var consumptionExtrapolationMovingData = -1//Moving averages
