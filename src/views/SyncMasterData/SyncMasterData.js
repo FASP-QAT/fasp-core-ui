@@ -243,9 +243,9 @@ export default class SyncMasterData extends Component {
             }
             var lastSyncDate = date;
             // if (this.props.location.state != undefined) {
-                // if (this.props.location.state.programIds.includes(programList[pl].id)) {
-                    lastSyncDate = moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")
-                // }
+            // if (this.props.location.state.programIds.includes(programList[pl].id)) {
+            lastSyncDate = moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")
+            // }
             // }
             jsonForNewShipmentSync.push({
                 roAndRoPrimeLineNoList: listOfRoNoAndRoPrimeLineNo,
@@ -326,10 +326,10 @@ export default class SyncMasterData extends Component {
                                             //     }
                                             // }
                                             var linkedShipmentsList = generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList.filter(c => c.active == true) : [];
-                                            console.log("Linked Shipment list from loaded program Test",linkedShipmentsList)
+                                            console.log("Linked Shipment list from loaded program Test", linkedShipmentsList)
                                             console.log("LinkedShipmentsList=========================>", linkedShipmentsList)
                                             var linkedShipmentsListFilter = linkedShipmentsList.filter(c => roNoAndRoPrimeLineNoSetFromAPI.includes(c.roNo + "|" + c.roPrimeLineNo));
-                                            console.log("Linked Shipments List filter from api Test",linkedShipmentsListFilter)
+                                            console.log("Linked Shipments List filter from api Test", linkedShipmentsListFilter)
                                             planningUnitList = [...new Set(linkedShipmentsListFilter).map(ele => ele.qatPlanningUnitId)];
                                             for (var ppl = 0; ppl < pplModified.length; ppl++) {
                                                 if (!planningUnitList.includes(pplModified[ppl].planningUnit.id)) {
@@ -359,9 +359,9 @@ export default class SyncMasterData extends Component {
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var batchInfoList = programJson.batchInfoList;
                                                 var shipArrayForPlanningUnit = linkedShipmentsListFilter.filter(c => c.qatPlanningUnitId == planningUnitList[pu]);
-                                                console.log("Ship array from planning Unit Test",shipArrayForPlanningUnit)
+                                                console.log("Ship array from planning Unit Test", shipArrayForPlanningUnit)
                                                 var uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId = [...new Set(shipArrayForPlanningUnit).map(ele => ele.roNo + "|" + ele.roPrimeLineNo)];
-                                                console.log("Unique Ro and Ro Prime Line No Test",uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId);
+                                                console.log("Unique Ro and Ro Prime Line No Test", uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId);
                                                 for (var j = 0; j < uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId.length; j++) {
                                                     console.log("Ship Array filter Test=========================>", shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]))
                                                     var uniqueKnShipmentNo = [...new Set(shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j])).map(ele => ele.orderNo + "|" + ele.primeLineNo + "|" + ele.knShipmentNo)];
@@ -520,7 +520,7 @@ export default class SyncMasterData extends Component {
                                                         } else {
                                                             var index = shipmentDataList.findIndex(c => linkedShipmentsList[checkIfAlreadyExists].childShipmentId > 0 ? linkedShipmentsList[checkIfAlreadyExists].childShipmentId == c.shipmentId : linkedShipmentsList[checkIfAlreadyExists].tempChildShipmentId == c.tempShipmentId);
                                                             var shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo = shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo + "|" + c.primeLineNo + "|" + c.knShipmentNo == uniqueKnShipmentNo[u])
-                                                            console.log("Ship Array based on ro and ro prime line no Test",shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo)
+                                                            console.log("Ship Array based on ro and ro prime line no Test", shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo)
                                                             var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo + "|" + c.primeLineNo + "|" + c.knShipmentNo == uniqueKnShipmentNo[u]);
                                                             var shipmentQty = 0;
                                                             var shipmentARUQty = 0;
@@ -701,7 +701,7 @@ export default class SyncMasterData extends Component {
                                             }
                                             // CR - Update price when program planning unit price changes
                                             var changedPlanningUnits = [];
-                                            var minDateForModify = this.props.location.state != undefined && this.props.location.state.programIds.includes(prog.id) ? generalJson.currentVersion.createdDate : date;
+                                            var minDateForModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? generalJson.currentVersion.createdDate : date;
                                             programPlanningUnitList.map(c => {
                                                 var programPlanningUnitProcurementAgentPrices = c.programPlanningUnitProcurementAgentPrices.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD"));
                                                 if (programPlanningUnitProcurementAgentPrices.length > 0) {
@@ -862,7 +862,7 @@ export default class SyncMasterData extends Component {
                                                         // console.log("M------------------------>", dt);
                                                         // console.log("program id in master data sync***", prog.id);
                                                         var rebuildQPL = false;
-                                                        if (this.props.location.state != undefined) {
+                                                        if (this.props.location.state != undefined && this.props.location.state.programIds != undefined) {
                                                             if (this.props.location.state.programIds.includes(prog.id)) {
                                                                 rebuildQPL = true;
                                                             }
@@ -1008,7 +1008,7 @@ export default class SyncMasterData extends Component {
                     let id = AuthenticationService.displayDashboardBasedOnRole();
                     // console.log("M sync role based dashboard done");
                     // console.log("End date", Date.now());
-                    if (this.props.location.state != undefined && this.props.location.state.programIds.length > 0) {
+                    if (this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.length > 0) {
                         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.programLoadedAndmasterDataSync.success'))
                     } else {
                         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.masterDataSync.success'))
