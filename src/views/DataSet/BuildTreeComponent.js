@@ -6577,7 +6577,7 @@ export default class BuildTree extends Component {
                     nodeTypeList.push(nodeType.allowedChildList[i]);
                 }
                 // console.log("Branch nodeType list---", nodeTypeList);
-                var fullBranchTemplateList = myResult.filter(x => x.active == true && x.forecastMethod.id == this.state.curTreeObj.forecastMethod.id);
+                var fullBranchTemplateList = myResult.filter(x => x.active == true);
                 var branchTemplateList = [];
                 // console.log("Branch branchTemplateList---", fullBranchTemplateList);
                 for (let i = 0; i < fullBranchTemplateList.length; i++) {
