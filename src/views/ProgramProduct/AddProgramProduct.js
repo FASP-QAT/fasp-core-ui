@@ -1,5 +1,6 @@
 import jexcel from 'jspreadsheet';
 import React, { Component } from "react";
+import { Prompt } from 'react-router';
 import {
     Button, Card, CardBody, CardFooter, Col, FormGroup, Input, InputGroup,
     Label
@@ -10,12 +11,12 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import ProgramService from "../../api/ProgramService";
 import getLabelText from '../../CommonComponent/getLabelText';
+import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
+import { ACTUAL_CONSUMPTION_TYPE, API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { Prompt } from 'react-router';
 
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
@@ -75,22 +76,81 @@ class AddprogramPlanningUnit extends Component {
         this.onPaste = this.onPaste.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
+        this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
+    }
+
+    getPlanningUnitList() {
+        var list = [];
+
+        PlanningUnitService.getActivePlanningUnitList()
+            .then(response => {
+                console.log("PlanningUnitResponse------->", response.data);
+                if (response.status == 200) {
+                    this.setState({
+                        planningUnitList: response.data
+                    }, () => {
+                        this.addRowInJexcel();
+                    });
+                    for (var k = 0; k < (response.data).length; k++) {
+                        var planningUnitJson = {
+                            name: response.data[k].label.label_en + ' | ' + response.data[k].planningUnitId,
+                            id: response.data[k].planningUnitId,
+                            active: response.data[k].active
+                        }
+                        list.push(planningUnitJson);
+                    }
+                } else {
+                    list = [];
+                    this.setState({ loading: false }, () => {
+                        this.addRowInJexcel();
+                    });
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false, color: '#BA0C2F'
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false, color: '#BA0C2F'
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false, color: '#BA0C2F'
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false, color: '#BA0C2F'
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        // var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
-
-        // AuthenticationService.setupAxiosInterceptors();
-        // PlanningUnitService.getActivePlanningUnitList()
-        //     .then(response => {
-        //         if (response.status == 200) {
-        // console.log("for my list response---", response.data);
-        // this.setState({
-        //     planningUnitList: response.data
-        // });
-
         var puList = []
         if (value != -1) {
             console.log("in if=====>");
@@ -131,11 +191,17 @@ class AddprogramPlanningUnit extends Component {
 
     componentDidMount() {
         this.hideFirstComponent();
-        ProgramService.getProgramList()
+        ProgramService.getProgramForDropDown(1)//supply plan programs
             .then(response => {
                 if (response.status == 200) {
+                    console.log("response.data", response.data)
+                    let myReasponse = response.data.sort((a, b) => {
+                        var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: myReasponse, loading: false
                     })
                 }
 
@@ -277,577 +343,544 @@ class AddprogramPlanningUnit extends Component {
                                 this.setState({ productCategoryList: response.data });
 
                                 // PlanningUnitService.getAllPlanningUnitList()
-                                PlanningUnitService.getActivePlanningUnitList()
+                                // PlanningUnitService.getActivePlanningUnitList()
+                                //     .then(response => {
+                                //         console.log("PlanningUnitResponse------->", response.data);
+                                //         if (response.status == 200) {
+                                //             this.setState({
+                                //                 planningUnitList: response.data
+                                //             });
+                                //             for (var k = 0; k < (response.data).length; k++) {
+                                //                 var planningUnitJson = {
+                                //                     name: response.data[k].label.label_en + ' | ' + response.data[k].planningUnitId,
+                                //                     id: response.data[k].planningUnitId,
+                                //                     active: response.data[k].active
+                                //                 }
+                                //                 list.push(planningUnitJson);
+                                //             }
+                                var db1;
+                                var storeOS;
+                                getDatabase();
+                                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                                openRequest.onsuccess = function (e) {
+                                    db1 = e.target.result;
+                                    var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                                    var planningunitOs = planningunitTransaction.objectStore('planningUnit');
+                                    var planningunitRequest = planningunitOs.getAll();
+                                    var planningList = []
+                                    planningunitRequest.onerror = function (event) {
+                                        // Handle errors!
+                                    };
+                                    planningunitRequest.onsuccess = function (e) {
+                                        var myResult = [];
+                                        myResult = planningunitRequest.result;
+                                        console.log("PlanningUnitResponse------->", myResult);
+
+                                        this.setState({
+                                            planningUnitList: myResult
+                                        });
+                                        for (var k = 0; k < (myResult).length; k++) {
+                                            var planningUnitJson = {
+                                                name: myResult[k].label.label_en + ' | ' + myResult[k].planningUnitId,
+                                                id: myResult[k].planningUnitId,
+                                                active: myResult[k].active
+                                            }
+                                            list.push(planningUnitJson);
+                                        }
+                                    }.bind(this);
+                                }.bind(this)
+
+
+                                // AuthenticationService.setupAxiosInterceptors();
+                                ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
                                     .then(response => {
-                                        console.log("PlanningUnitResponse------->", response.data);
                                         if (response.status == 200) {
-                                            this.setState({
-                                                planningUnitList: response.data
+                                            // alert("hi");
+                                            let myReasponse = response.data.sort((a, b) => {
+                                                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                return itemLabelA > itemLabelB ? 1 : -1;
                                             });
-                                            for (var k = 0; k < (response.data).length; k++) {
-                                                var planningUnitJson = {
-                                                    name: response.data[k].label.label_en + ' | ' + response.data[k].planningUnitId,
-                                                    id: response.data[k].planningUnitId,
-                                                    active: response.data[k].active
+                                            var productDataArr = []
+                                            // if (myReasponse.length > 0) {
+                                            this.setState({ rows: myReasponse });
+                                            var data = [];
+                                            if (myReasponse.length != 0) {
+                                                for (var j = 0; j < myReasponse.length; j++) {
+                                                    console.log("myReasponse[j]---", myReasponse[j]);
+                                                    data = [];
+                                                    data[0] = myReasponse[j].productCategory.id;
+                                                    data[1] = myReasponse[j].planningUnit.id;
+                                                    data[2] = myReasponse[j].planBasedOn;
+                                                    data[3] = myReasponse[j].reorderFrequencyInMonths;
+                                                    data[4] = myReasponse[j].planBasedOn == 1 ? myReasponse[j].minMonthsOfStock : "";
+                                                    data[5] = myReasponse[j].planBasedOn == 2 ? myReasponse[j].minQty : "";
+                                                    data[6] = myReasponse[j].monthsInFutureForAmc;
+                                                    data[7] = myReasponse[j].monthsInPastForAmc;
+                                                    data[8] = myReasponse[j].localProcurementLeadTime;
+                                                    data[9] = myReasponse[j].planBasedOn == 2 ? myReasponse[j].distributionLeadTime : "";
+                                                    data[10] = myReasponse[j].shelfLife;
+                                                    data[11] = myReasponse[j].catalogPrice;
+                                                    data[12] = myReasponse[j].programPlanningUnitId;
+                                                    data[13] = myReasponse[j].active;
+                                                    data[14] = 0;
+                                                    data[15] = myReasponse[j].program.id;
+                                                    data[16] = myReasponse[j].minMonthsOfStock;
+                                                    data[17] = myReasponse[j].minQty;
+                                                    data[18] = myReasponse[j].distributionLeadTime;
+                                                    productDataArr.push(data);
                                                 }
-                                                list.push(planningUnitJson);
+                                            }
+
+                                            if (productDataArr.length == 0) {
+                                                data = [];
+                                                data[0] = 0;
+                                                data[1] = "";
+                                                data[2] = 1;
+                                                data[3] = "";
+                                                data[4] = "";
+                                                data[5] = "";
+                                                data[6] = "";
+                                                data[7] = "";
+                                                data[8] = "";
+                                                data[9] = "";
+                                                data[10] = "";
+                                                data[11] = 0;
+                                                data[12] = 0;
+                                                data[13] = 1;
+                                                data[14] = 1;
+                                                data[15] = programId;
+                                                data[16] = "";
+                                                data[17] = "";
+                                                data[18] = "";
+                                                productDataArr[0] = data;
                                             }
 
 
-                                            // AuthenticationService.setupAxiosInterceptors();
-                                            ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
-                                                .then(response => {
-                                                    if (response.status == 200) {
-                                                        // alert("hi");
-                                                        let myReasponse = response.data.sort((a, b) => {
-                                                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                                            return itemLabelA > itemLabelB ? 1 : -1;
-                                                        });
-                                                        var productDataArr = []
-                                                        // if (myReasponse.length > 0) {
-                                                        this.setState({ rows: myReasponse });
-                                                        var data = [];
-                                                        if (myReasponse.length != 0) {
-                                                            for (var j = 0; j < myReasponse.length; j++) {
-                                                                console.log("myReasponse[j]---", myReasponse[j]);
-                                                                data = [];
-                                                                data[0] = myReasponse[j].productCategory.id;
-                                                                data[1] = myReasponse[j].planningUnit.id;
-                                                                data[2] = myReasponse[j].planBasedOn;
-                                                                data[3] = myReasponse[j].reorderFrequencyInMonths;
-                                                                data[4] = myReasponse[j].planBasedOn == 1 ? myReasponse[j].minMonthsOfStock : "";
-                                                                data[5] = myReasponse[j].planBasedOn == 2 ? myReasponse[j].minQty : "";
-                                                                data[6] = myReasponse[j].monthsInFutureForAmc;
-                                                                data[7] = myReasponse[j].monthsInPastForAmc;
-                                                                data[8] = myReasponse[j].localProcurementLeadTime;
-                                                                data[9] = myReasponse[j].planBasedOn == 2 ? myReasponse[j].distributionLeadTime : "";
-                                                                data[10] = myReasponse[j].shelfLife;
-                                                                data[11] = myReasponse[j].catalogPrice;
-                                                                data[12] = myReasponse[j].programPlanningUnitId;
-                                                                data[13] = myReasponse[j].active;
-                                                                data[14] = 0;
-                                                                data[15] = myReasponse[j].program.id;
-                                                                data[16] = myReasponse[j].minMonthsOfStock;
-                                                                data[17] = myReasponse[j].minQty;
-                                                                data[18] = myReasponse[j].distributionLeadTime;
-                                                                productDataArr.push(data);
-                                                            }
-                                                        }
+                                            this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
+                                            // this.el.destroy();
+                                            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+                                            var json = [];
+                                            var data = productDataArr;
+                                            var options = {
+                                                data: data,
+                                                columnDrag: true,
+                                                // colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 150, 100, 150,150],
+                                                columns: [
+                                                    {
+                                                        title: i18n.t('static.productCategory.productCategory'),
+                                                        type: 'dropdown',
+                                                        source: productCategoryListNew
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.dashboard.product'),
+                                                        type: 'autocomplete',
+                                                        source: list,
+                                                        filter: this.dropdownFilter
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.programPU.planBasedOn'),
+                                                        type: 'dropdown',
+                                                        source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
+                                                        tooltip: i18n.t("static.programPU.planByTooltip")
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.product.reorderFrequency'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        // decimal:'.',
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.reorderFrequencyTooltip")
 
-                                                        if (productDataArr.length == 0) {
-                                                            data = [];
-                                                            data[0] = 0;
-                                                            data[1] = "";
-                                                            data[2] = 1;
-                                                            data[3] = "";
-                                                            data[4] = "";
-                                                            data[5] = "";
-                                                            data[6] = "";
-                                                            data[7] = "";
-                                                            data[8] = "";
-                                                            data[9] = "";
-                                                            data[10] = "";
-                                                            data[11] = 0;
-                                                            data[12] = 0;
-                                                            data[13] = 1;
-                                                            data[14] = 1;
-                                                            data[15] = programId;
-                                                            data[16] = "";
-                                                            data[17] = "";
-                                                            data[18] = "";
-                                                            productDataArr[0] = data;
-                                                        }
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.product.minMonthOfStock'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        // decimal:'.',
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.product.minQuantity'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        // decimal:'.',
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.minQtyTooltip")
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.program.monthfutureamc'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        // decimal:'.',
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.monthsInFutureTooltip")
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.program.monthpastamc'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        // decimal:'.',
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.monthsInPastTooltip")
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.product.localProcurementAgentLeadTime'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        decimal: '.',
+                                                        mask: '#,##.00',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
+                                                        width: 120
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.product.distributionLeadTime'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        // decimal:'.',
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.report.shelfLife'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        // decimal:'.',
+                                                        mask: '#,##',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.shelfLifeTooltip"),
+                                                        width: 120
+                                                    },
+                                                    {
+                                                        title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
+                                                        type: 'numeric',
+                                                        textEditor: true,
+                                                        // decimal:'.',
+                                                        mask: '#,##.00',
+                                                        disabledMaskOnEdition: true,
+                                                        tooltip: i18n.t("static.programPU.catalogPriceTooltip"),
+                                                        width: 120
+                                                    },
+                                                    {
+                                                        title: 'Id',
+                                                        type: 'hidden',
+                                                        readOnly: true
+                                                    },
+                                                    {
+                                                        title: 'Active',
+                                                        type: 'checkbox'
+                                                    },
+                                                    {
+                                                        title: 'Changed Flag',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'ProgramId',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Min Mos',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Min Qty',
+                                                        type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'Distribution Lead Time',
+                                                        type: 'hidden'
+                                                    }
 
+                                                ],
+                                                updateTable: function (el, cell, x, y, source, value, id) {
+                                                    var elInstance = el;
+                                                    var rowData = elInstance.getRowData(y);
+                                                    // var productCategoryId = rowData[0];
+                                                    var programPlanningUnitId = rowData[12];
+                                                    if (programPlanningUnitId == 0) {
+                                                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                        cell1.classList.remove('readonly');
 
-                                                        this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-                                                        // this.el.destroy();
-                                                        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
-                                                        var json = [];
-                                                        var data = productDataArr;
-                                                        var options = {
-                                                            data: data,
-                                                            columnDrag: true,
-                                                            // colWidths: [290, 290, 100, 100, 100, 100, 100, 100, 150, 100, 150,150],
-                                                            columns: [
-                                                                {
-                                                                    title: i18n.t('static.productCategory.productCategory'),
-                                                                    type: 'dropdown',
-                                                                    source: productCategoryListNew
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.dashboard.product'),
-                                                                    type: 'autocomplete',
-                                                                    source: list,
-                                                                    filter: this.dropdownFilter
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.programPU.planBasedOn'),
-                                                                    type: 'dropdown',
-                                                                    source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
-                                                                    tooltip: i18n.t("static.programPU.planByTooltip")
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.product.reorderFrequency'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    // decimal:'.',
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.reorderFrequencyTooltip")
-
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.product.minMonthOfStock'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    // decimal:'.',
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.product.minQuantity'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    // decimal:'.',
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.minQtyTooltip")
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.program.monthfutureamc'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    // decimal:'.',
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.monthsInFutureTooltip")
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.program.monthpastamc'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    // decimal:'.',
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.monthsInPastTooltip")
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.product.localProcurementAgentLeadTime'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    decimal: '.',
-                                                                    mask: '#,##.00',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
-                                                                    width: 120
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.product.distributionLeadTime'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    // decimal:'.',
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.report.shelfLife'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    // decimal:'.',
-                                                                    mask: '#,##',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.shelfLifeTooltip"),
-                                                                    width: 120
-                                                                },
-                                                                {
-                                                                    title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
-                                                                    type: 'numeric',
-                                                                    textEditor: true,
-                                                                    // decimal:'.',
-                                                                    mask: '#,##.00',
-                                                                    disabledMaskOnEdition: true,
-                                                                    tooltip: i18n.t("static.programPU.catalogPriceTooltip"),
-                                                                    width: 120
-                                                                },
-                                                                {
-                                                                    title: 'Id',
-                                                                    type: 'hidden',
-                                                                    // title: 'A',
-                                                                    // type: 'text',
-                                                                    // visible: false,
-                                                                    readOnly: true
-                                                                },
-                                                                {
-                                                                    title: 'Active',
-                                                                    type: 'checkbox'
-                                                                },
-                                                                {
-                                                                    title: 'Changed Flag',
-                                                                    type: 'hidden'
-                                                                    // title: 'A',
-                                                                    // type: 'text',
-                                                                    // visible: false
-                                                                },
-                                                                {
-                                                                    title: 'ProgramId',
-                                                                    type: 'hidden'
-                                                                    // title: 'A',
-                                                                    // type: 'text',
-                                                                    // visible: false
-                                                                },
-                                                                {
-                                                                    title: 'Min Mos',
-                                                                    type: 'hidden'
-                                                                    // title: 'A',
-                                                                    // type: 'text',
-                                                                    // visible: false
-                                                                },
-                                                                {
-                                                                    title: 'Min Qty',
-                                                                    type: 'hidden'
-                                                                    // title: 'A',
-                                                                    // type: 'text',
-                                                                    // visible: false
-                                                                },
-                                                                {
-                                                                    title: 'Distribution Lead Time',
-                                                                    type: 'hidden'
-                                                                    // title: 'A',
-                                                                    // type: 'text',
-                                                                    // visible: false
-                                                                }
+                                                        var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                                                        cell2.classList.remove('readonly');
 
 
-                                                            ],
-                                                            updateTable: function (el, cell, x, y, source, value, id) {
-                                                                var elInstance = el;
-                                                                var rowData = elInstance.getRowData(y);
-                                                                // var productCategoryId = rowData[0];
-                                                                var programPlanningUnitId = rowData[12];
-                                                                if (programPlanningUnitId == 0) {
-                                                                    var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                                    cell1.classList.remove('readonly');
-
-                                                                    var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
-                                                                    cell2.classList.remove('readonly');
-
-
-                                                                } else {
-                                                                    var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                                                                    cell1.classList.add('readonly');
-
-                                                                    var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
-                                                                    cell2.classList.add('readonly');
-
-
-                                                                }
-                                                                if (rowData[2] == 1) {
-                                                                    var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                                                                    cell1.classList.add('readonly');
-                                                                    var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                                                                    cell1.classList.add('readonly');
-                                                                    var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                                                                    cell1.classList.remove('readonly');
-
-                                                                } else {
-                                                                    var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                                                                    cell1.classList.remove('readonly');
-                                                                    var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                                                                    cell1.classList.remove('readonly');
-                                                                    var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                                                                    cell1.classList.add('readonly');
-                                                                }
-                                                            },
-                                                            onsearch: function (el) {
-                                                                // el.jexcel.updateTable();
-                                                            },
-                                                            onfilter: function (el) {
-                                                                // el.jexcel.updateTable();
-                                                            },
-                                                            pagination: localStorage.getItem("sesRecordCount"),
-                                                            filters: true,
-                                                            search: true,
-                                                            columnSorting: true,
-                                                            // tableOverflow: true,
-                                                            wordWrap: true,
-                                                            paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                                            position: 'top',
-                                                            allowInsertColumn: false,
-                                                            allowManualInsertColumn: false,
-                                                            allowDeleteRow: true,
-                                                            onchange: this.changed,
-                                                            // oneditionend: this.onedit,
-                                                            copyCompatibility: true,
-                                                            allowManualInsertRow: false,
-                                                            parseFormulas: true,
-                                                            onpaste: this.onPaste,
-                                                            oneditionend: this.oneditionend,
-                                                            // text: {
-                                                            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                                            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                            //     show: '',
-                                                            //     entries: '',
-                                                            // },
-                                                            onload: this.loaded,
-                                                            license: JEXCEL_PRO_KEY,
-                                                            contextMenu: function (obj, x, y, e) {
-                                                                var items = [];
-                                                                //Add consumption batch info
-
-
-                                                                if (y == null) {
-                                                                    // Insert a new column
-                                                                    if (obj.options.allowInsertColumn == true) {
-                                                                        items.push({
-                                                                            title: obj.options.text.insertANewColumnBefore,
-                                                                            onclick: function () {
-                                                                                obj.insertColumn(1, parseInt(x), 1);
-                                                                            }
-                                                                        });
-                                                                    }
-
-                                                                    if (obj.options.allowInsertColumn == true) {
-                                                                        items.push({
-                                                                            title: obj.options.text.insertANewColumnAfter,
-                                                                            onclick: function () {
-                                                                                obj.insertColumn(1, parseInt(x), 0);
-                                                                            }
-                                                                        });
-                                                                    }
-
-                                                                    // Delete a column
-                                                                    // if (obj.options.allowDeleteColumn == true) {
-                                                                    //     items.push({
-                                                                    //         title: obj.options.text.deleteSelectedColumns,
-                                                                    //         onclick: function () {
-                                                                    //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                                                    //         }
-                                                                    //     });
-                                                                    // }
-
-                                                                    // Rename column
-                                                                    // if (obj.options.allowRenameColumn == true) {
-                                                                    //     items.push({
-                                                                    //         title: obj.options.text.renameThisColumn,
-                                                                    //         onclick: function () {
-                                                                    //             obj.setHeader(x);
-                                                                    //         }
-                                                                    //     });
-                                                                    // }
-
-                                                                    // Sorting
-                                                                    if (obj.options.columnSorting == true) {
-                                                                        // Line
-                                                                        items.push({ type: 'line' });
-
-                                                                        items.push({
-                                                                            title: obj.options.text.orderAscending,
-                                                                            onclick: function () {
-                                                                                obj.orderBy(x, 0);
-                                                                            }
-                                                                        });
-                                                                        items.push({
-                                                                            title: obj.options.text.orderDescending,
-                                                                            onclick: function () {
-                                                                                obj.orderBy(x, 1);
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                } else {
-                                                                    // Insert new row before
-                                                                    if (obj.options.allowInsertRow == true) {
-                                                                        items.push({
-                                                                            title: i18n.t('static.common.insertNewRowBefore'),
-                                                                            onclick: function () {
-                                                                                var data = [];
-                                                                                data[0] = -1;
-                                                                                data[1] = "";
-                                                                                data[2] = 1;
-                                                                                data[3] = "";
-                                                                                data[4] = "";
-                                                                                data[5] = "";
-                                                                                data[6] = "";
-                                                                                data[7] = "";
-                                                                                data[8] = "";
-                                                                                data[9] = "";
-                                                                                data[10] = "";
-                                                                                data[11] = 0;
-                                                                                data[12] = 0;
-                                                                                data[13] = 1;
-                                                                                data[14] = 1;
-                                                                                data[15] = programId;
-                                                                                data[16] = "";
-                                                                                data[17] = "";
-                                                                                data[18] = "";
-                                                                                obj.insertRow(data, parseInt(y), 1);
-                                                                            }.bind(this)
-                                                                        });
-                                                                    }
-                                                                    // after
-                                                                    if (obj.options.allowInsertRow == true) {
-                                                                        items.push({
-                                                                            title: i18n.t('static.common.insertNewRowAfter'),
-                                                                            onclick: function () {
-                                                                                var data = [];
-                                                                                data[0] = -1;
-                                                                                data[1] = "";
-                                                                                data[2] = 1;
-                                                                                data[3] = "";
-                                                                                data[4] = "";
-                                                                                data[5] = "";
-                                                                                data[6] = "";
-                                                                                data[7] = "";
-                                                                                data[8] = "";
-                                                                                data[9] = "";
-                                                                                data[10] = "";
-                                                                                data[11] = 0;
-                                                                                data[12] = 0;
-                                                                                data[13] = 1;
-                                                                                data[14] = 1;
-                                                                                data[15] = programId;
-                                                                                data[16] = "";
-                                                                                data[17] = "";
-                                                                                data[18] = "";
-                                                                                obj.insertRow(data, parseInt(y));
-                                                                            }.bind(this)
-                                                                        });
-                                                                    }
-                                                                    // Delete a row
-                                                                    if (obj.options.allowDeleteRow == true) {
-                                                                        // region id
-                                                                        if (obj.getRowData(y)[12] == 0) {
-                                                                            items.push({
-                                                                                title: i18n.t("static.common.deleterow"),
-                                                                                onclick: function () {
-                                                                                    obj.deleteRow(parseInt(y));
-                                                                                }
-                                                                            });
-                                                                        }
-                                                                    }
-
-                                                                    if (x) {
-                                                                        // if (obj.options.allowComments == true) {
-                                                                        //     items.push({ type: 'line' });
-
-                                                                        //     var title = obj.records[y][x].getAttribute('title') || '';
-
-                                                                        //     items.push({
-                                                                        //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
-                                                                        //         onclick: function () {
-                                                                        //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
-                                                                        //         }
-                                                                        //     });
-
-                                                                        //     if (title) {
-                                                                        //         items.push({
-                                                                        //             title: obj.options.text.clearComments,
-                                                                        //             onclick: function () {
-                                                                        //                 obj.setComments([x, y], '');
-                                                                        //             }
-                                                                        //         });
-                                                                        //     }
-                                                                        // }
-                                                                    }
-
-                                                                    //wr
-                                                                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
-                                                                        let cordsValue = `${this.el.getValueFromCoords(12, y)}`;
-                                                                        // console.log("CHECK--------->", cordsValue);
-                                                                        // if (cordsValue.length != 0) {
-                                                                        //     console.log("CHECK--------->not empty", cordsValue);
-                                                                        // } else {
-                                                                        //     console.log("CHECK--------->empty", cordsValue);
-                                                                        // }
-                                                                        if (obj.options.allowInsertRow == true) {
-                                                                            if (cordsValue.length != 0) {
-                                                                                items.push({
-                                                                                    title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
-                                                                                    onclick: function () {
-                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
-                                                                                        this.props.history.push({
-                                                                                            pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(12, y)}/${programId}`,
-                                                                                        });
-
-                                                                                    }.bind(this)
-                                                                                });
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-
-                                                                // Line
-                                                                items.push({ type: 'line' });
-
-                                                                // // Save
-                                                                // if (obj.options.allowExport) {
-                                                                //     items.push({
-                                                                //         title: i18n.t('static.supplyPlan.exportAsCsv'),
-                                                                //         shortcut: 'Ctrl + S',
-                                                                //         onclick: function () {
-                                                                //             obj.download(true);
-                                                                //         }
-                                                                //     });
-                                                                // }
-
-                                                                return items;
-                                                            }.bind(this)
-                                                        };
-                                                        var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
-                                                        this.el = elVar;
-                                                        this.setState({ mapPlanningUnitEl: elVar, loading: false });
-                                                        // }
                                                     } else {
-                                                        this.setState({
-                                                            message: response.data.messageCode, loading: false, color: '#BA0C2F'
-                                                        })
-                                                    }
-                                                }).catch(
-                                                    error => {
-                                                        if (error.message === "Network Error") {
-                                                            this.setState({
-                                                                // message: 'static.unkownError',
-                                                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                                loading: false, color: '#BA0C2F'
-                                                            });
-                                                        } else {
-                                                            switch (error.response ? error.response.status : "") {
+                                                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                                                        cell1.classList.add('readonly');
 
-                                                                case 401:
-                                                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                    break;
-                                                                case 403:
-                                                                    this.props.history.push(`/accessDenied`)
-                                                                    break;
-                                                                case 500:
-                                                                case 404:
-                                                                case 406:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false, color: '#BA0C2F'
+                                                        var cell2 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                                                        cell2.classList.add('readonly');
+
+
+                                                    }
+                                                    if (rowData[2] == 1) {
+                                                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                                                        cell1.classList.add('readonly');
+                                                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                                                        cell1.classList.add('readonly');
+                                                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                                                        cell1.classList.remove('readonly');
+
+                                                    } else {
+                                                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                                                        cell1.classList.remove('readonly');
+                                                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                                                        cell1.classList.remove('readonly');
+                                                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                                                        cell1.classList.add('readonly');
+                                                    }
+                                                },
+                                                onsearch: function (el) {
+                                                    // el.jexcel.updateTable();
+                                                },
+                                                onfilter: function (el) {
+                                                    // el.jexcel.updateTable();
+                                                },
+                                                pagination: localStorage.getItem("sesRecordCount"),
+                                                filters: true,
+                                                search: true,
+                                                columnSorting: true,
+                                                // tableOverflow: true,
+                                                wordWrap: true,
+                                                paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                                position: 'top',
+                                                allowInsertColumn: false,
+                                                allowManualInsertColumn: false,
+                                                allowDeleteRow: true,
+                                                onchange: this.changed,
+                                                // oneditionend: this.onedit,
+                                                copyCompatibility: true,
+                                                allowManualInsertRow: false,
+                                                parseFormulas: true,
+                                                onpaste: this.onPaste,
+                                                oneditionend: this.oneditionend,
+                                                // text: {
+                                                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                                                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                                //     show: '',
+                                                //     entries: '',
+                                                // },
+                                                onload: this.loaded,
+                                                license: JEXCEL_PRO_KEY,
+                                                contextMenu: function (obj, x, y, e) {
+                                                    var items = [];
+                                                    //Add consumption batch info
+
+
+                                                    if (y == null) {
+                                                        // Insert a new column
+                                                        if (obj.options.allowInsertColumn == true) {
+                                                            items.push({
+                                                                title: obj.options.text.insertANewColumnBefore,
+                                                                onclick: function () {
+                                                                    obj.insertColumn(1, parseInt(x), 1);
+                                                                }
+                                                            });
+                                                        }
+
+                                                        if (obj.options.allowInsertColumn == true) {
+                                                            items.push({
+                                                                title: obj.options.text.insertANewColumnAfter,
+                                                                onclick: function () {
+                                                                    obj.insertColumn(1, parseInt(x), 0);
+                                                                }
+                                                            });
+                                                        }
+
+                                                        // Delete a column
+                                                        // if (obj.options.allowDeleteColumn == true) {
+                                                        //     items.push({
+                                                        //         title: obj.options.text.deleteSelectedColumns,
+                                                        //         onclick: function () {
+                                                        //             obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                        //         }
+                                                        //     });
+                                                        // }
+
+                                                        // Rename column
+                                                        // if (obj.options.allowRenameColumn == true) {
+                                                        //     items.push({
+                                                        //         title: obj.options.text.renameThisColumn,
+                                                        //         onclick: function () {
+                                                        //             obj.setHeader(x);
+                                                        //         }
+                                                        //     });
+                                                        // }
+
+                                                        // Sorting
+                                                        if (obj.options.columnSorting == true) {
+                                                            // Line
+                                                            items.push({ type: 'line' });
+
+                                                            items.push({
+                                                                title: obj.options.text.orderAscending,
+                                                                onclick: function () {
+                                                                    obj.orderBy(x, 0);
+                                                                }
+                                                            });
+                                                            items.push({
+                                                                title: obj.options.text.orderDescending,
+                                                                onclick: function () {
+                                                                    obj.orderBy(x, 1);
+                                                                }
+                                                            });
+                                                        }
+                                                    } else {
+                                                        // Insert new row before
+                                                        if (obj.options.allowInsertRow == true) {
+                                                            items.push({
+                                                                title: i18n.t('static.common.insertNewRowBefore'),
+                                                                onclick: function () {
+                                                                    var data = [];
+                                                                    data[0] = -1;
+                                                                    data[1] = "";
+                                                                    data[2] = 1;
+                                                                    data[3] = "";
+                                                                    data[4] = "";
+                                                                    data[5] = "";
+                                                                    data[6] = "";
+                                                                    data[7] = "";
+                                                                    data[8] = "";
+                                                                    data[9] = "";
+                                                                    data[10] = "";
+                                                                    data[11] = 0;
+                                                                    data[12] = 0;
+                                                                    data[13] = 1;
+                                                                    data[14] = 1;
+                                                                    data[15] = programId;
+                                                                    data[16] = "";
+                                                                    data[17] = "";
+                                                                    data[18] = "";
+                                                                    obj.insertRow(data, parseInt(y), 1);
+                                                                }.bind(this)
+                                                            });
+                                                        }
+                                                        // after
+                                                        if (obj.options.allowInsertRow == true) {
+                                                            items.push({
+                                                                title: i18n.t('static.common.insertNewRowAfter'),
+                                                                onclick: function () {
+                                                                    var data = [];
+                                                                    data[0] = -1;
+                                                                    data[1] = "";
+                                                                    data[2] = 1;
+                                                                    data[3] = "";
+                                                                    data[4] = "";
+                                                                    data[5] = "";
+                                                                    data[6] = "";
+                                                                    data[7] = "";
+                                                                    data[8] = "";
+                                                                    data[9] = "";
+                                                                    data[10] = "";
+                                                                    data[11] = 0;
+                                                                    data[12] = 0;
+                                                                    data[13] = 1;
+                                                                    data[14] = 1;
+                                                                    data[15] = programId;
+                                                                    data[16] = "";
+                                                                    data[17] = "";
+                                                                    data[18] = "";
+                                                                    obj.insertRow(data, parseInt(y));
+                                                                }.bind(this)
+                                                            });
+                                                        }
+                                                        // Delete a row
+                                                        if (obj.options.allowDeleteRow == true) {
+                                                            // region id
+                                                            if (obj.getRowData(y)[12] == 0) {
+                                                                items.push({
+                                                                    title: i18n.t("static.common.deleterow"),
+                                                                    onclick: function () {
+                                                                        obj.deleteRow(parseInt(y));
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+
+                                                        if (x) {
+                                                            // if (obj.options.allowComments == true) {
+                                                            //     items.push({ type: 'line' });
+
+                                                            //     var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                            //     items.push({
+                                                            //         title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                            //         onclick: function () {
+                                                            //             obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                            //         }
+                                                            //     });
+
+                                                            //     if (title) {
+                                                            //         items.push({
+                                                            //             title: obj.options.text.clearComments,
+                                                            //             onclick: function () {
+                                                            //                 obj.setComments([x, y], '');
+                                                            //             }
+                                                            //         });
+                                                            //     }
+                                                            // }
+                                                        }
+
+                                                        //wr
+                                                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
+                                                            let cordsValue = `${this.el.getValueFromCoords(12, y)}`;
+                                                            // console.log("CHECK--------->", cordsValue);
+                                                            // if (cordsValue.length != 0) {
+                                                            //     console.log("CHECK--------->not empty", cordsValue);
+                                                            // } else {
+                                                            //     console.log("CHECK--------->empty", cordsValue);
+                                                            // }
+                                                            if (obj.options.allowInsertRow == true) {
+                                                                if (cordsValue.length != 0) {
+                                                                    items.push({
+                                                                        title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
+                                                                        onclick: function () {
+                                                                            // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                            this.props.history.push({
+                                                                                pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(12, y)}/${programId}`,
+                                                                            });
+
+                                                                        }.bind(this)
                                                                     });
-                                                                    break;
-                                                                case 412:
-                                                                    this.setState({
-                                                                        message: error.response.data.messageCode,
-                                                                        loading: false, color: '#BA0C2F'
-                                                                    });
-                                                                    break;
-                                                                default:
-                                                                    this.setState({
-                                                                        message: 'static.unkownError',
-                                                                        loading: false, color: '#BA0C2F'
-                                                                    });
-                                                                    break;
+                                                                }
                                                             }
                                                         }
                                                     }
-                                                );
+
+                                                    // Line
+                                                    items.push({ type: 'line' });
+
+                                                    // // Save
+                                                    // if (obj.options.allowExport) {
+                                                    //     items.push({
+                                                    //         title: i18n.t('static.supplyPlan.exportAsCsv'),
+                                                    //         shortcut: 'Ctrl + S',
+                                                    //         onclick: function () {
+                                                    //             obj.download(true);
+                                                    //         }
+                                                    //     });
+                                                    // }
+
+                                                    return items;
+                                                }.bind(this)
+                                            };
+                                            var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
+                                            this.el = elVar;
+                                            this.setState({ mapPlanningUnitEl: elVar, loading: false });
+                                            // }
                                         } else {
-                                            list = [];
-                                            this.setState({ loading: false });
+                                            this.setState({
+                                                message: response.data.messageCode, loading: false, color: '#BA0C2F'
+                                            })
                                         }
                                     }).catch(
                                         error => {
@@ -890,6 +923,51 @@ class AddprogramPlanningUnit extends Component {
                                             }
                                         }
                                     );
+                                //     } else {
+                                //         list = [];
+                                //         this.setState({ loading: false });
+                                //     }
+                                // }).catch(
+                                //     error => {
+                                //         if (error.message === "Network Error") {
+                                //             this.setState({
+                                //                 // message: 'static.unkownError',
+                                //                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                //                 loading: false, color: '#BA0C2F'
+                                //             });
+                                //         } else {
+                                //             switch (error.response ? error.response.status : "") {
+
+                                //                 case 401:
+                                //                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                //                     break;
+                                //                 case 403:
+                                //                     this.props.history.push(`/accessDenied`)
+                                //                     break;
+                                //                 case 500:
+                                //                 case 404:
+                                //                 case 406:
+                                //                     this.setState({
+                                //                         message: error.response.data.messageCode,
+                                //                         loading: false, color: '#BA0C2F'
+                                //                     });
+                                //                     break;
+                                //                 case 412:
+                                //                     this.setState({
+                                //                         message: error.response.data.messageCode,
+                                //                         loading: false, color: '#BA0C2F'
+                                //                     });
+                                //                     break;
+                                //                 default:
+                                //                     this.setState({
+                                //                         message: 'static.unkownError',
+                                //                         loading: false, color: '#BA0C2F'
+                                //                     });
+                                //                     break;
+                                //             }
+                                //         }
+                                //     }
+                                // );
                             } else {
                                 productCategoryListNew = []
                                 this.setState({
@@ -1951,9 +2029,9 @@ class AddprogramPlanningUnit extends Component {
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
+                    <option key={i} value={item.id}>
                         {/* {getLabelText(item.label, this.state.lang)} */}
-                        {item.programCode}
+                        {item.code}
                     </option>
                 )
             }, this);
@@ -2034,7 +2112,7 @@ class AddprogramPlanningUnit extends Component {
                                 &nbsp;
                                 {this.state.isChanged && this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
-                                {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> {i18n.t('static.common.addRow')}</Button>}
+                                {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.getPlanningUnitList}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;
                             </FormGroup>
                         </CardFooter>
