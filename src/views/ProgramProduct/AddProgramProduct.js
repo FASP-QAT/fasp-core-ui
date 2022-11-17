@@ -1,5 +1,6 @@
 import jexcel from 'jspreadsheet';
 import React, { Component } from "react";
+import { Prompt } from 'react-router';
 import {
     Button, Card, CardBody, CardFooter, Col, FormGroup, Input, InputGroup,
     Label
@@ -10,13 +11,12 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import ProgramService from "../../api/ProgramService";
 import getLabelText from '../../CommonComponent/getLabelText';
+import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
+import { ACTUAL_CONSUMPTION_TYPE, API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { Prompt } from 'react-router';
-import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
@@ -191,11 +191,17 @@ class AddprogramPlanningUnit extends Component {
 
     componentDidMount() {
         this.hideFirstComponent();
-        ProgramService.getProgramList()
+        ProgramService.getProgramForDropDown(1)//supply plan programs
             .then(response => {
                 if (response.status == 200) {
+                    console.log("response.data", response.data)
+                    let myReasponse = response.data.sort((a, b) => {
+                        var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: myReasponse, loading: false
                     })
                 }
 
@@ -2024,9 +2030,9 @@ class AddprogramPlanningUnit extends Component {
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
+                    <option key={i} value={item.id}>
                         {/* {getLabelText(item.label, this.state.lang)} */}
-                        {item.programCode}
+                        {item.code}
                     </option>
                 )
             }, this);
