@@ -1614,6 +1614,8 @@ export default class PlanningUnitSetting extends Component {
 
             var myResult1 = selectedForecastProgram.planningUnitList;
             console.log("myResult1===>", myResult1)
+            var original = myResult1.map(o => o.planningUnit);
+
             var listArray = myResult1;
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1636,7 +1638,7 @@ export default class PlanningUnitSetting extends Component {
             this.setState({
                 loading: false,
                 allPlanningUnitList: tempList,
-                originalPlanningUnitList: myResult1,
+                originalPlanningUnitList: original,
                 planningUnitList: myResult1,
             }, () => {
                 let forecastStartDate = selectedForecastProgram.forecastStartDate;
