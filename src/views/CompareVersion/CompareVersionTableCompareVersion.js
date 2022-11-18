@@ -367,11 +367,11 @@ export default class CompareVersionTableCompareVersion extends Component {
             [
                 {
                     title: '',
-                    rowspan: '1'
+                    colspan: '1'
                 },
                 {
                     title: '',
-                    rowspan: '1'
+                    colspan: '1'
                 },
                 {
                     title: this.props.versionLabel,

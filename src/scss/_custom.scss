@@ -744,6 +744,16 @@ label.arrow_label:after {
   background-color: #D3D3D3 !important;
 }
 
+.jss>tbody>tr>td.readonly.productValidationSubTotalClass{
+  background-color: #ccc !important;
+  font-weight: bold !important;
+}
+
+.jss>tbody>tr>td.productValidationSubTotalClass{
+  background-color: #ccc !important;
+  font-weight: bold !important;
+}
+
 .jexcel>tbody>tr>td.readonly.shipmentEntryDelete {
   color: #808080 !important;
   background-color: #808080 !important;
