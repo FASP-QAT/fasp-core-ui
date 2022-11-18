@@ -1001,7 +1001,7 @@ class ProductValidation extends Component {
                   align: 'justify'
                 });*/
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.productValidation'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.productValidation'), doc.internal.pageSize.width / 2, 80, {
                     align: 'center'
                 })
                 if (i == 1) {
