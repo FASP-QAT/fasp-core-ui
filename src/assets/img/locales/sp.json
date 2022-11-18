@@ -2868,5 +2868,6 @@
     "static.treeList.confirmAlert": "La versión del servidor tardará un tiempo en cargarse. ¿Está seguro de que desea cargar la versión del servidor?",
     "static.compareVersion.selectedForecastQtyTitle": "Pronóstico de cantidad para todo el período de pronóstico.",
     "static.dataset.BranchTreeTemplate": "Plantilla de rama",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.planningUnitSetting.offlineMsg": "Nota: El usuario debe estar en línea para agregar nuevos productos"
 }

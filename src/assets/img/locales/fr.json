@@ -2870,5 +2870,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.treeList.confirmAlert": "La version du serveur prendra un certain temps à se charger. Êtes-vous sûr de vouloir charger la version du serveur ?",
     "static.dataset.BranchTreeTemplate": "Modèle de branche",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.planningUnitSetting.offlineMsg": "Remarque : l`utilisateur doit être en ligne pour ajouter de nouveaux produits"
 }
