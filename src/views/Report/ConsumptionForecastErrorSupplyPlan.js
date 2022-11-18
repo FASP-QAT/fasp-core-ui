@@ -1095,15 +1095,22 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             var curDate ;     
                                         
                                             var year = from;
-                                            var adjustedActualConsumption=0;
-                                            var forecastedConsumption=0;
-                                            var aumultiplier="";
-                                            var fumultiplier="";
-                                            var auCount=0;
-                                            var fuCount=0;
+                                            var totalAvgForecasted=0;
+                                            var totalAvgActual =0;
+                                               
                                             curDate = year + "-" + String(month).padStart(2, '0') + "-01";
                                             console.log("@@@@NewDevelopement@@@FU curDate--->",curDate)
-                                            console.log("@@@@NewDevelopement@@@FU monthInCalc--->",monthInCalc)       
+                                            console.log("@@@@NewDevelopement@@@FU monthInCalc--->",monthInCalc) 
+                                            
+                                            for (var p = 0; p < planningUnitIdList.length; p++) {
+                                                year = from;
+                                                var adjustedActualConsumption=0;
+                                                var forecastedConsumption=0;
+                                                var PUadjustedActualConsumption=0;
+                                                var PUforecastedConsumption=0;
+                                                var auCount=0;
+                                                var fuCount=0;
+                                                console.log("@@@@NewDevelopement@@@FU conlist--->PU==",planningUnitIdList[p]);
                                             for (var i = month, j = 0; j <= monthInCalc; i--, j++) { 
                                             
                                                 if (i == 0) {
@@ -1112,8 +1119,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 }
                                                 var dt = year + "-" + String(i).padStart(2, '0') + "-01";
                                                 console.log("@@@@NewDevelopement@@@FU dt--->",dt);
-                                                var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                                                console.log("@@@@NewDevelopement@@@FU conlist--->",conlist);
+                                                var conlist = consumptionList.filter(c => c.consumptionDate === dt && c.planningUnit.id ==planningUnitIdList[p])
         
                                                 var noOfDays = moment(dt, "YYYY-MM").daysInMonth();
                                                 console.log("@@@@NewDevelopement@@@FU noOfDays--->",noOfDays);
@@ -1180,24 +1186,29 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             }
                                                 adjustedActualConsumption=adjustedActualConsumption+Number(regionTotalactualQty);
                                                 forecastedConsumption=forecastedConsumption+Number(regionTotalforecastQty);
-                                                console.log("@@@@NewDevelopement@@@FU Region auCount--->",auCount);
-                                                console.log("@@@@NewDevelopement@@@FU Region fuCount--->",fuCount);
-                                                
+                                                console.log("@@@@NewDevelopement@@@FU Region adjustedActualConsumption--->",adjustedActualConsumption);
+                                                console.log("@@@@NewDevelopement@@@FU Region forecastedConsumption--->",forecastedConsumption);
+                                                console.log("@@@@NewDevelopement@@@FU inside month Last DAte",dt);
+                                                                               
                                             }
-                                            console.log("@@@@NewDevelopement@@@FU adjustedActualConsumption--->",adjustedActualConsumption);
-                                            console.log("@@@@NewDevelopement@@@FU forecastedConsumption--->",forecastedConsumption);
-                                            console.log("@@@@NewDevelopement@@@FU auCount--->",auCount);
-                                            console.log("@@@@NewDevelopement@@@FU fuCount--->",fuCount);
-                                            console.log("@@@@NewDevelopement@@@FU aumultiplier--->",aumultiplier);
-                                            console.log("@@@@NewDevelopement@@@FU fumultiplier--->",fumultiplier);
-             
+                                            console.log("@@@@NewDevelopement@@@FU Before AVG auCount--->",auCount);
+                                            console.log("@@@@NewDevelopement@@@FU Before AVG fuCount--->",fuCount);
+                                            console.log("@@@@NewDevelopement@@@FU Before AVG adjustedActualConsumption--->",adjustedActualConsumption);
+                                            console.log("@@@@NewDevelopement@@@FU Before AVG forecastedConsumption--->",forecastedConsumption);
+
+                                            PUadjustedActualConsumption=(adjustedActualConsumption/(Number(auCount)));                                   
+                                            PUforecastedConsumption=(forecastedConsumption/(Number(fuCount)));
+                                            console.log("@@@@NewDevelopement@@@FU AVg PUadjustedActualConsumption--->",PUadjustedActualConsumption);
+                                            console.log("@@@@NewDevelopement@@@FU AVg PUforecastedConsumption--->",PUforecastedConsumption);
+                                            totalAvgActual +=PUadjustedActualConsumption;
+                                            totalAvgForecasted +=PUforecastedConsumption;
+                                            console.log("@@@@NewDevelopement@@@FU totalAvgActual--->",totalAvgActual);
+                                            console.log("@@@@NewDevelopement@@@FU totalAvgForecasted--->",totalAvgForecasted);
+                                            console.log("@@@@NewDevelopement@@@FU Last DAte",dt);
                                             
-                                            adjustedActualConsumption=(adjustedActualConsumption/(Number(auCount)));                                   
-                                            forecastedConsumption=(forecastedConsumption/(Number(fuCount)));
-                                            console.log("@@@@NewDevelopement@@@FU AVg adjustedActualConsumption--->",adjustedActualConsumption);
-                                            console.log("@@@@NewDevelopement@@@FU AVg forecastedConsumption--->",forecastedConsumption);
-           
-                                            var absEbar = (Math.abs(forecastedConsumption - adjustedActualConsumption)) / adjustedActualConsumption;
+                                        }
+                                                 
+                                            var absEbar = (Math.abs(totalAvgForecasted - totalAvgActual)) / totalAvgActual;
                                             console.log("@@@@NewDevelopement@@@FU absEbar--->",absEbar);
            
                                             var errorPerc = absEbar;
@@ -1205,8 +1216,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             dataList.push({
                                                 month: moment(curDate).format("YYYY-MM-DD"),
                                                 regionData: regionData,
-                                                actualQty: adjustedActualConsumption,
-                                                forecastQty: forecastedConsumption,
+                                                actualQty: totalAvgActual,
+                                                forecastQty: totalAvgForecasted,
                                                 errorPerc: errorPerc
                                                 // consumptionAdjForStockOutId: consumptionAdjForStockOutId,
                                                 // consumptionQtyStockedOut: totalConsumptionQtyOutOfStockData
@@ -1407,7 +1418,20 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     }.bind(this);
                 }if(equivalencyUnitId>0) // View by EquivalencyUnit 
                 {
-
+                    var equivalencyUnitList= this.state.equivalencyUnitList;
+                    var eqDataList = this.state.dataList;
+                    var filteredequivalencyUnit=equivalencyUnitList.filter(c=>c.equivalencyUnitId);
+                    for(var con =0; con<=eqDataList.length;con++){
+                        if(eqDataList[con].actualQty>=0){
+                            eqDataList[con].actualQty=eqDataList[con].actualQty*filteredequivalencyUnit.convertToEu;
+                        }
+                        if(eqDataList[con].forecastQty>=0){
+                            eqDataList[con].forecastQty=eqDataList[con].forecastQty*filteredequivalencyUnit.convertToEu;
+                        }
+                    }
+                    this.setState({
+                        dataList: eqDataList
+                        })
                 }
             } else {
                 this.setState({
@@ -1615,17 +1639,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         datacsv.push([(('Actual').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            var totalDaysOfStockOut = 0;
-            this.state.regions.map(r => {
-                var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                totalDaysOfStockOut += datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0;
-            })
-            // totalActual += Number(data[0].actualQty);
-            // countActual += 1;
-            // datacsv.push((data[0].actualQty))
-            totalActual += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty);
+            totalActual += Number(data[0].actualQty);
             countActual += 1;
-            datacsv.push((Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : (data[0].actualQty)).toFixed(2)))
+            datacsv.push((Number((data[0].actualQty)).toFixed(2)))
         })
         datacsv.push(Number(totalActual / countActual).toFixed(2));
         A.push(this.addDoubleQuoteToRowContent(datacsv))
@@ -1638,12 +1654,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             {
                 this.state.monthArray.map((item1, count) => {
                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    // totalRegion += Number(data[0].actualQty);
-                    // totalRegionCount += 1;
-                    // datacsv.push(data[0].actualQty)
-                    totalRegion += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : data[0].actualQty);
+                    totalRegion += Number(data[0].actualQty);
                     totalRegionCount += 1;
-                    datacsv.push(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : data[0].actualQty).toFixed(2))
+                    datacsv.push(Number(data[0].actualQty).toFixed(2))
                 })
             }
             datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
@@ -1653,14 +1666,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         datacsv.push([(('Difference').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            var totalDaysOfStockOut = 0;
-            this.state.regions.map(r => {
-                var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                totalDaysOfStockOut += datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0;
-            })
-            totalDifference += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty) - Number(data[0].forecastQty);
+            totalDifference += Number(data[0].actualQty) - Number(data[0].forecastQty);
             countDifference += 1;
-            datacsv.push((Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : data[0].actualQty) - Number(data[0].forecastQty)).toFixed(2))
+            datacsv.push((Number(data[0].actualQty) - Number(data[0].forecastQty)).toFixed(2))
         })
         datacsv.push(Number(totalDifference / countDifference).toFixed(2));
         A.push(this.addDoubleQuoteToRowContent(datacsv))
@@ -1673,9 +1681,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             {
                 this.state.monthArray.map((item1, count) => {
                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalRegion += Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : data[0].actualQty) - Number(data[0].forecastQty);
+                    totalRegion += Number(data[0].actualQty) - Number(data[0].forecastQty);
                     totalRegionCount += 1;
-                    datacsv.push(Number(this.state.consumptionAdjForStockOutId ? (data[0].actualQty / (item1.noOfDays - (data[0].daysOfStockOut != undefined ? data[0].daysOfStockOut : 0)) * item1.noOfDays) : data[0].actualQty) - Number(data[0].forecastQty))
+                    datacsv.push(Number(data[0].actualQty) - Number(data[0].forecastQty))
                 })
             }
             datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
@@ -2331,7 +2339,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             name="timeWindow"
                                                             id="timeWindow"
                                                             bsSize="sm"
-                                                        // onChange={this.fetchData}
+                                                            onChange={this.fetchData}
                                                         >
                                                             <option value="5">6 {i18n.t('static.dashboard.months')}</option>
                                                             <option value="2">3 {i18n.t('static.dashboard.months')}</option>
