@@ -192,7 +192,7 @@ export default class ListTreeComponent extends Component {
                 db1 = e.target.result;
                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                var datasetDetailsRequest = datasetDetailsTransaction.get(document.getElementById("datasetId").value);
                 datasetDetailsRequest.onsuccess = function (e) {         
                   var datasetDetailsRequestJson = datasetDetailsRequest.result;
                   datasetDetailsRequestJson.changed = 1;
@@ -834,7 +834,7 @@ export default class ListTreeComponent extends Component {
         // if (operationId == 3) {
         if (operationId == 3 && (treeTemplateId != "" && treeTemplateId != null)) {
             console.log("programId 1---", programId);
-            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true);
+            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true,true);
         } else {
             this.saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy);
         }
