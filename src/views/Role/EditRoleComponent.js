@@ -10,7 +10,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import { LABEL_REGEX } from '../../Constants.js';
+import { API_URL, LABEL_REGEX } from '../../Constants.js';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
 const initialValues = {
@@ -218,7 +218,8 @@ class EditRoleComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -284,7 +285,8 @@ class EditRoleComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -342,7 +344,8 @@ class EditRoleComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -422,7 +425,8 @@ class EditRoleComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -475,109 +479,109 @@ class EditRoleComponent extends Component {
                                         setFieldValue,
                                         setFieldTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='roleForm' autocomplete="off">
-                                                <CardBody className="pt-2 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label for="roleName">{i18n.t('static.role.role')}<span className="red Reqasterisk">*</span> </Label>
-                                                        <Input type="text"
-                                                            name="roleName"
-                                                            id="roleName"
-                                                            bsSize="sm"
-                                                            valid={!errors.roleName}
-                                                            invalid={(touched.roleName && !!errors.roleName || !!errors.roleName)}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            maxLength={30}
-                                                            required
-                                                            value={this.Capitalize(this.state.role.label.label_en)}
-                                                        />
-                                                        <FormFeedback className="red">{errors.roleName}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup className="Selectcontrol-bdrNone">
-                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
-                                                        <Select
-                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            //     { 'is-valid': !errors.businessFunctions },
-                                                            //     { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions || this.state.role.businessFunctions.length == 0) }
-                                                            // )}
-                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                                { 'is-valid': !errors.businessFunctions },
-                                                                { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions || !!errors.businessFunctions) }
-                                                            )}
-                                                            bsSize="sm"
-                                                            onChange={(e) => {
-                                                                handleChange(e);
-                                                                setFieldValue("businessFunctions", e);
-                                                                this.businessFunctionChange(e);
-                                                            }}
-                                                            onBlur={() => setFieldTouched("businessFunctions", true)}
-                                                            name="businessFunctions"
-                                                            id="businessFunctions"
-                                                            multi
-                                                            required
-                                                            min={1}
-                                                            options={this.state.businessFunctionList}
-                                                            value={this.state.role.businessFunctions}
-                                                        />
-                                                        <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup className="Selectcontrol-bdrNone">
-                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')} <span className="red Reqasterisk">*</span></Label>
-                                                        <Select
-                                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                                { 'is-valid': !errors.canCreateRoles },
-                                                                { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
-                                                            )}
-                                                            // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            //     { 'is-valid': !errors.canCreateRoles },
-                                                            //     { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || !!errors.canCreateRoles) }
-                                                            // )}
-                                                            bsSize="sm"
-                                                            onChange={(e) => {
-                                                                handleChange(e);
-                                                                setFieldValue("canCreateRoles", e);
-                                                                this.canCreateRoleChange(e);
-                                                            }}
-                                                            onBlur={() => setFieldTouched("canCreateRoles", true)}
-                                                            name="canCreateRoles"
-                                                            id="canCreateRoles"
-                                                            multi
-                                                            required
-                                                            min={1}
-                                                            options={this.state.canCreateRoleList}
-                                                            value={this.state.role.canCreateRoles}
-                                                        />
-                                                        <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
-                                                    </FormGroup>
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                        <Form onSubmit={handleSubmit} noValidate name='roleForm' autocomplete="off">
+                                            <CardBody className="pt-2 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label for="roleName">{i18n.t('static.role.role')}<span className="red Reqasterisk">*</span> </Label>
+                                                    <Input type="text"
+                                                        name="roleName"
+                                                        id="roleName"
+                                                        bsSize="sm"
+                                                        valid={!errors.roleName}
+                                                        invalid={(touched.roleName && !!errors.roleName || !!errors.roleName)}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        maxLength={30}
+                                                        required
+                                                        value={this.Capitalize(this.state.role.label.label_en)}
+                                                    />
+                                                    <FormFeedback className="red">{errors.roleName}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup className="Selectcontrol-bdrNone">
+                                                    <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
+                                                    <Select
+                                                        // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                        //     { 'is-valid': !errors.businessFunctions },
+                                                        //     { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions || this.state.role.businessFunctions.length == 0) }
+                                                        // )}
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.businessFunctions },
+                                                            { 'is-invalid': (touched.businessFunctions && !!errors.businessFunctions || !!errors.businessFunctions) }
+                                                        )}
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("businessFunctions", e);
+                                                            this.businessFunctionChange(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("businessFunctions", true)}
+                                                        name="businessFunctions"
+                                                        id="businessFunctions"
+                                                        multi
+                                                        required
+                                                        min={1}
+                                                        options={this.state.businessFunctionList}
+                                                        value={this.state.role.businessFunctions}
+                                                    />
+                                                    <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup className="Selectcontrol-bdrNone">
+                                                    <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')} <span className="red Reqasterisk">*</span></Label>
+                                                    <Select
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.canCreateRoles },
+                                                            { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || this.state.role.canCreateRoles.length == 0) }
+                                                        )}
+                                                        // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                        //     { 'is-valid': !errors.canCreateRoles },
+                                                        //     { 'is-invalid': (touched.canCreateRoles && !!errors.canCreateRoles || !!errors.canCreateRoles) }
+                                                        // )}
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("canCreateRoles", e);
+                                                            this.canCreateRoleChange(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("canCreateRoles", true)}
+                                                        name="canCreateRoles"
+                                                        id="canCreateRoles"
+                                                        multi
+                                                        required
+                                                        min={1}
+                                                        options={this.state.canCreateRoleList}
+                                                        value={this.state.role.canCreateRoles}
+                                                    />
+                                                    <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    {/* <FormGroup>
+                                            </div>
+                                            <CardFooter>
+                                                {/* <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>  {i18n.t('static.common.update')}</Button>
 
                                                         &nbsp;
                                                  </FormGroup> */}
-                                                    <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>  {i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
-                                        )} />
+                                                <FormGroup>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>  {i18n.t('static.common.update')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
+                                    )} />
                         </Card>
                     </Col>
                 </Row>
@@ -599,7 +603,8 @@ class EditRoleComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {

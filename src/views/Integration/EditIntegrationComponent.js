@@ -6,7 +6,7 @@ import IntegrationService from '../../api/IntegrationService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+import { ALPHABET_NUMBER_REGEX, API_URL, SPACE_REGEX } from '../../Constants.js';
 
 const entityname = i18n.t('static.integration.integration');
 let initialValues = {
@@ -210,7 +210,8 @@ export default class UpdateDataSourceComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -264,7 +265,8 @@ export default class UpdateDataSourceComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -362,7 +364,8 @@ export default class UpdateDataSourceComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -411,145 +414,145 @@ export default class UpdateDataSourceComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='integrationForm' autocomplete="off">
-                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={this.state.integration.realm.label.label_en}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
+                                        <Form onSubmit={handleSubmit} noValidate name='integrationForm' autocomplete="off">
+                                            <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="realmId"
+                                                        id="realmId"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        value={this.state.integration.realm.label.label_en}
+                                                    >
+                                                    </Input>
+                                                </FormGroup>
 
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.integration.integration')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="integrationName"
-                                                            id="integrationName"
-                                                            bsSize="sm"
-                                                            valid={!errors.integrationName && this.state.integration.integrationName != ''}
-                                                            invalid={touched.integrationName && !!errors.integrationName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.integration.integrationName}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.integrationName}</FormFeedback>
-                                                    </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.integration.integration')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="integrationName"
+                                                        id="integrationName"
+                                                        bsSize="sm"
+                                                        valid={!errors.integrationName && this.state.integration.integrationName != ''}
+                                                        invalid={touched.integrationName && !!errors.integrationName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.integration.integrationName}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.integrationName}</FormFeedback>
+                                                </FormGroup>
 
+                                                <FormGroup>
+                                                    <Label htmlFor="realmId">{i18n.t('static.integration.integrationViewName')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="integrationViewId"
+                                                        id="integrationViewId"
+                                                        bsSize="sm"
+                                                        valid={!errors.integrationViewId && this.state.integration.integrationView.integrationViewId != ''}
+                                                        invalid={touched.integrationViewId && !!errors.integrationViewId}
+                                                        onChange={(e) => {
+                                                            handleChange(e); this.dataChange(e);
+                                                        }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.integration.integrationView.integrationViewId}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {viewList}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.integrationViewId}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.integration.folderLocation')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="folderLocation"
+                                                        id="folderLocation"
+                                                        bsSize="sm"
+                                                        valid={!errors.folderLocation && this.state.integration.folderLocation != ''}
+                                                        invalid={touched.folderLocation && !!errors.folderLocation}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.integration.folderLocation}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.folderLocation}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.integration.fileName')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="fileName"
+                                                        id="fileName"
+                                                        bsSize="sm"
+                                                        valid={!errors.fileName && this.state.integration.fileName != ''}
+                                                        invalid={touched.fileName && !!errors.fileName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.integration.fileName}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.fileName}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup className="pb-3">
+                                                    {this.state.isHide && <Button color="info" size="md" className="float-left mr-1" onClick={() => this.addParameter()}><i className="fa fa-plus"></i>{i18n.t('static.integration.addBodyParameter')}</Button>}
+                                                    &nbsp;
+                                                    <Button color="warning" size="md" className="float-left mr-1" onClick={() => this.clearParameter()}><i className="fa fa-refresh"></i>{i18n.t('static.integration.clearBodyParameter')}</Button>
+                                                </FormGroup>
+
+                                                {!this.state.isHide &&
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.integration.integrationViewName')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="bodyParameter">{i18n.t('static.integration.bodyParameter')}</Label>
                                                         <Input
                                                             type="select"
-                                                            name="integrationViewId"
-                                                            id="integrationViewId"
+                                                            name="bodyParameter"
+                                                            id="bodyParameter"
                                                             bsSize="sm"
-                                                            valid={!errors.integrationViewId && this.state.integration.integrationView.integrationViewId != ''}
-                                                            invalid={touched.integrationViewId && !!errors.integrationViewId}
+                                                            // valid={!errors.realmId && this.state.realm.id != ''}
+                                                            // invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => {
                                                                 handleChange(e); this.dataChange(e);
                                                             }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.integration.integrationView.integrationViewId}
+                                                            value={this.state.bodyParameter}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
-                                                            {viewList}
+                                                            <option value="1">{i18n.t('static.programOnboarding.programCode')}</option>
+                                                            <option value="2">{i18n.t('static.pipelineProgram.programId')}</option>
+                                                            <option value="3">{i18n.t('static.program.versionId')}</option>
+                                                            <option value="4">{i18n.t('static.common.Date[YMDHMS]')}</option>
+                                                            <option value="5">{i18n.t('static.common.Date[YMD]')}</option>
                                                         </Input>
-                                                        <FormFeedback className="red">{errors.integrationViewId}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.bodyParameter}</FormFeedback>
                                                     </FormGroup>
+                                                }
 
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.integration.folderLocation')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="folderLocation"
-                                                            id="folderLocation"
-                                                            bsSize="sm"
-                                                            valid={!errors.folderLocation && this.state.integration.folderLocation != ''}
-                                                            invalid={touched.folderLocation && !!errors.folderLocation}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.integration.folderLocation}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.folderLocation}</FormFeedback>
-                                                    </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.integration.fileName')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="fileName"
-                                                            id="fileName"
-                                                            bsSize="sm"
-                                                            valid={!errors.fileName && this.state.integration.fileName != ''}
-                                                            invalid={touched.fileName && !!errors.fileName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.integration.fileName}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.fileName}</FormFeedback>
-                                                    </FormGroup>
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                    <FormGroup className="pb-3">
-                                                        {this.state.isHide && <Button color="info" size="md" className="float-left mr-1" onClick={() => this.addParameter()}><i className="fa fa-plus"></i>{i18n.t('static.integration.addBodyParameter')}</Button>}
-                                                        &nbsp;
-                                                        <Button color="warning" size="md" className="float-left mr-1" onClick={() => this.clearParameter()}><i className="fa fa-refresh"></i>{i18n.t('static.integration.clearBodyParameter')}</Button>
-                                                    </FormGroup>
-
-                                                    {!this.state.isHide &&
-                                                        <FormGroup>
-                                                            <Label htmlFor="bodyParameter">{i18n.t('static.integration.bodyParameter')}</Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="bodyParameter"
-                                                                id="bodyParameter"
-                                                                bsSize="sm"
-                                                                // valid={!errors.realmId && this.state.realm.id != ''}
-                                                                // invalid={touched.realmId && !!errors.realmId}
-                                                                onChange={(e) => {
-                                                                    handleChange(e); this.dataChange(e);
-                                                                }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                                value={this.state.bodyParameter}
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                <option value="1">{i18n.t('static.programOnboarding.programCode')}</option>
-                                                                <option value="2">{i18n.t('static.pipelineProgram.programId')}</option>
-                                                                <option value="3">{i18n.t('static.program.versionId')}</option>
-                                                                <option value="4">{i18n.t('static.common.Date[YMDHMS]')}</option>
-                                                                <option value="5">{i18n.t('static.common.Date[YMD]')}</option>
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.bodyParameter}</FormFeedback>
-                                                        </FormGroup>
-                                                    }
-
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                                                            <div class="spinner-border blue ml-4" role="status">
-
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                         </Card>
                     </Col>
@@ -575,7 +578,8 @@ export default class UpdateDataSourceComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {

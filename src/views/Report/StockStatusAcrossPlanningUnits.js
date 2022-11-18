@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -195,7 +195,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -272,7 +273,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.jexcelData.map(ele => A.push(this.addDoubleQuoteToRowContent([ele[9], (ele[0].replaceAll(',', ' ')).replaceAll(' ', '%20'),ele[1]==1?i18n.t('static.report.mos'):i18n.t('static.report.qty'),ele[2].replaceAll(' ','%20'),ele[3],ele[4],ele[5],ele[6],ele[7],ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : ''])));
+        this.state.jexcelData.map(ele => A.push(this.addDoubleQuoteToRowContent([ele[9], (ele[0].replaceAll(',', ' ')).replaceAll(' ', '%20'), ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2].replaceAll(' ', '%20'), ele[3], ele[4], ele[5], ele[6], ele[7], ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : ''])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -354,7 +355,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.jexcelData.map(ele => [ele[9], ele[0],ele[1]==1?i18n.t('static.report.mos'):i18n.t('static.report.qty'),ele[2],this.formatter(ele[3]),ele[4]!=i18n.t("static.supplyPlanFormula.na") && ele[4]!="-"?this.roundN(ele[4]):ele[4],isNaN(ele[5]) || ele[5] == undefined ? '' : this.formatterDouble(ele[5]), isNaN(ele[6]) || ele[6] == undefined ? '' : this.formatterDouble(ele[6]), isNaN(ele[7]) || ele[7] == null ? '' : this.formatter(ele[7]), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
+        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], this.formatter(ele[3]), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? this.roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : this.formatterDouble(ele[5]), isNaN(ele[6]) || ele[6] == undefined ? '' : this.formatterDouble(ele[6]), isNaN(ele[7]) || ele[7] == null ? '' : this.formatter(ele[7]), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -389,7 +390,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1316,7 +1318,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                             });
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {

@@ -354,7 +354,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABETS_REGEX, DECIMAL_NO_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, SPACE_REGEX, ALPHABETS_REGEX, DECIMAL_NO_REGEX, API_URL } from '../../Constants.js';
 
 const entityname = i18n.t('static.currency.currencyMaster');
 const initialValues = {
@@ -533,7 +533,8 @@ export default class AddCurrencyComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -586,45 +587,45 @@ export default class AddCurrencyComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='currencyForm' autocomplete="off">
-                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label && this.state.label.label_en != ''}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.label.label_en}
-                                                            required />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span class="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            name="currencyCode"
-                                                            id="currencyCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.currencyCode && this.state.currencyCode != ''}
-                                                            invalid={touched.currencyCode && !!errors.currencyCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.currencyCode}
-                                                            required
-                                                            maxLength={4}
-                                                        />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
-                                                    </FormGroup>
-                                                    {/* <FormGroup>
+                                        <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='currencyForm' autocomplete="off">
+                                            <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
+                                                    <Input type="text"
+                                                        name="label"
+                                                        id="label"
+                                                        bsSize="sm"
+                                                        valid={!errors.label && this.state.label.label_en != ''}
+                                                        invalid={touched.label && !!errors.label}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.label.label_en}
+                                                        required />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                    <Input type="text"
+                                                        name="currencyCode"
+                                                        id="currencyCode"
+                                                        bsSize="sm"
+                                                        valid={!errors.currencyCode && this.state.currencyCode != ''}
+                                                        invalid={touched.currencyCode && !!errors.currencyCode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.currencyCode}
+                                                        required
+                                                        maxLength={4}
+                                                    />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
+                                                </FormGroup>
+                                                {/* <FormGroup>
                                                         <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="currencySymbol"
@@ -638,84 +639,84 @@ export default class AddCurrencyComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.currencySymbol}</FormFeedback>
                                                     </FormGroup> */}
-                                                    <FormGroup>
-                                                        <Label for="laconversionRatebel">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-exchange"></i></InputGroupText> */}
-                                                        <Input type="number"
-                                                            name="conversionRate"
-                                                            id="conversionRate"
-                                                            valid={!errors.conversionRate && this.state.conversionRateToUsd != ''}
-                                                            invalid={touched.conversionRate && !!errors.conversionRate}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.conversionRateToUsd}
-                                                            bsSize="sm"
-                                                            required />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.conversionRate}</FormFeedback>
+                                                <FormGroup>
+                                                    <Label for="laconversionRatebel">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-exchange"></i></InputGroupText> */}
+                                                    <Input type="number"
+                                                        name="conversionRate"
+                                                        id="conversionRate"
+                                                        valid={!errors.conversionRate && this.state.conversionRateToUsd != ''}
+                                                        invalid={touched.conversionRate && !!errors.conversionRate}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.conversionRateToUsd}
+                                                        bsSize="sm"
+                                                        required />
+                                                    {/* </InputGroupAddon> */}
+                                                    <FormFeedback className="red">{errors.conversionRate}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="isSync">{i18n.t('static.common.issync')}  </Label>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active1"
+                                                            name="isSync"
+                                                            value={true}
+                                                            checked={this.state.isSync === true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio1">
+                                                            {i18n.t('static.program.yes')}
+                                                        </Label>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="isSync">{i18n.t('static.common.issync')}  </Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="isSync"
-                                                                value={true}
-                                                                checked={this.state.isSync === true}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.program.yes')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="isSync"
-                                                                value={false}
-                                                                checked={this.state.isSync === false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.program.no')}
-                                                            </Label>
-                                                        </FormGroup>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="isSync"
+                                                            value={false}
+                                                            checked={this.state.isSync === false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.program.no')}
+                                                        </Label>
                                                     </FormGroup>
+                                                </FormGroup>
 
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                            <div class="spinner-border blue ml-4" role="status">
+                                                        <div class="spinner-border blue ml-4" role="status">
 
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
 
-                                        )} />
+                                    )} />
 
                         </Card>
                     </Col>

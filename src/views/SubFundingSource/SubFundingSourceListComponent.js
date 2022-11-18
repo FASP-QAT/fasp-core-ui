@@ -9,6 +9,7 @@ import data from '../Tables/DataTable/_data';
 
 import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import { API_URL } from '../../Constants';
 
 class SubFundingSourceListComponent extends Component {
     constructor(props) {
@@ -52,7 +53,8 @@ class SubFundingSourceListComponent extends Component {
                     switch (error.message) {
                         case "Network Error":
                             this.setState({
-                                message: error.message
+                                // message: error.message
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             })
                             break
                         default:
@@ -74,7 +76,8 @@ class SubFundingSourceListComponent extends Component {
                     switch (error.message) {
                         case "Network Error":
                             this.setState({
-                                message: error.message
+                                // message: error.message
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             })
                             break
                         default:
@@ -110,7 +113,7 @@ class SubFundingSourceListComponent extends Component {
                         <i className="icon-menu"></i>Sub Funding Source List
                     </CardHeader>
                     <CardBody>
-                        <BootstrapTable data={this.state.subFundingSourceList} version="4" hover pagination search headerStyle={ { background: '#D1EEEE' } }  options={this.options}>
+                        <BootstrapTable data={this.state.subFundingSourceList} version="4" hover pagination search headerStyle={{ background: '#D1EEEE' }} options={this.options}>
                             <TableHeaderColumn isKey dataField='subFundingSourceId' hidden>ID</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="label" dataSort={true} dataFormat={this.showSubFundingSourceLabel} dataAlign="center">Sub Funding Source</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="fundingSource" dataFormat={this.showFundingSourceLabel} dataAlign="center" dataSort>Funding Source</TableHeaderColumn>

@@ -3,7 +3,7 @@ import ExtrapolationService from '../../api/ExtrapolationService.js';
 import i18n from '../../i18n.js';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 import { calculateCI } from './CalculateCI.js';
-export function calculateLinearRegression(inputData, confidence, noOfProjectionMonths, props, isTreeExtrapolation, page, regionId) {
+export function calculateLinearRegression(inputData, confidence, noOfProjectionMonths, props, isTreeExtrapolation, page, regionId,planningUnitId) {
     // console.log("InputData@@@", inputData)
 
     // const noOfMonthsForProjection = noOfProjectionMonths;
@@ -58,8 +58,11 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
                 }
 
                 console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
-                if (page == "DataEntry" || page == "ImportFromSupplyPlan") {
+                if (page == "DataEntry") {
                     var linearRegressionData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                    props.updateLinearRegressionData(linearRegressionData);
+                }else if (page == "importFromQATSP") {
+                    var linearRegressionData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
                     props.updateLinearRegressionData(linearRegressionData);
                 } else {
                     // calculateCI(output, Number(confidenceLevel), "tesData", props)
@@ -69,8 +72,11 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
             }
         }).catch(error => {
             console.log("Error@@@@@@", error)
-            if (page == "DataEntry" || page == "ImportFromSupplyPlan") {
+            if (page == "DataEntry") {
                 var linearRegressionData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                props.updateLinearRegressionData(linearRegressionData);
+            }else if (page == "importFromQATSP") {
+                var linearRegressionData = { "data": [], "PlanningUnitId": planningUnitId, "regionId": regionId }
                 props.updateLinearRegressionData(linearRegressionData);
             } else {
             if (!isTreeExtrapolation) {

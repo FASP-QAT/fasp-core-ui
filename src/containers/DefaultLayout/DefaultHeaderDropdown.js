@@ -20,7 +20,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import InitialTicketPageComponent from '../../views/Ticket/InitialTicketPageComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import {
-  SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling
+  SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, API_URL
 
 } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -146,7 +146,9 @@ class DefaultHeaderDropdown extends Component {
           error => {
             console.log("Going to change language api error---", error)
             if (error.message === "Network Error") {
-              this.setState({ message: error.message });
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage"))
+              });
             } else {
               this.setState({ message: error.response.data.messageCode });
             }
@@ -294,7 +296,7 @@ class DefaultHeaderDropdown extends Component {
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>{i18n.t('static.common.profile')}</strong></DropdownItem>
-          <DropdownItem className="nonclickablebox" style={{borderBottom:"2px solid #000"}}><i className="cui-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : i18n.t("static.unknown")}</span>
+          <DropdownItem className="nonclickablebox" style={{ borderBottom: "2px solid #000" }}><i className="cui-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : i18n.t("static.unknown")}</span>
             {this.state.roleList != null && this.state.roleList != '' && this.state.roleList.map(
               role =>
 
@@ -305,20 +307,20 @@ class DefaultHeaderDropdown extends Component {
             )}
           </DropdownItem>
           {checkOnline === 'Online' && <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem>}
-          {checkOnline === 'Online' ? <DropdownItem onClick={this.props.goOffline}><i class="fa fa-solid fa-circle fa-lg" style={{color:"#BA0C2F"}}></i>{i18n.t("static.login.goOffline")}</DropdownItem>:<DropdownItem onClick={this.props.goOnline}><i class="fa fa-solid fa-circle fa-lg" style={{color:"#4dbd74"}}></i>{i18n.t("static.login.goOnline")}</DropdownItem>}
+          {checkOnline === 'Online' ? <DropdownItem onClick={this.props.goOffline}><i class="fa fa-solid fa-circle fa-lg" style={{ color: "#BA0C2F" }}></i>{i18n.t("static.login.goOffline")}</DropdownItem> : <DropdownItem onClick={this.props.goOnline}><i class="fa fa-solid fa-circle fa-lg" style={{ color: "#4dbd74" }}></i>{i18n.t("static.login.goOnline")}</DropdownItem>}
           <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.language.preferredlng')}</b></DropdownItem>
           {this.state.languageList != null && this.state.languageList != '' && this.state.languageList.filter(c => c.active).map(
             language =>
-            <>
-              
-              <DropdownItem onClick={this.changeLanguage.bind(this, language.languageCode)}>
-                <i className={"flag-icon flag-icon-"+language.countryCode}></i>
-                {localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == language.languageCode ? 
-                <b>{getLabelText(language.label,this.state.lang)}</b> 
-                : getLabelText(language.label,this.state.lang)}
+              <>
+
+                <DropdownItem onClick={this.changeLanguage.bind(this, language.languageCode)}>
+                  <i className={"flag-icon flag-icon-" + language.countryCode}></i>
+                  {localStorage.getItem('lang') != null && localStorage.getItem('lang').toString() != 'undefined' && localStorage.getItem('lang').toString() == language.languageCode ?
+                    <b>{getLabelText(language.label, this.state.lang)}</b>
+                    : getLabelText(language.label, this.state.lang)}
                   {/* {language.languageName} */}
-              </DropdownItem>
-            </>
+                </DropdownItem>
+              </>
           )}
           {/* <DropdownItem onClick={this.changeLanguage.bind(this, 'en')}><i className="flag-icon flag-icon-us"></i>
             {localStorage.getItem('lang') == null || localStorage.getItem('lang').toString() == 'undefined' || localStorage.getItem('lang').toString() == 'en' ? <b>{i18n.t('static.language.english')}</b> : i18n.t('static.language.english')}

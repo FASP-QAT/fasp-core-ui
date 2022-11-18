@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 import * as Yup from 'yup';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
-import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX, SPACE_REGEX } from '../../Constants';
+import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX, SPACE_REGEX, API_URL } from '../../Constants';
 import FundingSourceService from '../../api/FundingSourceService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
@@ -183,7 +183,8 @@ export default class FundingSourceTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -287,7 +288,8 @@ export default class FundingSourceTicketComponent extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -339,7 +341,8 @@ export default class FundingSourceTicketComponent extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -439,7 +442,8 @@ export default class FundingSourceTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {

@@ -8,6 +8,7 @@ import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import { API_URL } from '../../Constants';
 
 const initialValues = {
   fundingSourceId: [],
@@ -123,7 +124,8 @@ class AddSubFundingSourceComponent extends Component {
         error => {
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -196,7 +198,8 @@ class AddSubFundingSourceComponent extends Component {
                       error => {
                         if (error.message === "Network Error") {
                           this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                           });
                         } else {
@@ -246,54 +249,54 @@ class AddSubFundingSourceComponent extends Component {
                     isValid,
                     setTouched
                   }) => (
-                      <Form onSubmit={handleSubmit} noValidate name='subFundingSourceForm'>
-                        <CardBody>
-                          <FormGroup>
-                            <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}<span className="red Reqasterisk">*</span></Label>
-                            <Input
-                              type="select"
-                              name="fundingSourceId"
-                              id="fundingSourceId"
-                              bsSize="sm"
-                              valid={!errors.fundingSourceId}
-                              invalid={touched.fundingSourceId && !!errors.fundingSourceId}
-                              onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                              onBlur={handleBlur}
-                              required
-                              value={this.state.subFundingSource.fundingSource.fundingSourceId}
-                            >
-                              <option value="">{i18n.t('static.common.select')}</option>
-                              {fundingSourceList}
-                            </Input>
-                            <FormFeedback>{errors.fundingSourceId}</FormFeedback>
-                          </FormGroup>
-                          <FormGroup>
-                            <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}<span className="red Reqasterisk">*</span></Label>
-                            <Input type="text"
-                              name="subFundingSource"
-                              id="subFundingSource"
-                              bsSize="sm"
-                              valid={!errors.subFundingSource}
-                              invalid={touched.subFundingSource && !!errors.subFundingSource}
-                              onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                              onBlur={handleBlur}
-                              required
-                              value={this.Capitalize(this.state.subFundingSource.label.label_en)}
-                            />
-                            <FormFeedback>{errors.subFundingSource}</FormFeedback>
-                          </FormGroup>
-                        </CardBody>
-                        <CardFooter>
-                          <FormGroup>
-                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                    <Form onSubmit={handleSubmit} noValidate name='subFundingSourceForm'>
+                      <CardBody>
+                        <FormGroup>
+                          <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}<span className="red Reqasterisk">*</span></Label>
+                          <Input
+                            type="select"
+                            name="fundingSourceId"
+                            id="fundingSourceId"
+                            bsSize="sm"
+                            valid={!errors.fundingSourceId}
+                            invalid={touched.fundingSourceId && !!errors.fundingSourceId}
+                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                            onBlur={handleBlur}
+                            required
+                            value={this.state.subFundingSource.fundingSource.fundingSourceId}
+                          >
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {fundingSourceList}
+                          </Input>
+                          <FormFeedback>{errors.fundingSourceId}</FormFeedback>
+                        </FormGroup>
+                        <FormGroup>
+                          <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}<span className="red Reqasterisk">*</span></Label>
+                          <Input type="text"
+                            name="subFundingSource"
+                            id="subFundingSource"
+                            bsSize="sm"
+                            valid={!errors.subFundingSource}
+                            invalid={touched.subFundingSource && !!errors.subFundingSource}
+                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                            onBlur={handleBlur}
+                            required
+                            value={this.Capitalize(this.state.subFundingSource.label.label_en)}
+                          />
+                          <FormFeedback>{errors.subFundingSource}</FormFeedback>
+                        </FormGroup>
+                      </CardBody>
+                      <CardFooter>
+                        <FormGroup>
+                          <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                          <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
+                          <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
-                            &nbsp;
-                          </FormGroup>
-                        </CardFooter>
-                      </Form>
-                    )} />
+                          &nbsp;
+                        </FormGroup>
+                      </CardFooter>
+                    </Form>
+                  )} />
             </Card>
           </Col>
         </Row>

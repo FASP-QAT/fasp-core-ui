@@ -40,7 +40,7 @@ import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities
 import AuthenticationService from '../Common/AuthenticationService';
 import i18n from '../../i18n'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
-import { polling } from '../../Constants';
+import { API_URL, polling } from '../../Constants';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
@@ -226,7 +226,8 @@ class RealmDashboard extends Component {
           error => {
             if (error.message === "Network Error") {
               this.setState({
-                message: 'static.unkownError',
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -272,7 +273,8 @@ class RealmDashboard extends Component {
           error => {
             if (error.message === "Network Error") {
               this.setState({
-                message: 'static.unkownError',
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -341,7 +343,7 @@ class RealmDashboard extends Component {
     return (
       <div className="animated fadeIn">
         <AuthenticationServiceComponent history={this.props.history} />
-        {checkOnline === 'Online' && 
+        {checkOnline === 'Online' &&
           <Row className="mt-2">
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">

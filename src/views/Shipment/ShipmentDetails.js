@@ -60,8 +60,8 @@ const validationSchemaReplan = function (values) {
             .required(i18n.t('static.procurementAgent.selectProcurementAgent')),
         fundingSourceId: Yup.string()
             .required(i18n.t('static.subfundingsource.errorfundingsource')),
-        budgetId: Yup.string()
-            .required(i18n.t('static.mt.selectBudget')),
+        // budgetId: Yup.string()
+        //     .required(i18n.t('static.mt.selectBudget')),
     })
 }
 
@@ -837,7 +837,8 @@ export default class ShipmentDetails extends React.Component {
                                         if (myResult[i].program.id == programId && myResult[i].active == true) {
                                             var productJson = {
                                                 label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
-                                                value: myResult[i].planningUnit.id
+                                                value: myResult[i].planningUnit.id,
+                                                actualLabel:myResult[i].planningUnit.label
                                             }
                                             proList.push(productJson)
                                             var productJson1 = {
@@ -1423,7 +1424,7 @@ export default class ShipmentDetails extends React.Component {
                         enableReinitialize={true}
                         initialValues={{
                             procurementAgentId: this.state.procurementAgentId,
-                            budgetId: this.state.budgetId,
+                            // budgetId: this.state.budgetId,
                             fundingSourceId: this.state.fundingSourceId
                         }}
                         validate={validate(validationSchemaReplan)}
@@ -1544,18 +1545,18 @@ export default class ShipmentDetails extends React.Component {
                                                             name="budgetId"
                                                             id="budgetId"
                                                             bsSize="sm"
-                                                            valid={!errors.budgetId}
-                                                            invalid={touched.budgetId && !!errors.budgetId}
-                                                            onBlur={handleBlur}
+                                                            // valid={!errors.budgetId}
+                                                            // invalid={touched.budgetId && !!errors.budgetId}
+                                                            // onBlur={handleBlur}
                                                             // onChange={this.filterVersion}
-                                                            onChange={(e) => { this.setBudgetId(e);; handleChange(e); }}
+                                                            onChange={(e) => { this.setBudgetId(e); }}
                                                             value={this.state.budgetId}
 
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {budgets}
                                                         </Input>
-                                                        <FormFeedback>{errors.budgetId}</FormFeedback>
+                                                        {/* <FormFeedback>{errors.budgetId}</FormFeedback> */}
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -1916,7 +1917,7 @@ export default class ShipmentDetails extends React.Component {
                                                         notes: i18n.t('static.supplyPlan.planByDateNote'),
                                                         planningUnit: {
                                                             id: planningUnitsIds[pu].value,
-                                                            label: (this.state.planningUnitList.filter(c => c.value == planningUnitsIds[pu].value)[0]).label
+                                                            label: (this.state.planningUnitList.filter(c => c.value == planningUnitsIds[pu].value)[0]).actualLabel
                                                         },
                                                         procurementAgent: {
                                                             id: this.state.procurementAgentId,
@@ -1935,9 +1936,9 @@ export default class ShipmentDetails extends React.Component {
                                                         },
                                                         suggestedQty: suggestedOrd,
                                                         budget: {
-                                                            id: this.state.budgetId,
-                                                            code: this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].budgetCode,
-                                                            label: this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].label,
+                                                            id: this.state.budgetId!=""?this.state.budgetId:"",
+                                                            code: this.state.budgetId!=""?this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].budgetCode:"",
+                                                            label: this.state.budgetId!=""?this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].label:{},
                                                         },
                                                         emergencyOrder: false,
                                                         currency: c,

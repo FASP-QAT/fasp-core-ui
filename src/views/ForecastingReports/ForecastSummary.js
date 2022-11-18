@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, API_URL, } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -2008,7 +2008,8 @@ class ForecastSummary extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -2095,9 +2096,13 @@ class ForecastSummary extends Component {
                     totalForecast = tsListFilter.totalForecast;
                 } else {
                     var flatList = tsListFilter.flatList;
-                    var flatListFilter = flatList.filter(c => c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
-
-                    var nodeDataMomList = flatListFilter[0].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM-DD"));
+                    console.log("Flat List @@@@@@@ Test", flatList)
+                    var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
+                    console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
+                    var nodeDataMomList = [];
+                    for (var fl = 0; fl < flatListFilter.length; fl++) {
+                        nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM")));
+                    }
                     nodeDataMomList.map(ele => {
                         totalForecast += Number(ele.calculatedMmdValue);
                     });
@@ -2208,7 +2213,8 @@ class ForecastSummary extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -2990,13 +2996,14 @@ class ForecastSummary extends Component {
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     var datasetDetailsRequest = datasetDetailsTransaction.get(id);
-                    datasetDetailsRequest.onsuccess = function (e) {         
-                      var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                      datasetDetailsRequestJson.changed = 1;
-                      var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                      datasetDetailsRequest1.onsuccess = function (event) {
-                           
-                          }}
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+
+                        }
+                    }
                     this.setState({
                         isChanged1: false,
                         message1: i18n.t('static.compareAndSelect.dataSaved'),
@@ -3598,15 +3605,16 @@ class ForecastSummary extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                    <ModalBody>
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceforForecastSummaryEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceforForecastSummaryFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceforForecastSummarySp :
-                  showguidanceforForecastSummaryPr
-              } } />
+                        <ModalBody>
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceforForecastSummaryEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceforForecastSummaryFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceforForecastSummarySp :
+                                            showguidanceforForecastSummaryPr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.ForecastSummary.ForecastSummary')}</h3>
                             </div>
