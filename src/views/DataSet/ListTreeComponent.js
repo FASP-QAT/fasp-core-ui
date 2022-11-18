@@ -1431,6 +1431,9 @@ export default class ListTreeComponent extends Component {
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
                     ]
+                },
+                {
+                    type:'hidden'
                 }
 
             ],
