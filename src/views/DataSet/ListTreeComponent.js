@@ -1277,7 +1277,7 @@ export default class ListTreeComponent extends Component {
 
         var treeList = programList.treeList;
 
-        if (treeList.length > 0) {
+        if (treeList!=undefined && treeList.length > 0) {
             for (var k = 0; k < treeList.length; k++) {
 
                 data = [];
