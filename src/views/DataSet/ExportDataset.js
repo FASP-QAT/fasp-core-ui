@@ -287,10 +287,15 @@ export default class ExportDataset extends Component {
                                                                                                 myResult[i].usageTemplateList = usageTemplateList;
                                                                                                 myResult[i].equivalencyUnitList = equivalencyUnitList;
                                                                                                 var programQPLResultFiltered = programQPLResult.filter(c => c.id == programId[j].value)[0];
-                                                                                                myResult[i].changed = programQPLResultFiltered.changed;
-                                                                                                // myResult[i].openCount = programQPLResultFiltered.openCount;
-                                                                                                // myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
-                                                                                                myResult[i].readonly = programQPLResultFiltered.readonly;
+                                                                                                if (programQPLResultFiltered != undefined) {
+                                                                                                    myResult[i].changed = programQPLResultFiltered.changed;
+                                                                                                    // myResult[i].openCount = programQPLResultFiltered.openCount;
+                                                                                                    // myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
+                                                                                                    myResult[i].readonly = programQPLResultFiltered.readonly;
+                                                                                                } else {
+                                                                                                    myResult[i].changed = 1;
+                                                                                                    myResult[i].readonly = 0;
+                                                                                                }
 
                                                                                                 if (isUnEncrepted) {//encrept data
 
