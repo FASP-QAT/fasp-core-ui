@@ -7728,6 +7728,29 @@ export default class BuildTree extends Component {
                 }
 
             }
+            try {
+                var puPerVisit = "";
+                var pu = this.state.planningUnitList.filter(x => x.id == this.state.tempPlanningUnitId)[0];
+                console.log("FU Node Edit---", pu);
+                 
+                if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                    console.log("FU Node Edit---Inside IF");
+                    var refillMonths = this.round(parseFloat(pu.multiplier / (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
+                    console.log("FU Node Edit---refillMonths",refillMonths);
+                    console.log("FU Node Edit---noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                    puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
+                    console.log("FU Node Edit---In if puPerVisit---", puPerVisit);
+                } else {
+                    puPerVisit = this.state.noOfMonthsInUsagePeriod / pu.multiplier;
+                    console.log("FU Node Edit---In else puPerVisit---", puPerVisit);
+                }
+                console.log("FU Node Edit---puPerVisit---", puPerVisit);  
+                (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = puPerVisit;
+            } catch (err) {
+                (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = 1;
+                (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = "";
+            }
+
         }
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
         console.log("findNodeIndex---", findNodeIndex);
