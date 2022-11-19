@@ -30,6 +30,7 @@ const validationSchema = function (values) {
         unitCode: Yup.string()
             // .matches(UNIT_LABEL_REGEX, i18n.t('static.message.alphaspespacenumtext'))
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+            .max(20, i18n.t('static.common.max20digittext'))
             .required(i18n.t('static.unit.unitcodetext'))
 
     })

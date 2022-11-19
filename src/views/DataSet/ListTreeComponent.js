@@ -214,15 +214,14 @@ export default class ListTreeComponent extends Component {
                 db1 = e.target.result;
                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                datasetDetailsRequest.onsuccess = function (e) {
-                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                    datasetDetailsRequestJson.changed = 1;
-                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    datasetDetailsRequest1.onsuccess = function (event) {
-
-                    }
-                }
+                var datasetDetailsRequest = datasetDetailsTransaction.get(document.getElementById("datasetId").value);
+                datasetDetailsRequest.onsuccess = function (e) {         
+                  var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                  datasetDetailsRequestJson.changed = 1;
+                  var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                  datasetDetailsRequest1.onsuccess = function (event) {
+                       
+                      }}
                 this.setState({
                     loading: false,
                     message: i18n.t('static.mt.dataUpdateSuccess'),
@@ -813,7 +812,7 @@ export default class ListTreeComponent extends Component {
         if (operationId == 3 && (treeTemplateId != "" && treeTemplateId != null)) {
             console.log("programId 1---", programId);
             programCopy.programData = tempProgram;
-            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true);
+            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true,true);
         } else {
             this.saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy);
         }
@@ -1302,7 +1301,7 @@ export default class ListTreeComponent extends Component {
 
         var treeList = programList.treeList;
 
-        if (treeList.length > 0) {
+        if (treeList!=undefined && treeList.length > 0) {
             for (var k = 0; k < treeList.length; k++) {
 
                 data = [];
@@ -1431,6 +1430,9 @@ export default class ListTreeComponent extends Component {
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
                     ]
+                },
+                {
+                    type:'hidden'
                 }
 
             ],

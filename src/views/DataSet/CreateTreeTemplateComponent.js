@@ -292,42 +292,46 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
 
-        refillMonths: Yup.string()
-            .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
-                function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
-                    var testNumber = (/^[1-9]\d*$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
-                    if ((document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 2) && (document.getElementById("refillMonths").value == "" || testNumber == false)) {
-                        return false;
-                    } else {
+                refillMonths: Yup.string()
+                .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
+                    function (value) {
+                        // var testNumber = document.getElementById("refillMonths").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("refillMonths").value) : false;
+                        if ((document.getElementById("nodeTypeId").value == 5)){
+                        var testNumber = (/^[1-9]\d*$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
+                        console.log("refill months*****", testNumber);
+                        if ((document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 2) && (document.getElementById("refillMonths").value == "" || testNumber == false)) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }else{
                         return true;
                     }
-                }),
-        sharePlanningUnit: Yup.string()
-            .test('sharePlanningUnit', i18n.t('static.validation.fieldRequired'),
-                function (value) {
-                    if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 1 && document.getElementById("sharePlanningUnit").value == "") {
-                        return false;
-                    } else {
+                    }),
+            // sharePlanningUnit: Yup.string()
+            //     .test('sharePlanningUnit', i18n.t('static.validation.fieldRequired'),
+            //         function (value) {
+            //             if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 1 && document.getElementById("sharePlanningUnit").value == "") {
+            //                 return false;
+            //             } else {
+            //                 return true;
+            //             }
+            //         }),
+            puPerVisit: Yup.string()
+                .test('puPerVisit', 'Please enter # of pu per visit.',
+                    function (value) {
+                        // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value));
+                        if ((document.getElementById("nodeTypeId").value == 5)){
+                        var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
+                        if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }else {
                         return true;
                     }
-                }),
-        puPerVisit: Yup.string()
-            .test('puPerVisit', 'Please enter # of pu per visit.',
-                function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
-                    // var testNumber = document.getElementById("puPerVisit").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("puPerVisit").value) : false;
-                    // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
-                    // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value));
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
-                    if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }),
+                    }),
 
     })
 }
