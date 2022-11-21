@@ -1058,13 +1058,13 @@ export default class ListTreeComponent extends Component {
         } else {
             this.setState({
                 versions: [],
-                treeData:[],
-                datasetListJexcel:[]
+                treeData: [],
+                datasetListJexcel: []
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-        // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"), true);
-             })
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+            })
         }
     }
 
@@ -1193,12 +1193,27 @@ export default class ListTreeComponent extends Component {
     setProgramId(event) {
         var datasetId = event.target.value
         localStorage.setItem("sesDatasetId", datasetId);
-        this.setState(
-            {
-                datasetId: datasetId
-            }, () => {
-                this.filterVersion();
-            })
+        if (datasetId != 0 && datasetId != "") {
+            this.setState(
+                {
+                    datasetId: datasetId,
+                    message: ""
+                }, () => {
+                    this.filterVersion();
+                    this.hideSecondComponent()
+                })
+        } else {
+            this.setState(
+                {
+                    datasetId: datasetId,
+                    message: i18n.t('static.mt.selectProgram'),
+                    color:"red"
+                }, () => {
+                    this.filterVersion();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
+                    this.hideSecondComponent()
+                })
+        }
     }
 
     onTemplateChange(event) {
@@ -1271,228 +1286,228 @@ export default class ListTreeComponent extends Component {
 
     }
     buildJexcel() {
-        if(this.state.datasetId!=0){
-        let programList = this.state.treeData;
-        console.log(">>>", programList);
-        let treeArray = [];
-        let count = 0;
-        var selStatus = document.getElementById("active").value;
-        var tempSelStatus = selStatus != "" ? (selStatus == "true" ? true : false) : "";
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        if (this.state.datasetId != 0) {
+            let programList = this.state.treeData;
+            console.log(">>>", programList);
+            let treeArray = [];
+            let count = 0;
+            var selStatus = document.getElementById("active").value;
+            var tempSelStatus = selStatus != "" ? (selStatus == "true" ? true : false) : "";
+            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+            var userId = userBytes.toString(CryptoJS.enc.Utf8);
 
-        var treeList = programList.treeList;
+            var treeList = programList.treeList;
 
-        if (treeList!=undefined && treeList.length > 0) {
-            for (var k = 0; k < treeList.length; k++) {
+            if (treeList != undefined && treeList.length > 0) {
+                for (var k = 0; k < treeList.length; k++) {
 
-                data = [];
-                data[0] = treeList[k].treeId
-                data[1] = programList.programCode + "~v" + programList.currentVersion.versionId
-                // data[1] = programList[j].programCode
-                data[2] = getLabelText(treeList[k].label, this.state.lang)
-                data[3] = treeList[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-                console.log("forecast method--->", treeList[k].forecastMethod.label)
-                data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
-                data[5] = treeList[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
-                data[6] = treeList[k].notes
-                data[7] = programList.programId
-                data[8] = programList.programId + "_v" + programList.currentVersion.versionId + "_uId_" + userId
-                data[9] = programList.version
-                data[10] = treeList[k].active
-                data[11] = this.state.versionId.toString().includes("(Local)") ? 1 : 2
-                console.log("selStatus---", this.state.versionId.toString().includes("(Local)"))
-                if (selStatus != "") {
-                    if (tempSelStatus == treeList[k].active) {
-                        // treeArray = treeArray.filter(x => x[10] == tempSelStatus);
+                    data = [];
+                    data[0] = treeList[k].treeId
+                    data[1] = programList.programCode + "~v" + programList.currentVersion.versionId
+                    // data[1] = programList[j].programCode
+                    data[2] = getLabelText(treeList[k].label, this.state.lang)
+                    data[3] = treeList[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                    console.log("forecast method--->", treeList[k].forecastMethod.label)
+                    data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
+                    data[5] = treeList[k].scenarioList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
+                    data[6] = treeList[k].notes
+                    data[7] = programList.programId
+                    data[8] = programList.programId + "_v" + programList.currentVersion.versionId + "_uId_" + userId
+                    data[9] = programList.version
+                    data[10] = treeList[k].active
+                    data[11] = this.state.versionId.toString().includes("(Local)") ? 1 : 2
+                    console.log("selStatus---", this.state.versionId.toString().includes("(Local)"))
+                    if (selStatus != "") {
+                        if (tempSelStatus == treeList[k].active) {
+                            // treeArray = treeArray.filter(x => x[10] == tempSelStatus);
+                            treeArray[count] = data;
+                            count++;
+                        }
+                    } else {
                         treeArray[count] = data;
                         count++;
                     }
-                } else {
-                    treeArray[count] = data;
-                    count++;
                 }
             }
-        }
-        // }
+            // }
 
 
 
-        const sortArray = (sourceArray) => {
-            const sortByName = (a, b) => a[2].localeCompare(b[2], 'en', { numeric: true });
-            return sourceArray.sort(sortByName);
-        };
+            const sortArray = (sourceArray) => {
+                const sortByName = (a, b) => a[2].localeCompare(b[2], 'en', { numeric: true });
+                return sourceArray.sort(sortByName);
+            };
 
-        if (treeArray.length > 0) {
-            // sortArray(treeArray);
-            treeArray.sort(function (a, b) {
-                return a[1].localeCompare(b[1]) || a[2].localeCompare(b[2]);
-            })
-        }
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"), true);
+            if (treeArray.length > 0) {
+                // sortArray(treeArray);
+                treeArray.sort(function (a, b) {
+                    return a[1].localeCompare(b[1]) || a[2].localeCompare(b[2]);
+                })
+            }
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
 
-        var json = [];
-        var data = treeArray;
+            var json = [];
+            var data = treeArray;
 
-        var options = {
-            data: data,
-            columnDrag: true,
-            // colWidths: [150, 150, 100],
-            colHeaderClasses: ["Reqasterisk"],
-            columns: [
-                {
-                    title: 'Tree Id',
-                    type: 'hidden'
-                },
-                {
-                    title: i18n.t('static.dashboard.programheader'),
-                    type: 'text',
-                    // readOnly: true
-                },
-                {
-                    title: i18n.t('static.common.treeName'),
-                    type: 'text',
-                    // readOnly: true
-                },
-                {
-                    title: i18n.t('static.common.region'),
-                    type: 'text',
-                    // readOnly: true
-                },
-                {
-                    title: i18n.t('static.forecastMethod.forecastMethod'),
-                    type: 'text',
-                    // readOnly: true
-                },
+            var options = {
+                data: data,
+                columnDrag: true,
+                // colWidths: [150, 150, 100],
+                colHeaderClasses: ["Reqasterisk"],
+                columns: [
+                    {
+                        title: 'Tree Id',
+                        type: 'hidden'
+                    },
+                    {
+                        title: i18n.t('static.dashboard.programheader'),
+                        type: 'text',
+                        // readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.common.treeName'),
+                        type: 'text',
+                        // readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.common.region'),
+                        type: 'text',
+                        // readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.forecastMethod.forecastMethod'),
+                        type: 'text',
+                        // readOnly: true
+                    },
 
-                {
-                    title: i18n.t('static.common.scenarioName'),
-                    type: 'text',
-                    // readOnly: true
-                },
-                {
-                    title: i18n.t('static.program.notes'),
-                    type: 'text',
-                    // readOnly: true
-                },
-                {
-                    title: 'ProgramId',
-                    type: 'hidden',
-                    // readOnly: true
-                },
-                {
-                    title: 'id',
-                    type: 'hidden',
-                    // readOnly: true
-                },
-                {
-                    title: 'versionId',
-                    type: 'hidden',
-                    // readOnly: true
-                },
-                {
-                    type: 'dropdown',
-                    title: i18n.t('static.common.status'),
-                    // readOnly: true,
-                    source: [
-                        { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
-                    ]
-                },
-                {
-                    type:'hidden'
-                }
-
-            ],
-            // text: {
-            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
-            editable: false,
-            onload: this.loaded,
-            pagination: localStorage.getItem("sesRecordCount"),
-            search: true,
-            columnSorting: true,
-            // tableOverflow: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            onselection: this.selected,
-            oneditionend: this.onedit,
-            copyCompatibility: true,
-            allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            filters: true,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                var items = [];
-                if (y != null) {
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.deleteTree'),
-                            onclick: function () {
-                                confirmAlert({
-                                    message: i18n.t('static.listTree.deleteTree'),
-                                    buttons: [
-                                        {
-                                            label: i18n.t('static.program.yes'),
-                                            onClick: () => {
-                                                this.setState({ treeFlag: true }, () => {
-                                                    this.copyDeleteTree(this.el.getValueFromCoords(0, y), this.el.getValueFromCoords(7, y), this.el.getValueFromCoords(9, y), 1);
-                                                })
-
-                                            }
-                                        },
-                                        {
-                                            label: i18n.t('static.program.no')
-                                        }
-                                    ]
-                                });
-
-                            }.bind(this)
-                        });
-
-                        items.push({
-                            title: i18n.t('static.common.duplicateTree'),
-                            onclick: function () {
-                                console.log("tree name---", this.el.getValueFromCoords(2, y))
-                                this.setState({
-                                    programId: this.state.treeEl.getValueFromCoords(7, y),
-                                    versionId: this.state.treeEl.getValueFromCoords(9, y),
-                                    treeId: this.state.treeEl.getValueFromCoords(0, y),
-                                    isModalOpen: !this.state.isModalOpen,
-                                    treeName: this.state.treeEl.getValueFromCoords(2, y) + " (copy)",
-                                    treeFlag: true,
-                                    treeTemplate: ''
-                                })
-                            }.bind(this)
-                        });
+                    {
+                        title: i18n.t('static.common.scenarioName'),
+                        type: 'text',
+                        // readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.program.notes'),
+                        type: 'text',
+                        // readOnly: true
+                    },
+                    {
+                        title: 'ProgramId',
+                        type: 'hidden',
+                        // readOnly: true
+                    },
+                    {
+                        title: 'id',
+                        type: 'hidden',
+                        // readOnly: true
+                    },
+                    {
+                        title: 'versionId',
+                        type: 'hidden',
+                        // readOnly: true
+                    },
+                    {
+                        type: 'dropdown',
+                        title: i18n.t('static.common.status'),
+                        // readOnly: true,
+                        source: [
+                            { id: true, name: i18n.t('static.common.active') },
+                            { id: false, name: i18n.t('static.common.disabled') }
+                        ]
+                    },
+                    {
+                        type: 'hidden'
                     }
-                }
 
-                return items;
-            }.bind(this),
-        };
-        var treeEl = jexcel(document.getElementById("tableDiv"), options);
-        this.el = treeEl;
-        this.setState({
-            treeEl: treeEl, loading: false
-        })
-    }else{
-        this.setState({
-            treeEl:"",
-            loading:false
-        })
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        // this.el.destroy();
-        jexcel.destroy(document.getElementById("tableDiv"), true);
-    }
+                ],
+                // text: {
+                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     show: '',
+                //     entries: '',
+                // },
+                editable: false,
+                onload: this.loaded,
+                pagination: localStorage.getItem("sesRecordCount"),
+                search: true,
+                columnSorting: true,
+                // tableOverflow: true,
+                wordWrap: true,
+                allowInsertColumn: false,
+                allowManualInsertColumn: false,
+                allowDeleteRow: false,
+                onselection: this.selected,
+                oneditionend: this.onedit,
+                copyCompatibility: true,
+                allowExport: false,
+                paginationOptions: JEXCEL_PAGINATION_OPTION,
+                position: 'top',
+                filters: true,
+                license: JEXCEL_PRO_KEY,
+                contextMenu: function (obj, x, y, e) {
+                    var items = [];
+                    if (y != null) {
+                        if (obj.options.allowInsertRow == true) {
+                            items.push({
+                                title: i18n.t('static.common.deleteTree'),
+                                onclick: function () {
+                                    confirmAlert({
+                                        message: i18n.t('static.listTree.deleteTree'),
+                                        buttons: [
+                                            {
+                                                label: i18n.t('static.program.yes'),
+                                                onClick: () => {
+                                                    this.setState({ treeFlag: true }, () => {
+                                                        this.copyDeleteTree(this.el.getValueFromCoords(0, y), this.el.getValueFromCoords(7, y), this.el.getValueFromCoords(9, y), 1);
+                                                    })
+
+                                                }
+                                            },
+                                            {
+                                                label: i18n.t('static.program.no')
+                                            }
+                                        ]
+                                    });
+
+                                }.bind(this)
+                            });
+
+                            items.push({
+                                title: i18n.t('static.common.duplicateTree'),
+                                onclick: function () {
+                                    console.log("tree name---", this.el.getValueFromCoords(2, y))
+                                    this.setState({
+                                        programId: this.state.treeEl.getValueFromCoords(7, y),
+                                        versionId: this.state.treeEl.getValueFromCoords(9, y),
+                                        treeId: this.state.treeEl.getValueFromCoords(0, y),
+                                        isModalOpen: !this.state.isModalOpen,
+                                        treeName: this.state.treeEl.getValueFromCoords(2, y) + " (copy)",
+                                        treeFlag: true,
+                                        treeTemplate: ''
+                                    })
+                                }.bind(this)
+                            });
+                        }
+                    }
+
+                    return items;
+                }.bind(this),
+            };
+            var treeEl = jexcel(document.getElementById("tableDiv"), options);
+            this.el = treeEl;
+            this.setState({
+                treeEl: treeEl, loading: false
+            })
+        } else {
+            this.setState({
+                treeEl: "",
+                loading: false
+            })
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+        }
     }
     hideSecondComponent() {
         setTimeout(function () {
