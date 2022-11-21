@@ -116,7 +116,7 @@ export default class CompareVersionTableCompareVersion extends Component {
                 });*/
                 doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.compareVersion'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.compareVersion'), doc.internal.pageSize.width / 2, 80, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -144,7 +144,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         doc.setTextColor("#002f6c");
 
 
-        var y = 80;
+        var y = 100;
         doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
             align: 'left'
         })
@@ -218,7 +218,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         const data = dataArr1;
         // doc.addPage()
         let content = {
-            margin: { top: 80, bottom: 50 },
+            margin: { top: 100, bottom: 50 },
             startY: startYtable,
             head: [headers2, columns],
             body: data,
