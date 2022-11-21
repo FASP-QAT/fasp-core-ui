@@ -1058,8 +1058,13 @@ export default class ListTreeComponent extends Component {
         } else {
             this.setState({
                 versions: [],
-
-            }, () => { })
+                treeData:[],
+                datasetListJexcel:[]
+            }, () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+             })
         }
     }
 
@@ -1266,6 +1271,7 @@ export default class ListTreeComponent extends Component {
 
     }
     buildJexcel() {
+        if(this.state.datasetId!=0){
         let programList = this.state.treeData;
         console.log(">>>", programList);
         let treeArray = [];
@@ -1478,6 +1484,15 @@ export default class ListTreeComponent extends Component {
         this.setState({
             treeEl: treeEl, loading: false
         })
+    }else{
+        this.setState({
+            treeEl:"",
+            loading:false
+        })
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+    }
     }
     hideSecondComponent() {
         setTimeout(function () {
