@@ -1029,7 +1029,7 @@ class ProductValidation extends Component {
         doc.setTextColor("#002f6c");
 
 
-        var y = 80;
+        var y = 100;
         // var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
         // // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         // for (var i = 0; i < planningText.length; i++) {
@@ -1048,7 +1048,7 @@ class ProductValidation extends Component {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1062,7 +1062,7 @@ class ProductValidation extends Component {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1115,7 +1115,7 @@ class ProductValidation extends Component {
         const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), ele[8] != "" ? this.formatter(Number(ele[8]).toFixed(2)) : ""]);
         // doc.addPage()
         let content = {
-            margin: { top: 80, bottom: 50 },
+            margin: { top: 100, bottom: 50 },
             startY: startYtable,
             head: headers,
             body: data,
