@@ -4059,7 +4059,7 @@ export default class CreateTreeTemplate extends Component {
                     this.nodeTypeChange(nodeTypeList[0].id);
                     if (nodeTypeList[0].id == 5) {
                         this.getNoOfMonthsInUsagePeriod();
-                        this,this.getNoFURequired();
+                        this.getNoFURequired();
                     }
                 })
             } else {
