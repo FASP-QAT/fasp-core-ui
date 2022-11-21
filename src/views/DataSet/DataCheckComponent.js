@@ -542,7 +542,7 @@ export function exportPDF(props) {
               align: 'justify'
             });*/
             doc.setTextColor("#002f6c");
-            doc.text(i18n.t('static.commitTree.forecastValidation'), doc.internal.pageSize.width / 2, 60, {
+            doc.text(i18n.t('static.commitTree.forecastValidation'), doc.internal.pageSize.width / 2, 80, {
                 align: 'center'
             })
             if (i == 1) {
@@ -575,7 +575,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -590,7 +590,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -608,7 +608,7 @@ export function exportPDF(props) {
                     for (var i = 0; i < planningText.length; i++) {
                         if (y > doc.internal.pageSize.height - 100) {
                             doc.addPage();
-                            y = 80;
+                            y = 100;
 
                         }
                         doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -623,7 +623,7 @@ export function exportPDF(props) {
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
-                    y = 80;
+                    y = 100;
 
                 }
                 doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -639,7 +639,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -653,7 +653,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -669,7 +669,7 @@ export function exportPDF(props) {
                 for (var i = 0; i < planningText.length; i++) {
                     if (y > doc.internal.pageSize.height - 100) {
                         doc.addPage();
-                        y = 80;
+                        y = 100;
 
                     }
                     doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -682,7 +682,7 @@ export function exportPDF(props) {
                 for (var i = 0; i < planningText.length; i++) {
                     if (y > doc.internal.pageSize.height - 100) {
                         doc.addPage();
-                        y = 80;
+                        y = 100;
 
                     }
                     doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -696,7 +696,7 @@ export function exportPDF(props) {
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
-                    y = 80;
+                    y = 100;
 
                 }
                 doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -712,7 +712,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -728,7 +728,7 @@ export function exportPDF(props) {
                 for (var i = 0; i < planningText.length; i++) {
                     if (y > doc.internal.pageSize.height - 100) {
                         doc.addPage();
-                        y = 80;
+                        y = 100;
 
                     }
                     doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -741,7 +741,7 @@ export function exportPDF(props) {
                 for (var i = 0; i < planningText.length; i++) {
                     if (y > doc.internal.pageSize.height - 100) {
                         doc.addPage();
-                        y = 80;
+                        y = 100;
 
                     }
                     doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -755,7 +755,7 @@ export function exportPDF(props) {
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
-                    y = 80;
+                    y = 100;
 
                 }
                 doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -771,7 +771,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -785,7 +785,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -801,7 +801,7 @@ export function exportPDF(props) {
                 for (var i = 0; i < planningText.length; i++) {
                     if (y > doc.internal.pageSize.height - 100) {
                         doc.addPage();
-                        y = 80;
+                        y = 100;
 
                     }
                     doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -815,7 +815,7 @@ export function exportPDF(props) {
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
-                    y = 80;
+                    y = 100;
 
                 }
                 doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -831,7 +831,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -850,7 +850,7 @@ export function exportPDF(props) {
                 for (var i = 0; i < planningText.length; i++) {
                     if (y > doc.internal.pageSize.height - 100) {
                         doc.addPage();
-                        y = 80;
+                        y = 100;
 
                     }
                     doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -871,7 +871,7 @@ export function exportPDF(props) {
                     for (var i = 0; i < planningText.length; i++) {
                         if (y > doc.internal.pageSize.height - 100) {
                             doc.addPage();
-                            y = 80;
+                            y = 100;
 
                         }
                         doc.text(doc.internal.pageSize.width / 10, y, planningText[i]);
@@ -887,7 +887,7 @@ export function exportPDF(props) {
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
-                    y = 80;
+                    y = 100;
 
                 }
                 doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -903,7 +903,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -931,7 +931,7 @@ export function exportPDF(props) {
                         for (var i = 0; i < planningText.length; i++) {
                             if (y > doc.internal.pageSize.height - 100) {
                                 doc.addPage();
-                                y = 80;
+                                y = 100;
 
                             }
                             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -960,7 +960,7 @@ export function exportPDF(props) {
 
                         var data = dataArr;
                         var content = {
-                            margin: { top: 80, bottom: 50 },
+                            margin: { top: 100, bottom: 50 },
                             startY: y,
                             head: [columnsArray],
                             body: data,
@@ -971,7 +971,7 @@ export function exportPDF(props) {
                         y = doc.lastAutoTable.finalY + 20
                         if (y + 100 > height) {
                             doc.addPage();
-                            y = 80
+                            y = 100
                         }
                     }
                 }
@@ -983,7 +983,7 @@ export function exportPDF(props) {
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
-                    y = 80;
+                    y = 100;
 
                 }
                 doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -999,7 +999,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1013,7 +1013,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1038,7 +1038,7 @@ export function exportPDF(props) {
             item5.consumtionNotes])
     });
     var content1 = {
-        margin: { top: 80, bottom: 50 },
+        margin: { top: 100, bottom: 50 },
         startY: startYtable,
         head: headers,
         body: dataArr2,
@@ -1051,7 +1051,7 @@ export function exportPDF(props) {
         y = doc.lastAutoTable.finalY + 20
         if (y + 100 > height) {
             doc.addPage();
-            y = 80
+            y = 100
         }
     } else {
         planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noConsumptionNotesFound'), doc.internal.pageSize.width * 3 / 4);
@@ -1060,7 +1060,7 @@ export function exportPDF(props) {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -1077,7 +1077,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1108,7 +1108,7 @@ export function exportPDF(props) {
         ])
     });
     var content2 = {
-        margin: { top: 80, bottom: 50 },
+        margin: { top: 100, bottom: 50 },
         startY: startYtable,
         head: headers,
         body: dataArr2,
@@ -1122,7 +1122,7 @@ export function exportPDF(props) {
         y = doc.lastAutoTable.finalY + 20
         if (y + 100 > height) {
             doc.addPage();
-            y = 80
+            y = 100
         }
     } else {
         planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noTreeScenarioNotesFound'), doc.internal.pageSize.width * 3 / 4);
@@ -1131,7 +1131,7 @@ export function exportPDF(props) {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -1145,7 +1145,7 @@ export function exportPDF(props) {
     for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
             doc.addPage();
-            y = 80;
+            y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1176,7 +1176,7 @@ export function exportPDF(props) {
         ])
     });
     var content3 = {
-        margin: { top: 80, bottom: 50 },
+        margin: { top: 100, bottom: 50 },
         startY: startYtable,
         head: headers,
         body: dataArr2,
@@ -1192,7 +1192,7 @@ export function exportPDF(props) {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
