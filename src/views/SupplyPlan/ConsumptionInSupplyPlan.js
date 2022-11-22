@@ -879,7 +879,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var rowData = elInstance.getRowData(y);
         this.props.updateState("consumptionError", "");
         this.props.updateState("consumptionDuplicateError", "");
-        this.props.updateState("consumptionChangedFlag", 1);
+        if (x == 0 || x == 1 || x == 2 || x == 3 || x == 4 || x == 5 || x == 8 || x == 9 || x == 10) {
+            this.props.updateState("consumptionChangedFlag", 1);
+        }
         if (x == 12 || x == 0 || x == 2 || x == 15 || x == 10) {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
             var rowData = elInstance.getRowData(y);

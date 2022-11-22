@@ -224,7 +224,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                             active: rcpuResult[k].active,
                             label: rcpuResult[k].label,
                             planningUnitId: rcpuResult[k].planningUnit.id,
-                            planningUnit:rcpuResult[k].planningUnit
+                            planningUnit: rcpuResult[k].planningUnit
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
@@ -2590,7 +2590,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 }
             }
         }
-        this.props.updateState("shipmentChangedFlag", 1);
+        if (x == 0 || x == 3 || x == 4 || x == 5 || x == 6 || x == 7 || x == 8 || x == 9 || x == 11 || x == 12 || x == 15 || x == 16 || x == 17 || x == 18 || x == 19 || x == 21 || x == 23 || x == 24) {
+            this.props.updateState("shipmentChangedFlag", 1);
+        }
         // this.showOnlyErrors();
     }
 
@@ -4288,7 +4290,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 data: json,
                 columnDrag: true,
                 columns: [
-                    { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'hidden', source: adjustedOrderQty, width: 120, readOnly:true },
+                    { title: i18n.t('static.supplyPlan.adjustesOrderQty'), type: 'hidden', source: adjustedOrderQty, width: 120, readOnly: true },
                     { title: i18n.t('static.supplyPlan.suggestedOrderQty'), type: 'hidden', textEditor: true, mask: '#,##', width: 120, readOnly: true },
                     { title: i18n.t('static.supplyPlan.manualOrderQty'), type: 'numeric', textEditor: true, mask: '#,##', width: 120 },
                     { type: roundingOptionType, title: i18n.t('static.supplyPlan.orderBasedOn'), source: orderBasedOn, width: 120 },
