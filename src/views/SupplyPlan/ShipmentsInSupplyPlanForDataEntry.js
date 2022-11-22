@@ -479,8 +479,8 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 paginationArray = JEXCEL_PAGINATION_OPTION;
                                                 filterOption = true;
                                             }
-                                            var erpType = "true";
-                                            var erpTypeVisible = false;
+                                            var erpType = "text";
+                                            var erpVisible = false;
                                             var shipmentList = this.props.items.shipmentListForSelectedPlanningUnits;
                                             shipmentList = shipmentList.sort(function (a, b) { return ((new Date(a.receivedDate != "" && a.receivedDate != null && a.receivedDate != undefined && a.receivedDate != "Invalid date" ? a.receivedDate : a.expectedDeliveryDate) - new Date(b.receivedDate != "" && b.receivedDate != null && b.receivedDate != undefined && b.receivedDate != "Invalid date" ? b.receivedDate : b.expectedDeliveryDate))) });
                                             var yForBatch = -1;
@@ -511,11 +511,12 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 }
                                                 if (shipmentList[i].erpFlag.toString() == "true" && this.props.shipmentPage != "shipmentDataEntry") {
                                                     erpType = "text";
-                                                    erpTypeVisible = true;
+                                                    erpVisible = true
+
                                                 }
                                                 if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentTypeIds).includes(2)) {
                                                     erpType = "text";
-                                                    erpTypeVisible = true;
+                                                    erpVisible = true
                                                 }
 
                                                 if (this.props.shipmentPage != "shipmentDataEntry" && shipmentList[i].erpFlag.toString() == "true") {
@@ -646,7 +647,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data: shipmentsArr,
                                                 columns: [
                                                     { type: 'checkbox', title: i18n.t('static.common.active'), width: 80, readOnly: !shipmentEditable },
-                                                    { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'text', visible: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? true : false, readOnly: true, title: i18n.t('static.supplyPlan.erpFlag'), width: 80 },
+                                                    { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'text', visible: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? true : false, readOnly: true, title: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? i18n.t('static.supplyPlan.erpFlag') : "", width: 80, autoCasting: false },
                                                     { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
                                                     { type: 'dropdown', title: i18n.t('static.supplyPlan.qatProduct'), width: 150, source: this.props.items.planningUnitListForJexcel },
                                                     { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
@@ -655,7 +656,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
                                                     { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80, readOnly: !shipmentEditable },
                                                     { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
-                                                    { type: erpType, visible: erpTypeVisible, title: i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo'), width: 100, readOnly: true },
+                                                    { type: erpType, visible: erpVisible, title: erpVisible ? i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo') : "", width: 100, readOnly: true, autoCasting: false },
                                                     { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                                                     { type: 'numeric', title: i18n.t("static.shipment.shipmentQtyARU"), width: 130, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                     { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 90, readOnly: true },
@@ -672,103 +673,72 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
                                                     { type: 'text', title: i18n.t('static.program.notes'), width: 400 },
                                                     {
-                                                        // type: 'hidden', title: i18n.t('static.supplyPlan.createdDate'), 
-                                                        title: 'A',
                                                         type: 'text',
-                                                        visible: false,
-                                                        width: 0, readOnly: true
+                                                        // title: i18n.t('static.supplyPlan.createdDate'), 
+                                                        // width: 100, 
+                                                        readOnly: true,
+                                                        visible: false, autoCasting: false
                                                     },
                                                     {
-                                                        // type: 'hidden', title: i18n.t('static.supplyPlan.lastshipmentStatus'), 
-                                                        title: 'A',
                                                         type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.lastshipmentStatus'), 
                                                         visible: false,
-                                                        width: 0, readOnly: true
+                                                        // width: 100, 
+                                                        readOnly: true, autoCasting: false
                                                     },
                                                     {
-                                                        // type: 'hidden', title: i18n.t('static.supplyPlan.index'), 
-                                                        title: 'A',
                                                         type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.index'), 
                                                         visible: false,
-                                                        width: 0, readOnly: true
+                                                        // width: 100, 
+                                                        readOnly: true, autoCasting: false
                                                     },
                                                     {
-                                                        // type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), 
-                                                        title: 'A',
                                                         type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.batchInfo'), 
                                                         visible: false,
-                                                        width: 200, readOnly: true
+                                                        // width: 200, 
+                                                        readOnly: true, autoCasting: false
                                                     },
                                                     {
-                                                        // type: 'hidden', title: i18n.t('static.supplyPlan.totalQtyBatchInfo'), 
-                                                        title: 'A',
                                                         type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.totalQtyBatchInfo'), 
                                                         visible: false,
-                                                        width: 0, readOnly: true
+                                                        // width: 100, 
+                                                        readOnly: true, autoCasting: false
                                                     },
                                                     {
-                                                        // type: 'hidden', title: i18n.t('static.supplyPlan.shipmentDatesJson'), 
-                                                        title: 'A',
                                                         type: 'text',
+                                                        // title: i18n.t('static.supplyPlan.shipmentDatesJson'), 
                                                         visible: false,
-                                                        width: 0, readOnly: true
+                                                        // width: 100, 
+                                                        readOnly: true, autoCasting: false
                                                     },
                                                     {
-                                                        // type: 'hidden', title: "Suggested order Qty", 
-                                                        title: 'A',
                                                         type: 'text',
+                                                        // title: "Suggested order Qty", 
                                                         visible: false,
+                                                        readOnly: true, autoCasting: false
+                                                    },
+                                                    {
+                                                        type: 'text',
+                                                        // title: "Is changed", 
+                                                        visible: false,
+                                                        readOnly: true, autoCasting: false
+                                                    },
+                                                    {
+                                                        // title: i18n.t('static.inventory.active'), 
+                                                        visible: false,
+                                                        type: 'text', 
+                                                        // width: 100, 
                                                         readOnly: true
+                                                        , autoCasting: false
                                                     },
-                                                    {
-                                                        // type: 'hidden', title: "Is changed", 
-                                                        title: 'A',
-                                                        type: 'text',
-                                                        visible: false,
-                                                        readOnly: true
-                                                    },
-                                                    {
-                                                        // title: i18n.t('static.inventory.active'), type: 'hidden', 
-                                                        title: 'A',
-                                                        type: 'text',
-                                                        visible: false,
-                                                        width: 0, readOnly: true
-                                                    },
-                                                    {
-                                                        // type: 'hidden', 
-                                                        title: 'A',
-                                                        type: 'text',
-                                                        visible: false,
-                                                        readOnly: true
-                                                    },
-                                                    {
-                                                        // type: 'hidden', 
-                                                        title: 'A',
-                                                        type: 'text',
-                                                        visible: false,
-                                                        readOnly: true
-                                                    },
-                                                    {
-                                                        // type: 'hidden', 
-                                                        title: 'A',
-                                                        type: 'text',
-                                                        visible: false,
-                                                        readOnly: true
-                                                    },
-                                                    {
-                                                        // type: 'hidden', 
-                                                        title: 'A',
-                                                        type: 'text',
-                                                        visible: false,
-                                                        readOnly: true
-                                                    },
-                                                    {
-                                                        // type: 'hidden', 
-                                                        title: 'A',
-                                                        type: 'text',
-                                                        visible: false,
-                                                        readOnly: true
-                                                    }
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false }
                                                 ],
                                                 editable: true,
                                                 pagination: paginationOption,

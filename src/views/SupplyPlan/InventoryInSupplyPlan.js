@@ -224,14 +224,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var data = [];
                     var inventoryDataArr = [];
                     var adjustmentType = this.props.items.inventoryType;
-                    var adjustmentVisible = false;
                     var adjustmentColumnType = "text";
+                    var adjustmentVisible = false;
                     if (adjustmentType == 2) {
                         adjustmentColumnType = "numeric"
                         adjustmentVisible = true;
                     }
-                    var actualColumnType = "text";
                     var actualVisible = false;
+                    var actualColumnType = "hidden";
                     if (adjustmentType == 1) {
                         actualColumnType = "numeric";
                         actualVisible = true;
@@ -343,48 +343,40 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 180, filter: this.filterDataSource },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 180 },
                             { title: i18n.t('static.supplyPlan.inventoryType'), type: 'dropdown', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
-                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 120 },
-                            { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, visible: actualVisible, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 120 },
+                            { title: adjustmentVisible ? i18n.t('static.supplyPlan.quantityCountryProduct') : "", type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 120, autoCasting: false },
+                            { title: actualVisible ? i18n.t('static.supplyPlan.quantityCountryProduct') : "", type: actualColumnType, visible: actualVisible, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 120, autoCasting: false },
                             { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 90, readOnly: true },
-                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##.00', decimal: '.', width: 120, readOnly: true },
-                            { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: actualColumnType, visible: actualVisible, mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                            { title: adjustmentVisible ? i18n.t('static.supplyPlan.quantityQATProduct') : "", type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##.00', decimal: '.', width: 120, readOnly: true, autoCasting: false },
+                            { title: actualVisible ? i18n.t('static.supplyPlan.quantityQATProduct') : "", type: actualColumnType, visible: actualVisible, mask: '#,##.00', decimal: '.', width: 120, readOnly: true, autoCasting: false },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !inventoryEditable },
                             {
-                                // title: i18n.t('static.inventory.inventoryDate'), type: 'hidden', 
-                                title: 'A',
-                                type: 'text',
-                                visible: false,
-                                width: 0, readOnly: true
+                                // title: i18n.t('static.inventory.inventoryDate'), 
+                                type: 'text', visible: false, 
+                                // width: 0, 
+                                readOnly: true, autoCasting: false
                             },
                             {
-                                // type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), 
-                                title: 'A',
                                 type: 'text',
-                                visible: false,
-                                width: 0, readOnly: true
+                                // title: i18n.t('static.supplyPlan.batchInfo'), 
+                                // width: 0, 
+                                readOnly: true, visible: false, autoCasting: false
                             },
                             {
-                                // type: 'hidden', title: i18n.t('static.supplyPlan.index'), 
-                                title: 'A',
                                 type: 'text',
-                                visible: false,
-                                width: 50, readOnly: true
+                                // title: i18n.t('static.supplyPlan.index'), 
+                                // width: 50, 
+                                readOnly: true, visible: false, autoCasting: false
                             },
                             {
-                                // type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), 
-                                title: 'A',
                                 type: 'text',
-                                visible: false,
-                                width: 0, readOnly: true
+                                // title: i18n.t('static.supplyPlan.isChanged'), 
+                                // width: 0, 
+                                readOnly: true, visible: false, autoCasting: false
                             },
-                            {
-                                // type: 'hidden', 
-                                title: 'A',
-                                type: 'text',
-                                visible: false,
-                                width: 0, readOnly: true
-                            },
+                            { type: 'text', 
+                            // width: 0, 
+                            readOnly: true, visible: false, autoCasting: false },
                         ],
                         pagination: paginationOption,
                         paginationOptions: paginationArray,
