@@ -1029,7 +1029,7 @@ export default class ListTreeComponent extends Component {
             console.log("programList[j]---", programList[j]);
             var treeList = programList[j].programData.treeList;
 
-            if (treeList.length > 0) {
+            if (treeList!=undefined && treeList.length > 0) {
                 for (var k = 0; k < treeList.length; k++) {
 
                     data = [];

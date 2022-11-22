@@ -470,6 +470,37 @@ const getErrorsFromValidationErrorScenario = (validationError) => {
     }, {})
 }
 
+const validationSchemaLevel = function (values) {
+    return Yup.object().shape({
+        levelName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required('Please enter level name.'),
+
+    })
+}
+
+const validateLevel = (getValidationSchema) => {
+    return (values) => {
+        const validationSchemaLevel = getValidationSchema(values)
+        try {
+            validationSchemaLevel.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorLevel(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorLevel = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 function addCommas(cell1, row) {
 
     if (cell1 != null && cell1 != "") {
@@ -955,6 +986,7 @@ export default class BuildTree extends Component {
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.getNodeTransferList = this.getNodeTransferList.bind(this);
         this.autoCalculate = this.autoCalculate.bind(this);
+        this.toggleTooltipAuto=this.toggleTooltipAuto.bind(this);
     }
 
     getMomValueForDateRange(startDate) {
@@ -1069,7 +1101,7 @@ export default class BuildTree extends Component {
             levelNo = data.context.levels[0]
             if (levelListFiltered.length > 0) {
                 name = levelListFiltered[0].label.label_en;
-                unit = levelListFiltered[0].unit != null ? levelListFiltered[0].unit.id : "";
+                unit = levelListFiltered[0].unit != null && levelListFiltered[0].unit.id != null ? levelListFiltered[0].unit.id : "";
             }
             console.log("Name@@@@###########", name);
             console.log("Unit@@@@###########", unit);
@@ -1643,6 +1675,12 @@ export default class BuildTree extends Component {
     toggleSenariotree() {
         this.setState({
             popoverOpenSenariotree: !this.state.popoverOpenSenariotree,
+        });
+    }
+
+    toggleTooltipAuto() {
+        this.setState({
+            popoverTooltipAuto: !this.state.popoverTooltipAuto,
         });
     }
 
@@ -3452,10 +3490,13 @@ export default class BuildTree extends Component {
                 if (this.state.currentTransferData == "") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? -1 : 1, true);
                 }
+                var startDate = this.state.currentCalculatorStartDate;
+                var endDate = this.state.currentCalculatorStopDate;
+                var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(7, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? parseFloat(this.state.currentTargetChangeNumber * -1) : parseFloat(this.state.currentTargetChangeNumber), true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? parseFloat(parseFloat(this.state.currentTargetChangeNumber / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat(this.state.currentTargetChangeNumber / monthDifference).toFixed(4)), true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             } else if (this.state.currentModelingType == 3) { //Linear %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
@@ -3517,7 +3558,7 @@ export default class BuildTree extends Component {
         var targetChangeNumber = '';
         var targetChangePer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
-            targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
+            targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))).toFixed(4);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
             percentForOneMonth = targetChangePer;
         }
@@ -3600,19 +3641,24 @@ export default class BuildTree extends Component {
         var momValue = ''
         if (this.state.currentModelingType == 2) {
             // momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(4);
-            momValue = getValue;
+            momValue = parseFloat(getValue / monthDifference).toFixed(4);
         }
         if (this.state.currentModelingType == 3) {
             // momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(4);
-            momValue = getValue;
+            momValue = parseFloat(getValue / monthDifference).toFixed(4);
         }
         if (this.state.currentModelingType == 4) {
             // momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(4);
-            momValue = getValue;
+            momValue = parseFloat(getValue / monthDifference).toFixed(4);
+        }
+        var targetChangePer = '';
+        if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
+            targetChangePer = (parseFloat(momValue / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
         }
         this.setState({
             currentEndValue: getValue != '' ? targetEndValue.toFixed(4) : '',
-            currentCalculatedMomChange: getValue != '' ? momValue : ''
+            currentCalculatedMomChange: getValue != '' ? momValue : '',
+            currentTargetChangePercentage: getValue != '' ? targetChangePer : ''
         });
     }
 
@@ -6206,6 +6252,29 @@ export default class BuildTree extends Component {
         }
     }
 
+    touchAllLevel(setTouched, errors) {
+        setTouched({
+            levelName: true
+        }
+        )
+        this.validateFormLevel(errors)
+    }
+
+    validateFormLevel(errors) {
+        this.findFirstErrorLevel('levelForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorLevel(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
             forecastMethodId: true,
@@ -6408,7 +6477,7 @@ export default class BuildTree extends Component {
 
                 this.setState({
                     unitList: myResult,
-                    nodeUnitList: myResult.filter(x => x.dimension.id == TREE_DIMENSION_ID)
+                    nodeUnitList: myResult.filter(x => x.dimension.id == TREE_DIMENSION_ID && x.active==true)
                 }, () => {
                     var nodeUnitListPlural = [];
                     console.log("this.state.nodeUnitList---", this.state.nodeUnitList);
@@ -11118,6 +11187,11 @@ export default class BuildTree extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
+                                            <div>
+                                        <Popover placement="top" isOpen={this.state.popoverTooltipAuto} target="PopoverAuto" trigger="hover" toggle={this.toggleTooltipAuto}>
+                                            <PopoverBody>{i18n.t('static.tooltip.autoCalculate')}</PopoverBody>
+                                        </Popover>
+                                    </div>
                                             <FormGroup className="col-md-4" >
                                                 <div className="check inline  pl-lg-0 pt-lg-0">
                                                     <div>
@@ -11132,7 +11206,7 @@ export default class BuildTree extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Auto Calculate'}</b>
+                                                            <b>{'Auto Calculate'}</b><i class="fa fa-info-circle icons pl-lg-2" id="PopoverAuto" onClick={this.toggleTooltipAuto} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                         </Label>
                                                     </div>
                                                 </div>
@@ -11912,48 +11986,82 @@ export default class BuildTree extends Component {
             {/* Modal for level */}
             <Modal isOpen={this.state.levelModal}
                 className={'modal-md'}>
-                <ModalHeader toggle={() => this.levelClicked("")} className="modalHeader">
-                    <strong>{i18n.t('static.tree.levelDetails')}</strong>
-                </ModalHeader>
-                <ModalBody>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
-                        <Input type="text"
-                            id="levelName"
-                            name="levelName"
-                            required
-                            onChange={(e) => { this.levelNameChanged(e) }}
-                            value={this.state.levelName}
-                        ></Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
-                        <Input
-                            type="select"
-                            id="levelUnit"
-                            name="levelUnit"
-                            bsSize="sm"
-                            onChange={(e) => { this.levelUnitChange(e) }}
-                            value={this.state.levelUnit}
-                        >
-                            <option value="">{i18n.t('static.common.select')}</option>
-                            {this.state.nodeUnitList.length > 0
-                                && this.state.nodeUnitList.map((item, i) => {
-                                    return (
-                                        <option key={i} value={item.unitId}>
-                                            {getLabelText(item.label, this.state.lang)}
-                                        </option>
-                                    )
-                                }, this)}
-                        </Input>
-                    </FormGroup>
-                </ModalBody>
-                <ModalFooter>
-                    <div className="mr-0">
-                        <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={this.levelDeatilsSaved}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
-                    </div>
-                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                </ModalFooter>
+                {/* Validation start */}
+                <Formik
+                    enableReinitialize={true}
+                    initialValues={{
+                        levelName: this.state.levelName
+                    }}
+                    validate={validate(validationSchemaLevel)}
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                        this.levelDeatilsSaved()
+                    }}
+                    render={
+                        ({
+                            values,
+                            errors,
+                            touched,
+                            handleChange,
+                            handleBlur,
+                            handleSubmit,
+                            isSubmitting,
+                            isValid,
+                            setTouched,
+                            handleReset,
+                            setFieldValue,
+                            setFieldTouched
+                        }) => (
+                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='levelForm' autocomplete="off">
+                                <ModalHeader toggle={() => this.levelClicked("")} className="modalHeader">
+                                    <strong>{i18n.t('static.tree.levelDetails')}</strong>
+                                </ModalHeader>
+                                <ModalBody>
+
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text"
+                                            id="levelName"
+                                            name="levelName"
+                                            required
+                                            valid={!errors.levelName && this.state.levelName != null ? this.state.levelName : '' != ''}
+                                            invalid={touched.levelName && !!errors.levelName}
+                                            onBlur={handleBlur}
+                                            onChange={(e) => { this.levelNameChanged(e); handleChange(e); }}
+                                            value={this.state.levelName}
+                                        ></Input>
+                                        <FormFeedback>{errors.levelName}</FormFeedback>
+                                    </FormGroup>
+
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
+                                        <Input
+                                            type="select"
+                                            id="levelUnit"
+                                            name="levelUnit"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.levelUnitChange(e) }}
+                                            value={this.state.levelUnit}
+                                        >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {this.state.nodeUnitList.length > 0
+                                                && this.state.nodeUnitList.map((item, i) => {
+                                                    return (
+                                                        <option key={i} value={item.unitId}>
+                                                            {getLabelText(item.label, this.state.lang)}
+                                                        </option>
+                                                    )
+                                                }, this)}
+                                        </Input>
+                                    </FormGroup>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <div className="mr-0">
+                                        <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={() => this.touchAllLevel(setTouched, errors)}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                    </div>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                </ModalFooter>
+                            </Form>
+                        )} />
             </Modal>
 
         </div >
