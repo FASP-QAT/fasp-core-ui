@@ -1795,7 +1795,7 @@ class Consumption extends Component {
                                   &&
                                   this.state.consumptions.map((item, idx) =>
                                     <td id="addr0" key={idx} className="textcolor-purple">
-                                      {this.state.consumptions[idx].forecastedConsumption}
+                                      {this.formatter(this.state.consumptions[idx].forecastedConsumption)}
                                     </td>
                                   )
                                 }
