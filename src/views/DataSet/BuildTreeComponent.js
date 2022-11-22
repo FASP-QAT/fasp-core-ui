@@ -5303,7 +5303,9 @@ export default class BuildTree extends Component {
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text(getLabelText(this.state.dataSetObj.programData.label, this.state.lang), 30, 85);
+            .text(getLabelText(this.state.dataSetObj.programData.label, this.state.lang), 30, 85,{
+                width:780,
+            });
 
         doc
             .fillColor('#002f6c')
