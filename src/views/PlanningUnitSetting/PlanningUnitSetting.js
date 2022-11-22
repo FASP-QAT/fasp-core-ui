@@ -2116,7 +2116,7 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.forecastReport.priceType'),
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
-                    width: '100'
+                    width: '120'
                     // filter: this.filterProcurementAgentByPlanningUnit
                     // readOnly: true //7H
                 },
@@ -2488,7 +2488,7 @@ export default class PlanningUnitSetting extends Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[9].classList.add('AsteriskTheadtrTd');
 
         tr.children[5].classList.add('InfoTr');

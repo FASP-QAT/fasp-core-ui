@@ -116,7 +116,7 @@ export default class CompareVersionTableCompareVersion extends Component {
                 });*/
                 doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.compareVersion'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.compareVersion'), doc.internal.pageSize.width / 2, 80, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -144,7 +144,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         doc.setTextColor("#002f6c");
 
 
-        var y = 80;
+        var y = 100;
         doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
             align: 'left'
         })
@@ -193,7 +193,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         //   }
         //   doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
         var columns = [];
-        this.state.columns.filter(c => c.visible != false).map((item, idx) => { columns.push(item.title) });
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
         const headers2 = [
             { content: '', colSpan: 1 },
             { content: '', colSpan: 1 },
@@ -205,7 +205,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         this.state.dataEl.getJson(null, false).map(ele => {
             dataArr = [];
             this.state.columns.map((item, idx) => {
-                if (item.visible != false) {
+                if (item.type != 'hidden') {
                     if (item.type == 'numeric') {
                         dataArr.push(this.formatter(ele[idx]));
                     } else {
@@ -218,7 +218,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         const data = dataArr1;
         // doc.addPage()
         let content = {
-            margin: { top: 80, bottom: 50 },
+            margin: { top: 100, bottom: 50 },
             startY: startYtable,
             head: [headers2, columns],
             body: data,
@@ -282,7 +282,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         // columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
         // columns.push(i18n.t('static.productValidation.cost'));
         const headers = [];
-        this.state.columns.filter(c => c.visible != false).map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
         var C = [this.addDoubleQuoteToRowContent(["", "", this.props.versionLabel, this.props.versionLabel, this.props.versionLabel, this.props.versionLabel1, this.props.versionLabel1, this.props.versionLabel1])];
@@ -290,7 +290,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         this.state.dataEl.getJson(null, false).map(ele => {
             B = [];
             this.state.columns.map((item, idx) => {
-                if (item.visible != false) {
+                if (item.type != 'hidden') {
                     B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23'));
                 }
             })

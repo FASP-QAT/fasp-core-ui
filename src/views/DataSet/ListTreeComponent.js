@@ -1071,8 +1071,13 @@ export default class ListTreeComponent extends Component {
         } else {
             this.setState({
                 versions: [],
-
-            }, () => { })
+                treeData:[],
+                datasetListJexcel:[]
+            }, () => {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+             })
         }
     }
 
@@ -1204,18 +1209,23 @@ export default class ListTreeComponent extends Component {
         if (datasetId != 0 && datasetId != "") {
             this.setState(
                 {
-                    datasetId: datasetId
+                    datasetId: datasetId,
+                    versions: [],
+                    message: ""
                 }, () => {
                     this.filterVersion();
+                    this.hideSecondComponent()
                 })
         } else {
             this.setState(
                 {
                     datasetId: datasetId,
-                    versions: [],
                     message: i18n.t('static.mt.selectProgram'),
+                    color:"red"
                 }, () => {
+                    this.filterVersion();
                     jexcel.destroy(document.getElementById("tableDiv"), true);
+                    this.hideSecondComponent()
                 })
         }
     }
@@ -1290,6 +1300,7 @@ export default class ListTreeComponent extends Component {
 
     }
     buildJexcel() {
+        if(this.state.datasetId!=0){
         let programList = this.state.treeData;
         console.log(">>>", programList);
         let treeArray = [];
@@ -1514,6 +1525,15 @@ export default class ListTreeComponent extends Component {
         this.setState({
             treeEl: treeEl, loading: false
         })
+    }else{
+        this.setState({
+            treeEl:"",
+            loading:false
+        })
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+    }
     }
     hideSecondComponent() {
         setTimeout(function () {
