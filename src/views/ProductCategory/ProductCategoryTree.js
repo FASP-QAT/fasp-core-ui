@@ -30,6 +30,7 @@ const validationSchema = function (values, t) {
     return Yup.object().shape({
         productCategory: Yup.string()
             .required(i18n.t('static.productCategoryName.productCategoryNameRequired'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
 
     })
 }
