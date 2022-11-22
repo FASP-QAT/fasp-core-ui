@@ -6408,7 +6408,7 @@ export default class BuildTree extends Component {
 
                 this.setState({
                     unitList: myResult,
-                    nodeUnitList: myResult.filter(x => x.dimension.id == TREE_DIMENSION_ID)
+                    nodeUnitList: myResult.filter(x => x.dimension.id == TREE_DIMENSION_ID && x.active==true)
                 }, () => {
                     var nodeUnitListPlural = [];
                     console.log("this.state.nodeUnitList---", this.state.nodeUnitList);
