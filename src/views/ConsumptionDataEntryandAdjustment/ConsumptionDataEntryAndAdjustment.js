@@ -1385,8 +1385,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var endMonthVal = endValList[0].month;
               interpolatedRegionsAndMonths.push({ region: regionList[r], month: moment(monthArray[j].date).format("YYYY-MM") });
               //y=y1+(x-x1)*(y2-y1)/(x2-x1);
-              const monthDifference = moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
-              const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
+              const monthDifference = Math.round(Number(moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true)));
+              const monthDiff = Math.round(Number(moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true)));
               var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
               var json = {
                 amount: missingActualConsumption.toFixed(0),
