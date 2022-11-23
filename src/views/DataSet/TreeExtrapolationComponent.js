@@ -1332,6 +1332,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endVal---", endVal);
                                 var endMonthVal = endValList[0].month;
                                 console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endMonthVal---", endMonthVal);
+                                console.log("new Start Date TEST123",new Date(startMonthVal))
+                                console.log("new Month Array Date TEST123",new Date(monthArray[j]))
                                 console.log("Start Value TEST123",startVal)
                                 console.log("Start Month Value TEST123",startMonthVal)
                                 console.log("End Value TEST123",endVal);
