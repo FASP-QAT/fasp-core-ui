@@ -1179,6 +1179,7 @@
     "static.common.onlyIntegers": "Enter only positive integer",
     "static.ManageTree.DefinedPercentageParent": "Defined as a percentage of the parent",
     "static.language.language": "Language",
+    "static.tooltip.autoCalculate": "If QAT is slow while editing your tree, uncheck the auto-calculate box to stop calculations. Note that all calculated numbers may be wrong. To update the calculations, either re-check the ‘auto-calculate’ checkbox, or click the recalculate icon.",
     "static.dataEntryAndAdjustments.DataValues": "Where known data values are (x0 , y0) and (x1 , y1)",
     "static.procurementUnit.weightUnit": "Weight Unit",
     "static.loadDelDataset.allOlderModifiedVersion": "All the older modified/non modified versions including latest version will get deleted and new latest version will get loaded do you want to continue?",

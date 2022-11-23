@@ -2440,7 +2440,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           align: 'justify'
         });*/
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.common.dataCheck'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.common.dataCheck'), doc.internal.pageSize.width / 2, 80, {
           align: 'center'
         })
         if (i == 1) {
@@ -2476,7 +2476,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     for (var i = 0; i < planningText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
         doc.addPage();
-        y = 80;
+        y = 100;
 
       }
       doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -2490,7 +2490,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     for (var i = 0; i < planningText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
         doc.addPage();
-        y = 80;
+        y = 100;
 
       }
       doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -2504,7 +2504,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
           doc.addPage();
-          y = 80;
+          y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -2517,7 +2517,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
           doc.addPage();
-          y = 80;
+          y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -2532,7 +2532,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     for (var i = 0; i < planningText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
         doc.addPage();
-        y = 80;
+        y = 100;
 
       }
       doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -2546,7 +2546,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
           doc.addPage();
-          y = 80;
+          y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
@@ -2559,7 +2559,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
           doc.addPage();
-          y = 80;
+          y = 100;
 
         }
         doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);

@@ -3522,6 +3522,10 @@ class usageTemplate extends Component {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.program.validvaluetext'));
+                        }else if(value.toString().length>10){
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
                         } else {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setComments(col, "");
@@ -4645,6 +4649,18 @@ class usageTemplate extends Component {
                                 this.el.setStyle(col, "background-color", "transparent");
                                 this.el.setStyle(col, "background-color", "yellow");
                                 this.el.setComments(col, i18n.t('static.program.validvaluetext'));
+                                valid = false;
+                                this.setState({
+                                    message: i18n.t('static.supplyPlan.validationFailed'),
+                                    color: 'red'
+                                },
+                                    () => {
+                                        this.hideSecondComponent();
+                                    })
+                            }else if(value.toString().length>10){
+                                this.el.setStyle(col, "background-color", "transparent");
+                                this.el.setStyle(col, "background-color", "yellow");
+                                this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
                                 valid = false;
                                 this.setState({
                                     message: i18n.t('static.supplyPlan.validationFailed'),
