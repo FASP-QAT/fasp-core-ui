@@ -4406,7 +4406,36 @@ export default class BuildTree extends Component {
                     })
 
                 } else if (rowData[4] == "" || rowData[4] == null) {
-                    alert("Please select modeling type before proceeding.");
+                    this.setState({
+                        currentRowIndex: '',
+                        currentTransferData: '',
+                        currentModelingType: '',
+                        currentCalculatorStartDate: '',
+                        currentCalculatorStopDate: '',
+                        currentCalculatorStartValue: '',
+                    }, () => {
+                        // console.log("x row data===>", this.el.getRowData(x));
+                        var startValue = this.getMomValueForDateRange(rowData[1]);
+                        console.log("***MOM final start value---", startValue)
+                        this.setState({
+                            currentRowIndex: x,
+                            showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
+                            currentModelingType: 2,
+                            currentTransferData: rowData[3],
+                            currentCalculatorStartDate: rowData[1],
+                            currentCalculatorStopDate: rowData[2],
+                            currentCalculatorStartValue: startValue,
+                            currentCalculatedMomChange: '',
+                            currentTargetChangeNumber: '',
+                            currentTargetChangeNumberEdit: false,
+                            currentTargetChangePercentage: '',
+                            currentTargetChangePercentageEdit: false,
+                            currentEndValue: '',
+                            currentEndValueEdit: false
+                        }, () => {
+                            // this.calculateMOMData(0, 3);
+                        });
+                    })
                 }
                 else if (rowData[1] == "" || rowData[1] == null) {
                     alert("Please select start date before proceeding.");
@@ -5273,10 +5302,10 @@ export default class BuildTree extends Component {
             templates: (templates || [])
         });
         var sample3size = sampleChart.getSize();
-        var doc = new PDFDocument({ size: 'LEGAL' });
+        var doc = new PDFDocument({ size: 'B0' });
         var stream = doc.pipe(blobStream());
 
-        var legalSize = { width: 612.00, height: 1008.00 }
+        var legalSize = { width: 2834.65, height: 4008.19 }
         var scale = Math.min(legalSize.width / (sample3size.width + 300), legalSize.height / (sample3size.height + 300))
         doc.scale(scale);
         doc
