@@ -1027,7 +1027,7 @@ class CompareAndSelectScenario extends Component {
                   align: 'justify'
                 });*/
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.compareAndSelect'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.compareAndSelect'), doc.internal.pageSize.width / 2, 80, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1056,13 +1056,13 @@ class CompareAndSelectScenario extends Component {
         doc.setTextColor("#002f6c");
 
 
-        var y = 80;
+        var y = 100;
         var planningText = doc.splitTextToSize(i18n.t('static.common.forecastPeriod') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1075,7 +1075,7 @@ class CompareAndSelectScenario extends Component {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1088,7 +1088,7 @@ class CompareAndSelectScenario extends Component {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1101,7 +1101,7 @@ class CompareAndSelectScenario extends Component {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1115,7 +1115,7 @@ class CompareAndSelectScenario extends Component {
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
-                    y = 80;
+                    y = 100;
 
                 }
                 doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1128,7 +1128,7 @@ class CompareAndSelectScenario extends Component {
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
-                    y = 80;
+                    y = 100;
 
                 }
                 doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1142,7 +1142,7 @@ class CompareAndSelectScenario extends Component {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1218,7 +1218,7 @@ class CompareAndSelectScenario extends Component {
 
         let data2 = dataArr3;
         let content1 = {
-            margin: { top: 80, bottom: 50 },
+            margin: { top: 100, bottom: 50 },
             startY: startYtable,
             head: [col1],
             body: data2,
@@ -1238,7 +1238,7 @@ class CompareAndSelectScenario extends Component {
         };
         doc.autoTable(content1);
         doc.addPage();
-        doc.addImage(canvasImg, 'png', 50, 80, 750, 260, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 100, 750, 260, 'CANVAS');
         var columns = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
         var dataArr = [];
@@ -1265,9 +1265,9 @@ class CompareAndSelectScenario extends Component {
         })
         const data = dataArr1;
         doc.addPage()
-        startYtable = 80
+        startYtable = 100
         let content = {
-            margin: { top: 80, bottom: 50 },
+            margin: { top: 100, bottom: 50 },
             startY: startYtable,
             head: [columns],
             body: data,
@@ -2204,13 +2204,13 @@ class CompareAndSelectScenario extends Component {
                         {
                             this.state.showAllData &&
                             <div className="col-md-12 card-header-actions">
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', float: 'right', marginTop: '4px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 <a className="card-header-action" style={{ float: 'right' }}>
 
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t("static.report.exportPdf")} onClick={() => this.exportPDF()} />
 
 
                                 </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', float: 'right', marginTop: '4px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
                         }
 
