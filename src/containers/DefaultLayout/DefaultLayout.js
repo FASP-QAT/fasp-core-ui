@@ -1308,7 +1308,7 @@ class DefaultLayout extends Component {
   // }
 
   toggle(tabPane, tab) {
-    document.getElementById('div1').style.display = 'none';
+    // document.getElementById('div1').style.display = 'none';
     // console.log("inside toggle function")
     // const newArray = this.state.activeTab.slice()
     // newArray[tabPane] = tab
