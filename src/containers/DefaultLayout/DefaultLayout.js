@@ -567,7 +567,7 @@ const routes = [
   { path: '/supplyPlan/:programId/:planningUnitId/:batchNo/:expiryDate', exact: true, name: 'static.dashboard.supplyPlan', component: SupplyPlan },
 
   { path: '/report/whatIf', name: 'static.dashboard.whatIf', component: WhatIfReport },
-  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging',exact:true, component: ManualTagging },
+  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging', exact: true, component: ManualTagging },
   { path: '/shipment/manualTagging/:tab', name: 'static.dashboard.manualTagging', component: ManualTagging },
   { path: '/shipment/delinking', name: 'static.dashboard.delinking', component: ShipmentDelinking },
   { path: '/supplyPlanFormulas', name: 'static.supplyplan.supplyplanformula', component: SupplyPlanFormulas },
@@ -877,7 +877,7 @@ class DefaultLayout extends Component {
     //   window.location.reload();
     // } else {
     //   // "The specific word doesn't exist";
-      localStorage.setItem("loginOnline", false);
+    localStorage.setItem("loginOnline", false);
     //   window.location.reload();
     // }
     // window.location.reload();
@@ -1147,14 +1147,14 @@ class DefaultLayout extends Component {
         var programDatasetChanged = 0;
         console.log(" programDatasetChanged@@@!", programDatasetChanged);
         console.log("myResult@@@!", myResult);
-          
+
         for (var i = 0; i < myResult.length; i++) {
           console.log("userId@@@!", userId);
-          console.log("myResult[i].userId==userId@@@1", myResult[i].userId==userId);
-            
+          console.log("myResult[i].userId==userId@@@1", myResult[i].userId == userId);
+
           if (myResult[i].userId == userId) {
             console.log("myResult[i].changed@@@!", myResult[i].changed);
-            
+
             if (myResult[i].changed == 1) {
               programDatasetChanged = 1;
               break;
@@ -1294,7 +1294,6 @@ class DefaultLayout extends Component {
   // }
 
   toggle(tabPane, tab) {
-    document.getElementById('div1').style.display = 'none';
     // console.log("inside toggle function")
     // const newArray = this.state.activeTab.slice()
     // newArray[tabPane] = tab
@@ -1322,15 +1321,17 @@ class DefaultLayout extends Component {
     // console.log("User111-----", decryptedUser1.defaultModuleId);
     this.setState({
       activeTab: decryptedUser1.defaultModuleId,
-    // }, () => {
+    }, () => {
       // if (decryptedUser1.defaultModuleId==1){
       //   this.props.history.push(`/ApplicationDashboard/fm/1`);
       // }
       // else if (decryptedUser1.defaultModuleId==2){
       //   this.props.history.push(`/ApplicationDashboard/sp/2`);
       // }
-      // let id = AuthenticationService.displayDashboardBasedOnRole();
+      let id = AuthenticationService.displayDashboardBasedOnRole();
       // this.props.history.push(`/ApplicationDashboard/` + `${id}`);
+      var a = document.getElementsByClassName('tab' + tab);
+      a.href = `#/ApplicationDashboard/` + `${id}`
     });
 
   }
@@ -4285,7 +4286,8 @@ class DefaultLayout extends Component {
                       className="bgColourRemoveLink tab1"
                       active={this.state.activeTab === '1'}
                       onClick={() => { this.toggle(0, '1'); }}
-                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}/green/Success`}
+                      href='#'
+                      // href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}/green/Success`}
                       style={{ border: "none" }}
                       title={i18n.t('static.module.forecasting')}
                     >
@@ -4298,7 +4300,8 @@ class DefaultLayout extends Component {
                       className="bgColourRemoveLink tab2"
                       active={this.state.activeTab === '2'}
                       onClick={() => { this.toggle(0, '2'); }}
-                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}/green/Success`}
+                      href='#'
+                      // href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}/green/Success`}
                       style={{ border: "none", padding: "0.75rem 0.2rem" }}
                       title={i18n.t('static.module.supplyPlanningMod')}
                     >
