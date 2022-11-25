@@ -744,6 +744,16 @@ label.arrow_label:after {
   background-color: #D3D3D3 !important;
 }
 
+.jss>tbody>tr>td.readonly.productValidationSubTotalClass{
+  background-color: #ccc !important;
+  font-weight: bold !important;
+}
+
+.jss>tbody>tr>td.productValidationSubTotalClass{
+  background-color: #ccc !important;
+  font-weight: bold !important;
+}
+
 .jexcel>tbody>tr>td.readonly.shipmentEntryDelete {
   color: #808080 !important;
   background-color: #808080 !important;
@@ -7457,6 +7467,7 @@ label.arrow_label:before {
   // border: 1px solid #002f6c!important;
   border-radius: 0px !important;
   cursor: pointer;
+  font-size: 10.7px !important;
 }
 
 // .ContactTitleWhite i{
@@ -9684,3 +9695,8 @@ legend.scheduler-border {
   font-size: 14px !important;
 }
 
+.card.removeCardwrap {
+  word-wrap: inherit !important;
+}
+  
+  

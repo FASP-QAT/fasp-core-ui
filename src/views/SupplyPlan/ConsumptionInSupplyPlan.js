@@ -327,11 +327,23 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !consumptionEditable },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0, readOnly: true },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.index'), width: 0, readOnly: true },
-                            { type: 'hidden', title: i18n.t('static.supplyPlan.isChanged'), width: 0, readOnly: true },
-                            { type: 'hidden', width: 0, readOnly: true },
-                            { type: 'hidden', width: 0, readOnly: true }
+                            {
+                                type: 'text', visible: false,
+                                // title: i18n.t('static.supplyPlan.batchInfo'), 
+                                width: 0, readOnly: true, autoCasting: false
+                            },
+                            {
+                                type: 'text', visible: false,
+                                // title: i18n.t('static.supplyPlan.index'), 
+                                width: 0, readOnly: true, autoCasting: false
+                            },
+                            {
+                                type: 'text', visible: false,
+                                // title: i18n.t('static.supplyPlan.isChanged'), 
+                                width: 0, readOnly: true, autoCasting: false
+                            },
+                            { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
+                            { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false }
                         ],
                         pagination: paginationOption,
                         onformulachain: this.formulaChanged,
@@ -879,7 +891,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var rowData = elInstance.getRowData(y);
         this.props.updateState("consumptionError", "");
         this.props.updateState("consumptionDuplicateError", "");
-        this.props.updateState("consumptionChangedFlag", 1);
+        if (x == 0 || x == 1 || x == 2 || x == 3 || x == 4 || x == 5 || x == 8 || x == 9 || x == 10) {
+            this.props.updateState("consumptionChangedFlag", 1);
+        }
         if (x == 12 || x == 0 || x == 2 || x == 15 || x == 10) {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
             var rowData = elInstance.getRowData(y);
