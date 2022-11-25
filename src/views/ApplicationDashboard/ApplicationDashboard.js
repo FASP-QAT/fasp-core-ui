@@ -1187,7 +1187,7 @@ class ApplicationDashboard extends Component {
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
-        <h5 className={this.props.match.params.color} id="div1" style={{display:this.props.match.params.message=='Success'?'none':'block'}}>{i18n.t(this.props.match.params.message)}</h5>
+        <h5 className={this.props.match.params.color} id="div1" style={{ display: this.props.match.params.message == 'Success' ? 'none' : 'block' }}>{i18n.t(this.props.match.params.message)}</h5>
         <h5 className={this.state.color} id="div2">{i18n.t(this.state.message)}</h5>
         <Row className="mt-2">
           {checkOnline === 'Online' && this.state.id == 1 &&
