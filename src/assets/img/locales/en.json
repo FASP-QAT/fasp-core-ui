@@ -702,7 +702,7 @@
     "static.user.resetPassword": "Reset password",
     "static.program.fileinput": "File input (must be .zip format)",
     "static.procurementAgent.procurementAgentHTMLCode": "Enter Color Code",
-    "static.extrapolation.error": "Arima could not be calculated for given data",
+    "static.extrapolation.error": "Note that even with the minimum 13 months of data, ARIMA may not always be able to calculate. Try add more months of data, or use another extrapolation method.",
     "static.ForecastAnalysisOutput.ForecastAnalysisOutput": "Forecast Analysis Output",
     "static.graph.inactiveProgram": "Inactive Programs",
     "static.programproduct.programproduct": "Program Planning Unit",
