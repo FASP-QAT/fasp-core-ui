@@ -1873,9 +1873,19 @@ class EditUserComponent extends Component {
                                                     </div>
                                                 </div>
                                             </CardBody>
-                                            <CardFooter>
+                                            <CardFooter style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+       
+                                            <CardFooter style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
@@ -1890,15 +1900,6 @@ class EditUserComponent extends Component {
                                                     </div>
                                                 </div>
                                             </Row>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-
-                                                    &nbsp;
-                                                </FormGroup>
-                                            </CardFooter>
                                         </Form>
                                     )} />
                         </Card>
