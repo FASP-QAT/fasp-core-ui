@@ -554,7 +554,7 @@ class ForecastMetrics extends Component {
         }
         // console.log("programids=====>", programIdsValue);
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
-        TracerCategoryService.getTracerCategoryByProgramIds(realmId, programIdsValue)
+        TracerCategoryService.getTracerCategoryByRealmId(realmId)
           .then(response => {
             console.log("tc respons==>", response.data);
             var listArray = response.data;
