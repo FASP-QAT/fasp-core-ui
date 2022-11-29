@@ -16,6 +16,7 @@ import DefaultHeaderDropdown from './DefaultHeaderDropdown';
 import eventBus from './eventBus.js'
 import CryptoJS from 'crypto-js'
 import ProgramService from "../../api/ProgramService"
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const propTypes = {
   children: PropTypes.node,
@@ -168,7 +169,7 @@ class DefaultHeader extends Component {
             </NavItem>
           }
           {/* <Online> */}
-          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_DATASET') && this.props.activeModule == 1 &&
+          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_DATASET') && this.props.activeModule == 1 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.fuChangeIcon)}
@@ -212,13 +213,13 @@ class DefaultHeader extends Component {
           </NavItem>
           }
 
-          <NavItem className="">
+          {isSiteOnline() && <NavItem className="">
             <span className="nav-link">
               <a href={`${API_URL}/file/qatUserGuide`}>
                 <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '30px', height: '30px' }} />
               </a>
             </span>
-          </NavItem>
+          </NavItem>}
           <NavItem className="" title={i18n.t('static.common.refreshPage')}>
             <span className="nav-link">
               <svg onClick={this.refreshPage} style={{ cursor: 'pointer', width: '28px', height: '28px', color: '#a7c6ed' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon icon-xxl" role="img"><path fill="var(--ci-primary-color, currentColor)" d="M265.614,206.387H456V16H424V149.887L397.863,123.75c-79.539-79.539-208.96-79.54-288.5,0s-79.539,208.96,0,288.5a204.232,204.232,0,0,0,288.5,0l-22.627-22.627c-67.063,67.063-176.182,67.063-243.244,0s-67.063-176.183,0-243.246,176.182-67.063,243.245,0l28.01,28.01H265.614Z" class="ci-primary"></path></svg>

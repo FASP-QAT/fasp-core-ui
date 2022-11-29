@@ -558,7 +558,7 @@ class ForecastOutput extends Component {
 
             return (A.push(this.addDoubleQuoteToRowContent([
                 ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                ((ele.scenario.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                ((ele.scenario.label!=null?ele.scenario.label:"").replaceAll(',', ' ')).replaceAll(' ', '%20'),
             ].concat(propertyName))))
         }
         );

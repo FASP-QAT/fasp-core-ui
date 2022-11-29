@@ -5080,10 +5080,10 @@ export default class BuildTree extends Component {
             templates: (templates || [])
         });
         var sample3size = sampleChart.getSize();
-        var doc = new PDFDocument({ size: 'LEGAL' });
+        var doc = new PDFDocument({ size: 'B0' });
         var stream = doc.pipe(blobStream());
 
-        var legalSize = { width: 612.00, height: 1008.00 }
+        var legalSize = { width: 2834.65, height: 4008.19 }
         var scale = Math.min(legalSize.width / (sample3size.width + 300), legalSize.height / (sample3size.height + 300))
         doc.scale(scale);
         doc
@@ -5114,7 +5114,9 @@ export default class BuildTree extends Component {
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text(getLabelText(this.state.dataSetObj.programData.label, this.state.lang), 30, 85);
+            .text(getLabelText(this.state.dataSetObj.programData.label, this.state.lang), 30, 85,{
+                width:780,
+            });
 
         doc
             .fillColor('#002f6c')
@@ -5779,7 +5781,7 @@ export default class BuildTree extends Component {
             console.log("usageTypeId 5---", usageTypeId);
             usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
             console.log("usagePeriodId 5---", usagePeriodId);
-            usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency;
+            usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",","");
             console.log("usageFrequency 5---", usageFrequency);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
@@ -5794,7 +5796,7 @@ export default class BuildTree extends Component {
                 usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
                 console.log("usagePeriodId 4---", usagePeriodId);
             }
-            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency;
+            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",","");
             console.log("usageFrequency 4---", usageFrequency);
 
         }
@@ -5841,7 +5843,7 @@ export default class BuildTree extends Component {
                     convertToMonth = 0;
                 }
             }
-            var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? ((this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+            var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount!=null?((this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",",""):(this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
             console.log("noFURequired---", noFURequired);
 
         } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
