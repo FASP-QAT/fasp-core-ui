@@ -247,7 +247,7 @@ class ProductCatalog extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             let realmId = AuthenticationService.getRealmId();
             if (isSiteOnline()) {
-                TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
+                TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
 
                     if (response.status == 200) {
                         var listArray = response.data;
