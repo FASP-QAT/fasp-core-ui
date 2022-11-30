@@ -360,7 +360,7 @@ export function buildJxl1(props) {
                     // readOnly: true
                 });
             }
-            if (columnsArray.filter(c => c.visible != false).length > 1) {
+            if (columnsArray.filter(c => c.type != 'hidden').length > 1) {
                 // var languageEl = jexcel(document.getElementById("tableDiv" + tsl), options);
                 // props.el = languageEl;
                 treeScenarioListNotHaving100PerChild.push({ treeId: treeScenarioListFilter[tsl].treeId, scenarioId: treeScenarioListFilter[tsl].scenarioId });
@@ -468,7 +468,7 @@ export function buildJxl(props) {
                     return [];
                 }.bind(this),
             };
-            if (columnsArray.filter(c => c.visible != false).length > 1) {
+            if (columnsArray.filter(c => c.type != 'hidden').length > 1) {
                 var languageEl = jexcel(document.getElementById("tableDiv" + tsl), options);
                 props.el = languageEl;
                 // treeScenarioListNotHaving100PerChild.push({ treeId: treeScenarioListFilter[tsl].treeId, scenarioId: treeScenarioListFilter[tsl].scenarioId });
@@ -940,14 +940,14 @@ export function exportPDF(props) {
 
 
                         var columnsArray = [];
-                        item1.columnArray.filter(c => c.visible != false).map(item4 => {
+                        item1.columnArray.filter(c => c.type != 'hidden').map(item4 => {
                             columnsArray.push(item4.title)
                         })
                         var dataArr = [];
                         item1.dataArray.map(item3 => {
                             var dataArr1 = []
                             item1.columnArray.map((item2, count) => {
-                                if (item2.visible != false) {
+                                if (item2.type != 'hidden') {
                                     if (item2.type == 'calendar') {
                                         dataArr1.push(moment(item3[count]).format(DATE_FORMAT_CAP_WITHOUT_DATE))
                                     } else {

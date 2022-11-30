@@ -192,7 +192,7 @@ export default class StockStatusMatrix extends React.Component {
 
 
           let realmId = AuthenticationService.getRealmId();
-          TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
+          TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
 
             if (response.status == 200) {
               var listArray = response.data;

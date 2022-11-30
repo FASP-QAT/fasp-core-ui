@@ -697,6 +697,16 @@ label.arrow_label:after {
   background-color: #D3D3D3 !important;
 }
 
+.jss > tbody > tr > td.readonly.productValidationSubTotalClass {
+  background-color: #ccc !important;
+  font-weight: bold !important;
+}
+
+.jss > tbody > tr > td.productValidationSubTotalClass {
+  background-color: #ccc !important;
+  font-weight: bold !important;
+}
+
 .jexcel > tbody > tr > td.readonly.shipmentEntryDelete {
   color: #808080 !important;
   background-color: #808080 !important;
@@ -4102,7 +4112,7 @@ h6 {
   border: 2px solid #fbcb09;
   background: white;
   color: #c77405;
-  width: 100%;
+  width: 84% !important;
   height: 100%;
   left: -2px;
   top: -2px;
@@ -4809,7 +4819,7 @@ label.arrow_label:before {
   border: 2px solid #fbcb09;
   background: white;
   color: #c77405;
-  width: 100%;
+  width: 84% !important;
   height: 100%;
   left: -2px;
   top: -2px;
@@ -8160,6 +8170,16 @@ table tbody tr td:after {
   color: #212721;
 }
 
+.HighlightFrame {
+  border: 2px solid #fbcb09;
+  background: white;
+  color: #c77405;
+  width: 84% !important;
+  height: 100%;
+  left: -2px;
+  top: -2px;
+}
+
 .MorginTopMonth {
   margin-top: 48px;
 }
@@ -8672,6 +8692,19 @@ table tbody tr td:after {
 
 .ModelingTableMargin {
   margin: 0 auto;
+}
+
+.HighlightFrame {
+  border: 0px solid #fbcb09 !important;
+  background: transparent !important;
+  color: transparent !important;
+  border-radius: 0px !important;
+  width: 84% !important;
+  height: 100%;
+  left: -1px;
+  top: -1px;
+  padding-bottom: 0px;
+  box-shadow: 0 8px 16px #0000001f !important;
 }
 
 @media (min-width: 1920px) {
@@ -10417,4 +10450,13 @@ label.arrow_label:before {
 
 .MarginTopCustformonth {
   margin-top: 32px;
+}
+
+.card.removeCardwrap {
+  word-wrap: inherit !important;
+}
+
+.whitebg_inforecastOutput {
+  background: #fff;
+  z-index: 9999999999999;
 }
