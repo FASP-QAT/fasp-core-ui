@@ -1181,18 +1181,18 @@ export default class CreateTreeTemplate extends Component {
             var pu = this.state.planningUnitList.filter(x => x.planningUnitId == currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id)[0];
             console.log("5 2----------------->>>", this.state.planningUnitList);
             console.log("5 3----------------->>>", pu);
-            console.log("pu qat cal 1---", pu.multiplier)
+            // console.log("pu qat cal 1---", pu.multiplier)
             console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson);
             // this.getNoOfMonthsInUsagePeriod();
             if (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) {
-                var refillMonths = currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths : this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
+                var refillMonths = currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths : this.round(parseFloat((pu!=undefined?pu.multiplier:1) / (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
                 console.log("refillMonths qat cal---", refillMonths)
                 console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
                 // qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
-                qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
+                qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / (pu!=undefined?pu.multiplier:1)).toFixed(4);
             } else {
                 // if (currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == true) {
-                qatCalculatedPUPerVisit = addCommas(this.state.noFURequired / pu.multiplier);
+                qatCalculatedPUPerVisit = addCommas(this.state.noFURequired / (pu!=undefined?pu.multiplier:1));
                 // } else {
                 //     qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                 // }
@@ -4380,10 +4380,12 @@ export default class CreateTreeTemplate extends Component {
                     });
                 }
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != "") {
-                    var conversionFactor = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id)[0].multiplier;
+                    console.log("this.state.planningUnitList Test",this.state.planningUnitList);
+                    console.log("Planning Unit Id Test",this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id);
+                    var conversionFactor = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id);
                     console.log("pu conversion factor---", conversionFactor);
                     this.setState({
-                        conversionFactor
+                        conversionFactor:conversionFactor.length>0?conversionFactor[0].multiplier:""
                     }, () => {
                         if (!this.state.addNodeFlag) {
                             this.qatCalculatedPUPerVisit(0);
@@ -4831,7 +4833,12 @@ export default class CreateTreeTemplate extends Component {
                     var planningUnitId = document.getElementById("planningUnitId");
                     var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
                 } else {
-                    var planningUnit = this.state.planningUnitList.filter(c => c.planningUnitId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id)[0].label.label_en;
+                    var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnitId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
+                    if(planningUnitObj.length>0){
+                        var planningUnit=planningUnitObj[0].label.label_en
+                    }else{
+                        var planningUnit=""
+                    }
                 }
                 if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                     var sharePu;
@@ -9874,47 +9881,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id: itemConfig.payload.nodeUnit.id,
                                                     label: itemConfig.payload.nodeUnit.label
                                                 },
-                                                nodeDataMap: [
-                                                    [
-                                                        {
-                                                            dataValue: (itemConfig.payload.nodeDataMap[0])[0].dataValue,
-                                                            calculatedDataValue: (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue,
-                                                            fuNode: {
-                                                                noOfForecastingUnitsPerPerson: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson : ''),
-                                                                usageFrequency: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency : ''),
-                                                                forecastingUnit: {
-                                                                    label: {
-                                                                        label_en: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en : '')
-                                                                    },
-                                                                    tracerCategory: {
-
-                                                                    },
-                                                                    unit: {
-                                                                        id: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id : '')
-                                                                    }
-                                                                },
-                                                                usageType: {
-                                                                    id: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id : '')
-                                                                },
-                                                                usagePeriod: {
-                                                                    usagePeriodId: (itemConfig.payload.nodeType.id == 4 && (itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : '')
-                                                                },
-                                                                repeatUsagePeriod: {
-
-                                                                },
-                                                                noOfPersons: (itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfPersons : '')
-                                                            },
-                                                            puNode: {
-                                                                planningUnit: {
-                                                                    unit: {
-
-                                                                    }
-                                                                },
-                                                                refillMonths: ''
-                                                            }
-                                                        }
-                                                    ]
-                                                ]
+                                                nodeDataMap: itemConfig.payload.nodeDataMap
                                             }
                                         }
 
