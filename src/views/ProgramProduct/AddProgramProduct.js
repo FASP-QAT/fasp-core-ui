@@ -89,7 +89,7 @@ class AddprogramPlanningUnit extends Component {
             for (var pcu = 0; pcu < pcList.length; pcu++) {
                 pcIdArray.push(pcList[pcu].payload.productCategoryId);
             }
-            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
+            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id));
         } else {
             console.log("in else=====>");
             puList = this.state.planningUnitList
@@ -97,8 +97,8 @@ class AddprogramPlanningUnit extends Component {
 
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
-                name: puList[k].label.label_en + ' | ' + puList[k].planningUnitId,
-                id: puList[k].planningUnitId
+                name: puList[k].label.label_en + ' | ' + puList[k].id,
+                id: puList[k].id
             }
             mylist.push(planningUnitJson);
         }
@@ -272,7 +272,7 @@ class AddprogramPlanningUnit extends Component {
                                 this.setState({ productCategoryList: response.data });
 
                                 // PlanningUnitService.getAllPlanningUnitList()
-                                PlanningUnitService.getActivePlanningUnitList()
+                                PlanningUnitService.getPlanningUnitListBasic()
                                     .then(response => {
                                         console.log("PlanningUnitResponse------->", response.data);
                                         if (response.status == 200) {
@@ -281,8 +281,8 @@ class AddprogramPlanningUnit extends Component {
                                             });
                                             for (var k = 0; k < (response.data).length; k++) {
                                                 var planningUnitJson = {
-                                                    name: response.data[k].label.label_en + ' | ' + response.data[k].planningUnitId,
-                                                    id: response.data[k].planningUnitId,
+                                                    name: response.data[k].label.label_en + ' | ' + response.data[k].id,
+                                                    id: response.data[k].id,
                                                     active: response.data[k].active
                                                 }
                                                 list.push(planningUnitJson);
@@ -297,7 +297,7 @@ class AddprogramPlanningUnit extends Component {
                                                         let myReasponse = response.data.sort((a, b) => {
                                                             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                                                             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                                                             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                                                             return itemLabelA > itemLabelB ? 1 : -1;
                                                         });
@@ -746,7 +746,7 @@ class AddprogramPlanningUnit extends Component {
                                                                                     title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
                                                                                     onclick: function () {
                                                                                         // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
-                                                                            // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
                                                                                         // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
                                                                                         // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
                                                                                         // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
