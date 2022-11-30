@@ -4655,7 +4655,11 @@ export default class BranchTemplate extends Component {
                 }
 
             }else{
-                selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en;                
+                if (this.state.currentItemConfig.context.level != 0) {
+                    selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en;
+                } else {
+                    selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en;
+                }
             }
 
             if (this.state.addNodeFlag) {

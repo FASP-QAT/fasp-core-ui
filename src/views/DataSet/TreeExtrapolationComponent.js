@@ -1332,16 +1332,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endVal---", endVal);
                                 var endMonthVal = endValList[0].month;
                                 console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endMonthVal---", endMonthVal);
-                                console.log("new Start Date TEST123",new Date(startMonthVal))
-                                console.log("new Month Array Date TEST123",new Date(monthArray[j]))
-                                console.log("Start Value TEST123",startVal)
-                                console.log("Start Month Value TEST123",startMonthVal)
-                                console.log("End Value TEST123",endVal);
-                                console.log("ENd value month TEST123",endMonthVal)
                                 const monthDifference = Math.round(Number(moment(new Date(monthArray[j])).diff(new Date(startMonthVal), 'months', true)));
                                 const monthDiff = Math.round(Number(moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true)));
-                                console.log("Month Difference TEST123",monthDifference)
-                                console.log("Month Diff TEST123",monthDiff)
                                 var missingActualData = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
                                 console.log("Missing Actual Data TEST123",missingActualData)
                                 console.log("Missing Actual Data FIXED TEST123",missingActualData.toFixed(4))
