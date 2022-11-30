@@ -210,6 +210,7 @@ class EditBudgetComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     console.log("(response.data.startDate)--", new Date(response.data.startDate));
+                    console.log("Response data Test",response.data)
                     // if (response.data.startDate != null && response.data.startDate != "") {
                     //     response.data.startDate = new Date(response.data.startDate);
                     // }
@@ -224,7 +225,7 @@ class EditBudgetComponent extends Component {
                     let budgetObj = response.data;
                     budgetObj.budgetAmt = (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                     console.log("AMT------>", (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
-
+                    console.log("Budget Obj Test",budgetObj)
                     this.setState({
                         budget: budgetObj, loading: false,
                         rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
@@ -691,7 +692,7 @@ class EditBudgetComponent extends Component {
                                                         // invalid={(touched.budgetAmt && !!errors.budgetAmt || !!errors.budgetAmt)}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        // type="text"
+                                                        type="text"
                                                         // placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                         value={this.state.budget.budgetAmt}
                                                     />
@@ -806,6 +807,7 @@ class EditBudgetComponent extends Component {
     resetClicked() {
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
+                console.log("Response data Test",response.data)
 
                 // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                 // response.data.budgetAmt = getBudgetAmount;

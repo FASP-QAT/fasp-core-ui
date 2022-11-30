@@ -648,24 +648,29 @@ export default class ConsumptionDetails extends React.Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'problemReportId',
-                    type: 'hidden',
+                    // title: 'problemReportId',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: 'problemActionIndex',
-                    type: 'hidden',
+                    // title: 'problemActionIndex',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: i18n.t('static.program.programCode'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.programCode'),
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: i18n.t('static.program.versionId'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.versionId'),
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: i18n.t('static.region.region'),
-                    type: 'hidden',
+                    // title: i18n.t('static.region.region'),
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
@@ -673,8 +678,9 @@ export default class ConsumptionDetails extends React.Component {
                     readOnly: true,
                 },
                 {
-                    title: i18n.t('static.report.month'),
-                    type: 'hidden',
+                    // title: i18n.t('static.report.month'),
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 // {
                 //     title: i18n.t('static.report.createdDate'),
@@ -709,25 +715,30 @@ export default class ConsumptionDetails extends React.Component {
                     type: 'text',
                 },
                 {
-                    title: i18n.t('static.common.action'),
-                    type: 'hidden',
+                    // title: i18n.t('static.common.action'),
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: 'planningUnitId',
-                    type: 'hidden',
+                    // title: 'planningUnitId',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: 'problemId',
-                    type: 'hidden',
+                    // title: 'problemId',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: 'actionUrl',
-                    type: 'hidden',
+                    // title: 'actionUrl',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
 
                 {
-                    title: 'Problem Type',
-                    type: 'hidden',
+                    // title: 'Problem Type',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
@@ -751,12 +762,14 @@ export default class ConsumptionDetails extends React.Component {
                     type: 'text',
                 },
                 {
-                    title: 'isChanged',
-                    type: 'hidden',
+                    // title: 'isChanged',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: 'problemType',
-                    type: 'hidden',
+                    // title: 'problemType',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
             ],
             editable: !qplEditable,
