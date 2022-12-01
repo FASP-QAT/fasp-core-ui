@@ -1033,7 +1033,7 @@ export function exportPDF(props) {
     props.state.datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").map((item5, i) => {
         dataArr2.push([
             getLabelText(item5.planningUnit.label, props.state.lang),
-            item5.consumtionNotes])
+            item5.consumptionNotes])
     });
     var content1 = {
         margin: { top: 100, bottom: 50 },
