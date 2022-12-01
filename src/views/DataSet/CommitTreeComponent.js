@@ -221,69 +221,76 @@ export default class CommitTreeComponent extends React.Component {
             loading: true,
             showCompare: false,
         }, () => {
-            var myResult = [];
-            myResult = this.state.programList;
-            localStorage.setItem("sesDatasetId", programId);
-            this.setState({
-                programId: programId
-            })
-
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
+            if (programId != "" && programId != undefined && programId != null) {
+                var myResult = [];
+                myResult = this.state.programList;
+                localStorage.setItem("sesDatasetId", programId);
                 this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: '#BA0C2F'
+                    programId: programId
                 })
-                // this.hideFirstComponent()
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var programDataTransaction = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                var programDataOs = programDataTransaction.objectStore('downloadedDatasetData');
-                var programRequest = programDataOs.get(programId);
-                programRequest.onsuccess = function (e) {
-                    var myResult1 = programRequest.result;
-                    var datasetDataBytes = CryptoJS.AES.decrypt(myResult1.programData, SECRET_KEY);
-                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                    var datasetJson = JSON.parse(datasetData);
 
-                    let programData = myResult.filter(c => (c.id == programId));
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
                     this.setState({
-                        programDataLocal: programData[0].datasetJson,
-                        programCode: programData[0].datasetJson.programCode,
-                        version: programData[0].version,
-                        pageName: i18n.t('static.button.commit'),
-                        programDataDownloaded: datasetJson,
-                        programName: programData[0].datasetJson.programCode + '~v' + programData[0].version + ' (local)',
-                        programNameOriginal: getLabelText(datasetJson.label, this.state.lang),
-                        forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
-                        forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
-                        notes: programData[0].datasetJson.currentVersion.notes
+                        message: i18n.t('static.program.errortext'),
+                        color: '#BA0C2F'
                     })
+                    // this.hideFirstComponent()
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                    var programDataOs = programDataTransaction.objectStore('downloadedDatasetData');
+                    var programRequest = programDataOs.get(programId);
+                    programRequest.onsuccess = function (e) {
+                        var myResult1 = programRequest.result;
+                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult1.programData, SECRET_KEY);
+                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                        var datasetJson = JSON.parse(datasetData);
 
-                    var programVersionJson = [];
-                    var json = {
-                        programId: programData[0].datasetJson.programId,
-                        versionId: '-1'
-                    }
-                    programVersionJson = programVersionJson.concat([json]);
-                    DatasetService.getAllDatasetData(programVersionJson)
-                        .then(response => {
-                            console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
-                            this.setState({
-                                programDataServer: response.data[0],
-                                showCompare: true,
-                                comparedLatestVersion: response.data[0].currentVersion.versionId
-                            }, () => {
-                                dataCheck(this, programData[0].datasetJson)
-                            })
+                        let programData = myResult.filter(c => (c.id == programId));
+                        this.setState({
+                            programDataLocal: programData[0].datasetJson,
+                            programCode: programData[0].datasetJson.programCode,
+                            version: programData[0].version,
+                            pageName: i18n.t('static.button.commit'),
+                            programDataDownloaded: datasetJson,
+                            programName: programData[0].datasetJson.programCode + '~v' + programData[0].version + ' (local)',
+                            programNameOriginal: getLabelText(datasetJson.label, this.state.lang),
+                            forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
+                            forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
+                            notes: programData[0].datasetJson.currentVersion.notes
                         })
 
+                        var programVersionJson = [];
+                        var json = {
+                            programId: programData[0].datasetJson.programId,
+                            versionId: '-1'
+                        }
+                        programVersionJson = programVersionJson.concat([json]);
+                        DatasetService.getAllDatasetData(programVersionJson)
+                            .then(response => {
+                                console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
+                                this.setState({
+                                    programDataServer: response.data[0],
+                                    showCompare: true,
+                                    comparedLatestVersion: response.data[0].currentVersion.versionId
+                                }, () => {
+                                    dataCheck(this, programData[0].datasetJson)
+                                })
+                            })
 
+
+                    }.bind(this)
                 }.bind(this)
-            }.bind(this)
+            } else {
+                this.setState({
+                    loading: false,
+                    programId:""
+                })
+            }
         })
     }
 
@@ -1110,7 +1117,7 @@ export default class CommitTreeComponent extends React.Component {
                                                         <div className="col-md-12">
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
                                                             {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
-                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>
+                                                            {this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>}
                                                         </div>
                                                     </div>
                                                 </Form>
@@ -1247,7 +1254,7 @@ export default class CommitTreeComponent extends React.Component {
                         </ModalBody>
                         <div className="col-md-12 pb-lg-5 pt-lg-3">
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
+                            {this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>}
                         </div>
                     </div>
                 </Modal >

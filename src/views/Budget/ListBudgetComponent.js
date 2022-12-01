@@ -1012,7 +1012,7 @@ class ListBudgetComponent extends Component {
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
-            programs: listArray, loading: false
+            programs: listArray
           })
         }
 

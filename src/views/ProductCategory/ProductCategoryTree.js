@@ -770,6 +770,7 @@ export default class ProductCategoryTree extends Component {
                                 <div className="col-md-12 ">
                                     <Col md="3 float-right" >
                                         <InputGroup>
+                                        <Label className='pt-1 pr-3'>{i18n.t('static.jexcel.search')}</Label>
                                             <input type="search" bsSize="sm" placeholder="Search" onChange={this.handleSearchOnChange} className="form-control form-control-sm" />
                                             <InputGroupAddon addonType="append">
                                                 <button type="button" className=" ml-1 btn btn-secondary Gobtn btn-sm " disabled={!this.state.searchFoundCount} onClick={selectPrevMatch}> <i class="fa fa-angle-left btn-Icon-productTreeNextPre"></i></button>
