@@ -439,9 +439,10 @@ class ListTracerCategoryComponent extends Component {
             data[0] = tracerCategoryList[j].tracerCategoryId
             data[1] = getLabelText(tracerCategoryList[j].realm.label, this.state.lang)
             data[2] = getLabelText(tracerCategoryList[j].label, this.state.lang)
-            data[3] = tracerCategoryList[j].lastModifiedBy.username;
-            data[4] = (tracerCategoryList[j].lastModifiedDate ? moment(tracerCategoryList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[5] = tracerCategoryList[j].active;
+            data[3] = getLabelText(tracerCategoryList[j].healthArea.label, this.state.lang)
+            data[4] = tracerCategoryList[j].lastModifiedBy.username;
+            data[5] = (tracerCategoryList[j].lastModifiedDate ? moment(tracerCategoryList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[6] = tracerCategoryList[j].active;
             tracerCategory[count] = data;
             count++;
         }
@@ -477,6 +478,11 @@ class ListTracerCategoryComponent extends Component {
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
+                    type: 'text',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.healtharea.healtharea'),
                     type: 'text',
                     // readOnly: true
                 },

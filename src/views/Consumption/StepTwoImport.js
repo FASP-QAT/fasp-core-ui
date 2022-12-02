@@ -248,7 +248,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
                 if (match.length > 0) {
                     data[2] = 1
-                    data[3] = ''
+                    data[3] = 1
                 } else {
                     data[2] = 0
                     data[3] = 3
@@ -303,9 +303,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 {
                     title: 'id',
                     type: 'hidden',
-                    // title: 'A',
-                    // type: 'text',
-                    // visible: false,
                     readOnly: true
                 },
                 {

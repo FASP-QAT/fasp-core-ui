@@ -331,6 +331,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n';
 import RealmService from "../../api/RealmService";
 import TracerCategoryService from "../../api/TracerCategoryService";
+import HealthAreaService from "../../api/HealthAreaService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
@@ -340,6 +341,7 @@ const entityname = i18n.t('static.tracercategory.tracercategory');
 
 const initialValues = {
     tracerCategoryName: "",
+    healthAreaId: "",
     submittedToApprovedLeadTime: ""
 }
 
@@ -349,6 +351,8 @@ const validationSchema = function (values) {
             // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.tracerCategory.tracercategorytext')),
+        healthAreaId: Yup.string()
+            .required(i18n.t('static.healtharea.healthareatext')),
     })
 }
 
@@ -379,6 +383,7 @@ class EditTracerCategoryComponent extends Component {
         this.state = {
             loading: true,
             realms: [],
+            healthAreas: [],
             // tracerCategory: this.props.location.state.tracerCategory,
             tracerCategory: {
                 realm: {
@@ -388,6 +393,9 @@ class EditTracerCategoryComponent extends Component {
                         label_sp: '',
                         label_pr: ''
                     }
+                },
+                healthArea: {
+                    id: ''
                 },
                 label: {
                     label_en: '',
@@ -441,6 +449,9 @@ class EditTracerCategoryComponent extends Component {
         if (event.target.name == "active") {
             tracerCategory.active = event.target.id === "active2" ? false : true;
         }
+        if (event.target.name == "healthAreaId") {
+            tracerCategory.healthArea.id = event.target.value;
+        }
 
 
         this.setState({
@@ -452,7 +463,8 @@ class EditTracerCategoryComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             tracerCategoryName: true,
-            submittedToApprovedLeadTime: true
+            submittedToApprovedLeadTime: true,
+            healthAreaId: true
         }
         )
         this.validateForm(errors)
@@ -531,8 +543,76 @@ class EditTracerCategoryComponent extends Component {
             }
         );
 
+        HealthAreaService.getHealthAreaList()
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        healthAreas: listArray, loading: false
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
     }
     render() {
+        const { healthAreas } = this.state;
+        let healthAreaList = healthAreas.length > 0
+            && healthAreas.map((item, i) => {
+                return (
+                    <option key={i} value={item.healthAreaId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -550,6 +630,7 @@ class EditTracerCategoryComponent extends Component {
                                     {
                                         tracerCategoryCode: this.state.tracerCategory.tracerCategoryCode,
                                         tracerCategoryName: this.state.tracerCategory.label.label_en,
+                                        healthAreaId: this.state.tracerCategory.healthArea.id,
                                         submittedToApprovedLeadTime: this.state.tracerCategory.submittedToApprovedLeadTime
                                     }}
                                 validate={validate(validationSchema)}
@@ -661,6 +742,28 @@ class EditTracerCategoryComponent extends Component {
                                                     />
                                                     {/* </InputGroupAddon> */}
                                                     <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                        <Label htmlFor="healthAreaId">{i18n.t('static.healtharea.healtharea')}<span className="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                        <Input
+                                                            type="select"
+                                                            bsSize="sm"
+                                                            name="healthAreaId"
+                                                            id="healthAreaId"
+                                                            valid={!errors.healthAreaId && this.state.tracerCategory.healthArea.id != ''}
+                                                            invalid={touched.healthAreaId && !!errors.healthAreaId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.tracerCategory.healthArea.id}
+                                                            required
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {healthAreaList}
+                                                        </Input>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>

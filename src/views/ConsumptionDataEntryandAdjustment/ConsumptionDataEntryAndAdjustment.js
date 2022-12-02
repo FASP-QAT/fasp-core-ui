@@ -773,7 +773,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var datasetJson = this.state.datasetJson;
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[r].regionId);
             var minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
-            var maxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+            var maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
 
             //Semi - averages
             console.log("this.state.jsonDataSemiAverage----------->", this.state.jsonDataSemiAverage);
