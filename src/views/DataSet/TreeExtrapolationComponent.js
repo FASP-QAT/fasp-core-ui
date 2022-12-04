@@ -394,6 +394,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.setState({ jexcelDataArr, nodeDataExtrapolation }, () => { this.buildJexcel() });
     }
     checkActualValuesGap(type) {
+        console.log("In check actual Values gaps Test123")
+        console.log("Loader 1 Test123")
         this.setState({ extrapolationLoader: true }, () => {
             setTimeout(() => {
                 var jexcelDataArr = [];
@@ -409,7 +411,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     }
                     jexcelDataArr.push(json);
                 }
-                console.log("jexcel data 2---", jexcelDataArr);
+                console.log("jexcel data 2--- Test123", jexcelDataArr);
                 var dataList = jexcelDataArr.filter(c => c.amount != "")
                     .sort(function (a, b) {
                         return new Date(a.month) - new Date(b.month);
@@ -420,7 +422,9 @@ export default class TreeExtrapolationComponent extends React.Component {
                 console.log("dataList[dataList.length - 1]---", dataList[dataList.length - 1]);
                 console.log("gap3---", moment('2021-02-01').isBetween(dataList[0], dataList[dataList.length - 1]))
                 console.log("gap4---", jexcelDataArr.filter(c => c.amount == '' && moment(c.month).isBetween(dataList[0], dataList[dataList.length - 1], null)))
+                console.log("Result Test123",result)
                 if (result.length > 0) {
+                    console.log("Loader 2 Test123")
                     this.setState({ extrapolationLoader: false }, () => {
                         setTimeout(() => {
                             alert("Please fill in the blank actual values or interpolate.")
@@ -428,6 +432,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     });
                 }
                 else {
+                    console.log("In else Test123")
                     if (type) {
                         var dataForExtrapolation = jexcelDataArr.filter(c => c.amount != "");
                         if (dataForExtrapolation.length < 3 || (this.state.smoothingId && dataForExtrapolation.length < 24) || (this.state.arimaId && dataForExtrapolation.length < 14)) {
@@ -437,8 +442,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                             }, 0);
                             // });
                         }
+                        console.log("Before calculate extrapolated Data Test123")
                         this.calculateExtrapolatedData(false);
                     } else {
+                        console.log("In build extrapolation mom Test123")
                         this.buildExtrapolationMom();
                     }
                 }
@@ -613,7 +620,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 nodeDataExtrapolationOptionList.push(json);
             }
         }
-
+        console.log("Loader 3 Test123")
         this.setState({
             nodeDataExtrapolation,
             nodeDataExtrapolationOptionList,
@@ -678,6 +685,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     }
 
     checkValidationExtrapolation() {
+        console.log("In check validation Test123");
         var valid = true;
         var json = this.state.dataExtrapolation.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
@@ -762,6 +770,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 }
             }
         }
+        console.log("After check validation Test123",valid);
         return valid;
     }
 
@@ -1113,6 +1122,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 });
 
             } else {
+                console.log("Loader 4 Test123")
                 this.setState({ extrapolationLoader: false });
             }
             // }, 0);
@@ -1122,6 +1132,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     }
 
     interpolate() {
+        console.log("Loader 5 Test123")
         this.setState({ extrapolationLoader: true, isChanged: true,noDataMessage:"" }, () => {
             setTimeout(() => {
                 var monthArray = this.state.monthArray;
@@ -1244,6 +1255,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     }
     getExtrapolationMethodList() {
         console.log("### inside did mount")
+        console.log("Loader 6 Test123")
         this.setState({
             extrapolationLoader: true
         }, () => {
@@ -1315,6 +1327,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         console.log("### inside did mount current---", this.props.items.currentScenario)
                         if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == null || this.props.items.currentScenario.nodeDataExtrapolationOptionList.length == 0) {
                             console.log("### inside did mount if")
+                            console.log("Loader 7 Test123")
                             this.setState({ extrapolationLoader: false, forecastNestedHeader: 5, filteredExtrapolationMethodList: JSON.parse(JSON.stringify(this.state.extrapolationMethodList)) }, () => {
                                 console.log("### inside did mount if state update")
                                 this.buildJexcel();
@@ -1949,6 +1962,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var minRsqd = Math.min(...rSqdArr.filter(c => c != ""));
         var minWape = Math.min(...wapeArr.filter(c => c != ""));
         console.log("### inside jexcel going to update state")
+        console.log("Loader 8 Test123")
         this.setState({
             dataExtrapolation,
             minRmse: minRmse,
@@ -3427,15 +3441,19 @@ export default class TreeExtrapolationComponent extends React.Component {
                             }}
                             validate={validateExtrapolation(validationSchemaExtrapolation)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                console.log("Check validation Extrapolation Test123",this.checkValidationExtrapolation());
                                 if (this.checkValidationExtrapolation()) {
+                                    console.log("This.state.button flag Test123",this.state.buttonFalg);
                                     if (this.state.buttonFalg) {
+                                        console.log("In If check value gaps Test123",this.checkActualValuesGap(false));
                                         this.checkActualValuesGap(false);
                                     } else {
+                                        console.log("In else check value gaps Test123",this.checkActualValuesGap(true));
                                         this.checkActualValuesGap(true);
                                     }
-                                    console.log("tree extrapolation on submit called")
+                                    console.log("tree extrapolation on submit called Test123")
                                 } else {
-                                    console.log("tree extrapolation on submit not called")
+                                    console.log("tree extrapolation on submit not called Test123")
                                 }
                             }}
                             render={
