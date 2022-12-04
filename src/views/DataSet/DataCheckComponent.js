@@ -962,7 +962,7 @@ export function exportPDF(props) {
                             startY: y,
                             head: [columnsArray],
                             body: data,
-                            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+                            styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" }
 
                         };
                         doc.autoTable(content);

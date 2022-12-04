@@ -305,9 +305,9 @@ export default class CommitTreeComponent extends React.Component {
             if (parameterName == "treeScenarioList") {
                 buildJxl1(this)
             }
-            // if (parameterName == "treeScenarioListNotHaving100PerChild") {
-            //     buildJxl(this)
-            // }
+            if (parameterName == "treeScenarioListNotHaving100PerChild" && this.state.showValidation) {
+                buildJxl(this)
+            }
         })
     }
 
