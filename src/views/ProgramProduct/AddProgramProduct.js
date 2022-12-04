@@ -1,5 +1,6 @@
 import jexcel from 'jspreadsheet';
 import React, { Component } from "react";
+import { Prompt } from 'react-router';
 import {
     Button, Card, CardBody, CardFooter, Col, FormGroup, Input, InputGroup,
     Label
@@ -15,7 +16,6 @@ import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { Prompt } from 'react-router';
 
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
@@ -79,18 +79,7 @@ class AddprogramPlanningUnit extends Component {
 
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
-        // var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
-
-        // AuthenticationService.setupAxiosInterceptors();
-        // PlanningUnitService.getActivePlanningUnitList()
-        //     .then(response => {
-        //         if (response.status == 200) {
-        // console.log("for my list response---", response.data);
-        // this.setState({
-        //     planningUnitList: response.data
-        // });
-
         var puList = []
         if (value != -1) {
             console.log("in if=====>");
@@ -100,7 +89,7 @@ class AddprogramPlanningUnit extends Component {
             for (var pcu = 0; pcu < pcList.length; pcu++) {
                 pcIdArray.push(pcList[pcu].payload.productCategoryId);
             }
-            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
+            puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id));
         } else {
             console.log("in else=====>");
             puList = this.state.planningUnitList
@@ -108,8 +97,8 @@ class AddprogramPlanningUnit extends Component {
 
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
-                name: puList[k].label.label_en + ' | ' + puList[k].planningUnitId,
-                id: puList[k].planningUnitId
+                name: puList[k].label.label_en + ' | ' + puList[k].id,
+                id: puList[k].id
             }
             mylist.push(planningUnitJson);
         }
@@ -131,11 +120,17 @@ class AddprogramPlanningUnit extends Component {
 
     componentDidMount() {
         this.hideFirstComponent();
-        ProgramService.getProgramList()
+        ProgramService.getProgramForDropDown(1)//supply plan programs
             .then(response => {
                 if (response.status == 200) {
+                    console.log("response.data", response.data)
+                    let myReasponse = response.data.sort((a, b) => {
+                        var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: myReasponse, loading: false
                     })
                 }
 
@@ -277,7 +272,7 @@ class AddprogramPlanningUnit extends Component {
                                 this.setState({ productCategoryList: response.data });
 
                                 // PlanningUnitService.getAllPlanningUnitList()
-                                PlanningUnitService.getActivePlanningUnitList()
+                                PlanningUnitService.getPlanningUnitListBasic()
                                     .then(response => {
                                         console.log("PlanningUnitResponse------->", response.data);
                                         if (response.status == 200) {
@@ -286,8 +281,8 @@ class AddprogramPlanningUnit extends Component {
                                             });
                                             for (var k = 0; k < (response.data).length; k++) {
                                                 var planningUnitJson = {
-                                                    name: response.data[k].label.label_en + ' | ' + response.data[k].planningUnitId,
-                                                    id: response.data[k].planningUnitId,
+                                                    name: response.data[k].label.label_en + ' | ' + response.data[k].id,
+                                                    id: response.data[k].id,
                                                     active: response.data[k].active
                                                 }
                                                 list.push(planningUnitJson);
@@ -301,6 +296,8 @@ class AddprogramPlanningUnit extends Component {
                                                         // alert("hi");
                                                         let myReasponse = response.data.sort((a, b) => {
                                                             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                                                             var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                                                             return itemLabelA > itemLabelB ? 1 : -1;
                                                         });
@@ -748,6 +745,14 @@ class AddprogramPlanningUnit extends Component {
                                                                                 items.push({
                                                                                     title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
                                                                                     onclick: function () {
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
                                                                                         // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
                                                                                         this.props.history.push({
                                                                                             pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(12, y)}/${programId}`,
@@ -1933,9 +1938,9 @@ class AddprogramPlanningUnit extends Component {
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
+                    <option key={i} value={item.id}>
                         {/* {getLabelText(item.label, this.state.lang)} */}
-                        {item.programCode}
+                        {item.code}
                     </option>
                 )
             }, this);
