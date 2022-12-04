@@ -158,7 +158,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.buildCSVTable.map(ele => A.push(this.addDoubleQuoteToRowContent([((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'), ele.supplyPlanConsumption, ele.multiplier, ele.convertedConsumption, ele.currentQATConsumption, ele.import == true ? 'Yes' : 'No'])));
+        this.state.buildCSVTable.map(ele => A.push(this.addDoubleQuoteToRowContent([((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'), ele.supplyPlanConsumption!=null?ele.supplyPlanConsumption:"", ele.multiplier, ele.convertedConsumption, ele.currentQATConsumption!=null?ele.currentQATConsumption:"", ele.import == true ? 'Yes' : 'No'])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
