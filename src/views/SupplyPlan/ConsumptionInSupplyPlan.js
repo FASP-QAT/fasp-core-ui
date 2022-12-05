@@ -42,7 +42,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     onPaste(instance, data) {
-        console.log("+++in paste");
+        console.log("+++in paste", data);
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
@@ -59,6 +59,18 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
             if (data[i].x == 0 && data[i].value != "") {
                 (instance).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
+            }
+            if (data[i].x == 4) {
+                var aruList = this.state.realmCountryPlanningUnitList.filter(c => (c.name == data[i].value || getLabelText(c.label, this.state.lang) == data[i].value) && c.active.toString() == "true");
+                if (aruList.length > 0) {
+                    (instance).setValueFromCoords(4, data[i].y, aruList[0].id, true);
+                }
+            }
+            if (data[i].x == 3) {
+                var dsList = this.state.dataSourceList.filter(c => (c.name == data[i].value || getLabelText(c.label, this.state.lang) == data[i].value) && c.active.toString() == "true");
+                if (dsList.length > 0) {
+                    (instance).setValueFromCoords(3, data[i].y, dsList[0].id, true);
+                }
             }
         }
     }
@@ -993,7 +1005,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(6, y, "", true);
             var valid = checkValidtion("text", "E", y, rowData[4], elInstance);
             if (valid == true) {
-                var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[4])[0]).multiplier;
+                var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[4].toString().split(";")[0])[0]).multiplier;
                 elInstance.setValueFromCoords(6, y, multiplier, true);
             }
         }
