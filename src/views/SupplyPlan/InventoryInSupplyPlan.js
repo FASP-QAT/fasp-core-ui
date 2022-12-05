@@ -62,6 +62,18 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             if (data[i].x == 0 && data[i].value != "") {
                 (instance).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
             }
+            if (data[i].x == 3) {
+                var aruList = this.state.realmCountryPlanningUnitList.filter(c => (c.name == data[i].value || getLabelText(c.label, this.state.lang) == data[i].value) && c.active.toString() == "true");
+                if (aruList.length > 0) {
+                    (instance).setValueFromCoords(3, data[i].y, aruList[0].id, true);
+                }
+            }
+            if (data[i].x == 2) {
+                var dsList = this.state.dataSourceList.filter(c => (c.name == data[i].value || getLabelText(c.label, this.state.lang) == data[i].value) && c.active.toString() == "true");
+                if (dsList.length > 0) {
+                    (instance).setValueFromCoords(2, data[i].y, dsList[0].id, true);
+                }
+            }
         }
     }
 
@@ -976,7 +988,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(7, y, "", true);
             var valid = checkValidtion("text", "D", y, rowData[3], elInstance);
             if (valid == true) {
-                var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[3])[0]).multiplier;
+                var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[3].toString().split(";")[0])[0]).multiplier;
                 elInstance.setValueFromCoords(7, y, multiplier, true);
             }
             if (valid == false) {
