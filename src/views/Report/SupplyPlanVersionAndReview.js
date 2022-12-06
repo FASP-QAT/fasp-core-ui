@@ -1337,7 +1337,7 @@ class SupplyPlanVersionAndReview extends Component {
                             </Form>
                         </div>
                         <div className="ReportSearchMarginTop consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable tableDivjss_contentDisplay">
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
