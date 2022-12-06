@@ -2012,6 +2012,7 @@ export default class PlanningUnitSetting extends Component {
         } console.log("outPutListArray---->", outPutListArray);
 
         if (outPutList.length == 0) {
+            this.getPlanningUnitList(0);
             data = [];
             data[0] = -1;
             data[1] = "";
@@ -2247,7 +2248,7 @@ export default class PlanningUnitSetting extends Component {
                                 title: i18n.t('static.common.addRow'),
                                 onclick: function () {
                                     // this.addRow();
-                                    this.getPlanningUnitList();
+                                    this.getPlanningUnitList(1);
                                 }.bind(this)
                             });
                         }
@@ -3072,7 +3073,7 @@ export default class PlanningUnitSetting extends Component {
         }
 
     }
-    getPlanningUnitList = function () {
+    getPlanningUnitList(callBy) {
         if (!this.state.isPlanningUnitLoaded) {
             var pID = document.getElementById("forecastProgramId").value;
             if (pID != 0) {
@@ -3136,7 +3137,9 @@ export default class PlanningUnitSetting extends Component {
                                 datasetId: selectedForecastProgram.id,
 
                             }, () => {
-                                this.filterData(1);
+                                if (callBy == 1) {
+                                    this.filterData(1);
+                                }
                             })
                     });
                 }).catch(
@@ -3383,7 +3386,7 @@ export default class PlanningUnitSetting extends Component {
                                         <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     }
                                     {/* {isSiteOnline() && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>} */}
-                                    {isSiteOnline() && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.getPlanningUnitList()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                    {isSiteOnline() && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.getPlanningUnitList(1)}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
 
                                     &nbsp;
                                 </FormGroup>
