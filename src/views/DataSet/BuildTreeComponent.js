@@ -4219,7 +4219,36 @@ export default class BuildTree extends Component {
                     })
 
                 } else if (rowData[4] == "" || rowData[4] == null) {
-                    alert("Please select modeling type before proceeding.");
+                    this.setState({
+                        currentRowIndex: '',
+                        currentTransferData: '',
+                        currentModelingType: '',
+                        currentCalculatorStartDate: '',
+                        currentCalculatorStopDate: '',
+                        currentCalculatorStartValue: '',
+                    }, () => {
+                        // console.log("x row data===>", this.el.getRowData(x));
+                        var startValue = this.getMomValueForDateRange(rowData[1]);
+                        console.log("***MOM final start value---", startValue)
+                        this.setState({
+                            currentRowIndex: x,
+                            showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
+                            currentModelingType: 2,
+                            currentTransferData: rowData[3],
+                            currentCalculatorStartDate: rowData[1],
+                            currentCalculatorStopDate: rowData[2],
+                            currentCalculatorStartValue: startValue,
+                            currentCalculatedMomChange: '',
+                            currentTargetChangeNumber: '',
+                            currentTargetChangeNumberEdit: false,
+                            currentTargetChangePercentage: '',
+                            currentTargetChangePercentageEdit: false,
+                            currentEndValue: '',
+                            currentEndValueEdit: false
+                        }, () => {
+                            // this.calculateMOMData(0, 3);
+                        });
+                    })
                 }
                 else if (rowData[1] == "" || rowData[1] == null) {
                     alert("Please select start date before proceeding.");
@@ -5806,8 +5835,8 @@ export default class BuildTree extends Component {
             console.log("inside if no fu");
             var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
             console.log("convertToMonth dis---", convertToMonth);
-            console.log("repeat count---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount);
-            console.log("no of month dis---", this.getNoOfMonthsInUsagePeriod());
+            // console.log("repeat count---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount);
+            // console.log("no of month dis---", this.getNoOfMonthsInUsagePeriod());
 
             if (usageTypeId == 2) {
                 var div = (convertToMonth * usageFrequency);
