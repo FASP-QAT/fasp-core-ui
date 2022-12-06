@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -76,7 +76,8 @@ class StockStatusAcrossPlanningUnits extends Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             programId: '',
-            versionId: ''
+            versionId: '',
+            jexcelData: []
 
         }
         this.buildJExcel = this.buildJExcel.bind(this);
@@ -176,7 +177,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
 
                 let realmId = AuthenticationService.getRealmId();
-                TracerCategoryService.getTracerCategoryByProgramId(realmId, programId).then(response => {
+                TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
 
                     if (response.status == 200) {
                         var listArray = response.data;
@@ -194,7 +195,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -271,7 +273,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.mos == null ? i18n.t('static.supplyPlanFormula.na') : this.roundN(ele.mos) == 0 ? i18n.t('static.report.stockout') : (this.roundN(ele.mos) < ele.minMos ? i18n.t('static.report.lowstock') : (this.roundN(ele.mos) > ele.maxMos ? i18n.t('static.report.overstock') : i18n.t('static.report.okaystock')))).replaceAll(' ', '%20'), ele.mos != null ? isNaN(ele.mos) ? '' : this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"), isNaN(ele.minMos) || ele.minMos == undefined ? '' : ele.minMos, isNaN(ele.maxMos) || ele.maxMos == undefined ? '' : ele.maxMos, ele.stock, isNaN(ele.amc) || ele.amc == null ? '' : this.round(ele.amc), ele.lastStockCount != null && ele.lastStockCount != '' ? (new moment(ele.lastStockCount).format('MMM-yy')).replaceAll(' ', '%20') : ''])));
+        this.state.jexcelData.map(ele => A.push(this.addDoubleQuoteToRowContent([ele[9], (ele[0].replaceAll(',', ' ')).replaceAll(' ', '%20'), ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2].replaceAll(' ', '%20'), ele[3], ele[4], ele[5], ele[6], ele[7], ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : ''])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -353,14 +355,14 @@ class StockStatusAcrossPlanningUnits extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), (ele.mos == null ? i18n.t("static.supplyPlanFormula.na") : this.roundN(ele.mos) == 0 ? i18n.t('static.report.stockout') : (this.roundN(ele.mos) < ele.minMos ? i18n.t('static.report.lowstock') : (this.roundN(ele.mos) > ele.maxMos ? i18n.t('static.report.overstock') : i18n.t('static.report.okaystock')))), ele.mos != null ? isNaN(ele.mos) ? '' : this.formatterDouble(ele.mos) : i18n.t("static.supplyPlanFormula.na"), isNaN(ele.minMos) || ele.minMos == undefined ? '' : this.formatterDouble(ele.minMos), isNaN(ele.maxMos) || ele.maxMos == undefined ? '' : this.formatterDouble(ele.maxMos), this.formatter(ele.stock), isNaN(ele.amc) || ele.amc == null ? '' : this.formatter(ele.amc), ele.lastStockCount != null && ele.lastStockCount != '' ? new moment(ele.lastStockCount).format('MMM-yy') : '']);
+        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], this.formatter(ele[3]), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? this.roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : this.formatterDouble(ele[5]), isNaN(ele[6]) || ele[6] == undefined ? '' : this.formatterDouble(ele[6]), isNaN(ele[7]) || ele[7] == null ? '' : this.formatter(ele[7]), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
 
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 200,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 75 },
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 70 },
             columnStyles: {
                 1: { cellWidth: 161.89 },
             }
@@ -388,7 +390,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -751,29 +754,49 @@ class StockStatusAcrossPlanningUnits extends Component {
         console.log("DataStockStatus+++", dataStockStatus);
         for (var j = 0; j < dataStockStatus.length; j++) {
             let data1 = '';
-            if (dataStockStatus[j].mos == null) {
-                data1 = i18n.t('static.supplyPlanFormula.na')
-            }
-            else if (this.roundN(dataStockStatus[j].mos) == 0) {
-                data1 = i18n.t('static.report.stockout')
-            } else
-                if (this.roundN(dataStockStatus[j].mos) < dataStockStatus[j].minMos) {
-                    data1 = i18n.t('static.report.lowstock')
-                } else if (this.roundN(dataStockStatus[j].mos) > dataStockStatus[j].maxMos) {
-                    data1 = i18n.t('static.report.overstock')
-                } else {
-                    data1 = i18n.t('static.report.okaystock')
+            if (dataStockStatus[j].planBasedOn == 1) {
+                if (dataStockStatus[j].mos == null) {
+                    data1 = i18n.t('static.supplyPlanFormula.na')
                 }
+                else if (this.roundN(dataStockStatus[j].mos) == 0) {
+                    data1 = i18n.t('static.report.stockout')
+                } else {
+                    if (this.roundN(dataStockStatus[j].mos) < dataStockStatus[j].minMos) {
+                        data1 = i18n.t('static.report.lowstock')
+                    } else if (this.roundN(dataStockStatus[j].mos) > dataStockStatus[j].maxMos) {
+                        data1 = i18n.t('static.report.overstock')
+                    } else {
+                        data1 = i18n.t('static.report.okaystock')
+                    }
+                }
+            } else {
+                if (dataStockStatus[j].stock == null) {
+                    data1 = i18n.t('static.supplyPlanFormula.na')
+                }
+                else if (this.roundN(dataStockStatus[j].stock) == 0) {
+                    data1 = i18n.t('static.report.stockout')
+                } else {
+                    if (this.roundN(dataStockStatus[j].stock) < dataStockStatus[j].minMos) {
+                        data1 = i18n.t('static.report.lowstock')
+                    } else if (this.roundN(dataStockStatus[j].stock) > dataStockStatus[j].maxMos) {
+                        data1 = i18n.t('static.report.overstock')
+                    } else {
+                        data1 = i18n.t('static.report.okaystock')
+                    }
+                }
+            }
 
             data = [];
             data[0] = getLabelText(dataStockStatus[j].planningUnit.label, this.state.lang)
-            data[1] = data1;
-            data[2] = dataStockStatus[j].mos != null ? this.roundN(dataStockStatus[j].mos) : i18n.t("static.supplyPlanFormula.na");
-            data[3] = (dataStockStatus[j].minMos);
-            data[4] = (dataStockStatus[j].maxMos);
-            data[5] = (dataStockStatus[j].stock);
-            data[6] = this.round(dataStockStatus[j].amc);
-            data[7] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('YYYY-MM-DD') : null);
+            data[1] = dataStockStatus[j].planBasedOn;
+            data[2] = data1;
+            data[3] = (dataStockStatus[j].stock);
+            data[4] = dataStockStatus[j].planBasedOn == 1 ? dataStockStatus[j].mos != null ? this.roundN(dataStockStatus[j].mos) : i18n.t("static.supplyPlanFormula.na") : "-";
+            data[5] = (dataStockStatus[j].minMos);
+            data[6] = (dataStockStatus[j].maxMos);
+            data[7] = this.round(dataStockStatus[j].amc);
+            data[8] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('YYYY-MM-DD') : null);
+            data[9] = dataStockStatus[j].planningUnit.id
 
             dataArray[count] = data;
             count++;
@@ -800,25 +823,31 @@ class StockStatusAcrossPlanningUnits extends Component {
                     type: 'text',
                 },
                 {
+                    title: i18n.t('static.programPU.planBasedOn'),
+                    type: 'dropdown',
+                    source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
+                },
+                {
                     title: i18n.t('static.report.withinstock'),
                     type: 'text',
+                },
+                {
+                    title: i18n.t('static.report.stock'),
+                    type: 'numeric', mask: '#,##',
                 },
                 {
                     title: i18n.t('static.report.mos'),
                     type: 'text'
                 },
                 {
-                    title: i18n.t('static.supplyPlan.minStockMos'),
+                    title: i18n.t('static.report.minMosOrQty'),
                     type: 'numeric', mask: '#,##.0', decimal: '.',
                 },
                 {
-                    title: i18n.t('static.supplyPlan.maxStockMos'),
+                    title: i18n.t('static.report.maxMosOrQty'),
                     type: 'numeric', mask: '#,##.0', decimal: '.',
                 },
-                {
-                    title: i18n.t('static.report.stock'),
-                    type: 'numeric', mask: '#,##',
-                },
+
                 {
                     title: i18n.t('static.report.amc'),
                     type: 'numeric', mask: '#,##',
@@ -828,6 +857,10 @@ class StockStatusAcrossPlanningUnits extends Component {
                     type: 'calendar',
                     options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
                     width: 120
+                },
+                {
+                    title: i18n.t('static.report.amc'),
+                    type: 'hidden'
                 },
             ],
             editable: false,
@@ -948,7 +981,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false
+            languageEl: languageEl, loading: false, jexcelData: data
         })
     }
 
@@ -957,58 +990,56 @@ class StockStatusAcrossPlanningUnits extends Component {
 
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
-        var colArrB = ['B', 'C'];
-        var colArrC = ['C'];
-        var colArrD = ['D'];
+        console.log("Json@@@@@@@@@@", json)
+        var colArrB = ['C', 'D', 'E'];
+        var colArrC = ['C', 'D'];
         var colArrE = ['E'];
 
         for (var j = 0; j < json.length; j++) {
 
             var rowData = elInstance.getRowData(j);
 
-            var mos = parseFloat(rowData[2]);
-            var minMos = parseFloat(rowData[3]);
-            var maxMos = parseFloat(rowData[4]);
+            var mos = rowData[1] == 1 ? parseFloat(rowData[4]) : rowData[3];
+            var minMos = parseFloat(rowData[5]);
+            var maxMos = parseFloat(rowData[6]);
             //------------B--------------
             if (mos == 0) {
                 console.log('1')
                 for (var i = 0; i < colArrB.length; i++) {
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[0].color);
-                    let textColor = contrast(legendcolor[1].color);
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
+                    var cell = elInstance.getCell(`${colArrB[i]}${parseInt(j) + 1}`);
+                    cell.classList.add('legendColor0');
+                    // elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    // elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[0].color);
+                    // let textColor = contrast(legendcolor[1].color);
+                    // elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
                 }
-            } else if (rowData[2] == i18n.t("static.supplyPlanFormula.na")) {
+            } else if (rowData[4] == i18n.t("static.supplyPlanFormula.na")) {
                 for (var i = 0; i < colArrB.length; i++) {
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[4].color);
-                    let textColor = contrast(legendcolor[1].color);
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
+                    var cell = elInstance.getCell(`${colArrB[i]}${parseInt(j) + 1}`);
+                    cell.classList.add('legendColor4');
                 }
             } else if (mos < minMos) {
                 console.log('1')
                 for (var i = 0; i < colArrB.length; i++) {
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[1].color);
-                    let textColor = contrast(legendcolor[1].color);
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
+                    var cell = elInstance.getCell(`${colArrB[i]}${parseInt(j) + 1}`);
+                    cell.classList.add('legendColor1');
                 }
             } else if (mos > maxMos) {
                 console.log('2')
                 for (var i = 0; i < colArrB.length; i++) {
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[3].color);
-                    let textColor = contrast(legendcolor[0].color);
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
+                    var cell = elInstance.getCell(`${colArrB[i]}${parseInt(j) + 1}`);
+                    cell.classList.add('legendColor3');
                 }
             } else {
                 console.log('3')
                 for (var i = 0; i < colArrB.length; i++) {
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'background-color', legendcolor[2].color);
-                    let textColor = contrast(legendcolor[2].color);
-                    elInstance.setStyle(`${colArrB[i]}${parseInt(j) + 1}`, 'color', textColor);
+                    var cell = elInstance.getCell(`${colArrB[i]}${parseInt(j) + 1}`);
+                    cell.classList.add('legendColor2');
                 }
+            }
+            if (rowData[1] == 2) {
+                var cell = elInstance.getCell(`E${parseInt(j) + 1}`);
+                cell.classList.add('legendColor4');
             }
         }
     }
@@ -1186,10 +1217,11 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                 planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
                                                 lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
                                                 mos: includePlanningShipments.toString() == 'true' ? list[0].mos != null ? this.roundN(list[0].mos) : null : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : null,//planningUnit.planningUnit.id==157?12:planningUnit.planningUnit.id==156?6:mos),
-                                                minMos: minStockMoS,
-                                                maxMos: maxStockMoS,
+                                                minMos: pu.planBasedOn == 1 ? minStockMoS : list[0].minStock,
+                                                maxMos: pu.planBasedOn == 1 ? maxStockMoS : list[0].maxStock,
                                                 stock: includePlanningShipments.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,
-                                                amc: list[0].amc
+                                                amc: list[0].amc,
+                                                planBasedOn: pu.planBasedOn
                                             }
                                             data.push(json)
 
@@ -1198,10 +1230,11 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                 planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
                                                 lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
                                                 mos: null,
-                                                minMos: minStockMoS,
-                                                maxMos: maxStockMoS,
+                                                minMos: pu.planBasedOn == 1 ? minStockMoS : pu.minStock,
+                                                maxMos: pu.planBasedOn == 1 ? maxStockMoS : "",
                                                 stock: 0,
-                                                amc: 0
+                                                amc: 0,
+                                                planBasedOn: pu.planBasedOn
                                             }
                                             data.push(json)
                                         }
@@ -1276,7 +1309,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                     }).catch(
                         error => {
                             this.setState({
-                                selData: [], loading: false
+                                selData: [], loading: false, jexcelData: []
                             }, () => {
                                 this.el = jexcel(document.getElementById("tableDiv"), '');
                                 // this.el.destroy();
@@ -1285,7 +1318,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                             });
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -1351,7 +1385,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 // );
             }
         } else if (programId == 0) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], selData: [] }, () => {
+            this.setState({ message: i18n.t('static.common.selectProgram'), data: [], selData: [], jexcelData: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 // this.el.destroy();
                 jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -1359,7 +1393,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             });
 
         } else if (versionId == 0) {
-            this.setState({ message: i18n.t('static.program.validversion'), data: [], selData: [] }, () => {
+            this.setState({ message: i18n.t('static.program.validversion'), data: [], selData: [], jexcelData: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 // this.el.destroy();
                 jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -1367,7 +1401,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             });
 
         } else {
-            this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), data: [], selData: [] }, () => {
+            this.setState({ message: i18n.t('static.tracercategory.tracercategoryText'), data: [], selData: [], jexcelData: [] }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
                 // this.el.destroy();
                 jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -1437,7 +1471,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             },
             {
                 dataField: 'mos',
-                text: i18n.t('static.report.withinstock'),
+                text: i18n.t('static.programPU.planBasedOn'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1463,7 +1497,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             },
             {
                 dataField: 'mos',
-                text: i18n.t('static.report.mos'),
+                text: i18n.t('static.report.withinstock'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1480,7 +1514,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             },
             {
                 dataField: 'minMos',
-                text: i18n.t('static.supplyPlan.minStockMos'),
+                text: i18n.t('static.report.stock'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1491,7 +1525,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             },
             {
                 dataField: 'maxMos',
-                text: i18n.t('static.supplyPlan.maxStockMos'),
+                text: i18n.t('static.report.mos'),
                 sort: true,
                 align: 'center',
                 style: { align: 'center', width: '100px' },
@@ -1501,7 +1535,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             ,
             {
                 dataField: 'stock',
-                text: i18n.t('static.report.stock'),
+                text: i18n.t('static.report.minMosOrQty'),
                 sort: true,
                 align: 'center',
                 style: { align: 'center', width: '100px' },
@@ -1509,6 +1543,15 @@ class StockStatusAcrossPlanningUnits extends Component {
                 formatter: this.formatter
             }
             ,
+            {
+                dataField: 'amc',
+                text: i18n.t('static.report.maxMosOrQty'),
+                sort: true,
+                align: 'center',
+                style: { align: 'center', width: '100px' },
+                headerAlign: 'center',
+                formatter: this.formatter
+            },
             {
                 dataField: 'amc',
                 text: i18n.t('static.report.amc'),
@@ -1577,7 +1620,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-5 pt-lg-0 ">
+                    <CardBody className="pb-lg-0 pt-lg-0 ">
                         <div className="" >
                             <div ref={ref}>
 

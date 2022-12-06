@@ -46,7 +46,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, API_URL } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -554,7 +554,7 @@ class ForecastMetrics extends Component {
         }
         // console.log("programids=====>", programIdsValue);
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
-        TracerCategoryService.getTracerCategoryByProgramIds(realmId, programIdsValue)
+        TracerCategoryService.getTracerCategoryByRealmId(realmId)
           .then(response => {
             console.log("tc respons==>", response.data);
             var listArray = response.data;
@@ -577,7 +577,8 @@ class ForecastMetrics extends Component {
               });
               if (error.message === "Network Error") {
                 this.setState({
-                  message: 'static.unkownError',
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
@@ -691,11 +692,11 @@ class ForecastMetrics extends Component {
         {
           title: i18n.t('static.report.error'),
           type: 'numeric',
-          mask: '#,##%',
+          mask: '#,##.00%', decimal: '.'
         },
         {
           title: i18n.t('static.report.noofmonth'),
-          type: 'numeric', mask: '#,##.00', decimal: '.',
+          type: 'numeric', mask: '#,##'
         },
         {
           title: i18n.t('static.report.error'),
@@ -786,8 +787,10 @@ class ForecastMetrics extends Component {
         for (var i = 0; i < colArr.length; i++) {
           elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
           //  elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-          let textColor = '#BA0C2F'//contrast('#f48282');
-          elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+          // let textColor = '#BA0C2F'//contrast('#f48282');
+          // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
+          var cell = elInstance.getCell((colArr[i]).concat(parseInt(j) + 1))
+          cell.classList.add('jexcelRedCell');
         }
       } else {
         for (var i = 0; i < colArr.length; i++) {
@@ -835,7 +838,8 @@ class ForecastMetrics extends Component {
             });
             if (error.message === "Network Error") {
               this.setState({
-                message: 'static.unkownError',
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -979,7 +983,8 @@ class ForecastMetrics extends Component {
             })
             if (error.message === "Network Error") {
               this.setState({
-                message: 'static.unkownError',
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -1128,7 +1133,8 @@ class ForecastMetrics extends Component {
               error => {
                 if (error.message === "Network Error") {
                   this.setState({
-                    message: 'static.unkownError',
+                    // message: 'static.unkownError',
+                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                     loading: false
                   });
                 } else {
@@ -1193,7 +1199,8 @@ class ForecastMetrics extends Component {
           })
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -1276,7 +1283,8 @@ class ForecastMetrics extends Component {
           })
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -1602,7 +1610,7 @@ class ForecastMetrics extends Component {
                       </div>
                     </FormGroup>
 
-                    <FormGroup className="col-md-3" style={{zIndex:'2'}}>
+                    <FormGroup className="col-md-3" style={{ zIndex: '2' }}>
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
 
@@ -1647,7 +1655,7 @@ class ForecastMetrics extends Component {
 
                     </FormGroup>
 
-                    <FormGroup className="col-md-3" style={{zIndex:'1'}}>
+                    <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
@@ -1670,7 +1678,7 @@ class ForecastMetrics extends Component {
                     </FormGroup>
 
 
-                    <FormGroup className="col-sm-3" id="hideDiv" style={{zIndex:'1'}}>
+                    <FormGroup className="col-sm-3" id="hideDiv" style={{ zIndex: '1' }}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                       <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                       <div className="controls">
@@ -1689,7 +1697,7 @@ class ForecastMetrics extends Component {
                       </div>
                     </FormGroup>
 
-                    <FormGroup className="col-md-3" style={{zIndex:'1'}}>
+                    <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
                       <div className="controls ">
                         <InputGroup>

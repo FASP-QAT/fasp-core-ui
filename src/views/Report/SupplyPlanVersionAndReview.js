@@ -19,7 +19,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, SPV_REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, SPV_REPORT_DATEPICKER_START_MONTH, API_URL } from '../../Constants.js';
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -30,6 +30,11 @@ import {
 import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
 import moment from "moment";
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import CryptoJS from 'crypto-js'
+
 const entityname = ""
 const options = {
     title: {
@@ -74,9 +79,9 @@ class SupplyPlanVersionAndReview extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        dt.setMonth(dt.getMonth() - SPV_REPORT_DATEPICKER_START_MONTH);
         var dt1 = new Date();
-        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+        dt1.setMonth(dt1.getMonth());
         this.state = {
             loading: true,
             matricsList: [],
@@ -92,9 +97,8 @@ class SupplyPlanVersionAndReview extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
-            programId: -1
-
-
+            programId: -1,
+            lang: localStorage.getItem('lang')
 
         };
 
@@ -114,6 +118,7 @@ class SupplyPlanVersionAndReview extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
+
     }
 
     setProgramId(event) {
@@ -139,11 +144,13 @@ class SupplyPlanVersionAndReview extends Component {
         clearTimeout(this.timeout);
     }
 
-
     buildJexcel() {
+        // this.setState({
+        //     loading: true
+        // })
 
         let matricsList = this.state.matricsList;
-        console.log("matricsList---->", matricsList);
+        // console.log("matricsList---->", matricsList);
         let matricsArray = [];
         let count = 0;
         for (var j = 0; j < matricsList.length; j++) {
@@ -178,7 +185,7 @@ class SupplyPlanVersionAndReview extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 70, 100, 100, 120, 100, 100, 120, 100],
+            colWidths: [100, 70, 100, 100, 120, 100, 100, 120, 180],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -188,7 +195,7 @@ class SupplyPlanVersionAndReview extends Component {
                 },
                 {
                     title: i18n.t('static.report.version'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    type: 'numeric', mask: '#,##',
                     // readOnly: true
                 },
                 {
@@ -328,9 +335,9 @@ class SupplyPlanVersionAndReview extends Component {
         // clearTimeout(this.timeout);
         // AuthenticationService.setupAxiosInterceptors();
         this.getCountrylist();
-        this.getPrograms()
-        this.getVersionTypeList()
-        this.getStatusList()
+        // this.getPrograms()
+        // this.getVersionTypeList()
+        // this.getStatusList()
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -365,6 +372,9 @@ class SupplyPlanVersionAndReview extends Component {
     }
 
     getCountrylist() {
+        this.setState({
+            loading: true
+        });
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         RealmCountryService.getRealmCountryForProgram(realmId)
@@ -376,9 +386,8 @@ class SupplyPlanVersionAndReview extends Component {
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    // countries: response.data.map(ele => ele.realmCountry), loading: false
-                    countries: listArray, loading: false
-                })
+                    countries: listArray
+                }, () => { this.getPrograms() });
             }).catch(
                 error => {
                     this.setState({
@@ -386,7 +395,8 @@ class SupplyPlanVersionAndReview extends Component {
                     })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -481,8 +491,8 @@ class SupplyPlanVersionAndReview extends Component {
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    programs: listArray, loading: false, programLst: listArray
-                })
+                    programs: listArray, programLst: listArray
+                }, () => { this.getVersionTypeList() });
             }).catch(
                 error => {
                     this.setState({
@@ -493,7 +503,8 @@ class SupplyPlanVersionAndReview extends Component {
                         })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -568,15 +579,17 @@ class SupplyPlanVersionAndReview extends Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
-                versionTypeList: listArray, loading: false
+                versionTypeList: listArray
             }, () => {
-                document.getElementById("versionTypeId").value = 2;
+                this.getStatusList();
+                // document.getElementById("versionTypeId").value = 2;
             })
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -624,7 +637,7 @@ class SupplyPlanVersionAndReview extends Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
-                statuses: listArray, loading: false
+                statuses: listArray
             }, () => {
                 this.fetchData()
             })
@@ -635,7 +648,8 @@ class SupplyPlanVersionAndReview extends Component {
                 })
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -707,7 +721,7 @@ class SupplyPlanVersionAndReview extends Component {
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         console.log('endDate', endDate)
         if (programId != 0 && countryId != 0) {
-            this.setState({ loading: true })
+            // this.setState({ loading: true })
             // AuthenticationService.setupAxiosInterceptors();
             ReportService.getProgramVersionList(programId, countryId, versionStatusId, versionTypeId, startDate, endDate)
                 .then(response => {
@@ -716,6 +730,11 @@ class SupplyPlanVersionAndReview extends Component {
                     if (versionStatusId == 1) {
                         result = result.filter(c => c.versionType.id != 1);
                     }
+                    result.sort((a, b) => {
+                        var itemLabelA = a.lastModifiedDate;
+                        var itemLabelB = b.lastModifiedDate
+                        return itemLabelA < itemLabelB ? 1 : -1;
+                    });
                     this.setState({
                         matricsList: result,
                         message: ''
@@ -732,7 +751,8 @@ class SupplyPlanVersionAndReview extends Component {
                             })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1012,11 +1032,19 @@ class SupplyPlanVersionAndReview extends Component {
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
                 return (
-                    <option key={i} value={item.id} selected={item.id == 1 ? 'selected' : ''}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
+
+        // const { programList } = this.state;
+        // let programs = programList.length > 0
+        //     && programList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.id}>{item.name}</option>
+        //         )
+        //     }, this);
 
 
         const bar = {

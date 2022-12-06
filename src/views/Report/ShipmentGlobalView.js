@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -202,6 +202,7 @@ class ShipmentGlobalView extends Component {
             productCategories: [],
             countryValues: [],
             procurementAgents: [],
+            procurementAgentTypes: [],
             fundingSources: [],
             countryLabels: [],
             planningUnitValues: [],
@@ -212,6 +213,7 @@ class ShipmentGlobalView extends Component {
             message: '',
             fundingSourceValues: [],
             procurementAgentValues: [],
+            procurementAgentTypeValues: [],
             shipmentList: [],
             dateSplitList: [],
             countrySplitList: [],
@@ -286,9 +288,12 @@ class ShipmentGlobalView extends Component {
         if (viewby == 1) {
             this.state.fundingSourceLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
-        } else {
+        } else if (viewby == 2) {
             this.state.procurementAgentLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+        } else if (viewby == 3) {
+            this.state.procurementAgentTypeLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.dashboard.procurementagentType') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         }
         csvRow.push('')
         csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
@@ -327,8 +332,10 @@ class ShipmentGlobalView extends Component {
             let tempLabel = '';
             if (viewby == 1) {
                 tempLabel = i18n.t('static.budget.fundingsource');
-            } else {
+            } else if (viewby == 2) {
                 tempLabel = i18n.t('static.procurementagent.procurementagent');
+            } else if (viewby == 3) {
+                tempLabel = i18n.t('static.dashboard.procurementagentType');
             }
             var B = [this.addDoubleQuoteToRowContent([(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')])];
             re = this.state.shipmentList;
@@ -443,10 +450,13 @@ class ShipmentGlobalView extends Component {
                         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, len, fundingSourceText)
 
-                    } else {
-
+                    } else if (viewby == 2) {
                         var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, len, procurementAgentText)
+
+                    } else if (viewby == 3) {
+                        var procurementAgentTypeText = doc.splitTextToSize((i18n.t('static.dashboard.procurementagentType') + ' : ' + this.state.procurementAgentTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, len, procurementAgentTypeText)
                     }
 
                 }
@@ -591,7 +601,9 @@ class ShipmentGlobalView extends Component {
 
 
     getCountrys() {
-
+        this.setState({
+            loading: true
+        })
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
         RealmCountryService.getRealmCountryForProgram(realmId)
@@ -604,8 +616,8 @@ class ShipmentGlobalView extends Component {
                 });
                 this.setState({
                     // countrys: response.data.map(ele => ele.realmCountry)
-                    countrys: listArray
-                }, () => { this.fetchData(); })
+                    countrys: listArray, loading: false
+                }, () => { this.getPrograms(); })
             }).catch(
                 error => {
                     this.setState({
@@ -613,7 +625,8 @@ class ShipmentGlobalView extends Component {
                     })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -653,7 +666,7 @@ class ShipmentGlobalView extends Component {
 
     }
     getPlanningUnit() {
-
+        this.setState({ loading: true })
         let productCategoryId = document.getElementById("productCategoryId").value;
         // AuthenticationService.setupAxiosInterceptors();
         var lang = this.state.lang
@@ -663,7 +676,7 @@ class ShipmentGlobalView extends Component {
                     return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
                 });
                 this.setState({
-                    planningUnits: response.data,
+                    planningUnits: response.data, loading: false
                 }, () => {
                     this.fetchData()
                 });
@@ -675,7 +688,8 @@ class ShipmentGlobalView extends Component {
                     })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -747,6 +761,8 @@ class ShipmentGlobalView extends Component {
         if (viewby == 1) {
             document.getElementById("fundingSourceDiv").style.display = "block";
             document.getElementById("procurementAgentDiv").style.display = "none";
+            document.getElementById("procurementAgentTypeDiv").style.display = "none";
+
             this.setState({
                 data: []
             }, () => {
@@ -756,6 +772,17 @@ class ShipmentGlobalView extends Component {
 
         } else if (viewby == 2) {
             document.getElementById("procurementAgentDiv").style.display = "block";
+            document.getElementById("fundingSourceDiv").style.display = "none";
+            document.getElementById("procurementAgentTypeDiv").style.display = "none";
+
+            this.setState({
+                data: []
+            }, () => {
+                this.fetchData();
+            })
+        } else if (viewby == 3) {
+            document.getElementById("procurementAgentTypeDiv").style.display = "block";
+            document.getElementById("procurementAgentDiv").style.display = "none";
             document.getElementById("fundingSourceDiv").style.display = "none";
             this.setState({
                 data: []
@@ -768,16 +795,21 @@ class ShipmentGlobalView extends Component {
     componentDidMount() {
 
         this.getCountrys();
-        this.getPrograms();
-        this.getProductCategories();
-        // this.getProcurementAgent();
-        this.getFundingSource();
+        // this.getPrograms();
+        // this.getProductCategories();
+        // // this.getProcurementAgent();
+        // this.getFundingSource();
+        // this.getProcurementAgentType();
         document.getElementById("procurementAgentDiv").style.display = "none";
+        document.getElementById("procurementAgentTypeDiv").style.display = "none";
+
 
     }
 
     getPrograms = () => {
-
+        this.setState({
+            loading: true
+        })
         ProgramService.getProgramList()
             .then(response => {
                 console.log(JSON.stringify(response.data))
@@ -787,9 +819,10 @@ class ShipmentGlobalView extends Component {
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
-                this.getProcurementAgent(this.state.programValues);
                 this.setState({
                     programs: listArray, loading: false
+                }, () => {
+                    this.getProductCategories();
                 })
             }).catch(
                 error => {
@@ -798,7 +831,8 @@ class ShipmentGlobalView extends Component {
                     })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -856,7 +890,8 @@ class ShipmentGlobalView extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -916,7 +951,7 @@ class ShipmentGlobalView extends Component {
     }
 
     getProcurementAgent = (programIds) => {
-
+        this.setState({ loading: true })
         // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
@@ -952,7 +987,55 @@ class ShipmentGlobalView extends Component {
                         procurementAgents: [], loading: false
                     })
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message, loading: false });
+                        this.setState({
+                            // message: error.message,
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError', loading: false });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    getProcurementAgentType = () => {
+        this.setState({ loading: true })
+        ProcurementAgentService.getProcurementAgentTypeListAll()
+            .then(response => {
+                let realmId = AuthenticationService.getRealmId();
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                console.log("listArray", listArray)
+                this.setState({
+                    procurementAgentTypes: listArray.filter(c => c.active == true && realmId == c.realm.id), loading: false,
+                }, () => { this.fetchData(); })
+            }).catch(
+                error => {
+                    this.setState({
+                        procurementAgentTypes: [], loading: false
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: error.message, 
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -972,7 +1055,8 @@ class ShipmentGlobalView extends Component {
     }
 
     getFundingSource = () => {
-
+        console.log("==>>inside funding src")
+        this.setState({ loading: true })
         // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
@@ -985,7 +1069,7 @@ class ShipmentGlobalView extends Component {
                 });
                 this.setState({
                     fundingSources: listArray, loading: false
-                })
+                }, () => { this.getProcurementAgentType(); })
             }).catch(
                 error => {
                     this.setState({
@@ -993,7 +1077,8 @@ class ShipmentGlobalView extends Component {
                     })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1055,6 +1140,9 @@ class ShipmentGlobalView extends Component {
     }
 
     getProductCategories() {
+        this.setState({
+            loading: true
+        })
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
         ProductService.getProductCategoryList(realmId)
@@ -1069,7 +1157,7 @@ class ShipmentGlobalView extends Component {
                 });
                 this.setState({
                     productCategories: list, loading: false
-                })
+                }, () => { this.getFundingSource(); })
             }).catch(
                 error => {
                     this.setState({
@@ -1077,7 +1165,8 @@ class ShipmentGlobalView extends Component {
                     })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1136,7 +1225,6 @@ class ShipmentGlobalView extends Component {
         //         }
         //     }
         // );
-        this.getPlanningUnit();
     }
 
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
@@ -1176,10 +1264,11 @@ class ShipmentGlobalView extends Component {
     }
 
     fetchData = () => {
-
+        console.log("==>>inside fetch data")
         let viewby = document.getElementById("viewById").value;
         let realmId = AuthenticationService.getRealmId()
         let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
+        let procurementAgentTypeIds = this.state.procurementAgentTypeValues.length == this.state.procurementAgentTypes.length ? [] : this.state.procurementAgentTypeValues.map(ele => (ele.value).toString());
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let productCategoryId = document.getElementById("productCategoryId").value;
         let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
@@ -1193,8 +1282,11 @@ class ShipmentGlobalView extends Component {
         let fundingSourceProcurementAgentIds = [];
         if (viewby == 1) {
             fundingSourceProcurementAgentIds = fundingSourceIds;
-        } else {
+        } else if (viewby == 2) {
             fundingSourceProcurementAgentIds = procurementAgentIds;
+        } else {
+            fundingSourceProcurementAgentIds = procurementAgentTypeIds;
+
         }
         // console.log("planningUnitId-------", planningUnitId);
         // console.log("productCategoryId------", productCategoryId);
@@ -1204,7 +1296,7 @@ class ShipmentGlobalView extends Component {
         // console.log("startDate-----", startDate);
         // console.log("endDate-----", endDate);
 
-        if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && this.state.programValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0))) {
+        if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && this.state.programValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 3 && this.state.procurementAgentTypeValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0))) {
             let planningUnitUnit = this.state.planningUnits.filter(c => c.planningUnitId == planningUnitId)[0].unit;
             console.log("planningUnitUnit------>", planningUnitUnit);
             this.setState({
@@ -1307,7 +1399,8 @@ class ShipmentGlobalView extends Component {
                         })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1466,6 +1559,19 @@ class ShipmentGlobalView extends Component {
                 lab: [],
                 val: []
             });
+        } else if (viewby == 3 && this.state.procurementAgentTypeValues.length == 0) {
+            this.setState({
+                message: i18n.t('static.shipment.shipmentProcurementAgentType'),
+                data: [],
+                shipmentList: [],
+                dateSplitList: [],
+                countrySplitList: [],
+                countryShipmentSplitList: [],
+                table1Headers: [],
+                table1Body: [],
+                lab: [],
+                val: []
+            });
 
         }
 
@@ -1490,7 +1596,26 @@ class ShipmentGlobalView extends Component {
             procurementAgentValues: procurementAgentIds.map(ele => ele),
             procurementAgentLabels: procurementAgentIds.map(ele => ele.label),
             fundingSourceValues: [],
-            fundingSourceLabels: []
+            fundingSourceLabels: [],
+            procurementAgentTypeValues: [],
+            procurementAgentTypeLabels: []
+        }, () => {
+
+            this.fetchData();
+        })
+    }
+
+    handleProcurementAgentTypeChange(procurementAgentTypeIds) {
+        procurementAgentTypeIds = procurementAgentTypeIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            procurementAgentTypeValues: procurementAgentTypeIds.map(ele => ele),
+            procurementAgentTypeLabels: procurementAgentTypeIds.map(ele => ele.label),
+            fundingSourceValues: [],
+            fundingSourceLabels: [],
+            procurementAgentValues: [],
+            procurementAgentLabels: []
         }, () => {
 
             this.fetchData();
@@ -1505,7 +1630,9 @@ class ShipmentGlobalView extends Component {
             fundingSourceValues: fundingSourceIds.map(ele => ele),
             fundingSourceLabels: fundingSourceIds.map(ele => ele.label),
             procurementAgentValues: [],
-            procurementAgentLabels: []
+            procurementAgentLabels: [],
+            procurementAgentTypeValues: [],
+            procurementAgentTypeLabels: []
         }, () => {
 
             this.fetchData();
@@ -1533,7 +1660,9 @@ class ShipmentGlobalView extends Component {
             programValues: [],
             programLabels: [],
             procurementAgentValues: [],
-            procurementAgents: []
+            procurementAgents: [],
+            // procurementAgentTypeValues: [],
+            // procurementAgentTypes: []
         }, () => {
             if (countryIds.length != 0) {
                 let programLst = [];
@@ -1614,6 +1743,18 @@ class ShipmentGlobalView extends Component {
                 return (
 
                     { label: item.procurementAgentCode, value: item.procurementAgentId }
+
+                )
+            }, this);
+
+        const { procurementAgentTypes } = this.state;
+        let procurementAgentTypeList = [];
+        procurementAgentTypeList = procurementAgentTypes.length > 0
+            && procurementAgentTypes.map((item, i) => {
+                console.log("procurementAgentTypes", procurementAgentTypes)
+                return (
+
+                    { label: item.procurementAgentTypeCode, value: item.procurementAgentTypeId }
 
                 )
             }, this);
@@ -1824,6 +1965,46 @@ class ShipmentGlobalView extends Component {
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentProcurementAgent'),
+                fontColor: 'black'
+            },
+            scales: {
+                xAxes: [{
+                    labelMaxWidth: 100,
+                    stacked: true,
+                    gridLines: {
+                        display: false
+                    },
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: this.state.puUnit.label.label_en,
+                        fontColor: 'black'
+                    },
+                    stacked: true,
+                    labelString: i18n.t('static.shipment.amount'),
+                }],
+            },
+            tooltips: {
+                enabled: false,
+                custom: CustomTooltips
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                }
+            }
+        }
+
+        const options3 = {
+            title: {
+                display: true,
+                text: i18n.t('static.shipment.shipmentProcurementAgentType'),
                 fontColor: 'black'
             },
             scales: {
@@ -2114,6 +2295,7 @@ class ShipmentGlobalView extends Component {
                                                     >
                                                         <option value="1">{i18n.t('static.dashboard.fundingsource')}</option>
                                                         <option value="2">{i18n.t('static.procurementagent.procurementagent')}</option>
+                                                        <option value="3">{i18n.t('static.dashboard.procurementagentType')}</option>
 
                                                     </Input>
                                                 </InputGroup>
@@ -2136,6 +2318,21 @@ class ShipmentGlobalView extends Component {
                                                 />
 
 
+                                            </div>
+                                        </FormGroup>
+
+                                        <FormGroup className="col-md-3" id="procurementAgentTypeDiv">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.procurementagentType')}</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <div className="controls ">
+                                                <MultiSelect
+                                                    name="procurementAgentTypeId"
+                                                    id="procurementAgentTypeId"
+                                                    bsSize="sm"
+                                                    value={this.state.procurementAgentTypeValues}
+                                                    onChange={(e) => { this.handleProcurementAgentTypeChange(e) }}
+                                                    options={procurementAgentTypeList && procurementAgentTypeList.length > 0 ? procurementAgentTypeList : []}
+                                                />
                                             </div>
                                         </FormGroup>
 
@@ -2215,7 +2412,7 @@ class ShipmentGlobalView extends Component {
                                             <div className="col-md-6">
                                                 <div className="chart-wrapper chart-graph-report">
                                                     {console.log(bar1)/* <Bar id="cool-canvas" data={bar} options={options} /> */}
-                                                    <Bar id="cool-canvas2" data={bar1} options={this.state.viewby == 1 ? options1 : options2} />
+                                                    <Bar id="cool-canvas2" data={bar1} options={this.state.viewby == 1 ? options1 : this.state.viewby == 2 ? options2 : options3} />
                                                 </div>
                                             </div>
                                         }
@@ -2288,8 +2485,12 @@ class ShipmentGlobalView extends Component {
                                                                         <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.budget.fundingsource')}</th>
                                                                     }
                                                                     {
-                                                                        this.state.viewby != 1 &&
+                                                                        this.state.viewby == 2 &&
                                                                         <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.procurementagent.procurementagent')}</th>
+                                                                    }
+                                                                    {
+                                                                        this.state.viewby == 3 &&
+                                                                        <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.dashboard.procurementagentType')}</th>
                                                                     }
 
                                                                     <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.common.status')}</th>

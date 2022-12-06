@@ -12,7 +12,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
@@ -143,7 +143,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -596,7 +597,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -950,7 +952,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false,
                                     color: "#BA0C2F",
                                 });
@@ -1057,8 +1060,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     proList[i] = myResult[i]
                                 }
                             }
-                            console.log("$$$$$$$$$$ proList",proList)
-                            
+                            console.log("$$$$$$$$$$ proList", proList)
+
                             var proListDataFilter = proList.filter(c => c.forecastingUnit.id == forecastingUnitId);
                             console.log("$$$$$$$$$$ proListDataFilter", proListDataFilter);
                             planningUnitIdList = proListDataFilter.map(c => c.planningUnit.id)
@@ -1100,18 +1103,18 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 supplyPlan: []
                                             }
                                         }
-                                        consumptionList= consumptionList.concat(programJson.consumptionList);
+                                        consumptionList = consumptionList.concat(programJson.consumptionList);
                                     }
                                     console.log("$$$$$$$$$$ consumptionList---", consumptionList);
                                     var monthArray = [];
                                     var curDate = startDate;
                                     var monthstartfrom = this.state.rangeValue.from.month
-                                    
+
                                     for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
                                         curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
                                         var noOfDays = moment(curDate, "YYYY-MM").daysInMonth();
                                         monthArray.push({ date: curDate, noOfDays: noOfDays })
-                                    }  
+                                    }
                                     var isStartYear = 0;
                                     for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                                         if (isStartYear == 0) {
@@ -1122,127 +1125,127 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                         monthstartfrom = (isStartYear == -1 ? monthstartfrom : 1);
 
                                         for (var month = monthstartfrom; month <= 12; month++) {
-                                            var curDate ;     
-                                        
+                                            var curDate;
+
                                             var year = from;
-                                            var totalAvgForecasted=0;
-                                            var totalAvgActual =0;
-                                               
+                                            var totalAvgForecasted = 0;
+                                            var totalAvgActual = 0;
+
                                             curDate = year + "-" + String(month).padStart(2, '0') + "-01";
-                                            console.log("@@@@NewDevelopement@@@FU curDate--->",curDate)
-                                            console.log("@@@@NewDevelopement@@@FU monthInCalc--->",monthInCalc) 
-                                            
+                                            console.log("@@@@NewDevelopement@@@FU curDate--->", curDate)
+                                            console.log("@@@@NewDevelopement@@@FU monthInCalc--->", monthInCalc)
+
                                             for (var p = 0; p < planningUnitIdList.length; p++) {
                                                 year = from;
-                                                var adjustedActualConsumption=0;
-                                                var forecastedConsumption=0;
-                                                var PUadjustedActualConsumption=0;
-                                                var PUforecastedConsumption=0;
-                                                var auCount=0;
-                                                var fuCount=0;
-                                                console.log("@@@@NewDevelopement@@@FU conlist--->PU==",planningUnitIdList[p]);
-                                            for (var i = month, j = 0; j <= monthInCalc; i--, j++) { 
-                                            
-                                                if (i == 0) {
-                                                    i = 12;
-                                                    year = year - 1
-                                                }
-                                                var dt = year + "-" + String(i).padStart(2, '0') + "-01";
-                                                console.log("@@@@NewDevelopement@@@FU dt--->",dt);
-                                                var conlist = consumptionList.filter(c => c.consumptionDate === dt && c.planningUnit.id ==planningUnitIdList[p])
-        
-                                                var noOfDays = moment(dt, "YYYY-MM").daysInMonth();
-                                                console.log("@@@@NewDevelopement@@@FU noOfDays--->",noOfDays);
-        
-                                                // For TIME WINDOW
-                                                var regionData = [];
-                                                var consumptionforecastQty="";
-                                                var regionTotalforecastQty="";
-                                                var consumptionactualQty="";
-                                                var regionTotalactualQty="";
-                                                var daysOfStockOut="";
-                                                var consumptionQtyOutOfStockData="";
-        
-                                                for (let k = 0; k < regionList.length; k++) {
-                                                    var forecastQty=0;
-                                                    var actualQty=0;
+                                                var adjustedActualConsumption = 0;
+                                                var forecastedConsumption = 0;
+                                                var PUadjustedActualConsumption = 0;
+                                                var PUforecastedConsumption = 0;
+                                                var auCount = 0;
+                                                var fuCount = 0;
+                                                console.log("@@@@NewDevelopement@@@FU conlist--->PU==", planningUnitIdList[p]);
+                                                for (var i = month, j = 0; j <= monthInCalc; i--, j++) {
 
-                                                   consumptionforecastQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
-                                                   console.log("@@@@NewDevelopement@@@FU consumptionforecastQty--->",consumptionforecastQty);
-           
-                                                   if (consumptionforecastQty.length >= 0) {
-                                                        for (var con = 0; con < consumptionforecastQty.length; con++) {
-                                                            if(consumptionforecastQty[con].consumptionQty>=0){
-                                                                fuCount+=1;  
-                                                            }
-                                                            var multiplierFu = proListDataFilter.filter(c => c.planningUnit.id==consumptionforecastQty[con].planningUnit.id)[0].multiplier;
-                                                            forecastQty = Number(forecastQty) + Number(Number(consumptionforecastQty[con].consumptionQty) * Number(multiplierFu));      
-                                                        }
+                                                    if (i == 0) {
+                                                        i = 12;
+                                                        year = year - 1
                                                     }
-                                                    consumptionactualQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
-                                                    console.log("@@@@NewDevelopement@@@FU consumptionactualQty--->",consumptionactualQty);
-           
-                                                    if (consumptionactualQty.length >= 0) {
-                                                        for (var con = 0; con < consumptionactualQty.length; con++) {
-                                                            if(consumptionactualQty[con].consumptionQty>=0){
-                                                                auCount+=1;  
-                                                            }
-                                                            var multiplierAu = proListDataFilter.filter(c => c.planningUnit.id==consumptionactualQty[con].planningUnit.id)[0].multiplier;
-                                                            if(consumptionAdjForStockOutId){
-                                                                var consumptionQtyOutOfStockData= (consumptionactualQty[con].consumptionQty*multiplierAu) / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
-                                                                actualQty = Number(actualQty) + Number(consumptionQtyOutOfStockData);
-                                                            }else{
-                                                                actualQty =Number(actualQty)+ Number(consumptionactualQty[con].consumptionQty)*multiplierAu;
-                                                            }
-                                                            // actualQty += consumptionAdjForStockOutId? Number(consumptionQtyOutOfStockData) :Number(consumptionactualQty[con].consumptionQty);
-                                                        }
-                                                    }    
-                                                var region = { id: regionList[k].regionId, lable: regionList[k].label };
-                                                regionData.push({
-                                                    region: region,
-                                                    actualQty: actualQty,
-                                                    forecastQty: forecastQty
-                                                    // daysOfStockOut: daysOfStockOut,
-                                                    // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
-                                                });
-                                                console.log("@@@@NewDevelopement@@@FU Region actualQty--->",actualQty);
-                                                console.log("@@@@NewDevelopement@@@FU Region forecastQty--->",forecastQty);
-                                                
-                                                regionTotalforecastQty=regionTotalforecastQty+Number(forecastQty);
-                                                regionTotalactualQty=regionTotalactualQty+Number(actualQty);
-                                                console.log("@@@@NewDevelopement@@@FU Region auCount--->",auCount);
-                                                console.log("@@@@NewDevelopement@@@FU Region fuCount--->",fuCount);
-                                                    
-                                            }
-                                                adjustedActualConsumption=adjustedActualConsumption+Number(regionTotalactualQty);
-                                                forecastedConsumption=forecastedConsumption+Number(regionTotalforecastQty);
-                                                console.log("@@@@NewDevelopement@@@FU Region adjustedActualConsumption--->",adjustedActualConsumption);
-                                                console.log("@@@@NewDevelopement@@@FU Region forecastedConsumption--->",forecastedConsumption);
-                                                console.log("@@@@NewDevelopement@@@FU inside month Last DAte",dt);
-                                                                               
-                                            }
-                                            console.log("@@@@NewDevelopement@@@FU Before AVG auCount--->",auCount);
-                                            console.log("@@@@NewDevelopement@@@FU Before AVG fuCount--->",fuCount);
-                                            console.log("@@@@NewDevelopement@@@FU Before AVG adjustedActualConsumption--->",adjustedActualConsumption);
-                                            console.log("@@@@NewDevelopement@@@FU Before AVG forecastedConsumption--->",forecastedConsumption);
+                                                    var dt = year + "-" + String(i).padStart(2, '0') + "-01";
+                                                    console.log("@@@@NewDevelopement@@@FU dt--->", dt);
+                                                    var conlist = consumptionList.filter(c => c.consumptionDate === dt && c.planningUnit.id == planningUnitIdList[p])
 
-                                            PUadjustedActualConsumption=(adjustedActualConsumption/(Number(auCount)));                                   
-                                            PUforecastedConsumption=(forecastedConsumption/(Number(fuCount)));
-                                            console.log("@@@@NewDevelopement@@@FU AVg PUadjustedActualConsumption--->",PUadjustedActualConsumption);
-                                            console.log("@@@@NewDevelopement@@@FU AVg PUforecastedConsumption--->",PUforecastedConsumption);
-                                            totalAvgActual +=PUadjustedActualConsumption;
-                                            totalAvgForecasted +=PUforecastedConsumption;
-                                            console.log("@@@@NewDevelopement@@@FU totalAvgActual--->",totalAvgActual);
-                                            console.log("@@@@NewDevelopement@@@FU totalAvgForecasted--->",totalAvgForecasted);
-                                            console.log("@@@@NewDevelopement@@@FU Last DAte",dt);
-                                            
-                                        }
-                                                 
+                                                    var noOfDays = moment(dt, "YYYY-MM").daysInMonth();
+                                                    console.log("@@@@NewDevelopement@@@FU noOfDays--->", noOfDays);
+
+                                                    // For TIME WINDOW
+                                                    var regionData = [];
+                                                    var consumptionforecastQty = "";
+                                                    var regionTotalforecastQty = "";
+                                                    var consumptionactualQty = "";
+                                                    var regionTotalactualQty = "";
+                                                    var daysOfStockOut = "";
+                                                    var consumptionQtyOutOfStockData = "";
+
+                                                    for (let k = 0; k < regionList.length; k++) {
+                                                        var forecastQty = 0;
+                                                        var actualQty = 0;
+
+                                                        consumptionforecastQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
+                                                        console.log("@@@@NewDevelopement@@@FU consumptionforecastQty--->", consumptionforecastQty);
+
+                                                        if (consumptionforecastQty.length >= 0) {
+                                                            for (var con = 0; con < consumptionforecastQty.length; con++) {
+                                                                if (consumptionforecastQty[con].consumptionQty >= 0) {
+                                                                    fuCount += 1;
+                                                                }
+                                                                var multiplierFu = proListDataFilter.filter(c => c.planningUnit.id == consumptionforecastQty[con].planningUnit.id)[0].multiplier;
+                                                                forecastQty = Number(forecastQty) + Number(Number(consumptionforecastQty[con].consumptionQty) * Number(multiplierFu));
+                                                            }
+                                                        }
+                                                        consumptionactualQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
+                                                        console.log("@@@@NewDevelopement@@@FU consumptionactualQty--->", consumptionactualQty);
+
+                                                        if (consumptionactualQty.length >= 0) {
+                                                            for (var con = 0; con < consumptionactualQty.length; con++) {
+                                                                if (consumptionactualQty[con].consumptionQty >= 0) {
+                                                                    auCount += 1;
+                                                                }
+                                                                var multiplierAu = proListDataFilter.filter(c => c.planningUnit.id == consumptionactualQty[con].planningUnit.id)[0].multiplier;
+                                                                if (consumptionAdjForStockOutId) {
+                                                                    var consumptionQtyOutOfStockData = (consumptionactualQty[con].consumptionQty * multiplierAu) / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays;
+                                                                    actualQty = Number(actualQty) + Number(consumptionQtyOutOfStockData);
+                                                                } else {
+                                                                    actualQty = Number(actualQty) + Number(consumptionactualQty[con].consumptionQty) * multiplierAu;
+                                                                }
+                                                                // actualQty += consumptionAdjForStockOutId? Number(consumptionQtyOutOfStockData) :Number(consumptionactualQty[con].consumptionQty);
+                                                            }
+                                                        }
+                                                        var region = { id: regionList[k].regionId, lable: regionList[k].label };
+                                                        regionData.push({
+                                                            region: region,
+                                                            actualQty: actualQty,
+                                                            forecastQty: forecastQty
+                                                            // daysOfStockOut: daysOfStockOut,
+                                                            // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
+                                                        });
+                                                        console.log("@@@@NewDevelopement@@@FU Region actualQty--->", actualQty);
+                                                        console.log("@@@@NewDevelopement@@@FU Region forecastQty--->", forecastQty);
+
+                                                        regionTotalforecastQty = regionTotalforecastQty + Number(forecastQty);
+                                                        regionTotalactualQty = regionTotalactualQty + Number(actualQty);
+                                                        console.log("@@@@NewDevelopement@@@FU Region auCount--->", auCount);
+                                                        console.log("@@@@NewDevelopement@@@FU Region fuCount--->", fuCount);
+
+                                                    }
+                                                    adjustedActualConsumption = adjustedActualConsumption + Number(regionTotalactualQty);
+                                                    forecastedConsumption = forecastedConsumption + Number(regionTotalforecastQty);
+                                                    console.log("@@@@NewDevelopement@@@FU Region adjustedActualConsumption--->", adjustedActualConsumption);
+                                                    console.log("@@@@NewDevelopement@@@FU Region forecastedConsumption--->", forecastedConsumption);
+                                                    console.log("@@@@NewDevelopement@@@FU inside month Last DAte", dt);
+
+                                                }
+                                                console.log("@@@@NewDevelopement@@@FU Before AVG auCount--->", auCount);
+                                                console.log("@@@@NewDevelopement@@@FU Before AVG fuCount--->", fuCount);
+                                                console.log("@@@@NewDevelopement@@@FU Before AVG adjustedActualConsumption--->", adjustedActualConsumption);
+                                                console.log("@@@@NewDevelopement@@@FU Before AVG forecastedConsumption--->", forecastedConsumption);
+
+                                                PUadjustedActualConsumption = (adjustedActualConsumption / (Number(auCount)));
+                                                PUforecastedConsumption = (forecastedConsumption / (Number(fuCount)));
+                                                console.log("@@@@NewDevelopement@@@FU AVg PUadjustedActualConsumption--->", PUadjustedActualConsumption);
+                                                console.log("@@@@NewDevelopement@@@FU AVg PUforecastedConsumption--->", PUforecastedConsumption);
+                                                totalAvgActual += PUadjustedActualConsumption;
+                                                totalAvgForecasted += PUforecastedConsumption;
+                                                console.log("@@@@NewDevelopement@@@FU totalAvgActual--->", totalAvgActual);
+                                                console.log("@@@@NewDevelopement@@@FU totalAvgForecasted--->", totalAvgForecasted);
+                                                console.log("@@@@NewDevelopement@@@FU Last DAte", dt);
+
+                                            }
+
                                             var absEbar = (Math.abs(totalAvgForecasted - totalAvgActual)) / totalAvgActual;
-                                            console.log("@@@@NewDevelopement@@@FU absEbar--->",absEbar);
-           
+                                            console.log("@@@@NewDevelopement@@@FU absEbar--->", absEbar);
+
                                             var errorPerc = absEbar;
-                                         
+
                                             dataList.push({
                                                 month: moment(curDate).format("YYYY-MM-DD"),
                                                 regionData: regionData,
@@ -1254,7 +1257,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             });
                                         }
                                     }
-                                    console.log("@@@@NewDevelopement@@@FU dataList--->",dataList)
+                                    console.log("@@@@NewDevelopement@@@FU dataList--->", dataList)
                                     console.log("Complete dataList----------------------", dataList);
                                     this.setState({
                                         monthArray: monthArray,
@@ -1265,7 +1268,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             }.bind(this);
                         }.bind(this);
                     }.bind(this);
-                } else if(planningUnitId > 0)// View by planningUnit
+                } else if (planningUnitId > 0)// View by planningUnit
                 {
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
@@ -1290,7 +1293,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         }.bind(this);
                         programRequest.onsuccess = function (event) {
                             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                            console.log("planningUnitDataList--->",planningUnitDataList)
+                            console.log("planningUnitDataList--->", planningUnitDataList)
                             var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
                             var programJson = {};
                             if (planningUnitDataFilter.length > 0) {
@@ -1314,14 +1317,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             var monthstartfrom = this.state.rangeValue.from.month;
                             var curDate = startDate;
                             for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
-                                console.log("@@@@NewDevelopement@@@ monthArray BEfore 1263--->",monthArray)
-                          
+                                console.log("@@@@NewDevelopement@@@ monthArray BEfore 1263--->", monthArray)
+
                                 curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
                                 var noOfDays = moment(curDate, "YYYY-MM").daysInMonth();
                                 monthArray.push({ date: curDate, noOfDays: noOfDays })
-                            }  
-                            console.log("@@@@NewDevelopement@@@ monthArray BEfore--->",monthArray)
-                            
+                            }
+                            console.log("@@@@NewDevelopement@@@ monthArray BEfore--->", monthArray)
+
                             var isStartYear = 0;
                             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                                 if (isStartYear == 0) {
@@ -1331,99 +1334,99 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 }
                                 monthstartfrom = (isStartYear == -1 ? monthstartfrom : 1);
                                 for (var month = monthstartfrom; month <= 12; month++) {
-                                    var curDate ;     
-                                
+                                    var curDate;
+
                                     var year = from;
-                                    var adjustedActualConsumption=0;
-                                    var forecastedConsumption=0;
-                                    var aumultiplier="";
-                                    var fumultiplier="";
-                                    var auCount=0;
-                                    var fuCount=0;
+                                    var adjustedActualConsumption = 0;
+                                    var forecastedConsumption = 0;
+                                    var aumultiplier = "";
+                                    var fumultiplier = "";
+                                    var auCount = 0;
+                                    var fuCount = 0;
                                     curDate = year + "-" + String(month).padStart(2, '0') + "-01";
-                                    console.log("@@@@NewDevelopement@@@ curDate--->",curDate)
-                                    console.log("@@@@NewDevelopement@@@ monthInCalc--->",monthInCalc)       
-                                    for (var i = month, j = 0; j <= monthInCalc; i--, j++) { 
-                                    
+                                    console.log("@@@@NewDevelopement@@@ curDate--->", curDate)
+                                    console.log("@@@@NewDevelopement@@@ monthInCalc--->", monthInCalc)
+                                    for (var i = month, j = 0; j <= monthInCalc; i--, j++) {
+
                                         if (i == 0) {
                                             i = 12;
                                             year = year - 1
                                         }
                                         var dt = year + "-" + String(i).padStart(2, '0') + "-01";
-                                        console.log("@@@@NewDevelopement@@@ dt--->",dt);
+                                        console.log("@@@@NewDevelopement@@@ dt--->", dt);
                                         var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                                        console.log("@@@@NewDevelopement@@@ conlist--->",conlist);
+                                        console.log("@@@@NewDevelopement@@@ conlist--->", conlist);
 
                                         var noOfDays = moment(dt, "YYYY-MM").daysInMonth();
-                                        console.log("@@@@NewDevelopement@@@ noOfDays--->",noOfDays);
+                                        console.log("@@@@NewDevelopement@@@ noOfDays--->", noOfDays);
 
                                         // For TIME WINDOW
                                         var regionData = [];
-                                        var consumptionforecastQty="";
-                                        var regionTotalforecastQty="";
-                                        var consumptionactualQty="";
-                                        var regionTotalactualQty="";
-                                        var daysOfStockOut="";
-                                        var consumptionQtyOutOfStockData="";
+                                        var consumptionforecastQty = "";
+                                        var regionTotalforecastQty = "";
+                                        var consumptionactualQty = "";
+                                        var regionTotalactualQty = "";
+                                        var daysOfStockOut = "";
+                                        var consumptionQtyOutOfStockData = "";
 
                                         for (let k = 0; k < regionList.length; k++) {
-                                            var forecastQty="";
-                                            var actualQty="";
-                                           
-                                           consumptionforecastQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
-                                           console.log("@@@@NewDevelopement@@@ consumptionforecastQty--->",consumptionforecastQty);
-   
-                                           if (consumptionforecastQty.length >= 0) {
+                                            var forecastQty = "";
+                                            var actualQty = "";
+
+                                            consumptionforecastQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
+                                            console.log("@@@@NewDevelopement@@@ consumptionforecastQty--->", consumptionforecastQty);
+
+                                            if (consumptionforecastQty.length >= 0) {
                                                 for (var con = 0; con < consumptionforecastQty.length; con++) {
-                                                    if(consumptionforecastQty[con].consumptionQty>=0){
-                                                        fuCount+=1;  
+                                                    if (consumptionforecastQty[con].consumptionQty >= 0) {
+                                                        fuCount += 1;
                                                     }
                                                     forecastQty += consumptionforecastQty[con].consumptionQty;
                                                 }
-                                            } 
+                                            }
                                             consumptionactualQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == true && c.active == true && c.region.id == regionList[k].regionId);
-                                            console.log("@@@@NewDevelopement@@@ consumptionactualQty--->",consumptionactualQty);
-   
+                                            console.log("@@@@NewDevelopement@@@ consumptionactualQty--->", consumptionactualQty);
+
                                             if (consumptionactualQty.length >= 0) {
                                                 for (var con = 0; con < consumptionactualQty.length; con++) {
-                                                    if(consumptionactualQty[con].consumptionQty>=0){
-                                                        auCount+=1;  
+                                                    if (consumptionactualQty[con].consumptionQty >= 0) {
+                                                        auCount += 1;
                                                     }
-                                                    actualQty += consumptionAdjForStockOutId? consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays :consumptionactualQty[con].consumptionQty; 
+                                                    actualQty += consumptionAdjForStockOutId ? consumptionactualQty[con].consumptionQty / (noOfDays - consumptionactualQty[con].dayOfStockOut) * noOfDays : consumptionactualQty[con].consumptionQty;
                                                 }
-                                            }    
-                                        var region = { id: regionList[k].regionId, lable: regionList[k].label };
-                                        regionData.push({
-                                            region: region,
-                                            actualQty: actualQty,
-                                            forecastQty: forecastQty
-                                            // daysOfStockOut: daysOfStockOut,
-                                            // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
-                                        });
-                                        regionTotalforecastQty=regionTotalforecastQty+Number(forecastQty);
-                                        regionTotalactualQty=regionTotalactualQty+Number(actualQty);
+                                            }
+                                            var region = { id: regionList[k].regionId, lable: regionList[k].label };
+                                            regionData.push({
+                                                region: region,
+                                                actualQty: actualQty,
+                                                forecastQty: forecastQty
+                                                // daysOfStockOut: daysOfStockOut,
+                                                // consumptionQtyOutOfStockData: consumptionQtyOutOfStockData
+                                            });
+                                            regionTotalforecastQty = regionTotalforecastQty + Number(forecastQty);
+                                            regionTotalactualQty = regionTotalactualQty + Number(actualQty);
                                         }
-                                        adjustedActualConsumption=adjustedActualConsumption+Number(regionTotalactualQty);
-                                        forecastedConsumption=forecastedConsumption+Number(regionTotalforecastQty);
-                                        console.log("@@@@NewDevelopement@@@ Region auCount--->",auCount);
-                                        console.log("@@@@NewDevelopement@@@ Region fuCount--->",fuCount);
-                                        
+                                        adjustedActualConsumption = adjustedActualConsumption + Number(regionTotalactualQty);
+                                        forecastedConsumption = forecastedConsumption + Number(regionTotalforecastQty);
+                                        console.log("@@@@NewDevelopement@@@ Region auCount--->", auCount);
+                                        console.log("@@@@NewDevelopement@@@ Region fuCount--->", fuCount);
+
                                     }
-                                    console.log("@@@@NewDevelopement@@@ adjustedActualConsumption--->",adjustedActualConsumption);
-                                    console.log("@@@@NewDevelopement@@@ forecastedConsumption--->",forecastedConsumption);
-                                    console.log("@@@@NewDevelopement@@@ auCount--->",auCount);
-                                    console.log("@@@@NewDevelopement@@@ fuCount--->",fuCount);
-                                    
-                                    adjustedActualConsumption=(adjustedActualConsumption/(Number(auCount)));                                   
-                                    forecastedConsumption=(forecastedConsumption/(Number(fuCount)));
-                                    console.log("@@@@NewDevelopement@@@ AVg adjustedActualConsumption--->",adjustedActualConsumption);
-                                    console.log("@@@@NewDevelopement@@@ AVg forecastedConsumption--->",forecastedConsumption);
-   
+                                    console.log("@@@@NewDevelopement@@@ adjustedActualConsumption--->", adjustedActualConsumption);
+                                    console.log("@@@@NewDevelopement@@@ forecastedConsumption--->", forecastedConsumption);
+                                    console.log("@@@@NewDevelopement@@@ auCount--->", auCount);
+                                    console.log("@@@@NewDevelopement@@@ fuCount--->", fuCount);
+
+                                    adjustedActualConsumption = (adjustedActualConsumption / (Number(auCount)));
+                                    forecastedConsumption = (forecastedConsumption / (Number(fuCount)));
+                                    console.log("@@@@NewDevelopement@@@ AVg adjustedActualConsumption--->", adjustedActualConsumption);
+                                    console.log("@@@@NewDevelopement@@@ AVg forecastedConsumption--->", forecastedConsumption);
+
                                     var absEbar = (Math.abs(forecastedConsumption - adjustedActualConsumption)) / adjustedActualConsumption;
-                                    console.log("@@@@NewDevelopement@@@ absEbar--->",absEbar);
-   
+                                    console.log("@@@@NewDevelopement@@@ absEbar--->", absEbar);
+
                                     var errorPerc = absEbar;
-                                 
+
                                     dataList.push({
                                         month: moment(curDate).format("YYYY-MM-DD"),
                                         regionData: regionData,
@@ -1446,22 +1449,22 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             console.log("DATALIST--->", this.state.dataList)
                         }.bind(this);
                     }.bind(this);
-                }if(equivalencyUnitId>0) // View by EquivalencyUnit 
+                } if (equivalencyUnitId > 0) // View by EquivalencyUnit 
                 {
-                    var equivalencyUnitList= this.state.equivalencyUnitList;
+                    var equivalencyUnitList = this.state.equivalencyUnitList;
                     var eqDataList = this.state.dataList;
-                    var filteredequivalencyUnit=equivalencyUnitList.filter(c=>c.equivalencyUnitId);
-                    for(var con =0; con<=eqDataList.length;con++){
-                        if(eqDataList[con].actualQty>=0){
-                            eqDataList[con].actualQty=eqDataList[con].actualQty*filteredequivalencyUnit.convertToEu;
+                    var filteredequivalencyUnit = equivalencyUnitList.filter(c => c.equivalencyUnitId);
+                    for (var con = 0; con <= eqDataList.length; con++) {
+                        if (eqDataList[con].actualQty >= 0) {
+                            eqDataList[con].actualQty = eqDataList[con].actualQty * filteredequivalencyUnit.convertToEu;
                         }
-                        if(eqDataList[con].forecastQty>=0){
-                            eqDataList[con].forecastQty=eqDataList[con].forecastQty*filteredequivalencyUnit.convertToEu;
+                        if (eqDataList[con].forecastQty >= 0) {
+                            eqDataList[con].forecastQty = eqDataList[con].forecastQty * filteredequivalencyUnit.convertToEu;
                         }
                     }
                     this.setState({
                         dataList: eqDataList
-                        })
+                    })
                 }
                 this.setState({ loading: false })
             } else {
@@ -1513,7 +1516,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -2711,7 +2715,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             </div>
                                         }
                                     </div>
-                                    {/* </div> */}
                                 </Col>
                             </div>
                         </div>

@@ -511,7 +511,7 @@ const routes = [
 
   // { path: '/dashboard/:message', component: Dashboard },
   { path: '/dashboard/:color/:message', component: Dashboard },
-  { path: '/program/downloadProgram', name: 'static.dashboard.downloadprogram', component: ProgramTree },
+  { path: '/program/downloadProgram', name: 'static.loadDeleteProgram.loadDeleteProgram', component: ProgramTree },
   { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: 'static.dashboard.exportprogram', component: ExportProgram },
@@ -567,7 +567,8 @@ const routes = [
   { path: '/supplyPlan/:programId/:planningUnitId/:batchNo/:expiryDate', exact: true, name: 'static.dashboard.supplyPlan', component: SupplyPlan },
 
   { path: '/report/whatIf', name: 'static.dashboard.whatIf', component: WhatIfReport },
-  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging', component: ManualTagging },
+  { path: '/shipment/manualTagging', name: 'static.dashboard.manualTagging', exact: true, component: ManualTagging },
+  { path: '/shipment/manualTagging/:tab', name: 'static.dashboard.manualTagging', component: ManualTagging },
   { path: '/shipment/delinking', name: 'static.dashboard.delinking', component: ShipmentDelinking },
   { path: '/supplyPlanFormulas', name: 'static.supplyplan.supplyplanformula', component: SupplyPlanFormulas },
 
@@ -782,6 +783,7 @@ class DefaultLayout extends Component {
     this.onAction = this._onAction.bind(this)
     this.onActive = this._onActive.bind(this)
     this.onIdle = this._onIdle.bind(this)
+    this.getDatasetData = this.getDatasetData.bind(this);
     this.getProgramData = this.getProgramData.bind(this);
     this.getNotificationCount = this.getNotificationCount.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -849,6 +851,7 @@ class DefaultLayout extends Component {
       }
       // var n=this.state.activeTab[0]==='1'?'Supply planning':'Forecasting'
       console.log("P*** Call indexed db methods0---------------------------")
+      this.getDatasetData();
       this.getProgramData();
       this.getNotificationCount();
       // this.getDownloadedPrograms();
@@ -860,6 +863,49 @@ class DefaultLayout extends Component {
         name
       });
     }
+  }
+
+  goOffline(e) {
+    // localStorage.setItem("loginOnline", false);
+    console.log("window.location", window.location)
+    // var url = window.location.href;
+    // if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
+    //   // "The specific word exists";
+    //   localStorage.setItem("loginOnline", false);
+    //   var getSplit = ((url.indexOf("green/") > -1 ? url.split("green/") : url.split("red/")))
+    //   window.location.href = getSplit[0] + '%20/' + '%20';
+    //   window.location.reload();
+    // } else {
+    //   // "The specific word doesn't exist";
+    localStorage.setItem("loginOnline", false);
+    //   window.location.reload();
+    // }
+    // window.location.reload();
+    let id = AuthenticationService.displayDashboardBasedOnRole();
+    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.login.successOffline'))
+    window.location.reload();
+
+  }
+
+  goOnline(e) {
+    confirmAlert({
+      message: i18n.t("static.login.confirmSessionChange"),
+      buttons: [
+        {
+          label: i18n.t("static.login.goToLogin"),
+          onClick: () => {
+            localStorage.setItem("sessionChanged", 1)
+            this.props.history.push("/login/static.login.loginAgain");
+          }
+        },
+        {
+          label: i18n.t("static.common.cancel"),
+          className: "dangerColor",
+          onClick: () => {
+          }
+        },
+      ]
+    })
   }
   componentDidMount() {
     console.log("timeout default layout component did mount---------------")
@@ -916,7 +962,7 @@ class DefaultLayout extends Component {
     this.props.history.push(`/changePassword`);
   }
 
-  goToMasterDataSync(e){
+  goToMasterDataSync(e) {
     e.preventDefault();
     this.props.history.push({ pathname: `/syncProgram`, state: { "isFullSync": true } })
   }
@@ -992,19 +1038,19 @@ class DefaultLayout extends Component {
   getNotificationCount() {
     if (localStorage.getItem("sessionType") === 'Online') {
       AuthenticationService.setupAxiosInterceptors();
-      // ManualTaggingService.getNotificationCount()
-      //   .then(response => {
-      //     console.log("notification response===", response.data);
-      //     this.setState({
-      //       notificationCount: response.data
-      //     })
-      //   }).catch(
-      //     error => {
-      //       this.setState({
-      //         notificationCount: 0
-      //       })
-      //     }
-      //   );
+      ManualTaggingService.getNotificationCount()
+        .then(response => {
+          console.log("notification response===", response.data);
+          this.setState({
+            notificationCount: response.data
+          })
+        }).catch(
+          error => {
+            this.setState({
+              notificationCount: 0
+            })
+          }
+        );
     }
   }
   getProgramData() {
@@ -1069,6 +1115,78 @@ class DefaultLayout extends Component {
     }.bind(this)
 
   }
+
+  getDatasetData() {
+    console.log("P***get programs called");
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: '#BA0C2F'
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['datasetDetails'], 'readwrite');
+      var program = transaction.objectStore('datasetDetails');
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: '#BA0C2F',
+          loading: false
+        })
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var programDatasetChanged = 0;
+        console.log(" programDatasetChanged@@@!", programDatasetChanged);
+        console.log("myResult@@@!", myResult);
+
+        for (var i = 0; i < myResult.length; i++) {
+          console.log("userId@@@!", userId);
+          console.log("myResult[i].userId==userId@@@1", myResult[i].userId == userId);
+
+          if (myResult[i].userId == userId) {
+            console.log("myResult[i].changed@@@!", myResult[i].changed);
+
+            if (myResult[i].changed == 1) {
+              programDatasetChanged = 1;
+              break;
+            }
+          }
+        }
+        this.setState({
+          programDatasetChanged: programDatasetChanged
+        })
+        console.log("Program modified Final@@@!", programDatasetChanged);
+        if (programDatasetChanged == 1) {
+          console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+          localStorage.setItem("sesLocalVersionChange", true);
+          this.setState({ fuChangeIcon: true });
+          console.log("P***d--------in if---------------")
+        } else {
+          localStorage.setItem("sesLocalVersionChange", false);
+          this.setState({ fuChangeIcon: false });
+          console.log("P***d--------in else---------------")
+        }
+        // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // this.setState({
+        //   programDataLastModifiedDate: moment.max(proList.map(d => moment(d.lastModifiedDate)))
+        // }, () => {
+        //   // this.props.func(this, this.state.programDataLastModifiedDate, this.state.downloadedProgramDataLastModifiedDate)
+        // })
+        // this.getDownloadedPrograms();
+      }.bind(this);
+    }.bind(this)
+  }
+
+
   // getDownloadedPrograms() {
   //   console.log("P***get programs called 1");
   //   var db1;
@@ -1176,6 +1294,7 @@ class DefaultLayout extends Component {
   // }
 
   toggle(tabPane, tab) {
+    // document.getElementById('div1').style.display = 'none';
     // console.log("inside toggle function")
     // const newArray = this.state.activeTab.slice()
     // newArray[tabPane] = tab
@@ -1203,15 +1322,15 @@ class DefaultLayout extends Component {
     // console.log("User111-----", decryptedUser1.defaultModuleId);
     this.setState({
       activeTab: decryptedUser1.defaultModuleId,
-    }, () => {
+    // }, () => {
       // if (decryptedUser1.defaultModuleId==1){
       //   this.props.history.push(`/ApplicationDashboard/fm/1`);
       // }
       // else if (decryptedUser1.defaultModuleId==2){
       //   this.props.history.push(`/ApplicationDashboard/sp/2`);
       // }
-      let id = AuthenticationService.displayDashboardBasedOnRole();
-      this.props.history.push(`/ApplicationDashboard/` + `${id}`);
+      // let id = AuthenticationService.displayDashboardBasedOnRole();
+      // this.props.history.push(`/ApplicationDashboard/` + `${id}`);
     });
 
   }
@@ -1239,7 +1358,7 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed >
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -1689,7 +1808,7 @@ class DefaultLayout extends Component {
                             url: '/equivalancyUnit/listEquivalancyUnit',
                             icon: 'fa fa-exchange',
                             attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') && this.state.activeTab == 1 ? false : true),
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -1799,14 +1918,14 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          // {
-                          //   name: i18n.t('static.common.loadDeleteDataSet'),
-                          //   url: '/dataset/loadDeleteDataSet',
-                          //   icon: 'fa fa-download',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                          // },
                           {
-                            name: 'Import Program',
+                            name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
+                            url: '/dataset/loadDeleteDataSet',
+                            icon: 'fa fa-download',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dashboard.importprogram'),
                             url: '/dataset/importDataset',
                             icon: 'fa fa-download',
                             attributes: {
@@ -1817,7 +1936,7 @@ class DefaultLayout extends Component {
                             }
                           },
                           {
-                            name: 'Export Program',
+                            name: i18n.t('static.dashboard.exportprogram'),
                             url: '/dataset/exportDataset',
                             icon: 'fa fa-upload',
                             attributes: {
@@ -1827,17 +1946,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.common.loadDeleteDataSet'),
-                            url: '/dataset/loadDeleteDataSet',
-                            icon: 'cui-cloud-download FontBoldIcon',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: i18n.t('static.common.loadDeleteDataSet'),
+                          //   url: '/dataset/loadDeleteDataSet',
+                          //   icon: 'cui-cloud-download FontBoldIcon',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           {
                             name: i18n.t('static.commitProgram.commitProgram'),
                             url: '/dataset/commitTree',
@@ -2203,7 +2322,7 @@ class DefaultLayout extends Component {
                             }
                           },
                           {
-                            name: i18n.t('static.dashboard.downloadprogram'),
+                            name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
                             url: '/program/downloadProgram',
                             icon: 'cui-cloud-download FontBoldIcon',
                             attributes: {
@@ -2213,18 +2332,18 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.program.deleteLocalProgram'),
-                            url: '/program/deleteLocalProgram',
-                            icon: 'fa fa-trash',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.program.deleteLocalProgram'),
+                          //   url: '/program/deleteLocalProgram',
+                          //   icon: 'fa fa-trash',
+                          //   attributes: {
+                          //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') && this.state.activeTab == 2) ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') ? false : true) }
+                          // },
                           {
                             name: i18n.t('static.dashboard.programimport'),
                             // url: '/pipeline/pipelineProgramImport',
@@ -3374,7 +3493,7 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
 
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
 
@@ -3389,17 +3508,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          // {
-                          //   name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
-                          //   url: '/planningUnitSetting/listPlanningUnitSetting',
-                          //   icon: 'fa fa-cubes',
-                          //   attributes: {
-                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true),
-                          //     onClick: e => {
-                          //       this.refreshPage();
-                          //     }
-                          //   }
-                          // },
+                          {
+                            name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
+                            url: '/planningUnitSetting/listPlanningUnitSetting',
+                            icon: 'fa fa-cubes',
+                            attributes: {
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
 
                           {
                             name: 'Import Program',
@@ -4166,7 +4285,7 @@ class DefaultLayout extends Component {
                       className="bgColourRemoveLink tab1"
                       active={this.state.activeTab === '1'}
                       onClick={() => { this.toggle(0, '1'); }}
-                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}`}
+                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}/green/Success`}
                       style={{ border: "none" }}
                       title={i18n.t('static.module.forecasting')}
                     >
@@ -4179,7 +4298,7 @@ class DefaultLayout extends Component {
                       className="bgColourRemoveLink tab2"
                       active={this.state.activeTab === '2'}
                       onClick={() => { this.toggle(0, '2'); }}
-                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}`}
+                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}/green/Success`}
                       style={{ border: "none", padding: "0.75rem 0.2rem" }}
                       title={i18n.t('static.module.supplyPlanningMod')}
                     >
@@ -4235,7 +4354,7 @@ class DefaultLayout extends Component {
         </div>
         <AppFooter>
           <Suspense fallback={this.loading()}>
-            <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)}/>
+            <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)} />
           </Suspense>
         </AppFooter>
       </div>

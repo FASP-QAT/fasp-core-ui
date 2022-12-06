@@ -1,6 +1,6 @@
 // export const API_URL='https://fasp.altius.cc/FASP'
-// export const API_URL='https://api-mod2.altius.cc'
 export const API_URL = 'http://localhost:8084'
+// export const API_URL = 'http://localhost:8081'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
 // export const API_URL = 'https://uat-api.quantificationanalytics.org'
@@ -81,7 +81,7 @@ export const JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_MASTER_DATA = "Add / Update Mast
 export const JEXCEL_DATE_FORMAT = "DD-MON-YY"
 export const JEXCEL_DATE_FORMAT_SM = "DD-Mon-YY"
 export const JEXCEL_DATE_FORMAT_WITHOUT_DATE = "MON-YY"
-export const APP_VERSION_REACT = "[9032]"
+export const APP_VERSION_REACT = "[9703]"
 export const BATCH_PREFIX = "QAT"
 export const NONE_SELECTED_DATA_SOURCE_ID = 17
 export const JEXCEL_PAGINATION_OPTION = [15, 25, 50, 5000000]
@@ -112,7 +112,7 @@ export const QAT_HELPDESK_CUSTOMER_PORTAL_URL = 'https://qathelpdesk.atlassian.n
 export const JEXCEL_MONTH_PICKER_FORMAT = "Mon-YYYY"
 export const FINAL_VERSION_TYPE = 2;
 export const OPEN_PROBLEM_STATUS_ID = 1
-export const JEXCEL_PRO_KEY = "ZDUwNjRmMTA3YTQ4MDc2MWQyODU2YjhhNDFmYzc3MDQzY2Q3ZWU2Nzg0ZWI4MjU1Y2Q4NGM3OWU2NWM4YmVlNTM3MzQ1NTQ2MWU5NzE3MWM3MjJmZjUxODYzMDNkMmNlYTM5MDYxMDNlYTQ2NzI3MTQwYzdkYWJlNzg1OTkyZmMsZXlKdVlXMWxJam9pUVd4MGFYVnpJRU4xYzNSdmJXVnlJRk5sY25acFkyVnpJRkIyZENCTWRHUWlMQ0prWVhSbElqb3hOalkyTmpVeU5EQXdMQ0prYjIxaGFXNGlPbHNpYkc5allXeG9iM04wSWl3aWNYVmhiblJwWm1sallYUnBiMjVoYm1Gc2VYUnBZM011YjNKbklpd2lZV3gwYVhWekxtTmpJaXdpYlc5a01pNWhiSFJwZFhNdVkyTWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2SWpNaUxDSnpZMjl3WlNJNld5SjJOeUlzSW5ZNElsMTk="
+export const JEXCEL_PRO_KEY = "Y2NkZmExMmFlNDE2OTg0ZWMwZWU5MzVkM2ZlOGI0YzY2NjkwZGFmNmY0ZTQ2M2I3MTI2M2I4ODljZTNmY2EyZDkyMTZkZWQ2YzZmYTRkN2I5YzY0OTRhNWViZjRiNGU1ODgwNjQzMDRiNzJhOWYzZmU5NWRkN2Q0Y2UxNTc3NmYsZXlKdVlXMWxJam9pUVd4MGFYVnpJRU4xYzNSdmJXVnlJRk5sY25acFkyVnpJRkIyZENCTWRHUWlMQ0prWVhSbElqbzBOemMwTVRFNE5EQXdMQ0prYjIxaGFXNGlPbHNpYkc5allXeG9iM04wSWl3aWNYVmhiblJwWm1sallYUnBiMjVoYm1Gc2VYUnBZM011YjNKbklpd2lZV3gwYVhWekxtTmpJaXdpYlc5a01pNWhiSFJwZFhNdVkyTWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2SWpJeElpd2ljMk52Y0dVaU9sc2lkamNpTENKMk9DSXNJblk1SWwxOQ=="
 export const SPECIAL_CHARECTER_WITHOUT_NUM = /^([^0-9\s])+$/
 export const SPECIAL_CHARECTER_WITH_NUM = /^([^\s])+$/
 export const SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE = /^(?!.*\s\s)\S(.*\S)?$/
@@ -157,4 +157,6 @@ export const MAX_DATE_RESTRICTION_IN_DATA_ENTRY = 200;
 export const FORECAST_DATEPICKER_START_MONTH = 3;
 export const QAT_DATASOURCE_ID = 31;
 export const FORECAST_DATEPICKER_MONTH_DIFF = 6;
-export const SHIPMENT_ID_ARR_MANUAL_TAGGING=["3","4","5","6","7","9"]
+export const SHIPMENT_ID_ARR_MANUAL_TAGGING = ["3", "4", "5", "6", "7", "9"]
+export const SPV_REPORT_DATEPICKER_START_MONTH = 3;
+export const QAT_SUGGESTED_DATA_SOURCE_ID = 28

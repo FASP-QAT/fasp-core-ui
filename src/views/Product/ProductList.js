@@ -7,6 +7,7 @@ import ProductService from '../../api/ProductService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
 import i18n from '../../i18n'
+import { API_URL } from '../../Constants';
 const entityname = i18n.t('static.product.product')
 class ProductList extends Component {
   constructor(props) {
@@ -70,7 +71,10 @@ class ProductList extends Component {
       .catch(
         error => {
           if (error.message === "Network Error") {
-            this.setState({ message: error.message });
+            this.setState({
+              // message: error.message 
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+            });
           } else {
             switch (error.response.status) {
               case 500:

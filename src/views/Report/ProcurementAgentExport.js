@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -93,6 +93,7 @@ class ProcurementAgentExport extends Component {
     }
 
     getPrograms = () => {
+        this.setState({ loading: true })
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
@@ -108,7 +109,8 @@ class ProcurementAgentExport extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -252,6 +254,7 @@ class ProcurementAgentExport extends Component {
 
     getProcurementAgent = () => {
         let programId = document.getElementById("programId").value;
+        this.setState({ loading: true })
 
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
@@ -282,7 +285,8 @@ class ProcurementAgentExport extends Component {
                         }, () => { this.consolidatedProcurementAgentList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -612,6 +616,7 @@ class ProcurementAgentExport extends Component {
                 else {
                     // AuthenticationService.setupAxiosInterceptors();
 
+                    this.setState({ loading: true })
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
                         // console.log('**' + JSON.stringify(response.data))
@@ -622,7 +627,7 @@ class ProcurementAgentExport extends Component {
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
-                            planningUnits: listArray, message: ''
+                            planningUnits: listArray, message: '', loading: false
                         }, () => {
                             this.fetchData();
                         })
@@ -630,10 +635,12 @@ class ProcurementAgentExport extends Component {
                         error => {
                             this.setState({
                                 planningUnits: [],
+                                loading: false
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -1094,7 +1101,7 @@ class ProcurementAgentExport extends Component {
                 },
                 {
                     title: i18n.t('static.report.qty'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    type: 'numeric', mask: '#,##',
                     // readOnly: true
                 },
                 {
@@ -1391,11 +1398,13 @@ class ProcurementAgentExport extends Component {
                     }
                     console.log("inputjson-------", inputjson);
                     // AuthenticationService.setupAxiosInterceptors();
+                    this.setState({ loading: true })
+
                     ReportService.procurementAgentExporttList(inputjson)
                         .then(response => {
                             console.log("Online Data------", response.data);
                             this.setState({
-                                data: response.data
+                                data: response.data, loading: false
                             }, () => {
                                 // this.consolidatedProgramList();
                                 // this.consolidatedProcurementAgentList();
@@ -1414,7 +1423,8 @@ class ProcurementAgentExport extends Component {
                                 })
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
@@ -1719,12 +1729,14 @@ class ProcurementAgentExport extends Component {
                         planningUnitIds: planningUnitIds,
                         includePlannedShipments: includePlannedShipments,
                     }
+                    this.setState({ loading: true })
+
                     // AuthenticationService.setupAxiosInterceptors();
                     ReportService.fundingSourceExportList(inputjson)
                         .then(response => {
                             // console.log(JSON.stringify(response.data))
                             this.setState({
-                                data: response.data
+                                data: response.data, loading: false
                             }, () => {
                                 // this.consolidatedProgramList();
                                 this.consolidatedFundingSourceList();
@@ -1744,7 +1756,8 @@ class ProcurementAgentExport extends Component {
                                 })
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
@@ -2030,12 +2043,14 @@ class ProcurementAgentExport extends Component {
                         planningUnitIds: planningUnitIds,
                         includePlannedShipments: includePlannedShipments,
                     }
+                    this.setState({ loading: true })
+
                     // AuthenticationService.setupAxiosInterceptors();
                     ReportService.AggregateShipmentByProduct(inputjson)
                         .then(response => {
                             console.log("Online Data------", response.data);
                             this.setState({
-                                data: response.data
+                                data: response.data, loading: false
                             }, () => {
                                 // this.consolidatedProgramList();
                                 this.buildJExcel();
@@ -2053,7 +2068,8 @@ class ProcurementAgentExport extends Component {
                                 })
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
@@ -2253,6 +2269,7 @@ class ProcurementAgentExport extends Component {
     }
 
     getFundingSource = () => {
+        this.setState({ loading: true })
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
@@ -2268,7 +2285,8 @@ class ProcurementAgentExport extends Component {
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -2733,7 +2751,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -2752,7 +2770,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3">
+                                <FormGroup className="col-md-3" style={{ zIndex: '1' }}>
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -2774,7 +2792,7 @@ class ProcurementAgentExport extends Component {
                                     </div>
                                 </FormGroup>
 
-                                <FormGroup className="col-md-3" id="procurementAgentDiv">
+                                <FormGroup className="col-md-3" id="procurementAgentDiv" style={{ zIndex: '1' }}>
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls">
@@ -2793,7 +2811,7 @@ class ProcurementAgentExport extends Component {
 
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                <FormGroup className="col-md-3" id="fundingSourceDiv" style={{ zIndex: '1' }}>
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls">

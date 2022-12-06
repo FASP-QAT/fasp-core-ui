@@ -23,6 +23,10 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import moment from 'moment';
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
+import ListTreeEn from '../../../src/ShowGuidanceFiles/ManageTreeListTreeEn.html';
+import ListTreeFr from '../../../src/ShowGuidanceFiles/ManageTreeListTreeFr.html';
+import ListTreeSp from '../../../src/ShowGuidanceFiles/ManageTreeListTreeSp.html';
+import ListTreePr from '../../../src/ShowGuidanceFiles/ManageTreeListTreePr.html';
 const entityname = i18n.t('static.common.listtree');
 
 const validationSchema = function (values) {
@@ -144,7 +148,8 @@ export default class ListTreeComponent extends Component {
             forecastMethodList: [],
             realmCountryId: '',
             datasetIdModal: '',
-            tempTreeId: ''
+            tempTreeId: '',
+            lang: localStorage.getItem('lang')
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -183,7 +188,18 @@ export default class ListTreeComponent extends Component {
             console.log("---hurrey---");
 
             transaction.oncomplete = function (event) {
-
+                console.log("in side datasetDetails")
+                db1 = e.target.result;
+                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                var datasetDetailsRequest = datasetDetailsTransaction.get(document.getElementById("datasetId").value);
+                datasetDetailsRequest.onsuccess = function (e) {         
+                  var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                  datasetDetailsRequestJson.changed = 1;
+                  var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                  datasetDetailsRequest1.onsuccess = function (event) {
+                       
+                      }}
                 this.setState({
                     // loading: false,
                     message: i18n.t('static.mt.dataUpdateSuccess'),
@@ -818,7 +834,7 @@ export default class ListTreeComponent extends Component {
         // if (operationId == 3) {
         if (operationId == 3 && (treeTemplateId != "" && treeTemplateId != null)) {
             console.log("programId 1---", programId);
-            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true);
+            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true,true);
         } else {
             this.saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy);
         }
@@ -1013,7 +1029,7 @@ export default class ListTreeComponent extends Component {
             console.log("programList[j]---", programList[j]);
             var treeList = programList[j].programData.treeList;
 
-            if (treeList.length > 0) {
+            if (treeList!=undefined && treeList.length > 0) {
                 for (var k = 0; k < treeList.length; k++) {
 
                     data = [];
@@ -1505,8 +1521,18 @@ export default class ListTreeComponent extends Component {
                             <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                         </ModalHeader>
                         <div>
-                            <ModalBody>
-                                <div>
+                        <ModalBody className="ModalBodyPadding">
+
+<div dangerouslySetInnerHTML={{
+    __html: localStorage.getItem('lang') == 'en' ?
+        ListTreeEn :
+        localStorage.getItem('lang') == 'fr' ?
+            ListTreeFr :
+            localStorage.getItem('lang') == 'sp' ?
+                ListTreeSp :
+                ListTreePr
+}} />
+                                {/* <div>
                                     <h3 className='ShowGuidanceHeading'>{i18n.t('static.listTree.manageTreeTreeList')}</h3>
                                 </div>
                                 <p>
@@ -1533,7 +1559,7 @@ export default class ListTreeComponent extends Component {
                                             <li>{i18n.t('static.listTree.submitHelpDeskTicket')} </li>
                                         </ul>
                                     </p>
-                                </p>
+                                </p> */}
 
                             </ModalBody>
                         </div>

@@ -9,7 +9,7 @@ import {
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, SECRET_KEY, PENDING_APPROVAL_VERSION_STATUS } from "../../Constants";
+import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, SECRET_KEY, PENDING_APPROVAL_VERSION_STATUS, API_URL } from "../../Constants";
 import i18n from '../../i18n';
 import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
@@ -220,70 +220,77 @@ export default class CommitTreeComponent extends React.Component {
         this.setState({
             loading: true,
             showCompare: false,
-        },()=>{
-            var myResult = [];
-        myResult = this.state.programList;
-        localStorage.setItem("sesDatasetId", programId);
-        this.setState({
-            programId: programId
-        })
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: '#BA0C2F'
-            })
-            // this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['downloadedDatasetData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('downloadedDatasetData');
-            var programRequest = programDataOs.get(programId);
-            programRequest.onsuccess = function (e) {
-                var myResult1 = programRequest.result;
-                var datasetDataBytes = CryptoJS.AES.decrypt(myResult1.programData, SECRET_KEY);
-                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                var datasetJson = JSON.parse(datasetData);
-
-                let programData = myResult.filter(c => (c.id == programId));
+        }, () => {
+            if (programId != "" && programId != undefined && programId != null) {
+                var myResult = [];
+                myResult = this.state.programList;
+                localStorage.setItem("sesDatasetId", programId);
                 this.setState({
-                    programDataLocal: programData[0].datasetJson,
-                    programCode: programData[0].datasetJson.programCode,
-                    version: programData[0].version,
-                    pageName: i18n.t('static.button.commit'),
-                    programDataDownloaded: datasetJson,
-                    programName: programData[0].datasetJson.programCode + '~v' + programData[0].version + ' (local)',
-                    programNameOriginal: getLabelText(datasetJson.label, this.state.lang),
-                    forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
-                    forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
-                    notes: programData[0].datasetJson.currentVersion.notes
+                    programId: programId
                 })
 
-                var programVersionJson = [];
-                var json = {
-                    programId: programData[0].datasetJson.programId,
-                    versionId: '-1'
-                }
-                programVersionJson = programVersionJson.concat([json]);
-                DatasetService.getAllDatasetData(programVersionJson)
-                    .then(response => {
-                        console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
-                        this.setState({
-                            programDataServer: response.data[0],
-                            showCompare: true,
-                            comparedLatestVersion: response.data[0].currentVersion.versionId
-                        },()=>{
-                            dataCheck(this, programData[0].datasetJson)
-                        })
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: '#BA0C2F'
                     })
-                
+                    // this.hideFirstComponent()
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                    var programDataOs = programDataTransaction.objectStore('downloadedDatasetData');
+                    var programRequest = programDataOs.get(programId);
+                    programRequest.onsuccess = function (e) {
+                        var myResult1 = programRequest.result;
+                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult1.programData, SECRET_KEY);
+                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                        var datasetJson = JSON.parse(datasetData);
 
-            }.bind(this)
-        }.bind(this)
+                        let programData = myResult.filter(c => (c.id == programId));
+                        this.setState({
+                            programDataLocal: programData[0].datasetJson,
+                            programCode: programData[0].datasetJson.programCode,
+                            version: programData[0].version,
+                            pageName: i18n.t('static.button.commit'),
+                            programDataDownloaded: datasetJson,
+                            programName: programData[0].datasetJson.programCode + '~v' + programData[0].version + ' (local)',
+                            programNameOriginal: getLabelText(datasetJson.label, this.state.lang),
+                            forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
+                            forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
+                            notes: programData[0].datasetJson.currentVersion.notes
+                        })
+
+                        var programVersionJson = [];
+                        var json = {
+                            programId: programData[0].datasetJson.programId,
+                            versionId: '-1'
+                        }
+                        programVersionJson = programVersionJson.concat([json]);
+                        DatasetService.getAllDatasetData(programVersionJson)
+                            .then(response => {
+                                console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
+                                this.setState({
+                                    programDataServer: response.data[0],
+                                    showCompare: true,
+                                    comparedLatestVersion: response.data[0].currentVersion.versionId
+                                }, () => {
+                                    dataCheck(this, programData[0].datasetJson)
+                                })
+                            })
+
+
+                    }.bind(this)
+                }.bind(this)
+            } else {
+                this.setState({
+                    loading: false,
+                    programId:""
+                })
+            }
         })
     }
 
@@ -298,9 +305,9 @@ export default class CommitTreeComponent extends React.Component {
             if (parameterName == "treeScenarioList") {
                 buildJxl1(this)
             }
-            // if (parameterName == "treeScenarioListNotHaving100PerChild") {
-            //     buildJxl(this)
-            // }
+            if (parameterName == "treeScenarioListNotHaving100PerChild" && this.state.showValidation) {
+                buildJxl(this)
+            }
         })
     }
 
@@ -617,14 +624,17 @@ export default class CommitTreeComponent extends React.Component {
                                             } else if (node.payload.nodeType.id == 5) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                             }
-                                            var nodeDataModelingList=node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList;
-                                            var nodeDataModelingListUpdated=[];
-                                            for(var nml=0;nml<nodeDataModelingList.length;nml++){
-                                                if(nodeDataModelingList[nml].dataValue!=="" && nodeDataModelingList[nml].dataValue!=="NaN" && nodeDataModelingList[nml].dataValue!==undefined && nodeDataModelingList[nml].increaseDecrease!==""){
+                                            var nodeDataModelingList = node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList;
+                                            var nodeDataModelingListUpdated = [];
+                                            for (var nml = 0; nml < nodeDataModelingList.length; nml++) {
+                                                if (nodeDataModelingList[nml].dataValue !== "" && nodeDataModelingList[nml].dataValue !== "NaN" && nodeDataModelingList[nml].dataValue !== undefined && nodeDataModelingList[nml].increaseDecrease !== "") {
+                                                    if (nodeDataModelingList[nml].transferNodeDataId == "null" || nodeDataModelingList[nml].transferNodeDataId === "") {
+                                                        nodeDataModelingList[nml].transferNodeDataId = null;
+                                                    }
                                                     nodeDataModelingListUpdated.push(nodeDataModelingList[nml]);
                                                 }
                                             }
-                                            node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList=nodeDataModelingListUpdated;
+                                            node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList = nodeDataModelingListUpdated;
                                             console.log("commit*** node after---", node);
                                             var findNodeIndex = completeFlatList.findIndex(n => n.id == node.id);
                                             console.log("commit*** findNodeIndex1---", findNodeIndex);
@@ -640,7 +650,7 @@ export default class CommitTreeComponent extends React.Component {
                                     console.log("commit*** treeList---", treeList);
                                 }
                                 programJson.treeList = treeList;
-                                console.log("commit*** final programJson---",programJson);
+                                console.log("commit*** final programJson---", programJson);
 
                                 //create saveDatasetData in ProgramService
                                 DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
@@ -671,7 +681,8 @@ export default class CommitTreeComponent extends React.Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.common.networkError',
+                                                    // message: 'static.common.networkError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     color: "red",
                                                     loading: false
                                                 }, () => {
@@ -796,7 +807,7 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     render() {
-        console.log("In render@@@@@@@@@@@%%%%%%%%%%%%%",this.state.loading);
+        console.log("In render@@@@@@@@@@@%%%%%%%%%%%%%", this.state.loading);
         const { programList } = this.state;
         let programs = programList.length > 0 && programList.map((item, i) => {
             return (
@@ -1106,7 +1117,7 @@ export default class CommitTreeComponent extends React.Component {
                                                         <div className="col-md-12">
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
                                                             {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
-                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>
+                                                            {this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>}
                                                         </div>
                                                     </div>
                                                 </Form>
@@ -1191,22 +1202,22 @@ export default class CommitTreeComponent extends React.Component {
                             <span>a. {i18n.t('static.forecastMethod.historicalData')}:</span>
                             <div className="mt-2">
                                 {(datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ?
-                                 <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
-                                        <thead>
-                                            <tr>
-                                                <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
-                                                <th style={{ width: '80%' }}><b>{i18n.t('static.program.notes')}</b></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>{consumtionNotes}</tbody>
-                                    </Table>
-                                </div> : <span>{consumtionNotes}</span>}
+                                    <div className="table-wrap table-responsive fixTableHead">
+                                        <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
+                                                    <th style={{ width: '80%' }}><b>{i18n.t('static.program.notes')}</b></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>{consumtionNotes}</tbody>
+                                        </Table>
+                                    </div> : <span>{consumtionNotes}</span>}
                             </div><br />
                             <span>b. {i18n.t('static.commitTree.treeScenarios')}:</span>
                             <div className="">
                                 {treeScenarioNotes.length > 0 ? <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
+                                    <Table className="table-bordered text-center  overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
                                                 <th style={{ width: '15%' }}><b>{i18n.t('static.forecastMethod.tree')}</b></th>
@@ -1243,7 +1254,7 @@ export default class CommitTreeComponent extends React.Component {
                         </ModalBody>
                         <div className="col-md-12 pb-lg-5 pt-lg-3">
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
+                            {this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>}
                         </div>
                     </div>
                 </Modal >

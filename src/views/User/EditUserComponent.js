@@ -17,7 +17,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants.js';
+import { API_URL, LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants.js';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import classNames from 'classnames';
 import jexcel from 'jspreadsheet';
@@ -429,7 +429,8 @@ class EditUserComponent extends Component {
                                                                 error => {
                                                                     if (error.message === "Network Error") {
                                                                         this.setState({
-                                                                            message: 'static.unkownError',
+                                                                            // message: 'static.unkownError',
+                                                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                             loading: false
                                                                         });
                                                                     } else {
@@ -478,7 +479,8 @@ class EditUserComponent extends Component {
                                                     error => {
                                                         if (error.message === "Network Error") {
                                                             this.setState({
-                                                                message: 'static.unkownError',
+                                                                // message: 'static.unkownError',
+                                                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 loading: false
                                                             });
                                                         } else {
@@ -524,7 +526,8 @@ class EditUserComponent extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.unkownError',
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
@@ -573,7 +576,8 @@ class EditUserComponent extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
@@ -622,7 +626,8 @@ class EditUserComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -725,17 +730,11 @@ class EditUserComponent extends Component {
         // var value = (instance.jexcel.getJson(null, false)[r])[1];
         var value = (this.state.addUserEL.getJson(null, false)[r])[1];
 
-        console.log("mylist--------->3.2", value);
-
-        // const { selProgram } = this.state;
-
         var proList = [];
         if (value != -1) {
-            console.log("mylist--------->3.11");
             proList = this.state.programListForFilter.filter(c => c.id == -1 || c.realmCountryId == value);
 
         } else {
-            console.log("mylist--------->3.22");
             proList = this.state.programListForFilter;
         }
         return proList;
@@ -1232,7 +1231,8 @@ class EditUserComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -1294,7 +1294,8 @@ class EditUserComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1355,7 +1356,8 @@ class EditUserComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1417,7 +1419,8 @@ class EditUserComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1606,7 +1609,8 @@ class EditUserComponent extends Component {
                                                 error => {
                                                     if (error.message === "Network Error") {
                                                         this.setState({
-                                                            message: 'static.unkownError',
+                                                            // message: 'static.unkownError',
+                                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                             loading: false
                                                         });
                                                     } else {
@@ -1850,9 +1854,9 @@ class EditUserComponent extends Component {
                                                 <FormGroup>
                                                     <h5><Label htmlFor="select">{'Access control'}</Label></h5>
                                                 </FormGroup>
-
-                                                <div id="paputableDiv" style={{ display: this.state.loading1 ? "none" : "block" }}>
-
+                                                <div className="" style={{ display: this.state.loading1 ? "none" : "block" }} >
+                                                    <div id="paputableDiv" className="RowheightForjexceladdRow consumptionDataEntryTable">
+                                                    </div>
                                                 </div>
                                                 <div style={{ display: this.state.loading1 ? "block" : "none" }}>
                                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -1866,9 +1870,19 @@ class EditUserComponent extends Component {
                                                     </div>
                                                 </div>
                                             </CardBody>
-                                            <CardFooter>
+                                            <CardFooter style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+       
+                                            <CardFooter style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
@@ -1883,15 +1897,6 @@ class EditUserComponent extends Component {
                                                     </div>
                                                 </div>
                                             </Row>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-
-                                                    &nbsp;
-                                                </FormGroup>
-                                            </CardFooter>
                                         </Form>
                                     )} />
                         </Card>
@@ -1919,7 +1924,8 @@ class EditUserComponent extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {

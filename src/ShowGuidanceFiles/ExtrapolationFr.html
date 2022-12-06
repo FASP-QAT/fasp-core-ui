@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Aide</title>
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+		a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								
+								<tr>
+									<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Extrapolation</h3>
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">But :</span>Permettre aux utilisateurs de créer une prévision en identifiant les tendances et les saisons à partir des données historiques chronologiques  de séries  saisies par l'utilisateur dans l' '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style="text-decoration: underline;">Saisie de données et ajustement</a>' écran. Plusieurs options d'extrapolation statistique sont disponibles et seront décrites ci-dessous. Les extrapolations à partir des données de consommation sont réalisées par unité de planification. </p>
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Utilisation de cet écran:</span></p>
+<p style="font-size: 13px;">
+	<b>1.Débuter l'extrapolation:</b>
+	<ul style="font-size: 13px;">
+		<li>Avant d'utiliser cet écran, assurez-vous d'avoir terminé l' '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style="text-decoration: underline;">Saisie de données et 
+			ajustement</a>' écran pour chaque unité de planification et région que vous souhaitez 
+			extrapoler
+		</li>
+		<li>Utiliser les filtres en haut de cet écran pour sélectionner l'unité de planification et 
+			la région à extrapoler. 
+		</li>
+		<li>Le long de la marge de gauche se trouvent les différentes méthodes d'extrapolation 
+			disponibles dans QAT. L'utilisateur peut en sélectionner une ou plusieurs, en fonction 
+			du modèle général de consommation et des données disponibles, comme cela sera discuté 
+			ci-dessous. Voir les sections 3 et 4 ci-dessous pour une explication des méthodes 
+			d'extrapolation et comment choisir au mieux les méthodes pour votre prévision
+		</li>
+		<li> Noter que les changements dans cet écran sont facultatifs - l'utilisateur effectue la 
+			sélection finale des prévisions dans le '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style="text-decoration: underline;">Comparaison et sélection des prévisions</a>'  screen.</li></ul>
+			<b style="font-size: 13px;">2.Méthodes d'extrapolation disponibles 
+				dans QAT</b>
+				<p class="pl-lg-3" style="font-size: 13px;">Les méthodes de prévision dans QAT sont organisées du plus simple au plus 
+					sophistiqué.
+				</p>
+				<ol type="a" style="font-size: 13px;">
+					<li><b>Moyenne mobile:</b> La moyenne mobile est une moyenne qui évolue dans le temps, 
+						supprimant les données plus anciennes à mesure qu'elle intègre des données plus 
+						récentes. Pour que QAT calcule la moyenne mobile, entrez le nombre de mois 
+						passés que vous souhaitez utiliser dans le calcul de la moyenne. L'utilisateur peut 
+						sélectionner nimporte quel nombre entier positif pour ce champ. Entrer 5, 
+						par exemple, signifierait que la projection pour le mois suivant dans la série 
+						serait la moyenne des cinq mois précédents. Cette méthode est particulièrement 
+						utile pour les prévisions à court terme et est sensible aux tendances. Elle n'est 
+						pas appropriée pour les données saisonnières
+					</li>
+					<li><b>Semi-moyennes:</b>Estimations semi-moyennes basent la tendance sur les deux 
+						moitiés d'une série. QAT divise les données réelles en deux parties égales (moitiés) 
+						et la moyenne arithmétique des valeurs de chaque partie (moitié) est calculée comme 
+						les valeurs y de deux points sur une ligne.  La pente de la ligne de tendance est 
+						déterminée par la différence entre ces valeurs y au fil du temps, définie par la 
+						différence entre les points médians des deux moitiés de la série ou valeurs x, de ces 
+						points.  Cette méthode est sensible aux tendances et utile pour les prévisions à 
+						court et moyen terme mais nest pas appropriée pour les données saisonnières. 
+					</li>
+					<li><b>Régression linéaire:</b> La régression linéaire modélise la relation entre deux 
+						variables en ajustant une équation linéaire aux données observées. Intervalle de 
+						confiance :  entre 78 % et 99 % (exclusif), par exemple, un niveau de confiance de 
+						90 % indique que 90 % des points futurs possibles doivent se situer dans ce rayon 
+						de prédiction représenté par la droite de régression. Cette méthode nest pas 
+						appropriée pour les données saisonnières.
+					</li>
+					<li><b>Lissage exponentiel triple (Holt-Winters):</b>  Les données brutes sont généralement hérissées. 
+						Dans les statistiques, différents types de lissage sont utilisés pour filtrer le bruit 
+						afin que nous puissions voir plus clairement les modèles dans un ensemble de données 
+						de séries chronologiques. Les prévisions utilisant le triple lissage exponentiel ont trois 
+						paramètres. Le lissage exponentiel utilise des données plus anciennes à des poids 
+						décroissants de manière exponentielle au fil du temps. Les prévisions ont des paramètres. 
+						Le triple lissage exponentiel applique trois paramètres de lissage. Les paramètres du lissage 
+						exponentiel sont définis entre 0 et 1, les valeurs proches de 1 favorisant les valeurs 
+						récentes et les valeurs proches de 0 favorisant les valeurs plus anciennes.  :
+						<ul style="font-size: 13px;">
+							<li>Alpha</li>
+							<li>Bêta</li>
+							<li>Gamma</li>
+							<li>Saisonnalité: Dans QAT, une saison peut être décrite comme la durée attendue 
+								(en mois) de tout schéma répétitif dans la consommation
+							</li>
+							<li>Intervalle de confiance:  entre 78 % et 99 % (exclusif), par exemple, un niveau 
+								de confiance de 90 % indique que 90 % des points futurs doivent se situer dans ce 
+								rayon de prédiction.
+							</li>
+						</ul>
+						<li><b>ARIMA:</b> La modélisation ARIMA permet d'intégrer et d'appliquer deux modèles 
+							statistiques conçus pour des séries chronologiques stationnaires à intégrer à des 
+							séries chronologiques non stationnaires, c'est-à-dire des séries chronologiques qui 
+							ont des tendances ou des saisons. Elle est souvent appliquée aux prévisions à court 
+							terme. Auto-régressif signifie que chaque point de la régression est influencé par 
+							ses valeurs précédentes et moyenne mobile implique que chaque point est une moyenne, 
+							une combinaison linéaire d'un ou plusieurs points adjacents. L'auto-régression et 
+							la moyenne mobile sont intégrées ensemble pour ajuster un meilleur modèle pour la 
+							série par différenciation, ou littéralement en utilisant la différence entre les
+							 points dune série chronologique pour lanalyse au lieu des valeurs brutes. Les
+							  modèles ARIMA ont trois paramètres:
+							  <ul style="font-size: 13px;">
+								<li>p ou AR (ordre de décalage): le nombre dobservations de décalage dans le modèle</li>
+								<li>d ou I (degré de différenciation): le nombre de fois que les observations brutes sont 
+									différenciées. Cette valeur est normalement 1 (sil y a une tendance) ou 0 (pas de tendance). 
+									Autres valeurs plus élevées sont possibles mais pas attendues.
+								</li>
+								<li>q ou MA (ordre de la moyenne mobile): la taille de la fenêtre de moyenne mobile ou le 
+									nombre dobservations différenciées à moyenner.
+								</li>
+								<br><p>De nombreux programmes utilisent des valeurs par défaut pour les paramètres ARIMA. 
+									SAP, par exemple, utilise 0,2 pour alpha, 0,1 pour bêta et 0,3 pour gamma. <br>Intervalle 
+									de confiance: entre 78 % et 99 % (exclusif), par exemple, un niveau de confiance de 
+									90 % indique que 90 % des points futurs doivent se situer dans ce rayon de prédiction.
+								</p>
+							</ul>
+						</li>
+					</li>
+				</ol>
+				<b style="font-size: 13px;">3.Quelle méthode d'extrapolation dois-je utiliser ?</b>
+				<p class="pl-lg-3" style="font-size: 13px;">Vous trouverez ci-dessous quelques considérations pour choisir une 
+					méthode de prévision. Les méthodes de prévision dans QAT sont organisées du plus simple 
+					au plus sophistiqué. En général,
+					<ul style="font-size: 13px;">
+						<li>Les modèles les plus sophistiqués sont plus 
+						sensibles à la qualité des données 
+					</li>
+					<li>Si vous avez des données de faible qualité (données manquantes, taux de rapportage 
+						variables, <i class="fa fa-angle-left" aria-hidden="true">12</i> mois de données), 
+						des méthodes de prévision plus simples sont recommandées
+					</li>
+				</ul>
+			</p>
+			<p class="pl-lg-3" style="font-size: 13px;">Le choix de la méthode d'extrapolation dépend du modèle attendu dans 
+				les données. Certains modèles typiques incluent:
+				<ul style="font-size: 13px;">
+					<li>Stationnaire, où la plage des valeurs observées dans le temps oscille autour 
+						d'une moyenne. Les modèles appliqués à ces ensembles de données peuvent inclure
+						<ul>
+							<li>Moyenne mobile</li>
+							<li>Lissage exponentiel simple</li>
+							<li>ARIMA</li>
+						</ul>
+					</li>
+					<li>Tendance sans composante saisonnière, où les valeurs observées ont une 
+						tendance à la hausse ou à la baisse. Les modèles appliqués à ces ensembles 
+						de données peuvent inclure
+						<ul>
+							<li>Projection semi-moyenne</li>
+							<li>Régression linéaire simple</li>
+						</ul>
+					</li>
+					<li>Tendance et Saisonalité, où les valeurs observées dans une plage de données ont 
+						à la fois des composantes de tendance et de saisonalité. Les modèles appliqués 
+						à ces ensembles de données peuvent inclure
+						<ul>
+							<li>Modèle ARIMA saisonnier</li>
+							<li>Triple Exponential Smoothing (Holt-Winters) </li>
+						</ul>
+					</li>
+						<li>
+								Seasonal without trend, 
+								where the observed values have a seasonal component but no trend. 
+								Models applied to such datasets may include 
+								<ul>
+									<li>Triple Exponential Smoothing (Holt-Winters)</li>
+								</ul>
+							</li>
+						</ul>
+							<p>The models suggested 
+								here are neither exhaustive nor exclusive. QAT enables the user to 
+								apply a variety of extrapolation methods and then to compare them 
+								using best fit or forecast error metrics. 
+							</p>
+						
+					<p>La deuxième étape consiste à déterminer si les valeurs de prévision sont 
+						censées refléter fidèlement les modèles historiques de vos données et si vous 
+						utiliserez les mesures d'erreur pour éclairer votre sélection. Cependant, 
+						lorsque vous choisissez de ne pas tenir compte de la mesure d'erreur, 
+						il sera important de documenter votre argumentaire pour éclairer les 
+						discussions ou les révisions de vos prévisions et pour aider les futurs 
+						prévisionnistes à étayer leurs décisions. 
+					</p>
+				</ul>
+			</p>
+			<b style="font-size: 13px;">4.Comment interpréter les erreurs ?</b>
+			<p class="pl-lg-3" style="font-size: 13px;">QAT calcule automatiquement les métriques d'erreur de prévision à l'aide 
+				de plusieurs méthodes. Ceux-ci inclus:
+				<ul style="font-size: 13px;">
+					<li>MAPE (erreur absolue moyenne en pourcentage)</li>
+					<li>WAPE (pourcentage d'erreur absolu pondéré)</li>
+					<li>RMSE (erreur quadratique moyenne)</li>
+					<li>MAE (erreur absolue moyenne)<br>En général, plus le score d'erreur est faible, 
+						plus le résultat de la méthode de prévision correspond aux données historiques.
+						 Dans les modèles où les modèles historiques d'un ensemble de données sont 
+						 censés se refléter dans les valeurs futures, une faible valeur d'erreur 
+						 peut être utilisée pour aider à sélectionner une méthode d'extrapolation 
+						 préférée, et QAT mettra en évidence ces meilleurs ajustements dans un tableau. 
+						 Cependant, si des changements substantiels sont anticipés, l'extrapolation la
+						  mieux adaptée peut ne pas être la prévision sélectionnée par l'utilisateur.
+						</li>
+						<br><p>Pour faire la meilleure sélection entre les méthodes d'extrapolation pour
+							 votre objectif, la chose la plus importante est d'abord de comprendre 
+							 quelle méthode d'extrapolation est la plus appropriée pour le modèle 
+							 attendu dans les données. Les méthodes de prévision dans QAT sont 
+							 organisées de la plus simple à la plus sophistiquée. En général,
+							 <ul>
+								<li>Les modèles plus sophistiqués sont plus sensibles aux problèmes 
+									de qualité des données 
+								</li>
+								<li>Si vous avez des données de faible qualité (données manquantes, 
+									taux de rapportage variables, <i class="fa fa-angle-left" aria-hidden="true">12</i> mois de 
+									données), des méthodes de prévision plus simples sont recommandées<br>La deuxième 
+									étape consiste à déterminer si les valeurs de prévision sont censées refléter fidèlement 
+									les modèles historiques de vos données et si vous utiliserez les mesures d'erreur pour 
+									éclairer votre sélection. Cependant, lorsque vous choisissez de ne pas tenir compte de 
+									la mesure d'erreur, il sera important de documenter votre argumentaire pour éclairer 
+									les discussions ou les révisions de vos prévisions et pour aider les futurs prévisionnistes 
+									à étayer leurs décisions.
+								</li>
+							</ul>
+						</p>
+					</ul>
+				</p>
+			</p>
+			<p style="font-size: 13px;"><b>Note :  Vous avez 0 mois de données sur la consommation réelle. Les valeurs minimales nécessaires pour les différentes fonctionnalités sont ci-dessous: <br><span class="ml-lg-5">* LET, Holt-Winters: Au moins 24 mois de données de consommation réelle<br></span><span class="ml-lg-5">* ARIMA:  Au moins 14 mois de données de consommation réelle<br></span><span class="ml-lg-5">* Moyenne mobile, semi-moyennes et régression linéaire: Au moins 3 mois de données de consommation réelle</span></b></p>
+							
+				</td>
+				</tr>
+	
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

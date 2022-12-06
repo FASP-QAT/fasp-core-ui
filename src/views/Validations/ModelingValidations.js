@@ -1169,7 +1169,7 @@ class ModelingValidation extends Component {
             startY: startYtable,
             head: [columns],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" }
 
         };
 
@@ -1526,13 +1526,14 @@ class ModelingValidation extends Component {
                         {/* } */}
                     </div>
                     <div className="card-header-actions pr-lg-3">
+                        {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer', float: 'right', marginTop: '3px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                         <a className="card-header-action" style={{ float: 'right' }}>
 
                             {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
 
 
                         </a>
-                        {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer', float: 'right', marginTop: '3px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>

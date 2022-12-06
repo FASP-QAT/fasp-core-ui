@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Aide</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Gestion de l'arbre de prévision - Construire des arbres de prévision</h3>
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">But</span> Permettre aux utilisateurs de gérer et de construire des arbres de prévision et des scénarios, pour toutes prévisions autres que les consommations (démographique, morbidité, services, etc.). Notez que plus d'informations sont disponibles après avoir cliqué sur un quelconque nœud .</p>
+										<p>
+											<p style="font-size: 13px;">
+												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Utilisation de cet écran :</span>
+												<br><span style="font-weight: bold;">Gérer l'arbre de prévision:</span> Cliquez sur l'icône de réglages <i class="fa fa-cog" aria-hidden="true"></i> pour afficher et modifier ou masquer la méthode de 
+												prévision, le nom de l'arbre de prévision et la région.</p>
+												<p style="font-size: 13px;">
+													<span style="font-weight: bold; font-size: 13px;">Construire l'arbre de prévision:</span>L'arbre de prévision est construit de haut en bas, en utilisant différents types de « nœuds ». 
+													Voir les types de nœuds et les actions de nœud ci-dessous. Chaque arbre de prévision 
+													doit inclure un ou plusieurs nœuds d'unité de planification, qui constituent les extrants 
+													de la prévision, pour que cet arbre soit disponible dans lécran "<a href="/#/report/compareAndSelectScenario" target="_blank">Comparaison  et 
+													sélection</a>. Chaque Nœud d'Unité de Planification doit être issu dun Nœud d'Unité de 
+													Prévision.  
+												</p>
+										</p>
+										<p>
+											<p style="font-size: 13px; font-weight: bold;">
+												<span class="">Actions de nœud :</span>
+											</p>
+											<ul class="pl-lg-4" style="font-size: 13px;">
+												<li><i class="fa fa-trash-o" aria-hidden="true" style="color: rgb(0, 47, 108);"></i> Supprimer : Supprime le nœud sélectionné </li>
+												<li><i class="fa fa-clone" aria-hidden="true" style="color: rgb(0, 47, 108);"></i> Dupliquer : Duplique le nœud sélectionné sous le même Noeud Source </li>
+												<li><i class="fa fa-plus-square-o" aria-hidden="true" style="color: rgb(0, 47, 108);"></i> Ajouter : ajoute un noeud dérivé du nœud sélectionné.</li>
+											</ul>
+										</p>
+										<p>
+											<p style="font-size: 13px; font-weight: bold;">
+												<span class="">Type de nœud  :</span>
+											</p>
+											<div class="pl-lg-4 pr-lg-4 table1">
+												<table  style="border-collapse: collapse;">
+													<thead>
+														<tr>
+															<th style="width: 130px;">Type de nœud</th>
+															<th>Valeur </th>
+															<th>Dérivés potentiels</th>
+															<th>Fonctionnalité avancée</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td class="BgLightBlue"><b>Agrégation ∑</b></td>
+															<td>Somme des dérivés</td>
+															<td><b style="color: rgb(0, 47, 108);">∑</b> ou Nombre</td>
+															<td>-</td>
+														</tr>
+														<tr>
+															<td class="BgLightBlue"><b>Nombre #</b></td>
+															<td>Défini à ce nœud</td>
+															<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i></td>
+														</tr>
+														<tr>
+															<td class="BgLightBlue"><b>Pourcentage %</b></td>
+															<td>Défini comme un pourcentage du parent/source</td>
+															<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														</tr>
+														<tr>
+															<td class="BgDarkBlue"><b>Unité de prévision <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td>Défini comme un pourcentage de la source et des paramètres de l'unité de prévision</td>
+															<td><b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														</tr>
+														<tr>
+															<td class="BgDarkBlue"><b>Unité de planification <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+															<td>Défini comme un pourcentage du parent/source et des paramètres de l'unité de planification</td>
+															<td>-</td>
+															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</p>
+										<p style="font-size: 13px;">
+											<span style="font-size: 13px; font-weight: bold;">Variations au fil du temps</span>
+											<br>Structure de l'arbre de prévision :
+											<ul style="font-size: 13px;">
+												<li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> La modélisation:</b> Permet à l'utilisateur de spécifier le taux exact de variation</li>
+												<li><b><i class="fa fa-link"></i> Transfert:</b> Permet aux utilisateurs de relier deux nœuds - de sorte que la diminution d'un nœud est liée à l'augmentation d'un 
+													autre nœud du même niveau. Utile pour les transitions.</li>
+												<li><b><i class="fa fa-line-chart"></i> Extrapolation:</b> Permet aux utilisateurs d'utiliser des données historiques pour extrapoler 
+													les changements futurs</li>
+												</ul>
+										</p>
+										<p style="font-size: 13px;">
+											<span style="font-size: 13px; font-weight: bold;">Utilisation des scénarios :</span><br>Les scénarios sont utilisés pour modéliser différentes valeurs pour 
+											le même arbre de prévision. Pour ajouter, modifier ou supprimer un scénario, utilisez l' <i class="fa fa-cog" aria-hidden="true"></i> icône à côté de la liste déroulante des scénarios. 
+											Utilisez la liste déroulante des scénarios pour sélectionner le scénario à afficher et à 
+											modifier.
+											<div class="pl-lg-4 pr-lg-4 table1">
+												<table  style="border-collapse: collapse;">
+													<thead>
+														<tr>
+															<th style="width: 130px;">Fixe pour tous les scénarios</th>
+															<th style="width: 230px;">Unique à chaque scénario</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td>Structure de l'arbre de prévision</td>
+															<td>Valeur du nœud</td>
+														</tr>
+														<tr>
+															<td>Titre du nœud</td>
+															<td>Mois</td>
+														</tr>
+														<tr>
+															<td>Type de nœud</td>
+															<td>Notes</td>
+														</tr>
+														<tr>
+															<td></td>
+															<td>Modélisation/Transfert/Extrapolation</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</p>
+
+									</li>
+								</ol>
+							</p>
+				</td>
+				</tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

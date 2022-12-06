@@ -28,6 +28,10 @@ import NumberFormat from 'react-number-format';
 import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
 import forcasterror from '../../assets/img/ForecastError-Formula.png';
+import compareAndSelectScenarioEn from '../../../src/ShowGuidanceFiles/compareAndSelectScenarioEn.html'
+import compareAndSelectScenarioFr from '../../../src/ShowGuidanceFiles/compareAndSelectScenarioFr.html'
+import compareAndSelectScenarioSp from '../../../src/ShowGuidanceFiles/compareAndSelectScenarioSp.html'
+import compareAndSelectScenarioPr from '../../../src/ShowGuidanceFiles/compareAndSelectScenarioPr.html'
 
 const ref = React.createRef();
 const pickerLang = {
@@ -79,7 +83,8 @@ class CompareAndSelectScenario extends Component {
             maxDateForSingleValue: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             showForecastPeriod: false,
             treeScenarioList: [],
-            actualConsumptionListForMonth: []
+            actualConsumptionListForMonth: [],
+            changed: false
         };
         this.getDatasets = this.getDatasets.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -219,12 +224,21 @@ class CompareAndSelectScenario extends Component {
                 var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
                 var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
                 for (var sl = 0; sl < scenarioList.length; sl++) {
-                    var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                    try {
+                        var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                    } catch (err) {
+                        flatList = []
+                    }
                     if (colourArrayCount > 10) {
                         colourArrayCount = 0;
                     }
-                    var readonly = flatList.length > 0 ? false : true
-                    var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                    var readonly = flatList.length > 0 ? false : true;
+                    dataForPlanningUnit = [];
+                    try {
+                        var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
+                    } catch (err) {
+                        dataForPlanningUnit = []
+                    }
                     console.log("dataForPlanningUnit####", dataForPlanningUnit);
                     var data = [];
                     if (dataForPlanningUnit.length > 0) {
@@ -770,7 +784,8 @@ class CompareAndSelectScenario extends Component {
                 equivalencyUnitId: equivalencyUnit.length == 1 ? equivalencyUnit[0].equivalencyUnitMappingId : 0,
                 loading: false,
                 viewById: viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById,
-                equivalencyUnitList: equivalencyUnit
+                equivalencyUnitList: equivalencyUnit,
+                changed: false
             }, () => {
                 if (planningUnitId > 0) {
                     this.showData();
@@ -1012,7 +1027,7 @@ class CompareAndSelectScenario extends Component {
                   align: 'justify'
                 });*/
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.compareAndSelect'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.compareAndSelect'), doc.internal.pageSize.width / 2, 80, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -1041,13 +1056,13 @@ class CompareAndSelectScenario extends Component {
         doc.setTextColor("#002f6c");
 
 
-        var y = 80;
+        var y = 100;
         var planningText = doc.splitTextToSize(i18n.t('static.common.forecastPeriod') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1060,7 +1075,7 @@ class CompareAndSelectScenario extends Component {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1073,7 +1088,7 @@ class CompareAndSelectScenario extends Component {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1086,7 +1101,7 @@ class CompareAndSelectScenario extends Component {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1100,7 +1115,7 @@ class CompareAndSelectScenario extends Component {
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
-                    y = 80;
+                    y = 100;
 
                 }
                 doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1113,7 +1128,7 @@ class CompareAndSelectScenario extends Component {
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
-                    y = 80;
+                    y = 100;
 
                 }
                 doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1127,7 +1142,7 @@ class CompareAndSelectScenario extends Component {
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
-                y = 80;
+                y = 100;
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
@@ -1203,7 +1218,7 @@ class CompareAndSelectScenario extends Component {
 
         let data2 = dataArr3;
         let content1 = {
-            margin: { top: 80, bottom: 50 },
+            margin: { top: 100, bottom: 50 },
             startY: startYtable,
             head: [col1],
             body: data2,
@@ -1223,7 +1238,7 @@ class CompareAndSelectScenario extends Component {
         };
         doc.autoTable(content1);
         doc.addPage();
-        doc.addImage(canvasImg, 'png', 50, 80, 750, 260, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 100, 750, 260, 'CANVAS');
         var columns = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
         var dataArr = [];
@@ -1250,9 +1265,9 @@ class CompareAndSelectScenario extends Component {
         })
         const data = dataArr1;
         doc.addPage()
-        startYtable = 80
+        startYtable = 100
         let content = {
-            margin: { top: 80, bottom: 50 },
+            margin: { top: 100, bottom: 50 },
             startY: startYtable,
             head: [columns],
             body: data,
@@ -1452,6 +1467,7 @@ class CompareAndSelectScenario extends Component {
         }
         if (x == 0) {
             this.setState({
+                changed: true,
                 selectedTreeScenarioId: elInstance.getRowData(y)[8]
             }, () => {
                 this.buildJexcel();
@@ -1581,6 +1597,7 @@ class CompareAndSelectScenario extends Component {
         localStorage.setItem("sesDatasetVersionId", versionIdSes);
         this.setState({
             datasetId: datasetId,
+            changed: false
         }, () => {
             if (datasetId != "") {
                 console.log("in if for set@@@", this.state.datasetList);
@@ -1723,7 +1740,8 @@ class CompareAndSelectScenario extends Component {
         var regionId = event.target.value;
         this.setState({
             regionId: event.target.value,
-            regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : ""
+            regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : "",
+            changed: false
         }, () => {
             if (regionId > 0) {
                 this.showData()
@@ -1888,8 +1906,21 @@ class CompareAndSelectScenario extends Component {
                 putRequest.onerror = function (event) {
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
+                    console.log("in side datasetDetails")
+                    db1 = e.target.result;
+                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     this.setState({
                         message: 'static.compareAndSelect.dataSaved',
+                        changed: false,
                         color: 'green',
                         datasetJson: datasetForEncryption,
                         planningUnitList: planningUnitList1.filter(c => c.active.toString() == "true").sort(function (a, b) {
@@ -1908,13 +1939,18 @@ class CompareAndSelectScenario extends Component {
 
     setForecastNotes(e) {
         this.setState({
-            forecastNotes: e.target.value
+            forecastNotes: e.target.value,
+            changed: true
         })
     }
 
     cancelClicked() {
-        let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.setState({
+            changed: false
+        }, () => {
+            let id = AuthenticationService.displayDashboardBasedOnRole();
+            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+        })
     }
 
     toggleShowGuidance() {
@@ -2168,13 +2204,13 @@ class CompareAndSelectScenario extends Component {
                         {
                             this.state.showAllData &&
                             <div className="col-md-12 card-header-actions">
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', float: 'right', marginTop: '4px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 <a className="card-header-action" style={{ float: 'right' }}>
 
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t("static.report.exportPdf")} onClick={() => this.exportPDF()} />
 
 
                                 </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', float: 'right', marginTop: '4px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
                         }
 
@@ -2518,7 +2554,7 @@ class CompareAndSelectScenario extends Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && this.state.changed && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
@@ -2530,7 +2566,16 @@ class CompareAndSelectScenario extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                            <div>
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    compareAndSelectScenarioEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        compareAndSelectScenarioFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            compareAndSelectScenarioSp :
+                                            compareAndSelectScenarioPr
+                            }} />
+                            {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.CompareSelect.CompareAndSelect')}</h3>
                             </div>
                             <p>
@@ -2560,7 +2605,7 @@ class CompareAndSelectScenario extends Component {
                                     <li>{i18n.t('static.CompareSelect.ByDefault')}  </li>
                                     <li>{i18n.t('static.CompareSelect.ViewForecastingUnit')} <a href='/#/dataset/versionSettings' target="_blank" style={{ textDecoration: 'underline' }}>{i18n.t('static.versionSettings.versionSettings')}</a> screen. </li>
                                 </ul>
-                            </p>
+                            </p> */}
                         </ModalBody>
                     </div>
                 </Modal>

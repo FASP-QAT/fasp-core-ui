@@ -19,13 +19,16 @@ import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ReportService from '../../api/ReportService';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -34,6 +37,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
 const ref = React.createRef();
 const entityname = i18n.t('static.dashboard.budget');
 const pickerLang = {
@@ -161,7 +165,8 @@ class Budgets extends Component {
             fundingSourceValues: [],
             fundingSourceLabels: [],
             fundingSources: [],
-            programId: ''
+            programId: '',
+            jexcelDataEl: ""
         }
 
 
@@ -177,6 +182,8 @@ class Budgets extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
+
     }
     show() {
 
@@ -210,7 +217,11 @@ class Budgets extends Component {
                             fundingSources: [], loading: false
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message, loading: false });
+                            this.setState({
+                                // message: error.message, 
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -600,6 +611,8 @@ class Budgets extends Component {
                                 selBudget: data,
                                 message: '',
                                 loading: false
+                            }, () => {
+                                this.buildJexcel()
                             })
 
 
@@ -619,6 +632,8 @@ class Budgets extends Component {
                         console.log("BudgetData--------", response.data);
                         this.setState({
                             selBudget: response.data, message: '', loading: false
+                        }, () => {
+                            this.buildJexcel();
                         })
                     }).catch(
                         error => {
@@ -627,7 +642,8 @@ class Budgets extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -723,7 +739,8 @@ class Budgets extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -878,7 +895,7 @@ class Budgets extends Component {
     }
     roundN = num => {
         return Number(Math.round((num / 1000000) * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
-       
+
     }
     filterVersion = () => {
         // let programId = document.getElementById("programId").value;
@@ -1488,20 +1505,28 @@ class Budgets extends Component {
 
                                                 </div>
                                             </div>
-                                            <div className="col-md-12">
+                                            {/* <div className="col-md-12">
                                                 <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                                     {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                                 </button>
 
-                                            </div>
+                                            </div> */}
                                         </div>}
 
 
                                 </div>
+                                {
+                                    // this.state.show && 
+                                    this.state.selBudget.length > 0 &&
+                                    <div className="dataEnteredTable">
+                                        <div id="budgetTable">
+                                        </div>
+                                    </div>
+                                }
 
 
 
-                                {this.state.show && this.state.selBudget.length > 0 &&
+                                {/* {this.state.show && this.state.selBudget.length > 0 &&
                                     <ToolkitProvider
                                         keyField="budgetId"
                                         data={this.state.selBudget}
@@ -1514,23 +1539,23 @@ class Budgets extends Component {
                                             props => (
                                                 <div>
                                                     <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                                        {/*<SearchBar {...props.searchProps} />
-                                                        <ClearSearchButton {...props.searchProps} />*/}
                                                     </div>
-                                                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                                        // pagination={paginationFactory(options)}
-                                                        rowEvents={{
-                                                            onClick: (e, row, rowIndex) => {
-                                                                console.log("***row", row);
-                                                                window.open(window.location.origin + `/#/report/shipmentSummery/${row.budget.id}/${row.budget.code}`);
-                                                            }
-                                                        }}
-                                                        {...props.baseProps}
-                                                    />
+                                                    <div className='fixTableHead'>
+                                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                            // pagination={paginationFactory(options)}
+                                                            rowEvents={{
+                                                                onClick: (e, row, rowIndex) => {
+                                                                    console.log("***row", row);
+                                                                    window.open(window.location.origin + `/#/report/shipmentSummery/${row.budget.id}/${row.budget.code}`);
+                                                                }
+                                                            }}
+                                                            {...props.baseProps}
+                                                        />
+                                                    </div>
                                                 </div>
                                             )
                                         }
-                                    </ToolkitProvider>}
+                                    </ToolkitProvider>} */}
                             </Col>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -1548,6 +1573,102 @@ class Budgets extends Component {
                 </Card>
             </div >
         )
+    }
+    buildJexcel() {
+        // this.el = jexcel(document.getElementById("budgetTable"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("budgetTable"), true);
+
+        var data = this.state.selBudget;
+        let outPutListArray = [];
+        let count = 0;
+
+        for (var j = 0; j < data.length; j++) {
+            var data1 = [];
+
+            data1[0] = getLabelText(data[j].budget.label, this.state.lang)
+            data1[1] = data[j].budget.code
+            data1[2] = data[j].fundingSource.code
+            data1[3] = getLabelText(data[j].currency.label, this.state.lang)
+            data1[4] = data[j].budgetAmt;
+            data1[5] = data[j].plannedBudgetAmt;
+            data1[6] = data[j].orderedBudgetAmt;
+            data1[7] = data[j].remainingBudgetAmtUsd;
+            data1[8] = data[j].startDate;
+            data1[9] = data[j].stopDate;
+            data1[10] = data[j].budget.id
+
+            outPutListArray[count] = data1;
+            count++;
+            //     indexVar = indexVar + 1;
+        }
+
+        var options = {
+            data: outPutListArray,
+            columnDrag: false,
+            // colWidths: [20, 100, 200, 50, 50, 50],
+            columns: [
+                { title: i18n.t('static.budget.budget'), type: 'text' },//0 A
+                { title: i18n.t('static.budget.budgetCode'), type: 'text' },//1 B
+                { title: i18n.t('static.budget.fundingsource'), type: 'text' },//2 C
+                { title: i18n.t('static.dashboard.currency'), type: 'text' },//2 C
+                { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##' },//3 D
+                { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##', },//4 E
+                { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
+                { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
+                { title: i18n.t('static.common.startdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
+                { title: i18n.t('static.common.stopdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
+                { title: 'Budget Id', type: 'hidden' },//4 E
+
+            ],
+            // text: {
+            //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //   show: '',
+            //   entries: '',
+            // },
+            onload: this.loaded,
+            pagination: localStorage.getItem("sesRecordCount"),
+            filters: false,
+            search: false,
+            columnSorting: true,
+            wordWrap: true,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            copyCompatibility: false,
+            allowManualInsertRow: false,
+            parseFormulas: true,
+            editable: false,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                if (y != null) {
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.supplyPlan.shipmentsDetails'),
+                            onclick: function () {
+                                window.open(window.location.origin + `/#/report/shipmentSummery/${this.el.getValueFromCoords(10, y)}/${this.el.getValueFromCoords(1, y)}`);
+                            }.bind(this)
+                        });
+                    }
+                }
+                return items;
+            }.bind(this),
+        };
+        var jexcelDataEl = jexcel(document.getElementById("budgetTable"), options);
+        this.el = jexcelDataEl;
+
+        // this.setState({
+        //     jexcelDataEl: jexcelDataEl
+        // })
+    }
+    loaded = function (instance, cell, x, y, value) {
+        // jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionOnlyHideRow(instance);
+
     }
 }
 

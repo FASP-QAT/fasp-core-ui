@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, API_URL, } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -41,7 +41,10 @@ import ProcurementSurplusGap from '../../assets/img/ProcurementSurplusGap.png';
 import ProductCost from '../../assets/img/ProductCost.png';
 import ProjectStockatForecastend from '../../assets/img/ProjectStockatForecastend.png';
 import TotalCost from '../../assets/img/TotalCost.png';
-
+import showguidanceforForecastSummaryEn from '../../../src/ShowGuidanceFiles/ForecastSummaryEn.html'
+import showguidanceforForecastSummaryFr from '../../../src/ShowGuidanceFiles/ForecastSummaryFr.html'
+import showguidanceforForecastSummaryPr from '../../../src/ShowGuidanceFiles/ForecastSummaryPr.html'
+import showguidanceforForecastSummarySp from '../../../src/ShowGuidanceFiles/ForecastSummarySp.html'
 
 
 const ref = React.createRef();
@@ -1925,21 +1928,21 @@ class ForecastSummary extends Component {
                                 nestedHeaders: [nestedHeaders],
                                 updateTable: function (el, cell, x, y, source, value, id) {
                                     if (y != null) {
-                                        var elInstance = el.jexcel;
+                                        var elInstance = el;
                                         var rowData = elInstance.getRowData(y);
                                         elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
                                     }
                                 }.bind(this),
-                                text: {
-                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                    show: '',
-                                    entries: '',
-                                },
+                                // text: {
+                                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                //     show: '',
+                                //     entries: '',
+                                // },
                                 pagination: false,
                                 search: false,
                                 columnSorting: true,
-                                tableOverflow: true,
+                                // tableOverflow: true,
                                 wordWrap: true,
                                 allowInsertColumn: false,
                                 allowManualInsertColumn: false,
@@ -2005,7 +2008,8 @@ class ForecastSummary extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -2092,9 +2096,13 @@ class ForecastSummary extends Component {
                     totalForecast = tsListFilter.totalForecast;
                 } else {
                     var flatList = tsListFilter.flatList;
-                    var flatListFilter = flatList.filter(c => c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
-
-                    var nodeDataMomList = flatListFilter[0].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM-DD"));
+                    console.log("Flat List @@@@@@@ Test", flatList)
+                    var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
+                    console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
+                    var nodeDataMomList = [];
+                    for (var fl = 0; fl < flatListFilter.length; fl++) {
+                        nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM")));
+                    }
                     nodeDataMomList.map(ele => {
                         totalForecast += Number(ele.calculatedMmdValue);
                     });
@@ -2205,7 +2213,8 @@ class ForecastSummary extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -2982,6 +2991,19 @@ class ForecastSummary extends Component {
                 putRequest.onerror = function (event) {
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
+                    console.log("in side datasetDetails")
+                    db1 = e.target.result;
+                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(id);
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+
+                        }
+                    }
                     this.setState({
                         isChanged1: false,
                         message1: i18n.t('static.compareAndSelect.dataSaved'),
@@ -3584,7 +3606,16 @@ class ForecastSummary extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                            <div>
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceforForecastSummaryEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceforForecastSummaryFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceforForecastSummarySp :
+                                            showguidanceforForecastSummaryPr
+                            }} />
+                            {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.ForecastSummary.ForecastSummary')}</h3>
                             </div>
                             <p>
@@ -3623,9 +3654,7 @@ class ForecastSummary extends Component {
                                     <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
                                     <li><img style={{ border: '1px solid #fff', padding: '10px', borderRadius: '5px' }} src={DesiredStockatForecasend} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
-                                    {/* <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
-            <li>Desired Stock at Forecast end = (Forecasted Quantity) / (Forecast Period) * (Desired Months of Stock) </li>
-            <li>Procurement Surplus/Gap = (Projected Stock at Forecast end) - (Desired Stock at Forecast end) </li> */}
+                                  
                                 </ul>
                             </p>
                             <p>
@@ -3665,9 +3694,7 @@ class ForecastSummary extends Component {
                                     <li><img className="formula-img-mr-showGuidance1 img-fluid" src={ProductCost} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance1 img-fluid" src={FreightCost} /><br></br></li>
                                     <li><img className="formula-img-mr-showGuidance1 img-fluid" src={TotalCost} /><br></br></li>
-                                    {/* <li>Product Cost = Procurement Gap * Unit Cost </li>
-            <li>Freight Cost = Product Cost * Freight Percentage </li>
-            <li>Total Cost = Product Cost + Freight Cost </li> */}
+                                 
                                 </ul>
                             </p>
                             <p>
@@ -3677,7 +3704,7 @@ class ForecastSummary extends Component {
                                     <li>{i18n.t('static.ForecastSummary.FreightCost')} = $38,500 * 7% = $2,695</li>
                                     <li>{i18n.t('static.ForecastSummary.TotalCost')} = $38,500 + $2,695 = $41,195</li>
                                 </ul>
-                            </p>
+                            </p> */}
 
                         </ModalBody>
                     </div>

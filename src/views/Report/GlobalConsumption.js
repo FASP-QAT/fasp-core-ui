@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -55,7 +55,7 @@ import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import {MultiSelect} from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
@@ -533,7 +533,7 @@ class GlobalConsumption extends Component {
       programLabels: programIds.map(ele => ele.label)
     }, () => {
 
-      this.filterData(this.state.rangeValue)
+      // this.filterData(this.state.rangeValue)
       this.getPlanningUnit();
     })
 
@@ -631,7 +631,8 @@ class GlobalConsumption extends Component {
           error => {
             if (error.message === "Network Error") {
               this.setState({
-                message: 'static.unkownError',
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -683,6 +684,7 @@ class GlobalConsumption extends Component {
   }
 
   getCountrys() {
+    this.setState({ loading: true })
     if (isSiteOnline()) {
 
       let realmId = AuthenticationService.getRealmId();
@@ -697,7 +699,8 @@ class GlobalConsumption extends Component {
           });
           this.setState({
             // countrys: response.data.map(ele => ele.realmCountry)
-            countrys: listArray
+            countrys: listArray,
+            loading: false
           })
         }).catch(
           error => {
@@ -706,7 +709,8 @@ class GlobalConsumption extends Component {
             })
             if (error.message === "Network Error") {
               this.setState({
-                message: 'static.unkownError',
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -803,7 +807,8 @@ class GlobalConsumption extends Component {
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
-            countrys: proList
+            countrys: proList,
+            loading: false
           })
 
         }.bind(this);
@@ -815,6 +820,7 @@ class GlobalConsumption extends Component {
   }
 
   getPlanningUnit() {
+    this.setState({ loading: true })
     let programValues = this.state.programValues;
     // console.log("programValues----->", programValues);
     this.setState({
@@ -832,13 +838,17 @@ class GlobalConsumption extends Component {
               return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
-              planningUnits: listArray,
+              planningUnits: listArray, loading: false
+            }, () => {
+              this.filterData(this.state.rangeValue)
+
             })
           }).catch(
             error => {
               if (error.message === "Network Error") {
                 this.setState({
-                  message: 'static.unkownError',
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
@@ -880,7 +890,7 @@ class GlobalConsumption extends Component {
   }
 
   getPrograms() {
-
+    this.setState({ loading: true })
     ProgramService.getProgramList()
       .then(response => {
         console.log(JSON.stringify(response.data))
@@ -892,6 +902,8 @@ class GlobalConsumption extends Component {
         });
         this.setState({
           programs: listArray, loading: false
+        }, () => {
+          this.getCountrys();
         })
       }).catch(
         error => {
@@ -900,7 +912,8 @@ class GlobalConsumption extends Component {
           })
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -964,19 +977,22 @@ class GlobalConsumption extends Component {
 
   componentDidMount() {
 
-    this.getPrograms()
-    this.getCountrys();
+    // this.getPrograms()
+    // this.getCountrys();
     this.getRelamList();
     // this.getProductCategories()
   }
 
   getRelamList = () => {
     // AuthenticationService.setupAxiosInterceptors();
+    this.setState({ loading: true })
     RealmService.getRealmListAll()
       .then(response => {
         if (response.status == 200) {
           this.setState({
             realmList: response.data, loading: false
+          }, () => {
+            this.getPrograms()
           })
         } else {
           this.setState({
@@ -987,7 +1003,8 @@ class GlobalConsumption extends Component {
         error => {
           if (error.message === "Network Error") {
             this.setState({
-              message: 'static.unkownError',
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
               loading: false
             });
           } else {
@@ -1410,11 +1427,11 @@ class GlobalConsumption extends Component {
 
                   </div>
                   <div className="row">
-                    <div className="col-md-12">
+                    <div className="col-md-12 mt-lg-2">
                       {this.state.show && this.state.consumptions.length > 0 &&
-                        <div className="table-responsive ">
+                        <div className="fixTableHead">
 
-                          <Table responsive className="table-striped  table-fixed table-bordered text-center mt-2">
+                          <Table className="table-striped  table-fixed table-bordered text-center">
 
                             <thead>
                               <tr>

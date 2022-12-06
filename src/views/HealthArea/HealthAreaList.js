@@ -355,7 +355,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import moment from 'moment';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, API_URL } from '../../Constants.js';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 
 const entityname = i18n.t('static.healtharea.healtharea');
@@ -368,7 +368,8 @@ export default class HealthAreaListComponent extends Component {
             healthAreas: [],
             message: "",
             selSource: [],
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang'),
         }
         this.editHealthArea = this.editHealthArea.bind(this);
         this.addHealthArea = this.addHealthArea.bind(this);
@@ -399,7 +400,7 @@ export default class HealthAreaListComponent extends Component {
         //     data = [];
         //     healthAreasArray[0] = data;
         // }
-        // console.log("healthAreasArray---->", healthAreasArray);
+        console.log("healthAreasArray---->", this.state.lang);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -547,7 +548,8 @@ export default class HealthAreaListComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -610,7 +612,8 @@ export default class HealthAreaListComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {

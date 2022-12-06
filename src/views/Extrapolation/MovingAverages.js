@@ -1,10 +1,10 @@
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
-export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, props) {
+export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, props, page, regionId,planningUnitId) {
 
     const data = inputData;
-    console.log("InputData mv@@@",inputData)
-    console.log("noOfMonths@@@",noOfMonths)
-    console.log("noOfProjectionMonths@@@",noOfProjectionMonths)
+    console.log("InputData mv@@@", inputData)
+    console.log("noOfMonths@@@", noOfMonths)
+    console.log("noOfProjectionMonths@@@", noOfProjectionMonths)
 
     const monthsForMovingAverage = noOfMonths;
     const noOfMonthsForProjection = noOfProjectionMonths;
@@ -12,21 +12,29 @@ export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, 
     for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
         if (x <= actualMonths) {
             var movingAvg = getMovingAverage(x, monthsForMovingAverage, actualMonths, data)
-            data[x - 1].forecast =  movingAvg>0? movingAvg :0; 
+            data[x - 1].forecast = movingAvg > 0 ? movingAvg : 0;
             // data[x - 1].forecast = getMovingAverage(x, monthsForMovingAverage, actualMonths, data);
-           } else {
-            var movingAvg = getMovingAverage(x, monthsForMovingAverage, actualMonths, data)   
-            data[x - 1] = { "month": x, "actual": null, "forecast": movingAvg>0? movingAvg :0};
-           // data[x - 1] = { "month": x, "actual": null, "forecast": getMovingAverage(x, monthsForMovingAverage, actualMonths, data) };
+        } else {
+            var movingAvg = getMovingAverage(x, monthsForMovingAverage, actualMonths, data)
+            data[x - 1] = { "month": x, "actual": null, "forecast": movingAvg > 0 ? movingAvg : 0 };
+            // data[x - 1] = { "month": x, "actual": null, "forecast": getMovingAverage(x, monthsForMovingAverage, actualMonths, data) };
         }
     }
-    calculateError(data, "movingAvgError", props);
-    console.log("mvg data---",data)
-    props.updateState("movingAvgData", data);
-    // for (let y=1; y<=actualMonths+noOfMonthsForProjection; y++) {
-    //     console.log(y+" = "+data[y-1].forecast);
-    // }
 
+    if (page == "DataEntry") {
+        var movingAvgData = { "data": data, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+        props.updateMovingAvgData(movingAvgData);
+    }else if(page=="importFromQATSP"){
+        var movingAvgData = { "data": data, "PlanningUnitId": planningUnitId, "regionId": regionId }
+        props.updateMovingAvgData(movingAvgData);
+    } else {
+        calculateError(data, "movingAvgError", props);
+        console.log("mvg data---", data)
+        props.updateState("movingAvgData", data);
+        // for (let y=1; y<=actualMonths+noOfMonthsForProjection; y++) {
+        //     console.log(y+" = "+data[y-1].forecast);
+        // }
+    }
 
 }
 

@@ -387,7 +387,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: false
+            // contextMenu: false
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this)
         };
 
         this.el = jexcel(document.getElementById("mapRegion"), options);

@@ -25,14 +25,17 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { FORECAST_DATEPICKER_START_MONTH, FORECAST_DATEPICKER_MONTH_DIFF, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY } from '../../Constants.js';
+import { FORECAST_DATEPICKER_START_MONTH, FORECAST_DATEPICKER_MONTH_DIFF, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY, API_URL } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import csvicon from '../../assets/img/csv.png';
 import ForecastedConsumptionimported from '../../assets/img/ForecastedConsumptionimported.png';
 import ShowGuidanceScreenshot1 from '../../assets/img/importintoqatsupplyplanscreenshot-1.jpg';
 import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.jpg';
-
+import listImportIntoQATSupplyPlanEn from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanEn.html'
+import listImportIntoQATSupplyPlanFr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanFr.html'
+import listImportIntoQATSupplyPlanSp from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanSp.html'
+import listImportIntoQATSupplyPlanPr from '../../../src/ShowGuidanceFiles/listImportIntoQATSupplyPlanPr.html'
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -274,7 +277,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -611,7 +615,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false, color: 'red'
                                 });
                             } else {
@@ -665,7 +670,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (versionId == 0) {
             this.setState({
@@ -675,7 +680,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else if (programId == 0) {
             this.setState({
@@ -685,7 +690,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             document.getElementById("stepOneBtn").disabled = true;
         } else {
             this.setState({
@@ -694,7 +699,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 message: ''
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
-            jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+            jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
             // this.el.destroy();
             document.getElementById("stepOneBtn").disabled = true;
         }
@@ -742,17 +747,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
 
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapRegion"),true);
+        jexcel.destroy(document.getElementById("mapRegion"), true);
 
 
         this.el = jexcel(document.getElementById("mapImport"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapImport"),true);
+        jexcel.destroy(document.getElementById("mapImport"), true);
 
 
         var json = [];
@@ -913,7 +918,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         };
 
         myVar = jexcel(document.getElementById("mapPlanningUnit"), options);
-        this.el=myVar
+        this.el = myVar
         this.setState({
             loading: false,
             mapPlanningUnitEl: myVar
@@ -1313,7 +1318,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 <div>
                     <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
                         {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
-                        <PopoverBody>If the last month of your forecast is more than 6 months old, it will not appear in the version dropdown. Please consider importing forecast data for future months.</PopoverBody>
+                        <PopoverBody>{i18n.t('static.importIntoSP.versionTitle')}</PopoverBody>
                     </Popover>
                 </div>
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
@@ -1333,7 +1338,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </ModalHeader>
                         <div>
                             <ModalBody>
-                                <div>
+                                <div dangerouslySetInnerHTML={{
+                                    __html: localStorage.getItem('lang') == 'en' ?
+                                        listImportIntoQATSupplyPlanEn :
+                                        localStorage.getItem('lang') == 'fr' ?
+                                            listImportIntoQATSupplyPlanFr :
+                                            localStorage.getItem('lang') == 'sp' ?
+                                                listImportIntoQATSupplyPlanSp :
+                                                listImportIntoQATSupplyPlanPr
+                                }} />
+
+                                {/* <div>
                                     <h3 className='ShowGuidanceHeading'>{i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan')}</h3>
                                 </div>
                                 <p>
@@ -1522,7 +1537,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         </ul>
 
                                     </p>
-                                </p>
+                                </p> */}
                             </ModalBody>
                         </div>
                     </Modal>

@@ -398,6 +398,7 @@ export default class AddInventory extends Component {
     }
 
     componentDidMount() {
+        document.getElementById("adjustmentsTableDiv").closest('.card').classList.add("removeCardwrap");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1001,4 +1002,3 @@ export default class AddInventory extends Component {
         this.pickRange.current.show()
     }
 }
-

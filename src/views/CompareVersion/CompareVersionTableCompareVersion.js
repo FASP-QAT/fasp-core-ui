@@ -116,7 +116,7 @@ export default class CompareVersionTableCompareVersion extends Component {
                 });*/
                 doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.compareVersion'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.compareVersion'), doc.internal.pageSize.width / 2, 80, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -144,7 +144,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         doc.setTextColor("#002f6c");
 
 
-        var y = 80;
+        var y = 100;
         doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
             align: 'left'
         })
@@ -218,7 +218,7 @@ export default class CompareVersionTableCompareVersion extends Component {
         const data = dataArr1;
         // doc.addPage()
         let content = {
-            margin: { top: 80, bottom: 50 },
+            margin: { top: 100, bottom: 50 },
             startY: startYtable,
             head: [headers2, columns],
             body: data,
@@ -367,11 +367,11 @@ export default class CompareVersionTableCompareVersion extends Component {
             [
                 {
                     title: '',
-                    rowspan: '1'
+                    colspan: '1'
                 },
                 {
                     title: '',
-                    rowspan: '1'
+                    colspan: '1'
                 },
                 {
                     title: this.props.versionLabel,
@@ -745,10 +745,10 @@ export default class CompareVersionTableCompareVersion extends Component {
             tr.children[6].classList.add('InfoTr');
             tr.children[7].classList.add('InfoTr');
 
-            tr.children[3].title = "Forecast method that was selected for the final forecast. Forecasts are selected in the Compare and Select Forecast screen.";
-            tr.children[4].title = "Quantity forecasted for the entire forecast period.";
-            tr.children[6].title = "Forecast method that was selected for the final forecast. Forecasts are selected in the Compare and Select Forecast screen.";
-            tr.children[7].title = "Quantity forecasted for the entire forecast period.";
+            tr.children[3].title = i18n.t('static.compareVersion.selectedForecastTitle');
+            tr.children[4].title = i18n.t('static.compareVersion.selectedForecastQtyTitle');
+            tr.children[6].title = i18n.t('static.compareVersion.selectedForecastTitle');
+            tr.children[7].title = i18n.t('static.compareVersion.selectedForecastQtyTitle');
         }
     }
 

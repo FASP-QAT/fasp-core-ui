@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -119,7 +119,9 @@ class Consumption extends Component {
       loading: true,
       programId: '',
       versionId: '',
-      planningUnitLabel: ''
+      planningUnitLabel: '',
+      forecastUnitLabel: '',
+      viewByIdState: 0
 
 
     };
@@ -178,7 +180,8 @@ class Consumption extends Component {
                 console.log("RESP-----", response.data)
                 this.setState({
                   multiplier: response.data.multiplier,
-                  planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
+                  planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text,
+                  forecastUnitLabel: getLabelText(response.data.forecastingUnit.label, this.state.lang)
                 },
                   () => {
                     this.filterData()
@@ -188,7 +191,8 @@ class Consumption extends Component {
                 error => {
                   if (error.message === "Network Error") {
                     this.setState({
-                      message: 'static.unkownError',
+                      // message: 'static.unkownError',
+                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                       loading: false
                     });
                   } else {
@@ -237,7 +241,8 @@ class Consumption extends Component {
             error => {
               if (error.message === "Network Error") {
                 this.setState({
-                  message: 'static.unkownError',
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
@@ -294,7 +299,9 @@ class Consumption extends Component {
             let productFilter = myResult.filter(c => (c.planningUnitId == productId));
             this.setState({
               multiplier: productFilter[0].multiplier,
-              planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
+              planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text,
+              forecastUnitLabel: getLabelText(productFilter[0].forecastUnit.label, this.state.lang)
+
             },
               () => {
                 this.filterData()
@@ -595,23 +602,23 @@ class Consumption extends Component {
             // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson = JSON.parse(programData);
-            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
-                        var programJson = {}
-                        if (planningUnitDataIndex != -1) {
-                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            programJson = JSON.parse(programData);
-                        } else {
-                            programJson = {
-                                consumptionList: [],
-                                inventoryList: [],
-                                shipmentList: [],
-                                batchInfoList: [],
-                                supplyPlan: []
-                            }
-                        }
+            var programJson = {}
+            if (planningUnitDataIndex != -1) {
+              var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              programJson = JSON.parse(programData);
+            } else {
+              programJson = {
+                consumptionList: [],
+                inventoryList: [],
+                shipmentList: [],
+                batchInfoList: [],
+                supplyPlan: []
+              }
+            }
             console.log("consumptionList----*********----", (programJson.consumptionList));
 
             var offlineConsumptionList = (programJson.consumptionList);
@@ -633,7 +640,7 @@ class Consumption extends Component {
               if (!a[consumptionDate])
                 a[consumptionDate] = Object.assign({}, { consumptionId, consumptionDate, actualFlag, consumptionQty });
               else
-                a[consumptionDate].consumptionQty += consumptionQty;
+                a[consumptionDate].consumptionQty += Number(consumptionQty);
               return a;
             }, {}));
             console.log("resultTrue---->", resultTrue);
@@ -644,7 +651,7 @@ class Consumption extends Component {
               if (!a[consumptionDate])
                 a[consumptionDate] = Object.assign({}, { consumptionId, consumptionDate, actualFlag, consumptionQty });
               else
-                a[consumptionDate].consumptionQty += consumptionQty;
+                a[consumptionDate].consumptionQty += Number(consumptionQty);
               return a;
             }, {}));
             console.log("resultFalse---->", resultFalse);
@@ -666,8 +673,8 @@ class Consumption extends Component {
             for (var j = 0; j < dateArray.length; j++) {
               let objActual = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == true);
               let objForecast = sorted.filter(c => (moment(dateArray[j], 'MM-YYYY').isSame(moment(moment(c.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'), 'MM-YYYY'))) != 0 && c.actualFlag == false);
-              let actualValue = null;
-              let forecastValue = null;
+              let actualValue = 0;
+              let forecastValue = 0;
               let transDate = '';
               if (objActual.length > 0) {
                 actualValue = this.round(objActual[0].consumptionQty);
@@ -702,7 +709,8 @@ class Consumption extends Component {
               offlineConsumptionList: finalOfflineConsumption,
               consumptions: finalOfflineConsumption,
               message: '',
-              loading: false
+              loading: false,
+              viewByIdState: viewById
             })
 
           }.bind(this)
@@ -731,7 +739,8 @@ class Consumption extends Component {
             this.setState({
               consumptions: response.data,
               message: '',
-              loading: false
+              loading: false,
+              viewByIdState: viewById
             },
               () => {
 
@@ -740,7 +749,8 @@ class Consumption extends Component {
             error => {
               if (error.message === "Network Error") {
                 this.setState({
-                  message: 'static.unkownError',
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
@@ -807,7 +817,8 @@ class Consumption extends Component {
             }, () => { this.consolidatedProgramList() })
             if (error.message === "Network Error") {
               this.setState({
-                message: 'static.unkownError',
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                 loading: false
               });
             } else {
@@ -1029,7 +1040,8 @@ class Consumption extends Component {
               })
               if (error.message === "Network Error") {
                 this.setState({
-                  message: 'static.unkownError',
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                   loading: false
                 });
               } else {
@@ -1339,8 +1351,7 @@ class Consumption extends Component {
   render() {
     const { planningUnits } = this.state;
     const { offlinePlanningUnitList } = this.state;
-
-
+    const { viewByIdState } = this.state;
 
     const { programs } = this.state;
     let programList = programs.length > 0
@@ -1367,7 +1378,7 @@ class Consumption extends Component {
       title: {
         display: true,
         // text: i18n.t('static.dashboard.consumption'),
-        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? i18n.t('static.dashboard.consumption') + " - " + this.state.planningUnitLabel : i18n.t('static.dashboard.consumption'),
+        text: viewByIdState == 1 && this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? i18n.t('static.dashboard.consumption') + " - " + this.state.planningUnitLabel : (viewByIdState == 2 && this.state.forecastUnitLabel != "" && this.state.forecastUnitLabel != undefined && this.state.forecastUnitLabel != null ? i18n.t('static.dashboard.consumption') + " - " + this.state.forecastUnitLabel : i18n.t('static.dashboard.consumption')),
         // fontColor: 'black'
       },
 

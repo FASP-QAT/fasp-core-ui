@@ -208,6 +208,7 @@ class ApplicationDashboard extends Component {
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
     this.hideFirstComponent = this.hideFirstComponent.bind(this);
+    this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
 
 
@@ -274,7 +275,7 @@ class ApplicationDashboard extends Component {
     // console.log(">>>", changed);
     confirmAlert({
       title: i18n.t('static.program.confirm'),
-      message: "Delete this program",
+      message: i18n.t("static.dashboard.deleteThisProgram"),
       buttons: [
         {
           label: i18n.t('static.program.yes'),
@@ -306,10 +307,10 @@ class ApplicationDashboard extends Component {
                   deleteRequest2.onsuccess = function (event) {
                     this.setState({
                       loading: false,
-                      message: "Program delete succesfully.",
+                      message: i18n.t("static.dashboard.programDeletedSuccessfully"),
                       color: 'green'
                     }, () => {
-                      this.hideFirstComponent()
+                      this.hideSecondComponent()
                     })
                     this.getPrograms();
                     // this.getLocalPrograms();
@@ -326,7 +327,7 @@ class ApplicationDashboard extends Component {
               message: i18n.t('static.actionCancelled'), loading: false, color: "red"
             })
             this.setState({ loading: false, color: "red" }, () => {
-              this.hideFirstComponent()
+              this.hideSecondComponent()
             })
             // this.props.history.push(`/program/downloadProgram`)
           }
@@ -341,7 +342,7 @@ class ApplicationDashboard extends Component {
     // console.log(">>>", changed);
     confirmAlert({
       title: i18n.t('static.program.confirm'),
-      message: "Delete this program",
+      message: i18n.t("static.dashboard.deleteThisProgram"),
       buttons: [
         {
           label: i18n.t('static.program.yes'),
@@ -374,10 +375,10 @@ class ApplicationDashboard extends Component {
                   deleteRequest2.onsuccess = function (event) {
                     this.setState({
                       loading: false,
-                      message: "Dataset delete succesfully.",
+                      message: i18n.t("static.loadDelDataset.datasetDeleteSuccessfully"),
                       color: 'green'
                     }, () => {
-                      this.hideFirstComponent()
+                      this.hideSecondComponent()
                     })
                     this.getDataSetList();
                     // this.getLocalPrograms();
@@ -394,7 +395,7 @@ class ApplicationDashboard extends Component {
               message: i18n.t('static.actionCancelled'), loading: false, color: "red"
             })
             this.setState({ loading: false, color: "red" }, () => {
-              this.hideFirstComponent()
+              this.hideSecondComponent()
             })
             // this.props.history.push(`/dataSet/loadDeleteDataSet`)
           }
@@ -428,11 +429,20 @@ class ApplicationDashboard extends Component {
     this.props.history.push(url);
   }
 
+
   hideFirstComponent() {
     this.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
     }, 30000);
   }
+
+  hideSecondComponent() {
+    document.getElementById('div2').style.display = 'block';
+    setTimeout(function () {
+      document.getElementById('div2').style.display = 'none';
+    }, 30000);
+  }
+
   componentWillUnmount() {
     clearTimeout(this.timeout);
   }
@@ -1177,8 +1187,8 @@ class ApplicationDashboard extends Component {
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
-        <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message)}</h5>
-        <h5 className={this.state.color} id="div1">{i18n.t(this.state.message)}</h5>
+        <h5 className={this.props.match.params.color} id="div1" style={{display:this.props.match.params.message=='Success'?'none':'block'}}>{i18n.t(this.props.match.params.message)}</h5>
+        <h5 className={this.state.color} id="div2">{i18n.t(this.state.message)}</h5>
         <Row className="mt-2">
           {checkOnline === 'Online' && this.state.id == 1 &&
 
@@ -1461,7 +1471,7 @@ class ApplicationDashboard extends Component {
 
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud(activeTab1==2?"/program/listProgram":"/dataSet/listDataSet")}>{i18n.t('static.list.listProgram')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud(activeTab1 == 2 ? "/program/listProgram" : "/dataSet/listDataSet")}>{i18n.t('static.list.listProgram')}</DropdownItem>
 
 
                           </DropdownMenu>
@@ -1470,7 +1480,7 @@ class ApplicationDashboard extends Component {
                     </div>
 
                     <div className="TextTittle ">{i18n.t('static.add.totalProgram')} </div>
-                    <div className="text-count">{activeTab1==2?this.state.dashboard.PROGRAM_COUNT:this.state.dashboard.DATASET_COUNT}</div>
+                    <div className="text-count">{activeTab1 == 2 ? this.state.dashboard.PROGRAM_COUNT : this.state.dashboard.DATASET_COUNT}</div>
                     <div className="chart-wrapper mt-4 pb-2" >
 
                     </div>
@@ -1487,7 +1497,7 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud(activeTab1==2?"/program/programOnboarding":"/dataset/addDataSet")}>{i18n.t('static.dashboard.setupprogram')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud(activeTab1 == 2 ? "/program/programOnboarding" : "/dataset/addDataSet")}>{i18n.t('static.dashboard.setupprogram')}</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
@@ -1499,7 +1509,7 @@ class ApplicationDashboard extends Component {
                   </CardBody>
                 </Card>
               </Col>
-              {activeTab1==2 && <Col xs="12" sm="6" lg="3">
+              {activeTab1 == 2 && <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
                   <CardBody className="box-p">
                     <div class="h1 text-muted text-left mb-2  ">
@@ -1557,7 +1567,7 @@ class ApplicationDashboard extends Component {
           }
 
 
-          {activeTab1==2 && checkOnline === 'Online' && this.state.id != 2 && this.state.roleArray.includes('ROLE_SUPPLY_PLAN_REVIEWER') &&
+          {activeTab1 == 2 && checkOnline === 'Online' && this.state.id != 2 && this.state.roleArray.includes('ROLE_SUPPLY_PLAN_REVIEWER') &&
             <>
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
@@ -1604,10 +1614,10 @@ class ApplicationDashboard extends Component {
                             <DropdownToggle caret className="p-0" color="transparent">
                             </DropdownToggle>
                             <DropdownMenu right>
-                              <DropdownItem onClick={() => this.deleteProgram(item.programId, item.versionId)}>{'Delete'}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/versionSettings", item.programId, item.versionId, 1)}>{'Version Settings'}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/listTree", item.programId, item.versionId, 2)}>{'Tree'}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataentry/consumptionDataEntryAndAdjustment", item.programId, item.versionId, 2)}>{'Consumption'}</DropdownItem>
+                              <DropdownItem onClick={() => this.deleteProgram(item.programId, item.versionId)}>{i18n.t("static.common.delete")}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/versionSettings", item.programId, item.versionId, 1)}>{i18n.t("static.versionSettings.versionSettings")}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/listTree", item.programId, item.versionId, 2)}>{i18n.t("static.forecastMethod.tree")}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataentry/consumptionDataEntryAndAdjustment", item.programId, item.versionId, 2)}>{i18n.t("static.supplyPlan.consumption")}</DropdownItem>
                               {/*<DropdownItem onClick={() => this.redirectToCrud(/report/problemList / 1 / + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem> */}
                             </DropdownMenu>
                           </Dropdown>
@@ -1655,7 +1665,7 @@ class ApplicationDashboard extends Component {
                             <DropdownToggle caret className="p-0" color="transparent">
                             </DropdownToggle>
                             <DropdownMenu right>
-                              <DropdownItem onClick={() => this.deleteSupplyPlanProgram(item.programId, item.versionId)}>{'Delete'}</DropdownItem>
+                              <DropdownItem onClick={() => this.deleteSupplyPlanProgram(item.programId, item.versionId)}>{i18n.t("static.common.delete")}</DropdownItem>
                               <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>{i18n.t('static.qpl.calculate')}</DropdownItem>
                               <DropdownItem onClick={() => this.redirectToCrud(`/report/problemList/1/` + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
                             </DropdownMenu>

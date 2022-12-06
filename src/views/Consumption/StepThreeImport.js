@@ -1,49 +1,29 @@
-import React, { Component } from 'react';
+import CryptoJS from 'crypto-js';
 import jexcel from 'jspreadsheet';
-import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
-import "../../../node_modules/jsuites/dist/jsuites.css";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import i18n from '../../i18n';
-import csvicon from '../../assets/img/csv.png';
+import moment from "moment";
+import React, { Component } from 'react';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import {
-    Badge,
-    Button,
-    ButtonDropdown,
-    ButtonGroup,
-    ButtonToolbar,
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-    Col,
-    Widgets,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownToggle,
-    Progress,
-    Pagination,
-    PaginationItem,
-    PaginationLink,
-    Row,
-    CardColumns,
-    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
-} from 'reactstrap';
-import Picker from 'react-month-picker'
-import MonthBox from '../../CommonComponent/MonthBox.js';
-import ProgramService from '../../api/ProgramService';
-import getLabelText from '../../CommonComponent/getLabelText';
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
-import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
-import moment from "moment";
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import CryptoJS from 'crypto-js';
 import { Prompt } from 'react-router';
+import {
+    Button, FormGroup
+} from 'reactstrap';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import ProgramService from '../../api/ProgramService';
+import csvicon from '../../assets/img/csv.png';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY } from '../../Constants.js';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { calculateArima } from '../Extrapolation/Arima';
+import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
+import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
+import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
+import { calculateTES } from '../Extrapolation/TESNew';
 
 
 export default class StepThreeImportMapPlanningUnits extends Component {
@@ -63,8 +43,34 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             stopDate: '',
             buildCSVTable: [],
             languageEl: '',
-            isChanged1: false
-
+            isChanged1: false,
+            confidenceLevelId: 0.85,
+            confidenceLevelIdLinearRegression: 0.85,
+            confidenceLevelIdArima: 0.85,
+            alpha: 0.2,
+            beta: 0.2,
+            gamma: 0.2,
+            noOfMonthsForASeason: 4,
+            confidence: 0.95,
+            monthsForMovingAverage: 6,
+            seasonality: 1,
+            p: 0,
+            d: 1,
+            q: 1,
+            CI: "",
+            tesData: [],
+            arimaData: [],
+            jsonDataMovingAvg: [],
+            jsonDataSemiAverage: [],
+            jsonDataLinearRegression: [],
+            jsonDataTes: [],
+            jsonDataArima: [],
+            count: 0,
+            countRecived: 0,
+            datasetId: 0,
+            listOfPlanningUnits: [],
+            datasetDataUnencrypted: {},
+            regionListForExtrapolate:[]
         }
 
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -72,6 +78,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         this.exportCSV = this.exportCSV.bind(this);
         this.changeColor = this.changeColor.bind(this);
 
+        this.updateMovingAvgData = this.updateMovingAvgData.bind(this);
+        this.updateSemiAveragesData = this.updateSemiAveragesData.bind(this);
+        this.updateLinearRegressionData = this.updateLinearRegressionData.bind(this);
+        this.updateTESData = this.updateTESData.bind(this);
+        this.updateArimaData = this.updateArimaData.bind(this);
     }
 
     componentWillUnmount() {
@@ -127,7 +138,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var csvRow = [];
 
         // this.state.countryLabels.map(ele =>
-        //     csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        //     csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
 
         // csvRow.push('"' + (i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -147,7 +158,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.buildCSVTable.map(ele => A.push(this.addDoubleQuoteToRowContent([((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'), ele.supplyPlanConsumption, ele.multiplier, ele.convertedConsumption, ele.currentQATConsumption, ele.import == true ? 'Yes' : 'No'])));
+        this.state.buildCSVTable.map(ele => A.push(this.addDoubleQuoteToRowContent([((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'), ele.supplyPlanConsumption!=null?ele.supplyPlanConsumption:"", ele.multiplier, ele.convertedConsumption, ele.currentQATConsumption!=null?ele.currentQATConsumption:"", ele.import == true ? 'Yes' : 'No'])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
@@ -168,6 +179,491 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         return arr.map(ele => '"' + ele + '"')
     }
 
+
+    // //.................................................................. Extrapolate..................................
+    ExtrapolatedParameters() {
+        var listOfPlanningUnits = this.state.listOfPlanningUnits;
+        var programData = this.state.datasetDataUnencrypted;
+        console.log("List of pus Test", listOfPlanningUnits)
+        console.log("Program Data Test", programData)
+        if (this.state.listOfPlanningUnits.length > 0) {
+            this.setState({ loading: true })
+            var datasetJson = programData;
+            console.log("datasetJson**********", datasetJson)
+            // Need to filter
+            var regionList = this.state.regionListForExtrapolate;
+            console.log("Region List Test",regionList)
+            var count = 0;
+            for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
+                for (var i = 0; i < regionList.length; i++) {
+                    var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu] && c.region.id == regionList[i]);
+                    console.log("actualConsumptionListForPlanningUnitAndRegion Test",actualConsumptionListForPlanningUnitAndRegion)
+                    if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+                        let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                        let maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                        let curDate = minDate;
+                        var inputDataMovingAvg = [];
+                        var inputDataSemiAverage = [];
+                        var inputDataLinearRegression = [];
+                        var inputDataTes = [];
+                        var inputDataArima = [];
+
+                        console.log("minDate", moment(minDate).format("YYYY-MM"));
+                        console.log("maxDate", moment(maxDate).format("YYYY-MM"));
+                        for (var j = 0; moment(curDate).format("YYYY-MM") < moment(maxDate).format("YYYY-MM"); j++) {
+                            curDate = moment(minDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
+                            console.log("curdate", curDate)
+                            var consumptionData = actualConsumptionListForPlanningUnitAndRegion.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
+                            console.log("consumptionData--->", consumptionData)
+                            console.log("Value@@@@@@@@@@@", consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null);
+                            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                            inputDataArima.push({ "month": inputDataArima.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                        }
+                        var forecastMinDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+                        var forecastMaxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+                        const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD") > moment(forecastMaxDate).format("YYYY-MM-DD") ? moment(maxDate).format("YYYY-MM-DD") : moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD") < moment(forecastMinDate).format("YYYY-MM-DD") ? moment(minDate).format("YYYY-MM-DD") : moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
+                        const noOfMonthsForProjection = (monthsDiff + 1) - inputDataMovingAvg.length;
+
+                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                            count++;
+                            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "importFromQATSP", regionList[i], listOfPlanningUnits[pu]);
+                        }
+                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                            count++;
+                            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this, "importFromQATSP", regionList[i], listOfPlanningUnits[pu]);
+                        }
+                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                            count++;
+                            calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false, "importFromQATSP", regionList[i], listOfPlanningUnits[pu]);
+                        }
+                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24) {
+                            count++;
+                            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "importFromQATSP", regionList[i], listOfPlanningUnits[pu]);
+                        }
+                        if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2))) {
+                            count++;
+                            calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "importFromQATSP", regionList[i], listOfPlanningUnits[pu]);
+                        }
+                    }
+                }
+            }
+            console.log("Count Test",count)
+            this.setState({
+                count: count
+            })
+        }
+    }
+
+    updateMovingAvgData(data) {
+
+        var jsonDataMovingAvg = this.state.jsonDataMovingAvg;
+        jsonDataMovingAvg.push(data);
+        console.log("jsonDataMovingAvg---> Test", jsonDataMovingAvg)
+        var countR = this.state.countRecived
+        console.log("countR--->", countR)
+
+        this.setState({
+            jsonDataMovingAvg: jsonDataMovingAvg,
+            countRecived: countR + 1
+        }, () => {
+            console.log("countRecivedMov", this.state.countRecived)
+            console.log("countMov", this.state.count)
+
+
+            if (this.state.jsonDataMovingAvg.length
+                + this.state.jsonDataSemiAverage.length
+                + this.state.jsonDataLinearRegression.length
+                + this.state.jsonDataTes.length
+                + this.state.jsonDataArima.length
+                == this.state.count) {
+                this.saveForecastConsumptionExtrapolation();
+            }
+        })
+    }
+
+    updateSemiAveragesData(data) {
+        var jsonDataSemiAverage = this.state.jsonDataSemiAverage;
+        jsonDataSemiAverage.push(data);
+        console.log("jsonDataSemiAverage--->", jsonDataSemiAverage)
+        var countR = this.state.countRecived
+        console.log("countR--->", countR)
+
+        this.setState({
+            jsonDataSemiAverage: jsonDataSemiAverage,
+            countRecived: countR + 1
+        }, () => {
+            console.log("countRecivedSemi", this.state.countRecived)
+            console.log("countSemi", this.state.count)
+
+            if (this.state.jsonDataMovingAvg.length
+                + this.state.jsonDataSemiAverage.length
+                + this.state.jsonDataLinearRegression.length
+                + this.state.jsonDataTes.length
+                + this.state.jsonDataArima.length
+                == this.state.count) {
+                this.saveForecastConsumptionExtrapolation();
+            }
+        })
+    }
+
+    updateLinearRegressionData(data) {
+        var jsonDataLinearRegression = this.state.jsonDataLinearRegression;
+        jsonDataLinearRegression.push(data);
+        console.log("jsonDataLinearRegression--->", jsonDataLinearRegression)
+        this.setState({
+            jsonDataLinearRegression: jsonDataLinearRegression,
+            countRecived: this.state.countRecived++
+        }, () => {
+            console.log("countRecivedL", this.state.countRecived)
+            console.log("countL", this.state.count)
+
+
+            if (this.state.jsonDataMovingAvg.length
+                + this.state.jsonDataSemiAverage.length
+                + this.state.jsonDataLinearRegression.length
+                + this.state.jsonDataTes.length
+                + this.state.jsonDataArima.length
+                == this.state.count) {
+                this.saveForecastConsumptionExtrapolation();
+            }
+        })
+    }
+
+    updateTESData(data) {
+        var jsonDataTes = this.state.jsonDataTes;
+        jsonDataTes.push(data);
+        console.log("jsonDataTes--->", jsonDataTes)
+        this.setState({
+            jsonDataTes: jsonDataTes,
+            countRecived: this.state.countRecived++
+        }, () => {
+            console.log("countRecivedT", this.state.countRecived)
+            console.log("countT", this.state.count)
+
+
+            if (this.state.jsonDataMovingAvg.length
+                + this.state.jsonDataSemiAverage.length
+                + this.state.jsonDataLinearRegression.length
+                + this.state.jsonDataTes.length
+                + this.state.jsonDataArima.length
+                == this.state.count) {
+                this.saveForecastConsumptionExtrapolation();
+            }
+        })
+    }
+
+    updateArimaData(data) {
+        var jsonDataArima = this.state.jsonDataArima;
+        jsonDataArima.push(data);
+        console.log("jsonDataArima--->", jsonDataArima)
+        this.setState({
+            jsonDataArima: jsonDataArima,
+            countRecived: this.state.countRecived++
+        }, () => {
+            console.log("countRecivedA", this.state.countRecived)
+            console.log("countA", this.state.count)
+            if (this.state.jsonDataMovingAvg.length
+                + this.state.jsonDataSemiAverage.length
+                + this.state.jsonDataLinearRegression.length
+                + this.state.jsonDataTes.length
+                + this.state.jsonDataArima.length
+                == this.state.count) {
+                this.saveForecastConsumptionExtrapolation();
+            }
+        })
+    }
+
+    saveForecastConsumptionExtrapolation() {
+        console.log("inside saveForecastConsumptionExtrapolation")
+        this.setState({
+            loading: true
+        })
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            this.props.updateState("color", "red");
+            this.props.hideFirstComponent();
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var extrapolationMethodTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
+            var extrapolationMethodObjectStore = extrapolationMethodTransaction.objectStore('extrapolationMethod');
+            var extrapolationMethodRequest = extrapolationMethodObjectStore.getAll();
+            extrapolationMethodRequest.onerror = function (event) {
+            }.bind(this);
+            extrapolationMethodRequest.onsuccess = function (event) {
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var datasetTransaction = transaction.objectStore('datasetData');
+                console.log("dataset", this.state.datasetId)
+                var datasetRequest = datasetTransaction.get(this.props.items.datasetList[0].id);
+                datasetRequest.onerror = function (event) {
+                }.bind(this);
+                datasetRequest.onsuccess = function (event) {
+                    var extrapolationMethodList = extrapolationMethodRequest.result;
+                    var myResult = datasetRequest.result;
+                    var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
+                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                    var datasetJson = JSON.parse(datasetData);
+                    var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
+                    console.log("consumptionExtrapolationDataUnFiltered@@@@@@@@@@", consumptionExtrapolationDataUnFiltered);
+                    console.log("this.state.planningUnitId@@@@@@@@@@", this.state.planningUnitId);
+                    var listOfPlanningUnits = this.state.listOfPlanningUnits;
+                    var regionList = this.state.regionListForExtrapolate;
+                    var consumptionExtrapolationList=datasetJson.consumptionExtrapolation;
+                    for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
+                        for (var r = 0; r < regionList.length; r++) {
+                            var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit.id != listOfPlanningUnits[pu] || (c.planningUnit.id == listOfPlanningUnits[pu] && c.region.id != regionList[r]));
+                            console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList);
+                            var consumptionExtrapolationData = -1//Semi Averages
+                            var consumptionExtrapolationMovingData = -1//Moving averages
+                            var consumptionExtrapolationRegression = -1//Linear Regression
+                            var consumptionExtrapolationTESL = -1//TES L
+                            console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
+                            var consumptionExtrapolationTESM = -1//TES M
+                            var consumptionExtrapolationTESH = -1//TES H
+                            //----------------------------
+                            // var rangeValue = this.state.rangeValue1;
+                            // let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                            // let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+
+                            var inputDataFilter = this.state.jsonDataSemiAverage;
+                            var inputDataAverageFilter = this.state.movingAvgData;
+                            var inputDataRegressionFilter = this.state.linearRegressionData;
+                            console.log("consumptionExtrapolationData", consumptionExtrapolationData);
+                            console.log("inputDataFilter", inputDataFilter);
+                            var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
+                            var planningUnitObj = this.props.items.planningUnitList.filter(c => c.id == listOfPlanningUnits[pu])[0];
+                            var regionObj = this.state.datasetDataUnencrypted.regionList.filter(c => c.regionId == regionList[r])[0];
+                            console.log("Planning Unit Obj****", planningUnitObj);
+                            console.log("Region Obj****", regionObj);
+                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            var datasetJson = this.state.datasetDataUnencrypted;
+                            var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu] && c.region.id == regionList[r]);
+                            var minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                            var maxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+
+                            //Semi - averages
+                            console.log("this.state.jsonDataSemiAverage----------->", this.state.jsonDataSemiAverage);
+                            var jsonDataSemiAvgFilter = this.state.jsonDataSemiAverage.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            console.log("json data semi avg Test",jsonDataSemiAvgFilter)
+                            if (jsonDataSemiAvgFilter.length > 0) {
+                                var jsonSemi = jsonDataSemiAvgFilter[0].data;
+                                console.log("this.state.jsonDataSemiAverage--json--------->", jsonSemi);
+                                var data = [];
+                                for (var i = 0; i < jsonSemi.length; i++) {
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(2) : null, ci: null })
+                                }
+                                console.log("data--------->", data);
+
+                                consumptionExtrapolationList.push(
+                                    {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
+                                        "jsonProperties": {
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    })
+                                id += 1;
+                            }
+                            console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
+                            //Moving Averages
+                            var data = [];
+                            var jsonDataMovingFilter = this.state.jsonDataMovingAvg.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            if (jsonDataMovingFilter.length > 0) {
+                                var jsonDataMoving = jsonDataMovingFilter[0].data;
+                                console.log("this.state.jsonDataMovingAvg--json--------->", jsonDataMoving);
+                                for (var i = 0; i < jsonDataMoving.length; i++) {
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(2) : null, ci: null })
+                                }
+                                consumptionExtrapolationList.push(
+                                    {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
+                                        "jsonProperties": {
+                                            months: this.state.monthsForMovingAverage,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    })
+                            }
+                            id += 1;
+                            //Linear Regression
+                            var data = [];
+                            var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            if (jsonDataLinearFilter.length > 0) {
+                                var jsonDataLinear = jsonDataLinearFilter[0].data;
+                                console.log("this.state.jsonDataLinear--json--------->", jsonDataLinear);
+                                for (var i = 0; i < jsonDataLinear.length; i++) {
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(2) : null, ci: (jsonDataLinear[i].ci) })
+                                }
+                                consumptionExtrapolationList.push(
+                                    {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelIdLinearRegression,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    })
+                                id += 1;
+                            }
+                            //TES L
+                            //TES M
+                            console.log("in if2")
+                            var data = [];
+                            var jsonDataTesFilter = this.state.jsonDataTes.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            if (jsonDataTesFilter.length > 0) {
+                                var jsonDataTes = jsonDataTesFilter[0].data;
+                                console.log("this.state.jsonDataTes--json--------->", jsonDataTes);
+
+                                for (var i = 0; i < jsonDataTes.length; i++) {
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(2) : null, ci: (jsonDataTes[i].ci) })
+                                }
+                                consumptionExtrapolationList.push(
+                                    {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelId,
+                                            seasonality: this.state.noOfMonthsForASeason,
+                                            alpha: this.state.alpha,
+                                            beta: this.state.beta,
+                                            gamma: this.state.gamma,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    })
+                                id += 1;
+                            }
+                            //Arima L
+                            //TES M
+                            console.log("in if2")
+                            var data = [];
+                            var jsonDataArimaFilter = this.state.jsonDataArima.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            if (jsonDataArimaFilter.length > 0) {
+                                var jsonDataArima = jsonDataArimaFilter[0].data;
+                                console.log("this.state.jsonDataArima--json--------->", jsonDataArima);
+                                for (var i = 0; i < jsonDataArima.length; i++) {
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(2) : null, ci: (jsonDataArima[i].ci) })
+                                }
+                                consumptionExtrapolationList.push(
+                                    {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelIdArima,
+                                            seasonality: this.state.seasonality,
+                                            p: this.state.p,
+                                            d: this.state.d,
+                                            q: this.state.q,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    })
+                                id += 1;
+                            }
+                        }
+                    }
+                    console.log("consumptionExtrapolation@@@@@@@ Test",consumptionExtrapolationList)
+                    console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
+                    datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
+                    console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
+                    datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+                    myResult.programData = datasetData;
+                    var putRequest = datasetTransaction.put(myResult);
+                    this.setState({
+                        dataChanged: false
+                    })
+                    putRequest.onerror = function (event) {
+                    }.bind(this);
+                    putRequest.onsuccess = function (event) {
+                        console.log("save");
+                        // let id = AuthenticationService.displayDashboardBasedOnRole();
+                        // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
+                        console.log("Data update success");
+                        this.setState({
+                            isChanged1: false
+                        })
+                        localStorage.setItem("sesDatasetId", this.props.items.datasetList[0].id);
+                        // this.ExtrapolatedParameters();
+
+                        // this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
+                        // this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment`)
+                        this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment/` + 'green/' + i18n.t('static.message.importSuccess'))
+
+                        // console.log(" after save",this.state.message);
+                        // , () => {
+                        //     this.componentDidMount();
+                        // })
+
+                    }.bind(this);
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+        // }
+    }
+    // //------------------------------------------------------------------------------------
+
+
     formSubmit() {
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
@@ -178,12 +674,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     onClick: () => {
                         this.props.updateStepOneData("loading", true);
                         var tableJson = this.el.getJson(null, false);
+                        console.log("Table Json Test", tableJson)
+                        var listOfForecastPlanningUnits = [...new Set(tableJson.filter(c => c[8].toString() == "true").map(ele => (ele[1])))];
+                        var regionListForExtrapolate= [...new Set(tableJson.filter(c => c[8].toString() == "true").map(ele => (ele[10])))];
+                        console.log("List of forecast planning unit Test", listOfForecastPlanningUnits)
+
                         var programs = [];
+                        //blank                    
                         var ImportListNotPink = [];
+                        //yellow        
                         var ImportListPink = [];
 
                         let datasetList = this.props.items.datasetList
                         let forecastProgramVersionId = this.props.items.forecastProgramVersionId
+                        console.log("Test", this.props.items)
                         let forecastProgramId = this.props.items.forecastProgramId
                         let selectedForecastProgramObj = datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0];
 
@@ -201,42 +705,42 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             forecastingUnitObj.multiplier = map1.get("5");
                             if (map1.get("9") == 0 && map1.get("8") == true) { //not pink
                                 // let tempJson = {
-                                //     "forecastConsumptionId": '',
-                                //     "program": {
-                                //         "id": selectedForecastProgramObj.programId,
-                                //         "label": selectedForecastProgramObj.label,
-                                //         "code": selectedForecastProgramObj.programCode,
-                                //         "idString": "" + selectedForecastProgramObj.programId
-                                //     },
-                                //     "consumptionUnit": {
-                                //         "forecastConsumptionUnitId": '',
-                                //         "dataType": 1,
-                                //         "forecastingUnit": forecastingUnitObj,
-                                //         "planningUnit": {
-                                //             "id": selectedPlanningUnitObj.planningUnitId,
-                                //             "label": selectedPlanningUnitObj.label,
-                                //             "multiplier": selectedPlanningUnitObj.multiplier,
-                                //             "idString": '' + selectedPlanningUnitObj.planningUnitId,
-                                //         },
-                                //         "otherUnit": null
-                                //     },
-                                //     "region": {
-                                //         "id": map1.get("10"),
-                                //         "label": null,
-                                //         "idString": '' + map1.get("10")
-                                //     },
-                                //     "month": map1.get("3"),
-                                //     // "actualConsumption": map1.get("4"),
-                                //     "actualConsumption": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                //     "reportingRate": null,
-                                //     "daysOfStockOut": null,
-                                //     "exclude": false,
-                                //     "versionId": selectedForecastProgramObj.versionId,
-                                //     "createdBy": {
-                                //         "userId": userId,
-                                //         "username": username
-                                //     },
-                                //     "createdDate": new Date().toISOString().slice(0, 10) + " 19:43:38"
+                                //     "forecastConsumptionId": '',
+                                //     "program": {
+                                //         "id": selectedForecastProgramObj.programId,
+                                //         "label": selectedForecastProgramObj.label,
+                                //         "code": selectedForecastProgramObj.programCode,
+                                //         "idString": "" + selectedForecastProgramObj.programId
+                                //     },
+                                //     "consumptionUnit": {
+                                //         "forecastConsumptionUnitId": '',
+                                //         "dataType": 1,
+                                //         "forecastingUnit": forecastingUnitObj,
+                                //         "planningUnit": {
+                                //             "id": selectedPlanningUnitObj.planningUnitId,
+                                //             "label": selectedPlanningUnitObj.label,
+                                //             "multiplier": selectedPlanningUnitObj.multiplier,
+                                //             "idString": '' + selectedPlanningUnitObj.planningUnitId,
+                                //         },
+                                //         "otherUnit": null
+                                //     },
+                                //     "region": {
+                                //         "id": map1.get("10"),
+                                //         "label": null,
+                                //         "idString": '' + map1.get("10")
+                                //     },
+                                //     "month": map1.get("3"),
+                                //     // "actualConsumption": map1.get("4"),
+                                //     "actualConsumption": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                //     "reportingRate": null,
+                                //     "daysOfStockOut": null,
+                                //     "exclude": false,
+                                //     "versionId": selectedForecastProgramObj.versionId,
+                                //     "createdBy": {
+                                //         "userId": userId,
+                                //         "username": username
+                                //     },
+                                //     "createdDate": new Date().toISOString().slice(0, 10) + " 19:43:38"
                                 // }
 
                                 let regionObj = selectedForecastProgramObj.regionList.filter(c => c.regionId == parseInt(map1.get("10")))[0];
@@ -333,30 +837,30 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         console.log("Final-------------->13", originalConsumptionList.concat(ImportListNotPink));
                         programData.actualConsumptionList = originalConsumptionList.concat(ImportListNotPink);
 
-
+                        var programDataWithoutEncrypt = programData;
                         programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
                         program.programData = programData;
                         // var db1;
                         // getDatabase();
                         // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                         // openRequest.onerror = function (event) {
-                        //     this.setState({
-                        //         message: i18n.t('static.program.errortext'),
-                        //         color: 'red'
-                        //     })
-                        //     this.hideFirstComponent()
+                        //     this.setState({
+                        //         message: i18n.t('static.program.errortext'),
+                        //         color: 'red'
+                        //     })
+                        //     this.hideFirstComponent()
                         // }.bind(this);
                         // openRequest.onsuccess = function (e) {
-                        //     db1 = e.target.result;
-                        //     var transaction = db1.transaction(['datasetData'], 'readwrite');
-                        //     var programTransaction = transaction.objectStore('datasetData');
-                        //     var programRequest = programTransaction.put(program);
-                        //     programRequest.onerror = function (e) {
+                        //     db1 = e.target.result;
+                        //     var transaction = db1.transaction(['datasetData'], 'readwrite');
+                        //     var programTransaction = transaction.objectStore('datasetData');
+                        //     var programRequest = programTransaction.put(program);
+                        //     programRequest.onerror = function (e) {
 
-                        //     }.bind(this);
-                        //     programRequest.onsuccess = function (e) {
+                        //     }.bind(this);
+                        //     programRequest.onsuccess = function (e) {
 
-                        //     }.bind(this);
+                        //     }.bind(this);
                         // }.bind(this);
                         programs.push(program);
 
@@ -386,22 +890,35 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
                                 // this.props.updateStepOneData("color", "green");
                                 // this.setState({
-                                //     message: i18n.t('static.mt.dataUpdateSuccess'),
-                                //     color: "green",
+                                //     message: i18n.t('static.mt.dataUpdateSuccess'),
+                                //     color: "green",
                                 // }, () => {
-                                //     this.props.hideSecondComponent();
-                                //     this.props.finishedStepThree();
-                                //     // this.buildJExcel();
+                                //     this.props.hideSecondComponent();
+                                //     this.props.finishedStepThree();
+                                //     // this.buildJExcel();
                                 // });
-                                console.log("Data update success");
-                                this.setState({
-                                    isChanged1: false
-                                })
-                                localStorage.setItem("sesDatasetId", program.id);
+                                console.log("in side datasetDetails")
+                                db1 = e.target.result;
+                                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                                var datasetDetailsRequest = datasetDetailsTransaction.get(this.props.items.datasetList[0].id);
+                                datasetDetailsRequest.onsuccess = function (e) {
+                                    console.log("")
+                                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                    console.log("Test dataset Request Json", datasetDetailsRequestJson);
+                                    datasetDetailsRequestJson.changed = 1;
+                                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                    datasetDetailsRequest1.onsuccess = function (event) {
+                                        this.setState({
+                                            listOfPlanningUnits: listOfForecastPlanningUnits,
+                                            datasetDataUnencrypted: programDataWithoutEncrypt,
+                                            regionListForExtrapolate:regionListForExtrapolate
+                                        }, () => {
+                                            this.ExtrapolatedParameters();
+                                        })
 
-                                // this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
-                                // this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment`)
-                                this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment/` + 'green/' + i18n.t('static.message.importSuccess'))
+                                    }.bind(this)
+                                }.bind(this)
                             }.bind(this);
                             transaction.onerror = function (event) {
                                 this.setState({
@@ -446,12 +963,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         // tempList.push({ id: 8, v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Aug-21', v5: '0.694444', v6: '3900', v7: '2708.33', v8: '', v9: true });
 
         // this.setState({
-        //     selSource: tempList,
-        //     loading: true
+        //     selSource: tempList,
+        //     loading: true
         // },
-        //     () => {
-        //         this.buildJexcel();
-        //     })
+        //     () => {
+        //         this.buildJexcel();
+        //     })
 
         let forecastPlanningUnitList = this.props.items.stepOneData.filter(c => c.forecastPlanningUnitId != -1);
         let supplyPlanPlanningUnitId = forecastPlanningUnitList.map(ele => ele.supplyPlanPlanningUnitId);
@@ -492,7 +1009,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false, color: 'red'
                         });
                     } else {
@@ -592,15 +1110,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         }
 
         // if (papuDataArr.length == 0) {
-        //     data = [];
-        //     data[0] = 0;
-        //     data[1] = "";
-        //     data[2] = true
-        //     data[3] = "";
-        //     data[4] = "";
-        //     data[5] = 1;
-        //     data[6] = 1;
-        //     papuDataArr[0] = data;
+        //     data = [];
+        //     data[0] = 0;
+        //     data[1] = "";
+        //     data[2] = true
+        //     data[3] = "";
+        //     data[4] = "";
+        //     data[5] = 1;
+        //     data[6] = 1;
+        //     papuDataArr[0] = data;
         // }
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
@@ -707,25 +1225,25 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
             }.bind(this),
             // updateTable: function (el, cell, x, y, source, value, id) {
-            //     console.log("INSIDE UPDATE TABLE");
-            //     var elInstance = el.jexcel;
-            //     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-            //     var rowData = elInstance.getRowData(y);
-            //     // console.log("elInstance---->", elInstance);
-            //     var id = rowData[9];
+            //     console.log("INSIDE UPDATE TABLE");
+            //     var elInstance = el.jexcel;
+            //     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+            //     var rowData = elInstance.getRowData(y);
+            //     // console.log("elInstance---->", elInstance);
+            //     var id = rowData[9];
 
-            //     if (id == 1) {
-            //         for (var i = 0; i < colArr.length; i++) {
-            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-            //             let textColor = contrast('#f48282');
-            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
-            //         }
-            //     } else {
-            //         for (var i = 0; i < colArr.length; i++) {
-            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            //         }
-            //     }
+            //     if (id == 1) {
+            //         for (var i = 0; i < colArr.length; i++) {
+            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
+            //             let textColor = contrast('#f48282');
+            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
+            //         }
+            //     } else {
+            //         for (var i = 0; i < colArr.length; i++) {
+            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
+            //         }
+            //     }
 
             // }.bind(this),
             // editable: false,
@@ -742,9 +1260,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
             // onchange: this.changed,
+            // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
+            // onpaste: this.onPaste,
+            // oneditionend: this.oneditionend,
             // text: {
             //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
             //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -752,17 +1273,26 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             //     entries: '',
             // },
             onload: function (obj, x, y, e) {
+                // jExcelLoadedFunctionWithoutPagination(obj);
                 jExcelLoadedFunction(obj);
+                // var asterisk = document.getElementsByClassName("resizable")[0];
+                // var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+                // var tr = asterisk.firstChild;
+                // tr.children[1].classList.add('AsteriskTheadtrTd');
+                // tr.children[2].classList.add('AsteriskTheadtrTd');
             },
             editable: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: false,
+            // contextMenu: false,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this)
         };
 
         var languageEl = jexcel(document.getElementById("mapImport"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable, isChanged1: true
+            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable, isChanged1: true, datasetId: this.props.items.forecastProgramId
         }, () => {
             this.props.updateStepOneData("loading", false);
             this.changeColor();
@@ -794,8 +1324,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h4 className="red">{this.props.message}</h4> */}
                 {/* <ul className="legendcommitversion list-group">
-                    <li><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span><h5 className="red">Data already exists in Forecast Program</h5></li>
-                </ul> */}
+                    <li><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span><h5 className="red">Data already exists in Forecast Program</h5></li>
+                </ul> */}
                 <div class="col-md-10 mt-2 pl-lg-0 form-group">
                     <ul class="legendcommitversion list-group">
                         <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
@@ -805,7 +1335,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 </div>
                 <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5>
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
-                <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
+                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
                     <div id="mapImport">
                     </div>
@@ -826,7 +1356,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     <Button color="success" size="md" className="float-right mr-1" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>{i18n.t('static.importFromQATSupplyPlan.Import')}</Button>
                     &nbsp;
                     {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button> */}
-                    <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.props.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                    <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.props.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                     &nbsp;
                 </FormGroup>
             </>

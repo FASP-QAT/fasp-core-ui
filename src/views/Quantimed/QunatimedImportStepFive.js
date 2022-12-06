@@ -62,7 +62,8 @@ export default class QunatimedImportStepFive extends Component {
         super(props);
         this.state = {
             loading: false,
-            finalImportData: ''
+            finalImportData: '',
+            importEl: ''
         }
         this.loaded_four = this.loaded_four.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
@@ -101,7 +102,7 @@ export default class QunatimedImportStepFive extends Component {
 
         jExcelLoadedFunctionQuantimed(instance);
 
-        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[7].title = `${i18n.t('static.quantimed.conversionFactor')} = 1 / ${i18n.t('static.unit.multiplier')}`
         tr.children[8].title = `${i18n.t('static.quantimed.quantimedForecastConsumptionQty')} * ${i18n.t('static.quantimed.importpercentage')} * ${i18n.t('static.quantimed.conversionFactor')} = ${i18n.t('static.quantimed.newconsupmtionqty')}`
@@ -488,30 +489,18 @@ export default class QunatimedImportStepFive extends Component {
                 var options = {
                     data: records,
                     contextMenu: function () { return false; },
-                    colHeaders: [
-                        i18n.t('static.quantimed.quantimedProductIdLabel'),
-                        i18n.t('static.quantimed.quantimedPlanningUnitLabel'),
-                        i18n.t('static.supplyPlan.qatProduct'),
-                        i18n.t('static.quantimed.consumptionDate'),
-                        i18n.t('static.quantimed.quantimedForecastConsumptionQty'),
-                        i18n.t('static.quantimed.importpercentage'),
-                        i18n.t('static.quantimed.conversionFactor'),
-                        i18n.t('static.quantimed.newconsupmtionqty'),
-                        i18n.t('static.quantimed.existingconsupmtionqty'),
-                        i18n.t('static.quantimed.importData')
-                    ],
                     colWidths: [35, 80, 80, 30, 30, 28, 28, 30, 30, 20],
                     columns: [
-                        { type: 'text', readOnly: true },
-                        { type: 'text', readOnly: true },
-                        { type: 'text', readOnly: true },
-                        { type: 'text', readOnly: true },
-                        { type: 'numeric', mask: '#,##', readOnly: true },
-                        { type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true },
-                        { type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true },
-                        { type: 'numeric', mask: '#,##', readOnly: true },
-                        { type: 'numeric', mask: '#,##', readOnly: true },
-                        { type: 'checkbox' }
+                        { type: 'text', title: i18n.t('static.quantimed.quantimedProductIdLabel'), readOnly: true },
+                        { type: 'text', title: i18n.t('static.quantimed.quantimedPlanningUnitLabel'), readOnly: true },
+                        { type: 'text', title: i18n.t('static.supplyPlan.qatProduct'), readOnly: true },
+                        { type: 'text', title: i18n.t('static.quantimed.consumptionDate'), readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.quantimed.quantimedForecastConsumptionQty'), mask: '#,##', readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.quantimed.importpercentage'), mask: '#,##.00', decimal: '.', readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.quantimed.conversionFactor'), mask: '#,##.00', decimal: '.', readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.quantimed.newconsupmtionqty'), mask: '#,##', readOnly: true },
+                        { type: 'numeric', title: i18n.t('static.quantimed.existingconsupmtionqty'), mask: '#,##', readOnly: true },
+                        { type: 'checkbox', title: i18n.t('static.quantimed.importData') }
                     ],
                     editable: true,
                     // text: {
@@ -531,7 +520,7 @@ export default class QunatimedImportStepFive extends Component {
                     onchange: this.changedImport,
                     // oneditionstart: this.editStart,
                     allowDeleteRow: false,
-                    tableOverflow: false,
+                    // tableOverflow: false,
                     onload: this.loaded_four,
                     license: JEXCEL_PRO_KEY,
                     filters: true
@@ -542,6 +531,7 @@ export default class QunatimedImportStepFive extends Component {
                 myVar = jexcel(document.getElementById("recordsDiv"), options);
                 this.el = myVar;
                 this.setState({
+                    importEl: myVar,
                     programId: this.props.items.program.programId
                 })
 
@@ -568,7 +558,7 @@ export default class QunatimedImportStepFive extends Component {
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
 
 
-                    <CardBody className="table-responsive pt-md-1 pb-md-1">
+                    <CardBody className="pt-md-1 pb-md-1">
 
                         <Col xs="12" sm="12">
                             <h6>
@@ -577,8 +567,9 @@ export default class QunatimedImportStepFive extends Component {
                         </Col>
 
                         <Col xs="12" sm="12">
-
+                            <div className='consumptionDataEntryTable'>
                             <div id="recordsDiv" >
+                            </div>
                             </div>
 
                         </Col>

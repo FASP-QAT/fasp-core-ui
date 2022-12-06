@@ -13,7 +13,7 @@ import LabelsService from '../../api/LabelService.js';
 import LanguageService from '../../api/LanguageService';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 
 const entityname = i18n.t('static.label.labelTranslations');
 export default class DatabaseTranslations extends React.Component {
@@ -79,6 +79,8 @@ export default class DatabaseTranslations extends React.Component {
                         for (var l = 0; l < languageList.length; l++) {
                             colHeadersArray.push({ type: 'text', title: languageList[l].label.label_en })
                         }
+                        jexcel.destroy(document.getElementById("labelTranslationTable"), true);
+
                         var options = {
                             data: label,
                             colWidths: [80, 80, 80, 80, 80],
@@ -110,7 +112,10 @@ export default class DatabaseTranslations extends React.Component {
                             }.bind(this),
                             // tableHeight: '500px',
                         };
+                        console.log("optionsss===1", options)
                         this.el = jexcel(document.getElementById("labelTranslationTable"), options);
+                        console.log("optionsss===2", options)
+
                         this.setState({
                             loading: false
                         })
@@ -129,7 +134,8 @@ export default class DatabaseTranslations extends React.Component {
                         console.log("Error+++", error)
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false,
                                 color: '#BA0C2F'
                             });
@@ -184,7 +190,8 @@ export default class DatabaseTranslations extends React.Component {
                 console.log("Error1+++", error)
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false,
                         color: '#BA0C2F'
                     });
@@ -289,7 +296,8 @@ export default class DatabaseTranslations extends React.Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false,
                             color: '#BA0C2F'
                         });
@@ -407,9 +415,7 @@ export default class DatabaseTranslations extends React.Component {
     }.bind(this)
 
     editStart = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         elInstance.setValueFromCoords(2, y, 1, true);
     }.bind(this)
 }
-
-

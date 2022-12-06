@@ -14,7 +14,7 @@ import {
     TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN,
     PLUS_MINUS_MONTHS_FOR_AMC_IN_SUPPLY_PLAN, MONTHS_IN_PAST_FOR_AMC, MONTHS_IN_FUTURE_FOR_AMC, DEFAULT_MIN_MONTHS_OF_STOCK, CANCELLED_SHIPMENT_STATUS, PSM_PROCUREMENT_AGENT_ID, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, NO_OF_MONTHS_ON_LEFT_CLICKED, ON_HOLD_SHIPMENT_STATUS, NO_OF_MONTHS_ON_RIGHT_CLICKED, DEFAULT_MAX_MONTHS_OF_STOCK, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, INVENTORY_DATA_SOURCE_TYPE, SHIPMENT_DATA_SOURCE_TYPE, QAT_DATA_SOURCE_ID, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, DATE_FORMAT_CAP_WITHOUT_DATE,
     REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH,
-    JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE
+    JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE, API_URL
 } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import moment from "moment";
@@ -105,6 +105,8 @@ export default class PlanningUnitSetting extends Component {
             productCategoryList: [],
             productCategoryListNew: [],
             planningUnitList: [],
+            lang: localStorage.getItem('lang'),
+            isPlanningUnitLoaded: false
 
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
@@ -129,6 +131,8 @@ export default class PlanningUnitSetting extends Component {
         this.disablePUConsumptionData = this.disablePUConsumptionData.bind(this);
         this.onPaste = this.onPaste.bind(this);
         this.productCategoryList = this.productCategoryList.bind(this);
+        this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
+
     }
 
     hideSecondComponent() {
@@ -1008,7 +1012,8 @@ export default class PlanningUnitSetting extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1092,7 +1097,8 @@ export default class PlanningUnitSetting extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1189,7 +1195,8 @@ export default class PlanningUnitSetting extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -1263,7 +1270,8 @@ export default class PlanningUnitSetting extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
@@ -1604,135 +1612,66 @@ export default class PlanningUnitSetting extends Component {
             console.log("programSplit-------->1", versionId);
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == versionId)[0]
 
-            // let programHealthAreaList = selectedForecastProgram.healthAreaList;
-            // let tracerCategoryArray = [];
-            // for (var i = 0; i < programHealthAreaList.length; i++) {
-            //     let tracerCategoryObj = this.state.allTracerCategoryList.filter(c => c.healthArea.id == programHealthAreaList[i].id)
-            //     tracerCategoryArray = tracerCategoryArray.concat(tracerCategoryObj);
-            // }
+            var myResult1 = selectedForecastProgram.planningUnitList;
+            console.log("myResult1===>", myResult1)
+            var original = myResult1.map(o => o.planningUnit);
 
-            // let tracerCategoryArray1 = tracerCategoryArray.map(ele => (ele.id).toString());
-            // let tracerCategoryArray2 = selectedForecastProgram.planningUnitList.map(ele => (ele.planningUnit.forecastingUnit.tracerCategory.id).toString());
-            // let tracerCategoryArray3 = tracerCategoryArray1.concat(tracerCategoryArray2);
-            // tracerCategoryArray3 = [... new Set(tracerCategoryArray3)];
+            var listArray = myResult1;
+            listArray.sort((a, b) => {
+                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
 
-            // console.log("tracerCategoryArray----------->3", tracerCategoryArray3);
-
-            // PlanningUnitService.getPlanningUnitByRealmId(AuthenticationService.getRealmId())
-            // PlanningUnitService.getActivePlanningUnitList()
-            PlanningUnitService.getPlanningUnitForProductCategory(-1)
-                .then(response => {
-                    console.log("RESP----->pu", response.data);
-
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-
-                    let tempList = [];
-                    if (listArray.length > 0) {
-                        for (var i = 0; i < listArray.length; i++) {
-                            var paJson = {
-                                // name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
-                                // id: parseInt(listArray[i].planningUnitId),
-                                // active: listArray[i].active,
-                                // forecastingUnit: listArray[i].forecastingUnit,
-                                // label: listArray[i].label
-
-                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].id),
-                                id: parseInt(listArray[i].id),
-                                // active: listArray[i].active,
-                                // forecastingUnit: listArray[i].forecastingUnit,
-                                label: listArray[i].label
-                            }
-                            tempList[i] = paJson
-                        }
+            let tempList = [];
+            if (listArray.length > 0) {
+                for (var i = 0; i < listArray.length; i++) {
+                    var paJson = {
+                        name: getLabelText(listArray[i].planningUnit.label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnit.id),
+                        id: parseInt(listArray[i].planningUnit.id),
+                        label: listArray[i].planningUnit.label
                     }
-                    this.setState({
-                        allPlanningUnitList: tempList,
-                        originalPlanningUnitList: response.data,
-                        planningUnitList: response.data,
-                    }, () => {
-                        console.log("List------->pu123", this.state.allPlanningUnitList.filter(c => c.id == 915));
+                    tempList[i] = paJson
+                }
+            }
 
-                        let forecastStartDate = selectedForecastProgram.forecastStartDate;
-                        let forecastStopDate = selectedForecastProgram.forecastStopDate;
+            this.setState({
+                loading: false,
+                allPlanningUnitList: tempList,
+                originalPlanningUnitList: original,
+                planningUnitList: myResult1,
+            }, () => {
+                let forecastStartDate = selectedForecastProgram.forecastStartDate;
+                let forecastStopDate = selectedForecastProgram.forecastStopDate;
 
-                        let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
-                        beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+                let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
-                        localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
-                        localStorage.setItem("sesForecastVersionIdReport", parseInt(versionId));
+                localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
+                localStorage.setItem("sesForecastVersionIdReport", parseInt(versionId));
 
-                        this.setState(
-                            {
-                                // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-                                rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
-                                // startDateDisplay: (forecastStartDate == '' ? '' : months[new Date(forecastStartDate).getMonth()] + ' ' + new Date(forecastStartDate).getFullYear()),
-                                startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY"))),
-                                // endDateDisplay: (forecastStopDate == '' ? '' : months[new Date(forecastStopDate).getMonth()] + ' ' + new Date(forecastStopDate).getFullYear()),
-                                endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY"))),
-                                beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
-                                forecastProgramId: parseInt(programId),
-                                forecastProgramVersionId: parseInt(versionId),
-                                datasetId: selectedForecastProgram.id,
+                this.setState({
+                    // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+                    rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
+                    // startDateDisplay: (forecastStartDate == '' ? '' : months[new Date(forecastStartDate).getMonth()] + ' ' + new Date(forecastStartDate).getFullYear()),
+                    startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY"))),
+                    // endDateDisplay: (forecastStopDate == '' ? '' : months[new Date(forecastStopDate).getMonth()] + ' ' + new Date(forecastStopDate).getFullYear()),
+                    endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY"))),
+                    beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
+                    forecastProgramId: parseInt(programId),
+                    forecastProgramVersionId: parseInt(versionId),
+                    datasetId: selectedForecastProgram.id,
 
-                            }, () => {
-                                // console.log("d----------->0", d1);
-                                // console.log("d----------->00", (d1.getMonth()));
-                                // console.log("d----------->1", this.state.startDateDisplay);
-                                // console.log("d----------->2", this.state.endDateDisplay);
-                                // console.log("d----------->3", this.state.beforeEndDateDisplay);
-                                // this.productCategoryList();
-                                this.filterData();
-                            })
-                    });
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
-
-
-
-
+                }, () => {
+                    // console.log("d----------->0", d1);
+                    // console.log("d----------->00", (d1.getMonth()));
+                    console.log("d----------->1", this.state.allPlanningUnitList);
+                    console.log("d----------->2", this.state.endDateDisplay);
+                    console.log("d----------->3", this.state.beforeEndDateDisplay);
+                    // this.productCategoryList();
+                    this.filterData();
+                })
+            });
 
 
         } else {
@@ -1956,12 +1895,12 @@ export default class PlanningUnitSetting extends Component {
         }.bind(this)
     }
 
-    filterData() {
+    filterData(addRowInJexcel) {
 
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         var forecastProgramId = this.state.forecastProgramId;
-        console.log("forecastProgramId--------->", forecastProgramId);
+        console.log("addRowInJexcel--------->", addRowInJexcel);
 
         if (forecastProgramId > 0) {
 
@@ -1985,7 +1924,7 @@ export default class PlanningUnitSetting extends Component {
                     // let planningUnitIds = this.state.allPlanningUnitList.map(ele => ele.id);
                     // console.log("selectedForecastProgram---------->11", planningUnitIds);
                     // this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitIds);
-                    this.buildJExcel();
+                    this.buildJExcel(addRowInJexcel);
 
                 })
         } else {
@@ -2036,7 +1975,7 @@ export default class PlanningUnitSetting extends Component {
     }
 
 
-    buildJExcel() {
+    buildJExcel(addRowInJexcel) {
         let outPutList = this.state.selsource;
         console.log("outPutList---->", outPutList);
         console.log("RESP----->2ProductCategoryServcie", outPutList);
@@ -2070,7 +2009,8 @@ export default class PlanningUnitSetting extends Component {
             outPutListArray[count] = data;
             count++;
             indexVar = indexVar + 1;
-        }
+        } console.log("outPutListArray---->", outPutListArray);
+
         if (outPutList.length == 0) {
             data = [];
             data[0] = -1;
@@ -2093,7 +2033,7 @@ export default class PlanningUnitSetting extends Component {
             data[17] = true;
             outPutListArray[0] = data;
         }
-        // console.log("outPutListArray---->", outPutListArray);
+        console.log("outPutListArray---->", this.state.allPlanningUnitList);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -2176,7 +2116,7 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.forecastReport.priceType'),
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
-                    width: '100'
+                    width: '120'
                     // filter: this.filterProcurementAgentByPlanningUnit
                     // readOnly: true //7H
                 },
@@ -2193,32 +2133,32 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: 'programPlanningUnitId',
                     type: 'hidden',
-                    // readOnly: true //9J
+                    readOnly: true //9J
                 },
                 {
                     title: 'isChange',
                     type: 'hidden',
-                    // readOnly: true //10K
+                    readOnly: true //10K
                 },
                 {
                     title: 'isNewRowAdded',
                     type: 'hidden',
-                    // readOnly: true //11L
+                    readOnly: true //11L
                 },
                 {
                     title: 'selected forecast map',
                     type: 'hidden',
-                    // readOnly: true //12M
+                    readOnly: true //12M
                 },
                 {
                     title: 'indexVar',
                     type: 'hidden',
-                    // readOnly: true //13N
+                    readOnly: true //13N
                 },
                 {
                     title: 'treeForecast',
                     type: 'hidden',
-                    // readOnly: true //14O
+                    readOnly: true //14O
                 },
                 {
                     title: i18n.t('static.program.notes'),
@@ -2234,7 +2174,7 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: 'active',
                     type: 'hidden',
-                    // readOnly: true //17R
+                    readOnly: true //17R
                 },
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
@@ -2301,13 +2241,16 @@ export default class PlanningUnitSetting extends Component {
                 } else {
 
                     // Insert new row before
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.addRow'),
-                            onclick: function () {
-                                this.addRow();
-                            }.bind(this)
-                        });
+                    if (isSiteOnline()) {
+                        if (obj.options.allowInsertRow == true) {
+                            items.push({
+                                title: i18n.t('static.common.addRow'),
+                                onclick: function () {
+                                    // this.addRow();
+                                    this.getPlanningUnitList();
+                                }.bind(this)
+                            });
+                        }
                     }
                     // alert("Hi1");
                     // Delete a row
@@ -2345,6 +2288,10 @@ export default class PlanningUnitSetting extends Component {
         this.el = languageEl;
         this.setState({
             languageEl: languageEl, loading: false, allowAdd: true
+        }, () => {
+            if (addRowInJexcel) {
+                this.addRow();
+            }
         })
     }
 
@@ -2541,7 +2488,7 @@ export default class PlanningUnitSetting extends Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[9].classList.add('AsteriskTheadtrTd');
 
         tr.children[5].classList.add('InfoTr');
@@ -2819,6 +2766,18 @@ export default class PlanningUnitSetting extends Component {
                     console.log("---hurrey---");
                 })
                 transaction.oncomplete = function (event) {
+                    console.log("in side datasetDetails")
+                    db1 = e.target.result;
+                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
                     // this.props.updateStepOneData("color", "green");
                     // this.setState({
@@ -2831,7 +2790,7 @@ export default class PlanningUnitSetting extends Component {
                     // });
 
                     this.setState({
-                        loading: false,
+                        // loading: false,
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: "green",
                         isChanged1: false,
@@ -2843,11 +2802,10 @@ export default class PlanningUnitSetting extends Component {
                             this.disablePUConsumptionData(listOfDisablePuNode);
                         }
 
-
+                        this.getDatasetList();
                         this.hideSecondComponent();
                         // this.filterData();
                         // this.setProgramId();
-                        // this.getDatasetList();
                     });
                     console.log("Data update success1");
                     // alert("success");
@@ -2922,6 +2880,18 @@ export default class PlanningUnitSetting extends Component {
                     console.log("---hurrey---");
                 })
                 transaction.oncomplete = function (event) {
+                    console.log("in side datasetDetails")
+                    db1 = e.target.result;
+                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     console.log("Data update success");
                     // alert("success");
                 }.bind(this);
@@ -3049,6 +3019,18 @@ export default class PlanningUnitSetting extends Component {
                     console.log("---hurrey---");
                 })
                 transaction.oncomplete = function (event) {
+                    console.log("in side datasetDetails")
+                    db1 = e.target.result;
+                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        datasetDetailsRequest1.onsuccess = function (event) {
+                        }
+                    }
                     // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
                     // this.props.updateStepOneData("color", "green");
                     // this.setState({
@@ -3090,9 +3072,122 @@ export default class PlanningUnitSetting extends Component {
         }
 
     }
+    getPlanningUnitList = function () {
+        if (!this.state.isPlanningUnitLoaded) {
+            var pID = document.getElementById("forecastProgramId").value;
+            if (pID != 0) {
+                this.setState({
+                    loading: true,
+                    isPlanningUnitLoaded: true
+                })
+                let programSplit = pID.split('_');
+
+                let programId = programSplit[0];
+                let versionId = programSplit[1];
+                versionId = versionId.replace(/[^\d]/g, '');
+                console.log("programSplit-------->1", versionId);
+                let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == versionId)[0]
+
+                PlanningUnitService.getPlanningUnitForProductCategory(-1).then(response => {
+                    console.log("RESP----->pu", response.data);
+
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+
+                    let tempList = [];
+                    if (listArray.length > 0) {
+                        for (var i = 0; i < listArray.length; i++) {
+                            var paJson = {
+                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].id),
+                                id: parseInt(listArray[i].id),
+                                label: listArray[i].label
+                            }
+                            tempList[i] = paJson
+                        }
+                    }
+                    this.setState({
+                        allPlanningUnitList: tempList,
+                        originalPlanningUnitList: response.data,
+                        planningUnitList: response.data,
+                    }, () => {
+                        console.log("List------->pu123", this.state.allPlanningUnitList.filter(c => c.id == 915));
+
+                        let forecastStartDate = selectedForecastProgram.forecastStartDate;
+                        let forecastStopDate = selectedForecastProgram.forecastStopDate;
+
+                        let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                        beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
+                        localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
+                        localStorage.setItem("sesForecastVersionIdReport", parseInt(versionId));
+
+                        this.setState(
+                            {
+                                rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
+                                startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY"))),
+                                endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY"))),
+                                beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
+                                forecastProgramId: parseInt(programId),
+                                forecastProgramVersionId: parseInt(versionId),
+                                datasetId: selectedForecastProgram.id,
+
+                            }, () => {
+                                this.filterData(1);
+                            })
+                    });
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+            }
+        } else {
+            this.addRow()
+        }
+
+    }
 
     addRow = function () {
-
+        console.log("return----")
         var json = this.el.getJson(null, false);
         var data = [];
         data[0] = -1;
@@ -3172,7 +3267,7 @@ export default class PlanningUnitSetting extends Component {
                             <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                             <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                             <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataset/versionSettings" className="supplyplanformulas">{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
-                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {i18n.t('static.tree.or')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className='supplyplanformulas'>{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {isSiteOnline() && <>{i18n.t('static.tree.or')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className='supplyplanformulas'>{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></>}</span>
                         </div>
                     </div>
 
@@ -3185,7 +3280,7 @@ export default class PlanningUnitSetting extends Component {
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
                                                 {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
-                                                <PopoverBody>If you dont see the desired program(s), please load them first.</PopoverBody>
+                                                <PopoverBody>{i18n.t('static.common.loadProgramFirst')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-3">
@@ -3254,6 +3349,12 @@ export default class PlanningUnitSetting extends Component {
                             </div>
                         </div>
 
+                        {!isSiteOnline() && <Col md="12" className="pl-lg-0">
+                            <div>
+                                <p>{i18n.t("static.planningUnitSetting.offlineMsg")}</p>
+                            </div>
+                        </Col>}
+
                         <div className="UpdatePlanningSettingTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv">
                             </div>
@@ -3281,7 +3382,9 @@ export default class PlanningUnitSetting extends Component {
                                     {this.state.isChanged1 &&
                                         <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     }
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                    {/* {isSiteOnline() && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>} */}
+                                    {isSiteOnline() && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.getPlanningUnitList()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+
                                     &nbsp;
                                 </FormGroup>
                             }

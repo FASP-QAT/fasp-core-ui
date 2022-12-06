@@ -24,7 +24,7 @@ import StepFour from './StepFour.js';
 import StepFive from './StepFive';
 import StepSix from './StepSix.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED } from "../../Constants";
+import { PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED, API_URL } from "../../Constants";
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramOnboarding extends Component {
     constructor(props) {
@@ -73,8 +73,8 @@ export default class ProgramOnboarding extends Component {
                 shippedToArrivedBySeaLeadTime: SHIPPED_TO_ARRIVED_SEA,
                 arrivedToDeliveredLeadTime: ARRIVED_TO_RECEIVED,
 
-                plannedToSubmittedLeadTime:PLANNED_TO_SUBMITTED,
-                
+                plannedToSubmittedLeadTime: PLANNED_TO_SUBMITTED,
+
                 // healthArea: {
                 //     id: ''
                 // },
@@ -82,11 +82,11 @@ export default class ProgramOnboarding extends Component {
                 regionArray: [],
                 healthAreaArray: [],
                 programPlanningUnits: [],
-                programTypeId:1
+                programTypeId: 1
             },
             lang: localStorage.getItem('lang'),
             regionId: '',
-            healthAreaId:'',
+            healthAreaId: '',
             realmList: [],
             realmCountryList: [],
             organisationList: [],
@@ -106,7 +106,7 @@ export default class ProgramOnboarding extends Component {
         this.getDependentLists = this.getDependentLists.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
-        this.updateFieldDataHealthArea=this.updateFieldDataHealthArea.bind(this);
+        this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
 
 
 
@@ -177,7 +177,8 @@ export default class ProgramOnboarding extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -308,7 +309,8 @@ export default class ProgramOnboarding extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -613,7 +615,8 @@ export default class ProgramOnboarding extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -890,10 +893,10 @@ export default class ProgramOnboarding extends Component {
                                     <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                     &nbsp; */}
 
-                                </div>
-                                <div id="stepThree">
-                                    <StepThree ref="healthAreaChild" finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} updateFieldDataHealthArea={this.updateFieldDataHealthArea} items={this.state} generateHealthAreaCode={this.generateHealthAreaCode}></StepThree>
-                                    {/* <FormGroup>
+                                    </div>
+                                    <div id="stepThree">
+                                        <StepThree ref="healthAreaChild" finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} updateFieldDataHealthArea={this.updateFieldDataHealthArea} items={this.state} generateHealthAreaCode={this.generateHealthAreaCode}></StepThree>
+                                        {/* <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             bsSize="sm"
@@ -1097,11 +1100,11 @@ export default class ProgramOnboarding extends Component {
                                         <FormGroup className="mt-2">
                                             <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                             &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                            <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                             &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                            <Button color="info" size="md" className="float-left mr-1 px-4" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                                             &nbsp;
-                                    </FormGroup>
+                                        </FormGroup>
                                     </div>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>

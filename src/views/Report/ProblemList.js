@@ -598,6 +598,7 @@ export default class ConsumptionDetails extends React.Component {
         problemList = problemList.filter(c => c.planningUnitActive != false && c.regionActive != false);
         // we set this in state becasue we need to use it on modal popup
         this.setState({ problemList: problemList });
+        console.log("problemList", problemList)
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -610,7 +611,8 @@ export default class ConsumptionDetails extends React.Component {
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
             // data[7] = moment(problemList[j].createdDate).format('MMM-YY')
-            data[7] = problemList[j].problemCategory.id
+            // data[7] = problemList[j].problemCategory.id
+            data[7] = problemList[j].problemType.id == 1 ? problemList[j].problemCategory.id : (problemList[j].realmProblem.criticality.id == 1 ? 4 : (problemList[j].realmProblem.criticality.id == 2 ? 5 : 6))
             data[8] = getProblemDesc(problemList[j], this.state.lang)
             data[9] = getSuggestion(problemList[j], this.state.lang)
             // data[10] = getLabelText(problemList[j].problemStatus.label, this.state.lang)
@@ -627,6 +629,8 @@ export default class ConsumptionDetails extends React.Component {
             data[18] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
             data[19] = (problemList[j].reviewedDate != null && problemList[j].reviewedDate != '') ? moment(problemList[j].reviewedDate).format(`${DATE_FORMAT_CAP}`) : ''
             data[21] = 0
+            data[22] = problemList[j].problemType.id
+
             problemArray[count] = data;
             count++;
         }
@@ -644,24 +648,29 @@ export default class ConsumptionDetails extends React.Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'problemReportId',
-                    type: 'hidden',
+                    // title: 'problemReportId',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: 'problemActionIndex',
-                    type: 'hidden',
+                    // title: 'problemActionIndex',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: i18n.t('static.program.programCode'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.programCode'),
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: i18n.t('static.program.versionId'),
-                    type: 'hidden',
+                    // title: i18n.t('static.program.versionId'),
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: i18n.t('static.region.region'),
-                    type: 'hidden',
+                    // title: i18n.t('static.region.region'),
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
@@ -669,8 +678,9 @@ export default class ConsumptionDetails extends React.Component {
                     readOnly: true,
                 },
                 {
-                    title: i18n.t('static.report.month'),
-                    type: 'hidden',
+                    // title: i18n.t('static.report.month'),
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 // {
                 //     title: i18n.t('static.report.createdDate'),
@@ -705,25 +715,30 @@ export default class ConsumptionDetails extends React.Component {
                     type: 'text',
                 },
                 {
-                    title: i18n.t('static.common.action'),
-                    type: 'hidden',
+                    // title: i18n.t('static.common.action'),
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: 'planningUnitId',
-                    type: 'hidden',
+                    // title: 'planningUnitId',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: 'problemId',
-                    type: 'hidden',
+                    // title: 'problemId',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
-                    title: 'actionUrl',
-                    type: 'hidden',
+                    // title: 'actionUrl',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
 
                 {
-                    title: 'Problem Type',
-                    type: 'hidden',
+                    // title: 'Problem Type',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
@@ -747,8 +762,14 @@ export default class ConsumptionDetails extends React.Component {
                     type: 'text',
                 },
                 {
-                    title: 'isChanged',
-                    type: 'hidden',
+                    // title: 'isChanged',
+                    type: 'text',
+                    visible: false, autoCasting: false
+                },
+                {
+                    // title: 'problemType',
+                    type: 'text',
+                    visible: false, autoCasting: false
                 },
             ],
             editable: !qplEditable,
@@ -1691,7 +1712,7 @@ export default class ConsumptionDetails extends React.Component {
                                 {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />} &nbsp;
                                 {this.state.programId != 0 && <a href="javascript:void();" title={i18n.t('static.qpl.recalculate')} onClick={this.getProblemListAfterCalculation}><i className="fa fa-refresh"></i></a>}
                                 &nbsp;&nbsp;
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>}
+                                {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addMannualProblem}><i className="fa fa-plus-square"></i></a>} */}
 
                             </div>
                         </div>
@@ -1702,7 +1723,7 @@ export default class ConsumptionDetails extends React.Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />
                         </div>
                     </div>} */}
-                    <CardBody className="pb-lg-5 pt-lg-0">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <Col md="9 pl-1">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup className="mt-md-2 mb-md-0 ">
@@ -1822,18 +1843,18 @@ export default class ConsumptionDetails extends React.Component {
                             {this.state.showProblemDashboard == 1 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
 
                             {/* <div className="ProgramListSearch"> */}
-                            <div className='ProgramListSearchAlignment'>
+                            <div className='ProblemListTableBorder'>
                                 <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
                             </div>
                             {/* </div> */}
                         </div>
-                    </CardBody>
+                    </CardBody >
                     <CardFooter>
                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.cancelClicked(id)}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         {this.state.showUpdateButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.updateChangedProblems}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                     </CardFooter>
-                </Card>
+                </Card >
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">

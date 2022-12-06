@@ -46,7 +46,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -251,7 +251,8 @@ class ShipmentSummery extends Component {
             budgetValues: [],
             budgetLabels: [],
 
-            filteredBudgetList: []
+            filteredBudgetList: [],
+            lang: localStorage.getItem('lang')
         };
         this.formatLabel = this.formatLabel.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -598,6 +599,8 @@ class ShipmentSummery extends Component {
                     });
                     this.setState({
                         fundingSources: listArray
+                    }, () => {
+                        this.getBudgetList();
                     })
                 }).catch(
                     error => {
@@ -605,7 +608,10 @@ class ShipmentSummery extends Component {
                             fundingSources: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                //  message: error.message
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -645,6 +651,8 @@ class ShipmentSummery extends Component {
                             b = b.fundingSourceCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
+                    }, () => {
+                        this.getBudgetList();
                     });
 
                 }.bind(this)
@@ -658,11 +666,13 @@ class ShipmentSummery extends Component {
 
     getBudgetList() {
         const { budgets } = this.state
+        var programId = localStorage.getItem("sesProgramIdReport");
+        console.log("programId=========>", programId)
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             BudgetService.getBudgetList()
                 .then(response => {
-                    var listArray = response.data.filter(b => b.program.id == this.state.programId);
+                    var listArray = response.data.filter(b => b.program.id == programId);
                     listArray.sort((a, b) => {
                         var itemLabelA = a.budgetCode.toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = b.budgetCode.toUpperCase(); // ignore upper and lowercase                   
@@ -683,6 +693,8 @@ class ShipmentSummery extends Component {
                         budgetLabels: budgetLabelsFromProps,
                         budgets: listArray,
                         filteredBudgetList: listArray
+                    }, () => {
+                        this.getPrograms();
                     })
                 }).catch(
                     error => {
@@ -690,7 +702,10 @@ class ShipmentSummery extends Component {
                             budgets: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                // message: error.message 
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -733,7 +748,7 @@ class ShipmentSummery extends Component {
                     }
                     console.log("budgetValuesFromProps offline===>", budgetValuesFromProps);
 
-                    fSourceResult = fSourceRequest.result.filter(b => b.program.id == this.state.programId);
+                    fSourceResult = fSourceRequest.result.filter(b => b.program.id == programId);
                     console.log("budget list offline--->", fSourceResult);
                     this.setState({
                         budgetValues: budgetValuesFromProps,
@@ -748,6 +763,8 @@ class ShipmentSummery extends Component {
                             b = b.budgetCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
+                    }, () => {
+                        this.getPrograms();
                     });
 
                 }.bind(this)
@@ -1026,7 +1043,8 @@ class ShipmentSummery extends Component {
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1150,7 +1168,7 @@ class ShipmentSummery extends Component {
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
                         this.filterVersion();
-                        this.getBudgetList();
+                        // this.getBudgetList();
                     })
                 } else {
                     this.setState({
@@ -1378,7 +1396,8 @@ class ShipmentSummery extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -1458,7 +1477,7 @@ class ShipmentSummery extends Component {
 
 
     componentDidMount() {
-        this.getPrograms();
+        // this.getPrograms();
         this.getFundingSourceList();
         // this.getBudgetList();
     }
@@ -1890,7 +1909,8 @@ class ShipmentSummery extends Component {
                             })
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -2285,7 +2305,7 @@ class ShipmentSummery extends Component {
             },
             {
                 label: i18n.t('static.supplyPlan.ordered'),
-                backgroundColor: '#0067B9',
+                backgroundColor: '#118b70',
                 borderColor: 'rgba(179,181,198,1)',
                 pointBackgroundColor: 'rgba(179,181,198,1)',
                 pointBorderColor: '#fff',
@@ -2556,16 +2576,17 @@ class ShipmentSummery extends Component {
                                         <div className="row">
                                             <div className="col-md-12 pl-0 pr-0">
                                                 {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                    <Table id="mytable1" responsive className="table-bordered table-striped text-center mt-2">
-                                                        <thead>
-                                                            <tr>
-                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
-                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
-                                                                <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
-                                                            </tr>
-                                                        </thead>
-                                                        {/* <tbody>
+                                                    <div className='fixTableHead'>
+                                                        <Table id="mytable1" responsive className="table-bordered table-striped text-center ">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
+                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
+                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            {/* <tbody>
                                                         <tr>
                                                             <td style={{ 'text-align': 'center' }}>Global Fund</td>
                                                             <td style={{ 'text-align': 'right' }}>2</td>
@@ -2579,19 +2600,21 @@ class ShipmentSummery extends Component {
                                                             <td style={{ 'text-align': 'right' }}>7,480,000</td>
                                                         </tr>
                                                     </tbody> */}
-                                                        <tbody>
-                                                            {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                                this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
-                                                                    <tr id="addr0" key={idx} >
-                                                                        <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
-                                                                        <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
-                                                                        <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                        <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                    </tr>
-                                                                )}
-                                                        </tbody>
+                                                            <tbody>
+                                                                {this.state.shipmentDetailsFundingSourceList.length > 0 &&
+                                                                    this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
+                                                                        <tr id="addr0" key={idx} >
+                                                                            <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
+                                                                            <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
+                                                                            <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                            <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                        </tr>
+                                                                    )}
+                                                            </tbody>
 
-                                                    </Table>}
+                                                        </Table>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
 

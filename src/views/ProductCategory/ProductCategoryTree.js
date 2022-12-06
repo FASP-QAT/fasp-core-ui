@@ -19,6 +19,7 @@ import { node } from 'prop-types';
 import * as Yup from 'yup';
 import { Formik } from "formik";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { API_URL } from '../../Constants';
 
 let initialValues = {
     productCategory: ''
@@ -29,6 +30,7 @@ const validationSchema = function (values, t) {
     return Yup.object().shape({
         productCategory: Yup.string()
             .required(i18n.t('static.productCategoryName.productCategoryNameRequired'))
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
 
     })
 }
@@ -72,7 +74,8 @@ export default class ProductCategoryTree extends Component {
             searchQuery: null,
             searchFocusIndex: 0,
             searchFoundCount: null,
-            loading: true
+            loading: true,
+            lang: localStorage.getItem('lang')
             // searchFocusIndex: 0
 
 
@@ -142,7 +145,8 @@ export default class ProductCategoryTree extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -247,7 +251,8 @@ export default class ProductCategoryTree extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -537,7 +542,8 @@ export default class ProductCategoryTree extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -728,30 +734,30 @@ export default class ProductCategoryTree extends Component {
                                             setTouched,
                                             handleReset
                                         }) => (
-                                                <Form onSubmit={handleSubmit} className="needs-validation" onReset={handleReset} noValidate name='productCategoryForm' autocomplete="off">
+                                            <Form onSubmit={handleSubmit} className="needs-validation" onReset={handleReset} noValidate name='productCategoryForm' autocomplete="off">
 
-                                                    <FormGroup>
-                                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
-                                                            <Row>
-                                                                <Col md={4} className="pr-lg-1">
-                                                                    <Label for="product category">{i18n.t('static.productCategory.productCategoryName')}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        value={this.state.nodename}
-                                                                        bsSize="sm"
-                                                                        valid={!errors.productCategory && this.state.nodename != ''}
-                                                                        invalid={touched.productCategory && !!errors.productCategory}
-                                                                        onChange={event => { handleChange(event); this.nodeNameChange(event) }}
-                                                                        onBlur={handleBlur}
-                                                                        name="productCategory" />
-                                                                    <FormFeedback className="red">{errors.productCategory}</FormFeedback>
-                                                                </Col>
-                                                                <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
-                                                                    <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i>{i18n.t('static.common.add')}</Button>
-                                                                </Col>
-                                                            </Row>}
-                                                    </FormGroup>
-                                                    {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
+                                                <FormGroup>
+                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
+                                                        <Row>
+                                                            <Col md={4} className="pr-lg-1">
+                                                                <Label for="product category">{i18n.t('static.productCategory.productCategoryName')}<span class="red Reqasterisk">*</span></Label>
+                                                                <Input
+                                                                    type="text"
+                                                                    value={this.state.nodename}
+                                                                    bsSize="sm"
+                                                                    valid={!errors.productCategory && this.state.nodename != ''}
+                                                                    invalid={touched.productCategory && !!errors.productCategory}
+                                                                    onChange={event => { handleChange(event); this.nodeNameChange(event) }}
+                                                                    onBlur={handleBlur}
+                                                                    name="productCategory" />
+                                                                <FormFeedback className="red">{errors.productCategory}</FormFeedback>
+                                                            </Col>
+                                                            <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
+                                                                <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i>{i18n.t('static.common.add')}</Button>
+                                                            </Col>
+                                                        </Row>}
+                                                </FormGroup>
+                                                {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PRODUCT_CATEGORY') &&
                                                         // <CardFooter>
                                                         <FormGroup className="mr-4">
                                                             <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.reSetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
@@ -759,8 +765,8 @@ export default class ProductCategoryTree extends Component {
                                                         </ FormGroup>
                                                         // </CardFooter>
                                                     } */}
-                                                </Form>
-                                            )} />
+                                            </Form>
+                                        )} />
                                 <div className="col-md-12 ">
                                     <Col md="3 float-right" >
                                         <InputGroup>

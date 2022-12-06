@@ -37,7 +37,7 @@ import ProgramService from '../../api/ProgramService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, INTEGER_NO_REGEX } from '../../Constants.js';
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, INTEGER_NO_REGEX, API_URL } from '../../Constants.js';
 import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import TracerCategoryService from "../../api/TracerCategoryService";
@@ -124,18 +124,20 @@ export default class StepOneImportMapPlanningUnits extends Component {
     getTracerCategoryList() {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
-                // console.log("response.data----", response.data);
+                console.log("response.data----", response.data);
                 this.setState({
                     tracerCategoryList: response.data,
                 },
                     () => {
                         this.props.updateStepOneData("loading", false);
+                        document.getElementById("stepOneBtn").disabled = true;
                     })
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -267,7 +269,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     componentDidMount() {
-        document.getElementById("stepOneBtn").disabled = true;
+        // document.getElementById("stepOneBtn").disabled = true;
         this.getPrograms();
     }
 
@@ -376,7 +378,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     }, () => { })
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -418,8 +421,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
-        this.filterData(value);
+        this.setState({
+            rangeValue: value
+        }, () => {
+            this.filterData();
+        })
     }
 
     _handleClickRangeBox(e) {
@@ -462,13 +468,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 let healthAreaList = selectedForecastProgram.healthAreaList;
                 let tracerCategory = [];
 
-                for (var i = 0; i < healthAreaList.length; i++) {
-                    let a = this.state.tracerCategoryList.filter(c => c.healthArea.id == healthAreaList[i].id);
-                    a = a.map(ele => ele.tracerCategoryId);
-                    tracerCategory = tracerCategory.concat(a);
-                }
-                console.log("tracerCategory--------->1", healthAreaList);
-                console.log("tracerCategory--------->2", tracerCategory);
+                // for (var i = 0; i < healthAreaList.length; i++) {
+                //     let a = this.state.tracerCategoryList.filter(c => c.healthArea.id == healthAreaList[i].id);
+                //     a = a.map(ele => ele.tracerCategoryId);
+                //     tracerCategory = tracerCategory.concat(a);
+                // }
+                // console.log("tracerCategory--------->1", healthAreaList);
+                // console.log("tracerCategory--------->2", tracerCategory);
 
                 ProgramService.getPlanningUnitByProgramId(programId, tracerCategory)
                     .then(response => {
@@ -493,7 +499,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false, color: 'red'
                                 });
                             } else {
@@ -870,6 +877,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
+                        elInstance.setComments(`J${parseInt(y) + 1}`, "");
 
                     } else {
                     }
@@ -1297,6 +1305,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                     <div id="mapPlanningUnit">
                     </div>
+                    <FormGroup>
+                        <Button color="info" size="md" className="float-right mr-1" id="stepOneBtn" type="submit" onClick={() => this.formSubmit()} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                    </FormGroup>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -1309,9 +1320,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </div>
                     </div>
                 </div>
-                <FormGroup>
-                    <Button color="info" size="md" className="float-right mr-1" id="stepOneBtn" type="submit" onClick={() => this.formSubmit()} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                </FormGroup>
+
             </>
         );
     }

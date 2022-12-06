@@ -22,7 +22,11 @@ import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBran
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
-
+import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsEn.html'
+import showguidanceFr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsFr.html'
+import showguidanceSp from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsSp.html'
+import showguidancePr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsPr.html'
+import { resolve } from "path";
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -525,131 +529,185 @@ class VersionSettingsComponent extends Component {
     formSubmit() {
         var validation = this.checkValidation();
         if (validation == true) {
-            this.setState({
-                loading: true
-            })
-            var tableJson = this.el.getJson(null, false);
-            var programs = [];
-            var count = 0;
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("12 map---" + map1.get("12"))
-                if (parseInt(map1.get("12")) === 1) {
-                    console.log("map1.get(11)---", map1.get("11"));
-                    console.log("map1.get(13)---", map1.get("13"));
-                    console.log("map1.get(7)---", map1.get("7"));
-                    console.log("map1.get(9)---", map1.get("9"));
-                    var notes = map1.get("4");
-                    var startDate = map1.get("7");
-                    var stopDate = map1.get("9");
-                    var id = map1.get("11");
-                    var noOfDaysInMonth = Number(map1.get("13"));
-                    console.log("start date ---", startDate);
-                    console.log("stop date ---", stopDate);
-                    console.log("noOfDaysInMonth ---", noOfDaysInMonth);
-                    var program = (this.state.datasetList.filter(x => x.id == id)[0]);
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
-                    programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
-                    programData.currentVersion.daysInMonth = noOfDaysInMonth;
-                    programData.currentVersion.notes = notes;
+            var cont = false;
+            var cf = window.confirm(i18n.t("static.versionSettings.confirmUpdate"));
+            if (cf == true) {
+                cont = true;
+            } else {
 
-
-                    programData.currentVersion.freightPerc = this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-                    programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-                    programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-                    program.programData = programData;
-                    // var db1;
-                    // getDatabase();
-                    // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    // openRequest.onerror = function (event) {
-                    //     this.setState({
-                    //         message: i18n.t('static.program.errortext'),
-                    //         color: 'red'
-                    //     })
-                    //     this.hideFirstComponent()
-                    // }.bind(this);
-                    // openRequest.onsuccess = function (e) {
-                    //     db1 = e.target.result;
-                    //     var transaction = db1.transaction(['datasetData'], 'readwrite');
-                    //     var programTransaction = transaction.objectStore('datasetData');
-                    //     var programRequest = programTransaction.put(program);
-                    //     programRequest.onerror = function (e) {
-
-                    //     }.bind(this);
-                    //     programRequest.onsuccess = function (e) {
-
-                    //     }.bind(this);
-                    // }.bind(this);
-                    programs.push(program);
-                    count++;
-                }
             }
-            console.log("programs to update---", programs);
-            if (count > 0) {
-                var db1;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function (event) {
-                    this.setState({
-                        message: i18n.t('static.program.errortext'),
-                        color: 'red'
-                    })
-                    this.hideFirstComponent()
-                }.bind(this);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var transaction = db1.transaction(['datasetData'], 'readwrite');
-                    var programTransaction = transaction.objectStore('datasetData');
-                    programs.forEach(program => {
-                        var programRequest = programTransaction.put(program);
-                        console.log("---hurrey---");
-                    })
-                    transaction.oncomplete = function (event) {
-                        this.setState({
-                            loading: false,
-                            message: i18n.t('static.mt.dataUpdateSuccess'),
-                            color: "green",
-                            isChanged: false
-                        }, () => {
-                            this.hideSecondComponent();
-                            this.getOnLineDatasetsVersion();
-                        });
-                        console.log("Data update success");
-                    }.bind(this);
-                    transaction.onerror = function (event) {
-                        this.setState({
-                            loading: false,
-                            // message: 'Error occured.',
-                            color: "red",
-                        }, () => {
-                            this.hideSecondComponent();
-                        });
-                        console.log("Data update errr");
-                    }.bind(this);
-                }.bind(this);
-            }
+            if (cont) {
+                this.setState({
+                   loading: true
+               })
+               var tableJson = this.el.getJson(null, false);
+               var programs = [];
+               var count = 0;
+               for (var i = 0; i < tableJson.length; i++) {
+                   var map1 = new Map(Object.entries(tableJson[i]));
+                   console.log("12 map---" + map1.get("12"))
+                   if (parseInt(map1.get("12")) === 1) {
+                       console.log("map1.get(11)---", map1.get("11"));
+                       console.log("map1.get(13)---", map1.get("13"));
+                       console.log("map1.get(7)---", map1.get("7"));
+                       console.log("map1.get(9)---", map1.get("9"));
+                       var notes = map1.get("4");
+                       var startDate = map1.get("7");
+                       var stopDate = map1.get("9");
+                       var id = map1.get("11");
+                       var noOfDaysInMonth = Number(map1.get("13"));
+                       console.log("start date ---", startDate);
+                       console.log("stop date ---", stopDate);
+                       console.log("noOfDaysInMonth ---", noOfDaysInMonth);
+                       var program = (this.state.datasetList.filter(x => x.id == id)[0]);
+                       var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                       var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                       programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
+                       programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
+                       programData.currentVersion.daysInMonth = noOfDaysInMonth;
+                       programData.currentVersion.notes = notes;
+   
+   
+                       programData.currentVersion.freightPerc = this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+                       programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+                       programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+   
+                       programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                       program.programData = programData;
+                       // var db1;
+                       // getDatabase();
+                       // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                       // openRequest.onerror = function (event) {
+                       //     this.setState({
+                       //         message: i18n.t('static.program.errortext'),
+                       //         color: 'red'
+                       //     })
+                       //     this.hideFirstComponent()
+                       // }.bind(this);
+                       // openRequest.onsuccess = function (e) {
+                       //     db1 = e.target.result;
+                       //     var transaction = db1.transaction(['datasetData'], 'readwrite');
+                       //     var programTransaction = transaction.objectStore('datasetData');
+                       //     var programRequest = programTransaction.put(program);
+                       //     programRequest.onerror = function (e) {
+   
+                       //     }.bind(this);
+                       //     programRequest.onsuccess = function (e) {
+   
+                       //     }.bind(this);
+                       // }.bind(this);
+                       programs.push(program);
+                       count++;
+                   }
+               }
+               console.log("programs to update---", programs);
+               if (count > 0) {
+                   var db1;
+                   getDatabase();
+                   var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                   openRequest.onerror = function (event) {
+                       this.setState({
+                           message: i18n.t('static.program.errortext'),
+                           color: 'red'
+                       })
+                       this.hideFirstComponent()
+                   }.bind(this);
+                   openRequest.onsuccess = function (e) {
+                       db1 = e.target.result;
+                       var transaction = db1.transaction(['datasetData'], 'readwrite');
+                       var programTransaction = transaction.objectStore('datasetData');
+                       programs.forEach(program => {
+                           var programRequest = programTransaction.put(program);
+                           console.log("---hurrey---");
+                       })
+                       transaction.oncomplete = function (event) {
+                           console.log("in side datasetDetails")
+                           db1 = e.target.result;
+                           var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                           var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                           programs.forEach(program => {
+                            var datasetDetailsRequest = datasetDetailsTransaction.get(program.id);
+                            datasetDetailsRequest.onsuccess = function (e) {         
+                                var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                datasetDetailsRequestJson.changed = 1;
+                                var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                datasetDetailsRequest1.onsuccess = function (event) {                               
+                                    }}                         
+                            console.log("---hurrey---");
+                             })
+                        
+                           
+
+                           
+                           this.setState({
+                               loading: false,
+                               message: i18n.t('static.mt.dataUpdateSuccess'),
+                               color: "green",
+                               isChanged: false
+                           }, () => {
+                               this.hideSecondComponent();
+                               // this.getOnLineDatasetsVersion();
+                           });
+                           console.log("Data update success");
+                       }.bind(this);
+                       transaction.onerror = function (event) {
+                           this.setState({
+                               loading: false,
+                               // message: 'Error occured.',
+                               color: "red",
+                           }, () => {
+                               this.hideSecondComponent();
+                           });
+                           console.log("Data update errr");
+                       }.bind(this);
+                   }.bind(this);
+               }
+           }
         }
     }
 
     getDatasetById(datasetIds) {
+        var versionSettingsListOffLine = [];
         var versionSettingsList = [];
-        var versionSettingsListForOther = []
         this.state.datasetList.map(dataset => {
             if (datasetIds.includes(dataset.programId)) {
                 versionSettingsList.push(dataset);
             }
         })
-        this.state.uniquePrograms.map(dataset => {
-            if (datasetIds.includes(dataset.programId)) {
-                versionSettingsListForOther.push(dataset);
-            }
-        })
-        this.setState({ versionSettingsList, versionSettingsListForOther }, () => { this.getOnLineDatasetsVersion() });
+        versionSettingsListOffLine = versionSettingsList.filter(c => c.id)
+        console.log("versionSettingsListOffLine!!!!", versionSettingsListOffLine)
+        console.log("versionSettingsList!!!!", versionSettingsList)
+        this.setState({
+            versionSettingsList: versionSettingsListOffLine,
+            datasetIds
+        }, () => {
+            this.getOnLineDatasetsVersion()
+        });
+
     }
+
+    // getDatasetById(datasetIds) {
+    //     var versionSettingsList = [];
+    //     var versionSettingsListForOther = []
+    //     // this.state.datasetList.map(dataset => {
+    //     //     if (datasetIds.includes(dataset.programId)) {
+    //     //         versionSettingsList.push(dataset);
+    //     //     }
+    //     // })
+    //     console.log("uniquePrograms!!!!", this.state.uniquePrograms)
+
+    //     this.state.uniquePrograms.map(dataset => {
+    //         console.log("datasetIds--->", datasetIds)
+    //         console.log("datasetIds--->dataset.programId", dataset.programId)
+    //         if (datasetIds.includes(dataset.programId)) {
+    //             versionSettingsListForOther.push(dataset);
+    //         }
+    //     })
+    //     console.log("versionSettingsListForOther!!!!", versionSettingsListForOther)
+    //     // this.setState({ versionSettingsList, versionSettingsListForOther }, () => { this.getOnLineDatasetsVersion() });
+    //     this.setState({ versionSettingsListForOther, datasetIds }, () => { this.getOnLineDatasetsVersion() });
+
+    // }
     getVersionTypeList() {
         var db1;
         getDatabase();
@@ -701,6 +759,7 @@ class VersionSettingsComponent extends Component {
                 var myResult = [];
                 var proList = [];
                 myResult = getRequest.result;
+                console.log("myResult--->", myResult)
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 var list = [];
@@ -714,7 +773,9 @@ class VersionSettingsComponent extends Component {
                         list.push({ label: myResult[i].programCode, value: myResult[i].programId })
                     }
                 }
+                var proList = proList.concat(this.state.datasetList);
                 console.log("proList---", proList);
+
                 proList = proList.sort(function (a, b) {
                     a = a.programCode.toLowerCase();
                     b = b.programCode.toLowerCase();
@@ -732,7 +793,12 @@ class VersionSettingsComponent extends Component {
 
 
                     }, () => {
+                        console.log("uniquePrograms", this.state.uniquePrograms)
+                        console.log("programValues", this.state.programValues)
+                        console.log("programValues.map(x => x.value).join(", ")", this.state.programValues.map(x => x.value).join(", "))
                         var programIds = this.state.programValues.map(x => x.value).join(", ");
+                        console.log("programIds", programIds)
+
                         programIds = Array.from(new Set(programIds.split(','))).toString();
                         this.getDatasetById(programIds);
                         // this.filterData()
@@ -781,28 +847,32 @@ class VersionSettingsComponent extends Component {
     }
 
     getOnLineDatasetsVersion() {
-        var programId = this.state.programId;
+        var programIds = this.state.programValues.map(x => x.value).join(",");
+        var programIdsarr = Array.from(new Set(programIds.split(',')));
         var versionTypeId = document.getElementById('versionTypeId').value;
+        if (versionTypeId == '') {
+            versionTypeId = -1
+        }
         var rangeValue = this.state.rangeValue;
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-
+        var dataList1 = [];
         var inputjson = {
-            programId: programId,
+            programIds: programIdsarr,
             versionTypeId: versionTypeId,
             startDate: startDate,
             stopDate: stopDate
         }
+        console.log("Input Json", inputjson)
         ProgramService.getDatasetVersions(inputjson).then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
                 console.log("responseData------->", responseData);
-                var dataList1 = [];
                 for (var i = 0; i < responseData.length; i++) {
                     var data = [];
-                    data[0] = responseData[i].programId
-                    data[1] = responseData[i].programCode
-                    data[2] = responseData[i].versionId + "(Live)"
+                    data[0] = responseData[i].program.id
+                    data[1] = responseData[i].program.code
+                    data[2] = responseData[i].versionId
                     data[3] = getLabelText(responseData[i].versionType.label, this.state.lang);
                     data[4] = responseData[i].notes
                     data[5] = responseData[i].createdDate
@@ -819,7 +889,7 @@ class VersionSettingsComponent extends Component {
                         data[8] = 0
                     }
                     data[9] = responseData[i].forecastStopDate
-                    data[10] = responseData[i].daysInMonth != null ? responseData[i].daysInMonth : '0'
+                    data[10] = 0
                     data[11] = responseData[i].versionId
                     data[12] = 0
                     data[13] = responseData[i].daysInMonth
@@ -832,7 +902,6 @@ class VersionSettingsComponent extends Component {
                     dataList1.push(data);
                 }
                 console.log("dataList1---------->", dataList1)
-
                 this.setState({
                     dataList: dataList1
                 },
@@ -850,12 +919,14 @@ class VersionSettingsComponent extends Component {
                     })
             }
         );
+
+        // }
     }
 
 
     buildJExcel() {
+        console.log("buildJExcel dataList--->", this.state.dataList)
         let versionSettingsListUnSorted = this.state.versionSettingsList;
-        let versionSettingsListForOther = this.state.versionSettingsListForOther;
         let versionSettingsList = versionSettingsListUnSorted.sort(
             function (a, b) {
                 if (a.programCode === b.programCode) {
@@ -867,85 +938,30 @@ class VersionSettingsComponent extends Component {
         let versionSettingsArray = [];
         let count = 0;
         var versionTypeId = document.getElementById('versionTypeId').value;
+        console.log("versionSettingsList-->", versionSettingsList)
         for (var j = 0; j < versionSettingsList.length; j++) {
-            var bytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
-            var pd = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            data = [];
-            data[0] = versionSettingsList[j].programId
-            data[1] = versionSettingsList[j].programCode
-            data[2] = versionSettingsList[j].version + "(Local)"
-            data[3] = ''
-            data[4] = pd.currentVersion.notes
-            data[5] = ''
-            data[6] = ''
-            if (pd.currentVersion.forecastStartDate != null && pd.currentVersion.forecastStartDate != "") {
-                var parts1 = pd.currentVersion.forecastStartDate.split('-');
-                data[7] = parts1[0] + "-" + parts1[1] + "-01 00:00:00"
-            } else {
-                data[7] = pd.currentVersion.forecastStartDate
-            }
-
-
-            if (pd.currentVersion.forecastStartDate != null && pd.currentVersion.forecastStopDate != null) {
-                let d1 = new Date(pd.currentVersion.forecastStartDate);
-                let d2 = new Date(pd.currentVersion.forecastStopDate)
-                var months;
-                months = (d2.getFullYear() - d1.getFullYear()) * 12;
-                months += d2.getMonth() - d1.getMonth();
-                data[8] = months + 1
-            } else {
-                data[8] = 0
-            }
-
-
-
-            if (pd.currentVersion.forecastStopDate != null && pd.currentVersion.forecastStopDate != "") {
-                var parts2 = pd.currentVersion.forecastStopDate.split('-');
-                data[9] = parts2[0] + "-" + parts2[1] + "-01 00:00:00"
-            } else {
-                data[9] = pd.currentVersion.forecastStopDate
-            }
-            // 1-Local 0-Live
-            data[10] = 1
-            data[11] = versionSettingsList[j].id
-            data[12] = 0
-            data[13] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
-
-
-            data[14] = (pd.currentVersion.freightPerc == null ? '' : pd.currentVersion.freightPerc)
-            data[15] = (pd.currentVersion.forecastThresholdHighPerc == null ? '' : pd.currentVersion.forecastThresholdHighPerc)
-            data[16] = (pd.currentVersion.forecastThresholdLowPerc == null ? '' : pd.currentVersion.forecastThresholdLowPerc)
-            data[17] = 0;
-            data[18] = pd;
-            if (versionTypeId == "") {
-                versionSettingsArray[count] = data;
-                count++;
-            }
-
-        }
-        // console.log("versionSettingsArray------->", versionSettingsArray);
-
-        for (var j = 0; j < versionSettingsListForOther.length; j++) {
-            var databytes = CryptoJS.AES.decrypt(versionSettingsListForOther[j].programData, SECRET_KEY);
-            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-            var rangeValue = this.state.rangeValue;
-            let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-            let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            var versionList = programData.versionList.filter(c => moment(c.createdDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
-            for (var k = versionList.length - 1; k >= 0; k--) {
-
+            if (versionSettingsList[j].programData) {
+                var bytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
+                var pd = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
                 data = [];
-                data[0] = versionSettingsListForOther[j].programId
-                data[1] = versionSettingsListForOther[j].programCode
-                data[2] = versionList[k].versionId
-                data[3] = getLabelText(versionList[k].versionType.label, this.state.lang);
-                data[4] = versionList[k].notes
-                data[5] = versionList[k].createdDate
-                data[6] = versionList[k].createdBy.username
-                data[7] = versionList[k].forecastStartDate
-                if (versionList[k].forecastStartDate != null && versionList[k].forecastStopDate != null) {
-                    let d1 = new Date(versionList[k].forecastStartDate);
-                    let d2 = new Date(versionList[k].forecastStopDate)
+                data[0] = versionSettingsList[j].programId
+                data[1] = versionSettingsList[j].programCode
+                data[2] = versionSettingsList[j].version + "(Local)"
+                data[3] = ''
+                data[4] = pd.currentVersion.notes
+                data[5] = ''
+                data[6] = ''
+                if (pd.currentVersion.forecastStartDate != null && pd.currentVersion.forecastStartDate != "") {
+                    var parts1 = pd.currentVersion.forecastStartDate.split('-');
+                    data[7] = parts1[0] + "-" + parts1[1] + "-01 00:00:00"
+                } else {
+                    data[7] = pd.currentVersion.forecastStartDate
+                }
+
+
+                if (pd.currentVersion.forecastStartDate != null && pd.currentVersion.forecastStopDate != null) {
+                    let d1 = new Date(pd.currentVersion.forecastStartDate);
+                    let d2 = new Date(pd.currentVersion.forecastStopDate)
                     var months;
                     months = (d2.getFullYear() - d1.getFullYear()) * 12;
                     months += d2.getMonth() - d1.getMonth();
@@ -953,35 +969,91 @@ class VersionSettingsComponent extends Component {
                 } else {
                     data[8] = 0
                 }
-                data[9] = versionList[k].forecastStopDate
-                data[10] = 0
-                data[11] = versionList[k].versionId
-                data[12] = 0
-                data[13] = versionList[k].daysInMonth
-
-
-                data[14] = versionList[k].freightPerc
-                data[15] = versionList[k].forecastThresholdHighPerc
-                data[16] = versionList[k].forecastThresholdLowPerc
-                data[17] = 0;
-                data[18] = {};
-
-                if (versionTypeId != "") {
-                    if (versionList[k].versionType.id == versionTypeId) {
-                        versionSettingsArray[count] = data;
-                        count++;
-                    }
+                if (pd.currentVersion.forecastStopDate != null && pd.currentVersion.forecastStopDate != "") {
+                    var parts2 = pd.currentVersion.forecastStopDate.split('-');
+                    data[9] = parts2[0] + "-" + parts2[1] + "-01 00:00:00"
                 } else {
+                    data[9] = pd.currentVersion.forecastStopDate
+                }
+                // 1-Local 0-Live
+                data[10] = 1
+                data[11] = versionSettingsList[j].id
+                data[12] = 0
+                data[13] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
+                data[14] = (pd.currentVersion.freightPerc == null ? '' : pd.currentVersion.freightPerc)
+                data[15] = (pd.currentVersion.forecastThresholdHighPerc == null ? '' : pd.currentVersion.forecastThresholdHighPerc)
+                data[16] = (pd.currentVersion.forecastThresholdLowPerc == null ? '' : pd.currentVersion.forecastThresholdLowPerc)
+                data[17] = 0;
+                data[18] = pd;
+                if (versionTypeId == "") {
                     versionSettingsArray[count] = data;
                     count++;
                 }
             }
         }
-        var dataList = this.state.dataList;
-        console.log("dataList------->1", dataList);
-        for (var i = 0; i < dataList.length; i++) {
+
+        // for (var j = 0; j < versionSettingsListForOther.length; j++) {
+        //     if (versionSettingsListForOther[j].programData) {
+        //         var databytes = CryptoJS.AES.decrypt(versionSettingsListForOther[j].programData, SECRET_KEY);
+        //         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+        //         var rangeValue = this.state.rangeValue;
+        //         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        //         let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        //         var versionList = programData.versionList.filter(c => moment(c.createdDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
+        //         for (var k = versionList.length - 1; k >= 0; k--) {
+
+        //             data = [];
+        //             data[0] = versionSettingsListForOther[j].programId
+        //             data[1] = versionSettingsListForOther[j].programCode
+        //             data[2] = versionList[k].versionId
+        //             data[3] = getLabelText(versionList[k].versionType.label, this.state.lang);
+        //             data[4] = versionList[k].notes
+        //             data[5] = versionList[k].createdDate
+        //             data[6] = versionList[k].createdBy.username
+        //             data[7] = versionList[k].forecastStartDate
+        //             if (versionList[k].forecastStartDate != null && versionList[k].forecastStopDate != null) {
+        //                 let d1 = new Date(versionList[k].forecastStartDate);
+        //                 let d2 = new Date(versionList[k].forecastStopDate)
+        //                 var months;
+        //                 months = (d2.getFullYear() - d1.getFullYear()) * 12;
+        //                 months += d2.getMonth() - d1.getMonth();
+        //                 data[8] = months + 1
+        //             } else {
+        //                 data[8] = 0
+        //             }
+        //             data[9] = versionList[k].forecastStopDate
+        //             data[10] = 0
+        //             data[11] = versionList[k].versionId
+        //             data[12] = 0
+        //             data[13] = versionList[k].daysInMonth
+
+
+        //             data[14] = versionList[k].freightPerc
+        //             data[15] = versionList[k].forecastThresholdHighPerc
+        //             data[16] = versionList[k].forecastThresholdLowPerc
+        //             data[17] = 0;
+        //             data[18] = {};
+
+        //             if (versionTypeId != "") {
+        //                 if (versionList[k].versionType.id == versionTypeId) {
+        //                     versionSettingsArray[count] = data;
+        //                     count++;
+        //                 }
+        //             } else {
+        //                 versionSettingsArray[count] = data;
+        //                 count++;
+        //             }
+        //         }
+        //     }
+        // }
+        var dataLists = this.state.dataList;
+        console.log("dataLists", dataLists)
+        console.log("dataLists length", dataLists.length)
+        for (var i = 0; i < this.state.dataList.length; i++) {
+            console.log("dataList----1009--->3");
+
             count = (versionSettingsArray.length);
-            versionSettingsArray[count] = dataList[i];
+            versionSettingsArray[count] = dataLists[i];
             count++;
         }
 
@@ -1105,7 +1177,7 @@ class VersionSettingsComponent extends Component {
                 },
                 {
                     title: 'datasetData',
-                    type: 'hidden',//17 R
+                    type: 'hidden',//18 S
                 },
 
             ],
@@ -1245,6 +1317,8 @@ class VersionSettingsComponent extends Component {
         })
     }
 
+
+
     openModalPopup(programData) {
         this.setState({
             showValidation: !this.state.showValidation,
@@ -1302,8 +1376,41 @@ class VersionSettingsComponent extends Component {
     }
 
     componentDidMount() {
-        this.getVersionTypeList();
-        this.getDatasetList();
+        ProgramService.getDataSetList().then(response => {
+            if (response.status == 200) {
+                var responseData = response.data;
+                console.log("getDataSetList**********responseData------->", responseData);
+                var datasetList = [];
+                for (var rd = 0; rd < responseData.length; rd++) {
+                    var json = {
+                        programId: responseData[rd].programId,
+                        name: getLabelText(responseData[rd].label, this.state.lang),
+                        programCode: responseData[rd].programCode,
+                        isOnline: 1
+                    }
+                    datasetList.push(json);
+                }
+                this.setState({
+                    datasetList: datasetList,
+                    loading: false
+                }, () => {
+                    this.getVersionTypeList();
+                    this.getDatasetList();
+
+                })
+            } else {
+                this.setState({
+                    message: response.data.messageCode, loading: false
+                }, () => {
+                    this.hideSecondComponent();
+                })
+            }
+        }).catch(
+            error => {
+                this.getVersionTypeList();
+                this.getDatasetList();
+            }
+        );
     }
 
     componentWillUnmount() {
@@ -1320,15 +1427,15 @@ class VersionSettingsComponent extends Component {
     }
 
     handleChangeProgram(programIds) {
-        programIds = programIds.sort(function (a, b) {
-            return parseInt(a.value) - parseInt(b.value);
-        })
+        // programIds = programIds.sort(function (a, b) {
+        //     return parseInt(a.value) - parseInt(b.value);
+        // })
         this.setState({
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
             var programIds = this.state.programValues.map(x => x.value).join(", ");
-            // console.log("program------------->>>", this.state.programValues);
+            console.log("program------------->>>", programIds);
             localStorage.setItem("sesForecastProgramIds", JSON.stringify(this.state.programValues));
             programIds = Array.from(new Set(programIds.split(','))).toString();
             this.getDatasetById(programIds);
@@ -1633,8 +1740,16 @@ class VersionSettingsComponent extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
-                            <div>
+                    <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
+                showguidanceEn :
+                localStorage.getItem('lang') == 'fr' ?
+                showguidanceFr :
+                  localStorage.getItem('lang') == 'sp' ?
+                  showguidanceSp :
+                  showguidancePr
+              } } />
+                            {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
                             </div>
                             <p>
@@ -1664,7 +1779,7 @@ class VersionSettingsComponent extends Component {
                                         </ol>
                                     </li>
                                 </ol>
-                            </p>
+                            </p> */}
                         </ModalBody>
                     </div>
                 </Modal>
@@ -1706,12 +1821,12 @@ class VersionSettingsComponent extends Component {
                             <br />
                             <br />
                             <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>
-                            <a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>,
-                            {/* (<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />   */} 
-                            {(this.state.version != undefined && this.state.version.toString().includes('Local'))?
-                            (<a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)
-                           :(<a href="/#/forecastReport/forecastSummary/" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)}
-                           </span><br />
+                                <a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>,
+                                {/* (<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />   */}
+                                {(this.state.version != undefined && this.state.version.toString().includes('Local')) ?
+                                    (<a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)
+                                    : (<a href="/#/forecastReport/forecastSummary/" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)}
+                            </span><br />
                             <ul>{noForecastSelected}</ul>
 
                             <span><b>2. {i18n.t('static.commitTree.consumptionForecast')}: </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">{i18n.t('static.commitTree.dataEntry&Adjustment')}</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.commitTree.extrapolation')}</a>)</span><br />

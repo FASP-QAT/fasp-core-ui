@@ -4,7 +4,7 @@ import i18n from "../../i18n";
 import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 
-export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation) {
+export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, page, regionId,planningUnitId) {
     console.log("inputData@@@@@@", inputData);
     console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
@@ -28,7 +28,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
         "beta": Number(betaParam),
         "gamma": Number(gammaParam),
         "n": Number(noOfProjectionMonths),
-        "level":Number(confidenceLevel)
+        "level": Number(confidenceLevel)
     }
     console.log("Json@@@@@@", json);
     ExtrapolationService.tes(json)
@@ -40,30 +40,45 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
                 var count = 0;
                 for (var k = 0; k < responseData.fits.length; k++) {
                     count += 1;
-                    output.push({ month: count, actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual != '' ? inputData[k].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0,ci:null })
+                    output.push({ month: count, actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual != '' ? inputData[k].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0, ci: null })
                 }
                 for (var j = 0; j < responseData.forecast.length; j++) {
                     count += 1;
-                    output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecast[j] == 'NA' ? null : responseData.forecast[j] > 0 ? responseData.forecast[j] : 0,ci: responseData.ci[j] > 0 ? responseData.ci[j] : 0 })
+                    output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecast[j] == 'NA' ? null : responseData.forecast[j] > 0 ? responseData.forecast[j] : 0, ci: responseData.ci[j] > 0 ? responseData.ci[j] : 0 })
                 }
 
                 console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
                 // calculateCI(output, Number(confidenceLevel), "tesData", props)
-                props.updateState("tesData", output);
-                calculateError(output, "tesError", props);
-
+                if (page == "DataEntry") {
+                    var tesData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                    props.updateTESData(tesData);
+                } else if (page == "importFromQATSP") {
+                    var tesData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
+                    props.updateTESData(tesData);
+                } else {
+                    props.updateState("tesData", output);
+                    calculateError(output, "tesError", props);
+                }
             }
         }).catch(error => {
             console.log("Error@@@@@@", error)
-            if (!isTreeExtrapolation) {
-                // props.updateState("showData", false);
-                // props.updateState("dataEl", "");
-                props.updateState("loading", false);
-                props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
-                props.updateState("dataChanged", true);
-                // props.updateState("show", false);
-                // props.el = jexcel(document.getElementById("tableDiv"), '');
-                // props.el.destroy();
+            if (page == "DataEntry") {
+                var tesData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+                props.updateTESData(tesData);
+            } else if (page == "importFromQATSP") {
+                var tesData = { "data": [], "PlanningUnitId": planningUnitId, "regionId": regionId }
+                props.updateTESData(tesData);
+            } else {
+                if (!isTreeExtrapolation) {
+                    // props.updateState("showData", false);
+                    // props.updateState("dataEl", "");
+                    props.updateState("loading", false);
+                    props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
+                    props.updateState("dataChanged", true);
+                    // props.updateState("show", false);
+                    // props.el = jexcel(document.getElementById("tableDiv"), '');
+                    // props.el.destroy();
+                }
             }
         })
 

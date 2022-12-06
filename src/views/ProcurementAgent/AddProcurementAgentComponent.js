@@ -13,7 +13,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { SketchPicker } from 'react-color';
-import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX, API_URL } from '../../Constants.js';
 import reactCSS from 'reactcss'
 
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -206,7 +206,8 @@ class AddProcurementAgentComponent extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -258,7 +259,8 @@ class AddProcurementAgentComponent extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -433,7 +435,8 @@ class AddProcurementAgentComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -502,7 +505,8 @@ class AddProcurementAgentComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -582,7 +586,8 @@ class AddProcurementAgentComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -700,7 +705,13 @@ class AddProcurementAgentComponent extends Component {
                                         loading: true
                                     })
                                     console.log("on submit---", this.state.procurementAgent)
-                                    ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
+                                    var pAgent = this.state.procurementAgent;
+                                    for (var i = 0; i < pAgent.programList.length; i++) {
+                                        if (pAgent.programList[i].id == 0) {
+                                            pAgent.programList = []
+                                        }
+                                    }
+                                    ProcurementAgentService.addProcurementAgent(pAgent)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -716,7 +727,8 @@ class AddProcurementAgentComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -793,7 +805,7 @@ class AddProcurementAgentComponent extends Component {
                                                     <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup className="Selectcontrol-bdrNone">
-                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             { 'is-valid': !errors.programId && this.state.procurementAgent.programList.length != 0 },
@@ -810,7 +822,7 @@ class AddProcurementAgentComponent extends Component {
                                                         id="programId"
                                                         multi
                                                         required
-                                                        min={1}
+                                                        // min={1}
                                                         options={this.state.programList}
                                                         value={this.state.programId}
                                                     />
