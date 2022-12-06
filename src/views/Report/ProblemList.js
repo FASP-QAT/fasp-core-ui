@@ -122,6 +122,7 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     componentDidMount = function () {
+         document.getElementById("tableDiv").closest('.card').classList.add("removeCardwrap");
         // qatProblemActions();
         // console.log("]]]]]]]======>", localStorage.getItem("sesProblemStatus"));
 
@@ -697,11 +698,13 @@ export default class ConsumptionDetails extends React.Component {
                     title: i18n.t('static.report.problemDescription'),
                     type: 'text',
                     readOnly: true,
+                    width: 300,
                 },
                 {
                     title: i18n.t('static.report.suggession'),
                     type: 'text',
                     readOnly: true,
+                    width: 300,
                 },
                 {
                     title: i18n.t('static.report.problemStatus'),
@@ -713,6 +716,7 @@ export default class ConsumptionDetails extends React.Component {
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
+                    width: 300
                 },
                 {
                     // title: i18n.t('static.common.action'),
@@ -749,6 +753,7 @@ export default class ConsumptionDetails extends React.Component {
                     title: i18n.t('static.report.reviewNotes'),
                     type: 'text',
                     readOnly: true,
+                    width: 260
 
                 },
                 {
