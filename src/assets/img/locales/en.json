@@ -2888,5 +2888,6 @@
     "static.common.accessControlList": "Access Control List",
     "static.dataset.version1Settings": "Version 1 Settings",
     "static.importIntoQAT.dateRange": "Range to Import Forecast Consumption",
-    "static.importIntoQAT.forecastTracerCategory": "Forecast Tracer Category"
+    "static.importIntoQAT.forecastTracerCategory": "Forecast Tracer Category",
+    "static.realmCountryPlanningUnit.failedToUpdate":"Failed to update data as one of the one is to one mapping is missing"
 }
