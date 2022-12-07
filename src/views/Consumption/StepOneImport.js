@@ -781,7 +781,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             colWidths: [50, 50, 100, 100, 100, 100, 50, 100, 50],
             columns: [
                 {
-                    title: 'Tracer Category',
+                    title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'text',
                     readOnly: true//0 A
                 },

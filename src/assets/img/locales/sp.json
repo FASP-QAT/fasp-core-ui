@@ -2869,6 +2869,14 @@
     "static.treeList.confirmAlert": "La versión del servidor tardará un tiempo en cargarse. ¿Está seguro de que desea cargar la versión del servidor?",
     "static.compareVersion.selectedForecastQtyTitle": "Pronóstico de cantidad para todo el período de pronóstico.",
     "static.dataset.BranchTreeTemplate": "Plantilla de rama",
+    "static.forecastErrorReport.noEquivalencyUnitData": "No hay datos de unidad de equivalencia disponibles para la unidad de pronóstico seleccionada",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.forecastErrorReport.noEquivalencyUnitData": "No hay datos de unidad de equivalencia disponibles para la unidad de pronóstico seleccionada"
+    "static.common.loadDeleteLocalVersion": "Cargar/Eliminar versión local",
+    "static.common.exportDataset": "Exportar conjunto de datos",
+    "static.common.importDataset": "Importar conjunto de datos",
+    "static.common.userList": "Lista de usuarios",
+    "static.common.accessControlList": "Lista de control de acceso",
+    "static.dataset.version1Settings": "Configuración de la versión 1",
+    "static.importIntoQAT.dateRange": "Rango para importar consumo de pronóstico",
+    "static.importIntoQAT.forecastTracerCategory": "Categoría del rastreador de pronóstico"
 }

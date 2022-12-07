@@ -2879,6 +2879,14 @@
     "static.message.editBranchTemplate": "Branch Template Updated Successfully",
     "static.dataEntry.validationFailedAndCannotInterpolate":"Validation failed so cannot interpolate",
     "static.dataEntry.daysOfStockOutMustBeLessInCaseOfActualConsumption":"Please enter value lesser than number of days when you have an actual consumption greater than 0 or update the actual consumption to 0.",
+    "static.forecastErrorReport.noEquivalencyUnitData": "No equivalency unit data available for the selected forecasting unit",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.forecastErrorReport.noEquivalencyUnitData": "No equivalency unit data available for the selected forecasting unit"
+    "static.common.loadDeleteLocalVersion": "Load/Delete Local Version",
+    "static.common.exportDataset": "Export Dataset",
+    "static.common.importDataset": "Import Dataset",
+    "static.common.userList": "User List",
+    "static.common.accessControlList": "Access Control List",
+    "static.dataset.version1Settings": "Version 1 Settings",
+    "static.importIntoQAT.dateRange": "Range to Import Forecast Consumption",
+    "static.importIntoQAT.forecastTracerCategory": "Forecast Tracer Category"
 }

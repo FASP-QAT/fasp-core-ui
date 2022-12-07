@@ -323,10 +323,10 @@ const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/dataset/versionSettings', name: 'static.UpdateversionSettings.UpdateversionSettings', component: VersionSettingsComponent },
-  { path: '/dataset/loadDeleteDataSet', name: 'Load/Delete Local Version', component: LoadDeleteDataSet },
-  { path: '/dataset/exportDataset', name: 'Export Dataset', component: ExportDataset },
-  { path: '/dataset/importDataset', name: 'Import Dataset', component: ImportDataset },
-  { path: '/dataset/loadDeleteDataSet/:message', name: 'Load/Delete Local Version', component: LoadDeleteDataSet },
+  { path: '/dataset/loadDeleteDataSet', name: 'static.common.loadDeleteLocalVersion', component: LoadDeleteDataSet },
+  { path: '/dataset/exportDataset', name: 'static.common.exportDataset', component: ExportDataset },
+  { path: '/dataset/importDataset', name: 'static.common.importDataset', component: ImportDataset },
+  { path: '/dataset/loadDeleteDataSet/:message', name: 'static.common.loadDeleteLocalVersion', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
   { path: '/dataset/listBranchTreeTemplate/:color/:message', name: 'static.dataset.BranchTreeTemplate', component: ListBranchTreeTemplate },

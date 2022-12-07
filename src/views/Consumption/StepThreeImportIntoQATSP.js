@@ -848,7 +848,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
                     <div className="row ">
                         <FormGroup className="col-md-4">
-                            <Label htmlFor="appendedInputButton">Supply Plan Program</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanProgram')}</Label>
                             <div className="controls ">
                                 <InputGroup>
                                     <Input
