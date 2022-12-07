@@ -11529,3 +11529,24 @@ label.arrow_label:before {
   z-index: 9999999999999;
 }
   
+  .tableDivjss_contentDisplay .jtabs-content .jss_content{
+    display: initial !important;
+  }
+  .tableDivjss_contentDisplay .jtabs-content .jss_content .jss{
+    table-layout: inherit!important;
+  }
+  .tableDivjss_contentDisplay .jtabs-content .jss_content .jss_worksheet{
+    table-layout: inherit!important;
+  }
+  .tableDivjss_contentDisplay  .jss_table{
+    
+    display: inherit !important;
+  }
+  .tableDivjss_contentDisplay.jss_container{
+    
+    display: inherit !important;
+  }
+  .tableDivjss_contentDisplay .jtabs-content .jss_worksheet .jss_table_container .jss_table .jss_content table>thead>tr>td{
+    resize: horizontal;
+  }
+      
