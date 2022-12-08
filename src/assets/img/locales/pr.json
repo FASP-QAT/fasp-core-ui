@@ -2876,5 +2876,6 @@
     "static.common.accessControlList": "Lista de controle de acesso",
     "static.dataset.version1Settings": "Configurações da versão 1",
     "static.importIntoQAT.dateRange": "Intervalo para Importar Previsão de Consumo",
-    "static.importIntoQAT.forecastTracerCategory": "Categoria do Rastreador de Previsão"
+    "static.importIntoQAT.forecastTracerCategory": "Categoria do Rastreador de Previsão",
+    "static.loadDeleteProgram.loadDeleteProgram": "Carregar/Excluir Programa"
 }
