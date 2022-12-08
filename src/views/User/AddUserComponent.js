@@ -1821,7 +1821,7 @@ class AddUserComponent extends Component {
                                                     <FormFeedback>{errors.languageId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <h5><Label htmlFor="select">{'Access control'}</Label></h5>
+                                                    <h5><Label htmlFor="select">{i18n.t('static.user.accessControlText')}</Label></h5>
                                                 </FormGroup>
                                                 <div className="" style={{ display: this.state.loading1 ? "none" : "block" }} >
                                                     <div id="paputableDiv" className="RowheightForjexceladdRow consumptionDataEntryTable">

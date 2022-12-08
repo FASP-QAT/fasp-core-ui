@@ -2873,5 +2873,13 @@
     "static.dataset.BranchTreeTemplate": "Modèle de branche",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
     "static.planningUnitSetting.offlineMsg": "Remarque : l`utilisateur doit être en ligne pour ajouter de nouveaux produits",
-    "static.forecastErrorReport.noEquivalencyUnitData":"Aucune donnée d`unité d`équivalence disponible pour l`unité de prévision sélectionnée"
+    "static.forecastErrorReport.noEquivalencyUnitData": "Aucune donnée d`unité d`équivalence disponible pour l`unité de prévision sélectionnée",
+    "static.common.loadDeleteLocalVersion": "Charger/Supprimer la version locale",
+    "static.common.exportDataset": "Exporter l`ensemble de données",
+    "static.common.importDataset": "Importer un jeu de données",
+    "static.common.userList": "liste d`utilisateur",
+    "static.common.accessControlList": "Liste de contrôle d`accès",
+    "static.dataset.version1Settings": "Paramètres de la version 1",
+    "static.importIntoQAT.dateRange": "Plage d`importation de la consommation prévue",
+    "static.importIntoQAT.forecastTracerCategory": "Catégorie de traceur de prévision"
 }

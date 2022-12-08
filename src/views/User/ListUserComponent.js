@@ -2364,7 +2364,7 @@ class ListUserComponent extends Component {
                                     active={this.state.activeTab1[0] === '1'}
                                     onClick={() => { this.toggleModal(0, '1'); }}
                                 >
-                                    {'User List'}
+                                    {i18n.t('static.common.userList')}
                                 </NavLink>
                             </NavItem>
                             <NavItem>
@@ -2372,7 +2372,7 @@ class ListUserComponent extends Component {
                                     active={this.state.activeTab1[0] === '2'}
                                     onClick={() => { this.toggleModal(0, '2'); }}
                                 >
-                                    {'Access Control List'}
+                                    {i18n.t('static.common.accessControlList')}
                                 </NavLink>
                             </NavItem>
                         </Nav>
