@@ -661,26 +661,34 @@ export default class PlanningUnitSetting extends Component {
         console.log("-----------------onPaste---------------------0", data);
         for (var i = 0; i < data.length; i++) {
             console.log("-----------------onPaste---------------------1", data[i]);
-
-            console.log("-----------------onPaste---------------------2");
-            var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
-            if (index == 0 || index === "" || index == null || index == undefined) {
-                if (z != data[i].y) {
+            if (z != data[i].y) {
+                console.log("-----------------onPaste---------------------2");
+                var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                if (index == 0 || index === "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
-                    (instance).setValueFromCoords(0, data[i].y, data[i].value, false);
-                } else {
-                    (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
+                    // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(3, data[i].y, true, true);
+                    (instance).setValueFromCoords(9, data[i].y, true, true);
+                    (instance).setValueFromCoords(10, data[i].y, 1, true);
+                    (instance).setValueFromCoords(11, data[i].y, 1, true);
+                    (instance).setValueFromCoords(12, data[i].y, {}, true);
+                    (instance).setValueFromCoords(13, data[i].y, 0, true);
+                    (instance).setValueFromCoords(14, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
+                    (instance).setValueFromCoords(16, data[i].y, true, true);
+                    z = data[i].y;
                 }
-                (instance).setValueFromCoords(9, data[i].y, true, true);
-                (instance).setValueFromCoords(10, data[i].y, 1, true);
-                (instance).setValueFromCoords(11, data[i].y, 1, true);
-                (instance).setValueFromCoords(12, data[i].y, {}, true);
-                (instance).setValueFromCoords(13, data[i].y, 0, true);
-                (instance).setValueFromCoords(14, data[i].y, true, true);
-                // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
-                (instance).setValueFromCoords(16, data[i].y, true, true);
+            }
+            if (data[i].x == 0) {
+                console.log("-----------------onPaste---------------------41", data[i]);
 
-                z = data[i].y;
+                (instance).setValueFromCoords(0, data[i].y, data[i].value, true);
+            }
+            if (data[i].x == 1) {
+                console.log("-----------------onPaste---------------------42", data[i].value);
+
+                (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
             }
         }
     }
@@ -3076,7 +3084,7 @@ export default class PlanningUnitSetting extends Component {
 
     }
     getPlanningUnitList(callBy) {
-        if (!this.state.isPlanningUnitLoaded) {
+        if (!this.state.isPlanningUnitLoaded || callBy == 0) {
             var pID = document.getElementById("forecastProgramId").value;
             if (pID != 0) {
                 this.setState({
