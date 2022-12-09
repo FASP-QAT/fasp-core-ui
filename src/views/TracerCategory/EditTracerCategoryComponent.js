@@ -607,11 +607,13 @@ class EditTracerCategoryComponent extends Component {
         const { healthAreas } = this.state;
         let healthAreaList = healthAreas.length > 0
             && healthAreas.map((item, i) => {
+                if(item.active==true){
                 return (
                     <option key={i} value={item.healthAreaId}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
+                }
             }, this);
         return (
             <div className="animated fadeIn">
