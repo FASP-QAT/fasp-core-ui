@@ -2870,5 +2870,13 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organización",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.common.loadDeleteLocalVersion": "Cargar/Eliminar versión local",
+    "static.common.exportDataset": "Exportar conjunto de datos",
+    "static.common.importDataset": "Importar conjunto de datos",
+    "static.common.userList": "Lista de usuarios",
+    "static.common.accessControlList": "Lista de control de acceso",
+    "static.dataset.version1Settings": "Configuración de la versión 1",
+    "static.importIntoQAT.dateRange": "Rango para importar consumo de pronóstico",
+    "static.importIntoQAT.forecastTracerCategory": "Categoría del rastreador de pronóstico"
 }
