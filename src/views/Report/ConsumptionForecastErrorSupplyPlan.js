@@ -462,8 +462,16 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         }
                     }
                 }
+                
+                var regionIds = regionList.map((item, i) => {
+                    return ({ label: getLabelText(item.label, this.state.lang), value: item.regionId })
+                }, this)
+
+                console.log("regionIds------->",regionIds)
                 this.setState({
                     regions: regionList,
+                    regionValues: regionIds.map(ele => ele),
+                    regionLabels: regionIds.map(ele => ele.label),
                     loading: false
                 }, () => {
                     this.getPlanningUnitAndForcastingUnit();
