@@ -630,7 +630,7 @@ class EditTracerCategoryComponent extends Component {
                                     {
                                         tracerCategoryCode: this.state.tracerCategory.tracerCategoryCode,
                                         tracerCategoryName: this.state.tracerCategory.label.label_en,
-                                        healthAreaId: this.state.tracerCategory.healthArea.id,
+                                        healthAreaId: this.state.tracerCategory.healthArea.id==""?"":this.state.tracerCategory.healthArea.id,
                                         submittedToApprovedLeadTime: this.state.tracerCategory.submittedToApprovedLeadTime
                                     }}
                                 validate={validate(validationSchema)}
