@@ -1371,41 +1371,75 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var valid = true;
         var elInstance = this.state.consumptionEl;
         var json = elInstance.getJson(null, false);
-        var mapArray = [];
+        // var mapArray = [];
         // var adjustmentsQty = 0;
         // var openingBalance = 0;
         // var consumptionQty = 0;
         console.log("A--------------------> JSON----------")
+        var consumptionDataList = this.props.items.consumptionListUnFiltered;
+        var coList = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
-            mapArray.push(map);
+            var actualFlag = true;
+            if (map.get("2") == 2) {
+                actualFlag = false;
+            }
+            if (parseInt(map.get("12")) != -1) {
+                consumptionDataList[parseInt(map.get("12"))].consumptionDate = moment(map.get("0")).startOf('month').format("YYYY-MM-DD");
+                consumptionDataList[parseInt(map.get("12"))].region.id = map.get("1");
+                consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.id = map.get("4");
+                consumptionDataList[parseInt(map.get("12"))].actualFlag = actualFlag;
+            } else {
+                var consumptionJson = {
+                    consumptionId: 0,
+                    region: {
+                        id: map.get("1"),
+                    },
+                    consumptionDate: moment(map.get("0")).startOf('month').format("YYYY-MM-DD"),
+                    realmCountryPlanningUnit: {
+                        id: map.get("4")
+                    },
+                    actualFlag: actualFlag,
+                }
+                coList.push(consumptionJson);
+            }
+        }
 
-            var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
-            var checkDuplicateOverAll = consumptionListUnFiltered.filter(c =>
+        for (var y = 0; y < json.length; y++) {
+            var map = new Map(Object.entries(json[y]));
+            // mapArray.push(map);
+
+            // var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
+            // var checkDuplicateOverAll = consumptionListUnFiltered.filter(c =>
+            //     c.realmCountryPlanningUnit.id == map.get("4") &&
+            //     moment(c.consumptionDate).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
+            //     c.region.id == map.get("1") &&
+            //     (c.actualFlag.toString() == "true" ? ACTUAL_CONSUMPTION_TYPE : FORCASTED_CONSUMPTION_TYPE) == map.get("2"));
+            // var index = 0;
+            // if (checkDuplicateOverAll.length > 0) {
+            //     if (checkDuplicateOverAll[0].consumptionId > 0) {
+            //         index = consumptionListUnFiltered.findIndex(c => c.consumptionId == checkDuplicateOverAll[0].consumptionId);
+            //     } else {
+            //         index = consumptionListUnFiltered.findIndex(c =>
+            //             c.realmCountryPlanningUnit.id == checkDuplicateOverAll[0].realmCountryPlanningUnit.id &&
+            //             moment(c.consumptionDate).format("YYYY-MM") == moment(checkDuplicateOverAll[0].consumptionDate).format("YYYY-MM") &&
+            //             c.region.id == checkDuplicateOverAll[0].region.id &&
+            //             (c.actualFlag.toString() == "true" ? ACTUAL_CONSUMPTION_TYPE : FORCASTED_CONSUMPTION_TYPE) == (checkDuplicateOverAll[0].actualFlag.toString() == "true" ? ACTUAL_CONSUMPTION_TYPE : FORCASTED_CONSUMPTION_TYPE));
+            //     }
+            // }
+
+            // var checkDuplicateInMap = mapArray.filter(c =>
+            //     c.get("4") == map.get("4") &&
+            //     moment(c.get("0")).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
+            //     c.get("1") == map.get("1") &&
+            //     c.get("2") == map.get("2")
+            // )
+            var checkDuplicate = (consumptionDataList.concat(coList)).filter(c =>
                 c.realmCountryPlanningUnit.id == map.get("4") &&
                 moment(c.consumptionDate).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
                 c.region.id == map.get("1") &&
                 (c.actualFlag.toString() == "true" ? ACTUAL_CONSUMPTION_TYPE : FORCASTED_CONSUMPTION_TYPE) == map.get("2"));
-            var index = 0;
-            if (checkDuplicateOverAll.length > 0) {
-                if (checkDuplicateOverAll[0].consumptionId > 0) {
-                    index = consumptionListUnFiltered.findIndex(c => c.consumptionId == checkDuplicateOverAll[0].consumptionId);
-                } else {
-                    index = consumptionListUnFiltered.findIndex(c =>
-                        c.realmCountryPlanningUnit.id == checkDuplicateOverAll[0].realmCountryPlanningUnit.id &&
-                        moment(c.consumptionDate).format("YYYY-MM") == moment(checkDuplicateOverAll[0].consumptionDate).format("YYYY-MM") &&
-                        c.region.id == checkDuplicateOverAll[0].region.id &&
-                        (c.actualFlag.toString() == "true" ? ACTUAL_CONSUMPTION_TYPE : FORCASTED_CONSUMPTION_TYPE) == (checkDuplicateOverAll[0].actualFlag.toString() == "true" ? ACTUAL_CONSUMPTION_TYPE : FORCASTED_CONSUMPTION_TYPE));
-                }
-            }
-
-            var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("4") == map.get("4") &&
-                moment(c.get("0")).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
-                c.get("1") == map.get("1") &&
-                c.get("2") == map.get("2")
-            )
-            if (checkDuplicateInMap.length > 1 || (checkDuplicateOverAll.length > 0 && index != map.get("12"))) {
+            if (checkDuplicate.length > 1) {
                 var colArr = ['E'];
                 for (var c = 0; c < colArr.length; c++) {
                     inValid(colArr[c], y, i18n.t('static.supplyPlan.duplicateConsumption'), elInstance);

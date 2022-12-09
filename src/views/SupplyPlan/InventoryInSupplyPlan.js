@@ -361,7 +361,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !inventoryEditable },
                             {
                                 // title: i18n.t('static.inventory.inventoryDate'), 
-                                type: 'text', visible: false, 
+                                type: 'text', visible: false,
                                 // width: 0, 
                                 readOnly: true, autoCasting: false
                             },
@@ -383,9 +383,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 // width: 0, 
                                 readOnly: true, visible: false, autoCasting: false
                             },
-                            { type: 'text', 
-                            // width: 0, 
-                            readOnly: true, visible: false, autoCasting: false },
+                            {
+                                type: 'text',
+                                // width: 0, 
+                                // width: 0, 
+                                // width: 0, 
+                                readOnly: true, visible: false, autoCasting: false
+                            },
                         ],
                         pagination: paginationOption,
                         paginationOptions: paginationArray,
@@ -1462,41 +1466,36 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var valid = true;
         var elInstance = this.state.inventoryEl;
         var json = elInstance.getJson(null, false);
-        var mapArray = [];
-        // var adjustmentsQty = 0;
-        // var openingBalance = 0;
-        // var consumptionQty = 0;
+        var inventoryDataList = this.props.items.inventoryListUnFiltered;
+        var inList = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
-            mapArray.push(map);
-
-            var inventoryListUnFiltered = this.props.items.inventoryListUnFiltered;
-            var iList = [];
-            var adjustmentType = this.props.items.inventoryType;
-            if (adjustmentType == 2) {
-                iList = inventoryListUnFiltered.filter(c => c.adjustmentQty != "" && c.adjustmentQty != null && c.adjustmentQty != undefined);
+            if (parseInt(map.get("14")) != -1) {
+                inventoryDataList[parseInt(map.get("14"))].inventoryDate = moment(map.get("0")).endOf('month').format("YYYY-MM-DD");
+                inventoryDataList[parseInt(map.get("14"))].region.id = map.get("1");
+                inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.id = map.get("3");
             } else {
-                iList = inventoryListUnFiltered.filter(c => c.actualQty != "" && c.actualQty != null && c.actualQty != undefined);
+                var inventoryJson = {
+                    inventoryId: 0,
+                    region: {
+                        id: map.get("1"),
+                    },
+                    inventoryDate: moment(map.get("0")).endOf('month').format("YYYY-MM-DD"),
+                    realmCountryPlanningUnit: {
+                        id: map.get("3"),
+                    },
+                }
+                inList.push(inventoryJson);
             }
-            var checkDuplicateOverAll = iList.filter(c =>
+        }
+        for (var y = 0; y < json.length; y++) {
+            var map = new Map(Object.entries(json[y]));
+            var adjustmentType = this.props.items.inventoryType;
+            var checkDuplicate = (inventoryDataList.concat(inList)).filter(c =>
                 c.realmCountryPlanningUnit.id == map.get("3") &&
                 moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
                 c.region.id == map.get("1"));
-            var index = 0;
-
-            if (checkDuplicateOverAll.length > 0) {
-                if (checkDuplicateOverAll[0].inventoryId > 0) {
-                    index = inventoryListUnFiltered.findIndex(c => c.inventoryId == checkDuplicateOverAll[0].inventoryId);
-                } else {
-                    index = checkDuplicateOverAll[0].index;
-                }
-            }
-            var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("3") == map.get("3") &&
-                moment(c.get("0")).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
-                c.get("1") == map.get("1")
-            )
-            if (adjustmentType == 1 && (checkDuplicateInMap.length > 1 || (checkDuplicateOverAll.length > 0 && index != map.get("14")))) {
+            if (adjustmentType == 1 && (checkDuplicate.length > 1)) {
                 var colArr = ['D'];
                 for (var c = 0; c < colArr.length; c++) {
                     var col = (colArr[c]).concat(parseInt(y) + 1);
