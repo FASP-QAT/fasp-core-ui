@@ -779,7 +779,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                 var noOfMonthsInUsagePeriod = 0;
                                                 var noFURequired = 0;
                                                 if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
-                                                    var convertToMonth = (props.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+                                                    var convertToMonth = (usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
                                                     if (usageTypeId == 2) {
                                                         var div = (convertToMonth * usageFrequency);
                                                         if (div != 0) {
@@ -799,7 +799,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
                                                         repeatUsagePeriodId = parentNodeNodeData.fuNode.repeatUsagePeriod.usagePeriodId;
                                                         if (repeatUsagePeriodId != "") {
-                                                            convertToMonth = (props.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+                                                            convertToMonth = (usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
                                                         } else {
                                                             convertToMonth = 0;
                                                         }
