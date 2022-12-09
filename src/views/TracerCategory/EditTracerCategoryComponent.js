@@ -547,6 +547,21 @@ class EditTracerCategoryComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
+                    var haArray = response.data;
+                    haArray = haArray.filter( (item) => {
+                        return item.healthAreaId === this.state.tracerCategory.healthArea.id;
+                    });
+                    if(haArray[0].active==false){
+                        this.setState(prevState => ({
+                            ...prevState,
+                            tracerCategory:{
+                                ...prevState.tracerCategory,
+                                healthArea:{
+                                    id:''
+                                }
+                            }
+                        }))
+                    }
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
