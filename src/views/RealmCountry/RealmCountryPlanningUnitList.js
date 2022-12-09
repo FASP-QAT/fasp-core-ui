@@ -297,8 +297,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                                         break;
                                     case 412:
                                         this.setState({
-                                            message: error.response.data.messageCode,
-                                            color: "#BA0C2F",
+                                            message: 'static.realmCountryPlanningUnit.failedToUpdate',
+                                            color: "red",
                                             loading: false
                                         });
                                         break;
