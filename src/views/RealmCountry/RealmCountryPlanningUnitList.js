@@ -270,6 +270,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                     })
                     .catch(
                         error => {
+                            console.log("Error",error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     // message: 'static.unkownError',
@@ -288,10 +289,16 @@ export default class RealmCountryPlanningUnitList extends Component {
                                         break;
                                     case 500:
                                     case 404:
-                                    case 406:
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             color: "#BA0C2F",
+                                            loading: false
+                                        });
+                                        break;
+                                    case 406:
+                                        this.setState({
+                                            message: 'static.realmCountryPlanningUnit.duplicateSKU',
+                                            color: "red",
                                             loading: false
                                         });
                                         break;
