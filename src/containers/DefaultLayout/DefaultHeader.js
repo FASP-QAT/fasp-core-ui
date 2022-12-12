@@ -199,7 +199,7 @@ class DefaultHeader extends Component {
           {this.props.activeModule == 1 && <NavItem className="">
             <span className="nav-link">
               <a href={localStorage.getItem('lang') == 'en' ?
-                "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceEn.html" :
+                "../../../../src/assets/img/ShowGuidance/ShowGuidanceEn.html" :
                 localStorage.getItem('lang') == 'fr' ?
                   "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceFr.html" :
                   localStorage.getItem('lang') == 'sp' ?
