@@ -199,12 +199,12 @@ class DefaultHeader extends Component {
           {this.props.activeModule == 1 && <NavItem className="">
             <span className="nav-link">
               <a href={localStorage.getItem('lang') == 'en' ?
-                "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceEn.html" :
+                "../../../../ShowGuidanceEn.html" :
                 localStorage.getItem('lang') == 'fr' ?
-                  "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceFr.html" :
+                  "../../../../ShowGuidanceFr.html" :
                   localStorage.getItem('lang') == 'sp' ?
-                    "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceSp.html" :
-                    "../../../../src/ShowGuidanceHtmlFile/ShowGuidancePr.html"
+                    "../../../../ShowGuidanceSp.html" :
+                    "../../../../ShowGuidancePr.html"
               } target="_blank">
                 {/* <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i> */}
                 <img src={ShowGuidanceImg} className="HelpIcon" title={'Show Guidance'} style={{ width: '25px', height: '25px' }} />
