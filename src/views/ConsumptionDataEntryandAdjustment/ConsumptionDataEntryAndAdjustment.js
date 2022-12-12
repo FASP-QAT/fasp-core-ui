@@ -553,7 +553,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
       this.setState({
         count: count,
-        
+
       })
     }
   }
@@ -950,7 +950,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
           datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
           console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
-          console.log("Test DatasetJson@@",datasetJson)
+          console.log("Test DatasetJson@@", datasetJson)
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
@@ -972,12 +972,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               countRecived: 0,
               count: 0,
               showDetailTable: true,
-              jsonDataMovingAvg:[],
-              jsonDataSemiAverage:[],
-              jsonDataLinearRegression:[],
-              jsonDataTes:[],
-              jsonDataArima:[],
-              datasetJson:datasetJson
+              jsonDataMovingAvg: [],
+              jsonDataSemiAverage: [],
+              jsonDataLinearRegression: [],
+              jsonDataTes: [],
+              jsonDataArima: [],
+              datasetJson: datasetJson
             }, () => {
               this.hideFirstComponent();
               this.componentDidMount()
@@ -3269,7 +3269,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var stopDate = moment(Date.now()).format("YYYY-MM-DD");
 
     var consumptionList = datasetJson.actualConsumptionList;
-    var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
+    var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active);
     var datasetRegionList = datasetJson.regionList;
     var missingMonthList = [];
 
