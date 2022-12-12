@@ -6,7 +6,9 @@ var assets = [
   '/manifest.json',
   '/QAT-logo192x192.png',
   '/QAT-logo512x512.png',
-  '/QAT-logo150x61.png'
+  '/QAT-logo150x61.png',
+  '../../ShowGuidanceHtmlFile/ShowGuidanceEn.html',
+  '../../ShowGuidanceHtmlFile'
 ];
 
 self.addEventListener('install', event => {
