@@ -142,7 +142,7 @@ export default class ProgramList extends Component {
             data[2] = getLabelText(programList[j].label, this.state.lang)
             data[3] = programList[j].programCode;
             data[4] = getLabelText(programList[j].realmCountry.country.label, this.state.lang)
-            data[5] = programList[j].organisation.code
+            data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
             data[6] = haValues.toString();
             data[7] = reValues.toString();
             data[8] = programList[j].programManager.username

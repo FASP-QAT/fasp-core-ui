@@ -1073,7 +1073,7 @@ export default class BuildTree extends Component {
                     //     qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                     // }
                     // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-                    qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                    qatCalculatedPUPerVisit = addCommas(this.state.noFURequired / pu.multiplier);
                     // } else {
                     // qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                     // }
@@ -1233,7 +1233,7 @@ export default class BuildTree extends Component {
             console.log("PUPERVISIT puPerVisit---", puPerVisit);
         } else if (parentScenario.fuNode.usageType.id == 1) {
             // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-            puPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / conversionFactor);
+            puPerVisit = addCommas(this.state.noFURequired / conversionFactor);
             // } else {
             // puPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / conversionFactor);
             // }
@@ -2461,6 +2461,7 @@ export default class BuildTree extends Component {
         var patients = 0;
         var grandParentMomList = [];
         var noOfBottlesInOneVisit = 0;
+        console.log("This.state.noFuRequired",this.state.noFURequired)
         if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
             monthsPerVisit = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths;
             var parent = (this.state.currentItemConfig.context.parent);
@@ -2549,7 +2550,7 @@ export default class BuildTree extends Component {
                     }
                 }
             }
-            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100),0)` : `=G${parseInt(j) + 1}`;
+            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100),0)` : this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 1?`=(G${parseInt(j) + 1}/(${this.state.noFURequired/(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier}))*${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit}`:`=G${parseInt(j) + 1}`;
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -4749,7 +4750,97 @@ export default class BuildTree extends Component {
                     if (type == 1) {
                         console.log("get payload 5", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode);
                         if (itemConfig.payload.nodeType.id == 4) {
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuPerMonth < 0.01 ? addCommasThreeDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].fuPerMonth) : addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].fuPerMonth)) + "/" + 'Month';
+                            var usageType=(itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
+                            var val=(itemConfig.payload.nodeDataMap[scenarioId])[0].fuPerMonth;
+                            var val1="/" + 'Month';
+                            if(usageType==1){
+                                var usagePeriodId;
+                                var usageTypeId;
+                                var usageFrequency;
+                                var nodeTypeId = itemConfig.payload.nodeType.id;
+                                var scenarioId = this.state.selectedScenario;
+                                var repeatUsagePeriodId;
+                                var oneTimeUsage;
+                                if (nodeTypeId == 5) {
+                                } else {
+                                    usageTypeId = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
+                                    console.log("usageTypeId 4---", usageTypeId);
+                                    if (usageTypeId == 1) {
+                                        oneTimeUsage = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
+                                    }
+                                    if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage !== "" && oneTimeUsage.toString() == "false")) {
+                                        usagePeriodId = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
+                                        console.log("usagePeriodId 4---", usagePeriodId);
+                                    }
+                                    usageFrequency = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",","");
+                                    console.log("usageFrequency 4---", usageFrequency);
+                        
+                                }
+                                console.log("usagePeriodId dis---", usagePeriodId);
+                                var noOfMonthsInUsagePeriod = 0;
+                                if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
+                                    console.log("inside if no fu");
+                                    var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+                                    console.log("convertToMonth dis---", convertToMonth);
+                                    console.log("repeat count---", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount);
+                        
+                                    if (usageTypeId == 2) {
+                                        var div = (convertToMonth * usageFrequency);
+                                        console.log("duv---", div);
+                                        if (div != 0) {
+                                            noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
+                                            console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                                        }
+                                    } else {
+                                        // var noOfFUPatient = this.state.noOfFUPatient;
+                                        var noOfFUPatient;
+                                        if (itemConfig.payload.nodeType.id == 4) {
+                                            noOfFUPatient = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                                        } else {
+                                            console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
+                                            noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                                        }
+                                        console.log("no of fu patient---", noOfFUPatient);
+                                        noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                                        console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                                    }
+                        
+                                    console.log("repeat count a---", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount);
+                                    console.log("convert to month a---", convertToMonth);
+                                    console.log("noOfMonthsInUsagePeriod a---", noOfMonthsInUsagePeriod);
+                                    if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
+                                        console.log("(this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode);
+                                        repeatUsagePeriodId = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                                        console.log("repeatUsagePeriodId for calc---", repeatUsagePeriodId);
+                                        if (repeatUsagePeriodId != "") {
+                                            convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+                                        } else {
+                                            convertToMonth = 0;
+                                        }
+                                    }
+                                    var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount!=null?((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",",""):(itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+                                    val=noFURequired;
+                                    val1=""
+                                    console.log("noFURequired---", noFURequired);
+                        
+                                } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+                                    console.log("inside else if no fu");
+                                    if (itemConfig.payload.nodeType.id == 4) {
+                                        noFURequired = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                        val=noFURequired;
+                                        val1="";
+                                    } else {
+                                        console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
+                                        noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                        val=noFURequired;
+                                        val1="";
+                                    }
+                                    // noOfMonthsInUsagePeriod = noOfFUPatient;
+                                }
+                                
+                            }
+                            console.log("Test123 Value",(itemConfig.payload.nodeDataMap[scenarioId])[0])
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (val < 0.01 ? addCommasThreeDecimal(val) : addCommasTwoDecimal(val)) + val1;
 
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             console.log("payload get puNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
@@ -5512,6 +5603,7 @@ export default class BuildTree extends Component {
                     this.nodeTypeChange(nodeTypeList[0].id);
                     if (nodeTypeList[0].id == 5) {
                         this.getNoOfMonthsInUsagePeriod();
+                        this.getNoFURequired();
                     }
                 })
             } else {
@@ -7147,6 +7239,7 @@ export default class BuildTree extends Component {
             currentItemConfig.context.payload.nodeType.id = event.target.value;
             if (event.target.value == 5) {
                 this.getNoOfMonthsInUsagePeriod();
+                this.getNoFURequired();
             }
         }
         if (event.target.name === "nodeUnitId") {
@@ -7405,7 +7498,7 @@ export default class BuildTree extends Component {
                 puPerVisit = parseFloat(((itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
             } else {
                 console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                puPerVisit = this.state.noOfMonthsInUsagePeriod / pu.multiplier;
+                puPerVisit = this.state.noFURequired / pu.multiplier;
             }
 
             console.log("AUTO puPerVisit---", puPerVisit);
@@ -7817,6 +7910,7 @@ export default class BuildTree extends Component {
                 } else if (data.context.payload.nodeType.id == 5) {
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
                     this.getNoOfMonthsInUsagePeriod();
+                    this.getNoFURequired();
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
                     var planningUnit = this.state.updatedPlanningUnitList.filter(x => x.id == this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id);
                     var conversionFactor = planningUnit.length > 0 ? planningUnit[0].multiplier : "";
@@ -8621,7 +8715,7 @@ export default class BuildTree extends Component {
                                                             bsSize="sm"
                                                             readOnly={true}
 
-                                                            value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) : this.state.noOfMonthsInUsagePeriod)}>
+                                                            value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) : this.state.noFURequired)}>
 
                                                         </Input>
                                                     </FormGroup>
@@ -8714,7 +8808,7 @@ export default class BuildTree extends Component {
                                                             name="noOfPUUsage"
                                                             bsSize="sm"
                                                             readOnly={true}
-                                                            value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? this.round((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : this.round(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))}>
+                                                            value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? this.round((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : this.round(this.state.noFURequired / this.state.conversionFactor))}>
 
                                                         </Input>
                                                     </FormGroup>
@@ -8852,7 +8946,7 @@ export default class BuildTree extends Component {
                                                     value={this.state.currentItemConfig.parentItem != null
                                                         && this.state.parentScenario.fuNode != null ?
                                                         (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
-                                                            addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
+                                                            addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noFURequired / this.state.conversionFactor) : ""}
                                                 // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
                                                 //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
                                                 >
@@ -9360,10 +9454,10 @@ export default class BuildTree extends Component {
                                                             <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}{"/ Time"}</td>
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
-                                                        </tr>
+                                                        {/* <tr> */}
+                                                            {/* <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td> */}
+                                                            {/* <td style={{ width: '50%' }}>{addCommas(this.state.noFURequired)}</td> */}
+                                                        {/* </tr> */}
                                                         <tr>
                                                             <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noFURequired)}</td>
