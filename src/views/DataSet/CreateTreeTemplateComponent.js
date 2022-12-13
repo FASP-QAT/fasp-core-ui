@@ -5761,9 +5761,11 @@ export default class CreateTreeTemplate extends Component {
                         }
                     }]
                 }, () => {
-                    console.log("Tree Template---", this.state.items);
-                    this.generateMonthList();
-                })
+                    setTimeout(() => {
+                        console.log("Tree Template---", this.state.items);
+                        this.generateMonthList();    
+                    }, 0);
+                     })
             }
 
             // this.generateMonthList();
