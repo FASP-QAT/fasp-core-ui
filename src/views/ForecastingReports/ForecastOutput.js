@@ -558,7 +558,7 @@ class ForecastOutput extends Component {
 
             return (A.push(this.addDoubleQuoteToRowContent([
                 ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                ((ele.scenario.label!=null?ele.scenario.label:"").replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                ((ele.scenario.label != null ? ele.scenario.label : "").replaceAll(',', ' ')).replaceAll(' ', '%20'),
             ].concat(propertyName))))
         }
         );
@@ -3784,10 +3784,10 @@ class ForecastOutput extends Component {
                                                             <Table className="table-bordered table-bordered1 text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options} id="forecastOutputId">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th className='Firstcolum'>{i18n.t('static.forecastReport.display')}</th>
-                                                                        <th className=''>{i18n.t('static.program.region')}</th>
-                                                                        <th className='Secondcolum'>{this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit')}</th>
-                                                                        <th className='MonthlyForecastdWidth Thirdcolum'>{i18n.t('static.consumption.forcast')}</th>
+                                                                        <th className='whitebg_inforecastOutput sticky-col Firstcolum'>{i18n.t('static.forecastReport.display')}</th>
+                                                                        <th className='whitebg_inforecastOutput sticky-col'>{i18n.t('static.program.region')}</th>
+                                                                        <th className='whitebg_inforecastOutput sticky-col Secondcolum'>{this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit')}</th>
+                                                                        <th className='whitebg_inforecastOutput sticky-col MonthlyForecastdWidth Thirdcolum'>{i18n.t('static.consumption.forcast')}</th>
                                                                         {this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
                                                                             <th>{moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>
                                                                         ))}
