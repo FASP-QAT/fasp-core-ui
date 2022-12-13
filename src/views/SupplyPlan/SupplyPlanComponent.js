@@ -2934,7 +2934,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             var productJson = {
                                                 label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
                                                 value: myResult[i].planningUnit.id,
-                                                actualLabel:myResult[i].label
+                                                actualLabel: myResult[i].label
                                             }
                                             proList.push(productJson);
                                             planningList.push(myResult[i]);
@@ -4097,14 +4097,18 @@ export default class SupplyPlanComponent extends React.Component {
                     this.setState({
                         shipments: !this.state.shipments
                     }, () => {
-                        this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                        if (this.state.shipments) {
+                            this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                        }
                     });
                 }
             } else if (supplyPlanType == 'shipments') {
                 this.setState({
                     shipments: !this.state.shipments
                 }, () => {
-                    this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+                    if (this.state.shipments) {
+                        this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+                    }
                 });
             } else if (supplyPlanType == 'Adjustments') {
                 var monthCountAdjustments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
@@ -6571,9 +6575,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                         },
                                                         suggestedQty: suggestedOrd,
                                                         budget: {
-                                                            id: this.state.budgetId!=""?this.state.budgetId:"",
-                                                            code: this.state.budgetId!=""?this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].budgetCode:"",
-                                                            label: this.state.budgetId!=""?this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].label:{},
+                                                            id: this.state.budgetId != "" ? this.state.budgetId : "",
+                                                            code: this.state.budgetId != "" ? this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].budgetCode : "",
+                                                            label: this.state.budgetId != "" ? this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].label : {},
                                                         },
                                                         emergencyOrder: false,
                                                         currency: c,
