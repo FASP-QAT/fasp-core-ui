@@ -676,11 +676,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         } else {
                                             // var noOfFUPatient = this.state.noOfFUPatient;
                                             var noOfFUPatient;
-                                            if (payload.nodeType.id == 4) {
+                                            // if (payload.nodeType.id == 4) {
                                                 noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
-                                            } else {
-                                                noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
-                                            }
+                                            // } else {
+                                                // noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                            // }
                                             noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                                         }
                                         if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
@@ -693,11 +693,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         }
                                         noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (parentNodeNodeData.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                     } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
-                                        if (payload.nodeType.id == 4) {
+                                        // if (payload.nodeType.id == 4) {
                                             noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
-                                        } else {
-                                            noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
-                                        }
+                                        // } else {
+                                            // noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                        // }
                                     }
                                     var puMultiplier = 0;
                                     if (!isTemplate) {
