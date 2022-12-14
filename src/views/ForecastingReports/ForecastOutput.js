@@ -945,9 +945,11 @@ class ForecastOutput extends Component {
     }
 
     filterData() {
-        console.log("INSIDE FILTERDATA---------------------------------");
+        console.log("INSIDE FILTERDATA---------------------------------", this.state);
         let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
         let forecastingUnitIds = this.state.forecastingUnitValues.map(ele => (ele.value))
+        console.log("Test123 FUs", forecastingUnitIds);
+        console.log("Test123 FUs state", this.state.forecastingUnitValues);
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -1106,16 +1108,18 @@ class ForecastOutput extends Component {
                                                                         let consumptionList = nodeDataMomList.map(m => {
                                                                             return {
                                                                                 consumptionDate: m.month,
-                                                                                consumptionQty: Math.round(m.calculatedMmdValue / convertToEu)
+                                                                                consumptionQty: m.calculatedMmdValue
                                                                             }
                                                                         });
                                                                         myTempData = myTempData.concat(consumptionList);
                                                                     } else {
 
                                                                         let consumptionList = nodeDataMomList.map(m => {
+                                                                            console.log("m calculated MMD Value Test123", m.calculatedMmdValue)
+                                                                            console.log("m month Test123", m.month)
                                                                             return {
                                                                                 consumptionDate: m.month,
-                                                                                consumptionQty: Math.round(m.calculatedMmdValue)
+                                                                                consumptionQty: m.calculatedMmdValue
                                                                             }
                                                                         });
                                                                         myTempData = myTempData.concat(consumptionList);
@@ -1132,7 +1136,12 @@ class ForecastOutput extends Component {
                                                                     a[consumptionDate].consumptionQty += consumptionQty;
                                                                 return a;
                                                             }, {}));
-
+                                                            if (yaxisEquUnitId != -1) {
+                                                                for (var rt = 0; rt < resultTrue.length; rt++) {
+                                                                    let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUniObj.planningUnit.forecastingUnit.id)[0].convertToEu;
+                                                                    resultTrue[rt].consumptionQty = Number(resultTrue[rt].consumptionQty) / Number(convertToEu);
+                                                                }
+                                                            }
 
                                                             if (resultTrue.length > 0) {
                                                                 let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: '(' + treeList[m].label.label_en + ' - ' + filteredScenario[0].label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: resultTrue, region: filteredProgram.regionList.filter(c => c.regionId == keys[j])[0], graphId: 0 }
@@ -1295,34 +1304,37 @@ class ForecastOutput extends Component {
                                                             if (filteredScenario.length > 0) {
                                                                 let flatlist = treeList[m].tree.flatList;
 
-                                                                let listContainNodeType4 = flatlist.filter(c => c.payload.nodeType.id == 4);
+                                                                let listContainNodeType4 = flatlist.filter(c => c.payload.nodeType.id == 5);
 
                                                                 console.log("TestFU------------>5", listContainNodeType4);
 
 
                                                                 let myTempData = [];
                                                                 for (let k = 0; k < listContainNodeType4.length; k++) {
-                                                                    let arrayOfNodeDataMap = (listContainNodeType4[k].payload.nodeDataMap[scenarioId]).filter(c => c.fuNode.forecastingUnit.id == selectedForecastingUnit[i].value);
+                                                                    let arrayOfNodeDataMap = (listContainNodeType4[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == forecastingUniObj[l].planningUnit.id);
 
                                                                     if (arrayOfNodeDataMap.length > 0) {
                                                                         nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
+                                                                        console.log("nodeDataMomList Test123", nodeDataMomList)
                                                                         if (yaxisEquUnitId != -1) {//Yes
 
-                                                                            let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == selectedForecastingUnit[i].value)[0].convertToEu;
+
 
                                                                             let consumptionList = nodeDataMomList.map(m => {
                                                                                 return {
                                                                                     consumptionDate: m.month,
-                                                                                    consumptionQty: Math.round(m.calculatedValue / convertToEu)
+                                                                                    consumptionQty: m.calculatedMmdValue
                                                                                 }
                                                                             });
                                                                             myTempData = myTempData.concat(consumptionList);
                                                                         } else {
 
                                                                             let consumptionList = nodeDataMomList.map(m => {
+                                                                                console.log("Month Test123", m.month)
+                                                                                console.log("Value Test123", m.calculatedMmdValue)
                                                                                 return {
                                                                                     consumptionDate: m.month,
-                                                                                    consumptionQty: Math.round(m.calculatedValue)
+                                                                                    consumptionQty: m.calculatedMmdValue
                                                                                 }
                                                                             });
                                                                             myTempData = myTempData.concat(consumptionList);
@@ -1330,6 +1342,7 @@ class ForecastOutput extends Component {
                                                                         }
                                                                     }
                                                                 }
+                                                                console.log("My Temp data@@@@@ Test123", myTempData);
 
                                                                 // logic for add same date data
                                                                 let resultTrue = Object.values(myTempData.reduce((a, { consumptionDate, consumptionQty }) => {
@@ -1339,8 +1352,18 @@ class ForecastOutput extends Component {
                                                                         a[consumptionDate].consumptionQty += consumptionQty;
                                                                     return a;
                                                                 }, {}));
-
+                                                                for (var rt = 0; rt < resultTrue.length; rt++) {
+                                                                    console.log("resultTrue[rt].consumptionQty Test123", resultTrue[rt].consumptionQty);
+                                                                    console.log("Multiplier Test123", forecastingUniObj[l].planningUnit.multiplier);
+                                                                    if (yaxisEquUnitId != -1) {
+                                                                        let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == selectedForecastingUnit[i].value)[0].convertToEu;
+                                                                        resultTrue[rt].consumptionQty = Number(Number(resultTrue[rt].consumptionQty) * Number(forecastingUniObj[l].planningUnit.multiplier)) / Number(convertToEu);
+                                                                    } else {
+                                                                        resultTrue[rt].consumptionQty = Number(resultTrue[rt].consumptionQty) * Number(forecastingUniObj[l].planningUnit.multiplier);
+                                                                    }
+                                                                }
                                                                 console.log("Test------------>IMP FU", resultTrue);
+
 
                                                                 // if (resultTrue.length > 0) {
                                                                 //     let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.forecastingUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: '(' + treeList[m].label.label_en + ' - ' + filteredScenario[0].label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: resultTrue, treeId: treeId, scenarioId: scenarioId, consumptionExtrapolationId: 0 }
@@ -1626,10 +1649,12 @@ class ForecastOutput extends Component {
                                     console.log("consumptionData------------------->3003", nextConsumptionListData);
 
                                     let tempConsumptionListData = nextConsumptionListData.map(m => {
+                                        console.log("m.month in aggregate Test123", m.consumptionDate)
+                                        console.log("m.qty in aggregate Test123", m.consumptionQty)
                                         return {
                                             consumptionDate: moment(m.consumptionDate).format("YYYY"),
                                             // consumptionQty: m.consumptionQty
-                                            consumptionQty: parseInt(m.consumptionQty)
+                                            consumptionQty: m.consumptionQty
                                         }
                                     });
                                     console.log("consumptionData------------------->33", tempConsumptionListData);
@@ -1641,7 +1666,7 @@ class ForecastOutput extends Component {
                                         else
                                             // a[consumptionDate].consumptionQty += consumptionQty;
                                             // a[consumptionDate].consumptionQty = parseFloat(a[consumptionDate].consumptionQty) + parseFloat(consumptionQty);
-                                            a[consumptionDate].consumptionQty = parseInt(a[consumptionDate].consumptionQty) + parseInt(consumptionQty);
+                                            a[consumptionDate].consumptionQty = Number(a[consumptionDate].consumptionQty) + Number(consumptionQty);
                                         return a;
                                     }, {}));
 
@@ -1772,7 +1797,15 @@ class ForecastOutput extends Component {
                 }.bind(this);
 
             } else {//api call
-
+                let planningUnitsByFus = [];
+                for (var fu = 0; fu < forecastingUnitIds.length; fu++) {
+                    console.log("forecastingUnitIds[fu] Test123", forecastingUnitIds[fu])
+                    console.log("this.state.planningUnits Test123", this.state.planningUnits)
+                    var puList = this.state.planningUnits.filter(c => c.forecastingUnit.id == forecastingUnitIds[fu]);
+                    console.log("puList Test123", puList);
+                    planningUnitsByFus = planningUnitsByFus.concat(puList);
+                }
+                let planningUnitIdsFu = planningUnitsByFus.map(ele => (ele.id).toString())
                 let consumptionData = [];
 
 
@@ -1781,9 +1814,9 @@ class ForecastOutput extends Component {
                     "versionId": versionId,
                     "startDate": startDate,
                     "stopDate": endDate,
-                    "reportView": viewById,
+                    "reportView": viewById == 1 ? viewById : 1,
                     "aggregateByYear": (xaxisId == 1 ? true : false),
-                    "unitIds": (viewById == 1 ? planningUnitIds : forecastingUnitIds)
+                    "unitIds": (viewById == 1 ? planningUnitIds : planningUnitIdsFu)
                 }
 
                 console.log("OnlineInputJson---------------->", inputJson);
@@ -1800,7 +1833,7 @@ class ForecastOutput extends Component {
                                 let consumptionList = primaryConsumptionData[i].monthlyForecastData.map(m => {
                                     return {
                                         consumptionDate: m.month,
-                                        consumptionQty: Math.round(m.consumptionQty)
+                                        consumptionQty: viewById == 1 ? m.consumptionQty : Number(m.consumptionQty) * Number(primaryConsumptionData[i].planningUnit.multiplier)
                                     }
                                 });
 
@@ -1810,7 +1843,7 @@ class ForecastOutput extends Component {
                                 let consumptionList = primaryConsumptionData[i].monthlyForecastData.map(m => {
                                     return {
                                         consumptionDate: m.month,
-                                        consumptionQty: Math.round(m.consumptionQty)
+                                        consumptionQty: viewById == 1 ? m.consumptionQty : Number(m.consumptionQty) * Number(primaryConsumptionData[i].planningUnit.multiplier)
                                     }
                                 });
                                 let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 0, label: 'No forecast selected' }, display: false, color: "#ba0c2f", consumptionList: consumptionList, region: primaryConsumptionData[i].region, graphId: 0 }
@@ -1860,10 +1893,12 @@ class ForecastOutput extends Component {
                                 console.log("consumptionData------------------->3003online", nextConsumptionListData);
 
                                 let tempConsumptionListData = nextConsumptionListData.map(m => {
+                                    console.log("Test123 Consumpty Qty ", m.consumptionQty)
+                                    console.log("Test123 Month ", m.consumptionDate)
                                     return {
                                         consumptionDate: moment(m.consumptionDate).format("YYYY"),
                                         // consumptionQty: m.consumptionQty
-                                        consumptionQty: parseInt(m.consumptionQty)
+                                        consumptionQty: Number(m.consumptionQty)
                                     }
                                 });
                                 console.log("consumptionData------------------->33online", tempConsumptionListData);
@@ -3806,7 +3841,7 @@ class ForecastOutput extends Component {
                                                                             <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
                                                                             <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
-                                                                                <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</td>
+                                                                                <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={Math.round(item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)} /> : ""}</td>
                                                                             ))}
                                                                             {/* <td style={{ display: 'none' }}>{(item.display == true ? countVar++ : '')}</td> */}
                                                                             {/* <td style={{ display: 'none' }}>{(this.state.consumptionData[index + 1] != undefined ? (this.state.consumptionData[index + 1].objUnit.id == item.objUnit.id || item.display == false ? '' : countVar++) : '')}{(item.display == false ? (this.state.consumptionData[index - 1] != undefined ? (this.state.consumptionData[index - 1].objUnit.id == item.objUnit.id ? countVar++ : '') : '') : '')}</td> */}
@@ -3836,7 +3871,7 @@ class ForecastOutput extends Component {
                                                                             <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
                                                                             <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
-                                                                                <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
+                                                                                <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={Math.round(item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty)} /> : ""}</td>
                                                                             ))}
                                                                             {/* <td style={{ display: 'none' }}>{(item.display == true ? countVar1++ : '')}</td> */}
                                                                             {/* <td style={{ display: 'none' }}>{(this.state.consumptionData[index + 1] != undefined ? (this.state.consumptionData[index + 1].objUnit.id == item.objUnit.id ? '' : countVar1++) : '')}</td> */}
