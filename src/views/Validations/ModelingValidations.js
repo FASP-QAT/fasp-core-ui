@@ -545,8 +545,8 @@ class ModelingValidation extends Component {
                         } else {
                         }
                     }
-                    data[k + 1] = calculatedValueTotal != "" ? Number(calculatedValueTotal).toFixed(2) : "";
-                    total += Number(calculatedValueTotal);
+                    data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
+                    total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
                 }
                 data[nodeVal.length + 1] = Number(total).toFixed(2);
 
