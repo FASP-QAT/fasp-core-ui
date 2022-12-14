@@ -96,7 +96,7 @@ class warehouseCapacity extends Component {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             this.getCountrylist();
-            this.getPrograms();
+            // this.getPrograms();
         } else {
             this.getPrograms();
         }
@@ -320,7 +320,11 @@ class warehouseCapacity extends Component {
                 });
                 this.setState({
                     // countries: response.data.map(ele => ele.realmCountry), loading: false
-                    countries: listArray, loading: false
+                    countries: listArray, loading: false, countryValues: JSON.parse(localStorage.getItem("sesCountryIdMulti"))
+                }, () => {
+                    if (this.state.countryValues.length > 0) {
+                        this.getPrograms()
+                    }
                 })
             }).catch(
                 error => {
@@ -435,6 +439,7 @@ class warehouseCapacity extends Component {
         countrysId = countrysId.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
+        localStorage.setItem("sesCountryIdMulti", JSON.stringify(countrysId))
         this.setState({
             countryValues: countrysId.map(ele => ele),
             countryLabels: countrysId.map(ele => ele.label)
@@ -447,6 +452,7 @@ class warehouseCapacity extends Component {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
+        localStorage.setItem("sesProgramIdMulti", JSON.stringify(programIds))
         this.setState({
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
@@ -458,6 +464,8 @@ class warehouseCapacity extends Component {
     }
 
     getPrograms() {
+        console.log("insis111")
+
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
@@ -469,8 +477,11 @@ class warehouseCapacity extends Component {
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
+                    console.log("insis", JSON.parse(localStorage.getItem("sesProgramIdMulti")))
+
                     this.setState({
-                        programs: listArray, loading: false,
+                        programs: listArray, loading: false, 
+                        programValues: JSON.parse(localStorage.getItem("sesProgramIdMulti")) == null || JSON.parse(localStorage.getItem("sesProgramIdMulti")) == "" ? "" : JSON.parse(localStorage.getItem("sesProgramIdMulti"))
                     })
                 }).catch(
                     error => {
@@ -590,7 +601,8 @@ class warehouseCapacity extends Component {
                             b = b.name.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
-                        programId: localStorage.getItem("sesProgramId")
+                        programId: localStorage.getItem("sesProgramId"),
+                        programValues: JSON.parse(localStorage.getItem("sesProgramIdMulti"))
                     }, () => {
                         this.fetchData();
                     })
@@ -601,7 +613,7 @@ class warehouseCapacity extends Component {
                             a = a.name.toLowerCase();
                             b = b.name.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
-                        })
+                        }), programValues: JSON.parse(localStorage.getItem("sesProgramIdMulti"))
                     })
                 }
 

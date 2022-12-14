@@ -538,6 +538,7 @@ class RegionListComponent extends Component {
         countrysId = countrysId.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
+        localStorage.setItem("sesCountryIdMulti", JSON.stringify(countrysId))
         this.setState({
             countryValues: countrysId.map(ele => ele),
             countryLabels: countrysId.map(ele => ele.label)
@@ -668,13 +669,14 @@ class RegionListComponent extends Component {
 
         // let CountryIds = this.state.countryValues.length == this.state.realmCountryList.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
         // console.log("CountryIds---", CountryIds);
-        let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
-        console.log("CountryIds123---", this.state.countryValues.map(ele => (ele.value).toString()));
-        if (this.state.countryValues.length > 0) {
+        var CountryIds = JSON.parse(localStorage.getItem("sesCountryIdMulti"));
+        // let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
+        console.log("CountryIds123---", CountryIds);
+        if (CountryIds.length > 0) {
             this.setState({ loading: true, message: '' })
             // AuthenticationService.setupAxiosInterceptors();
             let inputjson = {
-                realmCountryIds: CountryIds
+                realmCountryIds: CountryIds.map(ele => (ele.value).toString())
             }
             ReportService.wareHouseCapacityByCountry(inputjson)
                 .then(response => {
@@ -682,7 +684,8 @@ class RegionListComponent extends Component {
                     this.setState({
                         regionList: response.data,
                         selRegion: response.data,
-                        loading: false
+                        loading: false,
+                        countryValues: CountryIds
                     }, () => {
                         this.buildJexcel()
                     })
@@ -878,7 +881,7 @@ class RegionListComponent extends Component {
                         realmCountryList: listArray,
                         loading: false
                     },
-                        () => { })
+                        () => { this.filterData() })
                 } else {
                     this.setState({ message: response.data.messageCode, loading: false },
                         () => { this.hideSecondComponent(); })
