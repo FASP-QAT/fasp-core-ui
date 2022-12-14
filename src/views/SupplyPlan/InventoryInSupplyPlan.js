@@ -1494,7 +1494,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var checkDuplicate = (inventoryDataList.concat(inList)).filter(c =>
                 c.realmCountryPlanningUnit.id == map.get("3") &&
                 moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
-                c.region.id == map.get("1"));
+                c.region.id == map.get("1") && c.actualQty != "" && c.actualQty != null && c.actualQty != undefined);
             if (adjustmentType == 1 && (checkDuplicate.length > 1)) {
                 var colArr = ['D'];
                 for (var c = 0; c < colArr.length; c++) {
