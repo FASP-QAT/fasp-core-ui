@@ -761,7 +761,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var datasetJson = this.state.datasetJson;
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[r].regionId);
             var minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
-            var maxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+            var maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
 
             //Semi - averages
             console.log("this.state.jsonDataSemiAverage----------->", this.state.jsonDataSemiAverage);
@@ -1373,8 +1373,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var endMonthVal = endValList[0].month;
               interpolatedRegionsAndMonths.push({ region: regionList[r], month: moment(monthArray[j].date).format("YYYY-MM") });
               //y=y1+(x-x1)*(y2-y1)/(x2-x1);
-              const monthDifference = moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
-              const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
+              const monthDifference = Math.round(Number(moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true)));
+              const monthDiff = Math.round(Number(moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true)));
               var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
               var json = {
                 amount: missingActualConsumption.toFixed(0),

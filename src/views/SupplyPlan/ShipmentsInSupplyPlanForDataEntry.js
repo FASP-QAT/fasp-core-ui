@@ -136,6 +136,24 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             if (data[i].x == 15 && data[i].value != "") {
                 (instance).setValueFromCoords(15, data[i].y, data[i].value, true);
             }
+            if (data[i].x == 11) {
+                var aruList = this.state.realmCountryPlanningUnitList.filter(c => (c.name == data[i].value || getLabelText(c.label, this.state.lang) == data[i].value) && c.active.toString() == "true");
+                if (aruList.length > 0) {
+                    (instance).setValueFromCoords(11, data[i].y, aruList[0].id, true);
+                }
+            }
+            if (data[i].x == 23) {
+                var dsList = this.state.dataSourceList.filter(c => (c.name == data[i].value || getLabelText(c.label, this.state.lang) == data[i].value) && c.active.toString() == "true");
+                if (dsList.length > 0) {
+                    (instance).setValueFromCoords(23, data[i].y, dsList[0].id, true);
+                }
+            }
+            if (data[i].x == 17) {
+                var dsList = this.state.budgetList.filter(c => (c.name == data[i].value) && c.active.toString() == "true");
+                if (dsList.length > 0) {
+                    (instance).setValueFromCoords(23, data[i].y, dsList[0].id, true);
+                }
+            }
         }
     }
 
@@ -2097,7 +2115,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             elInstance.setValueFromCoords(13, y, "", true);
             var valid = checkValidtion("text", "L", y, rowData[11], elInstance);
             if (valid == true) {
-                var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[11])[0]).multiplier;
+                var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[11].toString().split(";")[0])[0]).multiplier;
                 elInstance.setValueFromCoords(13, y, multiplier, true);
             }
         }

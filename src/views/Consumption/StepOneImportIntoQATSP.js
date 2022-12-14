@@ -776,17 +776,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
             columns: [
 
                 {
-                    title: 'Forecast Tracer Category',
+                    title: i18n.t('static.importIntoQAT.forecastTracerCategory'),
                     type: 'text',
                     readOnly: true//0 A
                 },
                 {
-                    title: 'Forecast Planning Unit',
+                    title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
                     type: 'text',
                     readOnly: true//1 B
                 },
                 {
-                    title: 'Supply Plan Planning Unit',
+                    title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
                     type: 'autocomplete',
                     source: this.state.planningUnitListJexcel,//2 C
                     filter: this.filterPlanningUnitBasedOnTracerCategory
@@ -1544,7 +1544,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     <div className="row ">
                         <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanProgram')}</Label> */}
-                            <Label htmlFor="appendedInputButton">Forecast Program</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.dataSet.dataSet')}</Label>
                             <div className="controls ">
                                 <InputGroup>
                                     <Input
@@ -1587,7 +1587,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                         <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.forecastProgram')}</Label> */}
-                            <Label htmlFor="appendedInputButton">Supply Plan Program</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanProgram')}</Label>
                             <div className="controls ">
                                 <InputGroup>
                                     <Input
@@ -1607,7 +1607,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
                         <FormGroup className="col-md-4">
-                            <Label htmlFor="appendedInputButton">Range to Import Forecast Consumption<span className="stock-box-icon fa fa-sort-desc"></span> <i>(Forecast: {this.state.forecastPeriod})</i></Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importIntoQAT.dateRange')}<span className="stock-box-icon fa fa-sort-desc"></span> <i>({i18n.t('static.consumption.forcast')}: {this.state.forecastPeriod})</i></Label>
                             <div className="controls  Regioncalender">
 
                                 <Picker
