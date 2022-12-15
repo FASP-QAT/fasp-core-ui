@@ -2472,7 +2472,7 @@ export default class CreateTreeTemplate extends Component {
                                         usagePeriodId = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
                                         console.log("usagePeriodId 4---", usagePeriodId);
                                     }
-                                    usageFrequency = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",","");
+                                    usageFrequency = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency!=null?(itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",",""):"";
                                     console.log("usageFrequency 4---", usageFrequency);
                         
                                 }
@@ -4814,7 +4814,7 @@ export default class CreateTreeTemplate extends Component {
                 usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId != "" ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : "";
                 console.log("usagePeriodId---", usagePeriodId);
                 console.log("usageFrequency before 5---", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency);
-                usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
+                usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency!=null?(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", ""):"";
                 console.log("usageFrequency---", usageFrequency);
             }
 
@@ -4827,7 +4827,7 @@ export default class CreateTreeTemplate extends Component {
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
                 usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId != "" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : "";
                 console.log("usagePeriodId---", usagePeriodId);
-                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
+                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency!=null?(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", ""):"";
                 console.log("usageFrequency---", usageFrequency);
             }
 
@@ -4890,7 +4890,7 @@ export default class CreateTreeTemplate extends Component {
             noOfPersons = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             noOfForecastingUnitsPerPerson = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
             if (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage == false || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage == "false") {
-                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
+                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency!=null?(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", ""):"";
             }
 
             if (this.state.addNodeFlag) {
