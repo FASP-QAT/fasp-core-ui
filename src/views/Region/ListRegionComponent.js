@@ -669,7 +669,7 @@ class RegionListComponent extends Component {
 
         // let CountryIds = this.state.countryValues.length == this.state.realmCountryList.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
         // console.log("CountryIds---", CountryIds);
-        var CountryIds = JSON.parse(localStorage.getItem("sesCountryIdMulti"));
+        var CountryIds = localStorage.getItem("sesCountryIdMulti").length == 0 ? [] : JSON.parse(localStorage.getItem("sesCountryIdMulti"));
         // let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
         console.log("CountryIds123---", CountryIds);
         if (CountryIds.length > 0) {

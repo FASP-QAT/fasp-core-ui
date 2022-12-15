@@ -318,13 +318,15 @@ class warehouseCapacity extends Component {
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
+                var CountryIds = localStorage.getItem("sesCountryIdMulti").length == 0 ? [] : JSON.parse(localStorage.getItem("sesCountryIdMulti"));
+
                 this.setState({
                     // countries: response.data.map(ele => ele.realmCountry), loading: false
-                    countries: listArray, loading: false, countryValues: JSON.parse(localStorage.getItem("sesCountryIdMulti"))
+                    countries: listArray, loading: false, countryValues: CountryIds
                 }, () => {
-                    if (this.state.countryValues.length > 0) {
-                        this.getPrograms()
-                    }
+                    // if (this.state.countryValues.length > 0) {
+                    this.getPrograms()
+                    // }
                 })
             }).catch(
                 error => {
@@ -409,10 +411,15 @@ class warehouseCapacity extends Component {
                     programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
                 }
 
-                console.log('programLst', programLst)
                 if (programLst.length > 0) {
-
+                    let programLsts = [];
+                    var ProgramIds = localStorage.getItem("sesProgramIdMulti").length == 0 ? [] : JSON.parse(localStorage.getItem("sesProgramIdMulti"));
+                    for (var i = 0; i < programLst.length; i++) {
+                        programLsts = [...programLsts, ...ProgramIds.filter(c => c.value == programLst[i].programId)]
+                    }
                     this.setState({
+                        programValues: programLsts.map(ele => ele),
+                        programLabels: programLsts.map(ele => ele.label),
                         programLst: programLst
                     }, () => {
                         this.fetchData()
@@ -464,8 +471,6 @@ class warehouseCapacity extends Component {
     }
 
     getPrograms() {
-        console.log("insis111")
-
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
@@ -477,11 +482,14 @@ class warehouseCapacity extends Component {
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
-                    console.log("insis", JSON.parse(localStorage.getItem("sesProgramIdMulti")))
+                    var ProgramIds = localStorage.getItem("sesProgramIdMulti").length == 0 ? [] : JSON.parse(localStorage.getItem("sesProgramIdMulti"));
+                    console.log("insis", ProgramIds)
 
                     this.setState({
-                        programs: listArray, loading: false, 
-                        programValues: JSON.parse(localStorage.getItem("sesProgramIdMulti")) == null || JSON.parse(localStorage.getItem("sesProgramIdMulti")) == "" ? "" : JSON.parse(localStorage.getItem("sesProgramIdMulti"))
+                        programs: listArray, loading: false,
+                        programValues: ProgramIds
+                    }, () => {
+                        this.filterProgram()
                     })
                 }).catch(
                     error => {

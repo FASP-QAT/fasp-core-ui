@@ -414,15 +414,41 @@ class StockAdjustmentComponent extends Component {
                                 }
                             }
                             var lang = this.state.lang;
-                            this.setState({
-                                planningUnits: proList.sort(function (a, b) {
-                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
-                                    return a < b ? -1 : a > b ? 1 : 0;
-                                }), message: ''
-                            }, () => {
-                                this.fetchData();
+
+
+                            proList.sort(function (a, b) {
+                                a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                                b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
                             })
+
+                            var planningUnitIdProp = '';
+                            if (localStorage.getItem("sesPlanningUnitIdMulti") != '' && localStorage.getItem("sesPlanningUnitIdMulti") != undefined) {
+                                planningUnitIdProp = localStorage.getItem("sesPlanningUnitIdMulti");
+                                if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                    var planningUnitIdSession = JSON.parse(planningUnitIdProp);
+                                    var updatePlanningUnitList = [];
+                                    for (var pu = 0; pu < planningUnitIdSession.length; pu++) {
+                                        if (proList.filter(c => c.value == planningUnitIdSession[pu].value).length > 0) {
+                                            updatePlanningUnitList.push(planningUnitIdSession[pu]);
+                                        }
+                                    }
+                                    // var planningUnit = [{ value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label }];
+                                    this.setState({
+                                        planningUnitValues: updatePlanningUnitList, planningUnits: proList, message: ''
+                                        // planningUnitId: planningUnitIdProp
+                                    })
+                                    this.fetchData();
+
+                                }
+                            } else {
+                                this.setState({
+                                    planningUnits: proList, message: ''
+                                }, () => {
+                                    this.fetchData();
+                                })
+                            }
+
                         }.bind(this);
                     }.bind(this)
 
@@ -522,6 +548,7 @@ class StockAdjustmentComponent extends Component {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
+        localStorage.setItem("sesPlanningUnitIdMulti", JSON.stringify(planningUnitIds))
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
