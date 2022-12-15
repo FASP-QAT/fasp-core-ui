@@ -706,10 +706,13 @@ class Budgets extends Component {
 
             }
         } else if (programId == 0) {
+            jexcel.destroy(document.getElementById("budgetTable"), true);
             this.setState({ selBudget: [], message: i18n.t('static.common.selectProgram') });
         } else if (versionId == 0) {
+            jexcel.destroy(document.getElementById("budgetTable"), true);
             this.setState({ selBudget: [], message: i18n.t('static.program.validversion') });
         } else {
+            jexcel.destroy(document.getElementById("budgetTable"), true);
             this.setState({ selBudget: [], message: i18n.t('static.fundingSource.selectFundingSource') });
         }
     }
@@ -1517,7 +1520,7 @@ class Budgets extends Component {
                                 </div>
                                 {
                                     // this.state.show && 
-                                    this.state.selBudget.length > 0 &&
+                                    // this.state.selBudget.length > 0 &&
                                     <div className="dataEnteredTable">
                                         <div id="budgetTable">
                                         </div>
@@ -1577,6 +1580,7 @@ class Budgets extends Component {
     buildJexcel() {
         // this.el = jexcel(document.getElementById("budgetTable"), '');
         // this.el.destroy();
+        if(this.state.programId!=0 && this.state.programId!="" && this.state.versionId!="" && this.state.versionId!=0 && this.state.fundingSourceValues.length>0){
         jexcel.destroy(document.getElementById("budgetTable"), true);
 
         var data = this.state.selBudget;
@@ -1660,7 +1664,9 @@ class Budgets extends Component {
         };
         var jexcelDataEl = jexcel(document.getElementById("budgetTable"), options);
         this.el = jexcelDataEl;
-
+    }else{
+        jexcel.destroy(document.getElementById("budgetTable"), true);
+    }
         // this.setState({
         //     jexcelDataEl: jexcelDataEl
         // })
