@@ -4772,7 +4772,7 @@ export default class BuildTree extends Component {
                                         usagePeriodId = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
                                         console.log("usagePeriodId 4---", usagePeriodId);
                                     }
-                                    usageFrequency = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",","");
+                                    usageFrequency = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency!=null?(itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",",""):"";
                                     console.log("usageFrequency 4---", usageFrequency);
                         
                                 }
@@ -5900,9 +5900,9 @@ export default class BuildTree extends Component {
         if (nodeTypeId == 5) {
             usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
             console.log("usageTypeId 5---", usageTypeId);
-            usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
+            usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod!=null?(this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId:"";
             console.log("usagePeriodId 5---", usagePeriodId);
-            usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",","");
+            usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency!=null?(this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",",""):"";
             console.log("usageFrequency 5---", usageFrequency);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
@@ -5917,7 +5917,7 @@ export default class BuildTree extends Component {
                 usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
                 console.log("usagePeriodId 4---", usagePeriodId);
             }
-            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",","");
+            usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency!=null?(this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",",""):"";
             console.log("usageFrequency 4---", usageFrequency);
 
         }
@@ -6003,7 +6003,7 @@ export default class BuildTree extends Component {
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
                 usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
                 // console.log("usagePeriodId---", usagePeriodId);
-                usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
+                usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency!=null?(this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", ""):"";
                 // console.log("usageFrequency---", usageFrequency);
             }
 
@@ -6017,7 +6017,7 @@ export default class BuildTree extends Component {
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
                 usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
                 // console.log("usagePeriodId---", usagePeriodId);
-                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
+                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency!=null?(this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", ""):"";
                 // console.log("usageFrequency---", usageFrequency);
             }
 
@@ -6078,7 +6078,7 @@ export default class BuildTree extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                 noOfPersons = this.state.currentScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                 noOfForecastingUnitsPerPerson = this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
-                usageFrequency = this.state.currentScenario.fuNode.usageFrequency.toString().replaceAll(",", "");
+                usageFrequency = this.state.currentScenario.fuNode.usageFrequency!=null?this.state.currentScenario.fuNode.usageFrequency.toString().replaceAll(",", ""):"";
 
                 if (this.state.addNodeFlag) {
                     // var usageTypeParent = document.getElementById("usageTypeParent");
