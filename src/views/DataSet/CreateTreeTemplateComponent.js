@@ -6739,7 +6739,7 @@ export default class CreateTreeTemplate extends Component {
                 var pu = puNodes[puN].payload.nodeDataMap[0][0].puNode.planningUnit;
                 var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
                 var puNode=nodes[findNodeIndexPu].payload.nodeDataMap[0][0].puNode;
-                if (puNodes[puN].payload.nodeDataMap[0][0].fuNode.usageType.id == 2) {
+                if (currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) {
                     var refillMonths = this.round(parseFloat(pu.multiplier / (currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
                     console.log("AUTO refillMonths---", refillMonths);
                     console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
