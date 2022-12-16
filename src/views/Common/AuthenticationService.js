@@ -1432,12 +1432,24 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/dataset/branchTemplate/:templateId":
+                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
+                            return true;
+                        }
+                        break;
                     case "/dataset/listTreeTemplate/":
                     case "/dataset/listTreeTemplate/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_TREE_TEMPLATE")) {
                             return true;
                         }
                         break;
+                    case "/dataset/listBranchTreeTemplate/":
+                    case "/dataset/listBranchTreeTemplate/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_TREE_TEMPLATE")) {
+                            return true;
+                        }
+                        break;
+
                     case "/dataset/listTree/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_TREE")) {
                             return true;
