@@ -9897,7 +9897,7 @@ export default class CreateTreeTemplate extends Component {
                                     <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                 </button>}
                         </>}
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&
+                    {/* {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&
 
                         <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -9907,7 +9907,7 @@ export default class CreateTreeTemplate extends Component {
                             }}>
                             <i class="fa fa-sitemap" aria-hidden="true"></i>
                         </button>
-                    }
+                    } */}
 
                     {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}

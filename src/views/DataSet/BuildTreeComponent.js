@@ -11287,7 +11287,7 @@ export default class BuildTree extends Component {
                                 </button>}
 
                         </>}
-                    {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                    {/* {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
 
                         <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -11297,7 +11297,7 @@ export default class BuildTree extends Component {
                             }}>
                             <i class="fa fa-sitemap" aria-hidden="true"></i>
                         </button>
-                    }
+                    } */}
                     {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -12060,7 +12060,7 @@ export default class BuildTree extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-2" >
+                                            {/* <FormGroup className="col-md-2" >
                                                 <div className="check inline  pl-lg-0 pt-lg-0">
                                                     <div>
                                                         <Input
@@ -12079,7 +12079,7 @@ export default class BuildTree extends Component {
                                                         </Label>
                                                     </div>
                                                 </div>
-                                            </FormGroup>
+                                            </FormGroup> */}
 
                                         </div>
 

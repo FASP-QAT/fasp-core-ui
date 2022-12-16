@@ -2094,17 +2094,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.dataset.BranchTreeTemplate'),
-                            url: '/dataset/listBranchTreeTemplate',
-                            icon: 'fa fa-sitemap',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: i18n.t('static.dataset.BranchTreeTemplate'),
+                          //   url: '/dataset/listBranchTreeTemplate',
+                          //   icon: 'fa fa-sitemap',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           {
                             name: i18n.t('static.usageTemplate.usageTemplate'),
                             url: '/usageTemplate/listUsageTemplate',
