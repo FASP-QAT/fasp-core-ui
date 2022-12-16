@@ -986,7 +986,7 @@ export default class BuildTree extends Component {
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.getNodeTransferList = this.getNodeTransferList.bind(this);
         this.autoCalculate = this.autoCalculate.bind(this);
-        this.toggleTooltipAuto=this.toggleTooltipAuto.bind(this);
+        this.toggleTooltipAuto = this.toggleTooltipAuto.bind(this);
     }
 
     getMomValueForDateRange(startDate) {
@@ -5234,8 +5234,8 @@ export default class BuildTree extends Component {
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text(getLabelText(this.state.dataSetObj.programData.label, this.state.lang), 30, 85,{
-                width:780,
+            .text(getLabelText(this.state.dataSetObj.programData.label, this.state.lang), 30, 85, {
+                width: 780,
             });
 
         doc
@@ -5964,7 +5964,7 @@ export default class BuildTree extends Component {
                     convertToMonth = 0;
                 }
             }
-            var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount!=null?((this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",",""):(this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+            var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount != null ? ((this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
             console.log("noFURequired---", noFURequired);
 
         } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
@@ -6600,7 +6600,7 @@ export default class BuildTree extends Component {
 
                 this.setState({
                     unitList: myResult,
-                    nodeUnitList: myResult.filter(x => x.dimension.id == TREE_DIMENSION_ID && x.active==true)
+                    nodeUnitList: myResult.filter(x => x.dimension.id == TREE_DIMENSION_ID && x.active == true)
                 }, () => {
                     var nodeUnitListPlural = [];
                     console.log("this.state.nodeUnitList---", this.state.nodeUnitList);
@@ -7959,7 +7959,32 @@ export default class BuildTree extends Component {
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
         console.log("findNodeIndex---", findNodeIndex);
         nodes[findNodeIndex] = currentItemConfig.context;
-
+        if (currentItemConfig.context.payload.nodeType.id == 4) {
+            var puNodes = nodes.filter(c => c.parent == currentItemConfig.context.id);
+            for (var puN = 0; puN < puNodes.length; puN++) {
+                var refillMonths = "";
+                var puPerVisit = "";
+                var pu = puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit;
+                var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
+                var puNode=nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode;
+                if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                    var refillMonths = this.round(parseFloat(pu.multiplier / (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
+                    console.log("AUTO refillMonths---", refillMonths);
+                    console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                    puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
+                    puNode.refillMonths=refillMonths;
+                    puNode.puPerVisit=puPerVisit;
+                } else {
+                    console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                    puPerVisit = this.state.noFURequired / pu.multiplier;
+                    puNode.puPerVisit=puPerVisit;
+                }
+                
+                nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode = puNode;
+                console.log("Pu per visit Test123", puPerVisit)
+                console.log("Refill months Test123", refillMonths)
+            }
+        }
         const { curTreeObj } = this.state;
 
         var treeLevelList = curTreeObj.levelList;
@@ -11313,10 +11338,10 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </FormGroup>
                                             <div>
-                                        <Popover placement="top" isOpen={this.state.popoverTooltipAuto} target="PopoverAuto" trigger="hover" toggle={this.toggleTooltipAuto}>
-                                            <PopoverBody>{i18n.t('static.tooltip.autoCalculate')}</PopoverBody>
-                                        </Popover>
-                                    </div>
+                                                <Popover placement="top" isOpen={this.state.popoverTooltipAuto} target="PopoverAuto" trigger="hover" toggle={this.toggleTooltipAuto}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.autoCalculate')}</PopoverBody>
+                                                </Popover>
+                                            </div>
                                             <FormGroup className="col-md-4" >
                                                 <div className="check inline  pl-lg-0 pt-lg-0">
                                                     <div>
