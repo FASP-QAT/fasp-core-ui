@@ -3826,14 +3826,18 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         shipments: !this.state.shipments
                     }, () => {
-                        this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                        if (this.state.shipments) {
+                            this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                        }
                     });
                 }
             } else if (supplyPlanType == 'shipments') {
                 this.setState({
                     shipments: !this.state.shipments
                 }, () => {
-                    this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+                    if (this.state.shipments) {
+                        this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+                    }
                 });
             } else if (supplyPlanType == 'Adjustments') {
                 var monthCountAdjustments = count - 2;
