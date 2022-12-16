@@ -3338,7 +3338,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Picker>
                                             </div>
                                         </FormGroup>
-                                        <div className="MorginTopMonth">
+                                        <div className="MarginTopCustformonth">
                                             <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
                                         </div></>}
 
