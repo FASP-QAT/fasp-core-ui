@@ -263,6 +263,7 @@ export default class EditHealthAreaComponent extends Component {
                     console.log("Realm Country List -------list---", response.data);
                     if (response.status == 200) {
                         var json = response.data;
+                        json = json.filter(c => c.active)
                         var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
                         for (var i = 0; i < json.length; i++) {
                             regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
@@ -565,7 +566,7 @@ export default class EditHealthAreaComponent extends Component {
                                                     <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
                                                     <Input
                                                         bsSize="sm"
-                                                        type="text" name="healthAreaName"
+                                                        // type="text" name="healthAreaName"
                                                         valid={!errors.healthAreaName}
                                                         invalid={touched.healthAreaName && !!errors.healthAreaName || !!errors.healthAreaName}
                                                         type="text" name="healthAreaName"
@@ -731,6 +732,7 @@ export default class EditHealthAreaComponent extends Component {
                     console.log("Realm Country List -------list---", response.data);
                     if (response.status == 200) {
                         var json = response.data;
+                        json = json.filter(c => c.active)
                         var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
                         for (var i = 0; i < json.length; i++) {
                             regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
