@@ -684,7 +684,7 @@ class LoadDeleteDataSet extends Component {
                     <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardBody> */}
-                                <div className="table-responsive" id="treeDiv" style={{ display: "none" }}>
+                                <div className="table-responsive loadProgramHeight" id="treeDiv" style={{ display: "none" }}>
                                     <ul className="tree">
                                         <li>
                                             <input type="checkbox" id="c1" />
