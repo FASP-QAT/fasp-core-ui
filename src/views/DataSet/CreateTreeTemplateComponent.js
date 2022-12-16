@@ -4641,7 +4641,7 @@ export default class CreateTreeTemplate extends Component {
         if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
             var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
             console.log("convertToMonth dis---", convertToMonth);
-            console.log("repeat count---", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount);
+            // console.log("repeat count---", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount);
             console.log("no of month dis---", this.getNoOfMonthsInUsagePeriod());
 
             if (usageTypeId == 2) {
@@ -4666,7 +4666,11 @@ export default class CreateTreeTemplate extends Component {
                 console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
             }
             if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
-                repeatUsagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+                    repeatUsagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                }else{
+                    repeatUsagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId;                    
+                }
                 if (repeatUsagePeriodId) {
                     convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
                 } else {
@@ -4674,7 +4678,11 @@ export default class CreateTreeTemplate extends Component {
                 }
             }
             // var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / (convertToMonth * noOfMonthsInUsagePeriod);
-            var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+                var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+            }else{
+                var noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true ? ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+            }
             console.log("noFURequired---", noFURequired);
 
         } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
