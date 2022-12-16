@@ -1421,6 +1421,7 @@ class AuthenticationService {
                     case "/dataSet/buildTree/tree/:treeId/:programId":
                     case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
                     case "/dataSet/buildTree/":
+                    case "/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal":
                     case "/dataSet/buildTree/template/:templateId":
                         if (bfunction.includes("ROLE_BF_ADD_TREE")) {
                             return true;

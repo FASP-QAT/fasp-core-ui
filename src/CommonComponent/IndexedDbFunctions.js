@@ -196,6 +196,9 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('branchTemplate')){
             storeOS = db1.createObjectStore('branchTemplate', { keyPath: 'treeTemplateId', autoIncrement: true});
         }
+        if(!db1.objectStoreNames.contains('datasetDataServer')){
+            storeOS = db1.createObjectStore('datasetDataServer', { keyPath: 'id'});
+        }
         console.log("indexed db completed----------------------")
         
     };

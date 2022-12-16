@@ -2883,5 +2883,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.dataset.BranchTreeTemplate":"Branch Template",
     "static.dataset.createBranchTreeTemplate":"Create Branch Template",
-    "static.dataset.selectBranchTreeTemplate":"Select Template"
+    "static.dataset.selectBranchTreeTemplate":"Select Template",
+    "static.treeList.confirmAlert": "Server version will take some time to load. Are you sure you want to load the server version ?"
 }
