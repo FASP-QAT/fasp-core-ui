@@ -2461,12 +2461,12 @@ export default class syncPage extends Component {
                                                 var items = [];
                                                 //Resolve conflicts
                                                 var rowData = obj.getRowData(y)
-                                                if (rowData[33].toString() == 1) {
+                                                if (rowData[36].toString() == 1) {
                                                   items.push({
                                                     title: "Resolve conflicts",
                                                     onclick: function () {
                                                       this.setState({ loading: true })
-                                                      this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+                                                      this.toggleLargeShipment(rowData[33], rowData[34], y, 'shipment');
                                                     }.bind(this)
                                                   })
                                                 } else {
