@@ -1,6 +1,6 @@
 {
   "short_name": "QAT",
-  "name": "Demo",
+  "name": "Quantification Analytics Tool",
   "scope" : ".",
   "icons": [
     {
