@@ -451,12 +451,16 @@ class EditSupplyPlanStatus extends Component {
             this.setState({
                 shipments: !this.state.shipments
             });
-            this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+            if (this.state.shipments) {
+                this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+            }
         } else if (supplyPlanType == 'shipments') {
             this.setState({
                 shipments: !this.state.shipments
             });
-            this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+            if (this.state.shipments) {
+                this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+            }
         } else if (supplyPlanType == 'Adjustments') {
             var monthCountAdjustments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
             this.setState({
@@ -3566,7 +3570,7 @@ class EditSupplyPlanStatus extends Component {
                         </ul>
                     </FormGroup>
                     <div className="consumptionDataEntryTable RemoveStriped qat-problemListSearch EditStatusTable">
-                        <div id="problemListDiv" className="" />
+                        <div id="problemListDiv" className="tableDivjss_contentDisplay" />
                     </div>
                 </TabPane>
 

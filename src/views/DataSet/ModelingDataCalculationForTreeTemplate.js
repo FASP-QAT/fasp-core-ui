@@ -377,19 +377,23 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             if (payload.nodeType.id == 2) {
                                 calculatedValue = endValue;
                             } else if (payload.nodeType.id == 3 || payload.nodeType.id == 4 || payload.nodeType.id == 5) {
-                                // Jo uske parent ki calculated value hai Uska endValue %
-                                var parent = flatList[fl].parent;
-                                // console.log("parent---", parent);
-                                // console.log("flatList---", flatList);
-                                var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
-                                // console.log("parentFiltered---", parentFiltered);
-                                var singleNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id]);
-                                // console.log("singleNodeData---", singleNodeData);
-                                if (singleNodeData != undefined && singleNodeData.length > 0) {
-                                    var parentValueFilter = singleNodeData[0].nodeDataMomList.filter(c => c.month == i);
-                                    if (parentValueFilter.length > 0) {
-                                        var parentValue = parentValueFilter[0].calculatedValue;
-                                        calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
+                                if (flatList[fl].level != 0) {
+                                    // Jo uske parent ki calculated value hai Uska endValue %
+                                    var parent = flatList[fl].parent;
+                                    // console.log("parent---", parent);
+                                    // console.log("flatList---", flatList);
+                                    var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
+                                    // console.log("parentFiltered---", parentFiltered);
+                                    var singleNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id]);
+                                    // console.log("singleNodeData---", singleNodeData);
+                                    if (singleNodeData != undefined && singleNodeData.length > 0) {
+                                        var parentValueFilter = singleNodeData[0].nodeDataMomList.filter(c => c.month == i);
+                                        if (parentValueFilter.length > 0) {
+                                            var parentValue = parentValueFilter[0].calculatedValue;
+                                            calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
+                                        } else {
+                                            calculatedValue = 0;
+                                        }
                                     } else {
                                         calculatedValue = 0;
                                     }
@@ -519,15 +523,24 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     var grandParent = parentFiltered.parent;
                                     var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
                                     var patients = 0;
-                                    var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                    var grandParentNodeData = 0;
+                                    if (flatList[fl].level != 1) {
+                                        grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                    }
                                     console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                     if (grandParentNodeData != undefined) {
                                         var minusNumber = (nodeDataMapForScenario.month == 1 ? nodeDataMapForScenario.month - 2 : nodeDataMapForScenario.month - 1);
-                                        var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
+                                        var grandParentPrevMonthMMDValue = []
+                                        if (flatList[fl].level != 1) {
+                                            grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
+                                        }
                                         if (grandParentPrevMonthMMDValue.length > 0) {
                                             patients = grandParentPrevMonthMMDValue[0].calculatedValue;
                                         } else {
-                                            var grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == nodeDataMapForScenario.month);
+                                            var grandParentCurMonthMMDValue = [];
+                                            if (flatList[fl].level != 1) {
+                                                grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == nodeDataMapForScenario.month);
+                                            }
                                             if (grandParentCurMonthMMDValue.length > 0) {
                                                 patients = grandParentCurMonthMMDValue[0].calculatedValue;
                                             } else {
@@ -567,14 +580,23 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     console.log("cycle$$$%%%", cycle);
                                     var deltaPatients = 0;
                                     if (i == 0) {
-                                        var filter1 = grandParentNodeData.nodeDataMomList.filter(c => c.month == i);
+                                        var filter1 = [];
+                                        if (flatList[fl].level != 1) {
+                                            filter1 = grandParentNodeData.nodeDataMomList.filter(c => c.month == i);
+                                        }
                                         if (filter1.length > 0) {
                                             deltaPatients = filter1[0].calculatedValue - patients;
                                         }
                                     } else {
-                                        var filter1 = grandParentNodeData.nodeDataMomList.filter(c => c.month == i);
+                                        var filter1 = [];
+                                        if (flatList[fl].level != 1) {
+                                            filter1 = grandParentNodeData.nodeDataMomList.filter(c => c.month == i);
+                                        }
                                         var minusNumber = (i == 1 ? i - 2 : i - 1);
-                                        var filter2 = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
+                                        var filter2 = []
+                                        if (flatList[fl].level != 1) {
+                                            filter2 = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
+                                        }
                                         if (filter1.length > 0 && filter2.length > 0) {
                                             deltaPatients = filter1[0].calculatedValue - filter2[0].calculatedValue;
                                         }

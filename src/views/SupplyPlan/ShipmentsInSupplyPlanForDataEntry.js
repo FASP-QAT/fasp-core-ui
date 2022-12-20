@@ -3566,6 +3566,21 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 } else {
                     valid = false;
                 }
+                var validation = checkValidtion("text", "H", y, elInstance.getValueFromCoords(7, y, true), elInstance);
+                if (validation == true) {
+                    var shipmentStatus = rowData[4];
+                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                        if (rowData[7] == TBD_PROCUREMENT_AGENT_ID) {
+                            inValid("H", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
+                            valid = false;
+                            elInstance.setValueFromCoords(34, y, 1, true);
+                        } else {
+                            positiveValidation("H", y, elInstance);
+                        }
+                    }
+                } else {
+                    valid = false;
+                }
 
                 var validation = checkValidtion("text", "Q", y, rowData[16], elInstance);
                 if (validation == true) {
