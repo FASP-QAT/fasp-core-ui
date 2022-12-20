@@ -3338,7 +3338,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Picker>
                                             </div>
                                         </FormGroup>
-                                        <div className="MorginTopMonth">
+                                        <div className="MarginTopCustformonth">
                                             <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
                                         </div></>}
 
@@ -4252,7 +4252,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var stopDate = moment(Date.now()).format("YYYY-MM-DD");
 
         var consumptionList = datasetJson.actualConsumptionList;
-        var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
+        var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active);
         var datasetRegionList = datasetJson.regionList;
         var missingMonthList = [];
 
