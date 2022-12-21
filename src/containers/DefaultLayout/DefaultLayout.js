@@ -19,7 +19,7 @@ import {
 
 } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-
+import ErrorBoundary from '../../views/Pages/PageError/ErrorBoundary';
 
 // routes config
 //import routes from '../../routes';
@@ -1361,6 +1361,7 @@ class DefaultLayout extends Component {
     console.log("business function ----", this.state.businessFunctions)
     console.log("business function ----", this.state.activeTab)
     return (
+      <ErrorBoundary>
       <div className="app">
         {/* {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>} */}
 
@@ -4390,6 +4391,7 @@ class DefaultLayout extends Component {
           </Suspense>
         </AppFooter>
       </div>
+      </ErrorBoundary>
     );
   }
 }
