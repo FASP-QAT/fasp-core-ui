@@ -19,7 +19,7 @@ import {
 
 } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-
+import ErrorBoundary from '../../views/Pages/PageError/ErrorBoundary';
 
 // routes config
 //import routes from '../../routes';
@@ -1346,6 +1346,7 @@ class DefaultLayout extends Component {
     let events = ["keydown", "mousedown"];
     const checkOnline = localStorage.getItem('sessionType');
     return (
+      <ErrorBoundary>
       <div className="app">
         {/* {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>} */}
 
@@ -4375,6 +4376,7 @@ class DefaultLayout extends Component {
           </Suspense>
         </AppFooter>
       </div>
+      </ErrorBoundary>
     );
   }
 }
