@@ -1504,6 +1504,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 inventoryDataList[parseInt(map.get("14"))].inventoryDate = moment(map.get("0")).endOf('month').format("YYYY-MM-DD");
                 inventoryDataList[parseInt(map.get("14"))].region.id = map.get("1");
                 inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.id = map.get("3");
+                inventoryDataList[parseInt(map.get("14"))].adjustmentQty = (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
+                inventoryDataList[parseInt(map.get("14"))].actualQty = (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
             } else {
                 var inventoryJson = {
                     inventoryId: 0,
@@ -1514,6 +1516,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     realmCountryPlanningUnit: {
                         id: map.get("3"),
                     },
+                    adjustmentQty: (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
+                    actualQty: (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
                 }
                 inList.push(inventoryJson);
             }

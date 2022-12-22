@@ -19,7 +19,7 @@ import {
 
 } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-
+import ErrorBoundary from '../../views/Pages/PageError/ErrorBoundary';
 
 // routes config
 //import routes from '../../routes';
@@ -901,6 +901,11 @@ class DefaultLayout extends Component {
 
   }
 
+  logout(e){
+    console.log("inside customized logout function");
+    this.props.history.push('/login/static.message.sessionExpired')
+  }
+
   goOnline(e) {
     confirmAlert({
       message: i18n.t("static.login.confirmSessionChange"),
@@ -1356,6 +1361,7 @@ class DefaultLayout extends Component {
     console.log("business function ----", this.state.businessFunctions)
     console.log("business function ----", this.state.activeTab)
     return (
+      <ErrorBoundary>
       <div className="app">
         {/* {<ChangeInLocalProgramVersion ref="programChangeChild" func={this.checkClick} updateState={true}></ChangeInLocalProgramVersion>} */}
 
@@ -1374,7 +1380,7 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed >
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} logout={e => this.logout(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -4385,6 +4391,7 @@ class DefaultLayout extends Component {
           </Suspense>
         </AppFooter>
       </div>
+      </ErrorBoundary>
     );
   }
 }
