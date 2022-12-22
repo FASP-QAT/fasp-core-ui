@@ -1,6 +1,6 @@
 {
   "short_name": "QAT",
-  "name": "UAT",
+  "name": "UAT QAT",
   "scope" : ".",
   "icons": [
     {
