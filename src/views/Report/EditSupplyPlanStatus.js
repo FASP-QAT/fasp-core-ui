@@ -3570,7 +3570,7 @@ class EditSupplyPlanStatus extends Component {
                         </ul>
                     </FormGroup>
                     <div className="consumptionDataEntryTable RemoveStriped qat-problemListSearch EditStatusTable">
-                        <div id="problemListDiv" className="tableDivjss_contentDisplay" />
+                        <div id="problemListDiv" className="" />
                     </div>
                 </TabPane>
 
@@ -3880,9 +3880,9 @@ class EditSupplyPlanStatus extends Component {
             data = [];
             data[0] = problemList[j].problemReportId
             data[1] = problemList[j].problemActionIndex
-            data[2] = problemList[j].program.code
+            data[2] = ""
             data[3] = problemList[j].versionId
-            data[4] = (problemList[j].region != null) ? (getLabelText(problemList[j].region.label, this.state.lang)) : ''
+            data[4] = ""
             data[5] = getLabelText(problemList[j].planningUnit.label, this.state.lang)
             data[6] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
             data[7] = problemList[j].problemCategory.id
@@ -3893,7 +3893,7 @@ class EditSupplyPlanStatus extends Component {
             data[12] = problemList[j].problemStatus.id
             data[13] = problemList[j].planningUnit.id
             data[14] = problemList[j].realmProblem.problem.problemId
-            data[15] = problemList[j].realmProblem.problem.actionUrl
+            data[15] = ""
             data[16] = problemList[j].realmProblem.criticality.id
 
             data[17] = problemList[j].reviewNotes != null ? problemList[j].reviewNotes : ''
@@ -3931,42 +3931,72 @@ class EditSupplyPlanStatus extends Component {
             // colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'problemReportId',
-                    type: 'hidden',
-                    width: 0
+                    // title: 'problemReportId',
+                    // type: 'hidden',
+                    // width: 0
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
-                    title: 'problemActionIndex',
-                    type: 'hidden',
-                    width: 0
+                    // title: 'problemActionIndex',
+                    // type: 'hidden',
+                    // width: 0
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
-                    title: i18n.t('static.program.programCode'),
-                    type: 'hidden',
-                    width: 0
+                    // title: i18n.t('static.program.programCode'),
+                    // type: 'hidden',
+                    // width: 0
                     // readOnly:true
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
-                    title: i18n.t('static.program.versionId'),
-                    type: 'hidden',
-                    readOnly: true,
-                    width: 70
+                    // title: i18n.t('static.program.versionId'),
+                    // type: 'hidden',
+                    // readOnly: true,
+                    // width: 70
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
-                    title: i18n.t('static.region.region'),
-                    type: 'hidden',
-                    width: 0
+                    // title: i18n.t('static.region.region'),
+                    // type: 'hidden',
+                    // width: 0
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
                     type: 'text',
                     readOnly: true,
-                    width: 120
+                    width: 80
                 },
                 {
-                    title: i18n.t('static.report.month'),
-                    type: 'hidden',
-                    width: 0
+                    // title: i18n.t('static.report.month'),
+                    // type: 'hidden',
+                    // width: 0
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
                     title: i18n.t("static.problemActionReport.problemCategory"),
@@ -3992,7 +4022,8 @@ class EditSupplyPlanStatus extends Component {
                     type: 'dropdown',
                     source: this.state.problemStatusListForEdit,
                     width: 80,
-                    filter: this.filterProblemStatus
+                    filter: this.filterProblemStatus,
+                    readOnly:!this.state.editable
                 },
                 {
                     title: i18n.t('static.program.notes'),
@@ -4001,29 +4032,54 @@ class EditSupplyPlanStatus extends Component {
                     width: 120
                 },
                 {
-                    title: i18n.t('static.common.action'),
-                    type: 'hidden',
-                    width: 0
+                    // title: i18n.t('static.common.action'),
+                    // type: 'hidden',
+                    // width: 0
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
-                    title: 'planningUnitId',
-                    type: 'hidden',
-                    width: 0
+                    // title: 'planningUnitId',
+                    // type: 'hidden',
+                    // width: 0
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
-                    title: 'problemId',
-                    type: 'hidden',
-                    width: 0
+                    // title: 'problemId',
+                    // type: 'hidden',
+                    // width: 0
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
-                    title: 'actionUrl',
-                    type: 'hidden',
-                    width: 0
+                    // title: 'actionUrl',
+                    // type: 'hidden',
+                    // width: 0
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
-                    title: 'criticalitiId',
-                    type: 'hidden',
-                    width: 0
+                    // title: 'criticalitiId',
+                    // type: 'hidden',
+                    // width: 0
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
 
                 {
@@ -4045,24 +4101,31 @@ class EditSupplyPlanStatus extends Component {
                     title: i18n.t('static.problemAction.criticality'),
                     type: 'text',
                     readOnly: true,
-                    width: 100
+                    width: 80
                 },
                 {
                     title: i18n.t('static.supplyPlanReview.review'),
                     type: 'checkbox',
-                    width: 80,
+                    width: 50,
                     readOnly: !this.state.editable
                 },
                 {
-                    title: i18n.t('static.supplyPlanReview.reviewNotes'),
-                    type: !this.state.editable ? 'hidden' : 'text',
+                    title: !this.state.editable?'A':i18n.t('static.supplyPlanReview.reviewNotes'),
+                    type: !this.state.editable ? 'text' : 'text',
+                    visible:!this.state.editable?false:true,
+                    readOnly:!this.state.editable,
                     width: 120,
                 },
 
                 {
-                    title: 'isChanged',
-                    type: 'hidden',
-                    width: 0
+                    // title: 'isChanged',
+                    // type: 'hidden',
+                    // width: 0
+                    title:'A',
+                    type:'text',
+                    visible:false,
+                    width:0,
+                    readOnly:true,autoCasting: false
                 },
                 {
                     title: 'transList',
@@ -4126,7 +4189,7 @@ class EditSupplyPlanStatus extends Component {
             onfilter: function (el) {
                 // el.jexcel.updateTable();
             },
-            editable: this.state.editable,
+            // editable: this.state.editable,
             // text: {
             //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
             //     show: '',
