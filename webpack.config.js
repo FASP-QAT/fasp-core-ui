@@ -118,6 +118,22 @@ module.exports = {
             template: path.resolve(__dirname, 'src/assets/img/index.html'),
             filename: 'index.html'
         }),
+        new HtmlWebPackPlugin({
+            template: path.resolve(__dirname, 'src/ShowGuidanceHtmlFile/ShowGuidanceEn.html'),
+            filename: 'ShowGuidanceEn.html'
+        }),
+        new HtmlWebPackPlugin({
+            template: path.resolve(__dirname, 'src/ShowGuidanceHtmlFile/ShowGuidanceFr.html'),
+            filename: 'ShowGuidanceFr.html'
+        }),
+        new HtmlWebPackPlugin({
+            template: path.resolve(__dirname, 'src/ShowGuidanceHtmlFile/ShowGuidanceSp.html'),
+            filename: 'ShowGuidanceSp.html'
+        }),
+        new HtmlWebPackPlugin({
+            template: path.resolve(__dirname, 'src/ShowGuidanceHtmlFile/ShowGuidancePr.html'),
+            filename: 'ShowGuidancePr.html'
+        }),
         new WorkboxPlugin.GenerateSW({
             // swSrc: "src/src-sw.js",
             swDest: "faspsw.js",

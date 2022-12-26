@@ -297,8 +297,10 @@ const CompareAndSelectScenario = React.lazy(() => import('../../views/CompareAnd
 const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
+const ListBranchTreeTemplate = React.lazy(() => import('../../views/DataSet/ListBranchTemplateComponent'));
 const CommitTree = React.lazy(() => import('../../views/DataSet/CommitTreeComponent.js'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
+const BranchTemplate = React.lazy(() => import('../../views/DataSet/BranchTemplateComponent'));
 const LoadDeleteDataSet = React.lazy(() => import('../../views/DataSet/LoadDeleteDataSet'));
 const ExportDataset = React.lazy(() => import('../../views/DataSet/ExportDataset'));
 const ImportDataset = React.lazy(() => import('../../views/DataSet/ImportDataset'));
@@ -327,6 +329,8 @@ const routes = [
   { path: '/dataset/loadDeleteDataSet/:message', name: 'static.common.loadDeleteLocalVersion', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
+  { path: '/dataset/listBranchTreeTemplate/:color/:message', name: 'static.dataset.BranchTreeTemplate', component: ListBranchTreeTemplate },
+  { path: '/dataset/listBranchTreeTemplate/', exact: true, name: 'static.dataset.BranchTreeTemplate', component: ListBranchTreeTemplate },
   { path: '/validation/modelingValidation', exact: true, name: 'static.dashboard.modelingValidation', component: ModelingValidation },
   { path: '/report/compareVersion', exact: true, name: 'static.dashboard.Versioncomarition', component: CompareVersion },
   { path: '/validation/productValidation', exact: true, name: 'static.dashboard.productValidation', component: ProductValidation },
@@ -336,8 +340,10 @@ const routes = [
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:color/:message', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
+  { path: '/dataset/branchTemplate/:templateId', name: 'static.dataset.createBranchTreeTemplate', component: BranchTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId', exact: true, name: 'static.common.managetree', component: BuildTree },
+  { path: '/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId/:scenarioId', name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
@@ -2088,6 +2094,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
+                          // {
+                          //   name: i18n.t('static.dataset.BranchTreeTemplate'),
+                          //   url: '/dataset/listBranchTreeTemplate',
+                          //   icon: 'fa fa-sitemap',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           {
                             name: i18n.t('static.usageTemplate.usageTemplate'),
                             url: '/usageTemplate/listUsageTemplate',
