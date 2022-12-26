@@ -1,6 +1,6 @@
 {
   "short_name": "QAT",
-  "name": "Demo",
+  "name": "Demo QAT",
   "scope" : ".",
   "icons": [
     {
