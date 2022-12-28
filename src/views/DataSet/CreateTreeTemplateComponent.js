@@ -1933,50 +1933,50 @@ export default class CreateTreeTemplate extends Component {
     }
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson(null, false);
+        var json = this.state.modelingEl.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(11, y);
+            var value = this.state.modelingEl.getValueFromCoords(11, y);
             if (parseInt(value) == 1) {
 
                 //Modeling type
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(4, y);
+                var value = this.state.modelingEl.getValueFromCoords(4, y);
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
 
                 //+/-
                 var col = ("F").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(5, y);
+                var value = this.state.modelingEl.getValueFromCoords(5, y);
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(y);
                 console.log("modelingTypeId-valid--", rowData[4]);
                 // Start date
                 var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
+                var value = this.state.modelingEl.getValueFromCoords(1, y);
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
                 var startDate = rowData[1];
                 var stopDate = rowData[2];
@@ -1984,23 +1984,23 @@ export default class CreateTreeTemplate extends Component {
                 console.log("stopDate---", stopDate);
                 // Stop date
                 var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
+                var value = this.state.modelingEl.getValueFromCoords(2, y);
                 // var diff = moment(stopDate).diff(moment(startDate), 'months');
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 }
                 else if (stopDate <= startDate) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.validation.pleaseEnterValidDate'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.validation.pleaseEnterValidDate'));
                     valid = false;
                 }
                 else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
 
 
@@ -2010,44 +2010,44 @@ export default class CreateTreeTemplate extends Component {
                     // Month change %
                     if (rowData[4] != 2) {
                         var col = ("G").concat(parseInt(y) + 1);
-                        var value = this.el.getValueFromCoords(6, y);
+                        var value = this.state.modelingEl.getValueFromCoords(6, y);
                         if (value == "") {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                            this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                             valid = false;
                         }
                         // else if (!(reg.test(value))) {
-                        //     this.el.setStyle(col, "background-color", "transparent");
-                        //     this.el.setStyle(col, "background-color", "yellow");
-                        //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        //     this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                        //     this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                        //     this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
                         //     valid = false;
                         // }
                         else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setComments(col, "");
                         }
                     }
 
                     // Month change #
                     if (rowData[4] == 2) {
                         var col = ("H").concat(parseInt(y) + 1);
-                        var value = this.el.getValueFromCoords(7, y);
+                        var value = this.state.modelingEl.getValueFromCoords(7, y);
                         if (value == "") {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                            this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                             valid = false;
                         }
                         // else if (!(reg.test(value))) {
-                        //     this.el.setStyle(col, "background-color", "transparent");
-                        //     this.el.setStyle(col, "background-color", "yellow");
-                        //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        //     this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                        //     this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                        //     this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
                         //     valid = false;
                         // }
                         else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setComments(col, "");
                         }
                     }
 
@@ -2173,10 +2173,15 @@ export default class CreateTreeTemplate extends Component {
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
         var targetChangePer = '';
+        var targetChangeNumberForPer = '';
+        var targetChangePerForPer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
             targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))).toFixed(4);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
-            percentForOneMonth = targetChangePer;
+
+            targetChangeNumberForPer = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
+            targetChangePerForPer = (parseFloat(targetChangeNumberForPer / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
+            percentForOneMonth = targetChangePerForPer;
         }
         console.log("targetChangeNumber 1---", targetChangeNumber);
         this.setState({

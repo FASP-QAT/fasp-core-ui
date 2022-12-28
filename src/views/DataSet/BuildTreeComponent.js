@@ -3464,14 +3464,14 @@ export default class BuildTree extends Component {
     }
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson(null, false);
+        var json = this.state.modelingEl.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(11, y);
+            var value = this.state.modelingEl.getValueFromCoords(11, y);
             if (parseInt(value) == 1) {
 
                 //Transfer to node
                 var col = ("D").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(3, y);
+                var value = this.state.modelingEl.getValueFromCoords(3, y);
                 var transferFlag = false;
                 if (value != "") {
                     var items = this.state.items;
@@ -3489,80 +3489,80 @@ export default class BuildTree extends Component {
                     }
                     console.log("transferFlag---", transferFlag);
                     if (transferFlag) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, 'You can not transfer data to this node as it is an extrapolation node.');
+                        this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                        this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                        this.state.modelingEl.setComments(col, 'You can not transfer data to this node as it is an extrapolation node.');
                         valid = false;
                     } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
+                        this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                        this.state.modelingEl.setComments(col, "");
                     }
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
 
 
                 //Modeling type
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(4, y);
+                var value = this.state.modelingEl.getValueFromCoords(4, y);
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
 
                 //+/-
                 var col = ("F").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(5, y);
+                var value = this.state.modelingEl.getValueFromCoords(5, y);
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
 
                 // Start date
                 var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
+                var value = this.state.modelingEl.getValueFromCoords(1, y);
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
-                var startDate = this.el.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var stopDate = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var startDate = this.state.modelingEl.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var stopDate = this.state.modelingEl.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
 
                 // Stop date
                 var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
+                var value = this.state.modelingEl.getValueFromCoords(2, y);
                 var diff = moment(stopDate).diff(moment(startDate), 'months');
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 }
                 else if (diff <= 0) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.validation.pleaseEnterValidDate'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.validation.pleaseEnterValidDate'));
                     valid = false;
                 }
                 else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
 
                 var elInstance = this.state.modelingEl;
@@ -3575,44 +3575,44 @@ export default class BuildTree extends Component {
                     // Month change %
                     if (rowData[4] != 2) {
                         var col = ("G").concat(parseInt(y) + 1);
-                        var value = this.el.getValueFromCoords(6, y);
+                        var value = this.state.modelingEl.getValueFromCoords(6, y);
                         if (value == "") {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                            this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                             valid = false;
                         }
                         // else if (!(reg.test(value))) {
-                        //     this.el.setStyle(col, "background-color", "transparent");
-                        //     this.el.setStyle(col, "background-color", "yellow");
-                        //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        //     this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                        //     this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                        //     this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
                         //     valid = false;
                         // }
                         else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setComments(col, "");
                         }
                     }
 
                     // Month change #
                     if (rowData[4] == 2) {
                         var col = ("H").concat(parseInt(y) + 1);
-                        var value = this.el.getValueFromCoords(7, y);
+                        var value = this.state.modelingEl.getValueFromCoords(7, y);
                         if (value == "") {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                            this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                             valid = false;
                         }
                         // else if (!(reg.test(value))) {
-                        //     this.el.setStyle(col, "background-color", "transparent");
-                        //     this.el.setStyle(col, "background-color", "yellow");
-                        //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        //     this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                        //     this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                        //     this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
                         //     valid = false;
                         // }
                         else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setComments(col, "");
                         }
                     }
 
@@ -3730,10 +3730,15 @@ export default class BuildTree extends Component {
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
         var targetChangePer = '';
+        var targetChangeNumberForPer = '';
+        var targetChangePerForPer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
             targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))).toFixed(4);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
-            percentForOneMonth = targetChangePer;
+            targetChangeNumberForPer = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
+            targetChangePerForPer = (parseFloat(targetChangeNumberForPer / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
+
+            percentForOneMonth = targetChangePerForPer;
         }
         this.setState({
             currentTargetChangeNumber: currentEndValue != '' ? targetChangeNumber : '',
@@ -5035,7 +5040,6 @@ export default class BuildTree extends Component {
                                 }
                                 
                             }
-                            console.log("Test123 Value",(itemConfig.payload.nodeDataMap[scenarioId])[0])
                             return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (val < 0.01 ? addCommasThreeDecimal(val) : addCommasTwoDecimal(val)) + val1;
 
                         } else if (itemConfig.payload.nodeType.id == 5) {
@@ -8407,8 +8411,6 @@ export default class BuildTree extends Component {
                 }
                 
                 nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode = puNode;
-                console.log("Pu per visit Test123", puPerVisit)
-                console.log("Refill months Test123", refillMonths)
             }
         }
         const { curTreeObj } = this.state;
