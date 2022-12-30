@@ -374,56 +374,64 @@ export default class ImportProgram extends Component {
 
                                                 addProgramDataRequest.onsuccess = function (event) {
                                                 };
+                                                transaction2.oncomplete = function (event) {
+                                                    var json1 = JSON.parse(fileData.split("@~-~@")[1]);
+                                                    var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                    var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
+                                                    json1.userId = userId1;
+                                                    json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1
+                                                    // var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
+                                                    // var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                    // var programJson1 = JSON.parse(programData1);
 
-                                                var json1 = JSON.parse(fileData.split("@~-~@")[1]);
-                                                var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                                var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
-                                                json1.userId = userId1;
-                                                json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1
-                                                // var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
-                                                // var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
-                                                // var programJson1 = JSON.parse(programData1);
+                                                    // Adding data to program QPL details
+                                                    var item = {
+                                                        id: json.programId + "_v" + json.version + "_uId_" + userId,
+                                                        programId: json.programId,
+                                                        version: json.version,
+                                                        userId: userId,
+                                                        programCode: programJson.programCode,
+                                                        openCount: openCount,
+                                                        addressedCount: addressedCount,
+                                                        programModified: programModified,
+                                                        readonly: readonly
+                                                    }
+                                                    var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                                                    var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
+                                                    console.log("programQPLDetailsJson***", item);
+                                                    var programQPLDetailsRequest = programQPLDetailsOs.put(item);
+                                                    programQPLDetailsTransaction.oncomplete = function (event) {
+                                                        // Adding data in downloaded program data
 
-                                                // Adding data to program QPL details
-                                                var item = {
-                                                    id: json.programId + "_v" + json.version + "_uId_" + userId,
-                                                    programId: json.programId,
-                                                    version: json.version,
-                                                    userId: userId,
-                                                    programCode: programJson.programCode,
-                                                    openCount: openCount,
-                                                    addressedCount: addressedCount,
-                                                    programModified: programModified,
-                                                    readonly: readonly
-                                                }
-                                                var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                                var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                                console.log("programQPLDetailsJson***", item);
-                                                var programQPLDetailsRequest = programQPLDetailsOs.put(item);
-
-                                                // Adding data in downloaded program data
-
-                                                var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
-                                                var program3 = transaction3.objectStore('downloadedProgramData');
+                                                        var transaction3 = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                                        var program3 = transaction3.objectStore('downloadedProgramData');
 
 
-                                                var addProgramDataRequest1 = program3.put(json1);
-                                                addProgramDataRequest1.onerror = function (event) {
-                                                };
+                                                        var addProgramDataRequest1 = program3.put(json1);
+
+                                                        transaction3.oncomplete = function (event) {
+                                                            this.setState({
+                                                                message: i18n.t('static.program.dataimportsuccess'),
+                                                                loading: false
+                                                            })
+                                                            let id = AuthenticationService.displayDashboardBasedOnRole();
+                                                            // this.refs.programListChild.checkNewerVersions();
+                                
+                                                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
+                                                            
+                                                            addProgramDataRequest1.onerror = function (event) {
+                                                            };
+                                                        }.bind(this)
+                                                    }.bind(this)
+                                                }.bind(this)
+                                                
                                             }
 
                                         }
-                                    })
-                                })
-                            })
-                            this.setState({
-                                message: i18n.t('static.program.dataimportsuccess'),
-                                loading: false
-                            })
-                            let id = AuthenticationService.displayDashboardBasedOnRole();
-                            // this.refs.programListChild.checkNewerVersions();
-
-                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
+                                    }.bind(this))
+                                }.bind(this))
+                            }.bind(this))
+                            
                         } else {
                             confirmAlert({
                                 title: i18n.t('static.program.confirmsubmit'),
