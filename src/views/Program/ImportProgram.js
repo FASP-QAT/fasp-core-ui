@@ -706,30 +706,38 @@ export default class ImportProgram extends Component {
                                 }
                                 var bytes = CryptoJS.AES.decrypt(programDataJson.programData.generalData, SECRET_KEY);
                                 var plaintext = bytes.toString(CryptoJS.enc.Utf8);
-                                var programDataJsonDecrypted = JSON.parse(plaintext);
-                                console.log("programDatajson", programDataJsonDecrypted.label);
-                                console.log("displayName", getLabelText((programDataJsonDecrypted.label), lan));
-                                console.log("filename", filename);
-                                programDataJson.filename = filename;
-                                fileName[i] = {
-                                    value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJson.version
-                                }
-                                programListArray[i] = programDataJson;
-                                i++;
-                                console.log("Program data list in import", programListArray)
-                                if (i === size) {
+                                if(plaintext==""){
                                     this.setState({
-                                        programList: fileName,
-                                        programListArray: programListArray,
+                                        message: i18n.t('static.program.zipfilereaderror'),
                                         loading: false
                                     })
-                                    console.log("programList", fileName)
-                                    console.log("programDataArrayList after state set", programListArray)
+                                }else{
+                                    var programDataJsonDecrypted = JSON.parse(plaintext);
+                                    console.log("programDatajson", programDataJsonDecrypted.label);
+                                    console.log("displayName", getLabelText((programDataJsonDecrypted.label), lan));
+                                    console.log("filename", filename);
+                                    programDataJson.filename = filename;
+                                    fileName[i] = {
+                                        value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJson.version
+                                    }
+                                    programListArray[i] = programDataJson;
+                                    i++;
+                                    console.log("Program data list in import", programListArray)
+                                    if (i === size) {
+                                        this.setState({
+                                            message:"",
+                                            programList: fileName,
+                                            programListArray: programListArray,
+                                            loading: false
+                                        })
+                                        console.log("programList", fileName)
+                                        console.log("programDataArrayList after state set", programListArray)
 
-                                    document.getElementById("programIdDiv").style.display = "block";
-                                    document.getElementById("formSubmitButton").style.display = "block";
-                                    document.getElementById("fileImportDiv").style.display = "none";
-                                    document.getElementById("fileImportButton").style.display = "none";
+                                        document.getElementById("programIdDiv").style.display = "block";
+                                        document.getElementById("formSubmitButton").style.display = "block";
+                                        document.getElementById("fileImportDiv").style.display = "none";
+                                        document.getElementById("fileImportButton").style.display = "none";
+                                    }
                                 }
                             }.bind(this))
 
