@@ -191,59 +191,60 @@ class SupplyPlanVersionAndReview extends Component {
                 {
                     title: i18n.t('static.program.program'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.version'),
                     type: 'numeric', mask: '#,##',
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.versiontype'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 },
 
                 {
                     title: i18n.t('static.report.veruploaddate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    // readOnly: true
+                    readOnly: true
                 }, {
                     title: i18n.t('static.report.veruploaduser'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 }, {
                     title: i18n.t('static.report.issupplyplanapprove'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 }, {
                     title: i18n.t('static.report.reviewer'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 }, {
                     title: i18n.t('static.report.approvedRevieweddate'),
                     options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                    // readOnly: true,
+                    readOnly: true,
                     type: 'calendar'
                 }, {
                     title: i18n.t('static.report.comment'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: 'versionTypeId',
                     type: 'hidden',
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: 'versionStatusId',
                     type: 'hidden',
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: 'programId',
                     type: 'hidden',
+                    readOnly: true
 
                 }
             ],
@@ -252,7 +253,7 @@ class SupplyPlanVersionAndReview extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable: false,
+            // editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -1328,7 +1329,7 @@ class SupplyPlanVersionAndReview extends Component {
                             </Form>
                         </div>
                         <div className="ReportSearchMarginTop consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable tableDivjss_contentDisplay">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
