@@ -273,6 +273,10 @@ class DefaultHeaderDropdown extends Component {
   //     </Dropdown>
   //   );
   // }
+  redirect(){
+    console.log("in redirect");
+    this.props.logout();
+  }
 
   dropAccnt() {
     const checkOnline = localStorage.getItem('sessionType');
@@ -296,7 +300,8 @@ class DefaultHeaderDropdown extends Component {
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>{i18n.t('static.common.profile')}</strong></DropdownItem>
-          <DropdownItem className="nonclickablebox" style={{ borderBottom: "2px solid #000" }}><i className="cui-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : i18n.t("static.unknown")}</span>
+          {/* <DropdownItem className="nonclickablebox" style={{ borderBottom: "2px solid #000" }}><i className="cui-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : i18n.t("static.unknown")}</span> */}
+          <DropdownItem className="nonclickablebox" style={{ borderBottom: "2px solid #000" }}><i className="cui-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : this.redirect()}</span>
             {this.state.roleList != null && this.state.roleList != '' && this.state.roleList.map(
               role =>
 
