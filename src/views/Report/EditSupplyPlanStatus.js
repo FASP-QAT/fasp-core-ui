@@ -452,15 +452,16 @@ class EditSupplyPlanStatus extends Component {
                 shipments: !this.state.shipments
             });
             // if (this.state.shipments) {
-                this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+            this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
             // }
         } else if (supplyPlanType == 'shipments') {
             this.setState({
                 shipments: !this.state.shipments
+            }, () => {
+                if (this.state.shipments) {
+                    this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+                }
             });
-            // if (this.state.shipments) {
-                this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
-            // }
         } else if (supplyPlanType == 'Adjustments') {
             var monthCountAdjustments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
             this.setState({
