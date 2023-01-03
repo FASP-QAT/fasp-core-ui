@@ -915,7 +915,7 @@ export default class ImportDataset extends Component {
     resetClicked() {
         this.state.programId = '';
         // this.setState({ programId }, () => { });
-        this.setState({ programId: '' });
+        this.setState({ programId: '',message: '' });
     }
 
 }
