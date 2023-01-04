@@ -86,15 +86,19 @@ class PlanningUnitService {
         );
     }
 
-    getPlanningUnitListByProgramVersionIdForSelectedForecastMap(programId,versionId) {
+    getPlanningUnitListByProgramVersionIdForSelectedForecastMap(programId, versionId) {
         return axios.get(`${API_URL}/api/planningUnit/programId/${programId}/versionId/${versionId}`, {}
         );
     }
 
-    getPlanningUnitForProductCategory(productCategoryId){
+    getPlanningUnitForProductCategory(productCategoryId) {
         // return axios.get(`${API_URL}/api/planningUnit/productCategory/${productCategoryId}/programId/${programId}`, {}
         return axios.get(`${API_URL}/api/planningUnit/withPricing/productCategory/${productCategoryId}`, {}
         );
+    }
+
+    getPlanningUnitListBasic() {
+        return axios.get(`${API_URL}/api/planningUnit/basic`, {});
     }
 }
 export default new PlanningUnitService();

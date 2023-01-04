@@ -191,59 +191,60 @@ class SupplyPlanVersionAndReview extends Component {
                 {
                     title: i18n.t('static.program.program'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.version'),
                     type: 'numeric', mask: '#,##',
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.report.versiontype'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 },
 
                 {
                     title: i18n.t('static.report.veruploaddate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT_SM },
-                    // readOnly: true
+                    readOnly: true
                 }, {
                     title: i18n.t('static.report.veruploaduser'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 }, {
                     title: i18n.t('static.report.issupplyplanapprove'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 }, {
                     title: i18n.t('static.report.reviewer'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 }, {
                     title: i18n.t('static.report.approvedRevieweddate'),
                     options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                    // readOnly: true,
+                    readOnly: true,
                     type: 'calendar'
                 }, {
                     title: i18n.t('static.report.comment'),
                     type: 'text',
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: 'versionTypeId',
                     type: 'hidden',
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: 'versionStatusId',
                     type: 'hidden',
-                    // readOnly: true
+                    readOnly: true
                 },
                 {
                     title: 'programId',
                     type: 'hidden',
+                    readOnly: true
 
                 }
             ],
@@ -252,7 +253,7 @@ class SupplyPlanVersionAndReview extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable: false,
+            // editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -281,44 +282,46 @@ class SupplyPlanVersionAndReview extends Component {
         })
     }
 
-    selected = function (instance, cell, x, y, value) {
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-        if ((x == 0 && value != 0) || (y == 0)) {
-            // console.log("HEADER SELECTION--------------------------");
-        } else {
-            var hasRole = true;
-            // console.log("AuthenticationService.getLoggedInUserRole()====>", AuthenticationService.getLoggedInUserRole());
-            // AuthenticationService.getLoggedInUserRole().map(c => {
-            //     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
-            //         hasRole = true;
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                var hasRole = true;
+                // console.log("AuthenticationService.getLoggedInUserRole()====>", AuthenticationService.getLoggedInUserRole());
+                // AuthenticationService.getLoggedInUserRole().map(c => {
+                //     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+                //         hasRole = true;
 
-            //     }
-            // });
+                //     }
+                // });
 
-            if (hasRole) {
+                if (hasRole) {
 
 
-                // let countryId = document.getElementById("countryId").value;
-                // let versionStatusId = this.el.getValueFromCoords(5, x);
-                // let versionTypeId =this.el.getValueFromCoords(2, x);
+                    // let countryId = document.getElementById("countryId").value;
+                    // let versionStatusId = this.el.getValueFromCoords(5, x);
+                    // let versionTypeId =this.el.getValueFromCoords(2, x);
 
-                console.log("instance----->", instance.jexcel, "----------->", x);
-                var elInstance = instance;
-                var rowData = elInstance.getRowData(x);
-                console.log("rowData==>", rowData);
-                let programId = rowData[11];
-                let versionStatusId = rowData[10];
-                let versionTypeId = rowData[9];
-                // console.log("====>", versionStatusId, "====>", versionTypeId);
+                    console.log("instance----->", instance.jexcel, "----------->", x);
+                    var elInstance = instance;
+                    var rowData = elInstance.getRowData(x);
+                    console.log("rowData==>", rowData);
+                    let programId = rowData[11];
+                    let versionStatusId = rowData[10];
+                    let versionTypeId = rowData[9];
+                    // console.log("====>", versionStatusId, "====>", versionTypeId);
 
-                // if (versionStatusId == 1 && versionTypeId == 2) {
-                this.props.history.push({
-                    pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
+                    // if (versionStatusId == 1 && versionTypeId == 2) {
+                    this.props.history.push({
+                        pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
 
-                });
-                // }
+                    });
+                    // }
+                }
+
             }
-
         }
     }.bind(this);
 

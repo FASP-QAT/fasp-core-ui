@@ -24,6 +24,7 @@ const SyncProgram = React.lazy(() => import('./views/SyncMasterData/SyncProgram'
 const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/UpdateExpiredPasswordComponent'));
 const ResetPassword = React.lazy(() => import('./views/Pages/Login/ResetPasswordComponent'));
 const Page500 = React.lazy(() => import('./views/Pages/Page500'));
+const PageError = React.lazy(() => import('./views/Pages/PageError'));
 
 
 class App extends Component {
@@ -40,6 +41,8 @@ class App extends Component {
             <Route exact path="/register" name="Register Page" render={props => <Register {...props} />} />
             <Route exact path="/404" name="Page 404" render={props => <Page404 {...props} />} />
             <Route exact path="/500" name="Page 500" render={props => <Page500 {...props} />} />
+            <Route exact path="/error" name="Page Error" render={props => <PageError {...props} />} />
+            <Route exact path="/error/:message" name="Page Error" render={props => <PageError {...props} />} />
             <Route exact path="/forgotPassword" exact name="Forgot Password" render={props => <ForgotPassword {...props} />} />
             <Route exact path="/masterDataSync" exact name="Master data sync" render={props => <MasterDataSync {...props} />} />
             <Route exact path="/masterDataSync/:color/:message" exact name="Master data sync" render={props => <MasterDataSync {...props} />} />

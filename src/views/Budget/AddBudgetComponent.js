@@ -530,7 +530,9 @@ class AddBudgetComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-
+                                    this.setState({
+                                        loading:true
+                                    })
                                     console.log("this.state--->", this.state);
                                     let { budget } = this.state;
                                     let budget1 = this.state.budget;

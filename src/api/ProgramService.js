@@ -245,13 +245,12 @@ class ProgramService {
         return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
         );
     }
+    getProgramManagerListByProgramId(programId) {
+        return axios.get(`${API_URL}/api/user/programId/${programId}`, {});
+    }
 
     checkIfLinkingExistsWithOtherProgram(json) {
         return axios.post(`${API_URL}/api/erpLinking/otherProgramCheck`, json, {}
-        );
-    }
-    getProgramManagerListByProgramId(programId) {
-        return axios.get(`${API_URL}/api/user/programId/${programId}`, {}
         );
     }
 
@@ -262,6 +261,10 @@ class ProgramService {
 
     getDatasetVersions(json) {
         return axios.post(`${API_URL}/api/dataset/versions/`, json, {});
+    }
+
+    getProgramForDropDown(programTypeId) {
+        return axios.get(`${API_URL}/api/programForDropDown/programType/${programTypeId}`, {});
     }
 }
 export default new ProgramService()
