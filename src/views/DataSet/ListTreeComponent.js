@@ -836,7 +836,7 @@ export default class ListTreeComponent extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                var treeTemplateList = myResult.filter(x => x.active == true);
+                var treeTemplateList = myResult.filter(x => x.active == true && (x.flatList.filter(c=>c.parent ==null)[0].payload.nodeType.id==2 || x.flatList.filter(c=>c.parent ==null)[0].payload.nodeType.id==1));
                 treeTemplateList.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
