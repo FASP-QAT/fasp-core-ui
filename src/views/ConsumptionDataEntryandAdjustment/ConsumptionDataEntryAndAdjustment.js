@@ -1759,7 +1759,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     this.setState({
       consumptionUnitShowArr: consumptionUnitShowArr
+    }, () => {
+      this.setState({
+        isTableLoaded: this.getTableDiv()
+      })
     })
+    
   }
 
   componentDidMount() {
