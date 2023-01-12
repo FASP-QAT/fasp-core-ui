@@ -4888,7 +4888,6 @@ export default class syncPage extends Component {
     AuthenticationService.setupAxiosInterceptors();
     ProgramService.sendNotificationAsync(commitRequestId).then(resp => {
       var curUser = AuthenticationService.getLoggedInUserId();
-      console.log("Hello "+JSON.stringify(resp));
       if (resp.data.createdBy.userId == curUser && resp.data.status == 1) {
         setTimeout(function () {
           this.redirectToDashbaord(commitRequestId)
@@ -4925,7 +4924,6 @@ export default class syncPage extends Component {
             })
             this.hideFirstComponent()
           }.bind(this);
-          console.log("Hello "+JSON.stringify(getRequest) + " Hello "+JSON.stringify(getRequest.onerror)+" Hello "+JSON.stringify(getRequest.onsuccess));
           getRequest.onsuccess = function (event) {
             var myResult = [];
             myResult = getRequest.result;
@@ -4933,22 +4931,13 @@ export default class syncPage extends Component {
             var transaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
             var program1 = transaction1.objectStore('programQPLDetails');
             var getRequest1 = program1.put(myResult);
-            getRequest1.onerror = function (e) {
+            getRequest1.onsuccess = function (e) {
               this.setState({
                 message: i18n.t('static.commitVersion.commitFailed'),
                 color: 'red',
                 loading: false
               })
               this.hideFirstComponent()
-            }.bind(this)
-            getRequest1.onsuccess = function (e) {
-              this.setState({
-                progressPer: 75
-                , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
-              }, () => {
-                this.hideFirstComponent();
-                this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
-              })
             }.bind(this)
           }.bind(this)
         }.bind(this)
