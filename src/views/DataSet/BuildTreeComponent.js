@@ -3672,9 +3672,9 @@ export default class BuildTree extends Component {
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange))?"": parseFloat(this.state.currentCalculatedMomChange) < 0 ? parseFloat(this.state.currentCalculatedMomChange * -1).toFixed(4) : parseFloat(this.state.currentCalculatedMomChange), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange)) ? "" : parseFloat(this.state.currentCalculatedMomChange) < 0 ? parseFloat(this.state.currentCalculatedMomChange * -1).toFixed(4) : parseFloat(this.state.currentCalculatedMomChange), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4))?"": parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             }
         } else {
             // Linear #
@@ -5060,6 +5060,7 @@ export default class BuildTree extends Component {
                                 }
 
                             }
+                            console.log("Test123 Value", (itemConfig.payload.nodeDataMap[scenarioId])[0])
                             return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (val < 0.01 ? addCommasThreeDecimal(val) : addCommasTwoDecimal(val)) + val1;
 
                         } else if (itemConfig.payload.nodeType.id == 5) {
@@ -5485,7 +5486,7 @@ export default class BuildTree extends Component {
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text("Display Date(Forecast: " + this.state.forecastPeriod + ")" + ': ' + this.makeText(this.state.singleValue2), 30, 145);
+            .text(i18n.t('static.tree.displayDate') + "(" + i18n.t('static.consumption.forcast') + ": " + this.state.forecastPeriod + ")" + ': ' + this.makeText(this.state.singleValue2), 30, 145);
 
 
         sampleChart.draw(doc, 60, 180);
@@ -8853,7 +8854,7 @@ export default class BuildTree extends Component {
                                         <div className="row pl-lg-0 pr-lg-3">
                                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                                             <a className="">
-                                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceNodeData() }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceNodeData() }} ><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
 
                                             </a>
                                         </div>
@@ -9420,7 +9421,7 @@ export default class BuildTree extends Component {
                                                         <Label htmlFor="currencyId">{i18n.t('static.conversion.ConversionFactorFUPU')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     </FormGroup> */}
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">Conversion (FU:PU) <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.tree.conversionFUPU')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                         <Input type="text"
                                                             id="conversionFactor"
                                                             name="conversionFactor"
@@ -10269,7 +10270,7 @@ export default class BuildTree extends Component {
                         <div className="row pl-lg-0 pr-lg-3">
                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                             <a className="">
-                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceModelingTransfer() }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceModelingTransfer() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
 
                             </a>
                         </div>
@@ -10559,8 +10560,8 @@ export default class BuildTree extends Component {
                                             this.setState({
                                                 showCalculatorFields: false
                                             });
-                                        }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {'Accept'}</Button>
+                                        }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
+                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>
 
                                     </FormGroup>
                                     {/* </div> */}
@@ -11066,7 +11067,7 @@ export default class BuildTree extends Component {
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
                         <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{this.getPayloadData(itemConfig, 2)}</p></div>
-                        {this.state.showModelingValidation && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? "Sum of children: " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
+                        {this.state.showModelingValidation && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? i18n.t('static.ManageTree.SumofChildren') + ": " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
                     </div>
                 </div>
             ))
@@ -11662,7 +11663,7 @@ export default class BuildTree extends Component {
                                                                 value={this.state.programId}
                                                                 onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
                                                             >
-                                                                <option value="">{"Please select program"}</option>
+                                                                <option value="">{i18n.t('static.mt.selectProgram')}</option>
                                                                 {datasets}
                                                             </Input>
 
@@ -11742,7 +11743,7 @@ export default class BuildTree extends Component {
                                                     {this.state.showDate && <FormGroup className="col-md-3 pl-lg-0">
                                                         <Label htmlFor="languageId">
                                                             {/* {i18n.t('static.supplyPlan.date')}  */}
-                                                            Display Date <i>(Forecast: {this.state.forecastPeriod})</i></Label>
+                                                            {i18n.t('static.tree.displayDate')} <i>({i18n.t('static.consumption.forcast')}: {this.state.forecastPeriod})</i></Label>
                                                         <div className="controls edit">
                                                             <Picker
                                                                 ref={this.pickAMonth3}
@@ -12015,7 +12016,7 @@ export default class BuildTree extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Hide Planning Unit'}</b>
+                                                            <b>{i18n.t('static.tree.hidePlanningUnit')}</b>
                                                         </Label>
                                                     </div>
                                                 </div>
@@ -12034,7 +12035,7 @@ export default class BuildTree extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Hide Forecasting Unit & Planning Unit'}</b>
+                                                            <b>{i18n.t('static.tree.hideFUAndPU')}</b>
                                                         </Label>
                                                     </div>
                                                 </div>
@@ -12053,7 +12054,7 @@ export default class BuildTree extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Hide Tree Validation'}</b>
+                                                            <b>{i18n.t('static.tree.hideTreeValidation')}</b>
                                                         </Label>
                                                     </div>
                                                 </div>
@@ -12077,7 +12078,7 @@ export default class BuildTree extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Auto Calculate'}</b><i class="fa fa-info-circle icons pl-lg-2" id="PopoverAuto" onClick={this.toggleTooltipAuto} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            <b>{i18n.t('static.tree.autoCalculate')}</b><i class="fa fa-info-circle icons pl-lg-2" id="PopoverAuto" onClick={this.toggleTooltipAuto} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                         </Label>
                                                     </div>
                                                 </div>
@@ -12964,7 +12965,7 @@ export default class BuildTree extends Component {
                                         <Label
                                             className="form-check-label"
                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                            <b>{'Extrapolate'}</b>
+                                            <b>{i18n.t('static.tree.extrapolate')}</b>
                                         </Label>
                                     </div>
                                 </div>

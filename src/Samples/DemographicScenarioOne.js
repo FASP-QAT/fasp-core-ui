@@ -644,7 +644,7 @@ export default class DemographicScenarioOne extends Component {
                     source: [{ 'id': '0', 'name': 'Please select' }, { 'id': '1', 'name': 'AGO-CON-NACP' }, { 'id': '2', 'name': 'BEN-ARV-TBD' }, { 'id': '3', 'name': 'BWA-CON-TBD' }]
                 },
                 {
-                    title: 'Supply Plan Planning Unit',
+                    title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
                     type: 'dropdown',
                     source: [{ 'id': '0', 'name': 'Please select' }, { 'id': '1', 'name': 'Microplate, PCR, 96-Well, Clear, Low Profile, Unskirted, Max 200 uL/Well, 10 Each' }, { 'id': '2', 'name': 'Ammonium Sulfate, ACS Reagent, 500 gm' }, { 'id': '3', 'name': 'Darunavir/Ritonavir 400/50mg Tablet, 60 Tablets' }]
                 },
