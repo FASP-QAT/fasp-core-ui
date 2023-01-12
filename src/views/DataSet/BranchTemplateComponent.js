@@ -2038,9 +2038,9 @@ export default class BranchTemplate extends Component {
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange))?"": parseFloat(this.state.currentCalculatedMomChange) < 0 ? parseFloat(this.state.currentCalculatedMomChange * -1).toFixed(4) : parseFloat(this.state.currentCalculatedMomChange), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange)) ? "" : parseFloat(this.state.currentCalculatedMomChange) < 0 ? parseFloat(this.state.currentCalculatedMomChange * -1).toFixed(4) : parseFloat(this.state.currentCalculatedMomChange), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4))?"": parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             }
         } else {
             if (this.state.currentModelingType == 2) {
@@ -2051,8 +2051,8 @@ export default class BranchTemplate extends Component {
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentTargetChangeNumber))?"": parseFloat(this.state.currentTargetChangeNumber) < 0 ? parseFloat(this.state.currentTargetChangeNumber * -1) : parseFloat(this.state.currentTargetChangeNumber), true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4))?"": parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentTargetChangeNumber)) ? "" : parseFloat(this.state.currentTargetChangeNumber) < 0 ? parseFloat(this.state.currentTargetChangeNumber * -1) : parseFloat(this.state.currentTargetChangeNumber), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             } else if (this.state.currentModelingType == 3) { //Linear %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
                 if (this.state.currentTransferData == "") {
@@ -2060,9 +2060,9 @@ export default class BranchTemplate extends Component {
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth))?"": parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth)) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4))?"": parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             } else if (this.state.currentModelingType == 4) { // Exponential %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
                 if (this.state.currentTransferData == "") {
@@ -2070,9 +2070,9 @@ export default class BranchTemplate extends Component {
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth))?"": parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth)) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4))?"": parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             }
         }
         this.setState({ showCalculatorFields: false });
@@ -4664,7 +4664,7 @@ export default class BranchTemplate extends Component {
                     selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en;
                 }
 
-            }else{
+            } else {
                 if (this.state.currentItemConfig.context.level != 0) {
                     selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en;
                 } else {
@@ -6284,8 +6284,8 @@ export default class BranchTemplate extends Component {
                 } else if (event.target.name === "refillMonths") {
                     this.calculatePUPerVisit(true);
                     this.qatCalculatedPUPerVisit(0);
-                    
-                } 
+
+                }
                 this.getUsageText();
             }
         });
@@ -7102,7 +7102,7 @@ export default class BranchTemplate extends Component {
             };
         }
 
-        console.log("Loader@@@@@@@@@@@",this.state.momJexcelLoader);
+        console.log("Loader@@@@@@@@@@@", this.state.momJexcelLoader);
 
         return (
             <>
@@ -8211,7 +8211,7 @@ export default class BranchTemplate extends Component {
                                                         <tr>
                                                             <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/month/')}
                                                                 {this.state.currentItemConfig.context.parent != null && this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}
-                                                                {this.state.currentItemConfig.context.parent == null && this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id).length>0 &&  this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
+                                                                {this.state.currentItemConfig.context.parent == null && this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id).length > 0 && this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
                                                             </td>
                                                             {this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.hasOwnProperty('usagePeriodId') &&
                                                                 <td style={{ width: '50%' }}>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency) * (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.hasOwnProperty('usagePeriodId')
@@ -9052,7 +9052,7 @@ export default class BranchTemplate extends Component {
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
                         <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}> {this.getPayloadData(itemConfig, 2)}</p></div>
-                        <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? "Sum of children: " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>
+                        <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? i18n.t('static.ManageTree.SumofChildren') + ": " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>
                     </div>
                 </div>
             ))
@@ -9885,7 +9885,7 @@ export default class BranchTemplate extends Component {
                                                                             <Label
                                                                                 className="form-check-label"
                                                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                <b>{'Hide Planning Unit'}</b>
+                                                                                <b>{i18n.t('static.tree.hidePlanningUnit')}</b>
                                                                             </Label>
                                                                         </div>
                                                                         <div>
@@ -9900,7 +9900,7 @@ export default class BranchTemplate extends Component {
                                                                             <Label
                                                                                 className="form-check-label"
                                                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                <b>{'Hide Forecasting Unit & Planning Unit'}</b>
+                                                                                <b>{i18n.t('static.tree.hideFUAndPU')}</b>
                                                                             </Label>
                                                                         </div>
                                                                     </div>
