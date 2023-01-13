@@ -306,13 +306,13 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     readOnly: true,//0 A
                 },
                 {
-                    title: "Forecast Region(s)",
+                    title: i18n.t('static.QATForecastImport.ForecastRegion'),
                     type: 'text',
                     readOnly: true,
                     textEditor: true,//1 B
                 },
                 {
-                    title: "% of Forecast",
+                    title: i18n.t('static.QATForecastImport.perOfForecast'),
                     // type: 'text',
                     type: 'numeric',
                     decimal: '.',
@@ -321,7 +321,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     textEditor: true,//2 C
                 },
                 {
-                    title: "Supply Plan Region",
+                    title: i18n.t('static.QATForecastImport.SPRegion'),
                     type: 'autocomplete',
                     source: this.state.supplyPlanRegionListJExcel,//3 D
                 }

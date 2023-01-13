@@ -2878,5 +2878,22 @@
     "static.dataset.BranchTreeTemplate": "Modelo de Filial",
     "static.forecastErrorReport.noEquivalencyUnitData": "Nenhum dado de unidade de equivalência disponível para a unidade de previsão selecionada",
     "static.loadDeleteProgram.loadDeleteProgram": "Carregar/Excluir Programa",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
+    "static.tree.hidePlanningUnit": "Ocultar Unidade de Planejamento",
+    "static.tree.hideFUAndPU": "Ocultar unidade de previsão e unidade de planejamento",
+    "static.tree.hideTreeValidation": "Ocultar validação da árvore",
+    "static.tree.autoCalculate": "Calcular automaticamente",
+    "static.tree.displayDate": "Data de Exibição",
+    "static.tree.conversionFUPU": "Conversão (FU:PU)",
+    "static.tree.extrapolate": "Extrapolar",
+    "static.tree.startMonthForHistoricData": "Mês de início para dados históricos",
+    "static.tooltip.startMonthForHistoricData": "Para alterar o mês de início, volte para a tela de dados do nó e altere o mês",
+    "static.tree.tripleExponentialSmoothing": "Suavização Exponencial Tripla (Holts-Winters)",
+    "static.common.chooseMethod": "Escolha o método",
+    "static.tree.interpolate": "Interpolar",
+    "static.option.extrapolationMethod": "Selecione o método de extrapolação",
+    "static.QATForecastImport.perOfForecast": "% da previsão",
+    "static.QATForecastImport.forcastConsumption": "Consumo Previsto (Módulo Previsão)",
+    "static.QATForecastImport.convertedForecastConsumption": "Consumo Previsto Convertido (a ser importado)",
+    "static.QATForecastImport.currentForecastConsumption": "Consumo Atual Previsto (Módulo Plano de Suprimentos)"
 }

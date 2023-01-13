@@ -2882,5 +2882,22 @@
     "static.dataset.BranchTreeTemplate": "Modèle de branche",
     "static.planningUnitSetting.offlineMsg": "Remarque : l`utilisateur doit être en ligne pour ajouter de nouveaux produits",
     "static.forecastErrorReport.noEquivalencyUnitData": "Aucune donnée d`unité d`équivalence disponible pour l`unité de prévision sélectionnée",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.tree.hidePlanningUnit": "Masquer l`unité de planification",
+    "static.tree.hideFUAndPU": "Masquer l`unité de prévision et l`unité de planification",
+    "static.tree.hideTreeValidation": "Masquer la validation de l`arborescence",
+    "static.tree.autoCalculate": "Calcul automatique",
+    "static.tree.displayDate": "Date d`affichage",
+    "static.tree.conversionFUPU": "Conversion (FU:PU)",
+    "static.tree.extrapolate": "Extrapoler",
+    "static.tree.startMonthForHistoricData": "Mois de début pour les données historiques",
+    "static.tooltip.startMonthForHistoricData": "Pour changer le mois de début, veuillez revenir à l`écran Node Data et changer le mois",
+    "static.tree.tripleExponentialSmoothing": "Lissage triple exponentiel (Holts-Winters)",
+    "static.common.chooseMethod": "Choisissez la méthode",
+    "static.tree.interpolate": "Interpoler",
+    "static.option.extrapolationMethod": "Sélectionnez la méthode d`extrapolation",
+    "static.QATForecastImport.perOfForecast": "% de la prévision",
+    "static.QATForecastImport.forcastConsumption": "Consommation prévue (module de prévision)",
+    "static.QATForecastImport.convertedForecastConsumption": "Consommation prévisionnelle convertie (à importer)",
+    "static.QATForecastImport.currentForecastConsumption": "Consommation actuelle prévue (module Plan d`approvisionnement)"
 }
