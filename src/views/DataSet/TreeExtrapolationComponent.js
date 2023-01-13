@@ -1739,11 +1739,11 @@ export default class TreeExtrapolationComponent extends React.Component {
             console.log("minMonth hehehe semiAvgData---", this.state.semiAvgData);
             console.log("count 1 hehehe---", count1);
             console.log("final hehehe---", this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? "A" : 'B' : 'C');
-            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? parseFloat(this.state.movingAvgData[count1].forecast).toFixed(4) : '' : ''
-            data[5] = this.state.semiAvgData.length > 0 && count1 != '' && this.state.semiAvgData[count1].forecast != null ? parseFloat(this.state.semiAvgData[count1].forecast).toFixed(4) : ''
-            data[6] = this.state.linearRegressionData.length > 0 && count1 != '' && this.state.linearRegressionData[count1].forecast != null ? parseFloat(this.state.linearRegressionData[count1].forecast).toFixed(4) : ''
-            data[7] = this.state.tesData.length > 0 && count1 != '' && this.state.tesData[count1].forecast != null ? this.state.tesData[count1].forecast : ''
-            data[8] = this.state.arimaData.length > 0 && count1 != '' && this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].forecast : ''
+            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ?parseFloat(this.state.movingAvgData[count1].forecast).toFixed(4) : '' : ''
+            data[5] = this.state.semiAvgData.length > 0 && count1 != '' ? this.state.semiAvgData[count1]!=null ? this.state.semiAvgData[count1].forecast != null ? parseFloat(this.state.semiAvgData[count1].forecast).toFixed(4) : '':'':''
+            data[6] = this.state.linearRegressionData.length > 0 && count1 != '' ? this.state.linearRegressionData[count1]!=null ? this.state.linearRegressionData[count1].forecast != null ? parseFloat(this.state.linearRegressionData[count1].forecast).toFixed(4) : '':'':''
+            data[7] = this.state.tesData.length > 0 && count1 != '' ? this.state.tesData[count1]!=null ? this.state.tesData[count1].forecast != null ? this.state.tesData[count1].forecast : '':'':''
+            data[8] = this.state.arimaData.length > 0 && count1 != '' ? this.state.arimaData[count1]!=null ? this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].forecast : '':'':''
 
             data[9] = `=IF(ISBLANK(D${parseInt(j) + 1}),IF(N1 == 4,I${parseInt(j) + 1},IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},''))))),ROUND(D${parseInt(j) + 1},4))` // J
             data[10] = cellData != null && cellData != "" ? cellData.manualChange : ""
