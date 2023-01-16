@@ -747,7 +747,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     {
                                                         // title: i18n.t('static.inventory.active'), 
                                                         visible: false,
-                                                        type: 'text', 
+                                                        type: 'text',
                                                         // width: 100, 
                                                         readOnly: true
                                                         , autoCasting: false
@@ -3737,7 +3737,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
                         this.props.hideSecondComponent();
                     } else {
-                        positiveValidation("M", y, elInstance);
+                        if (rowData[1].toString() == "false" && rowData[0].toString() == "true" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != "") {
+                            positiveValidation("M", y, elInstance);
+                        } else {
+                            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        }
                     }
                     // }
                 }

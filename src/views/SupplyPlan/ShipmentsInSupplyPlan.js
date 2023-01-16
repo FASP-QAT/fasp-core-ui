@@ -668,7 +668,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
                                                     {
                                                         type: 'text',
-                                                        visible:false,
+                                                        visible: false,
                                                         // title: i18n.t('static.supplyPlan.qatProduct'), 
                                                         width: 150, readOnly: true, autoCasting: false
                                                     },
@@ -3557,7 +3557,11 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         this.props.updateState("shipmentBatchError", i18n.t('static.supplyPlan.batchNumberMissing'));
                         this.props.hideSecondComponent();
                     } else {
-                        positiveValidation("M", y, elInstance);
+                        if (rowData[1].toString() == "false" && rowData[0].toString() == "true" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != "") {
+                            positiveValidation("M", y, elInstance);
+                        } else {
+                            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        }
                     }
                     // }
                 }
