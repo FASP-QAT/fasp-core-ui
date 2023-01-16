@@ -1759,7 +1759,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     this.setState({
       consumptionUnitShowArr: consumptionUnitShowArr
+    }, () => {
+      this.setState({
+        isTableLoaded: this.getTableDiv()
+      })
     })
+    
   }
 
   componentDidMount() {
@@ -2277,7 +2282,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     }
                   }
                   console.log("&&totalQty--->", totalQty)
-                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQty !== "" ? Math.round(totalQtyPU) : "" })
+                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQtyPU !== "" ? Math.round(totalQtyPU) : "" })
                   console.log("&&planningUnitTotalList------>", planningUnitTotalList)
                   totalPlanningUnit += totalQty;
                   totalPlanningUnitPU += totalQtyPU;
@@ -2354,6 +2359,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   setShowInPlanningUnits(e) {
     this.setState({
       showInPlanningUnit: e.target.checked
+    }, () => {
+      this.setState({
+        isTableLoaded: this.getTableDiv()
+      })
     })
   }
 
