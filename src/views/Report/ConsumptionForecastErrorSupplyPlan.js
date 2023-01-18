@@ -1505,7 +1505,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     viewBy:  viewById, // 1 for PU and 2 for FU
                     regionIds: regionIds, // empty if all Regions
                     equivalencyUnitId: equivalencyUnitId, // If the output is to be in EquivalencyUnit then this is a non zero id
-                    previusMonths: monthInCalc, // The number of months that we need to average the Consumption for WAPE. Does not include current month which is always included.
+                    previousMonths: monthInCalc, // The number of months that we need to average the Consumption for WAPE. Does not include current month which is always included.
                     daysOfStockOut: consumptionAdjForStockOutId?true:false // Boolean field that if true means we should consider the Days of Stock Out valued and adjust the consumption accordingly. Only adjusts for Actual Consumption.                            
                 }
                 console.log("JSON INPUT---------->", inputjson);
