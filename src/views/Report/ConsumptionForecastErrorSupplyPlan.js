@@ -63,7 +63,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             equivalencyUnitList: [],
             programEquivalencyUnitList: [],
             dataList: [],
-            consumptionAdjForStockOutId: 0,
+            consumptionAdjForStockOutId: false,
             show: false,
             loading: true,
             defaultTimeWindow: true,
@@ -550,7 +550,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             var forcastingUnitList = proList.map(c => c.forecastingUnit);
                             const ids = forcastingUnitList.map(o => o.id);
                             const forecastingUnitList1 = forcastingUnitList.filter(({ id }, index) => !ids.includes(id, index + 1));
-                            console.log("CheckPU------------------>2", forecastingUnitList1);
                             // var planningUnitList = proList.map(c => c.planningUnit);
 
                             this.setState({
@@ -577,7 +576,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         console.log('**JSON.stringify(response.data)' + JSON.stringify(response.data))
                         var listArray = response.data;
                         var forcastingUnitList = listArray.map(c => c.forecastingUnit);
-                        forcastingUnitList.sort((a, b) => {
+                        const ids = forcastingUnitList.map(o => o.id);
+                        const forecastingUnitList1 = forcastingUnitList.filter(({ id }, index) => !ids.includes(id, index + 1));
+                        forecastingUnitList1.sort((a, b) => {
                             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
@@ -592,7 +593,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         });
                         this.setState({
                             planningUnits: listArray,
-                            forecastingUnits: forcastingUnitList,
+                            forecastingUnits: forecastingUnitList1,
                             message: '',
                             loading: false
                         }, () => {
@@ -652,11 +653,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.setState({
             versionId: event.target.value,
             show: false,
-            dataList: []
+            dataList: [],
+            planningUnits: [],
+            forecastingUnits: [],
+  
         }, () => {
             // if (this.state.matricsList.length != 0) {
             localStorage.setItem("sesVersionIdReport", this.state.versionId);
-            this.fetchData();
+            // this.fetchData();
+            this.getPlanningUnitAndForcastingUnit();
             // } else {
             // this.getPlanningUnit();
             // }
@@ -743,9 +748,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var falg = event.target.checked ? 1 : 0
         if (falg) {
             this.setState({
-                // viewById : 3
             }, () => {
-                // document.getElementById("equivelencyUnitDiv").style.display = "block";
                 this.getEquivalencyUnitData();
             })
         } else {
@@ -755,9 +758,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
     consumptionStockOutCheckbox(event) {
         var falg = event.target.checked ? 1 : 0
-        if (falg) {
+        console.log("consumptionStockOutCheckbox--",falg)
+       if (falg) {
+        this.setState({
+            consumptionAdjForStockOutId:true
+        }, () => {
             this.fetchData();
-        }
+        })
+       }
     }
 
 
@@ -847,7 +855,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         let EquiUnitList = [];
                         if (filteredEquList.length > 0) {
                             document.getElementById("equivelencyUnitDiv").style.display = "block";
-                            EquiUnitList = filteredEquList.map(c => c.equivalencyUnit);
+                            // EquiUnitList = filteredEquList.map(c => c.equivalencyUnit);
+                            EquiUnitList = filteredEquList;
                             console.log("EquiUnitList", EquiUnitList);
                         }
 
@@ -1017,8 +1026,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         let viewById = this.state.viewById
-        let consumptionAdjForStockOutId = document.getElementById("consumptionAdjusted").value;
-        console.log("viewById----", viewById)
+        let consumptionAdjForStockOutId = this.state.consumptionAdjForStockOutId;
+        console.log("consumptionAdjForStockOutId----", consumptionAdjForStockOutId)
         let regionIds = this.state.regionValues.map(ele => (ele.value).toString())
         let regionList = this.state.regions;
         let monthInCalc = document.getElementById("timeWindow").value;
@@ -1382,7 +1391,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             var actualQty = "";
 
                                             consumptionforecastQty = conlist.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(dt).format("YYYY-MM") && c.actualFlag == false && c.active == true && c.region.id == regionList[k].regionId);
-                                            console.log("@@@@NewDevelopement@@@ consumptionforecastQty--->", consumptionforecastQty);
+                                            console.log("@@@@NewDevelopement@@@ consumptionforecastQty PU--->", consumptionforecastQty);
 
                                             if (consumptionforecastQty.length >= 0) {
                                                 for (var con = 0; con < consumptionforecastQty.length; con++) {
@@ -1461,14 +1470,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 {
                     var equivalencyUnitList = this.state.equivalencyUnitList;
                     var eqDataList = this.state.dataList;
+                    console.log("Seema eqDataList---->",eqDataList)
                     var filteredequivalencyUnit = equivalencyUnitList.filter(c => c.equivalencyUnitId);
                     for (var con = 0; con <= eqDataList.length; con++) {
-                        if (eqDataList[con].actualQty >= 0) {
-                            eqDataList[con].actualQty = eqDataList[con].actualQty * filteredequivalencyUnit.convertToEu;
-                        }
-                        if (eqDataList[con].forecastQty >= 0) {
-                            eqDataList[con].forecastQty = eqDataList[con].forecastQty * filteredequivalencyUnit.convertToEu;
-                        }
+                        // if (eqDataList[con].actualQty >= 0) {
+                        //     eqDataList[con].actualQty = eqDataList[con].actualQty * filteredequivalencyUnit.convertToEu;
+                        // }
+                        // if (eqDataList[con].forecastQty >= 0) {
+                        //     eqDataList[con].forecastQty = eqDataList[con].forecastQty * filteredequivalencyUnit.convertToEu;
+                        // }
                     }
                     this.setState({
                         dataList: eqDataList
@@ -1489,14 +1499,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 var inputjson = {
                     programId: programId,
                     versionId: versionId, // Can be -1 for the latest Program
-                    unitId: equivalencyUnitId != '' ? equivalencyUnitId : viewById == 1 ? planningUnitId : forecastingUnitId, // PU or FU based on viewBy
+                    unitId: viewById == 1 ? planningUnitId : forecastingUnitId, // PU or FU based on viewBy
                     startDate: startDate,
                     stopDate: stopDate,
-                    viewBy: equivalencyUnitId != '' ? 3 : viewById, // 1 for PU and 2 for FU
+                    viewBy:  viewById, // 1 for PU and 2 for FU
                     regionIds: regionIds, // empty if all Regions
                     equivalencyUnitId: equivalencyUnitId, // If the output is to be in EquivalencyUnit then this is a non zero id
-                    previusMonths: monthInCalc, // The number of months that we need to average the Consumption for WAPE. Does not include current month which is always included.
-                    daysOfStockOut: true // Boolean field that if true means we should consider the Days of Stock Out valued and adjust the consumption accordingly. Only adjusts for Actual Consumption.                            
+                    previousMonths: monthInCalc, // The number of months that we need to average the Consumption for WAPE. Does not include current month which is always included.
+                    daysOfStockOut: consumptionAdjForStockOutId?true:false // Boolean field that if true means we should consider the Days of Stock Out valued and adjust the consumption accordingly. Only adjusts for Actual Consumption.                            
                 }
                 console.log("JSON INPUT---------->", inputjson);
                 ReportService.forecastError(inputjson)
@@ -1640,9 +1650,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         datacsv.push([(('Error*').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalError += Number(isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : parseFloat(data[0].errorPerc));
+            totalError += Number(isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : parseFloat(data[0].errorPerc*100));
             countError += 1;
-            datacsv.push(isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : this.PercentageFormatter(data[0].errorPerc))
+            datacsv.push(isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : this.PercentageFormatter(data[0].errorPerc*100))
         })
         datacsv.push(this.PercentageFormatter(totalError / countError));
         // datacsv.push(this.state.showInPlanningUnit ? Math.round(totalPU) : Math.round(total));
@@ -1725,7 +1735,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
                     totalRegion += Number(data[0].actualQty) - Number(data[0].forecastQty);
                     totalRegionCount += 1;
-                    datacsv.push(Number(data[0].actualQty) - Number(data[0].forecastQty))
+                    datacsv.push((Number(data[0].actualQty) - Number(data[0].forecastQty)).toFixed(2))
                 })
             }
             datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
@@ -1881,9 +1891,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countError = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalError += Number(isNaN(datavalue[0].errorPerc) ? '' : datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity' ? '' : datavalue[0].errorPerc);
+                totalError += Number(isNaN(datavalue[0].errorPerc) ? '' : datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity' ? '' : datavalue[0].errorPerc*100);
                 countError += 1;
-                A.push(isNaN(datavalue[0].errorPerc) ? '' : datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity' ? '' : this.PercentageFormatter(datavalue[0].errorPerc))
+                A.push(isNaN(datavalue[0].errorPerc) ? '' : datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity' ? '' : this.PercentageFormatter(datavalue[0].errorPerc*100))
             })
             A.push(this.PercentageFormatter(totalError / countError))
         }
@@ -1929,14 +1939,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countActal = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                var totalDaysOfStockOut = 0;
-                this.state.regions.map(r => {
-                    var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalDaysOfStockOut += datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0;
-                })
-                totalActal += Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : datavalue[0].actualQty);
+                totalActal += Number(datavalue[0].actualQty);
                 countActal += 1;
-                A.push((Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : datavalue[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push((Number(datavalue[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
             A.push((Number(totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
         }
@@ -1950,11 +1955,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 {
                     this.state.monthArray.map((item1, count) => {
                         var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                        totalRegion += Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - (datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0)) * item1.noOfDays) : datavalue[0].actualQty);;
+                        totalRegion += Number(datavalue[0].actualQty);
                         totalRegionCount += 1;
-                        A.push((Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty /
-                            (item1.noOfDays - (datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0))
-                            * item1.noOfDays) : datavalue[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
+                        A.push((Number(datavalue[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
                     })
                 }
                 A.push((Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
@@ -1969,16 +1972,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countDiff = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                var totalDaysOfStockOut = 0;
-                this.state.regions.map(r => {
-                    var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalDaysOfStockOut += datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0;
-                })
-                totalDiff += Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : datavalue[0].actualQty) - Number(datavalue[0].forecastQty);
+                totalDiff += Number(datavalue[0].actualQty) - Number(datavalue[0].forecastQty);
                 countDiff += 1;
-                A.push((Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty /
-                    (item1.noOfDays - totalDaysOfStockOut) * item1.noOfDays) : (datavalue[0].actualQty)
-                - datavalue[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push((Number((datavalue[0].actualQty)- datavalue[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
             A.push((Number(totalDiff / countDiff).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
         }
@@ -1992,9 +1988,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 {
                     this.state.monthArray.map((item1, count) => {
                         var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                        totalRegion += Number(this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - (datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0)) * item1.noOfDays) : datavalue[0].actualQty) - Number(datavalue[0].forecastQty);
+                        totalRegion += Number(datavalue[0].actualQty) - Number(datavalue[0].forecastQty);
                         totalRegionCount += 1;
-                        A.push((Number((this.state.consumptionAdjForStockOutId ? (datavalue[0].actualQty / (item1.noOfDays - (datavalue[0].daysOfStockOut != undefined ? datavalue[0].daysOfStockOut : 0)) * item1.noOfDays) : datavalue[0].actualQty) - Number(datavalue[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")))
+                        A.push((Number((datavalue[0].actualQty) - Number(datavalue[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                     })
                 }
                 A.push((Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
@@ -2074,6 +2070,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             }, this);
 
         const { equivalencyUnitList } = this.state;
+        console.log("seema equivalencyUnitList-->",equivalencyUnitList.length > 0)
         let equivalencyUnitList1 = equivalencyUnitList.length > 0
             && equivalencyUnitList.map((item, i) => {
                 return (
@@ -2239,8 +2236,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             for (var i = 0; i < elInstance.length; i++) {
                 var value = elInstance[i];
                 if (value) {
-                    consumptionActualValue.push(value.actualQty)
-                    consumptionForecastValue.push(value.forecastQty)
+                    consumptionActualValue.push((value.actualQty).toFixed(2))
+                    consumptionForecastValue.push((value.forecastQty).toFixed(2))
                 } else {
                     consumptionActualValue.push("");
                     consumptionForecastValue.push("");
@@ -2248,7 +2245,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             }
             datasetListForGraph.push({
                 label: 'Error',
-                data: this.state.dataList.map(item => (item.errorPerc !== "" ? item.errorPerc : null)),
+                data: this.state.dataList.map(item => (item.errorPerc !== "" ? item.errorPerc*100 : null)),
                 type: 'line',
                 yAxisID: 'B',
                 backgroundColor: (this.state.yaxisEquUnit > 0 ? '#002F6C' : 'transparent'),
@@ -2620,9 +2617,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                 <td className="sticky-col first-col clone hoverTd" align="left"><b>Error*</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    totalError += isNaN(data[0].errorPerc) ? 0 : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? 0 : data[0].errorPerc;
+                                                                    totalError += isNaN(data[0].errorPerc) ? 0 : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? 0 : data[0].errorPerc*100;
                                                                     countError += 1;
-                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].errorPerc)}</b></td>)
+                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].errorPerc*100)}</b></td>)
 
                                                                 })}
                                                                 <td className="sticky-col first-col clone hoverTd" align="left"><b>{this.PercentageFormatter(totalError / countError)}</b></td>
