@@ -1739,7 +1739,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             console.log("minMonth hehehe semiAvgData---", this.state.semiAvgData);
             console.log("count 1 hehehe---", count1);
             console.log("final hehehe---", this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? "A" : 'B' : 'C');
-            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? parseFloat(this.state.movingAvgData[count1].forecast).toFixed(4) : '' : ''
+            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1].forecast != null ? parseFloat(this.state.movingAvgData[count1].forecast).toFixed(4) : '' : ''
             data[5] = this.state.semiAvgData.length > 0 && count1 != '' && this.state.semiAvgData[count1].forecast != null ? parseFloat(this.state.semiAvgData[count1].forecast).toFixed(4) : ''
             data[6] = this.state.linearRegressionData.length > 0 && count1 != '' && this.state.linearRegressionData[count1].forecast != null ? parseFloat(this.state.linearRegressionData[count1].forecast).toFixed(4) : ''
             data[7] = this.state.tesData.length > 0 && count1 != '' && this.state.tesData[count1].forecast != null ? this.state.tesData[count1].forecast : ''
