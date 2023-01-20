@@ -6907,8 +6907,8 @@ export default class BuildTree extends Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var planningunitTransaction = db1.transaction(['branchTemplate'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('branchTemplate');
+            var planningunitTransaction = db1.transaction(['treeTemplate'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('treeTemplate');
             var planningunitRequest = planningunitOs.getAll();
             var planningList = []
             planningunitRequest.onerror = function (event) {
