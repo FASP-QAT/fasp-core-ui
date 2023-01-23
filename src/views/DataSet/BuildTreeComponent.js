@@ -9093,7 +9093,7 @@ export default class BuildTree extends Component {
                                                 {/* } */}
 
                                                 <FormGroup className="col-md-6">
-                                                    <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.ManageTree.Notes')}</Label>
                                                     <Input type="textarea"
                                                         id="notes"
                                                         name="notes"
@@ -11561,7 +11561,7 @@ export default class BuildTree extends Component {
                             <div className="Card-header-reporticon pb-1">
                                 <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                                 <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                                <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{'Tree List'}</small></span>
+                                <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{i18n.t('static.listTree.manageTreeTreeList')}</small></span>
                                 <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
                             </div>
                             {/* <div className="card-header-actions">
@@ -12075,7 +12075,7 @@ export default class BuildTree extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{'Hide Action Buttons'}</b>
+                                                            <b>{i18n.t('static.tree.hideActionButtons')}</b>
                                                         </Label>
                                                     </div>
                                                 </div>
