@@ -2895,5 +2895,6 @@
     "static.QATForecastImport.perOfForecast": "% da previsão",
     "static.QATForecastImport.forcastConsumption": "Consumo Previsto (Módulo Previsão)",
     "static.QATForecastImport.convertedForecastConsumption": "Consumo Previsto Convertido (a ser importado)",
-    "static.QATForecastImport.currentForecastConsumption": "Consumo Atual Previsto (Módulo Plano de Suprimentos)"
+    "static.QATForecastImport.currentForecastConsumption": "Consumo Atual Previsto (Módulo Plano de Suprimentos)",
+    "static.tree.hideActionButtons":"Ocultar Botões de Ação"
 }
