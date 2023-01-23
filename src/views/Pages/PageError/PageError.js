@@ -1,13 +1,99 @@
 import React, { Component } from 'react';
 import { Button, Col, Container, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
 import AuthenticationService from '../../Common/AuthenticationService';
+import JiraTikcetService from '../../../api/JiraTikcetService';
+import i18n from '../../../i18n';
+import { API_URL, SPACE_REGEX } from '../../../Constants';
 
 import ErrorMessageImg from '../../../../src/assets/img/errorImg.png'
 import ErrorMessageBg from '../../../../src/assets/img/E1.png'
 import { size } from 'mathjs';
 class PageError extends Component {
   constructor(props) {
-    super(props);
+      super(props);
+      this.state = {
+        bugReport: {
+            summary: "",
+            description: '',
+            file: '',
+            attachFile: ''
+        },
+        message: '',
+        loading: false
+    }
+    this.submitBug = this.submitBug.bind(this);
+  }
+
+  submitBug(e){
+
+    let { bugReport } = this.state;
+        bugReport.summary = e.match.params.message;
+        bugReport.description = e.match.params.message;
+        bugReport.file = '';
+        bugReport.attachFile = '';
+        this.setState({
+            bugReport
+        },
+            () => { });
+
+      JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => {
+        console.log("Response :", response.status, ":", JSON.stringify(response.data));
+        if (response.status == 200 || response.status == 201) {
+            var msg = response.data.key;
+            JiraTikcetService.addIssueAttachment(this.state.bugReport, response.data.id).then(response => {
+
+            });
+
+            this.setState({
+                message: msg, loading: false
+            })
+            e.history.push(`/ApplicationDashboard/` + AuthenticationService.displayDashboardBasedOnRole())
+        } else {
+            this.setState({
+                message: i18n.t('static.unkownError'), loading: false
+            })
+        }
+    }).catch(
+        error => {
+            if (error.message === "Network Error") {
+                this.setState({
+                    // message: 'static.unkownError',
+                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                    loading: false
+                });
+            } else {
+                switch (error.response ? error.response.status : "") {
+
+                    case 401:
+                        this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                    case 403:
+                        this.props.history.push(`/accessDenied`)
+                        break;
+                    case 500:
+                    case 404:
+                    case 406:
+                        this.setState({
+                            message: error.response.data.messageCode,
+                            loading: false
+                        });
+                        break;
+                    case 412:
+                        this.setState({
+                            message: error.response.data.messageCode,
+                            loading: false
+                        });
+                        break;
+                    default:
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                        break;
+                }
+            }
+        }
+    );
   }
  
   render() {
@@ -36,7 +122,7 @@ class PageError extends Component {
                   <Button color="primary" onClick={()=>this.props.history.push(`/ApplicationDashboard/` + AuthenticationService.displayDashboardBasedOnRole())}>Return to Dashboard</Button>
                 </InputGroupAddon>
               </InputGroup>
-              <Button color="primary" className='mt-2'>Raise a Ticket</Button>
+              <Button color="primary" onClick={()=>this.submitBug(this.props)} className='mt-2'>Raise a Ticket</Button>
             </Col>
           </Row>
         </Container>
