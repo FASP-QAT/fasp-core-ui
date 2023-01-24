@@ -292,11 +292,11 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
 
-                refillMonths: Yup.string()
-                .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
-                    function (value) {
-                        // var testNumber = document.getElementById("refillMonths").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("refillMonths").value) : false;
-                        if ((document.getElementById("nodeTypeId").value == 5)){
+        refillMonths: Yup.string()
+            .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
+                function (value) {
+                    // var testNumber = document.getElementById("refillMonths").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("refillMonths").value) : false;
+                    if ((document.getElementById("nodeTypeId").value == 5)) {
                         var testNumber = (/^[1-9]\d*$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
                         console.log("refill months*****", testNumber);
                         if ((document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 2) && (document.getElementById("refillMonths").value == "" || testNumber == false)) {
@@ -304,34 +304,34 @@ const validationSchemaNodeData = function (values) {
                         } else {
                             return true;
                         }
-                    }else{
+                    } else {
                         return true;
                     }
-                    }),
-            // sharePlanningUnit: Yup.string()
-            //     .test('sharePlanningUnit', i18n.t('static.validation.fieldRequired'),
-            //         function (value) {
-            //             if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 1 && document.getElementById("sharePlanningUnit").value == "") {
-            //                 return false;
-            //             } else {
-            //                 return true;
-            //             }
-            //         }),
-            puPerVisit: Yup.string()
-                .test('puPerVisit', 'Please enter # of pu per visit.',
-                    function (value) {
-                        // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value));
-                        if ((document.getElementById("nodeTypeId").value == 5)){
+                }),
+        // sharePlanningUnit: Yup.string()
+        //     .test('sharePlanningUnit', i18n.t('static.validation.fieldRequired'),
+        //         function (value) {
+        //             if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 1 && document.getElementById("sharePlanningUnit").value == "") {
+        //                 return false;
+        //             } else {
+        //                 return true;
+        //             }
+        //         }),
+        puPerVisit: Yup.string()
+            .test('puPerVisit', 'Please enter # of pu per visit.',
+                function (value) {
+                    // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value));
+                    if ((document.getElementById("nodeTypeId").value == 5)) {
                         var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
                         if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
                             return false;
                         } else {
                             return true;
                         }
-                    }else {
+                    } else {
                         return true;
                     }
-                    }),
+                }),
 
     })
 }
@@ -1185,14 +1185,14 @@ export default class CreateTreeTemplate extends Component {
             console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson);
             // this.getNoOfMonthsInUsagePeriod();
             if (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) {
-                var refillMonths = currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths : this.round(parseFloat((pu!=undefined?pu.multiplier:1) / (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
+                var refillMonths = currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths : this.round(parseFloat((pu != undefined ? pu.multiplier : 1) / (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
                 console.log("refillMonths qat cal---", refillMonths)
                 console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
                 // qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
-                qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / (pu!=undefined?pu.multiplier:1)).toFixed(4);
+                qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / (pu != undefined ? pu.multiplier : 1)).toFixed(4);
             } else {
                 // if (currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == true) {
-                qatCalculatedPUPerVisit = addCommas(this.state.noFURequired / (pu!=undefined?pu.multiplier:1));
+                qatCalculatedPUPerVisit = addCommas(this.state.noFURequired / (pu != undefined ? pu.multiplier : 1));
                 // } else {
                 //     qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                 // }
@@ -1214,7 +1214,7 @@ export default class CreateTreeTemplate extends Component {
         var currentItemConfig = this.state.currentItemConfig;
         var conversionFactor = this.state.conversionFactor;
         console.log("PUPERVISIT conversionFactor---", conversionFactor);
-        var puPerVisit="";
+        var puPerVisit = "";
         var refillMonths = isRefillMonth && currentScenario.puNode.refillMonths != "" ? currentScenario.puNode.refillMonths : this.round(parseFloat(conversionFactor / (parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
         console.log("PUPERVISIT refillMonths---", refillMonths);
         console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
@@ -1933,50 +1933,50 @@ export default class CreateTreeTemplate extends Component {
     }
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson(null, false);
+        var json = this.state.modelingEl.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(11, y);
+            var value = this.state.modelingEl.getValueFromCoords(11, y);
             if (parseInt(value) == 1) {
 
                 //Modeling type
                 var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(4, y);
+                var value = this.state.modelingEl.getValueFromCoords(4, y);
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
 
                 //+/-
                 var col = ("F").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(5, y);
+                var value = this.state.modelingEl.getValueFromCoords(5, y);
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(y);
                 console.log("modelingTypeId-valid--", rowData[4]);
                 // Start date
                 var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
+                var value = this.state.modelingEl.getValueFromCoords(1, y);
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
                 var startDate = rowData[1];
                 var stopDate = rowData[2];
@@ -1984,23 +1984,23 @@ export default class CreateTreeTemplate extends Component {
                 console.log("stopDate---", stopDate);
                 // Stop date
                 var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
+                var value = this.state.modelingEl.getValueFromCoords(2, y);
                 // var diff = moment(stopDate).diff(moment(startDate), 'months');
                 if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 }
                 else if (stopDate <= startDate) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.validation.pleaseEnterValidDate'));
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                    this.state.modelingEl.setComments(col, i18n.t('static.validation.pleaseEnterValidDate'));
                     valid = false;
                 }
                 else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                    this.state.modelingEl.setComments(col, "");
                 }
 
 
@@ -2010,44 +2010,44 @@ export default class CreateTreeTemplate extends Component {
                     // Month change %
                     if (rowData[4] != 2) {
                         var col = ("G").concat(parseInt(y) + 1);
-                        var value = this.el.getValueFromCoords(6, y);
+                        var value = this.state.modelingEl.getValueFromCoords(6, y);
                         if (value == "") {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                            this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                             valid = false;
                         }
                         // else if (!(reg.test(value))) {
-                        //     this.el.setStyle(col, "background-color", "transparent");
-                        //     this.el.setStyle(col, "background-color", "yellow");
-                        //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        //     this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                        //     this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                        //     this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
                         //     valid = false;
                         // }
                         else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setComments(col, "");
                         }
                     }
 
                     // Month change #
                     if (rowData[4] == 2) {
                         var col = ("H").concat(parseInt(y) + 1);
-                        var value = this.el.getValueFromCoords(7, y);
+                        var value = this.state.modelingEl.getValueFromCoords(7, y);
                         if (value == "") {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                            this.state.modelingEl.setComments(col, i18n.t('static.label.fieldRequired'));
                             valid = false;
                         }
                         // else if (!(reg.test(value))) {
-                        //     this.el.setStyle(col, "background-color", "transparent");
-                        //     this.el.setStyle(col, "background-color", "yellow");
-                        //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        //     this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                        //     this.state.modelingEl.setStyle(col, "background-color", "yellow");
+                        //     this.state.modelingEl.setComments(col, i18n.t('static.message.invalidnumber'));
                         //     valid = false;
                         // }
                         else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
+                            this.state.modelingEl.setStyle(col, "background-color", "transparent");
+                            this.state.modelingEl.setComments(col, "");
                         }
                     }
 
@@ -2104,8 +2104,8 @@ export default class CreateTreeTemplate extends Component {
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "")))?"": parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "")) < 0 ? parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4)), true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4))?"": parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", ""))) ? "" : parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "")) < 0 ? parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4)), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             } else if (this.state.currentModelingType == 3) { //Linear %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
                 if (this.state.currentTransferData == "") {
@@ -2113,9 +2113,9 @@ export default class CreateTreeTemplate extends Component {
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth))? "": parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth)) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4))?"": parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             } else if (this.state.currentModelingType == 4) { // Exponential %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
                 if (this.state.currentTransferData == "") {
@@ -2123,9 +2123,9 @@ export default class CreateTreeTemplate extends Component {
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth))? "": parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth)) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4))?"": parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             }
         }
         this.setState({ showCalculatorFields: false });
@@ -2173,10 +2173,15 @@ export default class CreateTreeTemplate extends Component {
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
         var targetChangePer = '';
+        var targetChangeNumberForPer = '';
+        var targetChangePerForPer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
             targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))).toFixed(4);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
-            percentForOneMonth = targetChangePer;
+
+            targetChangeNumberForPer = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
+            targetChangePerForPer = (parseFloat(targetChangeNumberForPer / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
+            percentForOneMonth = targetChangePerForPer;
         }
         console.log("targetChangeNumber 1---", targetChangeNumber);
         this.setState({
@@ -2450,10 +2455,10 @@ export default class CreateTreeTemplate extends Component {
                             // }
                             // (itemConfig.payload.nodeDataMap[0])[0].totalValue = totalValue;
                             // (itemConfig.payload.nodeDataMap[0])[0].fuPerMonth = (fuPerMonth < 0.01 ? addCommasThreeDecimal(fuPerMonth) : addCommasTwoDecimal(fuPerMonth));
-                            var usageType=(itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id;
-                            var val=(itemConfig.payload.nodeDataMap[0])[0].fuPerMonth;
-                            var val1="/" + 'Month';
-                            if(usageType==1){
+                            var usageType = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id;
+                            var val = (itemConfig.payload.nodeDataMap[0])[0].fuPerMonth;
+                            var val1 = "/" + 'Month';
+                            if (usageType == 1) {
                                 var usagePeriodId;
                                 var usageTypeId;
                                 var usageFrequency;
@@ -2472,9 +2477,9 @@ export default class CreateTreeTemplate extends Component {
                                         usagePeriodId = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
                                         console.log("usagePeriodId 4---", usagePeriodId);
                                     }
-                                    usageFrequency = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency!=null?(itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",",""):"";
+                                    usageFrequency = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency != null ? (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
                                     console.log("usageFrequency 4---", usageFrequency);
-                        
+
                                 }
                                 console.log("usagePeriodId dis---", usagePeriodId);
                                 var noOfMonthsInUsagePeriod = 0;
@@ -2483,7 +2488,7 @@ export default class CreateTreeTemplate extends Component {
                                     var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
                                     console.log("convertToMonth dis---", convertToMonth);
                                     console.log("repeat count---", (itemConfig.payload.nodeDataMap[0])[0].fuNode.repeatCount);
-                        
+
                                     if (usageTypeId == 2) {
                                         var div = (convertToMonth * usageFrequency);
                                         console.log("duv---", div);
@@ -2504,7 +2509,7 @@ export default class CreateTreeTemplate extends Component {
                                         noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                                         console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                                     }
-                        
+
                                     console.log("repeat count a---", (itemConfig.payload.nodeDataMap[0])[0].fuNode.repeatCount);
                                     console.log("convert to month a---", convertToMonth);
                                     console.log("noOfMonthsInUsagePeriod a---", noOfMonthsInUsagePeriod);
@@ -2518,28 +2523,28 @@ export default class CreateTreeTemplate extends Component {
                                             convertToMonth = 0;
                                         }
                                     }
-                                    var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((itemConfig.payload.nodeDataMap[0])[0].fuNode.repeatCount!=null?((itemConfig.payload.nodeDataMap[0])[0].fuNode.repeatCount).toString().replaceAll(",",""):(itemConfig.payload.nodeDataMap[0])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
-                                    val=noFURequired;
-                                    val1=""
+                                    var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((itemConfig.payload.nodeDataMap[0])[0].fuNode.repeatCount != null ? ((itemConfig.payload.nodeDataMap[0])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (itemConfig.payload.nodeDataMap[0])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+                                    val = noFURequired;
+                                    val1 = ""
                                     console.log("noFURequired---", noFURequired);
-                        
+
                                 } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                     console.log("inside else if no fu");
                                     if (itemConfig.payload.nodeType.id == 4) {
                                         noFURequired = (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
-                                        val=noFURequired;
-                                        val1="";
+                                        val = noFURequired;
+                                        val1 = "";
                                     } else {
                                         console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
                                         noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
-                                        val=noFURequired;
-                                        val1="";
+                                        val = noFURequired;
+                                        val1 = "";
                                     }
                                     // noOfMonthsInUsagePeriod = noOfFUPatient;
                                 }
-                                
+
                             }
-                            console.log("Test123 Value",(itemConfig.payload.nodeDataMap[0])[0])
+                            console.log("Test123 Value", (itemConfig.payload.nodeDataMap[0])[0])
                             return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue) + "% of parent, " + (val < 0.01 ? addCommasThreeDecimal(val) : addCommasTwoDecimal(val)) + val1;
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             // return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
@@ -2993,14 +2998,20 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             }
-            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100),0)` : this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 1?`=(G${parseInt(j) + 1}/(${this.state.noFURequired/(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier}))*${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit}`:`=G${parseInt(j) + 1}`;	
+            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100),0)` : this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 1 ? `=(G${parseInt(j) + 1}/(${this.state.noFURequired / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier}))*${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit}` : `=G${parseInt(j) + 1}`;
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
         }
-        this.el = jexcel(document.getElementById("momJexcelPer"), '');
+        if (document.getElementById("momJexcelPer") != null) {
+            this.el = jexcel(document.getElementById("momJexcelPer"), '');
+        } else {
+            this.el = "";
+        }
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("momJexcelPer"), true);
+        if (document.getElementById("momJexcelPer") != null) {
+            jexcel.destroy(document.getElementById("momJexcelPer"), true);
+        }
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
 
@@ -3165,8 +3176,12 @@ export default class CreateTreeTemplate extends Component {
             }.bind(this),
 
         };
-        var momElPer = jexcel(document.getElementById("momJexcelPer"), options);
-        this.el = momElPer;
+        if (document.getElementById("momJexcelPer") != null) {
+            var momElPer = jexcel(document.getElementById("momJexcelPer"), options);
+            this.el = momElPer;
+        } else {
+            var momElPer = "";
+        }
         this.setState({
             momElPer: momElPer
         }
@@ -3199,9 +3214,15 @@ export default class CreateTreeTemplate extends Component {
             dataArray[count] = data;
             count++;
         }
-        this.el = jexcel(document.getElementById("momJexcel"), '');
+        if (document.getElementById("momJexcel") != null) {
+            this.el = jexcel(document.getElementById("momJexcel"), '');
+        } else {
+            this.el = "";
+        }
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("momJexcel"), true);
+        if (document.getElementById("momJexcel") != null) {
+            jexcel.destroy(document.getElementById("momJexcel"), true);
+        }
 
         var data = dataArray;
         console.log("DataArray>>>", dataArray);
@@ -3338,8 +3359,12 @@ export default class CreateTreeTemplate extends Component {
             }.bind(this),
 
         };
-        var momEl = jexcel(document.getElementById("momJexcel"), options);
-        this.el = momEl;
+        if (document.getElementById("momJexcel") != null) {
+            var momEl = jexcel(document.getElementById("momJexcel"), options);
+            this.el = momEl;
+        } else {
+            var momEl = "";
+        }
         this.setState({
             momEl: momEl
         }
@@ -4479,12 +4504,12 @@ export default class CreateTreeTemplate extends Component {
                     });
                 }
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != "") {
-                    console.log("this.state.planningUnitList Test",this.state.planningUnitList);
-                    console.log("Planning Unit Id Test",this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id);
+                    console.log("this.state.planningUnitList Test", this.state.planningUnitList);
+                    console.log("Planning Unit Id Test", this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id);
                     var conversionFactor = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id);
                     console.log("pu conversion factor---", conversionFactor);
                     this.setState({
-                        conversionFactor:conversionFactor.length>0?conversionFactor[0].multiplier:""
+                        conversionFactor: conversionFactor.length > 0 ? conversionFactor[0].multiplier : ""
                     }, () => {
                         if (!this.state.addNodeFlag) {
                             this.qatCalculatedPUPerVisit(0);
@@ -4766,8 +4791,8 @@ export default class CreateTreeTemplate extends Component {
             if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                     repeatUsagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId;
-                }else{
-                    repeatUsagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId;                    
+                } else {
+                    repeatUsagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId;
                 }
                 if (repeatUsagePeriodId) {
                     convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
@@ -4778,7 +4803,7 @@ export default class CreateTreeTemplate extends Component {
             // var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / (convertToMonth * noOfMonthsInUsagePeriod);
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                 var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
-            }else{
+            } else {
                 var noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true ? ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
             }
             console.log("noFURequired---", noFURequired);
@@ -4814,7 +4839,7 @@ export default class CreateTreeTemplate extends Component {
                 usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId != "" ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : "";
                 console.log("usagePeriodId---", usagePeriodId);
                 console.log("usageFrequency before 5---", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency);
-                usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency!=null?(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", ""):"";
+                usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
                 console.log("usageFrequency---", usageFrequency);
             }
 
@@ -4827,7 +4852,7 @@ export default class CreateTreeTemplate extends Component {
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
                 usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId != "" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : "";
                 console.log("usagePeriodId---", usagePeriodId);
-                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency!=null?(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", ""):"";
+                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency != null ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
                 console.log("usageFrequency---", usageFrequency);
             }
 
@@ -4890,7 +4915,7 @@ export default class CreateTreeTemplate extends Component {
             noOfPersons = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             noOfForecastingUnitsPerPerson = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
             if (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage == false || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage == "false") {
-                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency!=null?(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", ""):"";
+                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency != null ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
             }
 
             if (this.state.addNodeFlag) {
@@ -4941,10 +4966,10 @@ export default class CreateTreeTemplate extends Component {
                     var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
                 } else {
                     var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnitId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
-                    if(planningUnitObj.length>0){
-                        var planningUnit=planningUnitObj[0].label.label_en
-                    }else{
-                        var planningUnit=""
+                    if (planningUnitObj.length > 0) {
+                        var planningUnit = planningUnitObj[0].label.label_en
+                    } else {
+                        var planningUnit = ""
                     }
                 }
                 if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
@@ -6156,9 +6181,9 @@ export default class CreateTreeTemplate extends Component {
                 }, () => {
                     setTimeout(() => {
                         console.log("Tree Template---", this.state.items);
-                        this.generateMonthList();    
+                        this.generateMonthList();
                     }, 0);
-                     })
+                })
             }
 
             // this.generateMonthList();
@@ -7139,20 +7164,20 @@ export default class CreateTreeTemplate extends Component {
                 var puPerVisit = "";
                 var pu = puNodes[puN].payload.nodeDataMap[0][0].puNode.planningUnit;
                 var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
-                var puNode=nodes[findNodeIndexPu].payload.nodeDataMap[0][0].puNode;
+                var puNode = nodes[findNodeIndexPu].payload.nodeDataMap[0][0].puNode;
                 if (currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) {
                     var refillMonths = this.round(parseFloat(pu.multiplier / (currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
                     console.log("AUTO refillMonths---", refillMonths);
                     console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
                     puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
-                    puNode.refillMonths=refillMonths;
-                    puNode.puPerVisit=puPerVisit;
+                    puNode.refillMonths = refillMonths;
+                    puNode.puPerVisit = puPerVisit;
                 } else {
                     console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
                     puPerVisit = this.state.noFURequired / pu.multiplier;
-                    puNode.puPerVisit=puPerVisit;
+                    puNode.puPerVisit = puPerVisit;
                 }
-                
+
                 nodes[findNodeIndexPu].payload.nodeDataMap[0][0].puNode = puNode;
                 console.log("Pu per visit Test123", puPerVisit)
                 console.log("Refill months Test123", refillMonths)
