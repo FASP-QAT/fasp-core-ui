@@ -1649,6 +1649,13 @@ class ForecastSummary extends Component {
                                         position: 'top',
                                         filters: true,
                                         onchange: this.forecastChanged,
+                                        onbeforepaste: function (instance, data, x, y) {
+                                            if (y != null) {
+                                                if (x == 3) {
+                                                    return false
+                                                }
+                                            }
+                                        },
                                         editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_FORECAST_SUMMARY') ? true : false,
                                         onload: function (instance, cell, x, y, value) {
                                             jExcelLoadedFunctionOnlyHideRow(instance);
@@ -2167,6 +2174,7 @@ class ForecastSummary extends Component {
                 mylist1.push(mylist[i]);
             }
         }
+        console.log("x---------------->mylist1", mylist1);
 
         return mylist1;
     }
