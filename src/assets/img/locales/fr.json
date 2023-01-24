@@ -1041,8 +1041,8 @@
     "static.importFromQATSupplyPlan.Range": "Période d'importation de la consommation réelle",
     "static.consumption.daysofstockout": "Nombre de jours de rupture",
     "static.program.region": "Région",
+    "static.ManageTree.Notes": "Remarques",
     "static.CompareSelect.bolded": "en gras",
-    "static.ManageTree.Notes": "Notes",
     "static.loadDelDataset.deleteLocalVersion": "Supprimer la version locale",
     "static.common.close": "Fermer",
     "static.scenarioPlanning.replannedShipmentSettings": "Paramètres d`envoi replanifié",
@@ -2899,5 +2899,6 @@
     "static.QATForecastImport.perOfForecast": "% de la prévision",
     "static.QATForecastImport.forcastConsumption": "Consommation prévue (module de prévision)",
     "static.QATForecastImport.convertedForecastConsumption": "Consommation prévisionnelle convertie (à importer)",
-    "static.QATForecastImport.currentForecastConsumption": "Consommation actuelle prévue (module Plan d`approvisionnement)"
+    "static.QATForecastImport.currentForecastConsumption": "Consommation actuelle prévue (module Plan d`approvisionnement)",
+    "static.tree.hideActionButtons":"Masquer les boutons d`action"
 }
