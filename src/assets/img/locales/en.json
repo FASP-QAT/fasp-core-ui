@@ -315,7 +315,7 @@
     "static.QATForecastImport.East": "East",
     "static.MonthlyForecast.MonthlyForecast": "Monthly Forecast",
     "static.supplyPlan.saveBudget": "Save Budget",
-    "static.tooltip.Parent": "To change the parent use drag and drop on the Tree View",
+    "static.tooltip.Parent": "The parent node values feed into the current node. Parent nodes cannot be edited. To change the parent, delete this node and create a child node under the neat parent node.",
     "static.modelingType.modelingType": "Modeling Type",
     "static.dashboard.productValidation": "Product Validations",
     "static.integration.editIntegration": "Edit Integration",
