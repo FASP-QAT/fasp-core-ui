@@ -4,6 +4,7 @@ import AuthenticationService from '../../Common/AuthenticationService';
 import JiraTikcetService from '../../../api/JiraTikcetService';
 import i18n from '../../../i18n';
 import { API_URL, SPACE_REGEX } from '../../../Constants';
+import { confirmAlert } from 'react-confirm-alert'; // Import
 
 import ErrorMessageImg from '../../../../src/assets/img/errorImg.png'
 import ErrorMessageBg from '../../../../src/assets/img/E1.png'
@@ -22,6 +23,18 @@ class PageError extends Component {
         loading: false
     }
     this.submitBug = this.submitBug.bind(this);
+    this.toggleSmall = this.toggleSmall.bind(this);
+  }
+
+  toggleSmall(msg) {
+    confirmAlert({
+      message: i18n.t('static.ticket.ticketcreated') + " " + i18n.t('static.ticket.ticketcode') + ": " + msg,
+      buttons: [
+        {
+          label: i18n.t('static.common.close')
+        }
+      ]
+    });
   }
 
   submitBug(e){
@@ -53,6 +66,7 @@ class PageError extends Component {
                 message: i18n.t('static.unkownError'), loading: false
             })
         }
+        this.toggleSmall(this.state.message);
     }).catch(
         error => {
             if (error.message === "Network Error") {
