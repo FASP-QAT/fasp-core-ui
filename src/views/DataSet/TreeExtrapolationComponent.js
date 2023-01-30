@@ -1495,7 +1495,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         }
                         console.log("rangeValue123---", rangeValue1);
                         let stopDate;
-                        let startDate = this.state.rangeValue1.from.year + '-' + this.state.rangeValue1.from.month + '-01';
+                        let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
                         let rangeStopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
                         if (moment(forecastStopDate).format('YYYY-MM-DD') > moment(rangeStopDate).format('YYYY-MM-DD')) {
                             stopDate = forecastStopDate;
@@ -4219,7 +4219,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                 <div className="col-md-6 pl-lg-0">
                                                     <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
-                                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <><Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>{i18n.t('static.tree.interpolate')}</Button>
+                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <><Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>{i18n.t('static.tree.interpolate')}</Button>
                                                         <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.extrapolate')}</Button></>}
                                                 </div>
                                                 <div className="col-md-6 pr-lg-0">
@@ -4449,10 +4449,10 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                 </FormGroup>
                                                 <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
-                                                    {this.state.isChanged && !this.state.dataChanged && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>}
+                                                    {this.state.isChanged && !this.state.dataChanged && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>}
                                                 </FormGroup>
                                             </Row>
-                                            {!this.state.dataChanged || !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <Row>{this.state.dataChanged && <div class="red">{i18n.t('static.message.treeExtrapolationSave')}</div>}</Row>}
+                                            {!this.state.dataChanged || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <Row>{this.state.dataChanged && <div class="red">{i18n.t('static.message.treeExtrapolationSave')}</div>}</Row>}
                                         </div>
                                     </Form>
                                 )} />
