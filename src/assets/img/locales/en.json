@@ -1687,7 +1687,7 @@
     "static.monthlyForecast.The": "The",
     "static.report.forecastConsumption": "Forecasted Consumption",
     "static.product.productunittext": "Select unit",
-    "static.tooltip.scenario": "Choose scenario for which the data below applies",
+    "static.tooltip.scenario": "To switch scenarios, please close this window and use the Scenario dropdown on the main screen",
     "static.supplyPlan.batchInfo": "Batch Information",
     "static.forecastingUnit.forecastingUnitId": "Forecasting Unit Id",
     "static.common.otherUnit": "Other Unit",
