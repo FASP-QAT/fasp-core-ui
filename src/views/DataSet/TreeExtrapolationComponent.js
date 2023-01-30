@@ -255,7 +255,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate1 = moment(Date.now()).startOf('month').subtract(23, 'months').startOf('month').format("YYYY-MM-DD");
         var endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         this.state = {
-            rangeValue1: { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 } },
+            rangeValue1: { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(this.props.items.forecastStartDate).getFullYear(), month: new Date(this.props.items.forecastStartDate).getMonth() + 1 } },
             seasonality: 0,
             dataChanged: false,
             buttonFalg: 1,
@@ -295,7 +295,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             ],
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            maxDateForHistoricalData:{ year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 },
+            maxDateForHistoricalData:{ year: new Date(this.props.items.forecastStartDate).getFullYear(), month: new Date(this.props.items.forecastStartDate).getMonth() + 1 },
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
             movingAvgId: true,
             semiAvgId: true,
