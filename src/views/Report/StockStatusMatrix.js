@@ -1525,7 +1525,47 @@ export default class StockStatusMatrix extends React.Component {
           doc.text(doc.internal.pageSize.width / 8, 170, planningText)
 
           var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 200, planningText)
+          doc.text(doc.internal.pageSize.width / 8, 180 + (this.state.tracerCategoryValues.length * 2), planningText)
+
+          //Legends start
+
+          doc.setDrawColor(0);
+          doc.setFillColor(186, 12, 47);
+          doc.rect(doc.internal.pageSize.width / 8, 190 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2), 15, 12, 'F');
+
+          doc.setFillColor(244, 133, 33);
+          doc.rect(doc.internal.pageSize.width / 8+100, 190 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2), 15, 12, 'F');
+
+          doc.setFillColor(17, 139, 112);
+          doc.rect(doc.internal.pageSize.width / 8+200, 190 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2), 15, 12, 'F');
+
+          doc.setFillColor(237, 185, 68);
+          doc.rect(doc.internal.pageSize.width / 8+300, 190 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2), 15, 12, 'F');
+
+          doc.setFillColor(207, 205, 201);
+          doc.rect(doc.internal.pageSize.width / 8+400, 190 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2), 15, 12, 'F');
+
+          doc.text(i18n.t(legendcolor[0].text), doc.internal.pageSize.width / 8+20, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2), {
+            align: 'left'
+          })
+
+          doc.text(i18n.t(legendcolor[1].text), doc.internal.pageSize.width / 8+120, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2), {
+            align: 'left'
+          })
+
+          doc.text(i18n.t(legendcolor[2].text), doc.internal.pageSize.width / 8+220, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2), {
+            align: 'left'
+          })
+
+          doc.text(i18n.t(legendcolor[3].text), doc.internal.pageSize.width / 8+320, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2), {
+            align: 'left'
+          })
+
+          doc.text(i18n.t(legendcolor[4].text), doc.internal.pageSize.width / 8+420, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2), {
+            align: 'left'
+          })
+
+          //Legends end
 
         }
 
@@ -1625,7 +1665,7 @@ export default class StockStatusMatrix extends React.Component {
       cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.nov, ele.novStock),
       cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.dec, ele.decStock),
     ]);
-    var startY = 230 + (this.state.planningUnitValues.length * 3)
+    var startY = 220 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 2)
     let content = {
       margin: { top: 80, bottom: 90 },
       startY: startY,
