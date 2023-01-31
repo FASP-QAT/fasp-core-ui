@@ -599,7 +599,7 @@ export default class CommitTreeComponent extends React.Component {
                             programQPLDetailsGetRequest.onsuccess = function (event) {
                                 var programQPLDetails = programQPLDetailsGetRequest.result;
                                 var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8).replaceAll("\"null\"",null);
                                 var datasetJson = JSON.parse(datasetData);
                                 var programJson = datasetJson;
                                 programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
