@@ -1183,7 +1183,7 @@ class EquivalancyUnit extends Component {
         console.log("Source Test123", source)
         var mylist = this.state.typeList1;
         if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
-            mylist.splice(0, 1);
+            mylist = mylist.filter(c => c.id != -1);
         }
         return mylist;
     }.bind(this)
@@ -1198,8 +1198,8 @@ class EquivalancyUnit extends Component {
         // console.log("myList--------->2", mylist);
         // console.log("myList--------->3", this.state.forecastingUnitList);
         let mylist = this.state.typeList;
-        if (!this.state.roleArray.includes('ROLE_REALM_ADMIN') && mylist[0].id == -1) {
-            mylist.splice(0, 1);
+        if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
+            mylist = mylist.filter(c => c.id != -1);
         }
         console.log("My List Test123", mylist)
         var eq = this.state.table1Instance.getRowData(r)[1];
