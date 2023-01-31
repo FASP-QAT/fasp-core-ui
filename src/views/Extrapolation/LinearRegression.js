@@ -267,9 +267,9 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
             let ciL = y - cLevel;
             let ciU = y + cLevel;
             ciString = " : " + ciL + " : " + ciU;
-            output.push({ month:(x + 1),actual:null, forecast:y,ci:cLevel})
+            output.push({ month:(x + 1),actual:null, forecast:y == 'NA' ? null : y > 0 ? y : 0,ci:cLevel})
         }else{
-            output.push({ month:(x + 1),actual:inputData[x].actual, forecast:y,ci:null})
+            output.push({ month:(x + 1),actual:inputData[x].actual, forecast:y == 'NA' ? null : y > 0 ? y : 0,ci:null})
         }
     }
     console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
