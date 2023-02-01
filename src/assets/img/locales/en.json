@@ -2907,5 +2907,6 @@
     "static.QATForecastImport.forcastConsumption": "Forecasted Consumption (Forecast Module)",
     "static.QATForecastImport.convertedForecastConsumption": "Converted Forecasted Consumption (to be imported)",
     "static.QATForecastImport.currentForecastConsumption": "Current Forecasted Consumption (Supply Plan Module)",
-    "static.tree.hideActionButtons": "Hide Action Buttons"
+    "static.tree.hideActionButtons": "Hide Action Buttons",
+    "static.tree.#OfFURequiredForPeriodPerPatient":"# of FU required for period per patient"
 }
