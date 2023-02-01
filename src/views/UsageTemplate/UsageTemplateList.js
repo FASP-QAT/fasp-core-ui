@@ -2225,7 +2225,7 @@ class usageTemplate extends Component {
         // console.log("myList--------->3", this.state.forecastingUnitList);
         var mylist = this.state.typeList;
         if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
-            mylist.splice(0, 1);
+            mylist = mylist.filter(c => c.id != -1);
         }
         return mylist;
         // return mylist.sort(function (a, b) {
@@ -3504,7 +3504,7 @@ class usageTemplate extends Component {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.program.validvaluetext'));
-                        }else if(value.toString().length>10){
+                        } else if (value.toString().length > 10) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
@@ -4639,7 +4639,7 @@ class usageTemplate extends Component {
                                     () => {
                                         this.hideSecondComponent();
                                     })
-                            }else if(value.toString().length>10){
+                            } else if (value.toString().length > 10) {
                                 this.el.setStyle(col, "background-color", "transparent");
                                 this.el.setStyle(col, "background-color", "yellow");
                                 this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
