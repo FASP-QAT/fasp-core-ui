@@ -252,7 +252,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.pickRange1 = React.createRef();
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD");
-        var startDate1 = moment(this.props.items.forecastStartDate).startOf('month').subtract(24, 'months').startOf('month').utc().format("YYYY-MM-DD");
+        var startDate1 = moment(this.props.items.forecastStartDate).startOf('month').subtract(23, 'months').startOf('month').utc().format("YYYY-MM-DD");
         var endDate1 = moment(this.props.items.forecastStartDate).startOf('month').utc().format("YYYY-MM-DD");
         this.state = {
             rangeValue1: { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 } },
@@ -1452,7 +1452,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         // if (moment(month).format("YYYY-MM") > moment(forecastStartDate).format("YYYY-MM")) {
                         //     minStartDate = forecastStartDate;
                         // }
-                        var tempStartDate = moment(month).subtract(24, 'months').format("YYYY-MM");
+                        var tempStartDate = moment(month).subtract(23, 'months').format("YYYY-MM");
                         var tempStopDate = moment(month).subtract(1, 'months').format("YYYY-MM");
                         var rangeValue1;
                         // var rangeValue = this.state.rangeValue1;
