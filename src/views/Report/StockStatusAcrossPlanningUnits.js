@@ -177,7 +177,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
 
                 let realmId = AuthenticationService.getRealmId();
-                TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
+                TracerCategoryService.getTracerCategoryByProgramId(realmId,programId).then(response => {
 
                     if (response.status == 200) {
                         var listArray = response.data;
