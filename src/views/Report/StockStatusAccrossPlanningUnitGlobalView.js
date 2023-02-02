@@ -522,7 +522,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     }
     // console.log("programids=====>", programIdsValue);
     let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
-    TracerCategoryService.getTracerCategoryByRealmId(realmId)
+    TracerCategoryService.getTracerCategoryByProgramIds(realmId,programIdsValue)
       .then(response => {
         console.log("tc respons==>", response.data);
         var listArray = response.data;
