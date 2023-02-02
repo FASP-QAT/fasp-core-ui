@@ -1865,7 +1865,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       csvRow.push('')
       csvRow.push('')
       if (this.state.selectedConsumptionUnitId > 0) {
-        csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + document.getElementById("planningUnitId").value).replaceAll(' ', '%20') + '"')
+        // console.log("document.getElementById(planningUnitId).value", document.getElementById("planningUnitId").value)
+        csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"')
+    
       }
       csvRow.push('')
       headers = [];
