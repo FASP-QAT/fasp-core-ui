@@ -4825,9 +4825,9 @@ export default class CreateTreeTemplate extends Component {
         } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
             console.log("inside else if no fu");
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
-                noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             } else {
-                noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             }
             // noOfMonthsInUsagePeriod = noOfFUPatient;
         }
