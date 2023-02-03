@@ -208,9 +208,9 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
     }
     
     // Number of months you want to project data for
-    const count = 24;
+    const count = noOfProjectionMonths;
     // Confidence # that you Confidence Interval for
-    const confidenceLevel = 0.95;
+    const confidenceLevel = confidence;
     
     let sumOfXMinusXBarSqr = 0;
     let sumOfXMinusXBar = 0;

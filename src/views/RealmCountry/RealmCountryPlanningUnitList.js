@@ -277,6 +277,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     color: "#BA0C2F",
                                     loading: false
+                                },
+                                () => {
+                                    this.hideSecondComponent();
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
@@ -293,6 +296,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                                             message: error.response.data.messageCode,
                                             color: "#BA0C2F",
                                             loading: false
+                                        },
+                                        () => {
+                                            this.hideSecondComponent();
                                         });
                                         break;
                                     case 406:
@@ -300,6 +306,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                                             message: 'static.realmCountryPlanningUnit.duplicateSKU',
                                             color: "red",
                                             loading: false
+                                        },
+                                        () => {
+                                            this.hideSecondComponent();
                                         });
                                         break;
                                     case 412:
@@ -307,6 +316,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                                             message: 'static.realmCountryPlanningUnit.failedToUpdate',
                                             color: "red",
                                             loading: false
+                                        },
+                                        () => {
+                                            this.hideSecondComponent();
                                         });
                                         break;
                                     default:
@@ -314,6 +326,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                                             message: 'static.unkownError',
                                             color: "#BA0C2F",
                                             loading: false
+                                        },
+                                        () => {
+                                            this.hideSecondComponent();
                                         });
                                         break;
                                 }
@@ -1138,6 +1153,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                 // message: 'static.unkownError',
                                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                 loading: false
+                                            },
+                                            () => {
+                                                this.hideSecondComponent();
                                             });
                                         } else {
                                             switch (error.response ? error.response.status : "") {
@@ -1154,18 +1172,27 @@ export default class RealmCountryPlanningUnitList extends Component {
                                                     this.setState({
                                                         message: error.response.data.messageCode,
                                                         loading: false
+                                                    },
+                                                    () => {
+                                                        this.hideSecondComponent();
                                                     });
                                                     break;
                                                 case 412:
                                                     this.setState({
                                                         message: error.response.data.messageCode,
                                                         loading: false
+                                                    },
+                                                    () => {
+                                                        this.hideSecondComponent();
                                                     });
                                                     break;
                                                 default:
                                                     this.setState({
                                                         message: 'static.unkownError',
                                                         loading: false
+                                                    },
+                                                    () => {
+                                                        this.hideSecondComponent();
                                                     });
                                                     break;
                                             }
@@ -1179,6 +1206,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                                         // message: 'static.unkownError',
                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
+                                    },
+                                    () => {
+                                        this.hideSecondComponent();
                                     });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
@@ -1195,18 +1225,27 @@ export default class RealmCountryPlanningUnitList extends Component {
                                             this.setState({
                                                 message: error.response.data.messageCode,
                                                 loading: false
+                                            },
+                                            () => {
+                                                this.hideSecondComponent();
                                             });
                                             break;
                                         case 412:
                                             this.setState({
                                                 message: error.response.data.messageCode,
                                                 loading: false
+                                            },
+                                            () => {
+                                                this.hideSecondComponent();
                                             });
                                             break;
                                         default:
                                             this.setState({
                                                 message: 'static.unkownError',
                                                 loading: false
+                                            },
+                                            () => {
+                                                this.hideSecondComponent();
                                             });
                                             break;
                                     }
@@ -1220,6 +1259,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                                 // message: 'static.unkownError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
+                            },
+                            () => {
+                                this.hideSecondComponent();
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -1236,18 +1278,27 @@ export default class RealmCountryPlanningUnitList extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
+                                    },
+                                    () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 case 412:
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false
+                                    },
+                                    () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false
+                                    },
+                                    () => {
+                                        this.hideSecondComponent();
                                     });
                                     break;
                             }
@@ -1321,6 +1372,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                             // message: 'static.unkownError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
+                        },
+                        () => {
+                            this.hideSecondComponent();
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -1337,18 +1391,27 @@ export default class RealmCountryPlanningUnitList extends Component {
                                 this.setState({
                                     message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
                                     loading: false
+                                },
+                                () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
                                     loading: false
+                                },
+                                () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
+                                },
+                                () => {
+                                    this.hideSecondComponent();
                                 });
                                 break;
                         }

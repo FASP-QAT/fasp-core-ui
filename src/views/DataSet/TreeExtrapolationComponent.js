@@ -252,8 +252,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.pickRange1 = React.createRef();
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD");
-        var startDate1 = moment(Date.now()).startOf('month').subtract(23, 'months').startOf('month').format("YYYY-MM-DD");
-        var endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+        var startDate1 = moment(this.props.items.forecastStartDate).startOf('month').subtract(23, 'months').startOf('month').utc().format("YYYY-MM-DD");
+        var endDate1 = moment(this.props.items.forecastStartDate).startOf('month').utc().format("YYYY-MM-DD");
         this.state = {
             rangeValue1: { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 } },
             seasonality: 0,
@@ -383,7 +383,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
     handleRangeDissmis1(value) {
         console.log("date range value---", value);
-        this.setState({ rangeValue1: value,dataChanged:true }, () => {
+        this.setState({ rangeValue1: value, dataChanged: true }, () => {
 
             this.getDateDifference();
 
@@ -569,7 +569,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 console.log("dataList[dataList.length - 1]---", dataList[dataList.length - 1]);
                 console.log("gap3---", moment('2021-02-01').isBetween(dataList[0], dataList[dataList.length - 1]))
                 console.log("gap4---", jexcelDataArr.filter(c => c.amount == '' && moment(c.month).isBetween(dataList[0], dataList[dataList.length - 1], null)))
-                console.log("Result Test123",result)
+                console.log("Result Test123", result)
                 if (result.length > 0) {
                     console.log("Loader 2 Test123")
                     this.setState({ extrapolationLoader: false }, () => {
@@ -923,7 +923,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 }
             }
         }
-        console.log("After check validation Test123",valid);
+        console.log("After check validation Test123", valid);
         return valid;
     }
 
@@ -1445,7 +1445,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         // if (moment(month).format("YYYY-MM") > moment(forecastStartDate).format("YYYY-MM")) {
                         //     minStartDate = forecastStartDate;
                         // }
-                        var tempStartDate = moment(month).subtract(24, 'months').format("YYYY-MM");
+                        var tempStartDate = moment(month).subtract(23, 'months').format("YYYY-MM");
                         var tempStopDate = moment(month).subtract(1, 'months').format("YYYY-MM");
                         var rangeValue1;
                         // var rangeValue = this.state.rangeValue1;
@@ -1488,7 +1488,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         }
                         console.log("rangeValue123---", rangeValue1);
                         let stopDate;
-                        let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
+                        let startDate = this.state.rangeValue1.from.year + '-' + this.state.rangeValue1.from.month + '-01';
                         let rangeStopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
                         if (moment(forecastStopDate).format('YYYY-MM-DD') > moment(rangeStopDate).format('YYYY-MM-DD')) {
                             stopDate = forecastStopDate;
@@ -1739,11 +1739,11 @@ export default class TreeExtrapolationComponent extends React.Component {
             console.log("minMonth hehehe semiAvgData---", this.state.semiAvgData);
             console.log("count 1 hehehe---", count1);
             console.log("final hehehe---", this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? "A" : 'B' : 'C');
-            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? parseFloat(this.state.movingAvgData[count1].forecast).toFixed(4) : '' : ''
-            data[5] = this.state.semiAvgData.length > 0 && count1 != '' && this.state.semiAvgData[count1].forecast != null ? parseFloat(this.state.semiAvgData[count1].forecast).toFixed(4) : ''
-            data[6] = this.state.linearRegressionData.length > 0 && count1 != '' && this.state.linearRegressionData[count1].forecast != null ? parseFloat(this.state.linearRegressionData[count1].forecast).toFixed(4) : ''
-            data[7] = this.state.tesData.length > 0 && count1 != '' && this.state.tesData[count1].forecast != null ? this.state.tesData[count1].forecast : ''
-            data[8] = this.state.arimaData.length > 0 && count1 != '' && this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].forecast : ''
+            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null && this.state.movingAvgData[count1].forecast != null ? parseFloat(this.state.movingAvgData[count1].forecast).toFixed(4) : '' : ''
+            data[5] = this.state.semiAvgData.length > 0 && count1 != '' && this.state.semiAvgData[count1] != null && this.state.semiAvgData[count1].forecast != null ? parseFloat(this.state.semiAvgData[count1].forecast).toFixed(4) : ''
+            data[6] = this.state.linearRegressionData.length > 0 && count1 != '' && this.state.linearRegressionData[count1] != null && this.state.linearRegressionData[count1].forecast != null ? parseFloat(this.state.linearRegressionData[count1].forecast).toFixed(4) : ''
+            data[7] = this.state.tesData.length > 0 && count1 != '' && this.state.tesData[count1] != null&& this.state.tesData[count1].forecast != null ? this.state.tesData[count1].forecast : ''
+            data[8] = this.state.arimaData.length > 0 && count1 != '' && this.state.arimaData[count1] != null && this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].forecast : ''
 
             data[9] = `=IF(ISBLANK(D${parseInt(j) + 1}),IF(N1 == 4,I${parseInt(j) + 1},IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},''))))),ROUND(D${parseInt(j) + 1},4))` // J
             data[10] = cellData != null && cellData != "" ? cellData.manualChange : ""
@@ -1755,17 +1755,17 @@ export default class TreeExtrapolationComponent extends React.Component {
             //TES lower
             // data[14] = this.state.tesData.length > 0 && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast - this.state.tesData[count1].CI : ''
             // console.log("tes lower calculations---", this.state.tesData[count1]);
-            data[14] = this.state.tesData.length > 0 && count1 != ''  && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast != null ? this.state.tesData[count1].ci != null ? this.state.tesData[count1].forecast - this.state.tesData[count1].ci : this.state.tesData[count1].forecast : '' : ''
+            data[14] = this.state.tesData.length > 0 && count1 != '' && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast != null ? this.state.tesData[count1].ci != null ? this.state.tesData[count1].forecast - this.state.tesData[count1].ci : this.state.tesData[count1].forecast : '' : ''
             //TES Upper
-            data[15] = this.state.tesData.length > 0 && count1 != ''  && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast != null ? this.state.tesData[count1].ci != null ? this.state.tesData[count1].forecast + this.state.tesData[count1].ci : this.state.tesData[count1].forecast : '' : ''
+            data[15] = this.state.tesData.length > 0 && count1 != '' && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast != null ? this.state.tesData[count1].ci != null ? this.state.tesData[count1].forecast + this.state.tesData[count1].ci : this.state.tesData[count1].forecast : '' : ''
             //Arima lower
-            data[16] = this.state.arimaData.length > 0 && count1 != ''  && this.state.arimaData[count1] != null ? this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].ci != null ? this.state.arimaData[count1].forecast - this.state.arimaData[count1].ci : this.state.arimaData[count1].forecast : '' : ''
+            data[16] = this.state.arimaData.length > 0 && count1 != '' && this.state.arimaData[count1] != null ? this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].ci != null ? this.state.arimaData[count1].forecast - this.state.arimaData[count1].ci : this.state.arimaData[count1].forecast : '' : ''
             //Arima Upper
-            data[17] = this.state.arimaData.length > 0 && count1 != ''  && this.state.arimaData[count1] != null ? this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].ci != null ? this.state.arimaData[count1].forecast + this.state.arimaData[count1].ci : this.state.arimaData[count1].forecast : '' : ''
+            data[17] = this.state.arimaData.length > 0 && count1 != '' && this.state.arimaData[count1] != null ? this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].ci != null ? this.state.arimaData[count1].forecast + this.state.arimaData[count1].ci : this.state.arimaData[count1].forecast : '' : ''
             //LR Lower
-            data[18] = this.state.linearRegressionData.length > 0 && count1 != ''  && this.state.linearRegressionData[count1] != null ? this.state.linearRegressionData[count1].forecast != null ? this.state.linearRegressionData[count1].ci != null ? this.state.linearRegressionData[count1].forecast - this.state.linearRegressionData[count1].ci : this.state.linearRegressionData[count1].forecast : '' : ''
+            data[18] = this.state.linearRegressionData.length > 0 && count1 != '' && this.state.linearRegressionData[count1] != null ? this.state.linearRegressionData[count1].forecast != null ? this.state.linearRegressionData[count1].ci != null ? this.state.linearRegressionData[count1].forecast - this.state.linearRegressionData[count1].ci : this.state.linearRegressionData[count1].forecast : '' : ''
             //LR Upper
-            data[19] = this.state.linearRegressionData.length > 0 && count1 != ''  && this.state.linearRegressionData[count1] != null ? this.state.linearRegressionData[count1].forecast != null ? this.state.linearRegressionData[count1].ci != null ? this.state.linearRegressionData[count1].forecast + this.state.linearRegressionData[count1].ci : this.state.linearRegressionData[count1].forecast : '' : ''
+            data[19] = this.state.linearRegressionData.length > 0 && count1 != '' && this.state.linearRegressionData[count1] != null ? this.state.linearRegressionData[count1].forecast != null ? this.state.linearRegressionData[count1].ci != null ? this.state.linearRegressionData[count1].forecast + this.state.linearRegressionData[count1].ci : this.state.linearRegressionData[count1].forecast : '' : ''
             if (count1 >= 0) {
                 count1++;
             }
@@ -1844,19 +1844,19 @@ export default class TreeExtrapolationComponent extends React.Component {
                     mask: '#,##0.0000'
                 },
                 {
-                    title: 'Moving Averages',
+                    title: i18n.t('static.extrapolation.movingAverages'),
                     type: this.state.movingAvgId ? 'number' : 'hidden',
                     mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
-                    title: 'Semi-Averages',
+                    title: i18n.t('static.extrapolation.SemiAverages'),
                     type: this.state.semiAvgId ? 'number' : 'hidden',
                     mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
-                    title: 'Linear Regression',
+                    title: i18n.t('static.extrapolation.linearRegression'),
                     type: this.state.linearRegressionId ? 'number' : 'hidden',
                     mask: '#,##0.0000',
                     readOnly: true
@@ -3645,14 +3645,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                             }}
                             validate={validateExtrapolation(validationSchemaExtrapolation)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
-                                console.log("Check validation Extrapolation Test123",this.checkValidationExtrapolation());
+                                console.log("Check validation Extrapolation Test123", this.checkValidationExtrapolation());
                                 if (this.checkValidationExtrapolation()) {
-                                    console.log("This.state.button flag Test123",this.state.buttonFalg);
+                                    console.log("This.state.button flag Test123", this.state.buttonFalg);
                                     if (this.state.buttonFalg) {
-                                        console.log("In If check value gaps Test123",this.checkActualValuesGap(false));
+                                        console.log("In If check value gaps Test123", this.checkActualValuesGap(false));
                                         this.checkActualValuesGap(false);
                                     } else {
-                                        console.log("In else check value gaps Test123",this.checkActualValuesGap(true));
+                                        console.log("In else check value gaps Test123", this.checkActualValuesGap(true));
                                         this.checkActualValuesGap(true);
                                     }
                                     console.log("tree extrapolation on submit called Test123")
@@ -3681,7 +3681,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             <div className="row pl-lg-0 pr-lg-0">
                                                 {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                                                 <a className="">
-                                                    <span onClick={() => { this.toggleShowGuidance() }} style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                                    <span onClick={() => { this.toggleShowGuidance() }} style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
 
                                                 </a>
                                             </div>
@@ -3691,11 +3691,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             <div className="row">
                                                 <div>
                                                     <Popover placement="top" isOpen={this.state.popoverOpenStartMonth} target="Popover28" trigger="hover" toggle={this.toggleStartMonth}>
-                                                        <PopoverBody>To change the start month, please go back to the Node Data screen and change the month</PopoverBody>
+                                                        <PopoverBody>{i18n.t('static.tooltip.startMonthForHistoricData')}</PopoverBody>
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tree.startMonthForHistoricData')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <div className="controls edit">
                                                         {/* <Picker
 
@@ -3729,7 +3729,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
                                                 </div>
                                                 <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">Forecast Period<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                     <div className="controls edit">
 
                                                         <Picker
@@ -3776,14 +3776,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 <Label
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
-                                                                    <b>Moving Averages</b>
+                                                                    <b>{i18n.t('static.extrapolation.movingAverages')}</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover29" onClick={this.toggleMa} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
                                                             {/* {this.state.movingAvgId && */}
                                                             <div className="row col-md-12 pt-lg-2">
                                                                 <div className="col-md-2 pl-lg-0 pt-lg-0" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
-                                                                    <Label htmlFor="appendedInputButton"># of Months</Label>
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
                                                                     <Input
                                                                         className="controls"
                                                                         type="number"
@@ -3820,7 +3820,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 <Label
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
-                                                                    <b>Semi-Averages</b>
+                                                                    <b>{i18n.t('static.extrapolation.SemiAverages')}</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover31" onClick={this.toggleSa} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
@@ -3843,7 +3843,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 <Label
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
-                                                                    <b>Linear Regression</b>
+                                                                    <b>{i18n.t('static.extrapolation.linearRegression')}</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover32" onClick={this.toggleLr} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
 
@@ -3902,7 +3902,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 <Label
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
-                                                                    <b>Triple-Exponential Smoothing (Holts-Winters)</b>
+                                                                    <b>{i18n.t('static.tree.tripleExponentialSmoothing')}</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover33" onClick={this.toggleTes} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
@@ -4183,8 +4183,8 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                 <div className="col-md-6 pl-lg-0">
                                                     <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
-                                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <><Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
-                                                        <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> Extrapolate</Button></>}
+                                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <><Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>{i18n.t('static.tree.interpolate')}</Button>
+                                                        <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.extrapolate')}</Button></>}
                                                 </div>
                                                 <div className="col-md-6 pr-lg-0">
                                                     <Button className="btn btn-info btn-md float-right" onClick={this.toggleJexcelData}>
@@ -4363,7 +4363,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         </div>
                                         <div className="col-md-12 row pl-lg-0  pr-lg-0 pt-lg-3 pb-lg-3">
                                             <ul className="legendcommitversion pl-lg-0">
-                                                <li><span className="lowestErrorGreenLegend legendcolor"></span> <span className="legendcommitversionText">Lowest Error</span></li>
+                                                <li><span className="lowestErrorGreenLegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')}</span></li>
 
                                             </ul>
                                         </div>
@@ -4371,7 +4371,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <div className="col-md-12 pl-lg-0 pr-lg-0">
                                             <Row>
                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                    <Label htmlFor="currencyId">Choose Method<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover51" onClick={this.toggleChooseMethod} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.common.chooseMethod')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover51" onClick={this.toggleChooseMethod} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     {/* <InputGroup> */}
                                                     <Input
                                                         type="select"
@@ -4385,7 +4385,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         required
                                                         value={this.state.nodeDataExtrapolation != null && this.state.nodeDataExtrapolation.extrapolationMethod != null ? this.state.nodeDataExtrapolation.extrapolationMethod.id : ""}
                                                     >
-                                                        <option value="">{"Select extrapolation method"}</option>
+                                                        <option value="">{i18n.t('static.option.extrapolationMethod')}</option>
                                                         {extrapolationMethods}
                                                     </Input>
 
@@ -4398,7 +4398,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-5">
-                                                    <Label htmlFor="currencyId">Notes</Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.ManageTree.Notes')}</Label>
                                                     <InputGroup>
                                                         <Input
                                                             type="textarea"
@@ -4440,15 +4440,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                    <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceTreeExtrapolationEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceTreeExtrapolationFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceTreeExtrapolationSp :
-                  showguidanceTreeExtrapolationPr
-              } } />
+                        <ModalBody className="ModalBodyPadding">
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceTreeExtrapolationEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceTreeExtrapolationFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceTreeExtrapolationSp :
+                                            showguidanceTreeExtrapolationPr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.extrapolation.ExtrapolationNode')}</h3>
                             </div>
