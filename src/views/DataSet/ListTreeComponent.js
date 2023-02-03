@@ -656,7 +656,7 @@ export default class ListTreeComponent extends Component {
                 tempTree = {
                     treeId: treeId,
                     active: this.state.active,
-                    forecastMethod: treeTemplate.forecastMethod,
+                    forecastMethod: this.state.forecastMethod,
                     label: {
                         label_en: this.state.treeName,
                         label_fr: '',
