@@ -1132,8 +1132,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 // var inputDataLinearRegression = [];
                 // var inputDataTes = [];
                 var tableJson = this.state.dataExtrapolation.getJson(null, false);
-                console.log("tableJson length---", tableJson.length);
-                console.log("tableJson---", tableJson);
+                console.log("interpolate tableJson length---", tableJson.length);
+                console.log("interpolate tableJson---", tableJson);
                 var resultCount = 0;
                 for (var i = 0; i < tableJson.length; i++) {
                     var map1 = new Map(Object.entries(tableJson[i]));
@@ -1153,34 +1153,38 @@ export default class TreeExtrapolationComponent extends React.Component {
                 this.setState({ jexcelDataArr }, () => {
                     for (var j = 0; j < monthArray.length; j++) {
                         var dataArr = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))[0];
-                        console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "dataArr---", dataArr);
+                        console.log("interpolate ",moment(monthArray[j]).format("YYYY-MM") + " " + "dataArr---", dataArr);
                         if (dataArr.amount == "") {
                             var startValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") && c.amount != "")
                                 .sort(function (a, b) {
                                     return new Date(a.month) - new Date(b.month);
                                 });
-                            console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startValList---", startValList);
+                            console.log("interpolate ",moment(monthArray[j]).format("YYYY-MM") + " " + "startValList---", startValList);
                             var endValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j]).format("YYYY-MM") && c.amount != "")
                                 .sort(function (a, b) {
                                     return new Date(a.month) - new Date(b.month);
                                 });
-                            console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endValList---", endValList);
+                            console.log("interpolate ",moment(monthArray[j]).format("YYYY-MM") + " " + "endValList---", endValList);
                             if (startValList.length > 0 && endValList.length > 0) {
                                 var startVal = startValList[startValList.length - 1].amount;
-                                console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startVal---", startVal);
+                                console.log(moment("interpolate ",monthArray[j]).format("YYYY-MM") + " " + "startVal---", startVal);
                                 var startMonthVal = startValList[startValList.length - 1].month;
-                                console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startMonthVal---", startMonthVal);
+                                console.log(moment("interpolate ",monthArray[j]).format("YYYY-MM") + " " + "startMonthVal---", startMonthVal);
                                 var endVal = endValList[0].amount;
-                                console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endVal---", endVal);
+                                console.log("interpolate ",moment(monthArray[j]).format("YYYY-MM") + " " + "endVal---", endVal);
                                 var endMonthVal = endValList[0].month;
-                                console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endMonthVal---", endMonthVal);
+                                console.log("interpolate ",moment(monthArray[j]).format("YYYY-MM") + " " + "endMonthVal---", endMonthVal);
                                 const monthDifference = Math.round(Number(moment(new Date(monthArray[j])).diff(new Date(startMonthVal), 'months', true)));
                                 const monthDiff = Math.round(Number(moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true)));
                                 var missingActualData = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
-                                console.log("month--->>>", monthArray[j]);
-                                console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "missingActualData---", missingActualData);
+                                console.log("interpolate missingActualData--->>>", missingActualData);
+                                
+                                console.log("interpolate month--->>>", monthArray[j]);
+                                console.log("interpolate ",moment(monthArray[j]).format("YYYY-MM") + " " + "missingActualData---", missingActualData);
                                 const index = jexcelDataArr.findIndex(c => c.month == monthArray[j]);
                                 var amount = missingActualData % 1 != 0 ? missingActualData.toFixed(4) : missingActualData;
+                                console.log("interpolate amount--->>>", amount);
+                               
                                 var json = {
                                     month: monthArray[j],
                                     amount: amount,
@@ -1197,7 +1201,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         //     // interpolatedData.push(dataArr);
                         // }
                     }
-                    console.log("interpolatedData---", interpolatedData);
+                    console.log("interpolate interpolatedData---", interpolatedData);
                     const { nodeDataExtrapolation } = this.state;
                     nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
                     var valList = jexcelDataArr.filter(c => c.amount != "")
