@@ -1279,6 +1279,7 @@
     "static.ForecastSummary.NationalView": "Vista Nacional",
     "static.tooltip.PeriodUnit": "La unidad deseada para la columna Período.",
     "static.supplyPlan.exportAsCsv": "Exportar como CSV",
+    "static.tree.#OfFURequiredForPeriodPerPatient": "# de FU requerida por período por paciente",
     "static.supplyPlan.minStock": "Existencias mínimas",
     "static.procurementagent.procurementagentapprovetoshippedtime": "Ingresar el tiempo de espera desde aprobado hasta embarcado (en meses) para este agente de compras",
     "static.datasource.datasourcetypetext": "Seleccionar el tipo de fuente de datos",
