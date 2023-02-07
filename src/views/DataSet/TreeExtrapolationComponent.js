@@ -3649,10 +3649,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 if (this.checkValidationExtrapolation()) {
                                     console.log("This.state.button flag Test123", this.state.buttonFalg);
                                     if (this.state.buttonFalg) {
-                                        console.log("In If check value gaps Test123", this.checkActualValuesGap(false));
+                                        // console.log("In If check value gaps Test123", this.checkActualValuesGap(false));
                                         this.checkActualValuesGap(false);
                                     } else {
-                                        console.log("In else check value gaps Test123", this.checkActualValuesGap(true));
+                                        // console.log("In else check value gaps Test123", this.checkActualValuesGap(true));
                                         this.checkActualValuesGap(true);
                                     }
                                     console.log("tree extrapolation on submit called Test123")

@@ -4974,6 +4974,7 @@ export default class BuildTree extends Component {
                             var usageType = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
                             var val = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuPerMonth;
                             var val1 = "/" + 'Month';
+                            var val2=", ";
                             if (usageType == 1) {
                                 var usagePeriodId;
                                 var usageTypeId;
@@ -5042,6 +5043,7 @@ export default class BuildTree extends Component {
                                     var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount != null ? ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                     val = noFURequired;
                                     val1 = ""
+                                    val2=" * "
                                     console.log("noFURequired---", noFURequired);
 
                                 } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
@@ -5050,17 +5052,19 @@ export default class BuildTree extends Component {
                                         noFURequired = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
                                         val = noFURequired;
                                         val1 = "";
+                                        val2=" * "
                                     } else {
                                         console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
                                         noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
                                         val = noFURequired;
                                         val1 = "";
+                                        val2=" * "
                                     }
                                     // noOfMonthsInUsagePeriod = noOfFUPatient;
                                 }
 
                             }
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (val < 0.01 ? addCommasThreeDecimal(val) : addCommasTwoDecimal(val)) + val1;
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent"+ val2 + (val < 0.01 ? addCommasThreeDecimal(val) : addCommasTwoDecimal(val)) + val1;
 
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             console.log("payload get puNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
@@ -7158,6 +7162,11 @@ export default class BuildTree extends Component {
             planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
+                myResult.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 console.log("myResult===============6", myResult);
                 console.log("fuIdArray---", fuIdArray);
                 var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1 && el.active);
@@ -7736,7 +7745,7 @@ export default class BuildTree extends Component {
         }
 
         if (event.target.name === "noOfPersons") {
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons = (event.target.value).replaceAll(",", "");
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getUsageText();
@@ -7749,7 +7758,7 @@ export default class BuildTree extends Component {
 
 
         if (event.target.name === "forecastingUnitPerPersonsFC") {
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson = (event.target.value).replaceAll(",","");
             if (currentItemConfig.context.payload.nodeType.id == 4 && (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 1) {
                 this.getNoOfFUPatient();
             }
@@ -7785,14 +7794,14 @@ export default class BuildTree extends Component {
         }
 
         if (event.target.name === "repeatCount") {
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount = (event.target.value).replaceAll(",","");
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getUsageText();
         }
 
         if (event.target.name === "usageFrequencyCon" || event.target.name === "usageFrequencyDis") {
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency = (event.target.value).replaceAll(",","");
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getUsageText();
@@ -10193,7 +10202,7 @@ export default class BuildTree extends Component {
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr> */}
                                                         <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriodPerPatient')}</td>
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noFURequired)}</td>
                                                         </tr>
                                                     </table>}
