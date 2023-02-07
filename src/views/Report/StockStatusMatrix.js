@@ -1567,45 +1567,6 @@ export default class StockStatusMatrix extends React.Component {
 
           //Legends end
 
-          //Legends start
-
-          doc.setDrawColor(0);
-          doc.setFillColor(186, 12, 47);
-          doc.rect(doc.internal.pageSize.width / 8, 220 + (this.state.planningUnitValues.length * 3), 15, 12, 'F');
-
-          doc.setFillColor(244, 133, 33);
-          doc.rect(doc.internal.pageSize.width / 8+100, 220 + (this.state.planningUnitValues.length * 3), 15, 12, 'F');
-
-          doc.setFillColor(17, 139, 112);
-          doc.rect(doc.internal.pageSize.width / 8+200, 220 + (this.state.planningUnitValues.length * 3), 15, 12, 'F');
-
-          doc.setFillColor(237, 185, 68);
-          doc.rect(doc.internal.pageSize.width / 8+300, 220 + (this.state.planningUnitValues.length * 3), 15, 12, 'F');
-
-          doc.setFillColor(207, 205, 201);
-          doc.rect(doc.internal.pageSize.width / 8+400, 220 + (this.state.planningUnitValues.length * 3), 15, 12, 'F');
-
-          doc.text(i18n.t(legendcolor[0].text), doc.internal.pageSize.width / 8+20, 230 + (this.state.planningUnitValues.length * 3), {
-            align: 'left'
-          })
-
-          doc.text(i18n.t(legendcolor[1].text), doc.internal.pageSize.width / 8+120, 230 + (this.state.planningUnitValues.length * 3), {
-            align: 'left'
-          })
-
-          doc.text(i18n.t(legendcolor[2].text), doc.internal.pageSize.width / 8+220, 230 + (this.state.planningUnitValues.length * 3), {
-            align: 'left'
-          })
-
-          doc.text(i18n.t(legendcolor[3].text), doc.internal.pageSize.width / 8+320, 230 + (this.state.planningUnitValues.length * 3), {
-            align: 'left'
-          })
-
-          doc.text(i18n.t(legendcolor[4].text), doc.internal.pageSize.width / 8+420, 230 + (this.state.planningUnitValues.length * 3), {
-            align: 'left'
-          })
-
-          //Legends end
 
         }
 
