@@ -1621,7 +1621,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.state.regions.map(ele =>
             csvRow.push('"' + ('Region' + ' : ' + getLabelText(ele.label, this.state.lang)).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
-        csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + document.getElementById("consumptionAdjusted")).replaceAll(' ', '%20') + '"')
+        this.state.consumptionAdjForStockOutId ? csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + true).replaceAll(' ', '%20') + '"'):
+        csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + false).replaceAll(' ', '%20') + '"')
+        // csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + this.state.consumptionAdjForStockOutId ? true :false).replaceAll(' ', '%20') + '"')
+        // csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + document.getElementById("consumptionAdjusted")).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         // csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
@@ -2156,7 +2159,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 cell1 += ' %';
                                 return cell1;
                             },
-                            max: 100
+                            // max: 100
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 0
@@ -2236,8 +2239,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             for (var i = 0; i < elInstance.length; i++) {
                 var value = elInstance[i];
                 if (value) {
-                    consumptionActualValue.push((value.actualQty).toFixed(2))
-                    consumptionForecastValue.push((value.forecastQty).toFixed(2))
+                    consumptionActualValue.push(Number(value.actualQty).toFixed(2))
+                    consumptionForecastValue.push(Number(value.forecastQty).toFixed(2))
                 } else {
                     consumptionActualValue.push("");
                     consumptionForecastValue.push("");
