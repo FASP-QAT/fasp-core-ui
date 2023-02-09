@@ -969,7 +969,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               datasetJson: datasetJson
             }, () => {
               this.hideFirstComponent();
-              this.componentDidMount()
+              // this.componentDidMount()
             })
 
 
@@ -1631,10 +1631,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   hideFirstComponent() {
+    try{
     document.getElementById('div1').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
     }, 30000);
+  }catch(Expection){}
   }
 
   hideSecondComponent() {
