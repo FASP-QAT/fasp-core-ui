@@ -985,13 +985,16 @@ export default class ListTreeComponent extends Component {
                         })
                     }
                     else if (localStorage.getItem("sesDatasetId") != '' && localStorage.getItem("sesDatasetId") != undefined) {
+                        console.log("Seema localStorage.getItem-sesDatasetId------------------>",localStorage.getItem("sesDatasetId"));
+                        var datasetarr = localStorage.getItem("sesDatasetId").split('_');
+                        var datasetId=datasetarr[0];
                         this.setState({
                             datasetList: proList.sort(function (a, b) {
                                 a = (a.programCode).toLowerCase();
                                 b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
-                            datasetId: localStorage.getItem("sesDatasetId"),
+                            datasetId: datasetId,
                             loading: false,
                             downloadedProgramData: downloadedProgramData,
                         }, () => {
