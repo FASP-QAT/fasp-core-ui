@@ -1262,7 +1262,7 @@
     "static.ForecastSummary.NationalView": "National View",
     "static.tooltip.PeriodUnit": "The desired unit for the Period column.",
     "static.supplyPlan.exportAsCsv": "Export as CSV",
-    "static.tree.#OfFURequiredForPeriodPerPatient": "# of FU required for period per patient",
+    "static.tree.#OfFURequiredForPeriodPerPatient": "# of FU required for period per",
     "static.supplyPlan.minStock": "Min Stock",
     "static.procurementagent.procurementagentapprovetoshippedtime": "Enter `Approved to Shipped` lead time for this procurement agent (in months)",
     "static.datasource.datasourcetypetext": "Select data source type",
@@ -2908,6 +2908,5 @@
     "static.QATForecastImport.forcastConsumption": "Forecasted Consumption (Forecast Module)",
     "static.QATForecastImport.convertedForecastConsumption": "Converted Forecasted Consumption (to be imported)",
     "static.QATForecastImport.currentForecastConsumption": "Current Forecasted Consumption (Supply Plan Module)",
-    "static.tree.#OfFURequiredForPeriodPerPatient":"# of FU required for period per patient",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
 }
