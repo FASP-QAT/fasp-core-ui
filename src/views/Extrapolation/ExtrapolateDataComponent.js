@@ -831,14 +831,15 @@ export default class ExtrapolateDataComponent extends React.Component {
         var minRmse = Math.min(...rmseArr.filter(c => c !== ""));
         var minMape = Math.min(...mapeArr.filter(c => c !== ""));
         var minMse = Math.min(...mseArr.filter(c => c !== ""));
-        var minRsqd = Math.min(...rSqdArr.filter(c => c !== ""));
+        // var minRsqd = Math.min(...rSqdArr.filter(c => c !== ""));
+        var maxRsqd = Math.max(...rSqdArr.filter(c => c !== ""));
         var minWape = Math.min(...wapeArr.filter(c => c !== ""));
         this.setState({
             dataEl: dataEl,
             minRmse: minRmse,
             minMape: minMape,
             minMse: minMse,
-            minRsqd: minRsqd,
+            maxRsqd: maxRsqd,
             minWape: minWape,
             loading: false,
             consumptionData: consumptionDataArr,
@@ -3879,6 +3880,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <div className="col-md-10 pt-4 pb-3">
                                                     <ul className="legendcommitversion">
                                                         <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
+                                                        <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">R^2 with Higest Error</span></li>
+                                                        
                                                         {/* <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.label.noFundsAvailable')} </span></li> */}
                                                     </ul>
                                                 </div>}
@@ -3983,19 +3986,19 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 <tr>
                                                                     <td>{i18n.t('static.extrapolation.rSquare')}</td>
                                                                     {this.state.movingAvgId &&
-                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd === this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd === this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd !== "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd !== "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                     }
                                                                     {this.state.semiAvgId &&
-                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd === this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd === this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd !== "" ? this.state.semiAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd !== "" ? this.state.semiAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                     }
                                                                     {this.state.linearRegressionId &&
-                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd === this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd === this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd !== "" ? this.state.linearRegressionError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd !== "" ? this.state.linearRegressionError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                     }
                                                                     {this.state.smoothingId &&
-                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd === this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd === this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd !== "" ? this.state.tesError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd !== "" ? this.state.tesError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                     }
                                                                     {this.state.arimaId &&
-                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd === this.state.arimaError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd === this.state.arimaError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.rSqd !== "" ? this.state.arimaError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.arimaError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.arimaError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.rSqd !== "" ? this.state.arimaError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                     }
                                                                 </tr>
                                                             </tbody>
