@@ -3880,7 +3880,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <div className="col-md-10 pt-4 pb-3">
                                                     <ul className="legendcommitversion">
                                                         <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
-                                                        <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">R^2 with Higest Error</span></li>
+                                                        <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">Highest R^2</span></li>
                                                         
                                                         {/* <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.label.noFundsAvailable')} </span></li> */}
                                                     </ul>

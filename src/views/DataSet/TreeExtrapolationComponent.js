@@ -4366,7 +4366,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <div className="col-md-12 row pl-lg-0  pr-lg-0 pt-lg-3 pb-lg-3">
                                             <ul className="legendcommitversion pl-lg-0">
                                                 <li><span className="lowestErrorGreenLegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')}</span></li>
-                                                <li><span className="lowestErrorGreenLegend legendcolor"></span> <span className="legendcommitversionText">R^2 with Higest Error</span></li>
+                                                <li><span className="lowestErrorGreenLegend legendcolor"></span> <span className="legendcommitversionText">Highest R^2</span></li>
                                             </ul>
                                         </div>
                                         <Input type="hidden" id="buttonFalg" name="buttonFalg" value={this.state.buttonFalg} />
