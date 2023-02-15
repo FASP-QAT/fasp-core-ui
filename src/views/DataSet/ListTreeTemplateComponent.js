@@ -270,9 +270,10 @@ export default class ListTreeTemplate extends Component {
             data[2] = getLabelText(treeTemplateList[j].forecastMethod.label, this.state.lang)
             data[3] = treeTemplateList[j].monthsInPast;
             data[4] = treeTemplateList[j].monthsInFuture;
-            data[5] = treeTemplateList[j].active;
-            data[6] = treeTemplateList[j].lastModifiedBy.username;
-            data[7] = (treeTemplateList[j].lastModifiedDate ? moment(treeTemplateList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[5] = getLabelText(treeTemplateList[j].flatList[0].payload.nodeType.label,this.state.lang);
+            data[6] = treeTemplateList[j].active;
+            data[7] = treeTemplateList[j].lastModifiedBy.username;
+            data[8] = (treeTemplateList[j].lastModifiedDate ? moment(treeTemplateList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             if (selStatus != "") {
                 if (tempSelStatus == treeTemplateList[j].active) {
                     treeTemplateArray[count] = data;
@@ -320,6 +321,11 @@ export default class ListTreeTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.program.monthsInFuture'),
+                    type: 'text',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.treeTemplate.startNode'),
                     type: 'text',
                     // readOnly: true
                 },
