@@ -3095,7 +3095,7 @@ class EquivalancyUnit extends Component {
                             <strong>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</strong>
                         </ModalHeader>
                         <ModalBody>
-                            <span><h5 style={{ color: this.state.color }} id="div3">{this.state.message}</h5></span>
+                            <span><h5 style={{ color: this.state.color,display:"none" }} id="div3">{this.state.message}</h5></span>
                             {/* <h6 className="red" id="div3"></h6> */}
                             <div>
                                 <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped consumptionDataEntryTable">
