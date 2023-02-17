@@ -34,6 +34,7 @@ import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import classNames from 'classnames';
 import CountryService from "../../api/CountryService";
 import ProductCategoryService from "../../api/PoroductCategoryService";
+import RealmCountryService from '../../api/RealmCountryService';
 import { json } from 'mathjs';
 
 
@@ -62,6 +63,8 @@ export default class InventoryTurns extends Component {
                 displayId: ''
             },
             costOfInventory: [],
+            costOfCountry:[],
+            costOfProgram:[],
             versions: [],
             message: '',
             countryList: [],
@@ -121,7 +124,8 @@ export default class InventoryTurns extends Component {
                     val3: 87
                 }
             ],
-            childShowArr: []
+            childShowArr: [],
+            childShowArr1: []
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -132,6 +136,8 @@ export default class InventoryTurns extends Component {
         this.updateCountryData = this.updateCountryData.bind(this);
         this.updatePUData = this.updatePUData.bind(this);
         this.toggleAccordion = this.toggleAccordion.bind(this);
+        this.toggleAccordion1 = this.toggleAccordion1.bind(this);
+
 
     }
     makeText = m => {
@@ -575,14 +581,14 @@ export default class InventoryTurns extends Component {
         document.getElementById("hideProductDiv").style.display = "none";
         document.getElementById("hideCountryDiv").style.display = "none";
 
-        CountryService.getCountryListAll()
+        RealmCountryService.getRealmCountryListAll()
                 .then(response => {
                     console.log("Realm Country List list---", response.data);
                     if (response.status == 200) {
                         var json = (response.data).filter(c => c.active == true);
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].countryId, label: json[i].label.label_en }
+                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
                         }
                         var listArray = regList;
                         listArray.sort((a, b) => {
@@ -828,12 +834,7 @@ export default class InventoryTurns extends Component {
 
 
     formSubmit() {
-        // planningUnitIds: [],
-        //         dt: new Date(),
-        //         includePlanningShipments: true,
-        //         country: [],
-        //         pu: [],
-        //         displayId: ''
+
         var inputJson = {
             "country": this.state.CostOfInventoryInput.country,
             "programIds": this.state.CostOfInventoryInput.programIds,
@@ -845,9 +846,42 @@ export default class InventoryTurns extends Component {
         console.log("Hello "+JSON.stringify(inputJson))
         // AuthenticationService.setupAxiosInterceptors();
         ReportService.inventoryTurns(inputJson).then(response => {
-            console.log("costOfInentory=====>", response.data);
+            console.log("costOfInentory=====>", JSON.stringify(response.data));
+
+            const countryData = [];
+            const programData = [];
+            
+            for(let i=0; i < this.state.CostOfInventoryInput.country.length; i++){
+                let tempData = response.data.filter(e => e.realmCountry.id == this.state.CostOfInventoryInput.country[i]);
+                let countrySum = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                let unique = [...new Set(tempData.map((item) => item.program.id))];
+            
+                countryData.push({
+                    countryId: this.state.CostOfInventoryInput.country[i],
+                    countryName: tempData[0].realmCountry.label.label_en,
+                    totalConsumption: countrySum,
+                    programIds: unique
+                })
+              
+                for(let j=0; j<unique.length; j++){
+                    let temp = response.data.filter(e =>  e.realmCountry.id == this.state.CostOfInventoryInput.country[i] && e.program.id == unique[j])
+                    let programSum = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                    
+                    programData.push({
+                        countryId: this.state.CostOfInventoryInput.country[i],
+                        programId: unique[j],
+                        programName: temp[0].program.label.label_en,
+                        totalConsumption: programSum
+                    })
+                }
+            }
+
+
             this.setState({
-                costOfInventory: response.data, message: ''
+                costOfInventory: response.data, 
+                costOfCountry: countryData,
+                costOfProgram: programData,
+                message: ''
             });
             this.setState({
                 isTableLoaded: this.getTableDiv()
@@ -926,12 +960,31 @@ export default class InventoryTurns extends Component {
         
       }
 
+      toggleAccordion1(parentId) {
+        console.log("Hello "+parentId)
+        var childShowArr = this.state.childShowArr1;
+        if (childShowArr.includes(parentId)) {
+          childShowArr = childShowArr.filter(c => c != parentId);
+        } else {
+          childShowArr.push(parentId)
+        }
+        this.setState({
+            childShowArr1: childShowArr
+        }, () => {
+          this.setState({
+            isTableLoaded: this.getTableDiv()
+          })
+        })
+        
+      }
+
     getTableDiv() {
         return (
           <Table className="table-bordered text-center overflowhide main-table " bordered size="sm" options={this.options}>
             <thead>
               <tr>
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
+                <th></th>
                 <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
                 <th>{i18n.t('static.supplyPlan.total')}</th>
                 <th>{i18n.t('static.dataentry.regionalPer')}</th>
@@ -939,30 +992,50 @@ export default class InventoryTurns extends Component {
               </tr>
             </thead>
             <tbody>
-              {this.state.costOfInventory.map(item => {
+              {this.state.costOfCountry.map(item => {
 
                 return (<>
                   <tr className="hoverTd">
-                    {/* <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.id)}>
-                        {this.state.childShowArr.includes(item.id) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                    </td> */}
-                    <td className="sticky-col first-col clone hoverTd" align="left">
-                        {item.planningUnit.label.label_en}  
+                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.countryId)}>
+                        {this.state.costOfProgram.includes(item.countryId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                     </td>
-                    <td>{item.avergeStock}</td>
-                    <td>{item.inventoryTurns}</td>
-                    <td>{item.noOfMonths}</td>
+                    <td className="sticky-col first-col clone hoverTd" colspan="2" align="left">
+                        {item.countryName}  
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td>{item.totalConsumption}</td>
                   </tr>
-                  {/* {this.state.testData1.map(r => {
+                  {this.state.costOfProgram.filter(e => e.countryId == item.countryId).map(r => {
 
-                    return (<tr style={{ display: this.state.childShowArr.includes(item.parentId) ? "" : "none" }}>
+                    return (<>
+                    <tr className="hoverTd" style={{ display: this.state.childShowArr.includes(r.countryId) ? "" : "none" }}>
+                      {/* <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td> */}
                       <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                      <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{r.name}</td>  
-                      <td>{r.val1}</td>
-                      <td>{r.val2}</td>
-                      <td>{r.val3}</td>
-                    </tr>)
-                  })} */}
+                      <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion1(r.programId)}>
+                        {this.state.costOfInventory.includes(r.programId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                      </td>
+                      <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{r.programName}</td>  
+                      <td></td>
+                      <td></td>
+                      <td>{r.totalConsumption}</td>
+                    </tr>
+
+                    {this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.countryId && arr.program.id == r.programId ).map(arr1 => {
+
+                        return (<tr style={{ display: this.state.childShowArr1.includes(arr1.program.id) ? "" : "none" }}>
+                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                        <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{arr1.planningUnit.label.label_en}</td>  
+                        <td></td>
+                        <td></td>
+                        <td>{arr1.totalConsumption}</td>
+                        </tr>)
+                    })}
+                    </>)
+
+                  })}
+
                 </>)
               }
               )}
@@ -1169,7 +1242,7 @@ export default class InventoryTurns extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2">
-                                                            {i18n.t('static.product.product')}
+                                                            {i18n.t('static.productCategory.productCategory')}
                                                         </Label>
                                                     </FormGroup>
                                                 </div>
@@ -1179,7 +1252,7 @@ export default class InventoryTurns extends Component {
                                         
                                         <div>
                                             <FormGroup className="col-md-12" id="hideProductDiv">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.product.product')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.productCategory.productCategory')}</Label>
                                                 <div className="controls ">
                                                     <Select
                                                         bsSize="sm"
