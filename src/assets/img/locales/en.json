@@ -2909,5 +2909,9 @@
     "static.QATForecastImport.convertedForecastConsumption": "Converted Forecasted Consumption (to be imported)",
     "static.QATForecastImport.currentForecastConsumption": "Current Forecasted Consumption (Supply Plan Module)",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.treeTemplate.startNode":"Start Node"
+    "static.treeTemplate.startNode":"Start Node",
+    "static.tree.branchTemplateNotes1":"You are adding a child node to a",
+    "static.tree.branchTemplateNotes2":"node, therefore only templates starting with",
+    "static.tree.branchTemplateNotes3":"are shown. See",
+    "static.tree.branchTemplateNotes4":"for the full list."
 }
