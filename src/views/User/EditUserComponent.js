@@ -729,11 +729,23 @@ class EditUserComponent extends Component {
         var mylist = [];
         // var value = (instance.jexcel.getJson(null, false)[r])[1];
         var value = (this.state.addUserEL.getJson(null, false)[r])[1];
-
+        var healthAreavalue = (this.state.addUserEL.getJson(null, false)[r])[2];
         var proList = [];
+        var proListByCountryId = [];
+        var proListByHealthAreaId = [];
         if (value != -1) {
-            proList = this.state.programListForFilter.filter(c => c.id == -1 || c.realmCountryId == value);
-
+            proListByCountryId = this.state.programListForFilter.filter(c => c.id == -1 || c.realmCountryId == value);
+            if (healthAreavalue != -1) {
+                for (var i = 1; i < proListByCountryId.length; i++) {
+                    proListByHealthAreaId = [];
+                    proListByHealthAreaId = proListByCountryId[i].healthAreaList.filter(c => c.id == healthAreavalue);
+                    if (proListByHealthAreaId.length != 0) {
+                        proList.push(proListByCountryId[i])
+                    }
+                }
+            }else{
+                proList= proListByCountryId;
+            }
         } else {
             proList = this.state.programListForFilter;
         }
@@ -762,6 +774,7 @@ class EditUserComponent extends Component {
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active,
                     realmCountryId: selProgram[i].realmCountry.realmCountryId,
+                    healthAreaList: selProgram[i].healthAreaList
                 }
                 programList[i] = paJson
             }
@@ -910,7 +923,7 @@ class EditUserComponent extends Component {
                     type: 'autocomplete',
                     source: programList,//4E
                     filter: this.filterProgramByCountryId,
-                    // filter: this.filterProgram
+                    // filter: this.filterProgramByhealthAreaId
 
                 },
 
