@@ -424,10 +424,10 @@ export default class SyncMasterData extends Component {
                                                                     planningUnit: shipmentDataList[index].planningUnit,
                                                                     realmCountryPlanningUnit: shipmentDataList[index].realmCountryPlanningUnit,
                                                                     procurementAgent: shipmentDataList[index].procurementAgent,
-                                                                    productCost: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price * shipmentQty,//Final cost
+                                                                    productCost: Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price/shipmentDataList[index].realmCountryPlanningUnit.multiplier).toFixed(6) * shipmentQty,//Final cost
                                                                     shipmentQty: Math.round(shipmentQty),
                                                                     shipmentRcpuQty: Math.round(shipmentARUQty),
-                                                                    rate: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price,//Price per planning unit
+                                                                    rate: Number(Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price/shipmentDataList[index].realmCountryPlanningUnit).toFixed(6)),//Price per planning unit
                                                                     shipmentId: 0,
                                                                     shipmentMode: (shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Land" || shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Ship" ? "Sea" : shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0] == "Air" ? "Air" : "Sea"),//Yeh
                                                                     shipmentStatus: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].qatEquivalentShipmentStatus,
@@ -563,8 +563,8 @@ export default class SyncMasterData extends Component {
                                                             shipmentDataList[index].shipmentQty = Math.round(shipmentQty);
                                                             shipmentDataList[index].shipmentRcpuQty = Math.round(shipmentARUQty);
                                                             shipmentDataList[index].freightCost = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shippingCost;
-                                                            shipmentDataList[index].productCost = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price * shipmentQty;
-                                                            shipmentDataList[index].rate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price;
+                                                            shipmentDataList[index].productCost = Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price/shipmentDataList[index].realmCountryPlanningUnit.multiplier).toFixed(6) * shipmentQty;
+                                                            shipmentDataList[index].rate = Number(Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price/shipmentDataList[index].realmCountryPlanningUnit.multiplier).toFixed(6));
                                                             shipmentDataList[index].shipmentMode = (shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Land" || shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Ship" ? "Sea" : shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0] == "Air" ? "Air" : "Sea");
                                                             shipmentDataList[index].shipmentStatus = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].qatEquivalentShipmentStatus;
                                                             shipmentDataList[index].expectedDeliveryDate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate;
