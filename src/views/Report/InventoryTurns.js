@@ -36,6 +36,7 @@ import CountryService from "../../api/CountryService";
 import ProductCategoryService from "../../api/PoroductCategoryService";
 import RealmCountryService from '../../api/RealmCountryService';
 import { json } from 'mathjs';
+import { de } from 'date-fns/locale';
 
 
 export const PSM_PROCUREMENT_AGENT_ID = 1
@@ -124,7 +125,7 @@ export default class InventoryTurns extends Component {
                     val3: 87
                 }
             ],
-            childShowArr: [],
+            childShowArr: {},
             childShowArr1: []
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -557,23 +558,19 @@ export default class InventoryTurns extends Component {
         let tempId = event.target.id;
 
         if(tempId === "displayId1"){
-            this.setState( prevState => ({ programList:[], programId:[], CostOfInventoryInput : { ...prevState.CostOfInventoryInput, displayId: parseInt(1), pu: [0], programIds:[] }}
+            this.setState( prevState => ({ programList:[], programId:[], costOfInventory: [], costOfCountry:[], costOfProgram:[], CostOfInventoryInput : { ...prevState.CostOfInventoryInput, displayId: parseInt(1), pu: [0], programIds:[] }}
         ),
             () => {
                 this.filterData();
             })    
         }else{
-            this.setState( prevState => ({ programList:[], programId:[], CostOfInventoryInput : { ...prevState.CostOfInventoryInput, displayId: parseInt(2), country: [], programIds:[] }}
+            this.setState( prevState => ({ programList:[], programId:[], costOfInventory: [], costOfCountry:[], costOfProgram:[], CostOfInventoryInput : { ...prevState.CostOfInventoryInput, displayId: parseInt(2), country: [], programIds:[] }}
         ),
             () => {
                 this.filterData();
+                this.formSubmit();
             })
         }
-        // this.setState( prevState => ({ CostOfInventoryInput : { ...prevState.CostOfInventoryInput, displayId: tempId === "displayId2" ? parseInt(2) : parseInt(1), pu: [0] }}
-        // ),
-        //     () => {
-        //         this.filterData();
-        //     })
     }
 
     componentDidMount() {
@@ -845,96 +842,138 @@ export default class InventoryTurns extends Component {
         }
         console.log("Hello "+JSON.stringify(inputJson))
         // AuthenticationService.setupAxiosInterceptors();
-        ReportService.inventoryTurns(inputJson).then(response => {
-            console.log("costOfInentory=====>", JSON.stringify(response.data));
 
-            const countryData = [];
-            const programData = [];
-            
-            for(let i=0; i < this.state.CostOfInventoryInput.country.length; i++){
-                let tempData = response.data.filter(e => e.realmCountry.id == this.state.CostOfInventoryInput.country[i]);
-                let countrySum = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
-                let unique = [...new Set(tempData.map((item) => item.program.id))];
-            
-                countryData.push({
-                    countryId: this.state.CostOfInventoryInput.country[i],
-                    countryName: tempData[0].realmCountry.label.label_en,
-                    totalConsumption: countrySum,
-                    programIds: unique
-                })
-              
-                for(let j=0; j<unique.length; j++){
-                    let temp = response.data.filter(e =>  e.realmCountry.id == this.state.CostOfInventoryInput.country[i] && e.program.id == unique[j])
-                    let programSum = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+        if(inputJson.programIds.length > 0){
+            ReportService.inventoryTurns(inputJson).then(response => {
+                console.log("costOfInentory=====>", JSON.stringify(response.data));
+
+                const level1Data = [];
+                const level2Data = [];
+                
+                if(this.state.CostOfInventoryInput.displayId == 1){
+                    for(let i=0; i < this.state.CostOfInventoryInput.country.length; i++){
+                        let tempData = response.data.filter(e => e.realmCountry.id == this.state.CostOfInventoryInput.country[i]);
+                        let level1Consumption = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                        let unique = [...new Set(tempData.map((item) => item.program.id))];
                     
-                    programData.push({
-                        countryId: this.state.CostOfInventoryInput.country[i],
-                        programId: unique[j],
-                        programName: temp[0].program.label.label_en,
-                        totalConsumption: programSum
-                    })
-                }
-            }
+                        level1Data.push({
+                            id: this.state.CostOfInventoryInput.country[i],
+                            countryName: tempData[0].realmCountry.label.label_en,
+                            totalConsumption: level1Consumption,
+                            programIds: unique
+                        })
+                    
+                        for(let j=0; j<unique.length; j++){
+                            let temp = response.data.filter(e =>  e.realmCountry.id == this.state.CostOfInventoryInput.country[i] && e.program.id == unique[j])
+                            let level2Consumption = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                            
+                            level2Data.push({
+                                id: this.state.CostOfInventoryInput.country[i],
+                                programId: unique[j],
+                                programName: temp[0].program.label.label_en,
+                                totalConsumption: level2Consumption
+                            })
+                        }
+                    }
+                }else{
+                    for(let i=0; i < this.state.CostOfInventoryInput.pu.length; i++){
+                        let tempData = response.data.filter(e => e.productCategory.id == this.state.CostOfInventoryInput.pu[i]);
+                        console.log("Hello1 "+JSON.stringify(tempData));
+                        let level1Consumption = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                        let unique = [...new Set(tempData.map((item) => item.program.id))];
+                    
+                        level1Data.push({
+                            id: this.state.CostOfInventoryInput.pu[i],
+                            countryName: tempData[0].productCategory.label.label_en,
+                            totalConsumption: level1Consumption,
+                            programIds: unique
+                        })
+                    
+                        for(let j=0; j<unique.length; j++){
+                            let temp = response.data.filter(e =>  e.productCategory.id == this.state.CostOfInventoryInput.pu[i] && e.program.id == unique[j])
+                            let level2Consumption = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                            
+                            level2Data.push({
+                                id: this.state.CostOfInventoryInput.pu[i],
+                                programId: unique[j],
+                                programName: temp[0].program.label.label_en,
+                                totalConsumption: level2Consumption
+                            })
+                        }
+                    }
+                } 
 
-
-            this.setState({
-                costOfInventory: response.data, 
-                costOfCountry: countryData,
-                costOfProgram: programData,
-                message: ''
-            });
-            this.setState({
-                isTableLoaded: this.getTableDiv()
-              })
-        }).catch(
-            error => {
                 this.setState({
-                    costOfInventory: [],
-                    loading: false
+                    costOfInventory: response.data, 
+                    costOfCountry: level1Data,
+                    costOfProgram: level2Data,
+                    message: ''
                 }, () => {
-                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                    // this.el.destroy();
-                    jexcel.destroy(document.getElementById("tableDiv"), true);
-                });
-                if (error.message === "Network Error") {
                     this.setState({
-                        // message: 'static.unkownError',
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                      isTableLoaded: this.getTableDiv()
+                    })
+                  });
+            }).catch(
+                error => {
+                    this.setState({
+                        costOfInventory: [],
                         loading: false
+                    }, () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
                     });
-                } else {
-                    switch (error.response ? error.response.status : "") {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
-        );
+            );
+        }else{
+            this.setState({
+                costOfInventory: [],
+                costOfCountry: [],
+                costOfProgram: [],
+            },() => {
+                this.setState({
+                    isTableLoaded: this.getTableDiv()
+                })
+            });
+            
+        }
     }
     formatLabel(cell, row) {
         // console.log("celll----", cell);
@@ -943,12 +982,12 @@ export default class InventoryTurns extends Component {
         }
     }
 
-    toggleAccordion(parentId) {
+      toggleAccordion(parentId) {
         var childShowArr = this.state.childShowArr;
-        if (childShowArr.includes(parentId)) {
-          childShowArr = childShowArr.filter(c => c != parentId);
+        if (parentId in childShowArr) {
+          delete childShowArr[parentId]
         } else {
-          childShowArr.push(parentId)
+          childShowArr[parentId]=[]
         }
         this.setState({
             childShowArr: childShowArr
@@ -960,16 +999,16 @@ export default class InventoryTurns extends Component {
         
       }
 
-      toggleAccordion1(parentId) {
-        console.log("Hello "+parentId)
-        var childShowArr = this.state.childShowArr1;
-        if (childShowArr.includes(parentId)) {
-          childShowArr = childShowArr.filter(c => c != parentId);
+      toggleAccordion1(childId, parentId) {
+        var childShowArr = this.state.childShowArr;
+        var temp = childShowArr[parentId];
+        if (temp.includes(childId)) {
+          childShowArr[parentId] = temp.filter(c => c != childId);
         } else {
-          childShowArr.push(parentId)
+          childShowArr[parentId].push(childId)
         }
         this.setState({
-            childShowArr1: childShowArr
+            childShowArr: childShowArr
         }, () => {
           this.setState({
             isTableLoaded: this.getTableDiv()
@@ -986,9 +1025,10 @@ export default class InventoryTurns extends Component {
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
                 <th></th>
                 <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
-                <th>{i18n.t('static.supplyPlan.total')}</th>
-                <th>{i18n.t('static.dataentry.regionalPer')}</th>
-                <th>{i18n.t('static.dataentry.regionalPer')}</th>
+                <th>{i18n.t('static.report.totconsumption')}</th>
+                <th>{i18n.t('static.report.avergeStock')}</th>
+                <th>{i18n.t('static.dashboard.months')}</th>
+                <th>{i18n.t('static.dashboard.inventoryTurns')}</th>
               </tr>
             </thead>
             <tbody>
@@ -996,40 +1036,51 @@ export default class InventoryTurns extends Component {
 
                 return (<>
                   <tr className="hoverTd">
-                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.countryId)}>
-                        {this.state.costOfProgram.includes(item.countryId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.id)}>
+                        {item.id in this.state.childShowArr ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                     </td>
-                    <td className="sticky-col first-col clone hoverTd" colspan="2" align="left">
+                    <td className="sticky-col first-col clone hoverTd" align="left">
                         {item.countryName}  
                     </td>
-                    <td></td>
-                    <td></td>
                     <td>{item.totalConsumption}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                   </tr>
-                  {this.state.costOfProgram.filter(e => e.countryId == item.countryId).map(r => {
+                  {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
 
                     return (<>
-                    <tr className="hoverTd" style={{ display: this.state.childShowArr.includes(r.countryId) ? "" : "none" }}>
-                      {/* <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td> */}
-                      <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                      <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion1(r.programId)}>
-                        {this.state.costOfInventory.includes(r.programId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                    <tr className="hoverTd" style={{ display: r.id in this.state.childShowArr ? "" : "none" }}>
+                      <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion1(r.programId, item.id)}>
+                        {this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(r.programId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i> : ""}
                       </td>
                       <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{r.programName}</td>  
-                      <td></td>
-                      <td></td>
                       <td>{r.totalConsumption}</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
                     </tr>
 
-                    {this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.countryId && arr.program.id == r.programId ).map(arr1 => {
+                    {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
 
-                        return (<tr style={{ display: this.state.childShowArr1.includes(arr1.program.id) ? "" : "none" }}>
+                        return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                        <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{arr1.planningUnit.label.label_en}</td>  
-                        <td></td>
-                        <td></td>
+                        <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
                         <td>{arr1.totalConsumption}</td>
+                        <td>{arr1.avergeStock}</td>
+                        <td>{arr1.noOfMonths}</td>
+                        <td>{arr1.inventoryTurns}</td>
+                        </tr>)
+                    })}
+                    {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+
+                        return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
+                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                        <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
+                        <td>{arr1.totalConsumption}</td>
+                        <td>{arr1.avergeStock}</td>
+                        <td>{arr1.noOfMonths}</td>
+                        <td>{arr1.inventoryTurns}</td>
                         </tr>)
                     })}
                     </>)
