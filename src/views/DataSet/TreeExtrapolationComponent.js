@@ -3714,7 +3714,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             />
                                                         </Picker> */}
                                                         <Picker
-                                                            years={{ min: this.state.minDate, max: this.state.maxDateForHistoricalData }}
+                                                            years={{ min: { year: 1001, month: new Date().getMonth() + 1 }, max: this.state.maxDateForHistoricalData }}
                                                             // ref={this.pickRange1}
                                                             ref={this.pickRange1}
                                                             value={rangeValue1}
