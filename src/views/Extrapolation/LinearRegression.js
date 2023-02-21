@@ -250,7 +250,7 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
     
     let varX = sumOfXMinusXBarSqr / data.length;
     let sqrtOfRegression = Math.pow(SSE / (data.length - 2), 0.5);
-    let criticalTValue = getCriticalTValue(data.length, confidenceLevel);
+    let criticalTValue = getCriticalTValue(data.length, Number(confidenceLevel));
     let sumYMinusY1Sqr = 0;
     let a = sqrtOfRegression / Math.pow(data.length, 0.5);
     var output = [];
