@@ -10011,3 +10011,18 @@ legend.scheduler-border {
 .err_text{
   font-weight: bold;
 }
+.jss_filters>div {
+  width: auto !important;
+  max-width: 350px!important;
+  overflow: auto !important;
+}
+
+    
+.jss_filters label {
+  display: table !important;
+}
+
+.jss_filters_options {
+  height: auto !important; 
+  max-height: 320px !important;
+}
