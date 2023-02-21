@@ -791,7 +791,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
             // }
             console.log("is valid result ---", this.props.items.isValidError);
-            if (this.props.items.isValidError.toString() == "false") {
+            if (!this.props.items.addNodeFlag) {
                 this.props.updateState("currentItemConfig", currentItemConfig);
             } else {
                 alert("Please fill all the required fields in Node Data Tab");
@@ -2131,7 +2131,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         var minRmse = Math.min(...rmseArr.filter(c => c != ""));
         var minMape = Math.min(...mapeArr.filter(c => c != ""));
         var minMse = Math.min(...mseArr.filter(c => c != ""));
-        var minRsqd = Math.min(...rSqdArr.filter(c => c != ""));
+        // var minRsqd = Math.min(...rSqdArr.filter(c => c != ""));
+        var maxRsqd = Math.max(...rSqdArr.filter(c => c != ""));
         var minWape = Math.min(...wapeArr.filter(c => c != ""));
         console.log("### inside jexcel going to update state")
         console.log("Loader 8 Test123")
@@ -2140,7 +2141,8 @@ export default class TreeExtrapolationComponent extends React.Component {
             minRmse: minRmse,
             minMape: minMape,
             minMse: minMse,
-            minRsqd: minRsqd,
+            maxRsqd: maxRsqd,
+            // minRsqd: minRsqd,
             minWape: minWape,
             extrapolationLoader: false
             // dataEl: dataEl, loading: false,
@@ -3712,7 +3714,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             />
                                                         </Picker> */}
                                                         <Picker
-                                                            years={{ min: this.state.minDate, max: this.state.maxDateForHistoricalData }}
+                                                            years={{ min: { year: 1001, month: new Date().getMonth() + 1 }, max: this.state.maxDateForHistoricalData }}
                                                             // ref={this.pickRange1}
                                                             ref={this.pickRange1}
                                                             value={rangeValue1}
@@ -4341,19 +4343,19 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.rSquare')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? addCommasExtrapolation(this.state.movingAvgError.rSqd.toFixed(4).toString()) : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? addCommasExtrapolation(this.state.movingAvgError.rSqd.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd != "" ? addCommasExtrapolation(this.state.semiAvgError.rSqd.toFixed(4).toString()) : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd == this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd == this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd != "" ? addCommasExtrapolation(this.state.semiAvgError.rSqd.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd != "" ? addCommasExtrapolation(this.state.linearRegressionError.rSqd.toFixed(4).toString()) : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd == this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd == this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd != "" ? addCommasExtrapolation(this.state.linearRegressionError.rSqd.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd != "" ? addCommasExtrapolation(this.state.tesError.rSqd.toFixed(4).toString()) : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd == this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd == this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd != "" ? addCommasExtrapolation(this.state.tesError.rSqd.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.arimaError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.arimaError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.rSqd != "" ? addCommasExtrapolation(this.state.arimaError.rSqd.toFixed(4).toString()) : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd == this.state.arimaError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd == this.state.arimaError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.rSqd != "" ? addCommasExtrapolation(this.state.arimaError.rSqd.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                             </tr>
                                                         </tbody>
@@ -4364,7 +4366,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <div className="col-md-12 row pl-lg-0  pr-lg-0 pt-lg-3 pb-lg-3">
                                             <ul className="legendcommitversion pl-lg-0">
                                                 <li><span className="lowestErrorGreenLegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')}</span></li>
-
+                                                <li><span className="lowestErrorGreenLegend legendcolor"></span> <span className="legendcommitversionText">Highest R^2</span></li>
                                             </ul>
                                         </div>
                                         <Input type="hidden" id="buttonFalg" name="buttonFalg" value={this.state.buttonFalg} />

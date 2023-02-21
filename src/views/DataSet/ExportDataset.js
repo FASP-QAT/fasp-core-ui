@@ -351,7 +351,7 @@ export default class ExportDataset extends Component {
                                                                                                     console.log("Txt-unencrept data ", txt);
                                                                                                     console.log("Txt 1-unencrept data", txt1);
 
-                                                                                                    zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                                    zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
 
                                                                                                 }
 
