@@ -48,11 +48,11 @@
 											<li style="font-size:13px;">Existem três maneiras de ajustar os dados:
 												<ol type="a">
 													<li><b>Ajustar para subnotificação</b>: O valor padrão é 100% de relatórios todos os meses. O usuário pode 
-														alterar isso para o valor correto. A QAT calculará o consumo ajustado devido à subnotificação. </li>
+														alterar isso para o valor correto. A QAT calculará o consumo ajustado devido à subnotificação. O cálculo assume que as instalações que não relataram nenhum consumo tiveram a mesma taxa de consumo das que o fizeram. </li>
 													<li><b>Ajuste para falta de estoque</b>: Para dados importados, o número de dias de falta de estoque é obtido do programa 
 														de plano de fornecimento QAT, se os dados forem coletados. O valor padrão para dias 
 														de falta de estoque é zero dias (produto assumido sempre em estoque). O usuário pode 
-														alterar isso para o valor correto. O valor padrão para o número de dias em um mês é baseado 
+														alterar isso para o valor correto. O cálculo pressupõe que os dias em que o produto ficou sem estoque teriam a mesma taxa de consumo que o restante do tempo em que o produto ficou em estoque. O valor padrão para o número de dias em um mês é baseado 
 														nos dias do calendário, mas os usuários podem ajustar o número de dias usados para o 
 														cálculo de falta de estoque em '<a href="/#/dataset/versionSettings" target="_blank" style="text-decoration: underline;">Atualizar configurações de versão</a>'. </li>
 														<p class="pl-lg-5"><span style="font-style: italic;"><b>Taxa de Falta de Estoque</b> = Esgotado (dias)/ (Nº de dias no mês). </span><br>
@@ -63,7 +63,7 @@
 															<span class="pl-lg-5" style="font-style: italic;"><b> Taxa de Falta de Estoque </b>= 5 days stocked out /31 days in a month = 16.1%. </span><br>
 															<span class="pl-lg-5" style="font-style: italic;"><b>  Consumo Ajustado </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  
 														</p>
-														<li>Interpolação de valores ausentes: Clique no botão verde "Interpolar" no meio direito da tela para procurar períodos
+														<li>Ajustando para valores ausentes: Clique no botão verde "Interpolar" no meio direito da tela para procurar períodos
 															 em que o valor de consumo está em branco e substituí-los por um valor interpolado. 
 															 QAT interpola encontrando os valores mais próximos em cada lado (antes ou depois do branco), 
 															 calcula a linha reta entre eles e usa essa fórmula de linha reta para calcular o valor do(s) 
@@ -79,7 +79,7 @@
 															<span><img class="formula-img-mr img-fluid mb-lg-0" src="../ShowGuidanceFiles/img/dataentryScreenshot-1.png" style="border: 1px solid rgb(255, 255, 255); width: 250px;"></span><br>
 															<span><img class="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src="../ShowGuidanceFiles/img/dataentryScreenshot-2.png" style="border: 1px solid rgb(255, 255, 255); width: 250px;"></span>
 														</li>
-														<li>Use o gráfico abaixo da tabela Dados Detalhados para visualizar os dados ajustados  </li>
+														<li>Use o gráfico abaixo da tabela Dados Detalhados para visualizar os dados ajustados (nota: o gráfico só será atualizado após clicar em “enviar”) </li>
 													</ol>
 												</li>
 												<li style="font-size:13px;">Clique em "Enviar" para salvar os dados inseridos </li>
