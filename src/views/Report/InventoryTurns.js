@@ -207,18 +207,18 @@ export default class InventoryTurns extends Component {
 
         {this.state.costOfCountry.map(item => {
 
-            A.push(this.addDoubleQuoteToRowContent([(item.countryName).replaceAll(',', ' '), item.totalConsumption, "", "", ""])) 
+            A.push(this.addDoubleQuoteToRowContent([(item.countryName).replaceAll(',', ' '), this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length, this.formatter(item.totalConsumption), "", "", ""])) 
                     
             {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
                 
-                A.push(this.addDoubleQuoteToRowContent([(r.programName).replaceAll(',', ' '), r.totalConsumption, "", "", ""]))
+                A.push(this.addDoubleQuoteToRowContent([(r.programName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, this.formatter(r.totalConsumption), "", "", ""]))
                         
                 {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths, this.roundN(arr1.inventoryTurns)]))          
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths, this.roundN(arr1.inventoryTurns)]))          
                 })}
 
                 {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths, this.roundN(arr1.inventoryTurns)]))  
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths, this.roundN(arr1.inventoryTurns)]))  
                 })}
                 
             })}
@@ -282,12 +282,13 @@ export default class InventoryTurns extends Component {
                     doc.text(i18n.t('static.forecastReport.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory')) , doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text(this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') + ' : ' + this.state.countryId.map(e => {return e.label}) : i18n.t('static.productCategory.productCategory')  + ' : ' + this.state.puId.map(e => {return e.label}), doc.internal.pageSize.width / 8, 150, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.program.program') + ' : ' + this.state.programId.map(e => {return e.label}), doc.internal.pageSize.width / 8, 170, {
-                        align: 'left'
-                    })
+
+                    var level1Text = doc.splitTextToSize((this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') + ' : ' + this.state.countryId.map(e => {return e.label}) : i18n.t('static.productCategory.productCategory')  + ' : ' + this.state.puId.map(e => {return e.label})), doc.internal.pageSize.width * 3 / 4)
+                    doc.text(doc.internal.pageSize.width / 8, 150, level1Text)
+                    
+                    var level2Text = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programId.map(e => {return e.label})), doc.internal.pageSize.width * 3 / 4)
+                    doc.text(doc.internal.pageSize.width / 8, this.state.CostOfInventoryInput.displayId == 1 ? 170 + this.state.countryId.length*1.5 : 170 + this.state.puId.length*2, level2Text)
+                    
                 }
 
             }
@@ -319,18 +320,18 @@ export default class InventoryTurns extends Component {
         const data=[];
         {this.state.costOfCountry.map(item => {
 
-            data.push([item.countryName, item.totalConsumption, "", "", ""])  
+            data.push([item.countryName, this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length, this.formatter(item.totalConsumption), "", "", ""])  
                     
             {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
                 
-                data.push([r.programName, r.totalConsumption, "", "", ""])
-                        
+                data.push([r.programName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, this.formatter(r.totalConsumption), "", "", ""])
+                
                 {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    data.push([getLabelText(arr1.planningUnit.label), this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), this.formatter(arr1.noOfMonths), this.formatterDouble(arr1.inventoryTurns)])          
+                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), this.formatter(arr1.noOfMonths), this.formatterDouble(arr1.inventoryTurns)])          
                 })}
 
                 {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    data.push([getLabelText(arr1.planningUnit.label), this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), this.formatter(arr1.noOfMonths), this.formatterDouble(arr1.inventoryTurns)])  
+                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), this.formatter(arr1.noOfMonths), this.formatterDouble(arr1.inventoryTurns)])  
                 })}
                 
             })}
@@ -338,7 +339,7 @@ export default class InventoryTurns extends Component {
         })}
         let content = {
             margin: { top: 80, bottom: 50 },
-            startY: 170,
+            startY: this.state.CostOfInventoryInput.displayId == 1 ? 170 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 170 + this.state.puId.length*2 + this.state.programId.length*2,
             head: [headers],
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 96 },
@@ -1076,6 +1077,7 @@ export default class InventoryTurns extends Component {
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
                 <th></th>
                 <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
+                <th>{i18n.t('static.planningunit.planningunit')}</th>
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
                 <th>{i18n.t('static.report.noofmonth')}</th>
@@ -1093,7 +1095,8 @@ export default class InventoryTurns extends Component {
                     <td className="sticky-col first-col clone hoverTd" align="left">
                         {item.countryName}  
                     </td>
-                    <td>{item.totalConsumption}</td>
+                    <td>{this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length }</td>
+                    <td>{this.formatter(item.totalConsumption)}</td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -1106,7 +1109,8 @@ export default class InventoryTurns extends Component {
                         {this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(r.programId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i> : ""}
                       </td>
                       <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{r.programName}</td>  
-                      <td>{r.totalConsumption}</td>
+                      <td>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length }</td>
+                      <td>{this.formatter(r.totalConsumption)}</td>
                       <td></td>
                       <td></td>
                       <td></td>
@@ -1117,10 +1121,11 @@ export default class InventoryTurns extends Component {
                         return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                         <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
-                        <td>{arr1.totalConsumption}</td>
-                        <td>{arr1.avergeStock}</td>
+                        <td></td>
+                        <td>{this.formatter(arr1.totalConsumption)}</td>
+                        <td>{this.formatter(arr1.avergeStock)}</td>
                         <td>{arr1.noOfMonths}</td>
-                        <td>{arr1.inventoryTurns}</td>
+                        <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
                         </tr>)
                     })}
                     {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
@@ -1128,10 +1133,11 @@ export default class InventoryTurns extends Component {
                         return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                         <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
-                        <td>{arr1.totalConsumption}</td>
-                        <td>{arr1.avergeStock}</td>
+                        <td></td>
+                        <td>{this.formatter(arr1.totalConsumption)}</td>
+                        <td>{this.formatter(arr1.avergeStock)}</td>
                         <td>{arr1.noOfMonths}</td>
-                        <td>{arr1.inventoryTurns}</td>
+                        <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
                         </tr>)
                     })}
                     </>)
@@ -1173,6 +1179,16 @@ export default class InventoryTurns extends Component {
                 headerAlign: 'center',
                 style: { align: 'center', width: '480px' },
                 formatter: this.formatLabel
+            },
+            {
+                dataField: 'noOfPlanningUnits',
+                text: i18n.t('static.planningunit.planningunit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { align: 'center', width: '200px' },
+                formatter: this.formatter
+
             },
             {
                 dataField: 'totalConsumption',
