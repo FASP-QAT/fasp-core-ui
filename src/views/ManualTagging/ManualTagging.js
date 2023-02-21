@@ -2234,7 +2234,7 @@ export default class ManualTagging extends Component {
                                                                 label: paRequest.result.filter(c => c.procurementAgentId == PSM_PROCUREMENT_AGENT_ID)[0].label,
                                                                 code: paRequest.result.filter(c => c.procurementAgentId == PSM_PROCUREMENT_AGENT_ID)[0].procurementAgentCode
                                                             },
-                                                            productCost: Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price) * Number(shipmentQty),//Final cost
+                                                            productCost: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price/rcpu.multiplier).toFixed(6)) * Number(shipmentQty),//Final cost
                                                             shipmentQty: Math.round(shipmentQty),
                                                             shipmentRcpuQty: Math.round(shipmentARUQty),
                                                             realmCountryPlanningUnit: {
@@ -2242,7 +2242,7 @@ export default class ManualTagging extends Component {
                                                                 label: rcpu.label,
                                                                 multiplier: rcpu.multiplier
                                                             },
-                                                            rate: getUniqueOrderNoAndPrimeLineNoList[uq][16].price,//Price per planning unit
+                                                            rate: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price/rcpu.multiplier).toFixed(6)),//Price per planning unit
                                                             shipmentId: 0,
                                                             shipmentMode: (tableJson[y][16].shipBy == "Land" || tableJson[y][16].shipBy == "Ship" ? "Sea" : tableJson[y][16].shipBy == "Air" ? "Air" : "Sea"),//Yeh
                                                             shipmentStatus: tableJson[y][15],
@@ -2337,7 +2337,7 @@ export default class ManualTagging extends Component {
                                                         planningUnit: shipmentList[shipmentIndex].planningUnit,
 
                                                         procurementAgent: shipmentList[shipmentIndex].procurementAgent,
-                                                        productCost: Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price) * Number(shipmentQty),//Final cost
+                                                        productCost: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price/rcpu.multiplier).toFixed(6)) * Number(shipmentQty),//Final cost
                                                         shipmentQty: Math.round(shipmentQty),
                                                         shipmentRcpuQty: Math.round(shipmentARUQty),
                                                         realmCountryPlanningUnit: {
@@ -2345,7 +2345,7 @@ export default class ManualTagging extends Component {
                                                             label: rcpu.label,
                                                             multiplier: rcpu.multiplier
                                                         },
-                                                        rate: getUniqueOrderNoAndPrimeLineNoList[uq][16].price,//Price per planning unit
+                                                        rate: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price/rcpu.multiplier).toFixed(6)),//Price per planning unit
                                                         shipmentId: 0,
                                                         shipmentMode: (getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Land" || getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Ship" ? "Sea" : getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Air" ? "Air" : "Sea"),//Yeh
                                                         shipmentStatus: getUniqueOrderNoAndPrimeLineNoList[uq][15],

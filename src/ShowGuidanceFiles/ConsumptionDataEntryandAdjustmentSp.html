@@ -50,11 +50,11 @@
 											<li style="font-size:13px;">Hay tres formas de ajustar los datos.:
 												<ol type="a">
 													<li><b>Ajustar por subregistro</b>: El valor predeterminado es 100% de informes cada mes. El usuario puede cambiar 
-														esto al valor correcto. QAT calculará el consumo ajustado por subregistro. </li>
+														esto al valor correcto. QAT calculará el consumo ajustado por subregistro. El cálculo asume que las instalaciones que no reportaron ningún consumo tuvieron la misma tasa de consumo que las que lo hicieron. </li>
 													<li><b>Ajuste por desabastecimiento</b>: Para los datos importados, la cantidad de días sin existencias se extrae del 
 														programa del plan de suministro de QAT, si se recopilan datos. El valor predeterminado para los días de desabastecimiento es 
 														cero días (se supone que el producto siempre está en stock). El usuario puede cambiar 
-														esto al valor correcto. El valor predeterminado para la cantidad de días en un mes se 
+														esto al valor correcto. El cálculo asume que los días que el producto estuvo sin stock habría tenido el mismo índice de consumo que el resto del tiempo que el producto estuvo en stock. El valor predeterminado para la cantidad de días en un mes se 
 														basa en los días calendario, pero los usuarios pueden ajustar la cantidad de días utilizados 
 														para el cálculo de agotamiento de existencias en '<a href="/#/dataset/versionSettings" target="_blank" style="text-decoration: underline;">Actualizar la configuración de la versión</a>'. </li>
 														<p class="pl-lg-5"><span style="font-style: italic;"><b>Tasa de desabastecimiento</b> = Agotado (días)/ (# de días en el mes). </span><br>
@@ -65,7 +65,7 @@
 															<span class="pl-lg-5" style="font-style: italic;"><b> Tasa de desabastecimiento </b>= 5 days stocked out /31 days in a month = 16.1%. </span><br>
 															<span class="pl-lg-5" style="font-style: italic;"><b>  Consumo ajustado </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  
 														</p>
-													<li>Interpolación de valores perdidos: Haga clic en el botón verde "Interpolar" en el centro derecho de 
+													<li>Ajuste por valores perdidos: Haga clic en el botón verde "Interpolar" en el centro derecho de 
 														la pantalla para buscar períodos en los que el valor de consumo está en blanco y reemplazarlos con un valor 
 														interpolado. QAT interpola encontrando los valores más cercanos a cada lado 
 														(antes o después del espacio en blanco), calcula la línea recta entre ellos y usa esa 
@@ -82,7 +82,7 @@
 												<span><img class="formula-img-mr img-fluid mb-lg-0" src="../ShowGuidanceFiles/img/dataentryScreenshot-1.png" style="border: 1px solid rgb(255, 255, 255); width: 250px;"></span><br>
 												<span><img class="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src="../ShowGuidanceFiles/img/dataentryScreenshot-2.png" style="border: 1px solid rgb(255, 255, 255); width: 250px;"></span>
 											</li>
-											<li>Use el gráfico debajo de la tabla de datos detallados para ver los datos ajustados  </li>
+											<li>Use el gráfico debajo de la tabla de datos detallados para ver los datos ajustados (nota: el gráfico solo se actualizará después de hacer clic en "enviar") </li>
 										</ol>
 									</li>
 									<li style="font-size:13px;">Haga clic en "Enviar" para guardar los datos ingresados </li>

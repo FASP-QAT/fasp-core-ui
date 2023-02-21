@@ -1423,7 +1423,7 @@ class AuthenticationService {
                     case "/dataSet/buildTree/":
                     case "/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal":
                     case "/dataSet/buildTree/template/:templateId":
-                        if (bfunction.includes("ROLE_BF_ADD_TREE")) {
+                        if (bfunction.includes("ROLE_BF_ADD_TREE") || bfunction.includes("ROLE_BF_VIEW_TREE") || bfunction.includes("ROLE_BF_EDIT_TREE")) {
                             return true;
                         }
                         break;
