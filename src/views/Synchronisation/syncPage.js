@@ -3254,7 +3254,7 @@ export default class syncPage extends Component {
         //   conflictsCount: this.state.conflictsCount + 1,
         //   shipmentAlreadyLinkedToOtherProgCount: this.state.shipmentAlreadyLinkedToOtherProgCount + 1
         // })
-        elInstance.setValueFromCoords(17, c, 6, true);
+        elInstance.setValueFromCoords(17, c, 0, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
           // elInstance.setStyle(col, "background-color", "transparent");
@@ -3369,7 +3369,7 @@ export default class syncPage extends Component {
           conflictsCountErp: this.state.conflictsCountErp + 1,
           shipmentAlreadyLinkedToOtherProgCount: this.state.shipmentAlreadyLinkedToOtherProgCount + 1
         })
-        elInstance.setValueFromCoords(17, c, 6, true);
+        elInstance.setValueFromCoords(17, c, 0, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
           // elInstance.setStyle(col, "background-color", "transparent");
@@ -3490,6 +3490,7 @@ export default class syncPage extends Component {
         }
       }
     }
+    elInstance.orderBy(17, 0);
     elInstance.options.editable = false;
     if (this.state.conflictsCount == 0) {
       this.generateDataAfterResolveConflictsForQPL();
