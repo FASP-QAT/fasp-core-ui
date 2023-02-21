@@ -215,7 +215,7 @@ class DefaultHeader extends Component {
 
           {isSiteOnline() && <NavItem className="">
             <span className="nav-link">
-              <a href={`${API_URL}/file/qatUserGuide`}>
+              <a href={`https://api.quantificationanalytics.org/file/qatUserGuide`}>
                 <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '30px', height: '30px' }} />
               </a>
             </span>
