@@ -187,125 +187,169 @@ export default class InventoryTurns extends Component {
     }
     exportCSV = (columns) => {
 
-        // var csvRow = [];
-        // csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
-        // csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        // csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        // csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
-        // csvRow.push('')
-        // csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
-        // var re;
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.forecastReport.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory'))).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') + ' : ' + this.state.countryId.map(e => {return e.label}) : i18n.t('static.productCategory.productCategory')  + ' : ' + this.state.puId.map(e => {return e.label})).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + this.state.programId.map(e => {return e.label})).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var re;
 
-        // const headers = [];
-        // columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
+        const headers = [];
+        columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
-        // var A = [this.addDoubleQuoteToRowContent(headers)]
+        var A = [this.addDoubleQuoteToRowContent(headers)]
         // this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.round(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)])));
 
-        // for (var i = 0; i < A.length; i++) {
-        //     csvRow.push(A[i].join(","))
-        // }
-        // var csvString = csvRow.join("%0A")
-        // var a = document.createElement("a")
-        // a.href = 'data:attachment/csv,' + csvString
-        // a.target = "_Blank"
-        // a.download = i18n.t('static.dashboard.inventoryTurns') + ".csv"
-        // document.body.appendChild(a)
-        // a.click()
+        {this.state.costOfCountry.map(item => {
+
+            A.push(this.addDoubleQuoteToRowContent([(item.countryName).replaceAll(',', ' '), item.totalConsumption, "", "", ""])) 
+                    
+            {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
+                
+                A.push(this.addDoubleQuoteToRowContent([(r.programName).replaceAll(',', ' '), r.totalConsumption, "", "", ""]))
+                        
+                {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths, this.roundN(arr1.inventoryTurns)]))          
+                })}
+
+                {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths, this.roundN(arr1.inventoryTurns)]))  
+                })}
+                
+            })}
+        
+        })}
+
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.dashboard.inventoryTurns') + ".csv"
+        document.body.appendChild(a)
+        a.click()
     }
     exportPDF = (columns) => {
-        // const addFooters = doc => {
+        const addFooters = doc => {
 
-        //     const pageCount = doc.internal.getNumberOfPages()
+            const pageCount = doc.internal.getNumberOfPages()
 
-        //     doc.setFont('helvetica', 'bold')
-        //     doc.setFontSize(6)
-        //     for (var i = 1; i <= pageCount; i++) {
-        //         doc.setPage(i)
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
 
-        //         doc.setPage(i)
-        //         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
-        //             align: 'center'
-        //         })
-        //         doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
-        //             align: 'center'
-        //         })
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
 
 
-        //     }
-        // }
-        // const addHeaders = doc => {
+            }
+        }
+        const addHeaders = doc => {
 
-        //     const pageCount = doc.internal.getNumberOfPages()
-        //     for (var i = 1; i <= pageCount; i++) {
-        //         doc.setFontSize(12)
-        //         doc.setFont('helvetica', 'bold')
+            const pageCount = doc.internal.getNumberOfPages()
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
 
-        //         doc.setPage(i)
-        //         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-        //         doc.setTextColor("#002f6c");
-        //         doc.text(i18n.t('static.dashboard.inventoryTurns'), doc.internal.pageSize.width / 2, 60, {
-        //             align: 'center'
-        //         })
-        //         if (i == 1) {
-        //             doc.setFontSize(8)
-        //             doc.setFont('helvetica', 'normal')
-        //             doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
-        //                 align: 'left'
-        //             })
-        //             doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-        //                 align: 'left'
-        //             })
-        //             doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-        //                 align: 'left'
-        //             })
-        //             doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
-        //                 align: 'left'
-        //             })
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.inventoryTurns'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFontSize(8)
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.forecastReport.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory')) , doc.internal.pageSize.width / 8, 130, {
+                        align: 'left'
+                    })
+                    doc.text(this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') + ' : ' + this.state.countryId.map(e => {return e.label}) : i18n.t('static.productCategory.productCategory')  + ' : ' + this.state.puId.map(e => {return e.label}), doc.internal.pageSize.width / 8, 150, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.program.program') + ' : ' + this.state.programId.map(e => {return e.label}), doc.internal.pageSize.width / 8, 170, {
+                        align: 'left'
+                    })
+                }
 
-        //         }
+            }
+        }
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
 
-        //     }
-        // }
-        // const unit = "pt";
-        // const size = "A4"; // Use A1, A2, A3 or A4
-        // const orientation = "landscape"; // portrait or landscape
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
 
-        // const marginLeft = 10;
-        // const doc = new jsPDF(orientation, unit, size, true);
+        doc.setFontSize(8);
 
-        // doc.setFontSize(8);
+        // var canvas = document.getElementById("cool-canvas");
+        //creates image
 
-        // // var canvas = document.getElementById("cool-canvas");
-        // //creates image
+        // var canvasImg = canvas.toDataURL("image/png", 1.0);
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        // var aspectwidth1 = (width - h1);
 
-        // // var canvasImg = canvas.toDataURL("image/png", 1.0);
-        // var width = doc.internal.pageSize.width;
-        // var height = doc.internal.pageSize.height;
-        // var h1 = 50;
-        // // var aspectwidth1 = (width - h1);
+        // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
-        // // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
-
-        // const headers = columns.map((item, idx) => (item.text));
+        const headers = columns.map((item, idx) => (item.text));
+        
         // const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.totalConsumption), this.formatter(ele.avergeStock), this.formatter(ele.noOfMonths), this.formatterDouble(ele.inventoryTurns)]);
 
-        // let content = {
-        //     margin: { top: 80, bottom: 50 },
-        //     startY: 170,
-        //     head: [headers],
-        //     body: data,
-        //     styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 96 },
-        //     columnStyles: {
-        //         1: { cellWidth: 281.89 },
-        //     }
-        // };
-        // doc.autoTable(content);
-        // addHeaders(doc)
-        // addFooters(doc)
-        // doc.save(i18n.t('static.dashboard.inventoryTurns') + ".pdf")
+        const data=[];
+        {this.state.costOfCountry.map(item => {
+
+            data.push([item.countryName, item.totalConsumption, "", "", ""])  
+                    
+            {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
+                
+                data.push([r.programName, r.totalConsumption, "", "", ""])
+                        
+                {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+                    data.push([getLabelText(arr1.planningUnit.label), this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), this.formatter(arr1.noOfMonths), this.formatterDouble(arr1.inventoryTurns)])          
+                })}
+
+                {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+                    data.push([getLabelText(arr1.planningUnit.label), this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), this.formatter(arr1.noOfMonths), this.formatterDouble(arr1.inventoryTurns)])  
+                })}
+                
+            })}
+        
+        })}
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: 170,
+            head: [headers],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 96 },
+            columnStyles: {
+                1: { cellWidth: 281.89 },
+            }
+        };
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.dashboard.inventoryTurns') + ".pdf")
     }
 
     handleClickMonthBox2 = (e) => {
@@ -376,7 +420,7 @@ export default class InventoryTurns extends Component {
             listArray.unshift({ value: "-1", label: i18n.t("static.common.all") });
                         
             console.log("getProgramListByRealmCountryIdList=====>", programIdArray);
-            this.setState( prevState => ({ programList: listArray, CostOfInventoryInput : { ...prevState.CostOfInventoryInput, programIds: programIdArray} } ),
+            this.setState( prevState => ({ programList: listArray, programId: listArray.slice(1), CostOfInventoryInput : { ...prevState.CostOfInventoryInput, programIds: programIdArray} } ),
             () => this.formSubmit());            
         }).catch(
             error => {
@@ -437,9 +481,9 @@ export default class InventoryTurns extends Component {
             selectedArray.push(value[p].value);
         }
 
-        if (selectedArray.includes("-1")) {
+        if (selectedArray.includes(1)) {
             this.setState({ puId: [] });
-            var list = this.state.puList.filter(c => c.value != -1)
+            var list = this.state.puList.filter(c => c.value != 1)
             this.setState({ puId: list });
             var puId = list;
         } else {
@@ -470,7 +514,7 @@ export default class InventoryTurns extends Component {
             listArray.unshift({ value: "-1", label: i18n.t("static.common.all") });
 
             console.log("getProgramListByProductCategoryIdList=====>", programIdArray);
-            this.setState( prevState => ({ programList:listArray, CostOfInventoryInput : { ...prevState.CostOfInventoryInput, programIds: programIdArray} } ),
+            this.setState( prevState => ({ programList:listArray, programId: listArray.slice(1), CostOfInventoryInput : { ...prevState.CostOfInventoryInput, programIds: programIdArray} } ),
             () => this.formSubmit());
         }).catch(
             error => {
@@ -831,7 +875,7 @@ export default class InventoryTurns extends Component {
 
 
     formSubmit() {
-
+        this.setState({loading: true})
         var inputJson = {
             "country": this.state.CostOfInventoryInput.country,
             "programIds": this.state.CostOfInventoryInput.programIds,
@@ -847,72 +891,78 @@ export default class InventoryTurns extends Component {
             ReportService.inventoryTurns(inputJson).then(response => {
                 console.log("costOfInentory=====>", JSON.stringify(response.data));
 
-                const level1Data = [];
-                const level2Data = [];
-                
-                if(this.state.CostOfInventoryInput.displayId == 1){
-                    for(let i=0; i < this.state.CostOfInventoryInput.country.length; i++){
-                        let tempData = response.data.filter(e => e.realmCountry.id == this.state.CostOfInventoryInput.country[i]);
-                        let level1Consumption = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
-                        let unique = [...new Set(tempData.map((item) => item.program.id))];
+                if(response.data.length > 0){
+                    const level1Data = [];
+                    const level2Data = [];
                     
-                        level1Data.push({
-                            id: this.state.CostOfInventoryInput.country[i],
-                            countryName: tempData[0].realmCountry.label.label_en,
-                            totalConsumption: level1Consumption,
-                            programIds: unique
-                        })
-                    
-                        for(let j=0; j<unique.length; j++){
-                            let temp = response.data.filter(e =>  e.realmCountry.id == this.state.CostOfInventoryInput.country[i] && e.program.id == unique[j])
-                            let level2Consumption = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                    if(this.state.CostOfInventoryInput.displayId == 1){
+                        for(let i=0; i < this.state.CostOfInventoryInput.country.length; i++){
+                            let tempData = response.data.filter(e => e.realmCountry.id == this.state.CostOfInventoryInput.country[i]);
+                            if(tempData.length > 0){
+                                let level1Consumption = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                                let unique = [...new Set(tempData.map((item) => item.program.id))];
                             
-                            level2Data.push({
-                                id: this.state.CostOfInventoryInput.country[i],
-                                programId: unique[j],
-                                programName: temp[0].program.label.label_en,
-                                totalConsumption: level2Consumption
-                            })
-                        }
-                    }
-                }else{
-                    for(let i=0; i < this.state.CostOfInventoryInput.pu.length; i++){
-                        let tempData = response.data.filter(e => e.productCategory.id == this.state.CostOfInventoryInput.pu[i]);
-                        console.log("Hello1 "+JSON.stringify(tempData));
-                        let level1Consumption = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
-                        let unique = [...new Set(tempData.map((item) => item.program.id))];
-                    
-                        level1Data.push({
-                            id: this.state.CostOfInventoryInput.pu[i],
-                            countryName: tempData[0].productCategory.label.label_en,
-                            totalConsumption: level1Consumption,
-                            programIds: unique
-                        })
-                    
-                        for(let j=0; j<unique.length; j++){
-                            let temp = response.data.filter(e =>  e.productCategory.id == this.state.CostOfInventoryInput.pu[i] && e.program.id == unique[j])
-                            let level2Consumption = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                                level1Data.push({
+                                    id: this.state.CostOfInventoryInput.country[i],
+                                    countryName: tempData[0].realmCountry.label.label_en,
+                                    totalConsumption: level1Consumption,
+                                    programIds: unique
+                                })
                             
-                            level2Data.push({
-                                id: this.state.CostOfInventoryInput.pu[i],
-                                programId: unique[j],
-                                programName: temp[0].program.label.label_en,
-                                totalConsumption: level2Consumption
-                            })
+                                for(let j=0; j<unique.length; j++){
+                                    let temp = response.data.filter(e =>  e.realmCountry.id == this.state.CostOfInventoryInput.country[i] && e.program.id == unique[j])
+                                    let level2Consumption = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                                    
+                                    level2Data.push({
+                                        id: this.state.CostOfInventoryInput.country[i],
+                                        programId: unique[j],
+                                        programName: temp[0].program.label.label_en,
+                                        totalConsumption: level2Consumption
+                                    })
+                                }
+                            }
                         }
-                    }
-                } 
+                    }else{
+                        for(let i=0; i < this.state.CostOfInventoryInput.pu.length; i++){
+                            let tempData = response.data.filter(e => e.productCategory.id == this.state.CostOfInventoryInput.pu[i]);
+                            if(tempData.length > 0){
+                                let level1Consumption = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                                let unique = [...new Set(tempData.map((item) => item.program.id))];
+                            
+                                level1Data.push({
+                                    id: this.state.CostOfInventoryInput.pu[i],
+                                    countryName: tempData[0].productCategory.label.label_en,
+                                    totalConsumption: level1Consumption,
+                                    programIds: unique
+                                })
+                            
+                                for(let j=0; j<unique.length; j++){
+                                    let temp = response.data.filter(e =>  e.productCategory.id == this.state.CostOfInventoryInput.pu[i] && e.program.id == unique[j])
+                                    let level2Consumption = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                                    
+                                    level2Data.push({
+                                        id: this.state.CostOfInventoryInput.pu[i],
+                                        programId: unique[j],
+                                        programName: temp[0].program.label.label_en,
+                                        totalConsumption: level2Consumption
+                                    })
+                                }
+                            }
+                        }
+                    } 
 
-                this.setState({
-                    costOfInventory: response.data, 
-                    costOfCountry: level1Data,
-                    costOfProgram: level2Data,
-                    message: ''
-                }, () => {
                     this.setState({
-                      isTableLoaded: this.getTableDiv()
-                    })
-                  });
+                        costOfInventory: response.data, 
+                        costOfCountry: level1Data,
+                        costOfProgram: level2Data,
+                        loading: false,
+                        message: ''
+                    }, () => {
+                        this.setState({
+                        isTableLoaded: this.getTableDiv()
+                        })
+                    });
+                }
             }).catch(
                 error => {
                     this.setState({
@@ -967,6 +1017,7 @@ export default class InventoryTurns extends Component {
                 costOfInventory: [],
                 costOfCountry: [],
                 costOfProgram: [],
+                loading: false
             },() => {
                 this.setState({
                     isTableLoaded: this.getTableDiv()
@@ -982,7 +1033,7 @@ export default class InventoryTurns extends Component {
         }
     }
 
-      toggleAccordion(parentId) {
+    toggleAccordion(parentId) {
         var childShowArr = this.state.childShowArr;
         if (parentId in childShowArr) {
           delete childShowArr[parentId]
@@ -997,9 +1048,9 @@ export default class InventoryTurns extends Component {
           })
         })
         
-      }
+    }
 
-      toggleAccordion1(childId, parentId) {
+    toggleAccordion1(childId, parentId) {
         var childShowArr = this.state.childShowArr;
         var temp = childShowArr[parentId];
         if (temp.includes(childId)) {
@@ -1015,7 +1066,7 @@ export default class InventoryTurns extends Component {
           })
         })
         
-      }
+    }
 
     getTableDiv() {
         return (
@@ -1027,7 +1078,7 @@ export default class InventoryTurns extends Component {
                 <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
-                <th>{i18n.t('static.dashboard.months')}</th>
+                <th>{i18n.t('static.report.noofmonth')}</th>
                 <th>{i18n.t('static.dashboard.inventoryTurns')}</th>
               </tr>
             </thead>
@@ -1113,14 +1164,7 @@ export default class InventoryTurns extends Component {
         );
 
         const columns = [
-            {
-                dataField: 'planningUnit.id',
-                text: i18n.t('static.report.qatPID'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center' }
-            },
+        
             {
                 dataField: 'planningUnit.label',
                 text: i18n.t('static.planningunit.planningunit'),
@@ -1223,7 +1267,7 @@ export default class InventoryTurns extends Component {
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                            <FormGroup className="col-md-3 pl-0">
+                                            <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker
