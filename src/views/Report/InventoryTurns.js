@@ -344,7 +344,7 @@ export default class InventoryTurns extends Component {
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 96 },
             columnStyles: {
-                1: { cellWidth: 281.89 },
+                0: { cellWidth: 281 },
             }
         };
         doc.autoTable(content);
@@ -1076,7 +1076,7 @@ export default class InventoryTurns extends Component {
               <tr>
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
                 <th></th>
-                <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
+                <th className="dataentryTdWidth sticky-col first-col clone z-index0">{i18n.t('static.dashboard.Productmenu')}</th>
                 <th>{i18n.t('static.planningunit.planningunit')}</th>
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
@@ -1361,7 +1361,7 @@ export default class InventoryTurns extends Component {
 
                                         </div>
                                         
-                                        <div>
+                                        <div className="row">
                                             <FormGroup className="col-md-12" id="hideProductDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.productCategory.productCategory')}</Label>
                                                 <div className="controls ">
