@@ -802,7 +802,16 @@ class AddUserComponent extends Component {
             }else{
                 proList= proListByCountryId;
             }
-        } else {
+        }else if(healthAreavalue != -1){
+            proListByCountryId = this.state.programListForFilter;
+            for (var i = 1; i < proListByCountryId.length; i++) {
+                proListByHealthAreaId = [];
+                proListByHealthAreaId = proListByCountryId[i].healthAreaList.filter(c => c.id == healthAreavalue);
+                if (proListByHealthAreaId.length != 0) {
+                    proList.push(proListByCountryId[i])
+                }
+            }
+        }else {
             proList = this.state.programListForFilter;
         }
         return proList;
