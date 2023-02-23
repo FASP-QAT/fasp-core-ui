@@ -969,7 +969,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               datasetJson: datasetJson
             }, () => {
               this.hideFirstComponent();
-              // this.componentDidMount()
+              this.componentDidMount()
             })
 
 
@@ -2062,7 +2062,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var myResult = [];
         myResult = getRequest.result;
         console.log("")
-        var datasetList = this.state.datasetList;
+        var datasetList = [];
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var mr = 0; mr < myResult.length; mr++) {
