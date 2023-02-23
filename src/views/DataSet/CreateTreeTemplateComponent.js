@@ -5261,9 +5261,15 @@ export default class CreateTreeTemplate extends Component {
                 myResult = planningunitRequest.result;
                 var nodeTypeList = [];
                 var nodeType = this.state.nodeTypeList.filter(c => c.id == nodeTypeId)[0];
+                var possibleNodeTypes="";
                 for (let i = 0; i < nodeType.allowedChildList.length; i++) {
                     // console.log("Branch allowed value---", nodeType.allowedChildList[i]);
                     var obj = this.state.nodeTypeList.filter(c => c.id == nodeType.allowedChildList[i])[0];
+                    if(i!=nodeType.allowedChildList.length-1){
+                        possibleNodeTypes+=(getLabelText(obj.label,this.state.lang)+" "+i18n.t('static.tree.node'))+" "+i18n.t('static.common.and')+" ";
+                    }else{
+                        possibleNodeTypes+=(getLabelText(obj.label,this.state.lang)+" "+i18n.t('static.tree.node'));
+                    }
                     nodeTypeList.push(nodeType.allowedChildList[i]);
                 }
                 // console.log("Branch nodeType list---", nodeTypeList);
@@ -5285,7 +5291,9 @@ export default class CreateTreeTemplate extends Component {
                     fullBranchTemplateList,
                     branchTemplateList,
                     isBranchTemplateModalOpen: true,
-                    parentNodeIdForBranch: itemConfig.id
+                    parentNodeIdForBranch: itemConfig.id,
+                    nodeTypeParentNode:getLabelText(nodeType.label,this.state.lang),
+                    possibleNodeTypes:possibleNodeTypes
                 }, () => {
 
                 })
@@ -10770,7 +10778,7 @@ export default class CreateTreeTemplate extends Component {
                                             <div>
                                                 <div className='row'>
                                                     <FormGroup className="col-md-12">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dataset.BranchTreeTemplate')}<span className="red Reqasterisk">*</span></Label>
+                                                        <p>{i18n.t('static.tree.branchTemplateNotes1')+" "}<b>{this.state.nodeTypeParentNode}</b>{" "+i18n.t('static.tree.branchTemplateNotes2')}{" "}<b>{this.state.possibleNodeTypes.toString()}</b>{" "+i18n.t('static.tree.branchTemplateNotes3')}<a href="/#/dataset/listTreeTemplate">{" "+i18n.t('static.dataset.TreeTemplate')}</a>{" "+i18n.t('static.tree.branchTemplateNotes4')}</p>
                                                         <div className="controls">
 
                                                             <Input

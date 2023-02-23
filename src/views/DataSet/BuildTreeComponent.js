@@ -1114,6 +1114,7 @@ export default class BuildTree extends Component {
     }
 
     getMissingPuListBranchTemplate() {
+        if(this.state.branchTemplateId!=""){
         console.log("In function Test@@@@@@@@@")
         var missingPUList = [];
         var json;
@@ -1149,6 +1150,14 @@ export default class BuildTree extends Component {
         }, () => {
             this.buildMissingPUJexcel();
         });
+    }else{
+        this.el = jexcel(document.getElementById("missingPUJexcel"), '');
+            // this.el.destroy();
+        jexcel.destroy(document.getElementById("missingPUJexcel"), true);
+        this.setState({
+            missingPUList:[]
+        })
+    }
     }
 
     getMomValueForDateRange(startDate) {
@@ -12203,8 +12212,8 @@ export default class BuildTree extends Component {
                                             <div>
                                                 <div className='row'>
                                                     <FormGroup className="col-md-12">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dataset.BranchTreeTemplate')}<span className="red Reqasterisk">*</span></Label><br/>
-                                                        <p style={{textAlign:'justify'}}>{i18n.t('static.tree.branchTemplateNotes1')+" "}{this.state.nodeTypeParentNode+" "+i18n.t('static.tree.branchTemplateNotes2')}{" "+this.state.possibleNodeTypes.toString()+" "+i18n.t('static.tree.branchTemplateNotes3')}<a href="/#/dataset/listTreeTemplate">{" "+i18n.t('static.dataset.TreeTemplate')}</a>{" "+i18n.t('static.tree.branchTemplateNotes4')}</p>
+                                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.dataset.BranchTreeTemplate')}<span className="red Reqasterisk">*</span></Label><br/> */}
+                                                        <p>{i18n.t('static.tree.branchTemplateNotes1')+" "}<b>{this.state.nodeTypeParentNode}</b>{" "+i18n.t('static.tree.branchTemplateNotes2')}{" "}<b>{this.state.possibleNodeTypes.toString()}</b>{" "+i18n.t('static.tree.branchTemplateNotes3')}<a href="/#/dataset/listTreeTemplate">{" "+i18n.t('static.dataset.TreeTemplate')}</a>{" "+i18n.t('static.tree.branchTemplateNotes4')}</p>
                                                         <div className="controls">
 
                                                             <Input
