@@ -11583,3 +11583,17 @@ label.arrow_label:before {
   height: auto !important; 
   max-height: 320px !important;
 }
+.borderedBoxforformulae{
+  margin: 10px 0px 20px 0px;
+    border: 1px solid #20a8d8;
+  padding: 10px;
+  border-radius: 5px;
+  font-family: "latin modern";
+    font-size: 16px;
+    font-weight: 400;
+}
+
+@font-face {
+  font-family: 'latin_modern_roman_slante10Rg';
+  src: url('/src/assets/font_formulae/lmromanslant10-regular-webfont.woff') format('woff');
+}
