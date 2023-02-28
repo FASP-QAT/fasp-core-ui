@@ -38,10 +38,10 @@ class PageError extends Component {
   }
 
   submitBug(e){
-
+    let desc = "\nError Page - "+e.location.state.errorPage+"\nError Stack - "+e.location.state.errorStack;
     let { bugReport } = this.state;
-        bugReport.summary = e.match.params.message;
-        bugReport.description = e.match.params.message;
+        bugReport.summary = e.location.state.errorMessage;
+        bugReport.description = desc;
         bugReport.file = '';
         bugReport.attachFile = '';
         this.setState({
@@ -123,7 +123,7 @@ class PageError extends Component {
               </span>
               <span>
                 <h3 className=''>We seem to have encountered an unexpected error. Please show this to one of our engineers so we can get someone working on this right away.</h3>
-                <h4 className="pt-3">Error reason - {this.props.match.params.message}</h4>
+                <h4 className="pt-3">Error reason - {this.props.location.state.errorMessage}</h4>
               </span>
               <InputGroup className="input-prepend">
                 {/* <InputGroupAddon addonType="prepend">
