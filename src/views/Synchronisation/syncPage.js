@@ -3490,7 +3490,7 @@ export default class syncPage extends Component {
         }
       }
     }
-    elInstance.orderBy(17, 0);
+    // elInstance.orderBy(17, 0);
     elInstance.options.editable = false;
     if (this.state.conflictsCount == 0) {
       this.generateDataAfterResolveConflictsForQPL();
