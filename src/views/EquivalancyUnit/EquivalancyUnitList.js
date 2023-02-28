@@ -370,8 +370,9 @@ class EquivalancyUnit extends Component {
                         var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
                     } else {
+                        let roleArray = this.state.roleArray;
                         let checkReadOnly = 0;
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && rowData[4] == -1 && rowData[4] != 0) {
+                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && rowData[4] == -1 && rowData[4] != 0)) {
                             checkReadOnly = checkReadOnly + 1;
 
                             // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -412,7 +413,7 @@ class EquivalancyUnit extends Component {
                         cell1.classList.add('readonly');
 
 
-                        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) {
+                        if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
                             // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                             // cell1.classList.add('readonly');
 
@@ -487,14 +488,12 @@ class EquivalancyUnit extends Component {
 
                     // Insert new row before
                     if (obj.options.allowInsertRow == true) {
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_EQUIVALENCY_UNIT_MAPPING')) {
-                            items.push({
-                                title: i18n.t('static.common.addRow'),
-                                onclick: function () {
-                                    this.addRow1();
-                                }.bind(this)
-                            });
-                        }
+                        items.push({
+                            title: i18n.t('static.common.addRow'),
+                            onclick: function () {
+                                this.addRow1();
+                            }.bind(this)
+                        });
                     }
 
                     // Delete a row
@@ -770,7 +769,8 @@ class EquivalancyUnit extends Component {
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
-                    type: 'checkbox'
+                    type: 'checkbox',
+                    // readOnly: (( AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE')  || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE'))? false : true)
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
@@ -816,8 +816,9 @@ class EquivalancyUnit extends Component {
                     var typeId = rowData[14];
                     // console.log("updateTable------>", rowData[11]);                    
 
+                    let roleArray = this.state.roleArray;
                     let checkReadOnly = 0;
-                    if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && typeId == -1 && typeId != 0)) {
+                    if ((roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                         checkReadOnly = checkReadOnly + 1;
 
                         // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -858,8 +859,7 @@ class EquivalancyUnit extends Component {
 
 
 
-                    if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
-                        && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) {
+                    if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
                         // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                         // cell1.classList.add('readonly');
 
@@ -1049,14 +1049,12 @@ class EquivalancyUnit extends Component {
 
                     // Insert new row before
                     if (obj.options.allowInsertRow == true) {
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_EQUIVALENCY_UNIT')) {
-                            items.push({
-                                title: i18n.t('static.common.addRow'),
-                                onclick: function () {
-                                    this.addRow();
-                                }.bind(this)
-                            });
-                        }
+                        items.push({
+                            title: i18n.t('static.common.addRow'),
+                            onclick: function () {
+                                this.addRow();
+                            }.bind(this)
+                        });
                     }
 
                     // Delete a row
@@ -1154,7 +1152,7 @@ class EquivalancyUnit extends Component {
     filterDataset1 = function (instance, cell, c, r, source) {
         console.log("Source Test123", source)
         var mylist = this.state.typeList1;
-        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
+        if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
             mylist = mylist.filter(c => c.id != -1);
         }
         return mylist;
@@ -1170,7 +1168,7 @@ class EquivalancyUnit extends Component {
         // console.log("myList--------->2", mylist);
         // console.log("myList--------->3", this.state.forecastingUnitList);
         let mylist = this.state.typeList;
-        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
+        if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
             mylist = mylist.filter(c => c.id != -1);
         }
         console.log("My List Test123", mylist)
@@ -2277,8 +2275,7 @@ class EquivalancyUnit extends Component {
                         equivalencyUnitMappingId: parseInt(map1.get("0")),
                         tracerCategory: { id: parseInt(map1.get("3")) },
                         forecastingUnit: { id: parseInt(map1.get("4")) },
-                        //change here
-                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("1")), realm: equivalencyUnitObj.realm, program: equivalencyUnitObj.program },
+                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("1")), realm: equivalencyUnitObj.realm },
                         convertToEu: map1.get("6").toString().replace(/,/g, ""),
                         notes: map1.get("7"),
                         program: (parseInt(map1.get("8")) == -1 ? null : { id: parseInt(map1.get("8")) }),
@@ -3113,8 +3110,7 @@ class EquivalancyUnit extends Component {
 
                     </CardBody>
                     <CardFooter>
-                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
-                            || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) &&
+                        {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
@@ -3256,7 +3252,7 @@ class EquivalancyUnit extends Component {
                             <strong>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</strong>
                         </ModalHeader>
                         <ModalBody>
-                            <span><h5 style={{ color: this.state.color, display: "none" }} id="div3">{this.state.message}</h5></span>
+                            <span><h5 style={{ color: this.state.color,display:"none" }} id="div3">{this.state.message}</h5></span>
                             {/* <h6 className="red" id="div3"></h6> */}
                             <div>
                                 <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped consumptionDataEntryTable">
@@ -3266,8 +3262,7 @@ class EquivalancyUnit extends Component {
                         </ModalBody>
 
                         <ModalFooter>
-                            {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
-                                || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) &&
+                            {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
                                 <div className="mr-0">
                                     {this.state.isChanged1 && <Button type="submit" size="md" color="success" className="float-right" onClick={this.formSubmit1} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                     <Button color="info" size="md" className="float-right mr-1" id="eqUnitAddRow" type="button" onClick={() => this.addRow1()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
