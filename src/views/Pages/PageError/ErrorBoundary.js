@@ -1,3 +1,4 @@
+import { json } from 'mathjs';
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 class ErrorBoundary extends Component {
@@ -22,8 +23,8 @@ class ErrorBoundary extends Component {
         // this.props.history.push('/error');
         // return <h1>{error.message}</h1>;
         return <Redirect to={{
-            pathname: '/error/'+error.message,
-            state: { message: error.message }
+            pathname: '/error',
+            state: { errorMessage: error.message, errorPage: window.location.href, errorName: error.name, errorStack: error.stack }
         }}  />    
     }
   
