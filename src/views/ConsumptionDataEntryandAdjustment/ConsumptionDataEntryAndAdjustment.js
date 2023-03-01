@@ -145,7 +145,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       jsonDataTes: [],
       jsonDataArima: [],
       count: 0,
-      countRecived: 0
+      countRecived: 0,
+      isTableLoaded: ""
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -541,7 +542,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
       this.setState({
         count: count,
-        
+
       })
     }
   }
@@ -761,7 +762,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var datasetJson = this.state.datasetJson;
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[r].regionId);
             var minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
-            var maxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+            var maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
 
             //Semi - averages
             console.log("this.state.jsonDataSemiAverage----------->", this.state.jsonDataSemiAverage);
@@ -938,7 +939,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
           datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
           console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
-          console.log("Test DatasetJson@@",datasetJson)
+          console.log("Test DatasetJson@@", datasetJson)
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
@@ -960,15 +961,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               countRecived: 0,
               count: 0,
               showDetailTable: true,
-              jsonDataMovingAvg:[],
-              jsonDataSemiAverage:[],
-              jsonDataLinearRegression:[],
-              jsonDataTes:[],
-              jsonDataArima:[],
-              datasetJson:datasetJson
+              jsonDataMovingAvg: [],
+              jsonDataSemiAverage: [],
+              jsonDataLinearRegression: [],
+              jsonDataTes: [],
+              jsonDataArima: [],
+              datasetJson: datasetJson
             }, () => {
               this.hideFirstComponent();
-              this.componentDidMount()
+              // this.componentDidMount()
             })
 
 
@@ -1630,10 +1631,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   hideFirstComponent() {
+    try{
     document.getElementById('div1').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
     }, 30000);
+  }catch(Expection){}
   }
 
   hideSecondComponent() {
@@ -1758,7 +1761,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     this.setState({
       consumptionUnitShowArr: consumptionUnitShowArr
+    }, () => {
+      this.setState({
+        isTableLoaded: this.getTableDiv()
+      })
     })
+    
   }
 
   componentDidMount() {
@@ -1847,7 +1855,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       csvRow.push('')
       csvRow.push('')
       if (this.state.selectedConsumptionUnitId > 0) {
-        csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + document.getElementById("planningUnitId").value).replaceAll(' ', '%20') + '"')
+        // console.log("document.getElementById(planningUnitId).value", document.getElementById("planningUnitId").value)
+        csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"')
+    
       }
       csvRow.push('')
       headers = [];
@@ -2120,9 +2130,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         dataEl: "",
         showSmallTable: false,
         showDetailTable: false,
+        isTableLoaded: ""
       }, () => {
         try {
-          this.el = jexcel(document.getElementById("tableDiv"), '');
+          // this.el = jexcel(document.getElementById("tableDiv"), '');
           // this.el.destroy();
           jexcel.destroy(document.getElementById("tableDiv"), true);
         } catch (error) {
@@ -2134,7 +2145,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           this.setState({
             showSmallTable: false,
             showDetailTable: false,
-            dataEl: ""
+            dataEl: "",
+            isTableLoaded: ""
           })
         }
       })
@@ -2274,7 +2286,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     }
                   }
                   console.log("&&totalQty--->", totalQty)
-                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQty !== "" ? Math.round(totalQtyPU) : "" })
+                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQtyPU !== "" ? Math.round(totalQtyPU) : "" })
                   console.log("&&planningUnitTotalList------>", planningUnitTotalList)
                   totalPlanningUnit += totalQty;
                   totalPlanningUnitPU += totalQtyPU;
@@ -2305,6 +2317,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 planningUnitTotalListRegion: planningUnitTotalListRegion,
                 allPlanningUnitList: allPlanningUnitList
               }, () => {
+                this.setState({
+                  isTableLoaded: this.getTableDiv()
+                })
                 console.log("this.props.match.params.planningUnitId+++", this.props.match.params.planningUnitId)
                 if (this.props.match.params.planningUnitId > 0) {
                   this.buildDataJexcel(this.props.match.params.planningUnitId, 0)
@@ -2348,6 +2363,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   setShowInPlanningUnits(e) {
     this.setState({
       showInPlanningUnit: e.target.checked
+    }, () => {
+      this.setState({
+        isTableLoaded: this.getTableDiv()
+      })
     })
   }
 
@@ -2608,6 +2627,68 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   }
 
+  getTableDiv() {
+    return (
+      <Table className="table-bordered text-center overflowhide main-table " bordered size="sm" options={this.options}>
+        <thead>
+          <tr>
+            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+            <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
+            {this.state.monthArray.map((item, count) => {
+              return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
+            })}
+            <th>{i18n.t('static.supplyPlan.total')}</th>
+            <th>{i18n.t('static.dataentry.regionalPer')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.state.planningUnitList.map(item => {
+            var total = 0;
+            var totalPU = 0;
+            return (<>
+              <tr className="hoverTd">
+                <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.planningUnit.id)}>
+                  {this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                </td>
+                <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }}>
+                  {
+                    this.state.showInPlanningUnit ? getLabelText(item.planningUnit.label, this.state.lang) : item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)
+                    // item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)
+                  }</td>
+                {this.state.monthArray.map((item1, count) => {
+                  var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                  total += Number(data[0].qty);
+                  totalPU += Number(data[0].qtyInPU);
+                  return (<td style={{ backgroundColor: (this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty) === "" ? 'yellow' : 'transparent' }} onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
+                })}
+                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? Math.round(totalPU) : "" : this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? Math.round(total) : ""} /></td>
+                <td>{this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? 100 : ""}</td>
+              </tr>
+              {this.state.regionList.map(r => {
+                var totalRegion = 0;
+                var totalRegionPU = 0;
+                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? "" : "none" }}>
+                  <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                  <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
+                  {this.state.monthArray.map((item1, count) => {
+                    var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
+                    totalRegion += Number(data[0].qty);
+                    totalRegionPU += Number(data[0].qtyInPU);
+                    return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }} style={{ backgroundColor: (this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty) === "" ? 'yellow' : 'transparent' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
+                  })}
+                  <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? Math.round(totalRegionPU) : "") : (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? Math.round(totalRegion) : "")} /></td>
+                  <td>{this.state.showInPlanningUnit ? (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? (totalPU == 0 ? 100 : Math.round((totalRegionPU / totalPU) * 100)) : "") : (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? (total == 0 ? 100 : Math.round((totalRegion / total) * 100)) : "")}</td>
+                </tr>)
+              })}
+            </>)
+          }
+          )}
+
+        </tbody>
+      </Table>
+    )
+  }
+
   render() {
     jexcel.setDictionary({
       Show: " ",
@@ -2816,26 +2897,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
               <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className="supplyplanformulas">{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>
               <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/extrapolation/extrapolateData" className="supplyplanformulas">{i18n.t('static.dashboard.extrapolation')}</a></span><br />
-              {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
-
-              {/* <a className="card-header-action">
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                            </a>
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
-              {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
             </div>
           </div>
           <div className="Card-header-addicon pb-0">
             <div className="card-header-actions">
-              {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
               <a className="card-header-action">
                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
               </a>
               <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-              {/* <span className="card-header-action">
-                {this.state.datasetId != "" && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} ><i className="fa fa-plus-square" style={{ fontSize: '20px' }} onClick={() => this.buildDataJexcel(0)}></i></a>}</span> */}
-
-              {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
             </div>
           </div>
 
@@ -2853,7 +2922,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             name="datasetId"
                             id="datasetId"
                             bsSize="sm"
-                            // onChange={this.filterVersion}
                             onChange={(e) => { this.setDatasetId(e); }}
                             value={this.state.datasetId}
 
@@ -2876,13 +2944,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           lang={pickerLang}
                           onChange={this.handleAMonthChange2}
                           onDismiss={this.handleAMonthDissmis2}
-                        //theme="light"
-                        // onChange={this.handleRangeChange}
-                        // onDismiss={this.handleRangeDissmis}
                         >
-                          {/* <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} /> */}
                           <MonthBox value={makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
-
                         </Picker>
                       </div>
                     </FormGroup>
@@ -2904,63 +2967,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     <div className="col-md-12 mt-2">
                       <div className="table-scroll">
                         <div className="table-wrap DataEntryTable table-responsive fixTableHeadSupplyPlan">
-                          <Table className="table-bordered text-center overflowhide main-table " bordered size="sm" options={this.options}>
-                            <thead>
-                              <tr>
-                                <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
-                                {this.state.monthArray.map((item, count) => {
-                                  return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
-                                })}
-                                <th>{i18n.t('static.supplyPlan.total')}</th>
-                                <th>{i18n.t('static.dataentry.regionalPer')}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {this.state.planningUnitList.map(item => {
-                                var total = 0;
-                                var totalPU = 0;
-                                return (<>
-                                  <tr className="hoverTd">
-                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.planningUnit.id)}>
-                                      {this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                    </td>
-                                    <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }}>
-                                      {
-                                        this.state.showInPlanningUnit ? getLabelText(item.planningUnit.label, this.state.lang) : item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)
-                                        // item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)
-                                      }</td>
-                                    {this.state.monthArray.map((item1, count) => {
-                                      var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                      total += Number(data[0].qty);
-                                      totalPU += Number(data[0].qtyInPU);
-                                      return (<td style={{ backgroundColor: (this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty) === "" ? 'yellow' : 'transparent' }} onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
-                                    })}
-                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? Math.round(totalPU) : "" : this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? Math.round(total) : ""} /></td>
-                                    <td>{this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && c.qty !== "").length > 0 ? 100 : ""}</td>
-                                  </tr>
-                                  {this.state.regionList.map(r => {
-                                    var totalRegion = 0;
-                                    var totalRegionPU = 0;
-                                    return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? "" : "none" }}>
-                                      <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                      <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
-                                      {this.state.monthArray.map((item1, count) => {
-                                        var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
-                                        totalRegion += Number(data[0].qty);
-                                        totalRegionPU += Number(data[0].qtyInPU);
-                                        return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }} style={{ backgroundColor: (this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty) === "" ? 'yellow' : 'transparent' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
-                                      })}
-                                      <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? Math.round(totalRegionPU) : "") : (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? Math.round(totalRegion) : "")} /></td>
-                                      <td>{this.state.showInPlanningUnit ? (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? (totalPU == 0 ? 100 : Math.round((totalRegionPU / totalPU) * 100)) : "") : (this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && c.region.regionId == r.regionId && c.qty !== "").length > 0 ? (total == 0 ? 100 : Math.round((totalRegion / total) * 100)) : "")}</td>
-                                    </tr>)
-                                  })}
-                                </>)
-                              }
-                              )}
-
-                            </tbody>
-                          </Table>
+                          {this.state.isTableLoaded}
                         </div>
                       </div>
                       <br></br>
@@ -3001,35 +3008,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>}
                         </FormGroup>
                       </div>
-                      {/* <div className="table-scroll">
-                          <div className="table-wrap table-responsive">
-                            <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
-                              <tbody>
-                                {this.state.consumptionUnitList.map(c => {
-                                  return (<tr>
-                                    <td>{this.state.selectedConsumptionUnitId != 0 ? <input type="radio" id="dataType" name="dataType" checked={c.dataType == this.state.selectedConsumptionUnitId ? true : false} readOnly ></input> : <input type="radio" id="dataType" name="dataType" checked={c.dataType == this.state.selectedConsumptionUnitId ? true : false}></input>}</td>
-                                    <td>{c.dataType == 1 ? "Forecasting Unit" : c.dataType == 2 ? "Planning Unit" : "Other"}</td>
-                                    <td>{c.dataType == 1 ? getLabelText(c.forecastingUnit.label, this.state.lang) : c.dataType == 2 ? getLabelText(c.planningUnit.label, this.state.lang) : getLabelText(c.otherUnit.label, this.state.label)}</td>
-                                    <td>{c.dataType == 1 ? c.forecastingUnit.multiplier : c.dataType == 2 ? c.planningUnit.multiplier : c.otherUnit.multiplier}</td>
-                                  </tr>)
-                                })}
-                                {this.state.selectedConsumptionUnitId==0 && 
-                                <tr></tr>
-                              }
-                              </tbody>
-                              
-                            </Table>
-                          </div></div> */}
-                      {/* </> */}
 
-                      {/* <div className="row">
-                        <div className="col-md-12 pl-2 pr-2">
-                          <div id="smallTableDiv" className="dataentryTable">
-                          </div>
-                        </div>
-                      </div> */}
-                      {/* <br></br> */}
-                      {/* <br></br> */}
                       <div className="row">
                         <div className="col-md-12 pl-2 pr-2 datdEntryRow consumptionDataEntryTable">
                           <div id="tableDiv" className="leftAlignTable">
@@ -3242,7 +3221,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     </Label>
                   </ModalBody>
                   <ModalFooter>
-                    <Button type="submit" size="md" onClick={(e) => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button type="submit" size="md" onClick={(e) => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ toggleDataChangeForSmallTable: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                   </ModalFooter>
                   {/* </CardBody> */}
@@ -3279,7 +3258,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var stopDate = moment(Date.now()).format("YYYY-MM-DD");
 
     var consumptionList = datasetJson.actualConsumptionList;
-    var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
+    var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active);
     var datasetRegionList = datasetJson.regionList;
     var missingMonthList = [];
 

@@ -2081,6 +2081,7 @@ export default class syncPage extends Component {
                                               filters: true,
                                               license: JEXCEL_PRO_KEY,
                                               contextMenu: function (obj, x, y, e) {
+                                                console.log("Y Test123 Consumption",y)
                                                 var items = [];
                                                 //Resolve conflicts
                                                 var rowData = obj.getRowData(y)
@@ -2461,12 +2462,12 @@ export default class syncPage extends Component {
                                                 var items = [];
                                                 //Resolve conflicts
                                                 var rowData = obj.getRowData(y)
-                                                if (rowData[33].toString() == 1) {
+                                                if (rowData[36].toString() == 1) {
                                                   items.push({
                                                     title: "Resolve conflicts",
                                                     onclick: function () {
                                                       this.setState({ loading: true })
-                                                      this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
+                                                      this.toggleLargeShipment(rowData[33], rowData[34], y, 'shipment');
                                                     }.bind(this)
                                                   })
                                                 } else {
@@ -2725,6 +2726,7 @@ export default class syncPage extends Component {
                                                 entries: '',
                                               },
                                               contextMenu: function (obj, x, y, e) {
+                                                console.log("Y Test123",y)
                                                 var items = [];
                                                 //Resolve conflicts
                                                 var rowData = obj.getRowData(y);
@@ -2736,24 +2738,26 @@ export default class syncPage extends Component {
                                                       var getLocalParentShipmentId = obj.getValueFromCoords(5, y);
                                                       var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[5] === getServerParentShipmentId || c[11] === getServerParentShipmentId : c[5] === getLocalParentShipmentId || c[11] === getLocalParentShipmentId);
                                                       for (var rn = 0; rn < rowNumber.length; rn++) {
+                                                        var index=obj.getJson(null,false).findIndex(c=>c[19]==rowNumber[rn][19]);
                                                         obj.options.editable = true;
                                                         obj.options.allowDeleteRow = true;
                                                         var deletedRowsListServer = this.state.deletedRowsListServer;
                                                         if (rowNumber[rn][11] !== "" && rowNumber[rn][5] === "") {
-                                                          obj.deleteRow(parseInt(rowNumber[rn][19]))
+                                                          obj.deleteRow(parseInt(index))
                                                           deletedRowsListServer.push(rowNumber[rn][24])
                                                         } else if (rowNumber[rn][11] !== "" && rowNumber[rn][5] !== "") {
-                                                          obj.setValueFromCoords(8, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(9, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(10, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(11, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(12, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(13, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(15, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(18, rowNumber[rn][19], rowNumber[rn][20], true)
+                                                          obj.setValueFromCoords(8, index, '', true)
+                                                          obj.setValueFromCoords(9, index, '', true)
+                                                          obj.setValueFromCoords(10, index, '', true)
+                                                          obj.setValueFromCoords(11, index, '', true)
+                                                          obj.setValueFromCoords(12, index, '', true)
+                                                          obj.setValueFromCoords(13, index, '', true)
+                                                          obj.setValueFromCoords(15, index, '', true)
+                                                          obj.setValueFromCoords(18, index, rowNumber[rn][20], true)
                                                           deletedRowsListServer.push(rowNumber[rn][24])
                                                         }
                                                         obj.options.allowDeleteRow = false;
+                                                        obj.orderBy(17, 0);
                                                         obj.options.editable = false;
                                                         this.setState({
                                                           conflictsCount: this.state.conflictsCount - this.state.conflictsCountErp,
@@ -2775,25 +2779,27 @@ export default class syncPage extends Component {
                                                       var getLocalParentShipmentId = obj.getValueFromCoords(5, y);
                                                       var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[5] === getServerParentShipmentId || c[11] === getServerParentShipmentId : c[5] === getLocalParentShipmentId || c[11] === getLocalParentShipmentId);
                                                       for (var rn = 0; rn < rowNumber.length; rn++) {
+                                                        var index=obj.getJson(null,false).findIndex(c=>c[19]==rowNumber[rn][19]);
                                                         obj.options.editable = true;
                                                         obj.options.allowDeleteRow = true;
                                                         var deletedRowsListLocal = this.state.deletedRowsListLocal;
                                                         if (rowNumber[rn][5] !== "" && rowNumber[rn][11] === "") {
-                                                          obj.deleteRow(parseInt(rowNumber[rn][19]))
+                                                          obj.deleteRow(parseInt(index))
                                                           deletedRowsListLocal.push(rowNumber[rn][23])
                                                         } else if (rowNumber[rn][11] !== "" && rowNumber[rn][5] !== "") {
-                                                          obj.setValueFromCoords(2, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(3, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(4, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(5, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(6, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(7, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(14, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(16, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(18, rowNumber[rn][19], rowNumber[rn][21], true)
+                                                          obj.setValueFromCoords(2, index, '', true)
+                                                          obj.setValueFromCoords(3, index, '', true)
+                                                          obj.setValueFromCoords(4, index, '', true)
+                                                          obj.setValueFromCoords(5, index, '', true)
+                                                          obj.setValueFromCoords(6, index, '', true)
+                                                          obj.setValueFromCoords(7, index, '', true)
+                                                          obj.setValueFromCoords(14, index, '', true)
+                                                          obj.setValueFromCoords(16, index, '', true)
+                                                          obj.setValueFromCoords(18, index, rowNumber[rn][21], true)
                                                           deletedRowsListLocal.push(rowNumber[rn][23])
                                                         }
                                                         obj.options.allowDeleteRow = false;
+                                                        obj.orderBy(17, 0);
                                                         obj.options.editable = false;
                                                         this.setState({
                                                           conflictsCount: this.state.conflictsCount - this.state.conflictsCountErp,
@@ -2820,8 +2826,10 @@ export default class syncPage extends Component {
                                                         var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[5] === getServerParentShipmentId || c[11] === getServerParentShipmentId : c[5] === getLocalParentShipmentId || c[11] === getLocalParentShipmentId);
                                                         var shipmentIdSetThatWhoseConflictsAreResolved = [...new Set(rowNumber.map(ele => ele[19]))];
                                                         for (var rn = 0; rn < rowNumber.length; rn++) {
+                                                          var index=obj.getJson(null,false).findIndex(c=>c[19]==rowNumber[rn][19]);
                                                           obj.options.editable = true;
-                                                          obj.setValueFromCoords(22, rowNumber[rn][19], rowNumber[rn][22].concat(shipmentIdSetThatWhoseConflictsAreResolved), true);
+                                                          obj.setValueFromCoords(22, index, rowNumber[rn][22].concat(shipmentIdSetThatWhoseConflictsAreResolved), true);
+                                                          obj.orderBy(17, 0);
                                                           obj.options.editable = false;
                                                           this.setState({
                                                             conflictsCount: this.state.conflictsCount - this.state.conflictsCountErp,
@@ -3254,7 +3262,7 @@ export default class syncPage extends Component {
         //   conflictsCount: this.state.conflictsCount + 1,
         //   shipmentAlreadyLinkedToOtherProgCount: this.state.shipmentAlreadyLinkedToOtherProgCount + 1
         // })
-        elInstance.setValueFromCoords(17, c, 6, true);
+        elInstance.setValueFromCoords(17, c, 0, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
           // elInstance.setStyle(col, "background-color", "transparent");
@@ -3369,7 +3377,7 @@ export default class syncPage extends Component {
           conflictsCountErp: this.state.conflictsCountErp + 1,
           shipmentAlreadyLinkedToOtherProgCount: this.state.shipmentAlreadyLinkedToOtherProgCount + 1
         })
-        elInstance.setValueFromCoords(17, c, 6, true);
+        elInstance.setValueFromCoords(17, c, 0, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
           // elInstance.setStyle(col, "background-color", "transparent");
@@ -3490,6 +3498,7 @@ export default class syncPage extends Component {
         }
       }
     }
+    elInstance.orderBy(17, 0);
     elInstance.options.editable = false;
     if (this.state.conflictsCount == 0) {
       this.generateDataAfterResolveConflictsForQPL();

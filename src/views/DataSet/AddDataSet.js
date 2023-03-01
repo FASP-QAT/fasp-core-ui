@@ -1221,7 +1221,7 @@ export default class AddForecastProgram extends Component {
                                                     <FormFeedback>{errors.programNotes}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <h6><Label htmlFor="select">{'Version 1 Settings'}</Label></h6>
+                                                    <h6><Label htmlFor="select">{i18n.t('static.dataset.version1Settings')}</Label></h6>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.forecastStart')}<span class="red Reqasterisk">*</span></Label>

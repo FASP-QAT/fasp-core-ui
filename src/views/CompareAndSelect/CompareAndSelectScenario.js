@@ -23,7 +23,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOld, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionOnlyHideRowOld } from '../../CommonComponent/JExcelCommonFunctions';
+import { jExcelLoadedFunction, jExcelLoadedFunctionOld, jExcelLoadedFunctionOldForCompareAndSelect, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionOnlyHideRowOld } from '../../CommonComponent/JExcelCommonFunctions';
 import NumberFormat from 'react-number-format';
 import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
@@ -1499,7 +1499,8 @@ class CompareAndSelectScenario extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionOld(instance);
+        console.log("In loaded Test123")
+        jExcelLoadedFunctionOldForCompareAndSelect(instance);
         var elInstance = instance.jexcel;
         var json = elInstance.getJson(null, false);
         var jsonLength;
@@ -1888,7 +1889,7 @@ class CompareAndSelectScenario extends Component {
                 var datasetForEncryption = datasetJson;
                 var planningUnitList = datasetJson.planningUnitList;
                 var planningUnitList1 = planningUnitList;
-                var index = planningUnitList.findIndex(c => c.planningUnit.id == this.state.planningUnitId);
+                var index = planningUnitList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.active.toString()=="true");
                 // let map1 = new Map();
                 // map1.set(Number(this.state.regionId), { "scenarioId": scenarioId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": this.state.totalArray[0] / this.state.multiplier })
 

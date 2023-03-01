@@ -1299,7 +1299,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.state.rows.push({
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: this.state.percentage,
+                            percentage: "",
                             startDate: moment(startDate).format(DATE_FORMAT_CAP),
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
                             scenarioChecked: true,
@@ -1576,7 +1576,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.state.rows.push({
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: this.state.percentage,
+                            percentage: "",
                             startDate: "",
                             stopDate: "",
                             scenarioChecked: true,
@@ -1686,7 +1686,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.state.rows.push({
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: this.state.percentage,
+                            percentage: "",
                             startDate: "",
                             stopDate: "",
                             scenarioChecked: true,
@@ -1793,7 +1793,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.state.rows.push({
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: this.state.percentage,
+                            percentage: "",
                             startDate: "",
                             stopDate: "",
                             scenarioChecked: true,
@@ -1867,7 +1867,7 @@ export default class WhatIfReportComponent extends React.Component {
                         this.state.rows.push({
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: this.state.percentage,
+                            percentage: "",
                             startDate: moment(startDate).format(DATE_FORMAT_CAP),
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
                             scenarioChecked: true,
@@ -3826,14 +3826,18 @@ export default class WhatIfReportComponent extends React.Component {
                     this.setState({
                         shipments: !this.state.shipments
                     }, () => {
-                        this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                        if (this.state.shipments) {
+                            this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                        }
                     });
                 }
             } else if (supplyPlanType == 'shipments') {
                 this.setState({
                     shipments: !this.state.shipments
                 }, () => {
-                    this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+                    if (this.state.shipments) {
+                        this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+                    }
                 });
             } else if (supplyPlanType == 'Adjustments') {
                 var monthCountAdjustments = count - 2;

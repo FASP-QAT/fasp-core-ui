@@ -516,9 +516,17 @@ class ModelingValidation extends Component {
             columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             for (var k = 0; k < nodeVal.length; k++) {
-                columns.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                if (this.state.levelId != -2) {
+                    columns.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                } else {
+                    columns.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##' : '#,##.00 %', decimal: '.' });
+                }
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            if (this.state.levelId != -2) {
+                columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            } else {
+                columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##' : '#,## %' });
+            }
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k], type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
@@ -545,8 +553,8 @@ class ModelingValidation extends Component {
                         } else {
                         }
                     }
-                    data[k + 1] = calculatedValueTotal != "" ? Number(calculatedValueTotal).toFixed(2) : "";
-                    total += Number(calculatedValueTotal);
+                    data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
+                    total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
                 }
                 data[nodeVal.length + 1] = Number(total).toFixed(2);
 

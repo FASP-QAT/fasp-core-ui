@@ -529,7 +529,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                 var noOfMonthsInUsagePeriod = 0;
                                                 var noFURequired = 0;
                                                 if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
-                                                    var convertToMonth = (props.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+                                                    var convertToMonth = (usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
                                                     if (usageTypeId == 2) {
                                                         var div = (convertToMonth * usageFrequency);
                                                         if (div != 0) {
@@ -549,7 +549,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
                                                         repeatUsagePeriodId = nodeDataMapForScenario.fuNode.repeatUsagePeriod.usagePeriodId;
                                                         if (repeatUsagePeriodId != "") {
-                                                            convertToMonth = (props.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+                                                            convertToMonth = (usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
                                                         } else {
                                                             convertToMonth = 0;
                                                         }
@@ -557,9 +557,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (nodeDataMapForScenario.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                                 } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                                     if (payload.nodeType.id == 4) {
-                                                        noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                                        noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                                     } else {
-                                                        noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                                        noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                                     }
                                                 }
                                                 if (nodeDataMapForScenario.fuNode.usageType.id == 2) {
@@ -762,6 +762,70 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                 // }
                                                 console.log("CalculatedMmdValueForPU$$$$###", calculatedMmdValue)
                                                 // console.log("calculatedMMDValuePU$$$%%%", calculatedMmdValue);
+                                            }else{
+                                                var usagePeriodId;
+                                                var usageTypeId;
+                                                var usageFrequency;
+                                                var repeatUsagePeriodId;
+                                                var oneTimeUsage;
+                                                usageTypeId = parentNodeNodeData.fuNode.usageType.id;
+                                                if (usageTypeId == 1) {
+                                                    oneTimeUsage = parentNodeNodeData.fuNode.oneTimeUsage;
+                                                }
+                                                if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage !== "" && oneTimeUsage.toString() == "false")) {
+                                                    usagePeriodId = parentNodeNodeData.fuNode.usagePeriod.usagePeriodId;
+                                                }
+                                                usageFrequency = parentNodeNodeData.fuNode.usageFrequency;
+                                                var noOfMonthsInUsagePeriod = 0;
+                                                var noFURequired = 0;
+                                                if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
+                                                    var convertToMonth = (usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+                                                    if (usageTypeId == 2) {
+                                                        var div = (convertToMonth * usageFrequency);
+                                                        if (div != 0) {
+                                                            noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
+                                                            console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                                                        }
+                                                    } else {
+                                                        // var noOfFUPatient = this.state.noOfFUPatient;
+                                                        var noOfFUPatient;
+                                                        // if (payload.nodeType.id == 4) {
+                                                            noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                                        // } else {
+                                                            // noOfFUPatient = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                                        // }
+                                                        noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                                                    }
+                                                    if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
+                                                        repeatUsagePeriodId = parentNodeNodeData.fuNode.repeatUsagePeriod.usagePeriodId;
+                                                        if (repeatUsagePeriodId != "") {
+                                                            convertToMonth = (usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+                                                        } else {
+                                                            convertToMonth = 0;
+                                                        }
+                                                    }
+                                                    noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (parentNodeNodeData.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+                                                } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+                                                    // if (payload.nodeType.id == 4) {
+                                                        noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                                    // } else {
+                                                        // noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                                    // }
+                                                }
+                                                var puMultiplier=0;
+                                                if (!isTemplate) {
+                                                    var puFilter = (datasetJson.planningUnitList).filter(c => c.planningUnit.id == nodeDataMapForScenario.puNode.planningUnit.id);
+                                                    if (puFilter.length > 0) {
+                                                        var pu = puFilter[0];
+                                                        puMultiplier = pu.planningUnit.multiplier;
+                                                    }
+                                                } else {
+                                                    puMultiplier = nodeDataMapForScenario.puNode.planningUnit.multiplier;
+                                                }
+                                                console.log("Calculated Value@ Test",calculatedValue)
+                                                console.log("NoFU Required Test",noFURequired)
+                                                calculatedValue=(calculatedValue/(noFURequired/puMultiplier))*nodeDataMapForScenario.puNode.puPerVisit;
+                                                calculatedMmdValue=(calculatedMmdValue/(noFURequired/puMultiplier))*nodeDataMapForScenario.puNode.puPerVisit;
                                             }
                                         }
 

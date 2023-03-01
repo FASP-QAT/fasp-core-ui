@@ -1421,13 +1421,19 @@ class AuthenticationService {
                     case "/dataSet/buildTree/tree/:treeId/:programId":
                     case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
                     case "/dataSet/buildTree/":
+                    case "/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal":
                     case "/dataSet/buildTree/template/:templateId":
-                        if (bfunction.includes("ROLE_BF_ADD_TREE")) {
+                        if (bfunction.includes("ROLE_BF_ADD_TREE") || bfunction.includes("ROLE_BF_VIEW_TREE") || bfunction.includes("ROLE_BF_EDIT_TREE")) {
                             return true;
                         }
                         break;
 
                     case "/dataset/createTreeTemplate/:templateId":
+                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/branchTemplate/:templateId":
                         if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
                             return true;
                         }
@@ -1438,6 +1444,13 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/dataset/listBranchTreeTemplate/":
+                    case "/dataset/listBranchTreeTemplate/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_TREE_TEMPLATE")) {
+                            return true;
+                        }
+                        break;
+
                     case "/dataset/listTree/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_TREE")) {
                             return true;

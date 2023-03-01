@@ -39,7 +39,7 @@ class RealmCountryService {
         );
     }
     getRealmCountryPlanningUnitByProgramId(json) {
-        return axios.put(`${API_URL}/api/realmCountry/programIds/planningUnit`, json, {}
+        return axios.post(`${API_URL}/api/realmCountry/programIds/planningUnit`, json, {}
         );
     }
 

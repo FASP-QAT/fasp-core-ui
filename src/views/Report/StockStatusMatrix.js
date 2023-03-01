@@ -1525,7 +1525,48 @@ export default class StockStatusMatrix extends React.Component {
           doc.text(doc.internal.pageSize.width / 8, 170, planningText)
 
           var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 200, planningText)
+          doc.text(doc.internal.pageSize.width / 8, 180 + (this.state.tracerCategoryValues.length * 1.2 ), planningText)
+
+          //Legends start
+
+          doc.setDrawColor(0);
+          doc.setFillColor(186, 12, 47);
+          doc.rect(doc.internal.pageSize.width / 8, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), 15, 12, 'F');
+
+          doc.setFillColor(244, 133, 33);
+          doc.rect(doc.internal.pageSize.width / 8+100, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), 15, 12, 'F');
+
+          doc.setFillColor(17, 139, 112);
+          doc.rect(doc.internal.pageSize.width / 8+200, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), 15, 12, 'F');
+
+          doc.setFillColor(237, 185, 68);
+          doc.rect(doc.internal.pageSize.width / 8+300, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), 15, 12, 'F');
+
+          doc.setFillColor(207, 205, 201);
+          doc.rect(doc.internal.pageSize.width / 8+400, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), 15, 12, 'F');
+
+          doc.text(i18n.t(legendcolor[0].text), doc.internal.pageSize.width / 8+20, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), {
+            align: 'left'
+          })
+
+          doc.text(i18n.t(legendcolor[1].text), doc.internal.pageSize.width / 8+120, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), {
+            align: 'left'
+          })
+
+          doc.text(i18n.t(legendcolor[2].text), doc.internal.pageSize.width / 8+220, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), {
+            align: 'left'
+          })
+
+          doc.text(i18n.t(legendcolor[3].text), doc.internal.pageSize.width / 8+320, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), {
+            align: 'left'
+          })
+
+          doc.text(i18n.t(legendcolor[4].text), doc.internal.pageSize.width / 8+420, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), {
+            align: 'left'
+          })
+
+          //Legends end
+
 
         }
 
@@ -1580,7 +1621,52 @@ export default class StockStatusMatrix extends React.Component {
 
     ]);
 
-    var startY = 230 + (this.state.planningUnitValues.length * 3)
+    const roundN = num => {
+
+      if (num == null) {
+        return ''
+      } else {
+        return parseFloat(Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
+      }
+    }
+    const cellStyle = (planBasedOn, min, reorderFrequency, value, valueStock) => {
+      var actualValue = planBasedOn == 1 ? value : valueStock;
+      var maxValue = planBasedOn == 1 ? min + reorderFrequency : value;
+      if (actualValue != null) {
+        actualValue = this.roundN(actualValue)
+        if (actualValue == 0) {
+          return legendcolor[0].color 
+        } else if (min > actualValue) {
+          return  legendcolor[1].color 
+        } else if ((maxValue) < actualValue) {
+  
+          return legendcolor[3].color 
+        } else {
+          return  legendcolor[2].color 
+  
+        }
+      }
+      else {
+        return  legendcolor[4].color 
+      }
+    }
+
+    let dataColor;
+    dataColor = this.state.data.map(ele => [
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.jan, ele.janStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.feb, ele.febStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.mar, ele.marStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.apr, ele.aprStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.may, ele.mayStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.jun, ele.junStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.jul, ele.julStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.aug, ele.augStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.sep, ele.sepStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.oct, ele.octStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.nov, ele.novStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.dec, ele.decStock),
+    ]);
+    var startY = 230 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 )
     let content = {
       margin: { top: 80, bottom: 90 },
       startY: startY,
@@ -1590,6 +1676,10 @@ export default class StockStatusMatrix extends React.Component {
       columnStyles: {
         1: { cellWidth: 99.89 },
         2: { cellWidth: 54 },
+      },
+      didParseCell: function (data) {
+          if(data.section=="body" && data.column.index > 5)
+            data.cell.styles.fillColor=dataColor[data.row.index][data.column.index-6];
       }
     };
 

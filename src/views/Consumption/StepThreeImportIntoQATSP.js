@@ -141,15 +141,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var csvRow = [];
 
         const headers = [];
-        headers.push("Forecast Planning Unit");
-        headers.push("Supply Plan Planning Unit");
-        headers.push("Supply Plan Region");
-        headers.push("Month");
-        headers.push("Forecasted Consumption (Forecast Module)");
-        headers.push("% of Forecast");
-        headers.push("Conversion Factor (Forecast to Supply Plan)");
-        headers.push("Converted Forecasted Consumption (to be imported)");
-        headers.push("Current Forecasted Consumption (Supply Plan Module)");
+        headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'));
+        headers.push(i18n.t('static.QATForecastImport.SPRegion'));
+        headers.push(i18n.t('static.common.month'));
+        headers.push(i18n.t('static.QATForecastImport.forcastConsumption'));
+        headers.push(i18n.t('static.QATForecastImport.perOfForecast'));
+        headers.push(i18n.t('static.importIntoQATSupplyPlan.conversionFactor'));
+        headers.push(i18n.t('static.QATForecastImport.convertedForecastConsumption'));
+        headers.push(i18n.t('static.QATForecastImport.currentForecastConsumption'));
         headers.push(i18n.t('static.quantimed.importData'));
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
@@ -655,15 +655,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapPlanningUnit"),true);
+        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
 
         this.el = jexcel(document.getElementById("mapRegion"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapRegion"),true);
+        jexcel.destroy(document.getElementById("mapRegion"), true);
 
         this.el = jexcel(document.getElementById("mapImport"), '');
         // this.el.destroy();
-        jexcel.destroy(document.getElementById("mapImport"),true);
+        jexcel.destroy(document.getElementById("mapImport"), true);
 
         var json = [];
         var data = papuDataArr;
@@ -678,31 +678,31 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             columns: [
                 {
-                    title: 'Forecast Planning Unit',
+                    title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
                     type: 'text',
                     textEditor: true,
                     readOnly: true
                 },
                 {
-                    title: 'Supply Plan Planning Unit',
+                    title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
                     type: 'text',
                     textEditor: true,
                     readOnly: true
                 },
                 {
-                    title: 'Supply Plan Region',
+                    title: i18n.t('static.QATForecastImport.SPRegion'),
                     type: 'text',
                     textEditor: true,
                     readOnly: true
                 },
                 {
-                    title: 'Month',
+                    title: i18n.t('static.common.month'),
                     type: 'text',
                     textEditor: true,
                     readOnly: true
                 },
                 {
-                    title: 'Forecasted Consumption (Forecast Module)',
+                    title: i18n.t('static.QATForecastImport.forcastConsumption'),
                     // type: 'text',
                     type: 'numeric',
                     decimal: '.',
@@ -711,7 +711,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: '% of Forecast',
+                    title: i18n.t('static.QATForecastImport.perOfForecast'),
                     // type: 'text',
                     type: 'numeric',
                     decimal: '.',
@@ -729,7 +729,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Converted Forecasted Consumption (to be imported)',
+                    title: i18n.t('static.QATForecastImport.convertedForecastConsumption'),
                     // type: 'text',
                     type: 'numeric',
                     decimal: '.',
@@ -738,7 +738,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Current Forecasted Consumption (Supply Plan Module)',
+                    title: i18n.t('static.QATForecastImport.currentForecastConsumption'),
                     // type: 'text',
                     type: 'numeric',
                     decimal: '.',
@@ -839,7 +839,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
                     <div className="row ">
                         <FormGroup className="col-md-4">
-                            <Label htmlFor="appendedInputButton">Supply Plan Program</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanProgram')}</Label>
                             <div className="controls ">
                                 <InputGroup>
                                     <Input
@@ -931,7 +931,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </li>
                     </ul>
                 </div>
-               
+
                 {/* <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5> */}
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
                 <div className="consumptionDataEntryTable">

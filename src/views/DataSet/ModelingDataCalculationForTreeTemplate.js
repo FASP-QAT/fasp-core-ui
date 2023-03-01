@@ -377,19 +377,23 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             if (payload.nodeType.id == 2) {
                                 calculatedValue = endValue;
                             } else if (payload.nodeType.id == 3 || payload.nodeType.id == 4 || payload.nodeType.id == 5) {
-                                // Jo uske parent ki calculated value hai Uska endValue %
-                                var parent = flatList[fl].parent;
-                                // console.log("parent---", parent);
-                                // console.log("flatList---", flatList);
-                                var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
-                                // console.log("parentFiltered---", parentFiltered);
-                                var singleNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id]);
-                                // console.log("singleNodeData---", singleNodeData);
-                                if (singleNodeData != undefined && singleNodeData.length > 0) {
-                                    var parentValueFilter = singleNodeData[0].nodeDataMomList.filter(c => c.month == i);
-                                    if (parentValueFilter.length > 0) {
-                                        var parentValue = parentValueFilter[0].calculatedValue;
-                                        calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
+                                if (flatList[fl].level != 0) {
+                                    // Jo uske parent ki calculated value hai Uska endValue %
+                                    var parent = flatList[fl].parent;
+                                    // console.log("parent---", parent);
+                                    // console.log("flatList---", flatList);
+                                    var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
+                                    // console.log("parentFiltered---", parentFiltered);
+                                    var singleNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id]);
+                                    // console.log("singleNodeData---", singleNodeData);
+                                    if (singleNodeData != undefined && singleNodeData.length > 0) {
+                                        var parentValueFilter = singleNodeData[0].nodeDataMomList.filter(c => c.month == i);
+                                        if (parentValueFilter.length > 0) {
+                                            var parentValue = parentValueFilter[0].calculatedValue;
+                                            calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
+                                        } else {
+                                            calculatedValue = 0;
+                                        }
                                     } else {
                                         calculatedValue = 0;
                                     }
@@ -461,9 +465,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (nodeDataMapForScenario.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                     } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                         if (payload.nodeType.id == 4) {
-                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                         } else {
-                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                         }
                                     }
                                     console.log("noFURequired@@@@@@@@@@@", noFURequired);
@@ -519,15 +523,24 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     var grandParent = parentFiltered.parent;
                                     var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
                                     var patients = 0;
-                                    var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                    var grandParentNodeData = 0;
+                                    if (flatList[fl].level != 1) {
+                                        grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                    }
                                     console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                     if (grandParentNodeData != undefined) {
                                         var minusNumber = (nodeDataMapForScenario.month == 1 ? nodeDataMapForScenario.month - 2 : nodeDataMapForScenario.month - 1);
-                                        var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
+                                        var grandParentPrevMonthMMDValue = []
+                                        if (flatList[fl].level != 1) {
+                                            grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
+                                        }
                                         if (grandParentPrevMonthMMDValue.length > 0) {
                                             patients = grandParentPrevMonthMMDValue[0].calculatedValue;
                                         } else {
-                                            var grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == nodeDataMapForScenario.month);
+                                            var grandParentCurMonthMMDValue = [];
+                                            if (flatList[fl].level != 1) {
+                                                grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == nodeDataMapForScenario.month);
+                                            }
                                             if (grandParentCurMonthMMDValue.length > 0) {
                                                 patients = grandParentCurMonthMMDValue[0].calculatedValue;
                                             } else {
@@ -567,14 +580,23 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     console.log("cycle$$$%%%", cycle);
                                     var deltaPatients = 0;
                                     if (i == 0) {
-                                        var filter1 = grandParentNodeData.nodeDataMomList.filter(c => c.month == i);
+                                        var filter1 = [];
+                                        if (flatList[fl].level != 1) {
+                                            filter1 = grandParentNodeData.nodeDataMomList.filter(c => c.month == i);
+                                        }
                                         if (filter1.length > 0) {
                                             deltaPatients = filter1[0].calculatedValue - patients;
                                         }
                                     } else {
-                                        var filter1 = grandParentNodeData.nodeDataMomList.filter(c => c.month == i);
+                                        var filter1 = [];
+                                        if (flatList[fl].level != 1) {
+                                            filter1 = grandParentNodeData.nodeDataMomList.filter(c => c.month == i);
+                                        }
                                         var minusNumber = (i == 1 ? i - 2 : i - 1);
-                                        var filter2 = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
+                                        var filter2 = []
+                                        if (flatList[fl].level != 1) {
+                                            filter2 = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
+                                        }
                                         if (filter1.length > 0 && filter2.length > 0) {
                                             deltaPatients = filter1[0].calculatedValue - filter2[0].calculatedValue;
                                         }
@@ -627,6 +649,72 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     }
 
                                     console.log("CalculatedMmdValueForPU$$$$###", calculatedMmdValue)
+                                } else {
+                                    var usagePeriodId;
+                                    var usageTypeId;
+                                    var usageFrequency;
+                                    var repeatUsagePeriodId;
+                                    var oneTimeUsage;
+                                    usageTypeId = parentNodeNodeData.fuNode.usageType.id;
+                                    if (usageTypeId == 1) {
+                                        oneTimeUsage = parentNodeNodeData.fuNode.oneTimeUsage;
+                                    }
+                                    if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage.toString() != "" && oneTimeUsage.toString() == "false")) {
+                                        usagePeriodId = parentNodeNodeData.fuNode.usagePeriod.usagePeriodId;
+                                    }
+                                    usageFrequency = parentNodeNodeData.fuNode.usageFrequency;
+                                    var noOfMonthsInUsagePeriod = 0;
+                                    var noFURequired = 0;
+                                    if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
+                                        var convertToMonth = (props.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+                                        if (usageTypeId == 2) {
+                                            var div = (convertToMonth * usageFrequency);
+                                            if (div != 0) {
+                                                noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
+                                                console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                                            }
+                                        } else {
+                                            // var noOfFUPatient = this.state.noOfFUPatient;
+                                            var noOfFUPatient;
+                                            // if (payload.nodeType.id == 4) {
+                                                noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                            // } else {
+                                                // noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                            // }
+                                            noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                                        }
+                                        if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
+                                            repeatUsagePeriodId = parentNodeNodeData.fuNode.repeatUsagePeriod.usagePeriodId;
+                                            if (repeatUsagePeriodId != "") {
+                                                convertToMonth = (props.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+                                            } else {
+                                                convertToMonth = 0;
+                                            }
+                                        }
+                                        noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (parentNodeNodeData.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+                                    } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+                                        // if (payload.nodeType.id == 4) {
+                                            noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                        // } else {
+                                            // noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                        // }
+                                    }
+                                    var puMultiplier = 0;
+                                    if (!isTemplate) {
+                                        var puFilter = (datasetJson.planningUnitList).filter(c => c.planningUnit.id == nodeDataMapForScenario.puNode.planningUnit.id);
+                                        if (puFilter.length > 0) {
+                                            var pu = puFilter[0];
+                                            puMultiplier = pu.planningUnit.multiplier;
+                                        }
+                                    } else {
+                                        puMultiplier = nodeDataMapForScenario.puNode.planningUnit.multiplier;
+                                    }
+                                    console.log("Pu Multiplier Test",puMultiplier)
+                                    console.log("No Fu Required Test",noFURequired)
+                                    console.log("Calculated Value Required Test",calculatedValue)
+                                    console.log("Pu per visit Test",nodeDataMapForScenario.puNode.puPerVisit)
+                                    calculatedValue = (calculatedValue / (noFURequired/puMultiplier)) * nodeDataMapForScenario.puNode.puPerVisit;
+                                    calculatedMmdValue = (calculatedMmdValue / (noFURequired/puMultiplier)) * nodeDataMapForScenario.puNode.puPerVisit;
                                 }
                             }
 

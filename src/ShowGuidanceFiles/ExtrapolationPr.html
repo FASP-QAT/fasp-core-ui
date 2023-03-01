@@ -33,17 +33,11 @@
 	<b style="font-size: 13px;">1.Iniciando a extrapolação:</b>
 	<ul style="font-size: 13px;">
 		<li>Antes de usar esta tela, certifique-se de ter concluído o '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style="text-decoration: underline;">Entrada e Ajuste de Dados</a>' tela para cada unidade de planejamento e região que você deseja extrapolar</li>
-		<li>Use os filtros na parte superior desta tela para selecionar a unidade de planejamento e a 
-			região para extrapolar. 
+		<li>Use os filtros na parte superior desta tela para selecionar a unidade de planejamento, a região a ser extrapolada e o intervalo de datas a serem utilizados pelos dados históricos. 
 		</li>
-		<li>Ao longo da margem esquerda estão os diferentes métodos de extrapolação disponíveis no 
-			QAT. O usuário pode selecionar um ou vários, conforme apropriado ao padrão geral de 
-			consumo e aos dados disponíveis, conforme será discutido abaixo. Consulte as seções 3 e 4 
-			abaixo para obter uma explicação dos métodos de extrapolação e como escolher melhor os 
-			métodos para sua previsão
+		<li>O usuário pode selecionar um ou vários dos métodos de extrapolação disponíveis no QAT, conforme apropriado para o padrão geral de consumo e dados disponíveis, como será discutido abaixo. Consulte as seções 2-4 abaixo para obter uma explicação dos métodos de extrapolação e como escolher os melhores métodos para sua previsão.
 		</li>
-		<li> Observe que as alterações nesta tela são opcionais - o usuário faz a seleção final 
-			da previsão no '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style="text-decoration: underline;">Compare e 
+		<li> Observe que as alterações nessa tela são opcionais – o QAT aplica automaticamente os parâmetros de extrapolação padrão a todas as unidades de planejamento após a conclusão da tela Ajustes. O usuário então faz a seleção final da previsão no '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style="text-decoration: underline;">Compare e 
 				selecione a previsão</a>'  screen.
 		</li>
 	</ul>
@@ -73,15 +67,13 @@
 			pontos futuros devem cair dentro deste raio da previsão representada pela linha de 
 			regressão. Este método não é apropriado para dados sazonais.
 		</li>
-		<li><b>Suavização Exponencial Tripla (Holt-Winters):</b>  Os dados brutos geralmente são 
-			pontiagudos. Em estatística, diferentes tipos de suavização são usados para filtrar o 
-			ruído para que possamos ver padrões em um conjunto de dados de séries temporais com mais 
-			clareza. As previsões que usam suavização exponencial tripla têm três parâmetros. 
-			A suavização exponencial usa dados mais antigos com pesos exponencialmente 
-			decrescentes ao longo do tempo. As previsões têm parâmetros. Os parâmetros na 
-			suavização exponencial são definidos entre 0 e 1, com valores próximos de 1 favorecendo 
-			valores recentes e valores próximos de 0 favorecendo valores mais antigos. A suavização 
-			exponencial tripla aplica três parâmetros de suavização :
+		<li><b>Suavização Exponencial Tripla (Holt-Winters):</b>  Nas estatísticas, diferentes tipos 
+			de suavização são usados ​​para filtrar o ruído para que possamos ver os padrões em um 
+			conjunto de dados de séries temporais com mais clareza. A suavização exponencial usa 
+			dados mais antigos com pesos decrescentes exponencialmente ao longo do tempo. Os parâmetros 
+			de suavização na suavização exponencial são definidos entre 0 e 1, com valores próximos 
+			a 1 favorecendo valores recentes e valores próximos a 0 favorecendo valores mais antigos. 
+			Os usuários que utilizam a suavização exponencial tripla podem escolher entre quatro parâmetros:
 			<ul>
 				<li>Alfa</li>
 				<li>Beta</li>
@@ -110,12 +102,12 @@
 					<li>q ou MA (ordem da média móvel): o tamanho da janela de média móvel ou o número 
 						de observações diferenciadas a serem calculadas.
 					</li>
+					<li>Os valores padrão de QAT para parâmetros ARIMA são p = 0, d = 1, q = 1.
+					</li>
+					<li>Intervalo de confiança: entre 0% e 100% (exclusivo), por ex. O nível de 
+						confiança de 90% indica que 90% dos pontos futuros devem cair dentro desse raio da previsão.
+					</li>
 					<br>
-					<p>Muitos programas usam valores padrão para parâmetros ARIMA. SAP, por exemplo, 
-						usa 0,2 para alfa, 0,1 para beta e 0,3 para gama. <br>Intervalo de confiança: 
-						entre 0% e 100% (exclusivo), por exemplo, nível de confiança de 90% indica que 
-						90% dos pontos futuros devem cair dentro deste raio de previsão.
-					</p>
 				</ul>
 			</li>
 		</li>
@@ -138,7 +130,6 @@
 				torno de uma média. Os modelos aplicados a esses conjuntos de dados podem incluir
 				<ul>
 					<li>Média móvel</li>
-					<li>Suavização Exponencial Simples</li>
 					<li>ARIMA</li>
 				</ul>
 			</li>
@@ -146,8 +137,8 @@
 				crescente ou decrescente. Os modelos aplicados a esses conjuntos de dados podem 
 				incluir
 				<ul>
-					<li>Projeção de semi-médias</li>
-					<li>Regressão Linear Simples</li>
+					<li>Semi-médias</li>
+					<li>Regressão Linear</li>
 				</ul>
 			</li>
 			<li>Tendência e Sazonal, em que os valores observados em um conjunto de dados têm 
@@ -155,21 +146,21 @@
 				dados podem incluir
 				<ul>
 					<li>Modelo ARIMA sazonal</li>
-					<li>Triple Exponential Smoothing (Holt-Winters) 
+					<li>Suavização Exponencial Tripla (Holt-Winters) 
 				</ul>
 			</li>		
-				<li>Seasonal without trend, 
-						where the observed values have a seasonal component but no trend. Models 
-						applied to such datasets may include 
+				<li>Sazonal sem tendência,
+					onde os valores observados têm um componente sazonal, mas sem tendência. modelos
+					aplicados a tais conjuntos de dados podem incluir 
 						<ul>
-							<li>Triple Exponential Smoothing (Holt-Winters)</li>
+							<li>Suavização Exponencial Tripla (Holt-Winters)</li>
 						</ul>
 					</li>
 				</ul>
-					<p>The models suggested here 
-						are neither exhaustive nor exclusive. QAT enables the user to apply a 
-						variety of extrapolation methods and then to compare them using best 
-						fit or forecast error metrics. 
+					<p>Os modelos sugeridos aqui
+						não são exaustivas nem exclusivas. QAT permite ao usuário aplicar
+						uma variedade de métodos de extrapolação e, em seguida, compará-los usando os melhores
+						ajustar ou prever métricas de erro. 
 					</p>
 				
 			<p>A segunda etapa é considerar se os valores de previsão devem refletir de perto 
@@ -188,7 +179,7 @@
 			<li>MAPE (Erro de Porcentagem Absoluta Média)</li>
 			<li>WAPE (Erro de Porcentagem Absoluta Ponderada)</li>
 			<li>RMSE (Erro ao quadrado médio da raiz)</li>
-			<li>MAE (Erro Absoluto Médio)<br>Em geral, quanto menor a pontuação de erro, mais 
+			<li>MSE (Erro Quadrado Médio)<br>Em geral, quanto menor a pontuação de erro, mais 
 				próximo o resultado do método de previsão se ajusta aos dados históricos. Em 
 				modelos em que se espera que os padrões históricos em um conjunto de dados 
 				sejam refletidos nos valores futuros, um valor de erro baixo pode ser usado 
