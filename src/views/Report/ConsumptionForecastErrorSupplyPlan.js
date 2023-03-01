@@ -1041,6 +1041,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var planningUnitIdList = [];
         console.log("planningUnitId----->", planningUnitId);
         console.log("forecastingUnitId----->", forecastingUnitId);
+        console.log("equivalencyUnitId----->", equivalencyUnitId);
 
         if (programId > 0 && (planningUnitId > 0 || forecastingUnitId > 0) && versionId != 0) {
             console.log("Inside If")
