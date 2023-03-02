@@ -1192,7 +1192,7 @@ class ForecastSummary extends Component {
                             let tempData = [];
 
 
-                            let treeList = filteredProgram.treeList;
+                            let treeList = filteredProgram.treeList.filter(c => c.active == true);;
                             let regionList = filteredProgram.regionList;
                             let consumptionExtrapolation = filteredProgram.consumptionExtrapolation;
 
@@ -1468,7 +1468,7 @@ class ForecastSummary extends Component {
                                 if (displayId == 2) {
                                     // console.log("langaugeList---->", langaugeList);
                                     let dataArray = [];
-                                    var treeList = this.state.regDatasetJson.treeList;
+                                    var treeList = this.state.regDatasetJson.treeList.filter(c => c.active == true);;
                                     console.log("TreeList+++", treeList)
                                     var consumptionExtrapolation = this.state.regDatasetJson.consumptionExtrapolation;
                                     var tsList = [];
