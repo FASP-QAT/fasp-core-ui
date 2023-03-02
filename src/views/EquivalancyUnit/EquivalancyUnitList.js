@@ -2278,7 +2278,7 @@ class EquivalancyUnit extends Component {
                         tracerCategory: { id: parseInt(map1.get("3")) },
                         forecastingUnit: { id: parseInt(map1.get("4")) },
                         //change here
-                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("1")), realm: equivalencyUnitObj.realm, program: equivalencyUnitObj.program },
+                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("1")), realm: equivalencyUnitObj.realm},
                         convertToEu: map1.get("6").toString().replace(/,/g, ""),
                         notes: map1.get("7"),
                         program: (parseInt(map1.get("8")) == -1 ? null : { id: parseInt(map1.get("8")) }),
