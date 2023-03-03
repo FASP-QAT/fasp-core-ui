@@ -904,7 +904,7 @@ export default class ManualTagging extends Component {
                         if (j != y && json[j][22] == this.el.getValueFromCoords(22, y, true)) {
                             this.el.setValueFromCoords(11, j, Math.round(this.el.getValueFromCoords(32, j) * rcpu.multiplier), true);
                             this.el.setValueFromCoords(10, j, rcpu.multiplier, true);
-                            this.el.setValueFromCoords(8, j, value, true);
+                            this.el.setValueFromCoords(8, j, rcpu.id, true);
                         }
                     }
                 }
@@ -1958,17 +1958,17 @@ export default class ManualTagging extends Component {
                                     multiplier: rcpu.multiplier
                                 }
 
-                                var batchInfoList = shipmentList[shipmentIndex].batchInfoList;
-                                var batchInfoListOriginal = this.state.languageEl.getValueFromCoords(26, mdf).batchDetailsList;
-                                for (var bi = 0; bi < batchInfoList.length; bi++) {
+                                // var batchInfoList = shipmentList[shipmentIndex].batchInfoList;
+                                // var batchInfoListOriginal = this.state.languageEl.getValueFromCoords(26, mdf).batchDetailsList.filter(c=>c.orderNo==linkedShipmentsList[linkedShipmentsListIndex].orderNo && c.primeLineNo==linkedShipmentsList[linkedShipmentsListIndex].primeLineNo && c.knShipmentNo==linkedShipmentsList[linkedShipmentsListIndex].knShipmentNo);
+                                // for (var bi = 0; bi < batchInfoList.length; bi++) {
 
-                                    var batchInfoListOriginalFilter = batchInfoListOriginal.filter(c => c.batchNo == batchInfoList[bi].batch.batchNo);
-                                    if (batchInfoListOriginalFilter.length > 0) {
-                                        batchInfoList[bi].shipmentQty = Math.round(batchInfoListOriginalFilter[0].quantity);
-                                    }
+                                //     var batchInfoListOriginalFilter = batchInfoListOriginal.filter(c => c.batchNo == batchInfoList[bi].batch.batchNo);
+                                //     if (batchInfoListOriginalFilter.length > 0) {
+                                //         batchInfoList[bi].shipmentQty = Math.round(batchInfoListOriginalFilter[0].quantity);
+                                //     }
 
-                                }
-                                shipmentList[shipmentIndex].batchInfoList = batchInfoList;
+                                // }
+                                // shipmentList[shipmentIndex].batchInfoList = batchInfoList;
                                 if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
                                     minDate = moment(shipmentList[shipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
                                 }
