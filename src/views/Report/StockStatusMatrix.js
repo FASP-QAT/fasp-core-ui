@@ -121,7 +121,7 @@ export default class StockStatusMatrix extends React.Component {
             };
             planningunitRequest.onsuccess = function (e) {
               var myResult = [];
-              myResult = planningunitRequest.result;
+              myResult = planningunitRequest.result.filter(c=>c.active==true);
               var programId = (document.getElementById("programId").value).split("_")[0];
               var proList = []
 
