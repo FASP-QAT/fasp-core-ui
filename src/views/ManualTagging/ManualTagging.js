@@ -1032,16 +1032,16 @@ export default class ManualTagging extends Component {
 
                 if (x == 9) {
                     var col = ("J").concat(parseInt(y) + 1);
-                    value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    var qty = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    value = this.state.instance.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    var qty = this.state.instance.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     if (value == "") {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                        this.state.instance.setStyle(col, "background-color", "transparent");
+                        this.state.instance.setStyle(col, "background-color", "yellow");
+                        this.state.instance.setComments(col, i18n.t('static.label.fieldRequired'));
                     } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                        this.el.setComments(col, "");
+                        this.state.instance.setStyle(col, "background-color", "transparent");
+                        this.state.instance.setComments(col, "");
+                        this.state.instance.setComments(col, "");
                         console.log("this.state.realmCountryPlanningUnitList@@@@@@@@@@@Mohit", this.state.realmCountryPlanningUnitList)
                         console.log("this.state.Value@@@@@@@@@@@Mohit", this.state.instance.getValueFromCoords(9, y))
                         var rcpuFilter = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
@@ -1073,7 +1073,7 @@ export default class ManualTagging extends Component {
 
                 if (x == 13) {
                     var col = ("N").concat(parseInt(y) + 1);
-                    value = this.el.getValue(`N${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    value = this.state.instance.getValue(`N${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     // var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                     // var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     // console.log("x@@@@@@@@@@@@", x)
@@ -1117,7 +1117,7 @@ export default class ManualTagging extends Component {
 
                 // }
                 if (x == 0) {
-                    var checkboxValue = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                    var checkboxValue = this.state.instance.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
 
                     console.log("Json@@@@@@@@@@@@", json)
                     console.log("Json@@@@@@@@@@@@", json.length)
@@ -1723,8 +1723,8 @@ export default class ManualTagging extends Component {
                     planningUnits: [],
                     planningUnitsBasedOnTracerCategory: [],
                     notLinkedShipments: [],
-                    outputList:[],
-                    selectedShipment:[]
+                    outputList: [],
+                    selectedShipment: []
                 })
             }
         })
@@ -2234,7 +2234,7 @@ export default class ManualTagging extends Component {
                                                                 label: paRequest.result.filter(c => c.procurementAgentId == PSM_PROCUREMENT_AGENT_ID)[0].label,
                                                                 code: paRequest.result.filter(c => c.procurementAgentId == PSM_PROCUREMENT_AGENT_ID)[0].procurementAgentCode
                                                             },
-                                                            productCost: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price/rcpu.multiplier).toFixed(6)) * Number(shipmentQty),//Final cost
+                                                            productCost: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)) * Number(shipmentQty),//Final cost
                                                             shipmentQty: Math.round(shipmentQty),
                                                             shipmentRcpuQty: Math.round(shipmentARUQty),
                                                             realmCountryPlanningUnit: {
@@ -2242,7 +2242,7 @@ export default class ManualTagging extends Component {
                                                                 label: rcpu.label,
                                                                 multiplier: rcpu.multiplier
                                                             },
-                                                            rate: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price/rcpu.multiplier).toFixed(6)),//Price per planning unit
+                                                            rate: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)),//Price per planning unit
                                                             shipmentId: 0,
                                                             shipmentMode: (tableJson[y][16].shipBy == "Land" || tableJson[y][16].shipBy == "Ship" ? "Sea" : tableJson[y][16].shipBy == "Air" ? "Air" : "Sea"),//Yeh
                                                             shipmentStatus: tableJson[y][15],
@@ -2337,7 +2337,7 @@ export default class ManualTagging extends Component {
                                                         planningUnit: shipmentList[shipmentIndex].planningUnit,
 
                                                         procurementAgent: shipmentList[shipmentIndex].procurementAgent,
-                                                        productCost: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price/rcpu.multiplier).toFixed(6)) * Number(shipmentQty),//Final cost
+                                                        productCost: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)) * Number(shipmentQty),//Final cost
                                                         shipmentQty: Math.round(shipmentQty),
                                                         shipmentRcpuQty: Math.round(shipmentARUQty),
                                                         realmCountryPlanningUnit: {
@@ -2345,7 +2345,7 @@ export default class ManualTagging extends Component {
                                                             label: rcpu.label,
                                                             multiplier: rcpu.multiplier
                                                         },
-                                                        rate: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price/rcpu.multiplier).toFixed(6)),//Price per planning unit
+                                                        rate: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)),//Price per planning unit
                                                         shipmentId: 0,
                                                         shipmentMode: (getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Land" || getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Ship" ? "Sea" : getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Air" ? "Air" : "Sea"),//Yeh
                                                         shipmentStatus: getUniqueOrderNoAndPrimeLineNoList[uq][15],
@@ -4758,16 +4758,16 @@ export default class ManualTagging extends Component {
                                     planningUnit: c.planningUnit
                                 })
                             })
-                            console.log("List Array Test",listArray)
-                            console.log("Test planning unit Id",listArray.filter(c=>c.planningUnit.id==document.getElementById("planningUnitId1").value).length)
-                            if(listArray.filter(c=>c.planningUnit.id==document.getElementById("planningUnitId1").value).length==0){
-                                document.getElementById("planningUnitId1").value=-1;
+                            console.log("List Array Test", listArray)
+                            console.log("Test planning unit Id", listArray.filter(c => c.planningUnit.id == document.getElementById("planningUnitId1").value).length)
+                            if (listArray.filter(c => c.planningUnit.id == document.getElementById("planningUnitId1").value).length == 0) {
+                                document.getElementById("planningUnitId1").value = -1;
                             }
                             this.setState({
                                 planningUnitsBasedOnTracerCategory: listArray,
                                 realmCountryPlanningUnitList: rcpuList
                             }, () => {
-                                if(this.state.active3){
+                                if (this.state.active3) {
                                     this.displayShipmentData();
                                 }
                                 this.getNotLinkedShipments();

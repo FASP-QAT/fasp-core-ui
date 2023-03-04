@@ -1133,6 +1133,7 @@ export default class syncPage extends Component {
       }
       shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => (c.shipmentId == 0 && c.erpFlag == true) || (c.shipmentId == 0 && c.active.toString() == "true")));
 
+      console.log("shipmentData Test@@@123", shipmentData)
       //Make all active erp shipments not active
       shipmentData.map((item, index) => {
         if (item.erpFlag.toString() == "true") {
@@ -1148,17 +1149,37 @@ export default class syncPage extends Component {
           linkedShipmentListLocal.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) == shipmentLinkedJson[c][0]).map(item1 => {
             item1.active = false;
           });
-          linkedShipmentListLocal = linkedShipmentListLocal.concat(linkedShipmentListServer.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) == shipmentLinkedJson[c][0]));
+          linkedShipmentListServer.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) == shipmentLinkedJson[c][0]).map(item => {
+            var linkedServerIndex = linkedShipmentListLocal.findIndex(d => item.shipmentLinkingId == d.shipmentLinkingId);
+            if (linkedServerIndex == -1) {
+              linkedShipmentListLocal.push(item)
+            } else {
+              linkedShipmentListLocal[linkedServerIndex] = item
+            }
+          })
 
-          if (shipmentLinkedJson[c][15].toString() == "true") {
-            var listOfChildShipments = linkedShipmentListServer.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) == shipmentLinkedJson[c][0]);
-            listOfChildShipments.map(item => {
-              var shipmentIndex1 = shipmentData.findIndex(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
-              var latestShipmentIndex = latestProgramDataShipment.findIndex(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
-              shipmentData[shipmentIndex1] = latestProgramDataShipment[latestShipmentIndex];
+
+          // if (shipmentLinkedJson[c][15].toString() == "true") {
+          var listOfChildShipments = linkedShipmentListServer.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) == shipmentLinkedJson[c][0]);
+          listOfChildShipments.map(item => {
+            var shipmentIndex1 = shipmentData.findIndex(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
+            var latestShipmentIndex = latestProgramDataShipment.findIndex(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
+            shipmentData[shipmentIndex1] = latestProgramDataShipment[latestShipmentIndex];
+            console.log("Item Test@@@123", item)
+            console.log("Shipment data Test@@@123", shipmentData)
+            var listOfLinkedParentShipments = latestProgramDataShipment.filter(c => item.parentShipmentId > 0 ? (c.parentLinkedShipmentId == item.parentShipmentId) : (c.tempParentLinkedShipmentId == item.tempParentShipmentId));
+            console.log("listOfLinkedParentShipments Test@@@123", listOfLinkedParentShipments)
+            listOfLinkedParentShipments.map(item1 => {
+
+              var shipmentIndex2 = shipmentData.findIndex(c => item1.shipmentId > 0 ? c.shipmentId == item1.shipmentId : c.tempShipmentId == item1.tempShipmentId);
+              var latestShipmentIndex2 = latestProgramDataShipment.findIndex(c => item1.shipmentId > 0 ? c.shipmentId == item1.shipmentId : c.tempShipmentId == item1.tempShipmentId);
+              shipmentData[shipmentIndex2] = latestProgramDataShipment[latestShipmentIndex2];
 
             })
-          }
+
+          })
+
+          // }
         }
         // if (shipmentLinkedJson[c][21] == 4 && shipmentLinkedJson[c][18] != shipmentLinkedJson[c][19]) {
         //   var existingList = linkedShipmentListServer.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) == shipmentLinkedJson[c][0]);
@@ -1197,10 +1218,11 @@ export default class syncPage extends Component {
           console.log("Item1Test@@@123", item1)
           var parentShipmentId = item1.parentShipmentId;
           var tempParentShipmentId = item1.tempParentShipmentId;
-          var checkIfThereAreAnyActiveChildShipments = shipmentData.filter(c => c.active.toString() == "true" && c.erpFlag.toString() == "true" && (parentShipmentId > 0 ? c.parentShipmentId == parentShipmentId : c.tempParentShipmentId == tempParentShipmentId));
+          console.log("Shipment Data Test@@@123", shipmentData);
+          var checkIfThereAreAnyActiveChildShipments = shipmentData.filter(c => c.active.toString() == "true" && c.erpFlag.toString() == "true" && (parentShipmentId > 0 ? (c.parentShipmentId == parentShipmentId) : (c.tempParentShipmentId == tempParentShipmentId)));
           console.log("checkIfThereAreAnyActiveChildShipments Test@@@123", checkIfThereAreAnyActiveChildShipments);
           if (checkIfThereAreAnyActiveChildShipments.length == 0) {
-            var shipmentIndex1 = shipmentData.findIndex(c => parentShipmentId > 0 ? c.shipmentId == parentShipmentId : c.shipmentId == tempParentShipmentId);
+            var shipmentIndex1 = shipmentData.findIndex(c => parentShipmentId > 0 ? (c.shipmentId > 0 ? (c.shipmentId == parentShipmentId) : (c.tempShipmentId == parentShipmentId)) : (c.shipmentId > 0 ? (c.shipmentId == tempParentShipmentId) : (c.tempShipmentId == tempParentShipmentId)));
             shipmentData[shipmentIndex1].active = true;
             shipmentData[shipmentIndex1].erpFlag = false;
             // Activate linked parent shipment Id
@@ -2636,6 +2658,7 @@ export default class syncPage extends Component {
                                             // console.log("latestProgramDataShipmentLinked@@@@@@@@@@@@@", latestProgramDataShipmentLinked)
                                             console.log("oldProgramDataShipmentLinked Test@@@123 @@@@@@@@@@@@@", oldProgramData.shipmentLinkingList)
                                             var downloadedProgramDataShipmentLinked = downloadedProgramData.shipmentLinkingList != null ? downloadedProgramData.shipmentLinkingList : [];
+                                            console.log("downloadedProgramDataShipmentLinked Test@@@123", downloadedProgramDataShipmentLinked)
 
                                             // var modifiedShipmentIds = []
                                             // latestProgramDataShipment.filter(c => c.versionId > oldProgramData.currentVersion.versionId || moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => { modifiedShipmentIds.push(item.shipmentId) });
@@ -3587,7 +3610,11 @@ export default class syncPage extends Component {
     // }
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD']
     elInstance.options.editable = true;
+    var localDataChanged = 0;
+    var serverDataChanged = 0;
     for (var c = 0; c < jsonLength; c++) {
+      localDataChanged = 0;
+      serverDataChanged = 0;
       elInstance.setStyle(("I").concat(parseInt(c) + 1), "pointer-events", "");
       elInstance.setStyle(("P").concat(parseInt(c) + 1), "pointer-events", "");
       elInstance.setStyle(("I").concat(parseInt(c) + 1), "pointer-events", "none");
@@ -3655,6 +3682,7 @@ export default class syncPage extends Component {
               var col = ("K").concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+              serverDataChanged += 1;
             } else if (jsonData[c][10] == jsonData[c][30]) {
               this.setState({
                 isChanged: true
@@ -3663,6 +3691,7 @@ export default class syncPage extends Component {
               var col = ("D").concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+              localDataChanged += 1;
             } else {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1,
@@ -3687,6 +3716,7 @@ export default class syncPage extends Component {
               var col = ("L").concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+              serverDataChanged += 1;
             } else if (jsonData[c][11] == jsonData[c][31]) {
               this.setState({
                 isChanged: true
@@ -3695,6 +3725,7 @@ export default class syncPage extends Component {
               var col = ("E").concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+              localDataChanged += 1;
             } else {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1,
@@ -3712,7 +3743,7 @@ export default class syncPage extends Component {
             if (jsonData[c][8].toString() == "true" && jsonData[c][15].toString() == "true") {
               if (jsonData[c][5].toString() == jsonData[c][12].toString()) {
 
-              } else if (jsonData[c][5].toString() == jsonData[c][32].toString()) {
+              } else if (jsonData[c][5].toString() == jsonData[c][32].toString() && jsonData[c][35].toString() == "true") {
                 this.setState({
                   isChanged: true
                 })
@@ -3720,7 +3751,8 @@ export default class syncPage extends Component {
                 var col = ("M").concat(parseInt(c) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-              } else if (jsonData[c][12].toString() == jsonData[c][32].toString()) {
+                serverDataChanged += 1;
+              } else if (jsonData[c][12].toString() == jsonData[c][32].toString() && jsonData[c][35].toString() == "true") {
                 this.setState({
                   isChanged: true
                 })
@@ -3728,6 +3760,7 @@ export default class syncPage extends Component {
                 var col = ("F").concat(parseInt(c) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                localDataChanged += 1;
               } else {
                 this.setState({
                   conflictsCount: this.state.conflictsCount + 1,
@@ -3753,6 +3786,7 @@ export default class syncPage extends Component {
               var col = ("N").concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+              serverDataChanged += 1;
             } else if (jsonData[c][13].toString() == jsonData[c][33].toString()) {
               this.setState({
                 isChanged: true
@@ -3761,6 +3795,7 @@ export default class syncPage extends Component {
               var col = ("G").concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+              localDataChanged += 1;
             } else {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1,
@@ -3785,6 +3820,7 @@ export default class syncPage extends Component {
               var col = ("P").concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+              serverDataChanged += 1;
             } else if (jsonData[c][15].toString() == jsonData[c][35].toString()) {
               this.setState({
                 isChanged: true
@@ -3793,6 +3829,7 @@ export default class syncPage extends Component {
               var col = ("I").concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+              localDataChanged += 1;
             } else {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1,
@@ -3807,6 +3844,19 @@ export default class syncPage extends Component {
               }
             }
 
+            if (localDataChanged > 0 && serverDataChanged > 0) {
+              this.setState({
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountErp: this.state.conflictsCountErp + 1,
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 1, true);
+              for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+              }
+            }
 
           }
         }
@@ -3867,22 +3917,26 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            if ((jsonData[c])[35] != "" && oldData[j] == downloadedData[j]) {
-              var col = (colArr[j]).concat(parseInt(c) + 1);
-              elInstance.setValueFromCoords(j, c, latestData[j], true);
-              elInstance.setStyle(col, "background-color", "transparent");
-              // console.log("Mohit above latest 1")
-              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-              elInstance.setValueFromCoords(36, c, 3, true);
-              (jsonData[c])[36] = 3;
-            } else if ((jsonData[c])[35] != "" && latestData[j] == downloadedData[j]) {
-              var col = (colArr[j]).concat(parseInt(c) + 1);
-              elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-              elInstance.setValueFromCoords(36, c, 2, true);
-              (jsonData[c])[36] = 2;
-            } else {
-              if (jsonData[c][26].toString() != "true") {
+            if (jsonData[c][26].toString() != "true") {
+              console.log("In if Test@@@123", c)
+              console.log("jsonData[c][26].toString()", jsonData[c][26].toString())
+              if ((jsonData[c])[35] != "" && oldData[j] == downloadedData[j]) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                if (j == 26 && latestData[j].toString() != "true") {
+                  elInstance.setValueFromCoords(j, c, latestData[j], true);
+                  elInstance.setStyle(col, "background-color", "transparent");
+                  // console.log("Mohit above latest 1")
+                  elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+                  elInstance.setValueFromCoords(36, c, 3, true);
+                  (jsonData[c])[36] = 3;
+                }
+              } else if ((jsonData[c])[35] != "" && latestData[j] == downloadedData[j]) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                elInstance.setValueFromCoords(36, c, 2, true);
+                (jsonData[c])[36] = 2;
+              } else {
                 this.setState({
                   conflictsCount: this.state.conflictsCount + 1
                 })
