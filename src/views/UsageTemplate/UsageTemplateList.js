@@ -976,7 +976,7 @@ class usageTemplate extends Component {
                     type: 'autocomplete',
                     width: '130',
                     source: this.state.dimensionList,
-                    readOnly: (this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) ? false : true //8 I
+                    readOnly: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? false : true //8 I
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
@@ -1282,7 +1282,7 @@ class usageTemplate extends Component {
                         var userId = rowData[22];
                         var curUser = AuthenticationService.getLoggedInUserId();
                         // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0)))) {
-                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && !roleArray.includes('ROLE_REALM_ADMIN')) && (typeId == -1 && typeId != 0)) {
+                        if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
 
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -1319,7 +1319,7 @@ class usageTemplate extends Component {
 
                         }
 
-                        if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+                        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1422,7 +1422,7 @@ class usageTemplate extends Component {
                         var userId = rowData[22];
                         var curUser = AuthenticationService.getLoggedInUserId();
                         // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0)))) {
-                        if ((roleArray.includes('ROLE_DATASET_ADMIN') && !roleArray.includes('ROLE_REALM_ADMIN')) && (typeId == -1 && typeId != 0)) {
+                        if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
 
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -1459,7 +1459,7 @@ class usageTemplate extends Component {
 
                         }
 
-                        if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+                        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1508,7 +1508,7 @@ class usageTemplate extends Component {
             //     entries: '',
             // },
             onchangepage: this.onchangepage,
-            editable: (this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) ? true : false,
+            editable: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? true : false,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -1534,9 +1534,8 @@ class usageTemplate extends Component {
                         }
 
                         var typeId = this.el.getValueFromCoords(19, y);
-                        let roleArray = this.state.roleArray;
 
-                        if (!this.el.getValueFromCoords(10, y) && !(roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                        if (!this.el.getValueFromCoords(10, y) && ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && typeId == -1 && typeId != 0)) {
                             items.push({
                                 title: i18n.t('static.usageTemplate.calculateUsageFrequency'),
                                 onclick: function () {
@@ -2224,7 +2223,7 @@ class usageTemplate extends Component {
         // console.log("myList--------->2", mylist);
         // console.log("myList--------->3", this.state.forecastingUnitList);
         var mylist = this.state.typeList;
-        if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
+        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) {
             mylist.splice(0, 1);
         }
         return mylist;
@@ -2738,7 +2737,7 @@ class usageTemplate extends Component {
             var userId = rowData[22];
 
             // if ((roleArray.includes('ROLE_DATASET_ADMIN') && (typeId == -1 && typeId != 0)) || (!roleArray.includes('ROLE_REALM_ADMIN') && (typeId == -1 && typeId != 0 || userId != ""))) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && !roleArray.includes('ROLE_REALM_ADMIN')) && (typeId == -1 && typeId != 0)) {
+            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
 
                 // console.log("roleArrayinsideIf--------->onchangepage", roleArray, "---", userId);
 
@@ -2777,7 +2776,7 @@ class usageTemplate extends Component {
 
             }
 
-            if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+            if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -2946,7 +2945,7 @@ class usageTemplate extends Component {
             var userId = rowData[22];
             var curUser = AuthenticationService.getLoggedInUserId();
             // if ((roleArray.includes('ROLE_DATASET_ADMIN') && ((typeId == -1 && typeId != 0))) || (!roleArray.includes('ROLE_REALM_ADMIN') && ((typeId == -1 && typeId != 0) || curUser != userId))) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && !roleArray.includes('ROLE_REALM_ADMIN')) && (typeId == -1 && typeId != 0)) {
+            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
 
                 // console.log("roleArrayinsideIf--------->2", elInstance);
 
@@ -2985,7 +2984,7 @@ class usageTemplate extends Component {
 
             }
 
-            if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+            if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -3504,7 +3503,7 @@ class usageTemplate extends Component {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.program.validvaluetext'));
-                        }else if(value.toString().length>10){
+                        } else if (value.toString().length > 10) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
@@ -3773,7 +3772,7 @@ class usageTemplate extends Component {
         let roleArray = this.state.roleArray;
 
         if (x == 19) {
-            if ((roleArray.includes('ROLE_DATASET_ADMIN') && value == -1 && value != 0)) {
+            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && value == -1 && value != 0)) {
                 var cell1 = this.el.getCell(("B").concat(parseInt(y) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = this.el.getCell(("C").concat(parseInt(y) + 1))
@@ -3807,7 +3806,7 @@ class usageTemplate extends Component {
         }
 
 
-        if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
             var cell1 = this.el.getCell(("B").concat(parseInt(y) + 1))
             cell1.classList.add('readonly');
             var cell1 = this.el.getCell(("C").concat(parseInt(y) + 1))
@@ -4639,7 +4638,7 @@ class usageTemplate extends Component {
                                     () => {
                                         this.hideSecondComponent();
                                     })
-                            }else if(value.toString().length>10){
+                            } else if (value.toString().length > 10) {
                                 this.el.setStyle(col, "background-color", "transparent");
                                 this.el.setStyle(col, "background-color", "yellow");
                                 this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
@@ -4924,7 +4923,7 @@ class usageTemplate extends Component {
                         </Col>
                     </CardBody>
                     <CardFooter>
-                        {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
+                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isChanged1 &&
@@ -5109,7 +5108,7 @@ class usageTemplate extends Component {
                                                     </CardBody>
 
                                                     <CardFooter>
-                                                        {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
+                                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
                                                             <FormGroup>
                                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
