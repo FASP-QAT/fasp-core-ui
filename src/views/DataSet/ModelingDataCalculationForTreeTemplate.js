@@ -210,8 +210,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 //Linear number
                                 if (nodeDataModeling.modelingType.id == 2 || nodeDataModeling.modelingType.id == 5) {
                                     if (nodeDataModeling.transferNodeDataId > 0) {
-                                        transfer += Number(nodeDataModelingValue);
-                                        transferWMC += Number(nodeDataModelingValue);
+                                        transfer = Number(nodeDataModelingValue);
+                                        transferWMC = Number(nodeDataModelingValue);
                                         if (endValue + Number(nodeDataModelingValue) >= 0) {
                                             endValue += Number(nodeDataModelingValue);
                                             endValueWMC += Number(nodeDataModelingValue);
@@ -265,8 +265,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         }
                                     }
                                     if (nodeDataModeling.transferNodeDataId > 0) {
-                                        transfer += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
-                                        transferWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                        transfer = Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                        transferWMC = Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
                                         console.log("Transfer+++++++++++++@@@@@", transfer);
                                         if (endValue + Number((Number(dv) * Number(nodeDataModelingValue)) / 100) >= 0) {
                                             endValue += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
@@ -303,8 +303,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 //Exponential %
                                 else if (nodeDataModeling.modelingType.id == 4) {
                                     if (nodeDataModeling.transferNodeDataId > 0) {
-                                        transfer += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
-                                        transferWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        transfer = Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        transferWMC = Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
                                         if (endValue + Number((Number(startValue) * Number(nodeDataModelingValue)) / 100) >= 0) {
                                             endValue += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
                                             endValueWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
