@@ -67,6 +67,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             show: false,
             loading: true,
             defaultTimeWindow: true,
+            yaxisEquUnit:0,
+            isEquUnitChecked:false,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 }
@@ -748,11 +750,17 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var falg = event.target.checked ? 1 : 0
         if (falg) {
             this.setState({
+                isEquUnitChecked:true
             }, () => {
                 this.getEquivalencyUnitData();
             })
         } else {
             document.getElementById("equivelencyUnitDiv").style.display = "none";
+            this.setState({
+                isEquUnitChecked:false
+            }, () => {
+                this.fetchData();
+            })
         }
     }
 
@@ -1035,7 +1043,13 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         let equivalencyUnitId = -1;
         let planningUnitId = -1;
         let forecastingUnitId = -1;
-        equivalencyUnitId = document.getElementById("yaxisEquUnit").value;
+        var FilterEquivalencyUnit="";
+        var equivalencyUnitLable="";
+        equivalencyUnitId = this.state.isEquUnitChecked?document.getElementById("yaxisEquUnit").value:0;
+        if(equivalencyUnitId>0){
+            FilterEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == equivalencyUnitId);
+            equivalencyUnitLable=FilterEquivalencyUnit[0].equivalencyUnit.label.label_en;
+        }
         planningUnitId = document.getElementById("planningUnitId").value
         forecastingUnitId = document.getElementById("forecastingUnitId").value;
         var planningUnitIdList = [];
@@ -1280,7 +1294,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     this.setState({
                                         monthArray: monthArray,
                                         dataList: dataList,
-                                        consumptionAdjForStockOutId: consumptionAdjForStockOutId
+                                        consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                                        yaxisEquUnit:equivalencyUnitId,
+                                        equivalencyUnitLabel:equivalencyUnitLable
                                     })
                                 }.bind(this);
                             }.bind(this);
@@ -1461,7 +1477,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             this.setState({
                                 monthArray: monthArray,
                                 dataList: dataList,
-                                consumptionAdjForStockOutId: consumptionAdjForStockOutId
+                                consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                                yaxisEquUnit:equivalencyUnitId,
+                                equivalencyUnitLabel:equivalencyUnitLable
                             })
                             // }
                             console.log("DATALIST--->", this.state.dataList)
@@ -1469,17 +1487,16 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     }.bind(this);
                 } if (equivalencyUnitId > 0) // View by EquivalencyUnit 
                 {
-                    var equivalencyUnitList = this.state.equivalencyUnitList;
                     var eqDataList = this.state.dataList;
                     console.log("Seema eqDataList---->",eqDataList)
-                    var filteredequivalencyUnit = equivalencyUnitList.filter(c => c.equivalencyUnitId);
+                    var filteredequivalencyUnit = FilterEquivalencyUnit[0];
                     for (var con = 0; con <= eqDataList.length; con++) {
-                        // if (eqDataList[con].actualQty >= 0) {
-                        //     eqDataList[con].actualQty = eqDataList[con].actualQty * filteredequivalencyUnit.convertToEu;
-                        // }
-                        // if (eqDataList[con].forecastQty >= 0) {
-                        //     eqDataList[con].forecastQty = eqDataList[con].forecastQty * filteredequivalencyUnit.convertToEu;
-                        // }
+                        if (eqDataList[con].actualQty >= 0) {
+                            eqDataList[con].actualQty = eqDataList[con].actualQty * filteredequivalencyUnit.convertToEu;
+                        }
+                        if (eqDataList[con].forecastQty >= 0) {
+                            eqDataList[con].forecastQty = eqDataList[con].forecastQty * filteredequivalencyUnit.convertToEu;
+                        }
                     }
                     this.setState({
                         dataList: eqDataList
@@ -1526,7 +1543,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             monthArray: monthArray,
                             consumptionAdjForStockOutId: consumptionAdjForStockOutId,
                             message: '',
-                            loading: false
+                            loading: false,
+                            yaxisEquUnit:equivalencyUnitId,
+                            equivalencyUnitLabel:equivalencyUnitLable
                         })
                         // , () => {
                         //     this.hideFirstComponent();
@@ -2252,7 +2271,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 data: this.state.dataList.map(item => (item.errorPerc !== "" ? item.errorPerc*100 : null)),
                 type: 'line',
                 yAxisID: 'B',
-                backgroundColor: (this.state.yaxisEquUnit > 0 ? '#002F6C' : 'transparent'),
+                // backgroundColor: (this.state.yaxisEquUnit > 0 ? '#002F6C' : 'transparent'),
+                backgroundColor: 'transparent',
                 borderColor: '#EDB944',
                 borderStyle: 'dotted',
                 borderWidth: 5,
