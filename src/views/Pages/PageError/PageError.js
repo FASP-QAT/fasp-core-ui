@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Col, Container, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
+import { Button, Col, Container, Input, InputGroup, InputGroupAddon, InputGroupText, Row,Form,FormGroup } from 'reactstrap';
 import AuthenticationService from '../../Common/AuthenticationService';
 import JiraTikcetService from '../../../api/JiraTikcetService';
 import i18n from '../../../i18n';
@@ -9,6 +9,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import ErrorMessageImg from '../../../../src/assets/img/errorImg.png'
 import ErrorMessageBg from '../../../../src/assets/img/E1.png'
 import { size } from 'mathjs';
+import { DropdownSearchInput } from 'semantic-ui-react';
 class PageError extends Component {
   constructor(props) {
       super(props);
@@ -17,7 +18,8 @@ class PageError extends Component {
             summary: "",
             description: '',
             file: '',
-            attachFile: ''
+            attachFile: '',
+            userComments:''
         },
         message: '',
         loading: false
@@ -39,11 +41,14 @@ class PageError extends Component {
 
   submitBug(e){
     let desc = "\nError Page - "+e.location.state.errorPage+"\nError Stack - "+e.location.state.errorStack;
+    let userComments= ""+document.getElementById("userComments").value;
+    console.log("userComments",userComments)
     let { bugReport } = this.state;
         bugReport.summary = e.location.state.errorMessage;
         bugReport.description = desc;
         bugReport.file = '';
         bugReport.attachFile = '';
+        bugReport.userComments=userComments;
         this.setState({
             bugReport
         },
@@ -136,6 +141,15 @@ class PageError extends Component {
                   <Button color="primary" onClick={()=>this.props.history.push(`/ApplicationDashboard/` + AuthenticationService.displayDashboardBasedOnRole())}>Return to Dashboard</Button>
                 </InputGroupAddon>
               </InputGroup>
+
+              <FormGroup className='mt-4'>
+                    <InputGroup>
+                      <Input type="textarea" id="userComments" name="userComments" placeholder="Your Comments here!"/>
+                    </InputGroup>
+                  </FormGroup>
+
+
+
               <Button color="primary" onClick={()=>this.submitBug(this.props)} className='mt-2'>Raise a Ticket</Button>
             </Col>
           </Row>
