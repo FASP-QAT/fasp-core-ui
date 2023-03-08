@@ -1631,10 +1631,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   hideFirstComponent() {
+    try{
     document.getElementById('div1').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
     }, 30000);
+  }catch(Expection){}
   }
 
   hideSecondComponent() {
@@ -2060,7 +2062,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var myResult = [];
         myResult = getRequest.result;
         console.log("")
-        var datasetList = this.state.datasetList;
+        var datasetList = [];
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var mr = 0; mr < myResult.length; mr++) {

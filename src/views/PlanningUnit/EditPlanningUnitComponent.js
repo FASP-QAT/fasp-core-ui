@@ -352,7 +352,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                 </FormGroup>
-                                                {/* <FormGroup>
+                                                <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
@@ -370,7 +370,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
                                                         <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             className="form-check-input"

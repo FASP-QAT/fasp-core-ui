@@ -1114,6 +1114,7 @@ export default class BuildTree extends Component {
     }
 
     getMissingPuListBranchTemplate() {
+        if(this.state.branchTemplateId!=""){
         console.log("In function Test@@@@@@@@@")
         var missingPUList = [];
         var json;
@@ -1149,6 +1150,14 @@ export default class BuildTree extends Component {
         }, () => {
             this.buildMissingPUJexcel();
         });
+    }else{
+        this.el = jexcel(document.getElementById("missingPUJexcel"), '');
+            // this.el.destroy();
+        jexcel.destroy(document.getElementById("missingPUJexcel"), true);
+        this.setState({
+            missingPUList:[]
+        })
+    }
     }
 
     getMomValueForDateRange(startDate) {
@@ -1246,6 +1255,9 @@ export default class BuildTree extends Component {
                     if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
                         currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
                     }
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
+                }
+                if(type==2){
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
                 }
             }
@@ -6226,10 +6238,10 @@ export default class BuildTree extends Component {
         } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
             console.log("inside else if no fu");
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
-                noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/(this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             } else {
                 console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
-                noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/(this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             }
             // noOfMonthsInUsagePeriod = noOfFUPatient;
         }
@@ -6921,8 +6933,8 @@ export default class BuildTree extends Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var planningunitTransaction = db1.transaction(['branchTemplate'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('branchTemplate');
+            var planningunitTransaction = db1.transaction(['treeTemplate'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('treeTemplate');
             var planningunitRequest = planningunitOs.getAll();
             var planningList = []
             planningunitRequest.onerror = function (event) {
@@ -6933,9 +6945,15 @@ export default class BuildTree extends Component {
                 myResult = planningunitRequest.result;
                 var nodeTypeList = [];
                 var nodeType = this.state.nodeTypeList.filter(c => c.id == nodeTypeId)[0];
+                var possibleNodeTypes="";
                 for (let i = 0; i < nodeType.allowedChildList.length; i++) {
                     // console.log("Branch allowed value---", nodeType.allowedChildList[i]);
                     var obj = this.state.nodeTypeList.filter(c => c.id == nodeType.allowedChildList[i])[0];
+                    if(i!=nodeType.allowedChildList.length-1){
+                        possibleNodeTypes+=(getLabelText(obj.label,this.state.lang)+" "+i18n.t('static.tree.node'))+" "+i18n.t('static.common.and')+" ";
+                    }else{
+                        possibleNodeTypes+=(getLabelText(obj.label,this.state.lang)+" "+i18n.t('static.tree.node'));
+                    }
                     nodeTypeList.push(nodeType.allowedChildList[i]);
                 }
                 // console.log("Branch nodeType list---", nodeTypeList);
@@ -6957,7 +6975,9 @@ export default class BuildTree extends Component {
                     fullBranchTemplateList,
                     branchTemplateList,
                     isBranchTemplateModalOpen: true,
-                    parentNodeIdForBranch: itemConfig.id
+                    parentNodeIdForBranch: itemConfig.id,
+                    nodeTypeParentNode:getLabelText(nodeType.label,this.state.lang),
+                    possibleNodeTypes:possibleNodeTypes
                 }, () => {
 
                 })
@@ -7678,7 +7698,7 @@ console.log("Seema selected",document.getElementById("scenarioId"))
         if (event.target.name === "sharePlanningUnit") {
             console.log("event.target.name", event.target.value);
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = event.target.id === "sharePlanningUnitFalse" ? false : true;
-            this.qatCalculatedPUPerVisit(0);
+            this.qatCalculatedPUPerVisit(2);
             this.getUsageText();
         }
         if (event.target.name === "refillMonths") {
@@ -9501,7 +9521,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                                                 bsSize="sm"
                                                                 className="mr-2"
                                                                 readOnly={true}
-                                                                value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? this.round((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : this.round(this.state.noFURequired / this.state.conversionFactor))}>
+                                                                value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? parseFloat((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor).toFixed(4) : (this.state.noFURequired / this.state.conversionFactor))}>
 
                                                             </Input>
                                                             {/* </FormGroup>
@@ -9512,7 +9532,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                                                 bsSize="sm"
                                                                 disabled="true"
                                                                 onChange={(e) => { this.dataChange(e) }}
-                                                                value={this.state.currentScenario.puNode.planningUnit.unit.id}>
+                                                                value={this.state.planningUnitList.filter(c=>c.id==this.state.currentScenario.puNode.planningUnit.id).length>0?this.state.planningUnitList.filter(c=>c.id==this.state.currentScenario.puNode.planningUnit.id)[0].unit.id:""}>
 
                                                                 <option value=""></option>
                                                                 {this.state.unitList.length > 0
@@ -10220,7 +10240,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr> */}
                                                         <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriodPerPatient')}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriodPerPatient')+" "+ this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noFURequired)}</td>
                                                         </tr>
                                                     </table>}
@@ -11337,7 +11357,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                 </button>}
 
                         </>}
-                    {/* {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                    {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
 
                         <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -11347,7 +11367,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                             }}>
                             <i class="fa fa-sitemap" aria-hidden="true"></i>
                         </button>
-                    } */}
+                    }
                     {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -12020,7 +12040,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                                                 <FormGroup className="col-md-3 pt-lg-4">
 
                                                                     {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 && <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                                 </FormGroup>
                                                             </Row>
                                                         </Form>
@@ -12245,7 +12265,8 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                             <div>
                                                 <div className='row'>
                                                     <FormGroup className="col-md-12">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dataset.BranchTreeTemplate')}<span className="red Reqasterisk">*</span></Label>
+                                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.dataset.BranchTreeTemplate')}<span className="red Reqasterisk">*</span></Label><br/> */}
+                                                        <p>{i18n.t('static.tree.branchTemplateNotes1')+" "}<b>{this.state.nodeTypeParentNode}</b>{" "+i18n.t('static.tree.branchTemplateNotes2')}{" "}<b>{this.state.possibleNodeTypes.toString()}</b>{" "+i18n.t('static.tree.branchTemplateNotes3')}<a href="/#/dataset/listTreeTemplate">{" "+i18n.t('static.dataset.TreeTemplate')}</a>{" "+i18n.t('static.tree.branchTemplateNotes4')}</p>
                                                         <div className="controls">
 
                                                             <Input

@@ -1889,7 +1889,7 @@ class CompareAndSelectScenario extends Component {
                 var datasetForEncryption = datasetJson;
                 var planningUnitList = datasetJson.planningUnitList;
                 var planningUnitList1 = planningUnitList;
-                var index = planningUnitList.findIndex(c => c.planningUnit.id == this.state.planningUnitId);
+                var index = planningUnitList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.active.toString()=="true");
                 // let map1 = new Map();
                 // map1.set(Number(this.state.regionId), { "scenarioId": scenarioId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": this.state.totalArray[0] / this.state.multiplier })
 

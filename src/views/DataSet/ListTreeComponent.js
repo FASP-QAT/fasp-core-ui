@@ -836,7 +836,7 @@ export default class ListTreeComponent extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                var treeTemplateList = myResult.filter(x => x.active == true);
+                var treeTemplateList = myResult.filter(x => x.active == true && (x.flatList.filter(c=>c.parent ==null)[0].payload.nodeType.id==2 || x.flatList.filter(c=>c.parent ==null)[0].payload.nodeType.id==1));
                 treeTemplateList.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -985,13 +985,16 @@ export default class ListTreeComponent extends Component {
                         })
                     }
                     else if (localStorage.getItem("sesDatasetId") != '' && localStorage.getItem("sesDatasetId") != undefined) {
+                        console.log("Seema localStorage.getItem-sesDatasetId------------------>",localStorage.getItem("sesDatasetId"));
+                        var datasetarr = localStorage.getItem("sesDatasetId").split('_');
+                        var datasetId=datasetarr[0];
                         this.setState({
                             datasetList: proList.sort(function (a, b) {
                                 a = (a.programCode).toLowerCase();
                                 b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
-                            datasetId: localStorage.getItem("sesDatasetId"),
+                            datasetId: datasetId,
                             loading: false,
                             downloadedProgramData: downloadedProgramData,
                         }, () => {

@@ -1192,7 +1192,7 @@ class ForecastSummary extends Component {
                             let tempData = [];
 
 
-                            let treeList = filteredProgram.treeList;
+                            let treeList = filteredProgram.treeList.filter(c => c.active == true);;
                             let regionList = filteredProgram.regionList;
                             let consumptionExtrapolation = filteredProgram.consumptionExtrapolation;
 
@@ -1468,7 +1468,7 @@ class ForecastSummary extends Component {
                                 if (displayId == 2) {
                                     // console.log("langaugeList---->", langaugeList);
                                     let dataArray = [];
-                                    var treeList = this.state.regDatasetJson.treeList;
+                                    var treeList = this.state.regDatasetJson.treeList.filter(c => c.active == true);;
                                     console.log("TreeList+++", treeList)
                                     var consumptionExtrapolation = this.state.regDatasetJson.consumptionExtrapolation;
                                     var tsList = [];
@@ -2972,7 +2972,7 @@ class ForecastSummary extends Component {
                 var planningUnitList1 = planningUnitList;
                 for (var dl = 0; dl < dataList.length; dl++) {
                     console.log("dataList[dl].planningUnit.id+++", dataList[dl].planningUnit.id);
-                    var index = planningUnitList.findIndex(c => c.planningUnit.id == dataList[dl].planningUnit.id);
+                    var index = planningUnitList.findIndex(c => c.planningUnit.id == dataList[dl].planningUnit.id && c.active.toString()=="true");
                     console.log("Index+++", index)
                     console.log("Reg+++", dataList[dl].region.regionId)
                     var pu = planningUnitList1[index];

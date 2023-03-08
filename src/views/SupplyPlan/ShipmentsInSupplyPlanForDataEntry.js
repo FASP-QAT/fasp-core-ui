@@ -594,7 +594,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[17] = shipmentList[i].budget.id;//R
                                                 data[18] = shipmentList[i].currency.currencyId;//S
                                                 data[19] = shipmentList[i].rate != undefined ? Number(shipmentList[i].rate).toFixed(2) : "";//T
-                                                data[20] = `=ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)`;//U
+                                                data[20] = shipmentList[i].erpFlag.toString()=="true"?Number(shipmentList[i].productCost).toFixed(2):`=ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)`;//U
                                                 data[21] = shipmentList[i].freightCost != undefined ? Number(shipmentList[i].freightCost).toFixed(2) : "";//V
 
                                                 data[22] = `=ROUND(ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)+V${parseInt(i) + 1},2)`;
@@ -3491,9 +3491,13 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             var map = new Map(Object.entries(json[y]));
             var rowData = elInstance.getRowData(y);
             if (checkOtherValidation) {
-                var validation = checkValidtion("text", "E", y, rowData[4], elInstance);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("text", "E", y, rowData[4], elInstance);
+                } else {
+                    var validation = true;
+                }
                 if (validation == true) {
-                    if (rowData[4] == SUBMITTED_SHIPMENT_STATUS || rowData[4] == ARRIVED_SHIPMENT_STATUS || rowData[4] == SHIPPED_SHIPMENT_STATUS || rowData[4] == DELIVERED_SHIPMENT_STATUS || rowData[4] == APPROVED_SHIPMENT_STATUS) {
+                    if (rowData[4] == SUBMITTED_SHIPMENT_STATUS || rowData[4] == ARRIVED_SHIPMENT_STATUS || rowData[4] == SHIPPED_SHIPMENT_STATUS || rowData[4] == DELIVERED_SHIPMENT_STATUS || rowData[4] == APPROVED_SHIPMENT_STATUS && json[y][1].toString() == "false") {
                         var budget = rowData[17];
                         var v = checkValidtion("text", "R", y, budget, elInstance);
                         if (v == false) {
@@ -3545,16 +3549,20 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     valid = false;
                 }
 
-                if (rowData[9].length > 50) {
+                if (rowData[9].length > 50 && json[y][1].toString() == "false") {
                     inValid("J", y, i18n.t('static.common.max50digittext'), elInstance);
                     valid = false;
                 } else {
                     positiveValidation("J", y, elInstance)
                 }
-                var validation = checkValidtion("text", "H", y, rowData[7], elInstance);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("text", "H", y, rowData[7], elInstance);
+                } else {
+                    var validation = true;
+                }
                 if (validation == true) {
                     var shipmentStatus = rowData[4];
-                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS && json[y][1].toString() == "false") {
                         if (rowData[7] == TBD_PROCUREMENT_AGENT_ID) {
                             inValid("H", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
                             valid = false;
@@ -3566,10 +3574,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 } else {
                     valid = false;
                 }
-                var validation = checkValidtion("text", "H", y, elInstance.getValueFromCoords(7, y, true), elInstance);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("text", "H", y, elInstance.getValueFromCoords(7, y, true), elInstance);
+                } else {
+                    var validation = true;
+                }
                 if (validation == true) {
                     var shipmentStatus = rowData[4];
-                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS && json[y][1].toString() == "false") {
                         if (rowData[7] == TBD_PROCUREMENT_AGENT_ID) {
                             inValid("H", y, i18n.t('static.supplyPlan.procurementAgentCannotBeTBD'), elInstance);
                             valid = false;
@@ -3581,11 +3593,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 } else {
                     valid = false;
                 }
-
-                var validation = checkValidtion("text", "Q", y, rowData[16], elInstance);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("text", "Q", y, rowData[16], elInstance);
+                } else {
+                    var validation = true;
+                }
                 if (validation == true) {
                     var shipmentStatus = rowData[4];
-                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS) {
+                    if (shipmentStatus == SUBMITTED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == APPROVED_SHIPMENT_STATUS && json[y][1].toString() == "false") {
                         if (rowData[16] == TBD_FUNDING_SOURCE) {
                             inValid("Q", y, i18n.t('static.supplyPlan.fundingSourceCannotBeTBD'), elInstance);
                             valid = false;
@@ -3597,12 +3612,15 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 } else {
                     valid = false;
                 }
-
-                var validation = checkValidtion("dateWithInvalidForShipment", "F", y, rowData[5], elInstance, "", "", "", 5);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("dateWithInvalidForShipment", "F", y, rowData[5], elInstance, "", "", "", 5);
+                } else {
+                    var validation = true;
+                }
                 if (validation == false) {
                     valid = false;
                 } else {
-                    if (rowData[4] == DELIVERED_SHIPMENT_STATUS) {
+                    if (rowData[4] == DELIVERED_SHIPMENT_STATUS && json[y][1].toString() == "false") {
                         var curDate = moment(Date.now()).format("YYYY-MM-DD");
                         var selectedDate = moment(rowData[5]).format("YYYY-MM-DD");
                         if (selectedDate > curDate) {
@@ -3615,7 +3633,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         positiveValidation("F", y, elInstance);
                     }
                 }
-                if (valid && rowData[28] != "") {
+                if (valid && rowData[28] != "" && json[y][1].toString() == "false") {
                     var batchDetails = rowData[28].filter(c => moment(c.batch.expiryDate).format("YYYY-MM") <= moment(rowData[5]).format("YYYY-MM"));
                     if (batchDetails.length > 0) {
                         inValid("F", y, i18n.t('static.shipmentDataEntry.expiryDateMustBeGreaterThanEDD'), elInstance);
@@ -3624,34 +3642,47 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         positiveValidation("F", y, elInstance);
                     }
                 }
-
-                var validation = checkValidtion("text", "X", y, rowData[23], elInstance);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("text", "X", y, rowData[23], elInstance);
+                } else {
+                    var validation = true;
+                }
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(34, y, 1, true);
                 }
 
-                var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("text", "D", y, rowData[3], elInstance);
+                } else {
+                    var validation = true;
+                }
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(34, y, 1, true);
                 }
 
-
-                var validation = checkValidtion("text", "G", y, rowData[6], elInstance);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("text", "G", y, rowData[6], elInstance);
+                } else {
+                    var validation = true;
+                }
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(34, y, 1, true);
                 }
-
-                var validation = checkValidtion("text", "L", y, rowData[11], elInstance);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("text", "L", y, rowData[11], elInstance);
+                } else {
+                    var validation = true;
+                }
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(34, y, 1, true);
                 }
 
                 var value = rowData[4];
-                if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
+                if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS && json[y][1].toString() == "false") {
                     var budget = rowData[17];
                     var validation = checkValidtion("text", "R", y, budget, elInstance);
                     if (validation == false) {
@@ -3667,27 +3698,37 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         elInstance.setValueFromCoords(34, y, 1, true);
                     }
                 }
-
-                var validation = checkValidtion("text", "S", y, rowData[18], elInstance);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("text", "S", y, rowData[18], elInstance);
+                } else {
+                    var validation = true;
+                }
+                if (validation == false) {
+                    valid = false;
+                    elInstance.setValueFromCoords(34, y, 1, true);
+                }
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("number", "T", y, elInstance.getValue(`T${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
+                } else {
+                    var validation = true;
+                }
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(34, y, 1, true);
                 }
 
-                var validation = checkValidtion("number", "T", y, elInstance.getValue(`T${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(34, y, 1, true);
+                if (json[y][1].toString() == "false") {
+                    var validation = checkValidtion("number", "V", y, elInstance.getValue(`V${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
+                } else {
+                    var validation = true;
                 }
-
-                var validation = checkValidtion("number", "V", y, elInstance.getValue(`V${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
                 if (validation == false) {
                     valid = false;
                     elInstance.setValueFromCoords(34, y, 1, true);
                 }
 
                 var shipmentStatus = elInstance.getRowData(y)[4];
-                if (shipmentStatus != CANCELLED_SHIPMENT_STATUS && shipmentStatus != ON_HOLD_SHIPMENT_STATUS) {
+                if (shipmentStatus != CANCELLED_SHIPMENT_STATUS && shipmentStatus != ON_HOLD_SHIPMENT_STATUS && json[y][1].toString() == "false") {
                     // if (shipmentStatus == DELIVERED_SHIPMENT_STATUS || shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) {
                     var totalShipmentQty = (rowData[29]);
                     var adjustedOrderQty = elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
