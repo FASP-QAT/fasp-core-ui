@@ -41,6 +41,7 @@ export default class ProgramList extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
+        this.dataChange = this.dataChange.bind(this);
 
     }
     hideFirstComponent() {
@@ -58,10 +59,14 @@ export default class ProgramList extends Component {
         }, 30000);
     }
 
-
+    dataChange() {
+        localStorage.setItem("FMCountryId", document.getElementById("countryId").value);
+        localStorage.setItem("FMSelStatus", document.getElementById("active").value)
+    }
     filterData() {
-        let countryId = document.getElementById("countryId").value;
-        var selStatus = document.getElementById("active").value;
+        let countryId = localStorage.getItem("FMCountryId") ? localStorage.getItem("FMCountryId") : 0;
+        var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : "";
+        
         console.log("countryId--------->", countryId);
         console.log("selStatus--------->", selStatus);
         if (countryId != 0 && selStatus != "") {
@@ -715,7 +720,8 @@ export default class ProgramList extends Component {
                                                 name="countryId"
                                                 id="countryId"
                                                 bsSize="sm"
-                                                onChange={this.filterData}
+                                                onChange={() => {this.dataChange(); this.filterData() } }
+                                                value={ localStorage.getItem("FMCountryId") }
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
                                                 {countries}
@@ -738,10 +744,11 @@ export default class ProgramList extends Component {
                                                 name="active"
                                                 id="active"
                                                 bsSize="sm"
-                                                onChange={this.filterData}
+                                                onChange={() => {this.dataChange(); this.filterData() } }
+                                                value={localStorage.getItem("FMSelStatus")}
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
-                                                <option value="true" selected>{i18n.t('static.common.active')}</option>
+                                                <option value="true">{i18n.t('static.common.active')}</option>
                                                 <option value="false">{i18n.t('static.common.disabled')}</option>
 
                                             </Input>
