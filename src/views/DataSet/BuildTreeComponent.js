@@ -9137,7 +9137,7 @@ export default class BuildTree extends Component {
                                                         }}
                                                         // step={.01}
                                                         // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
-                                                        value={this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)}
+                                                        value={this.state.currentItemConfig.context.payload.nodeType.id==2 ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)}
                                                     ></Input>
                                                     <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                 </FormGroup>
@@ -9338,7 +9338,7 @@ export default class BuildTree extends Component {
                                                                     handleChange(e);
                                                                     this.dataChange(e)
                                                                 }}
-                                                                value={(this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)) + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
+                                                                value={(this.state.currentItemConfig.context.payload.nodeType.id==2 ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)) + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
                                                             ></Input>
                                                             <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                         </FormGroup>
