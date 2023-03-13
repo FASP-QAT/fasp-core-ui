@@ -40,15 +40,14 @@ class PageError extends Component {
   }
 
   submitBug(e){
-    let desc = "\nError Page - "+e.location.state.errorPage+"\nError Stack - "+e.location.state.errorStack;
-    let userComments= ""+document.getElementById("userComments").value;
+    let userComments= document.getElementById("userComments").value;
+    let desc = "\nUser Comments - "+userComments+"\nError Page - "+e.location.state.errorPage+"\nError Stack - "+e.location.state.errorStack;
     console.log("userComments",userComments)
     let { bugReport } = this.state;
         bugReport.summary = e.location.state.errorMessage;
         bugReport.description = desc;
         bugReport.file = '';
         bugReport.attachFile = '';
-        bugReport.userComments=userComments;
         this.setState({
             bugReport
         },
