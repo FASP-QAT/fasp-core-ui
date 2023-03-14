@@ -1651,8 +1651,19 @@ export default class BuildTree extends Component {
             console.log("my scenario---", scenarioId);
             // console.log("current item --->", items[i]);
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+                console.log("my scenario---INSIDE IF items[i]",items[i]);
+                console.log("my scenario---INSIDE IF items[i].payload",items[i].payload);
+                console.log("my scenario---INSIDE IF items[i].payload.nodeDataMap",items[i].payload.nodeDataMap);
+                console.log("my scenario---INSIDE IF scenarioId",scenarioId);
+                console.log("my scenario---INSIDE IF (items[i].payload.nodeDataMap[scenarioId])",(items[i].payload.nodeDataMap[scenarioId]));
+                console.log("my scenario---INSIDE IF (items[i].payload.nodeDataMap[scenarioId])[0]",(items[i].payload.nodeDataMap[scenarioId])[0]);
+                
+                console.log("my scenario---INSIDE IF (items[i].payload.nodeDataMap[scenarioId])[0].dataValue",(items[i].payload.nodeDataMap[scenarioId])[0].dataValue);
                 (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
+                console.log("my scenario---INSIDE IF Conpleted",items[i]);
+            
             } else {
+                console.log("my scenario---INSIDE ESLE");
                 var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
                 var parentValue = (items[findNodeIndex].payload.nodeDataMap[scenarioId])[0].calculatedDataValue;
                 console.log("api parent value---", parentValue);
@@ -7633,6 +7644,9 @@ export default class BuildTree extends Component {
                 var scenarioId = event.target.value;
                 var scenario = document.getElementById("scenarioId");
                 var selectedText = scenario.options[scenario.selectedIndex].text;
+console.log("Seema scenarioId",scenarioId)
+console.log("Seema selectedText",selectedText)
+console.log("Seema selected",document.getElementById("scenarioId"))
 
                 this.setState({
                     selectedScenario: scenarioId,
@@ -7898,6 +7912,10 @@ export default class BuildTree extends Component {
 
         console.log("anchal 1---", currentItemConfig)
         console.log("anchal 2---", this.state.selectedScenario)
+
+console.log("Seema currentItemConfig",currentItemConfig)
+console.log("Seema [this.state.selectedScenario]",[this.state.selectedScenario])
+console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]",currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])
 
         this.setState({
             currentItemConfig,
@@ -11170,6 +11188,7 @@ export default class BuildTree extends Component {
                     </option>
                 )
             }, this);
+        console.log("scenarios--->",scenarios)    
         const { regionList } = this.state;
         let regionMultiList = regionList.length > 0
             && regionList.map((item, i) => {
