@@ -1169,11 +1169,15 @@ export default class syncPage extends Component {
           listOfChildShipments.map(item => {
             var shipmentIndex1 = shipmentData.findIndex(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
             var latestShipmentIndex = latestProgramDataShipment.findIndex(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
-            shipmentData[shipmentIndex1] = latestProgramDataShipment[latestShipmentIndex];
+            if (shipmentIndex1 != -1 && latestShipmentIndex != -1) {
+              shipmentData[shipmentIndex1] = latestProgramDataShipment[latestShipmentIndex];
+            }
 
             var shipmentIndex2 = shipmentData.findIndex(c => item.parentShipmentId > 0 ? c.shipmentId == item.parentShipmentId : c.tempShipmentId == item.tempParentShipmentId);
             var latestShipmentIndex1 = latestProgramDataShipment.findIndex(c => item.parentShipmentId > 0 ? c.shipmentId == item.parentShipmentId : c.tempShipmentId == item.tempParentShipmentId);
-            shipmentData[shipmentIndex2] = latestProgramDataShipment[latestShipmentIndex1];
+            if (shipmentIndex2 != -1 && latestShipmentIndex1 != -1) {
+              shipmentData[shipmentIndex2] = latestProgramDataShipment[latestShipmentIndex1];
+            }
 
 
             // console.log("Item Test@@@123", item)
@@ -1184,7 +1188,9 @@ export default class syncPage extends Component {
 
               var shipmentIndex2 = shipmentData.findIndex(c => item1.shipmentId > 0 ? c.shipmentId == item1.shipmentId : c.tempShipmentId == item1.tempShipmentId);
               var latestShipmentIndex2 = latestProgramDataShipment.findIndex(c => item1.shipmentId > 0 ? c.shipmentId == item1.shipmentId : c.tempShipmentId == item1.tempShipmentId);
-              shipmentData[shipmentIndex2] = latestProgramDataShipment[latestShipmentIndex2];
+              if (shipmentIndex2 != -1 && latestShipmentIndex2 != -1) {
+                shipmentData[shipmentIndex2] = latestProgramDataShipment[latestShipmentIndex2];
+              }
 
             })
 
@@ -1194,7 +1200,7 @@ export default class syncPage extends Component {
 
               var shipmentIndex2 = shipmentData.findIndex(c => item1.shipmentId > 0 ? c.shipmentId == item1.shipmentId : c.tempShipmentId == item1.tempShipmentId);
               var latestShipmentIndex2 = latestProgramDataShipment.findIndex(c => item1.shipmentId > 0 ? c.shipmentId == item1.shipmentId : c.tempShipmentId == item1.tempShipmentId);
-              if (shipmentIndex2 >= 0 && latestShipmentIndex2 >= 0) {
+              if (shipmentIndex2 != -1 && latestShipmentIndex2 != -1) {
                 shipmentData[shipmentIndex2] = latestProgramDataShipment[latestShipmentIndex2];
               }
 
@@ -1241,7 +1247,9 @@ export default class syncPage extends Component {
         uniquePlanningUnitsInShipmentLinking = uniquePlanningUnitsInShipmentLinking.concat(item1.qatPlanningUnitId)
         if (item1.active.toString() == "true") {
           var shipmentIndex = shipmentData.findIndex(c => item1.childShipmentId > 0 ? c.shipmentId == item1.childShipmentId : c.tempShipmentId == item1.tempChildShipmentId);
-          shipmentData[shipmentIndex].active = true;
+          if (shipmentIndex != -1) {
+            shipmentData[shipmentIndex].active = true;
+          }
         }
       })
 
@@ -1256,16 +1264,20 @@ export default class syncPage extends Component {
           // console.log("checkIfThereAreAnyActiveChildShipments Test@@@123", checkIfThereAreAnyActiveChildShipments);
           if (checkIfThereAreAnyActiveChildShipments.length == 0) {
             var shipmentIndex1 = shipmentData.findIndex(c => parentShipmentId > 0 ? (c.shipmentId > 0 ? (c.shipmentId == parentShipmentId) : (c.tempShipmentId == parentShipmentId)) : (c.shipmentId > 0 ? (c.shipmentId == tempParentShipmentId) : (c.tempShipmentId == tempParentShipmentId)));
-            shipmentData[shipmentIndex1].active = true;
-            shipmentData[shipmentIndex1].erpFlag = false;
+            if (shipmentIndex1 != -1) {
+              shipmentData[shipmentIndex1].active = true;
+              shipmentData[shipmentIndex1].erpFlag = false;
+            }
             // Activate linked parent shipment Id
             var linkedParentShipmentIdList = shipmentData.filter(c => parentShipmentId > 0 ? (c.parentLinkedShipmentId == parentShipmentId) : (c.tempParentLinkedShipmentId == tempParentShipmentId));
             for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
               var parentShipmentIndex1 = shipmentData.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
-              shipmentData[parentShipmentIndex1].active = true;
-              shipmentData[parentShipmentIndex1].erpFlag = false;
-              shipmentData[parentShipmentIndex1].parentLinkedShipmentId = null;
-              shipmentData[parentShipmentIndex1].tempParentLinkedShipmentId = null;
+              if (parentShipmentIndex1 != -1) {
+                shipmentData[parentShipmentIndex1].active = true;
+                shipmentData[parentShipmentIndex1].erpFlag = false;
+                shipmentData[parentShipmentIndex1].parentLinkedShipmentId = null;
+                shipmentData[parentShipmentIndex1].tempParentLinkedShipmentId = null;
+              }
 
             }
           }
