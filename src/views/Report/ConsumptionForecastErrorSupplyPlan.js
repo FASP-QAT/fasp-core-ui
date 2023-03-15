@@ -1490,7 +1490,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     var eqDataList = this.state.dataList;
                     console.log("Seema eqDataList---->",eqDataList)
                     var filteredequivalencyUnit = FilterEquivalencyUnit[0];
-                    for (var con = 0; con <= eqDataList.length; con++) {
+                    console.log("Seema filteredequivalencyUnit---->",filteredequivalencyUnit)
+                    for (var con = 0; con < eqDataList.length; con++) {
                         if (eqDataList[con].actualQty >= 0) {
                             eqDataList[con].actualQty = eqDataList[con].actualQty * filteredequivalencyUnit.convertToEu;
                         }
@@ -1500,7 +1501,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     }
                     this.setState({
                         dataList: eqDataList
-                    })
+                    }).bind(this)
                 }
                 this.setState({ loading: false })
             } else {
