@@ -1123,6 +1123,16 @@ class GlobalConsumption extends Component {
     }
   }
 
+  filterOptions = async (options, filter) => {
+    if (filter) {
+        return options.filter((i) =>
+            i.label.toLowerCase().includes(filter.toLowerCase())
+        );
+    } else {
+        return options;
+    }
+};
+
   render() {
     const { planningUnits } = this.state;
     let planningUnitList = [];
@@ -1311,6 +1321,7 @@ class GlobalConsumption extends Component {
                           value={this.state.countryValues}
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
+                          filterOptions={this.filterOptions}
                           disabled={this.state.loading}
                         />
                         {!!this.props.error &&
@@ -1334,6 +1345,7 @@ class GlobalConsumption extends Component {
                         value={this.state.programValues}
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
+                        filterOptions={this.filterOptions}
                         disabled={this.state.loading}
                       />
                       {!!this.props.error &&
@@ -1357,6 +1369,7 @@ class GlobalConsumption extends Component {
                           value={this.state.planningUnitValues}
                           onChange={(e) => { this.handlePlanningUnitChange(e) }}
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                          filterOptions={this.filterOptions}
                           disabled={this.state.loading}
                         />
 
