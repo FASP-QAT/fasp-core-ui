@@ -1519,7 +1519,7 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview/1")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
