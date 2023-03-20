@@ -901,6 +901,21 @@ class EditSupplyPlanStatus extends Component {
                         dataSourceList: dataSourceList
                     })
 
+                    RealmCountryService.getRealmCountryPlanningUnitByProgramId([this.props.match.params.programId]).then(response1 => {
+                        var rcpuList = [];
+                        response1.data.map(c => {
+                            rcpuList.push({
+                                name: getLabelText(c.label, this.state.lang),
+                                id: c.realmCountryPlanningUnitId,
+                                multiplier: c.multiplier,
+                                active: c.active,
+                                label: c.label
+                            })
+                        })
+                        this.setState({
+                            realmCountryPlanningUnitList: rcpuList
+                        })
+
                     ShipmentStatusService.getShipmentStatusListActive().then(response1 => {
                         var shipmentStatusList = [];
                         response1.data.map(c => {
@@ -1018,6 +1033,7 @@ class EditSupplyPlanStatus extends Component {
                         }).catch(error => { console.log("Error+++", error) });
                     }).catch(error => { console.log("Error+++", error) });
                 }).catch(error => { console.log("Error+++", error) });
+            }).catch(error => { console.log("Error+++", error) });
             }.bind(this)
         }.bind(this)
     }
