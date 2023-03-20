@@ -1364,7 +1364,7 @@ export default class CreateTreeTemplate extends Component {
 
         var templates = [
             {
-                itemSize: new Size(200, 85)
+                itemSize: new Size(200, 110)
             }
         ]
         var items1 = this.state.items;
