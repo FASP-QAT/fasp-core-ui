@@ -46,14 +46,14 @@ export default function ItemTemplate(options, itemTemplateConfig) {
     doc.save();
 
     /* item border */
-    doc.roundedRect(position.x, position.y, 200, 85, 0)
+    doc.roundedRect(position.x, position.y, 200, 110, 0)
       .lineWidth(_config.itemBorderWidth)
       .stroke('#dddddd');
 
     /* title background */
     doc.fillColor(itemConfig.payload.nodeType.id == 5
       || itemConfig.payload.nodeType.id == 4 ? "#002f6c" : "#a7c6ed")
-      .roundedRect(position.x + 2, position.y + 2, 198, 18, 0)
+      .roundedRect(position.x + 2, position.y + 2, 198, ((itemConfig.payload.label.label_en).length <= 20 ? 18 : 32), 0)
       .fill();
     console.log("itemConfig@@@", itemConfig);
     /* title */
@@ -61,9 +61,9 @@ export default function ItemTemplate(options, itemTemplateConfig) {
       || itemConfig.payload.nodeType.id == 4 ? "#FFF" : "#002f6c")
       .font('Helvetica-Bold', 12)
       .text((itemConfig.payload.label.label_en).replaceAll('-', ' '), position.x + 4, position.y + 7, {
-        ellipsis: false,
+        // ellipsis: false,
         width: (contentSize.width - 30),
-        height: 16,
+        // height: 16,
         align: 'left',
       });
 
@@ -166,7 +166,7 @@ export default function ItemTemplate(options, itemTemplateConfig) {
       doc
         .font('Helvetica', 12)
         .fillColor('black')
-        .text(addCommas((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].displayDataValue), position.x, position.y + 24, {
+        .text(addCommas((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].displayDataValue), position.x, position.y + 42, {
           ellipsis: false,
           width: (contentSize.width - 4),
           height: 74,
@@ -190,7 +190,7 @@ export default function ItemTemplate(options, itemTemplateConfig) {
       doc
         .font('Helvetica', 12)
         .fillColor('black')
-        .text(text, position.x, position.y + 24, {
+        .text(text, position.x, position.y + 42, {
           ellipsis: false,
           width: (contentSize.width - 4),
           height: 74,
@@ -204,7 +204,7 @@ export default function ItemTemplate(options, itemTemplateConfig) {
       doc
         .font('Helvetica-Oblique', 12)
         .fillColor('black')
-        .text("= " + ((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].displayCalculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].displayCalculatedDataValue) : ""), position.x, position.y + 45, {
+        .text("= " + ((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].displayCalculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].displayCalculatedDataValue) : ""), position.x, position.y + 64, {
           ellipsis: false,
           width: (contentSize.width - 4),
           height: 74,
@@ -220,9 +220,9 @@ export default function ItemTemplate(options, itemTemplateConfig) {
         text1 = "Sum of children: ";
         text2 = " %"
       }
-      var yPosition = position.y + 69;
+      var yPosition = position.y + 93;
       if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
-        yPosition = position.y + 45;
+        yPosition = position.y + 64;
       }
       doc
         .font('Helvetica', 12)

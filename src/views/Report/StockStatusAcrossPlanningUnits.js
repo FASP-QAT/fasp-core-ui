@@ -108,7 +108,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                     };
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
-                        myResult = planningunitRequest.result;
+                        myResult = planningunitRequest.result.filter(c=>c.active==true);
                         var programId = (document.getElementById("programId").value).split("_")[0];
                         var proList = []
 
@@ -177,7 +177,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
 
                 let realmId = AuthenticationService.getRealmId();
-                TracerCategoryService.getTracerCategoryByRealmId(realmId).then(response => {
+                TracerCategoryService.getTracerCategoryByProgramId(realmId,programId).then(response => {
 
                     if (response.status == 200) {
                         var listArray = response.data;

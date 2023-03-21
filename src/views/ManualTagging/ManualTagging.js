@@ -3629,10 +3629,12 @@ export default class ManualTagging extends Component {
                         totalQuantity: this.addCommas(Math.round(qty)),
                         displayTotalQty: (qty > 0 ? true : false)
                     });
+                    if(document.getElementById("tableDiv1")!=null){
                     console.log("TableDiv1@@@@@@@@@@@@@@@@@@@@@", document.getElementById("tableDiv1"))
                     this.el = jexcel(document.getElementById("tableDiv1"), '');
                     // this.el.destroy();
                     jexcel.destroy(document.getElementById("tableDiv1"), true);
+                    }
 
                     var json = [];
                     var data = erpDataArray;
