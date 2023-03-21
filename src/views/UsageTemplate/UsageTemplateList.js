@@ -2242,7 +2242,7 @@ class usageTemplate extends Component {
         // console.log("myList--------->3", this.state.forecastingUnitList);
         var mylist = this.state.typeList;
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) {
-            mylist.splice(0, 1);
+            mylist = mylist.filter(c => c.id != -1);
         }
         return mylist;
         // return mylist.sort(function (a, b) {
