@@ -1290,7 +1290,7 @@ class ModelingValidation extends Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: this.state.levelUnit,
+                        labelString: this.state.levelId != -1 && this.state.levelId != -2 ? this.state.levelUnit : i18n.t('static.dashboard.unit'),
                         fontColor: 'black'
                     },
                     stacked: true,

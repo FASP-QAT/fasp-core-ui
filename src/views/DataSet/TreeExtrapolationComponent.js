@@ -295,7 +295,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             ],
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            maxDateForHistoricalData:{ year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 },
+            maxDateForHistoricalData: { year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 },
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
             movingAvgId: true,
             semiAvgId: true,
@@ -1742,7 +1742,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null && this.state.movingAvgData[count1].forecast != null ? parseFloat(this.state.movingAvgData[count1].forecast).toFixed(4) : '' : ''
             data[5] = this.state.semiAvgData.length > 0 && count1 != '' && this.state.semiAvgData[count1] != null && this.state.semiAvgData[count1].forecast != null ? parseFloat(this.state.semiAvgData[count1].forecast).toFixed(4) : ''
             data[6] = this.state.linearRegressionData.length > 0 && count1 != '' && this.state.linearRegressionData[count1] != null && this.state.linearRegressionData[count1].forecast != null ? parseFloat(this.state.linearRegressionData[count1].forecast).toFixed(4) : ''
-            data[7] = this.state.tesData.length > 0 && count1 != '' && this.state.tesData[count1] != null&& this.state.tesData[count1].forecast != null ? this.state.tesData[count1].forecast : ''
+            data[7] = this.state.tesData.length > 0 && count1 != '' && this.state.tesData[count1] != null && this.state.tesData[count1].forecast != null ? this.state.tesData[count1].forecast : ''
             data[8] = this.state.arimaData.length > 0 && count1 != '' && this.state.arimaData[count1] != null && this.state.arimaData[count1].forecast != null ? this.state.arimaData[count1].forecast : ''
 
             data[9] = `=IF(ISBLANK(D${parseInt(j) + 1}),IF(N1 == 4,I${parseInt(j) + 1},IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},''))))),ROUND(D${parseInt(j) + 1},4))` // J
@@ -2166,18 +2166,31 @@ export default class TreeExtrapolationComponent extends React.Component {
         var tr = asterisk.firstChild.nextSibling;
 
         tr.children[3].classList.add('InfoTr');
-        tr.children[5].classList.add('InfoTr');
-        tr.children[6].classList.add('InfoTr');
-        tr.children[7].classList.add('InfoTr');
-        tr.children[8].classList.add('InfoTr');
-        tr.children[9].classList.add('InfoTr');
         tr.children[3].title = i18n.t('static.tooltip.ReportingRate');
-        tr.children[5].title = i18n.t('static.tooltip.MovingAverages');
-        tr.children[6].title = i18n.t('static.tooltip.SemiAverages');
-        tr.children[7].title = i18n.t('static.tooltip.LinearRegression');
-        tr.children[8].title = i18n.t('static.tooltip.Tes');
-        tr.children[9].title = i18n.t('static.tooltip.arima');
-        // }
+        // tr.children[5].classList.add('InfoTr');
+        // tr.children[6].classList.add('InfoTr');
+        // tr.children[7].classList.add('InfoTr');
+        // tr.children[8].classList.add('InfoTr');
+        if (tr.children[5] != undefined) {
+            tr.children[5].classList.add('InfoTr');
+            tr.children[5].title = i18n.t('static.tooltip.MovingAverages');
+        }
+        if (tr.children[6] != undefined) {
+            tr.children[6].classList.add('InfoTr');
+            tr.children[6].title = i18n.t('static.tooltip.SemiAverages');
+        }
+        if (tr.children[7] != undefined) {
+            tr.children[7].classList.add('InfoTr');
+            tr.children[7].title = i18n.t('static.tooltip.LinearRegression');
+        }
+        if (tr.children[8] != undefined) {
+            tr.children[8].classList.add('InfoTr');
+            tr.children[8].title = i18n.t('static.tooltip.Tes');
+        }
+        if (tr.children[9] != undefined) {
+            tr.children[9].classList.add('InfoTr');
+            tr.children[9].title = i18n.t('static.tooltip.arima');
+        }
 
     }
 

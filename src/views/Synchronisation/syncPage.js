@@ -4412,6 +4412,13 @@ export default class syncPage extends Component {
                 batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
                 supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
               }
+              var sl=shipmentList.filter(c=>c.budget.id==="");
+              sl.map(item=>{
+                var index=shipmentList.findIndex(c=>item.shipmentId>0?c.shipmentId==item.shipmentId:c.tempShipmentId==item.tempShipmentId);
+                if(index!=-1){
+                shipmentList[index].budget.id=0;
+                }
+              })
               var programJson = generalJson;
               programJson.consumptionList = consumptionList;
               programJson.inventoryList = inventoryList;
@@ -4492,6 +4499,13 @@ export default class syncPage extends Component {
                 batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
                 supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
               }
+              var sl=shipmentList.filter(c=>c.budget.id==="");
+              sl.map(item=>{
+                var index=shipmentList.findIndex(c=>item.shipmentId>0?c.shipmentId==item.shipmentId:c.tempShipmentId==item.tempShipmentId);
+                if(index!=-1){
+                shipmentList[index].budget.id=0;
+                }
+              })
               var programJson = generalJson;
               programJson.consumptionList = consumptionList;
               programJson.inventoryList = inventoryList;
@@ -4570,6 +4584,7 @@ export default class syncPage extends Component {
               // ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
               // if (response1.status == 200) {
               // if (response1.data == false) {
+                console.log("Program Json Final Test@@@123",programJson)
               ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
                   // console.log(")))) Commit Request generated successfully");
