@@ -867,7 +867,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var minMape = Math.min(...mapeArr.filter(c => c !== ""));
         var minMse = Math.min(...mseArr.filter(c => c !== ""));
         // var minRsqd = Math.min(...rSqdArr.filter(c => c !== ""));
-        var maxRsqd = Math.max(...rSqdArr.filter(c => c !== ""));
+        var maxRsqd = Math.max(...rSqdArr.filter(c => c !== "" && !isNaN(c)));
         var minWape = Math.min(...wapeArr.filter(c => c !== ""));
         this.setState({
             dataEl: dataEl,
