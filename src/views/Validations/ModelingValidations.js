@@ -851,23 +851,27 @@ class ModelingValidation extends Component {
                     var myResult = [];
                     myResult = getRequest.result;
                     var datasetList = this.state.datasetList;
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     for (var mr = 0; mr < myResult.length; mr++) {
-                        var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
-                        if (index == -1) {
-                            var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
-                            var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                            var programNameJson = JSON.parse(programNameLabel)
-                            var json = {
-                                id: myResult[mr].programId,
-                                name: getLabelText(programNameJson, this.state.lang),
-                                code: myResult[mr].programCode,
-                                versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                        if (myResult[mr].userId == userId) {
+                            var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                            if (index == -1) {
+                                var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
+                                var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
+                                var programNameJson = JSON.parse(programNameLabel)
+                                var json = {
+                                    id: myResult[mr].programId,
+                                    name: getLabelText(programNameJson, this.state.lang),
+                                    code: myResult[mr].programCode,
+                                    versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                                }
+                                datasetList.push(json)
+                            } else {
+                                var existingVersionList = datasetList[index].versionList;
+                                existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                                datasetList[index].versionList = existingVersionList
                             }
-                            datasetList.push(json)
-                        } else {
-                            var existingVersionList = datasetList[index].versionList;
-                            existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
-                            datasetList[index].versionList = existingVersionList
                         }
                     }
                     var datasetId = "";
