@@ -365,34 +365,38 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var forecastProgramList = [];
                 var myResult = programRequest.result;
                 console.log("result*******", myResult)
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
-                    var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                    var datasetJson = JSON.parse(datasetData);
-                    console.log("datasetJson%%%%", datasetJson);
-                    var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
-                    var regionList = datasetJson.regionList;
+                    if (myResult[i].userId == userId) {
+                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                        var datasetJson = JSON.parse(datasetData);
+                        console.log("datasetJson%%%%", datasetJson);
+                        var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
+                        var regionList = datasetJson.regionList;
 
-                    planningUnitList.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    regionList.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
+                        planningUnitList.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        regionList.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
 
-                    var forecastProgramJson = {
-                        name: datasetJson.programCode + "~v" + myResult[i].version,
-                        id: myResult[i].id,
-                        regionList: regionList,
-                        planningUnitList: planningUnitList,
-                        datasetData: datasetJson
+                        var forecastProgramJson = {
+                            name: datasetJson.programCode + "~v" + myResult[i].version,
+                            id: myResult[i].id,
+                            regionList: regionList,
+                            planningUnitList: planningUnitList,
+                            datasetData: datasetJson
+                        }
+
+                        forecastProgramList.push(forecastProgramJson)
                     }
-
-                    forecastProgramList.push(forecastProgramJson)
                 }
                 var forecastProgramId = "";
                 var event = {
@@ -531,7 +535,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             data = [];
             data[0] = monthArrayPart2[j];
             var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayPart2[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
-            var consumptionDataActual=consumptionData.filter(c=>moment(c.month).format("YYYY-MM")>=moment(startDateFromRangeValue1).format("YYYY-MM") && moment(c.month).format("YYYY-MM")<=moment(stopDateFromRangeValue1).format("YYYY-MM"));
+            var consumptionDataActual = consumptionData.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDateFromRangeValue1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDateFromRangeValue1).format("YYYY-MM"));
             if (checkIfAnyMissingActualConsumption == false && consumptionData.length == 0 && moment(monthArrayPart2[j]).format("YYYY-MM") >= moment(actualStartDate).format("YYYY-MM") && moment(monthArrayPart2[j]).format("YYYY-MM") <= moment(actualStopDate).format("YYYY-MM")) {
                 checkIfAnyMissingActualConsumption = true;
             }
@@ -1384,13 +1388,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                         var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                         var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.forecastProgramId);
-                        datasetDetailsRequest.onsuccess = function (e) {         
-                          var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                          datasetDetailsRequestJson.changed = 1;
-                          var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                          datasetDetailsRequest1.onsuccess = function (event) {
-                               
-                              }}
+                        datasetDetailsRequest.onsuccess = function (e) {
+                            var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                            datasetDetailsRequestJson.changed = 1;
+                            var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                            datasetDetailsRequest1.onsuccess = function (event) {
+
+                            }
+                        }
 
                         // let id = AuthenticationService.displayDashboardBasedOnRole();
                         // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
@@ -3913,7 +3918,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <ul className="legendcommitversion">
                                                         <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                         <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">Highest R^2</span></li>
-                                                        
+
                                                         {/* <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.label.noFundsAvailable')} </span></li> */}
                                                     </ul>
                                                 </div>}
