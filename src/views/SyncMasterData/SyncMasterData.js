@@ -815,7 +815,7 @@ export default class SyncMasterData extends Component {
                                             // programJson.shipmentList = shipmentDataList;
                                             // programJson.batchInfoList = batchInfoList;
                                             generalJson.actionList = actionList;
-                                            generalJson.shipmentLinkingList = linkedShipmentsList;
+                                            generalJson.shipmentLinkingList = linkedShipmentsList.concat(generalJson.shipmentLinkingList.filter(c => c.active == false));
                                             generalJson.problemReportList = problemReportList;
                                             prgQPLDetails.openCount = (problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
                                             prgQPLDetails.addressedCount = (problemReportList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
