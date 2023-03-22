@@ -5004,8 +5004,8 @@ export default class syncPage extends Component {
               // ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
               // if (response1.status == 200) {
               // if (response1.data == false) {
-              console.log("CommitLogs --- 2 Log before sending data to server")
                 console.log("Program Json Final Test@@@123",programJson)
+              console.log("CommitLogs --- 2 Log before sending data to server")
               ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
                   console.log("CommitLogs --- 3 Log after response 200")

@@ -1967,6 +1967,9 @@ export default class ManualTagging extends Component {
                                     label: rcpu.label,
                                     multiplier: rcpu.multiplier
                                 }
+                                shipmentList[shipmentIndex].lastModifiedBy.userId = curUser;
+                                shipmentList[shipmentIndex].lastModifiedBy.username = username;
+                                shipmentList[shipmentIndex].lastModifiedDate = curDate;
 
                                 // var batchInfoList = shipmentList[shipmentIndex].batchInfoList;
                                 // var batchInfoListOriginal = this.state.languageEl.getValueFromCoords(26, mdf).batchDetailsList.filter(c=>c.orderNo==linkedShipmentsList[linkedShipmentsListIndex].orderNo && c.primeLineNo==linkedShipmentsList[linkedShipmentsListIndex].primeLineNo && c.knShipmentNo==linkedShipmentsList[linkedShipmentsListIndex].knShipmentNo);
