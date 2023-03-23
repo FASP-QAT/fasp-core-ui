@@ -529,7 +529,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     }
                                     console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                     if (grandParentNodeData != undefined) {
-                                        var minusNumber = (nodeDataMapForScenario.month == 1 ? nodeDataMapForScenario.month - 2 : nodeDataMapForScenario.month - 1);
+                                        var minusNumber = (nodeDataMapForScenario.monthNo == 1 ? nodeDataMapForScenario.monthNo - 2 : nodeDataMapForScenario.monthNo - 1);
                                         var grandParentPrevMonthMMDValue = []
                                         if (flatList[fl].level != 1) {
                                             grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
@@ -539,7 +539,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         } else {
                                             var grandParentCurMonthMMDValue = [];
                                             if (flatList[fl].level != 1) {
-                                                grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == nodeDataMapForScenario.month);
+                                                grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == nodeDataMapForScenario.monthNo);
                                             }
                                             if (grandParentCurMonthMMDValue.length > 0) {
                                                 patients = grandParentCurMonthMMDValue[0].calculatedValue;

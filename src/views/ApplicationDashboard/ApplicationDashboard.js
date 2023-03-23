@@ -908,7 +908,10 @@ class ApplicationDashboard extends Component {
   render() {
     const checkOnline = localStorage.getItem('sessionType');
     console.log("AuthenticationService.getLoggedInUserRoleBusinessFunctionArray()@@@@@@@@", AuthenticationService.getLoggedInUserRoleBusinessFunctionArray())
-    let defaultModuleId = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)).defaultModuleId;
+    let defaultModuleId;
+    if(localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != ""){
+      defaultModuleId = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)).defaultModuleId;
+    }
     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE')) {
       console.log("In if@@@@@@@@")
       defaultModuleId = defaultModuleId != undefined ? defaultModuleId : 1;
@@ -1519,7 +1522,7 @@ class ApplicationDashboard extends Component {
                           <DropdownToggle caret className="p-0" color="transparent">
                           </DropdownToggle>
                           <DropdownMenu right>
-                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview/1")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </ButtonGroup>
