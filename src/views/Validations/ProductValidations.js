@@ -577,7 +577,7 @@ class ProductValidation extends Component {
                 data[2] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang) + " | " + finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id;
                 data[3] = usageText;
                 var planningUnitObj = finalData[i].nodeDataMap != "" ? this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id) : [];
-                data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length > 0 && planningUnitObj[0].planningUnit.forecastingUnit.id==finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) + " | " + planningUnitObj[0].planningUnit.id : "";
+                data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length > 0 && planningUnitObj[0].planningUnit.forecastingUnit.id == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) + " | " + planningUnitObj[0].planningUnit.id : "";
                 data[5] = usageTextPU;
                 data[6] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? qty.toFixed(2) : "";
                 data[7] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? this.formatter((price / currency.conversionRateToUsd).toFixed(2)) : "";
@@ -886,25 +886,29 @@ class ProductValidation extends Component {
                                     })
                                     console.log("MyResult+++", myResult);
                                     var datasetList = this.state.datasetList;
+                                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                     for (var mr = 0; mr < myResult.length; mr++) {
-                                        var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
-                                        if (index == -1) {
-                                            var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
-                                            var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                                            console.log("programNamelabel+++", programNameLabel);
-                                            var programNameJson = JSON.parse(programNameLabel)
-                                            var json = {
-                                                id: myResult[mr].programId,
-                                                name: getLabelText(programNameJson, this.state.lang),
-                                                code: myResult[mr].programCode,
-                                                versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                                        if (myResult[mr].userId == userId) {
+                                            var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                                            if (index == -1) {
+                                                var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
+                                                var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
+                                                console.log("programNamelabel+++", programNameLabel);
+                                                var programNameJson = JSON.parse(programNameLabel)
+                                                var json = {
+                                                    id: myResult[mr].programId,
+                                                    name: getLabelText(programNameJson, this.state.lang),
+                                                    code: myResult[mr].programCode,
+                                                    versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                                                }
+                                                datasetList.push(json)
+                                            } else {
+                                                var existingVersionList = datasetList[index].versionList;
+                                                console.log("existingVersionList+++", datasetList[index].versionList)
+                                                existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                                                datasetList[index].versionList = existingVersionList
                                             }
-                                            datasetList.push(json)
-                                        } else {
-                                            var existingVersionList = datasetList[index].versionList;
-                                            console.log("existingVersionList+++", datasetList[index].versionList)
-                                            existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
-                                            datasetList[index].versionList = existingVersionList
                                         }
                                     }
                                     var datasetId = "";

@@ -1337,13 +1337,17 @@ class CompareAndSelectScenario extends Component {
                     var myResult = [];
                     myResult = getRequest.result;
                     var datasetList = [];
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     for (var mr = 0; mr < myResult.length; mr++) {
-                        var json = {
-                            id: myResult[mr].id,
-                            name: myResult[mr].programCode + "~v" + myResult[mr].version,
-                            programJson: myResult[mr].programData
+                        if (myResult[mr].userId == userId) {
+                            var json = {
+                                id: myResult[mr].id,
+                                name: myResult[mr].programCode + "~v" + myResult[mr].version,
+                                programJson: myResult[mr].programData
+                            }
+                            datasetList.push(json)
                         }
-                        datasetList.push(json)
                     }
                     var datasetId = "";
                     var event = {
@@ -1889,7 +1893,7 @@ class CompareAndSelectScenario extends Component {
                 var datasetForEncryption = datasetJson;
                 var planningUnitList = datasetJson.planningUnitList;
                 var planningUnitList1 = planningUnitList;
-                var index = planningUnitList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.active.toString()=="true");
+                var index = planningUnitList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.active.toString() == "true");
                 // let map1 = new Map();
                 // map1.set(Number(this.state.regionId), { "scenarioId": scenarioId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": this.state.totalArray[0] / this.state.multiplier })
 
