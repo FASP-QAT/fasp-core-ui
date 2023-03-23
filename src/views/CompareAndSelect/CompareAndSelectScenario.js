@@ -517,7 +517,9 @@ class CompareAndSelectScenario extends Component {
                 arrayForTotal.push(totalArray[t])
             }
         }
-        var sortedArray = arrayForTotal.sort();
+        var sortedArray = arrayForTotal.sort(function(a, b) {
+            return a - b;
+        });
         higherThenConsumptionThreshold = sortedArray.length > 0 && sortedArray[sortedArray.length - 1] != "" && sortedArray[sortedArray.length - 1] != null && sortedArray[sortedArray.length - 1] != undefined ? sortedArray[sortedArray.length - 1] : 0;
         lowerThenConsumptionThreshold = sortedArray.length > 0 && sortedArray[0] != "" && sortedArray[0] != null && sortedArray[0] != undefined ? sortedArray[0] : 0;
 
