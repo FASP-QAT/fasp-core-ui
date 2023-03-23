@@ -146,7 +146,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       jsonDataArima: [],
       count: 0,
       countRecived: 0,
-      isTableLoaded: ""
+      isTableLoaded: "",
+      monthArray: []
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
