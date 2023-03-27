@@ -20,6 +20,7 @@ const Register = React.lazy(() => import('./views/Pages/Register'));
 const Page404 = React.lazy(() => import('./views/Pages/Page404'));
 const ForgotPassword = React.lazy(() => import('./views/Pages/Login/ForgotPasswordComponent'));
 const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
+const MasterDataSyncForTree = React.lazy(() => import('./views/SyncMasterData/SyncMasterDataForTree'));
 const SyncProgram = React.lazy(() => import('./views/SyncMasterData/SyncProgram'));
 const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/UpdateExpiredPasswordComponent'));
 const ResetPassword = React.lazy(() => import('./views/Pages/Login/ResetPasswordComponent'));
@@ -46,6 +47,7 @@ class App extends Component {
             <Route exact path="/forgotPassword" exact name="Forgot Password" render={props => <ForgotPassword {...props} />} />
             <Route exact path="/masterDataSync" exact name="Master data sync" render={props => <MasterDataSync {...props} />} />
             <Route exact path="/masterDataSync/:color/:message" exact name="Master data sync" render={props => <MasterDataSync {...props} />} />
+            <Route exact path="/masterDataSyncForTree" exact name="Master data sync" render={props => <MasterDataSyncForTree {...props} />} />
             <Route exact path="/syncProgram/:color/:message" exact name="Sync Program" render={props => <SyncProgram {...props} />} />
             <Route exact path="/syncProgram" exact name="Sync Program" render={props => <SyncProgram {...props} />} />
             <Route exact path="/updateExpiredPassword" exact name="Update expired password" render={props => <UpdateExpiredPassword {...props} />} />

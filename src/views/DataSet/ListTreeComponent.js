@@ -1762,7 +1762,7 @@ export default class ListTreeComponent extends Component {
                                 loading: false
                             }, () => {
                                 // this.hideFirstComponent()
-                                this.props.history.push({ pathname: `/syncProgram`, state: { "programIds": programIds, "treeId": treeId } })
+                                this.props.history.push({ pathname: `/masterDataSyncForTree`, state: { "programIds": programIds, "treeId": treeId } })
 
                             })
                         }.bind(this);

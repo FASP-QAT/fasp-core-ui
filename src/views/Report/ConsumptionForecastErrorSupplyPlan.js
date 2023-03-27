@@ -1289,6 +1289,19 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             });
                                         }
                                     }
+                                    if (equivalencyUnitId > 0) // View by EquivalencyUnit 
+                                    {
+                                        var filteredequivalencyUnit = FilterEquivalencyUnit[0];
+                                        console.log("Seema filteredequivalencyUnit---->",filteredequivalencyUnit.convertToEu)
+                                        for (var con = 0; con < dataList.length; con++) {
+                                            if (dataList[con].actualQty >= 0) {
+                                                dataList[con].actualQty = dataList[con].actualQty * filteredequivalencyUnit.convertToEu;
+                                            }
+                                            if (dataList[con].forecastQty >= 0) {
+                                                dataList[con].forecastQty = dataList[con].forecastQty * filteredequivalencyUnit.convertToEu;
+                                            }
+                                        }
+                                    }
                                     console.log("@@@@NewDevelopement@@@FU dataList--->", dataList)
                                     console.log("Complete dataList----------------------", dataList);
                                     this.setState({
@@ -1474,6 +1487,19 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 console.log("@@@@NewDevelopement@@@ dataList--->", dataList)
                                 console.log("@@@@NewDevelopement@@@ monthArray--->", monthArray)
                             }
+                            if (equivalencyUnitId > 0) // View by EquivalencyUnit 
+                                    {
+                                        var filteredequivalencyUnit = FilterEquivalencyUnit[0];
+                                        console.log("Seema filteredequivalencyUnit---->",filteredequivalencyUnit.convertToEu)
+                                        for (var con = 0; con < dataList.length; con++) {
+                                            if (dataList[con].actualQty >= 0) {
+                                                dataList[con].actualQty = dataList[con].actualQty * filteredequivalencyUnit.convertToEu;
+                                            }
+                                            if (dataList[con].forecastQty >= 0) {
+                                                dataList[con].forecastQty = dataList[con].forecastQty * filteredequivalencyUnit.convertToEu;
+                                            }
+                                        }
+                                    }
                             this.setState({
                                 monthArray: monthArray,
                                 dataList: dataList,
@@ -1485,23 +1511,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             console.log("DATALIST--->", this.state.dataList)
                         }.bind(this);
                     }.bind(this);
-                } if (equivalencyUnitId > 0) // View by EquivalencyUnit 
-                {
-                    var eqDataList = this.state.dataList;
-                    console.log("Seema eqDataList---->",eqDataList)
-                    var filteredequivalencyUnit = FilterEquivalencyUnit[0];
-                    console.log("Seema filteredequivalencyUnit---->",filteredequivalencyUnit)
-                    for (var con = 0; con < eqDataList.length; con++) {
-                        if (eqDataList[con].actualQty >= 0) {
-                            eqDataList[con].actualQty = eqDataList[con].actualQty * filteredequivalencyUnit.convertToEu;
-                        }
-                        if (eqDataList[con].forecastQty >= 0) {
-                            eqDataList[con].forecastQty = eqDataList[con].forecastQty * filteredequivalencyUnit.convertToEu;
-                        }
-                    }
-                    this.setState({
-                        dataList: eqDataList
-                    }).bind(this)
                 }
                 this.setState({ loading: false })
             } else {
@@ -2252,6 +2261,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
 
         var elInstance = this.state.dataList;
+        console.log("In graph----->",elInstance)
         if (elInstance != undefined) {
             var colourCount = 0;
 

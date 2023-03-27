@@ -1127,24 +1127,24 @@ export default class SyncMasterData extends Component {
                                         pIds.push(program.programId);
                                     });
 
-                                    var datasetDataServerTransaction1 = db1.transaction(['datasetDataServer'], 'readwrite');
-                                    var ddatasetDataServerOs = datasetDataServerTransaction1.objectStore('datasetDataServer');
-                                    var ddatasetDataServerRequest = ddatasetDataServerOs.getAll();
-                                    ddatasetDataServerRequest.onsuccess = function (e) {
-                                        // var datasetDataServerDetailsList = ddatasetDataServerRequest.result.filter(c => c.readonly == 1);
-                                        // var readonlyDatasetDataServerIds = [];
-                                        // for (var rp = 0; rp < datasetDataServerDetailsList.length; rp++) {
-                                        //     readonlyDatasetDataServerIds.push(datasetDataServerDetailsList[rp].programId);
-                                        // }
-                                        var datasetDataServerList = ddatasetDataServerRequest.result;
-                                        console.log("###datasetDataServerList+++", datasetDataServerList)
-                                        var datasetDataServerListFiltered = [];
-                                        if (this.props.location.state != undefined && this.props.location.state.programIds!=undefined) {
-                                            datasetDataServerListFiltered = datasetDataServerList.filter(c => (this.props.location.state.programIds).includes(c.id));
-                                        }
-                                        datasetDataServerList.filter(c => c.userId == userId).map(program => {
-                                            pIds.push(program.programId);
-                                        });
+                                    // var datasetDataServerTransaction1 = db1.transaction(['datasetDataServer'], 'readwrite');
+                                    // var ddatasetDataServerOs = datasetDataServerTransaction1.objectStore('datasetDataServer');
+                                    // var ddatasetDataServerRequest = ddatasetDataServerOs.getAll();
+                                    // ddatasetDataServerRequest.onsuccess = function (e) {
+                                    //     // var datasetDataServerDetailsList = ddatasetDataServerRequest.result.filter(c => c.readonly == 1);
+                                    //     // var readonlyDatasetDataServerIds = [];
+                                    //     // for (var rp = 0; rp < datasetDataServerDetailsList.length; rp++) {
+                                    //     //     readonlyDatasetDataServerIds.push(datasetDataServerDetailsList[rp].programId);
+                                    //     // }
+                                    //     var datasetDataServerList = ddatasetDataServerRequest.result;
+                                    //     console.log("###datasetDataServerList+++", datasetDataServerList)
+                                    //     var datasetDataServerListFiltered = [];
+                                    //     if (this.props.location.state != undefined && this.props.location.state.programIds!=undefined) {
+                                    //         datasetDataServerListFiltered = datasetDataServerList.filter(c => (this.props.location.state.programIds).includes(c.id));
+                                    //     }
+                                    //     datasetDataServerList.filter(c => c.userId == userId).map(program => {
+                                    //         pIds.push(program.programId);
+                                    //     });
 
                                         // var datasetListFiltered=datasetList;
                                         this.setState({
@@ -2032,7 +2032,7 @@ export default class SyncMasterData extends Component {
                                             }
 
                                         }
-                                    }.bind(this)
+                                    // }.bind(this)
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
