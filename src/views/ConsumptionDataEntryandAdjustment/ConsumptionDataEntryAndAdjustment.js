@@ -2648,7 +2648,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
             <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
             {this.state.monthArray.map((item, count) => {
-              return (<th className="supplyplanTdWidthForMonths">{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
+              return (<th className="supplyplanTdWidthForMonths">{item.monthName.concat(" ").concat(item.monthYear)}</th>)
             })}
             <th>{i18n.t('static.supplyPlan.total')}</th>
             <th>{i18n.t('static.dataentry.regionalPer')}</th>
