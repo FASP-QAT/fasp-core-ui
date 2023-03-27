@@ -2635,6 +2635,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           <tr>
             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
             <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
+            {console.log("Hello "+this.state.monthArray)}
             {this.state.monthArray.map(item => {
               return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
             })}
