@@ -851,12 +851,22 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 document.getElementById("equivelencyUnitDiv").style.display = "none";
                                 console.log("filteredEquList---Result-->", filteredEquList);
                                 console.log("No EquivalencyUnitData")
-                                this.setState({ message: "No equivalency unit data available", equivalencyUnitList: [] });
+                                this.setState({ 
+                                    message: "No equivalency unit data available", 
+                                    equivalencyUnitList: [],
+                                        },() => {
+                                    this.hideFirstComponent();
+                                });
                             }
                         } else {
 
                             document.getElementById("equivelencyUnitDiv").style.display = "none";
-                            this.setState({ message: "No equivalency unit data available for the selected forecasting unit ", equivalencyUnitList: [] });
+                            this.setState({ 
+                                message: "No equivalency unit data available for the selected forecasting unit ", 
+                                equivalencyUnitList: []
+                            },() => {
+                                    this.hideFirstComponent();
+                                });
                             console.log("No FU associated");
                         }
                         console.log("filteredEQUnit---Result-->", filteredEQUnit);
@@ -967,9 +977,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode, loading: false
-                            // },
-                            //     () => {
-                            //         this.hideSecondComponent();
+                            },
+                                () => {
+                                    this.hideFirstComponent();
                         })
                     }
                 })
@@ -1556,10 +1566,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             loading: false,
                             yaxisEquUnit:equivalencyUnitId,
                             equivalencyUnitLabel:equivalencyUnitLable
-                        })
-                        // , () => {
-                        //     this.hideFirstComponent();
-                        // }).bind(this)
+                        },() => {
+                            this.hideFirstComponent();
+                        }).bind(this)
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
