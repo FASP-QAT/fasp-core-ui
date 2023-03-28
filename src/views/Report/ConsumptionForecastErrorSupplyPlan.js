@@ -489,8 +489,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnitId: e.target.value,
             planningUnitLabel: selectedText,
             show: false,
-            dataList: []
+            dataList: [],
+            isEquUnitChecked:false
         }, () => {
+            document.getElementById('div1').style.display = 'none';
+            document.getElementById("equivelencyUnitDiv").style.display = "none";
+            document.getElementById("yaxisEquUnitCb").checked=false;
             this.fetchData();
         })
     }
@@ -719,13 +723,16 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.setState({
             forecastingUnitId: e.target.value,
             forecastingUnitLabel: selectedText,
-            dataList: []
+            dataList: [],
+            isEquUnitChecked:false
         }, () => {
             // this.filterPlanningUnit()
             // if (this.state.viewById == 2 && forecastingUnitId) {
             //     this.showData();
             // }
-            console.log("calling fetch")
+            document.getElementById('div1').style.display = 'none';
+            document.getElementById("equivelencyUnitDiv").style.display = "none";
+            document.getElementById("yaxisEquUnitCb").checked=false;
             this.fetchData();
         })
     }
@@ -851,12 +858,22 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 document.getElementById("equivelencyUnitDiv").style.display = "none";
                                 console.log("filteredEquList---Result-->", filteredEquList);
                                 console.log("No EquivalencyUnitData")
-                                this.setState({ message: "No equivalency unit data available", equivalencyUnitList: [] });
+                                this.setState({ 
+                                    message: "No equivalency unit data available", 
+                                    equivalencyUnitList: [],
+                                        },() => {
+                                    this.hideFirstComponent();
+                                });
                             }
                         } else {
 
                             document.getElementById("equivelencyUnitDiv").style.display = "none";
-                            this.setState({ message: "No equivalency unit data available for the selected forecasting unit ", equivalencyUnitList: [] });
+                            this.setState({ 
+                                message: "No equivalency unit data available for the selected forecasting unit ", 
+                                equivalencyUnitList: []
+                            },() => {
+                                    this.hideFirstComponent();
+                                });
                             console.log("No FU associated");
                         }
                         console.log("filteredEQUnit---Result-->", filteredEQUnit);
@@ -967,9 +984,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode, loading: false
-                            // },
-                            //     () => {
-                            //         this.hideSecondComponent();
+                            },
+                                () => {
+                                    this.hideFirstComponent();
                         })
                     }
                 })
@@ -1556,10 +1573,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             loading: false,
                             yaxisEquUnit:equivalencyUnitId,
                             equivalencyUnitLabel:equivalencyUnitLable
-                        })
-                        // , () => {
-                        //     this.hideFirstComponent();
-                        // }).bind(this)
+                        },() => {
+                            this.hideFirstComponent();
+                        }).bind(this)
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
