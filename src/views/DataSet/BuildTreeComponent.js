@@ -1114,50 +1114,50 @@ export default class BuildTree extends Component {
     }
 
     getMissingPuListBranchTemplate() {
-        if(this.state.branchTemplateId!=""){
-        console.log("In function Test@@@@@@@@@")
-        var missingPUList = [];
-        var json;
-        var treeTemplate = this.state.branchTemplateList.filter(x => x.treeTemplateId == this.state.branchTemplateId)[0];
-        console.log("dataset Id template---", this.state.datasetIdModal);
-        // if (1==1) {
-        // var dataset = this.state.datasetList.filter(x => x.id == this.state.datasetIdModal)[0];
-        // console.log("dataset---", dataset);
-        console.log("treeTemplate---", treeTemplate);
-        var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
-        console.log("puNodeList---", puNodeList);
-        console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
-        var planningUnitList = this.state.updatedPlanningUnitList;
-        for (let i = 0; i < puNodeList.length; i++) {
-            console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
-            if (planningUnitList.filter(x => x.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
-                var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
-                console.log("parentNodeData---", parentNodeData);
-                json = {
-                    productCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory,
-                    planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
-                };
-                missingPUList.push(json);
+        if (this.state.branchTemplateId != "") {
+            console.log("In function Test@@@@@@@@@")
+            var missingPUList = [];
+            var json;
+            var treeTemplate = this.state.branchTemplateList.filter(x => x.treeTemplateId == this.state.branchTemplateId)[0];
+            console.log("dataset Id template---", this.state.datasetIdModal);
+            // if (1==1) {
+            // var dataset = this.state.datasetList.filter(x => x.id == this.state.datasetIdModal)[0];
+            // console.log("dataset---", dataset);
+            console.log("treeTemplate---", treeTemplate);
+            var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
+            console.log("puNodeList---", puNodeList);
+            console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
+            var planningUnitList = this.state.updatedPlanningUnitList;
+            for (let i = 0; i < puNodeList.length; i++) {
+                console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
+                if (planningUnitList.filter(x => x.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
+                    var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
+                    console.log("parentNodeData---", parentNodeData);
+                    json = {
+                        productCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory,
+                        planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
+                    };
+                    missingPUList.push(json);
+                }
             }
-        }
-        // }
-        console.log("missingPUList---", missingPUList);
-        if (missingPUList.length > 0) {
-            missingPUList = missingPUList.filter((v, i, a) => a.findIndex(v2 => (v2.planningUnit.id === v.planningUnit.id)) === i)
-        }
-        this.setState({
-            missingPUList
-        }, () => {
-            this.buildMissingPUJexcel();
-        });
-    }else{
-        this.el = jexcel(document.getElementById("missingPUJexcel"), '');
+            // }
+            console.log("missingPUList---", missingPUList);
+            if (missingPUList.length > 0) {
+                missingPUList = missingPUList.filter((v, i, a) => a.findIndex(v2 => (v2.planningUnit.id === v.planningUnit.id)) === i)
+            }
+            this.setState({
+                missingPUList
+            }, () => {
+                this.buildMissingPUJexcel();
+            });
+        } else {
+            this.el = jexcel(document.getElementById("missingPUJexcel"), '');
             // this.el.destroy();
-        jexcel.destroy(document.getElementById("missingPUJexcel"), true);
-        this.setState({
-            missingPUList:[]
-        })
-    }
+            jexcel.destroy(document.getElementById("missingPUJexcel"), true);
+            this.setState({
+                missingPUList: []
+            })
+        }
     }
 
     getMomValueForDateRange(startDate) {
@@ -1257,7 +1257,7 @@ export default class BuildTree extends Component {
                     }
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
                 }
-                if(type==2){
+                if (type == 2) {
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
                 }
             }
@@ -1651,17 +1651,17 @@ export default class BuildTree extends Component {
             console.log("my scenario---", scenarioId);
             // console.log("current item --->", items[i]);
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
-                console.log("my scenario---INSIDE IF items[i]",items[i]);
-                console.log("my scenario---INSIDE IF items[i].payload",items[i].payload);
-                console.log("my scenario---INSIDE IF items[i].payload.nodeDataMap",items[i].payload.nodeDataMap);
-                console.log("my scenario---INSIDE IF scenarioId",scenarioId);
-                console.log("my scenario---INSIDE IF (items[i].payload.nodeDataMap[scenarioId])",(items[i].payload.nodeDataMap[scenarioId]));
-                console.log("my scenario---INSIDE IF (items[i].payload.nodeDataMap[scenarioId])[0]",(items[i].payload.nodeDataMap[scenarioId])[0]);
-                
-                console.log("my scenario---INSIDE IF (items[i].payload.nodeDataMap[scenarioId])[0].dataValue",(items[i].payload.nodeDataMap[scenarioId])[0].dataValue);
+                console.log("my scenario---INSIDE IF items[i]", items[i]);
+                console.log("my scenario---INSIDE IF items[i].payload", items[i].payload);
+                console.log("my scenario---INSIDE IF items[i].payload.nodeDataMap", items[i].payload.nodeDataMap);
+                console.log("my scenario---INSIDE IF scenarioId", scenarioId);
+                console.log("my scenario---INSIDE IF (items[i].payload.nodeDataMap[scenarioId])", (items[i].payload.nodeDataMap[scenarioId]));
+                console.log("my scenario---INSIDE IF (items[i].payload.nodeDataMap[scenarioId])[0]", (items[i].payload.nodeDataMap[scenarioId])[0]);
+
+                console.log("my scenario---INSIDE IF (items[i].payload.nodeDataMap[scenarioId])[0].dataValue", (items[i].payload.nodeDataMap[scenarioId])[0].dataValue);
                 (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
-                console.log("my scenario---INSIDE IF Conpleted",items[i]);
-            
+                console.log("my scenario---INSIDE IF Conpleted", items[i]);
+
             } else {
                 console.log("my scenario---INSIDE ESLE");
                 var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
@@ -4997,7 +4997,7 @@ export default class BuildTree extends Component {
                             var usageType = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
                             var val = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuPerMonth;
                             var val1 = "/" + 'Month';
-                            var val2=", ";
+                            var val2 = ", ";
                             if (usageType == 1) {
                                 var usagePeriodId;
                                 var usageTypeId;
@@ -5066,7 +5066,7 @@ export default class BuildTree extends Component {
                                     var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount != null ? ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                     val = noFURequired;
                                     val1 = ""
-                                    val2=" * "
+                                    val2 = " * "
                                     console.log("noFURequired---", noFURequired);
 
                                 } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
@@ -5075,19 +5075,19 @@ export default class BuildTree extends Component {
                                         noFURequired = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
                                         val = noFURequired;
                                         val1 = "";
-                                        val2=" * "
+                                        val2 = " * "
                                     } else {
                                         console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
                                         noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
                                         val = noFURequired;
                                         val1 = "";
-                                        val2=" * "
+                                        val2 = " * "
                                     }
                                     // noOfMonthsInUsagePeriod = noOfFUPatient;
                                 }
 
                             }
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent"+ val2 + (val < 0.01 ? addCommasThreeDecimal(val) : addCommasTwoDecimal(val)) + val1;
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent" + val2 + (val < 0.01 ? addCommasThreeDecimal(val) : addCommasTwoDecimal(val)) + val1;
 
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             console.log("payload get puNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
@@ -6238,10 +6238,10 @@ export default class BuildTree extends Component {
         } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
             console.log("inside else if no fu");
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
-                noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/(this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             } else {
                 console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
-                noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/(this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             }
             // noOfMonthsInUsagePeriod = noOfFUPatient;
         }
@@ -6945,14 +6945,14 @@ export default class BuildTree extends Component {
                 myResult = planningunitRequest.result;
                 var nodeTypeList = [];
                 var nodeType = this.state.nodeTypeList.filter(c => c.id == nodeTypeId)[0];
-                var possibleNodeTypes="";
+                var possibleNodeTypes = "";
                 for (let i = 0; i < nodeType.allowedChildList.length; i++) {
                     // console.log("Branch allowed value---", nodeType.allowedChildList[i]);
                     var obj = this.state.nodeTypeList.filter(c => c.id == nodeType.allowedChildList[i])[0];
-                    if(i!=nodeType.allowedChildList.length-1){
-                        possibleNodeTypes+=(getLabelText(obj.label,this.state.lang)+" "+i18n.t('static.tree.node'))+" "+i18n.t('static.common.and')+" ";
-                    }else{
-                        possibleNodeTypes+=(getLabelText(obj.label,this.state.lang)+" "+i18n.t('static.tree.node'));
+                    if (i != nodeType.allowedChildList.length - 1) {
+                        possibleNodeTypes += (getLabelText(obj.label, this.state.lang) + " " + i18n.t('static.tree.node')) + " " + i18n.t('static.common.and') + " ";
+                    } else {
+                        possibleNodeTypes += (getLabelText(obj.label, this.state.lang) + " " + i18n.t('static.tree.node'));
                     }
                     nodeTypeList.push(nodeType.allowedChildList[i]);
                 }
@@ -6976,8 +6976,8 @@ export default class BuildTree extends Component {
                     branchTemplateList,
                     isBranchTemplateModalOpen: true,
                     parentNodeIdForBranch: itemConfig.id,
-                    nodeTypeParentNode:getLabelText(nodeType.label,this.state.lang),
-                    possibleNodeTypes:possibleNodeTypes
+                    nodeTypeParentNode: getLabelText(nodeType.label, this.state.lang),
+                    possibleNodeTypes: possibleNodeTypes
                 }, () => {
 
                 })
@@ -7644,9 +7644,9 @@ export default class BuildTree extends Component {
                 var scenarioId = event.target.value;
                 var scenario = document.getElementById("scenarioId");
                 var selectedText = scenario.options[scenario.selectedIndex].text;
-console.log("Seema scenarioId",scenarioId)
-console.log("Seema selectedText",selectedText)
-console.log("Seema selected",document.getElementById("scenarioId"))
+                console.log("Seema scenarioId", scenarioId)
+                console.log("Seema selectedText", selectedText)
+                console.log("Seema selected", document.getElementById("scenarioId"))
 
                 this.setState({
                     selectedScenario: scenarioId,
@@ -7792,7 +7792,7 @@ console.log("Seema selected",document.getElementById("scenarioId"))
 
 
         if (event.target.name === "forecastingUnitPerPersonsFC") {
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson = (event.target.value).replaceAll(",","");
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson = (event.target.value).replaceAll(",", "");
             if (currentItemConfig.context.payload.nodeType.id == 4 && (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 1) {
                 this.getNoOfFUPatient();
             }
@@ -7828,14 +7828,14 @@ console.log("Seema selected",document.getElementById("scenarioId"))
         }
 
         if (event.target.name === "repeatCount") {
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount = (event.target.value).replaceAll(",","");
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount = (event.target.value).replaceAll(",", "");
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getUsageText();
         }
 
         if (event.target.name === "usageFrequencyCon" || event.target.name === "usageFrequencyDis") {
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency = (event.target.value).replaceAll(",","");
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency = (event.target.value).replaceAll(",", "");
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getUsageText();
@@ -7913,9 +7913,9 @@ console.log("Seema selected",document.getElementById("scenarioId"))
         console.log("anchal 1---", currentItemConfig)
         console.log("anchal 2---", this.state.selectedScenario)
 
-console.log("Seema currentItemConfig",currentItemConfig)
-console.log("Seema [this.state.selectedScenario]",[this.state.selectedScenario])
-console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]",currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])
+        console.log("Seema currentItemConfig", currentItemConfig)
+        console.log("Seema [this.state.selectedScenario]", [this.state.selectedScenario])
+        console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]", currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])
 
         this.setState({
             currentItemConfig,
@@ -8851,9 +8851,10 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                             nodeTypeId: this.state.currentItemConfig.context.payload.nodeType.id,
                             nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id,
                             forecastingUnitId: this.state.fuValues,
-                            tempPlanningUnitId: this.state.tempPlanningUnitId
+                            tempPlanningUnitId: this.state.tempPlanningUnitId,
+                            nodeValue: this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue),
                             // showFUValidation : true
-                            // percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[1])[0].dataValue
+                            percentageOfParent: this.state.currentScenario.dataValue
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -9356,7 +9357,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                                                     handleChange(e);
                                                                     this.dataChange(e)
                                                                 }}
-                                                                value={(this.state.currentItemConfig.context.payload.nodeType.id==2 ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)) + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
+                                                                value={(this.state.currentItemConfig.context.payload.nodeType.id == 2 ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)) + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
                                                             ></Input>
                                                             <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                         </FormGroup>
@@ -9532,7 +9533,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                                                 bsSize="sm"
                                                                 disabled="true"
                                                                 onChange={(e) => { this.dataChange(e) }}
-                                                                value={this.state.planningUnitList.filter(c=>c.id==this.state.currentScenario.puNode.planningUnit.id).length>0?this.state.planningUnitList.filter(c=>c.id==this.state.currentScenario.puNode.planningUnit.id)[0].unit.id:""}>
+                                                                value={this.state.planningUnitList.filter(c => c.id == this.state.currentScenario.puNode.planningUnit.id).length > 0 ? this.state.planningUnitList.filter(c => c.id == this.state.currentScenario.puNode.planningUnit.id)[0].unit.id : ""}>
 
                                                                 <option value=""></option>
                                                                 {this.state.unitList.length > 0
@@ -10240,7 +10241,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr> */}
                                                         <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriodPerPatient')+" "+ this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriodPerPatient') + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noFURequired)}</td>
                                                         </tr>
                                                     </table>}
@@ -10257,7 +10258,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                     <FormGroup className="pb-lg-3">
                                         {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, isChanged: false, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => {this.resetNodeData();this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id)}} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
@@ -11188,7 +11189,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                     </option>
                 )
             }, this);
-        console.log("scenarios--->",scenarios)    
+        console.log("scenarios--->", scenarios)
         const { regionList } = this.state;
         let regionMultiList = regionList.length > 0
             && regionList.map((item, i) => {
@@ -12266,7 +12267,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                                 <div className='row'>
                                                     <FormGroup className="col-md-12">
                                                         {/* <Label htmlFor="appendedInputButton">{i18n.t('static.dataset.BranchTreeTemplate')}<span className="red Reqasterisk">*</span></Label><br/> */}
-                                                        <p>{i18n.t('static.tree.branchTemplateNotes1')+" "}<b>{this.state.nodeTypeParentNode}</b>{" "+i18n.t('static.tree.branchTemplateNotes2')}{" "}<b>{this.state.possibleNodeTypes.toString()}</b>{" "+i18n.t('static.tree.branchTemplateNotes3')}<a href="/#/dataset/listTreeTemplate">{" "+i18n.t('static.dataset.TreeTemplate')}</a>{" "+i18n.t('static.tree.branchTemplateNotes4')}</p>
+                                                        <p>{i18n.t('static.tree.branchTemplateNotes1') + " "}<b>{this.state.nodeTypeParentNode}</b>{" " + i18n.t('static.tree.branchTemplateNotes2')}{" "}<b>{this.state.possibleNodeTypes.toString()}</b>{" " + i18n.t('static.tree.branchTemplateNotes3')}<a href="/#/dataset/listTreeTemplate">{" " + i18n.t('static.dataset.TreeTemplate')}</a>{" " + i18n.t('static.tree.branchTemplateNotes4')}</p>
                                                         <div className="controls">
 
                                                             <Input
