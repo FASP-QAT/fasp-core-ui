@@ -214,7 +214,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                             id: parseInt(map1.get("1"))
                         },
                         label: {
-                            label_en: map1.get("2"),
+                            label_en: map1.get("2").toString().trim(),
                         },
                         skuCode: map1.get("3"),
                         unit: {
