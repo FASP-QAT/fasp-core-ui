@@ -489,8 +489,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnitId: e.target.value,
             planningUnitLabel: selectedText,
             show: false,
-            dataList: []
+            dataList: [],
+            isEquUnitChecked:false
         }, () => {
+            document.getElementById('div1').style.display = 'none';
+            document.getElementById("equivelencyUnitDiv").style.display = "none";
+            document.getElementById("yaxisEquUnitCb").checked=false;
             this.fetchData();
         })
     }
@@ -719,13 +723,16 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.setState({
             forecastingUnitId: e.target.value,
             forecastingUnitLabel: selectedText,
-            dataList: []
+            dataList: [],
+            isEquUnitChecked:false
         }, () => {
             // this.filterPlanningUnit()
             // if (this.state.viewById == 2 && forecastingUnitId) {
             //     this.showData();
             // }
-            console.log("calling fetch")
+            document.getElementById('div1').style.display = 'none';
+            document.getElementById("equivelencyUnitDiv").style.display = "none";
+            document.getElementById("yaxisEquUnitCb").checked=false;
             this.fetchData();
         })
     }
