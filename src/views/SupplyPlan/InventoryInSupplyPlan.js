@@ -1506,6 +1506,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.id = map.get("3");
                 inventoryDataList[parseInt(map.get("14"))].adjustmentQty = (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
                 inventoryDataList[parseInt(map.get("14"))].actualQty = (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
+                inventoryDataList[parseInt(map.get("14"))].dataSource.id = map.get("2");
             } else {
                 var inventoryJson = {
                     inventoryId: 0,
@@ -1518,6 +1519,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     },
                     adjustmentQty: (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
                     actualQty: (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
+                    dataSource: {
+                        id: map.get("2")
+                    }
                 }
                 inList.push(inventoryJson);
             }
@@ -1528,7 +1532,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var checkDuplicate = (inventoryDataList.concat(inList)).filter(c =>
                 c.realmCountryPlanningUnit.id == map.get("3") &&
                 moment(c.inventoryDate).format("YYYY-MM") == moment(map.get("0")).format("YYYY-MM") &&
-                c.region.id == map.get("1") && c.actualQty != "" && c.actualQty != null && c.actualQty != undefined);
+                c.region.id == map.get("1") &&
+                c.dataSource.id == map.get("2") &&
+                c.actualQty != "" && c.actualQty != null && c.actualQty != undefined);
+                console.log("checkDuplicate Test@@@123",checkDuplicate)
             if (adjustmentType == 1 && (checkDuplicate.length > 1)) {
                 var colArr = ['D'];
                 for (var c = 0; c < colArr.length; c++) {
