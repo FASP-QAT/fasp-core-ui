@@ -2629,14 +2629,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   getTableDiv() {
+    var testArray = ["Option 1","Option 2","Option 3","Option 4"];
     return (
       <Table className="table-bordered text-center overflowhide main-table " bordered size="sm" options={this.options}>
         <thead>
           <tr>
             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
             <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
-            {this.state.monthArray.map(item => {
-              return (<th>{item.date}</th>)
+            {testArray.map(item => {
+              return (<th>{item}</th>)
             })}
             <th>{i18n.t('static.supplyPlan.total')}</th>
             <th>{i18n.t('static.dataentry.regionalPer')}</th>
