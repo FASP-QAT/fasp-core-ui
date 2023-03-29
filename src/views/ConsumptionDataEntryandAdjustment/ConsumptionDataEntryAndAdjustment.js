@@ -146,8 +146,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       jsonDataArima: [],
       count: 0,
       countRecived: 0,
-      isTableLoaded: "",
-      monthArray: []
+      isTableLoaded: ""
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -2220,7 +2219,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               });
               var rangeValue = this.state.singleValue2;
               console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-              var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
+              var startDate = moment(rangeValue.year + '-' + (rangeValue.month<=9?"0"+rangeValue.month:rangeValue.month) + '-01').format("YYYY-MM-DD");
               // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
               var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
 
@@ -2635,8 +2634,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           <tr>
             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
             <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
-            {this.state.monthArray.map(item => {
-              return (<th>{item.date}</th>)
+            {this.state.monthArray.map((item, count) => {
+              return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
             })}
             <th>{i18n.t('static.supplyPlan.total')}</th>
             <th>{i18n.t('static.dataentry.regionalPer')}</th>
