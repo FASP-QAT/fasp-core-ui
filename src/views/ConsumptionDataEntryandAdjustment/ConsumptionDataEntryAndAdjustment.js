@@ -146,8 +146,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       jsonDataArima: [],
       count: 0,
       countRecived: 0,
-      isTableLoaded: "",
-      monthArray: []
+      isTableLoaded: ""
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -2220,7 +2219,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               });
               var rangeValue = this.state.singleValue2;
               console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
-              var startDate = moment(rangeValue.year + '-' + (rangeValue.month<=9?"0"+rangeValue.month:rangeValue.month) + '-01').format("YYYY-MM-DD");
+              var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
               // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
               var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
 
@@ -2629,8 +2628,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   getTableDiv() {
-    var testArray = ["Option 1","Option 2","Option 3","Option 4"];
-    console.log("MonthArray ----->"+this.state.monthArray)
     return (
       <Table className="table-bordered text-center overflowhide main-table " bordered size="sm" options={this.options}>
         <thead>
