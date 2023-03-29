@@ -417,7 +417,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
                                 if (nodeDataMapForScenario.fuNode.usageType.id == 2) {
                                     fuPerMonth = ((noOfForecastingUnitsPerPerson / usageFrequency) * convertToMonth);
-                                    totalValue = fuPerMonth * calculatedValue;
+                                    totalValue = Number(fuPerMonth).toFixed(4) * calculatedValue;
 
                                 } else {
                                     // Need to change this logic
@@ -475,10 +475,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         var noOfPersons = nodeDataMapForScenario.fuNode.noOfPersons;
                                         if (nodeDataMapForScenario.fuNode.oneTimeUsage == "true" || nodeDataMapForScenario.fuNode.oneTimeUsage == true) {
                                             fuPerMonth = noOfForecastingUnitsPerPerson / noOfPersons;
-                                            totalValue = fuPerMonth * calculatedValue;
+                                            totalValue = Number(fuPerMonth).toFixed(4) * calculatedValue;
                                         } else {
                                             fuPerMonth = ((noOfForecastingUnitsPerPerson / noOfPersons) * usageFrequency * convertToMonth);
-                                            totalValue = fuPerMonth * calculatedValue;
+                                            totalValue = Number(fuPerMonth).toFixed(4) * calculatedValue;
                                         }
                                     } else {
                                         totalValue = noFURequired * calculatedValue;
