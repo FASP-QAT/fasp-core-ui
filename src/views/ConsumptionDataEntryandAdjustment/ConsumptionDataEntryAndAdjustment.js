@@ -2630,6 +2630,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   getTableDiv() {
     var testArray = ["Option 1","Option 2","Option 3","Option 4"];
+    console.log("MonthArray ----->"+monthArray)
     return (
       <Table className="table-bordered text-center overflowhide main-table " bordered size="sm" options={this.options}>
         <thead>
