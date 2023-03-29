@@ -146,8 +146,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       jsonDataArima: [],
       count: 0,
       countRecived: 0,
-      isTableLoaded: "",
-      monthArray: []
+      isTableLoaded: ""
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -2635,8 +2634,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           <tr>
             <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
             <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
-            {this.state.monthArray.map(item => {
-              return (<th>{item.date}</th>)
+            {this.state.monthArray.map((item, count) => {
+              return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
             })}
             <th>{i18n.t('static.supplyPlan.total')}</th>
             <th>{i18n.t('static.dataentry.regionalPer')}</th>
