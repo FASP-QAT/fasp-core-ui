@@ -2422,7 +2422,7 @@ export default class CreateTreeTemplate extends Component {
             } else {
                 if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
                     if (type == 1) {
-                        return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue);
+                        return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[0])[0].displayDataValue).toFixed(2));
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                         if (childList.length > 0) {
@@ -2559,13 +2559,13 @@ export default class CreateTreeTemplate extends Component {
 
                             }
                             console.log("Test123 Value", (itemConfig.payload.nodeDataMap[0])[0])
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue) + "% of parent" + val2 + (val < 0.01 ? addCommasThreeDecimal(val) : addCommasTwoDecimal(val)) + val1;
+                            return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[0])[0].displayDataValue).toFixed(2)) + "% of parent" + val2 + (val < 0.01 ? addCommasThreeDecimal(Number(val).toFixed(3)) : addCommasTwoDecimal(Number(val).toFixed(2))) + val1;
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             // return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
+                            return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[0])[0].displayDataValue).toFixed(2)) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
                         } else {
                             // return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent";
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue) + "% of parent";
+                            return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[0])[0].displayDataValue).toFixed(2)) + "% of parent";
                         }
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
@@ -2581,7 +2581,7 @@ export default class CreateTreeTemplate extends Component {
                             return "";
                         }
                     } else {
-                        return "= " + ((itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue != null ? addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue) : "");
+                        return "= " + ((itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue != null ? addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue).toFixed(2)) : "");
                         // if (itemConfig.payload.nodeType.id == 4) {
                         //     (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommasTwoDecimal(((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
                         //     return "= " + ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommasTwoDecimal(((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");

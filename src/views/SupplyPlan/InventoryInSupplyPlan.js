@@ -141,9 +141,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
 
     componentDidMount() {
-
-        document.getElementById("adjustmentsTableDiv").closest('.card').classList.add("removeCardwrap");
-
     }
 
     showInventoryData() {
@@ -528,17 +525,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var json = [];
         var inventoryQty = 0;
         var adjustmentType = this.props.items.inventoryType;
-        var adjustmentVisible = false;
-        var adjustmentColumnType = "text";
+        var adjustmentColumnType = "hidden";
         if (adjustmentType == 2) {
             adjustmentColumnType = "numeric"
-            adjustmentVisible = true;
         }
-        var actualColumnType = "text";
-        var actualVisible = false;
+        var actualColumnType = "hidden";
         if (adjustmentType == 1) {
             actualColumnType = "numeric";
-            actualVisible = false;
         }
         var batchInfo = rowData[13];
         var inventoryQty = 0;
@@ -622,35 +615,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             columns: [
                 { title: i18n.t('static.supplyPlan.batchId'), type: 'dropdown', source: batchList, filter: this.filterBatchInfoForExistingDataForInventory, width: 100 },
                 { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
-                {
-                    // title: i18n.t('static.supplyPlan.adjustmentType'), type: 'hidden',
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
-                    source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true
-                },
-                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
-                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, visible: actualVisible, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
-                {
-                    // title: i18n.t('static.supplyPlan.inventoryTransBatchInfoId'), type: 'hidden', 
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
-                    width: 0
-                },
-                {
-                    // title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', 
-                    title: 'A',
-                    type: 'text',
-                    visible: false,
-                    width: 0
-                },
-                {
-                    // type: 'hidden'
-                    title: 'A',
-                    type: 'text',
-                    visible: false
-                }
+                { title: i18n.t('static.supplyPlan.adjustmentType'), type: 'hidden', source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true },
+                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
+                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
+                { title: i18n.t('static.supplyPlan.inventoryTransBatchInfoId'), type: 'hidden', width: 0 },
+                { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
+                { type: 'hidden' }
             ],
             pagination: false,
             search: false,
