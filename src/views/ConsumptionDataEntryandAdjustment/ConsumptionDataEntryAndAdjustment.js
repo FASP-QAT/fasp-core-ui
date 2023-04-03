@@ -51,6 +51,13 @@ const pickerLang = {
   from: 'From', to: 'To',
 }
 
+const validationSchema = function (values, t) {
+  return Yup.object().shape({
+    consumptionNotes: Yup.string()
+      .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.label.validData"))
+  })
+}
+
 const validate = (getValidationSchema) => {
   return (values) => {
 
@@ -146,7 +153,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       jsonDataArima: [],
       count: 0,
       countRecived: 0,
-      isTableLoaded: ""
+      isTableLoaded: "",
+      consumptionNotesForValidation: ""
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -181,13 +189,20 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   touchAll(setTouched, errors) {
     setTouched({
       otherUnitName: true,
-      otherUnitMultiplier: true
+      otherUnitMultiplier: true,
+      consumptionNotes:  true
     }
     );
     this.validateForm(errors);
+    this.validateTable(errors);
   }
   validateForm(errors) {
     this.findFirstError('dataEnteredInForm', (fieldName) => {
+      return Boolean(errors[fieldName])
+    })
+  }
+  validateTable(errors) {
+    this.findFirstError('dataEnteredInTable', (fieldName) => {
       return Boolean(errors[fieldName])
     })
   }
@@ -279,6 +294,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         if (!isInterpolate) {
           document.getElementById("consumptionNotes").value = consumptionNotes;
         }
+        this.setState({ consumptionNotesForValidation: consumptionNotes })
         var multiplier = 1;
         var changedConsumptionDataDesc = "";
         if (consumptionUnitId != 0) {
@@ -2907,153 +2923,183 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
             </div>
           </div>
+          <Formik
+            enableReinitialize = {true}
+            initialValues={ {consumptionNotes: this.state.consumptionNotesForValidation} }
+            validate={validate(validationSchema)}
+            onSubmit={(values, { setSubmitting, setErrors }) => { this.saveConsumptionList() }}
+            render={
+              ({
+                values,
+                errors,
+                touched,
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                isSubmitting,
+                isValid,
+                setTouched,
+                handleReset,
+                setFieldValue,
+                setFieldTouched,
+                setFieldError
+              }) => (
+                  <Form className="col-md-12" onSubmit={handleSubmit} noValidate name="dataEnteredInTable" autocomplete="off">
 
-          <CardBody className="pb-lg-0 pt-lg-0">
-            <div>
-              <Form >
-                <div className="pl-0">
-                  <div className="row">
-                    <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.programheader')}</Label>
-                      <div className="controls ">
-                        <InputGroup>
-                          <Input
-                            type="select"
-                            name="datasetId"
-                            id="datasetId"
-                            bsSize="sm"
-                            onChange={(e) => { this.setDatasetId(e); }}
-                            value={this.state.datasetId}
+                    <CardBody className="pb-lg-0 pt-lg-0">
+                      <div>
+                        <Form >
+                          <div className="pl-0">
+                            <div className="row">
+                              <FormGroup className="col-md-3">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.programheader')}</Label>
+                                <div className="controls ">
+                                  <InputGroup>
+                                    <Input
+                                      type="select"
+                                      name="datasetId"
+                                      id="datasetId"
+                                      bsSize="sm"
+                                      onChange={(e) => { this.setDatasetId(e); }}
+                                      value={this.state.datasetId}
 
-                          >
-                            <option value="">{i18n.t('static.common.select')}</option>
-                            {datasets}
-                          </Input>
+                                    >
+                                      <option value="">{i18n.t('static.common.select')}</option>
+                                      {datasets}
+                                    </Input>
 
-                        </InputGroup>
-                      </div>
-                    </FormGroup>
-                    <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                      <div className="controls edit">
-                        <Picker
-                          ref="pickAMonth2"
-                          years={{ min: this.state.minDate, max: this.state.maxDate }}
-                          value={this.state.singleValue2}
-                          key={JSON.stringify(this.state.singleValue2)}
-                          lang={pickerLang}
-                          onChange={this.handleAMonthChange2}
-                          onDismiss={this.handleAMonthDissmis2}
-                        >
-                          <MonthBox value={makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
-                        </Picker>
-                      </div>
-                    </FormGroup>
-
-                  </div>
-                  <div className="row">
-                    <FormGroup className="tab-ml-0 mb-md-3 ml-3">
-                      <Col md="12" >
-                        <Input className="form-check-input" type="checkbox" id="checkbox1" name="checkbox1" value={this.state.showInPlanningUnit} onChange={(e) => this.setShowInPlanningUnits(e)} />
-                        <Label check className="form-check-label" htmlFor="checkbox1">{i18n.t('static.dataentry.showInPlanningUnits')}</Label>
-                      </Col>
-                    </FormGroup>
-                  </div>
-                </div>
-              </Form>
-              <div style={{ display: this.state.loading ? "none" : "block" }}>
-                {this.state.showSmallTable &&
-                  <div className="row">
-                    <div className="col-md-12 mt-2">
-                      <div className="table-scroll">
-                        <div className="table-wrap DataEntryTable table-responsive fixTableHeadSupplyPlan">
-                          {this.state.isTableLoaded}
-                        </div>
-                      </div>
-                      <br></br>
-                      <br></br>
-                      <div className="row">
-                        {this.state.showDetailTable &&
-                          <>
-                            <FormGroup className="col-md-4">
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.common.for')} {i18n.t('static.dashboard.planningunitheader')}: <b>{getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)}</b>
-                              </Label><br />
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
-                                <a className="card-header-action">
-                                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>}
-                                </a>
-                              </Label><br />
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>
-                              </Label>
-
-                            </FormGroup></>}
-                        <FormGroup className="col-md-4" style={{ display: this.state.showDetailTable ? 'block' : 'none' }}>
-                          <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.consumptionNotes')}</Label>
-                          <div className="controls ">
-                            <InputGroup>
-                              <Input
-                                type="textarea"
-                                name="consumptionNotes"
-                                id="consumptionNotes"
-                                bsSize="sm"
-                                readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? false : true}
-                                onChange={(e) => this.setState({ consumptionChanged: true })}
-                              >
-                              </Input>
-                            </InputGroup>
-                          </div>
-                        </FormGroup>
-                        <FormGroup className="col-md-4" style={{ paddingTop: '30px', display: this.state.showDetailTable ? 'block' : 'none' }}>
-                          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
-                            <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>}
-                        </FormGroup>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-12 pl-2 pr-2 datdEntryRow consumptionDataEntryTable">
-                          <div id="tableDiv" className="leftAlignTable">
-                          </div>
-                        </div>
-                      </div>
-                      <br></br>
-                      <br></br>
-                      {this.state.showDetailTable &&
-                        <div className="col-md-12">
-                          <div className="chart-wrapper chart-graph-report">
-                            <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                            <div>
+                                  </InputGroup>
+                                </div>
+                              </FormGroup>
+                              <FormGroup className="col-md-3">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                <div className="controls edit">
+                                  <Picker
+                                    ref="pickAMonth2"
+                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                    value={this.state.singleValue2}
+                                    key={JSON.stringify(this.state.singleValue2)}
+                                    lang={pickerLang}
+                                    onChange={this.handleAMonthChange2}
+                                    onDismiss={this.handleAMonthDissmis2}
+                                  >
+                                    <MonthBox value={makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
+                                  </Picker>
+                                </div>
+                              </FormGroup>
 
                             </div>
+                            <div className="row">
+                              <FormGroup className="tab-ml-0 mb-md-3 ml-3">
+                                <Col md="12" >
+                                  <Input className="form-check-input" type="checkbox" id="checkbox1" name="checkbox1" value={this.state.showInPlanningUnit} onChange={(e) => this.setShowInPlanningUnits(e)} />
+                                  <Label check className="form-check-label" htmlFor="checkbox1">{i18n.t('static.dataentry.showInPlanningUnits')}</Label>
+                                </Col>
+                              </FormGroup>
+                            </div>
                           </div>
-                          <b>{i18n.t('static.dataentry.graphNotes')}</b>
+                        </Form>
+                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                          {this.state.showSmallTable &&
+                            <div className="row">
+                              <div className="col-md-12 mt-2">
+                                <div className="table-scroll">
+                                  <div className="table-wrap DataEntryTable table-responsive fixTableHeadSupplyPlan">
+                                    {this.state.isTableLoaded}
+                                  </div>
+                                </div>
+                                <br></br>
+                                <br></br>
+                                <div className="row">
+                                      {this.state.showDetailTable &&
+                                        <>
+                                          <FormGroup className="col-md-4">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.for')} {i18n.t('static.dashboard.planningunitheader')}: <b>{getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)}</b>
+                                            </Label><br />
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
+                                              <a className="card-header-action">
+                                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>}
+                                              </a>
+                                            </Label><br />
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>
+                                            </Label>
+
+                                          </FormGroup>
+                                        </>
+                                      }
+                                      <FormGroup className="col-md-4" style={{ display: this.state.showDetailTable ? 'block' : 'none' }}>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.consumptionNotes')}</Label>
+                                        <div className="controls ">
+                                          <InputGroup>
+                                            <Input
+                                              type="textarea"
+                                              name="consumptionNotes"
+                                              id="consumptionNotes"
+                                              valid={!errors.consumptionNotes}
+                                              invalid={!!errors.consumptionNotes}
+                                              bsSize="sm"
+                                              readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? false : true}
+                                              onChange={(e) => { handleChange(e);this.setState({ consumptionChanged: true })}}
+                                              onBlur={handleBlur}
+                                            >
+                                            </Input>
+                                            <FormFeedback className="red">{errors.consumptionNotes}</FormFeedback>
+                                          </InputGroup>
+                                        </div>
+                                      </FormGroup>
+                                      <FormGroup className="col-md-4" style={{ paddingTop: '30px', display: this.state.showDetailTable ? 'block' : 'none' }}>
+                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
+                                          <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>}
+                                      </FormGroup>
+                                </div>
+
+                                <div className="row">
+                                  <div className="col-md-12 pl-2 pr-2 datdEntryRow consumptionDataEntryTable">
+                                    <div id="tableDiv" className="leftAlignTable">
+                                    </div>
+                                  </div>
+                                </div>
+                                <br></br>
+                                <br></br>
+                                {this.state.showDetailTable &&
+                                  <div className="col-md-12">
+                                    <div className="chart-wrapper chart-graph-report">
+                                      <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                      <div>
+
+                                      </div>
+                                    </div>
+                                    <b>{i18n.t('static.dataentry.graphNotes')}</b>
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                          }
                         </div>
-                      }
-                    </div>
-                  </div>
-                }
-              </div>
-              <div style={{ display: this.state.loading ? "block" : "none" }}>
-                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                  <div class="align-items-center">
-                    <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                          <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                            <div class="align-items-center">
+                              <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                    <div class="spinner-border blue ml-4" role="status">
+                              <div class="spinner-border blue ml-4" role="status">
 
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardBody>
-          <CardFooter>
-            <FormGroup>
-              <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-              <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-              {this.state.consumptionChanged && <><Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.saveConsumptionList()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>&nbsp;</>}
-              {this.state.showSmallTable && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
-              &nbsp;
-            </FormGroup>
-          </CardFooter>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardBody>
+                    <CardFooter>
+                      <FormGroup>
+                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                        {this.state.consumptionChanged && <><Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>&nbsp;</>}
+                        {this.state.showSmallTable && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
+                        &nbsp;
+                      </FormGroup>
+                    </CardFooter>
+                  </Form>
+            )} />
         </Card>
         <Modal isOpen={this.state.showGuidance}
           className={'modal-lg ' + this.props.className} >
