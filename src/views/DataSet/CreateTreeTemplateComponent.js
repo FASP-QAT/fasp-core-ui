@@ -96,7 +96,7 @@ const validationSchemaNodeData = function (values) {
             .test('nodeUnitId', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     // console.log("@@@",(parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "");
-                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "") {
+                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2 || parseInt(document.getElementById("nodeTypeId").value) == 4) && document.getElementById("nodeUnitId").value == "") {
                         return false;
                     } else {
                         return true;
@@ -4937,17 +4937,33 @@ export default class CreateTreeTemplate extends Component {
 
             if (this.state.addNodeFlag) {
                 // var usageTypeParent = document.getElementById("usageTypeParent");
-                if (this.state.currentItemConfig.context.level != 0) {
-                    selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en;
+                if (this.state.currentItemConfig.context.parent != null) {
+                    if (this.state.currentItemConfig.parentItem.payload.nodeUnit.id != "") {
+                        selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en;
+                    } else {
+                        selectedText = "";
+                    }
                 } else {
-                    selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en;
+                    if (this.state.currentItemConfig.context.payload.nodeUnit.id != "") {
+                        selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en;
+                    } else {
+                        selectedText = "";
+                    }
                 }
 
             } else {
-                if (this.state.currentItemConfig.context.level != 0) {
-                    selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en;
+                if (this.state.currentItemConfig.context.parent != null) {
+                    if (this.state.currentItemConfig.parentItem.payload.nodeUnit.id != "") {
+                        selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en;
+                    } else {
+                        selectedText = "";
+                    }
                 } else {
-                    selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en;
+                    if (this.state.currentItemConfig.context.payload.nodeUnit.id != "") {
+                        selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en;
+                    } else {
+                        selectedText = "";
+                    }
                 }
             }
 
