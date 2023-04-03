@@ -154,7 +154,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       count: 0,
       countRecived: 0,
       isTableLoaded: "",
-      consumptionNotesForValidation: ""
+      consumptionNotesForValidation: ""
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
