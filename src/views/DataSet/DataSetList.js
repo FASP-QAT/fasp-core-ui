@@ -65,7 +65,7 @@ export default class ProgramList extends Component {
     }
     filterData() {
         let countryId = localStorage.getItem("FMCountryId") ? localStorage.getItem("FMCountryId") : 0;
-        var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : "";
+        var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : "true";
         
         console.log("countryId--------->", countryId);
         console.log("selStatus--------->", selStatus);
@@ -739,7 +739,7 @@ export default class ProgramList extends Component {
                                                 id="active"
                                                 bsSize="sm"
                                                 onChange={() => {this.dataChange(); this.filterData() } }
-                                                value={localStorage.getItem("FMSelStatus")}
+                                                value={localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : true}
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
                                                 <option value="true">{i18n.t('static.common.active')}</option>
