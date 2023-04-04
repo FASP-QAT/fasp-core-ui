@@ -291,7 +291,7 @@ class CompareVersion extends Component {
                         code: responseData[rd].programCode,
                         versionList: responseData[rd].versionList,
                         regionList: responseData[rd].regionList,
-                        label:responseData[rd].label
+                        label: responseData[rd].label
                     }
                     datasetList.push(json);
                 }
@@ -334,25 +334,29 @@ class CompareVersion extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = getRequest.result;
                 var datasetList = this.state.datasetList;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var mr = 0; mr < myResult.length; mr++) {
-                    var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
-                    if (index == -1) {
-                        var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
-                        var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                        console.log("programNamelabel+++", programNameLabel);
-                        var programNameJson = JSON.parse(programNameLabel)
-                        var json = {
-                            id: myResult[mr].programId,
-                            name: getLabelText(programNameJson, this.state.lang),
-                            code: myResult[mr].programCode,
-                            versionList: [{ versionId: myResult[mr].version + " (Local)" }]
+                    if (myResult[mr].userId == userId) {
+                        var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                        if (index == -1) {
+                            var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
+                            var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
+                            console.log("programNamelabel+++", programNameLabel);
+                            var programNameJson = JSON.parse(programNameLabel)
+                            var json = {
+                                id: myResult[mr].programId,
+                                name: getLabelText(programNameJson, this.state.lang),
+                                code: myResult[mr].programCode,
+                                versionList: [{ versionId: myResult[mr].version + " (Local)" }]
+                            }
+                            datasetList.push(json)
+                        } else {
+                            var existingVersionList = datasetList[index].versionList;
+                            console.log("existingVersionList+++", datasetList[index].versionList)
+                            existingVersionList.push({ versionId: myResult[mr].version + " (Local)" })
+                            datasetList[index].versionList = existingVersionList
                         }
-                        datasetList.push(json)
-                    } else {
-                        var existingVersionList = datasetList[index].versionList;
-                        console.log("existingVersionList+++", datasetList[index].versionList)
-                        existingVersionList.push({ versionId: myResult[mr].version + " (Local)" })
-                        datasetList[index].versionList = existingVersionList
                     }
                 }
                 var datasetId = "";
@@ -423,7 +427,7 @@ class CompareVersion extends Component {
                     var consumptionExtrapolation = datasetJson.consumptionExtrapolation;
                     for (var pu = 0; pu < planningUnitList.length; pu++) {
                         for (var r = 0; r < regionList.length; r++) {
-                            var label = {label_en:"",label_fr:"",label_pr:"",label_sp:""};
+                            var label = { label_en: "", label_fr: "", label_pr: "", label_sp: "" };
                             if (planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined) {
                                 if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "") {
                                     var selectedTree = treeList.filter(c => planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeId == c.treeId)[0];
@@ -450,17 +454,17 @@ class CompareVersion extends Component {
                             list.push({
                                 selectedForecast: label,
                                 totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].totalForecast : "",
-                                notes: {label_en:planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].notes : ""},
+                                notes: { label_en: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].notes : "" },
                                 planningUnit: planningUnitList[pu].planningUnit,
                                 region: {
-                                    id:regionList[r].regionId,
-                                    label:regionList[r].label
+                                    id: regionList[r].regionId,
+                                    label: regionList[r].label
                                 }
                             })
 
                         }
                     }
-                    console.log("List@@@@@Mohit",list)
+                    console.log("List@@@@@Mohit", list)
                     var json = {
                         currentVersion: {
                             forecastStartDate: datasetJson.currentVersion.forecastStartDate,
@@ -469,10 +473,10 @@ class CompareVersion extends Component {
                         },
                         planningUnitList: list,
                         regionList: datasetJson.regionList,
-                        programCode:datasetJson.programCode,
-                        label:datasetJson.label
+                        programCode: datasetJson.programCode,
+                        label: datasetJson.label
                     }
-                    console.log("Json@@@@@@@@",json);
+                    console.log("Json@@@@@@@@", json);
                     this.setState({
                         datasetData: json,
                         firstDataSet: 1,
@@ -502,8 +506,8 @@ class CompareVersion extends Component {
                         },
                         planningUnitList: responseData,
                         regionList: datasetFiltered.regionList,
-                        programCode:datasetFiltered.code,
-                        label:datasetFiltered.label
+                        programCode: datasetFiltered.code,
+                        label: datasetFiltered.label
                     }
                     this.setState({
                         datasetData: json,
@@ -575,7 +579,7 @@ class CompareVersion extends Component {
                     var consumptionExtrapolation = datasetJson.consumptionExtrapolation;
                     for (var pu = 0; pu < planningUnitList.length; pu++) {
                         for (var r = 0; r < regionList.length; r++) {
-                            var label = {label_en:"",label_fr:"",label_pr:"",label_sp:""};
+                            var label = { label_en: "", label_fr: "", label_pr: "", label_sp: "" };
                             if (planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined) {
                                 if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "") {
                                     var selectedTree = treeList.filter(c => planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeId == c.treeId)[0];
@@ -602,11 +606,11 @@ class CompareVersion extends Component {
                             list.push({
                                 selectedForecast: label,
                                 totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].totalForecast : "",
-                                notes: {label_en:planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].notes : ""},
+                                notes: { label_en: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].notes : "" },
                                 planningUnit: planningUnitList[pu].planningUnit,
                                 region: {
-                                    id:regionList[r].regionId,
-                                    label:regionList[r].label
+                                    id: regionList[r].regionId,
+                                    label: regionList[r].label
                                 }
                             })
 
@@ -620,8 +624,8 @@ class CompareVersion extends Component {
                         },
                         planningUnitList: list,
                         regionList: datasetJson.regionList,
-                        programCode:datasetJson.programCode,
-                        label:datasetJson.label
+                        programCode: datasetJson.programCode,
+                        label: datasetJson.label
                     }
                     this.setState({
                         datasetData1: json,
@@ -651,8 +655,8 @@ class CompareVersion extends Component {
                         },
                         planningUnitList: responseData,
                         regionList: datasetFiltered.regionList,
-                        programCode:datasetFiltered.code,
-                        label:datasetFiltered.label
+                        programCode: datasetFiltered.code,
+                        label: datasetFiltered.label
                     }
                     this.setState({
                         datasetData1: json,
