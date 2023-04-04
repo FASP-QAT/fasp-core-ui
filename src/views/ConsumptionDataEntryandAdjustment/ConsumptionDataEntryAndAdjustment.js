@@ -1112,7 +1112,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
-        elInstance.setValueFromCoords(x, y, Math.round(value), true)
+        elInstance.setValueFromCoords(x, y, (value), true)
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
       }
