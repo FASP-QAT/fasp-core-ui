@@ -4814,7 +4814,7 @@ export default class BuildTree extends Component {
                 }
             }
         }
-        if (x != 11) {
+        if (x != 11 && x!=9) {
             instance.setValueFromCoords(11, y, 1, true);
             this.setState({ isChanged: true });
         }
