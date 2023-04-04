@@ -153,8 +153,8 @@ export default class PlanningUnitSetting extends Component {
         var json = this.el.getJson(null, false);
         console.log("json.length-------", json);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(10, y);
-            if (parseInt(value) == 1) {
+            // var value = this.el.getValueFromCoords(10, y);
+            // if (parseInt(value) == 1) {
 
                 //tracer category
                 var col = ("A").concat(parseInt(y) + 1);
@@ -184,7 +184,7 @@ export default class PlanningUnitSetting extends Component {
                     for (var i = (json.length - 1); i >= 0; i--) {
                         var map = new Map(Object.entries(json[i]));
                         var planningUnitValue = map.get("1");
-                        if (planningUnitValue == value && y != i && i > y) {
+                        if (planningUnitValue == value && y != i && i > y && map.get("16").toString()=="true" && json[y][16].toString()=="true") {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
@@ -367,7 +367,7 @@ export default class PlanningUnitSetting extends Component {
 
 
 
-            }
+            // }
         }
         return valid;
     }
@@ -1539,9 +1539,9 @@ export default class PlanningUnitSetting extends Component {
                 var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                 for (var i = 0; i < filteredGetRequestList.length; i++) {
 
-                    var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                    var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                    var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                    var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson1 = JSON.parse(programData);
                     console.log("programJson1-------->1", programJson1);

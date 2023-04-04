@@ -47,6 +47,7 @@ class EquivalancyUnit extends Component {
             selSource: [],
 
             typeList: [],
+            typeList1: [],
             tracerCategoryList: [],
             tracerCategoryList1: [],
             forecastingUnitList: [],
@@ -127,7 +128,7 @@ class EquivalancyUnit extends Component {
         var elInstance = this.state.table2Instance;
         var rowData = elInstance.getRowData(y);
 
-        elInstance.setValueFromCoords(8, y, 1, true);
+        elInstance.setValueFromCoords(9, y, 1, true);
 
     }
 
@@ -192,9 +193,21 @@ class EquivalancyUnit extends Component {
             }
         }
 
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
         //Active
-        if (x != 8) {
-            elInstance.setValueFromCoords(8, y, 1, true);
+        if (x != 9) {
+            elInstance.setValueFromCoords(9, y, 1, true);
         }
         this.setState({ isChanged1: true })
     }.bind(this);
@@ -223,18 +236,19 @@ class EquivalancyUnit extends Component {
             for (var j = 0; j < papuList.length; j++) {
 
                 data = [];
-                data[0] = papuList[j].equivalencyUnitId
-                data[1] = papuList[j].healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
-                data[2] = getLabelText(papuList[j].label, this.state.lang)
+                data[0] = papuList[j].equivalencyUnitId //A
+                data[1] = papuList[j].healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';') //B
+                data[2] = getLabelText(papuList[j].label, this.state.lang) // C
                 // data[2] = papuList[j].healthArea.id
 
-                data[3] = getLabelText(papuList[j].realm.label, this.state.lang)
-                data[4] = ''
-                data[5] = papuList[j].active
-                data[6] = papuList[j].lastModifiedBy.username;
-                data[7] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-                data[8] = 0
-                data[9] = 0
+                data[3] = getLabelText(papuList[j].realm.label, this.state.lang) //D
+                data[4] = papuList[j].program != null ? papuList[j].program.id : -1; //E
+                data[5] = papuList[j].notes //F
+                data[6] = papuList[j].active//G
+                data[7] = papuList[j].lastModifiedBy.username;//H
+                data[8] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)//I
+                data[9] = 0//J
+                data[10] = 0//K
                 papuDataArr[count] = data;
                 count++;
             }
@@ -297,8 +311,18 @@ class EquivalancyUnit extends Component {
                     // textEditor: true,
                 },
                 {
+                    title: i18n.t('static.dashboard.programheader'),
+                    title: i18n.t('static.dataSource.program'),
+                    type: 'autocomplete',
+                    source: this.state.typeList1,
+                    filter: this.filterDataset1
+                    // readOnly: true
+                    // textEditor: true,
+                },
+
+                {
                     title: i18n.t('static.common.notes'),
-                    type: 'hidden',
+                    type: 'text',
                     // readOnly: true
                     textEditor: true,
                 },
@@ -335,23 +359,95 @@ class EquivalancyUnit extends Component {
                     elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
                     var rowData = elInstance.getRowData(y);
-                    var addRowId = rowData[9];
+                    var addRowId = rowData[10];
                     console.log("addRowId------>", addRowId);
                     if (addRowId == 1) {//active grade out
-                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
                     } else {
-                        var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
+                        let checkReadOnly = 0;
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && rowData[4] == -1 && rowData[4] != 0) {
+                            checkReadOnly = checkReadOnly + 1;
 
+                            // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                            // cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`K${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        }
                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
+                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+
+                        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) {
+                            // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                            // cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`A${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+
+                            var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                            var cell1 = elInstance.getCell(`K${parseInt(y) + 1}`)
+                            cell1.classList.add('readonly');
+                        }
                     }
                 }
-            },
+            }.bind(this),
 
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
@@ -391,12 +487,14 @@ class EquivalancyUnit extends Component {
 
                     // Insert new row before
                     if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.addRow'),
-                            onclick: function () {
-                                this.addRow1();
-                            }.bind(this)
-                        });
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_EQUIVALENCY_UNIT_MAPPING')) {
+                            items.push({
+                                title: i18n.t('static.common.addRow'),
+                                onclick: function () {
+                                    this.addRow1();
+                                }.bind(this)
+                            });
+                        }
                     }
 
                     // Delete a row
@@ -672,8 +770,7 @@ class EquivalancyUnit extends Component {
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
-                    type: 'checkbox',
-                    // readOnly: (( AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE')  || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE'))? false : true)
+                    type: 'checkbox'
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
@@ -719,9 +816,8 @@ class EquivalancyUnit extends Component {
                     var typeId = rowData[14];
                     // console.log("updateTable------>", rowData[11]);                    
 
-                    let roleArray = this.state.roleArray;
                     let checkReadOnly = 0;
-                    if ((roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                    if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && typeId == -1 && typeId != 0)) {
                         checkReadOnly = checkReadOnly + 1;
 
                         // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -762,7 +858,8 @@ class EquivalancyUnit extends Component {
 
 
 
-                    if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+                    if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
+                        && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) {
                         // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                         // cell1.classList.add('readonly');
 
@@ -952,12 +1049,14 @@ class EquivalancyUnit extends Component {
 
                     // Insert new row before
                     if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.common.addRow'),
-                            onclick: function () {
-                                this.addRow();
-                            }.bind(this)
-                        });
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_EQUIVALENCY_UNIT')) {
+                            items.push({
+                                title: i18n.t('static.common.addRow'),
+                                onclick: function () {
+                                    this.addRow();
+                                }.bind(this)
+                            });
+                        }
                     }
 
                     // Delete a row
@@ -1052,6 +1151,15 @@ class EquivalancyUnit extends Component {
         return mylist;
     }.bind(this)
 
+    filterDataset1 = function (instance, cell, c, r, source) {
+        console.log("Source Test123", source)
+        var mylist = this.state.typeList1;
+        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
+            mylist = mylist.filter(c => c.id != -1);
+        }
+        return mylist;
+    }.bind(this)
+
     filterDataset = function (instance, cell, c, r, source) {
         // var mylist = [];
         // var mylist = (instance.jexcel.getJson(null, false)[r])[5];
@@ -1061,9 +1169,23 @@ class EquivalancyUnit extends Component {
         // console.log("myList--------->1", value);
         // console.log("myList--------->2", mylist);
         // console.log("myList--------->3", this.state.forecastingUnitList);
-        var mylist = this.state.typeList;
-        if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
-            mylist.splice(0, 1);
+        let mylist = this.state.typeList;
+        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
+            mylist = mylist.filter(c => c.id != -1);
+        }
+        console.log("My List Test123", mylist)
+        var eq = this.state.table1Instance.getRowData(r)[1];
+        if (eq != "") {
+            console.log("Eq != Test123", eq)
+            var eqObject = this.state.equivalancyUnitList.filter(c => c.id == eq)[0];
+            console.log("Eq obj Test123", eqObject)
+            if (eqObject.program == null || eqObject.program.id == 0) {
+                console.log("In if Test123")
+                mylist = mylist;
+            } else {
+                console.log("In else Test123")
+                mylist = mylist.filter(c => c.id == eqObject.program.id);
+            }
         }
         return mylist;
         // return mylist.sort(function (a, b) {
@@ -1552,7 +1674,17 @@ class EquivalancyUnit extends Component {
                             tempProgramList[i] = paJson
                         }
                     }
-
+                    let tempProgramList1 = [];
+                    if (listArray.length > 0) {
+                        for (var i = 0; i < listArray.length; i++) {
+                            var paJson1 = {
+                                name: listArray[i].programCode,
+                                id: listArray[i].programId,
+                                active: listArray[i].active,
+                            }
+                            tempProgramList1[i] = paJson1
+                        }
+                    }
                     let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                     let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
                     // console.log("decryptedUser=====>", decryptedUser);
@@ -1569,10 +1701,17 @@ class EquivalancyUnit extends Component {
                         id: -1,
                         active: true,
                     });
+                    tempProgramList1.unshift({
+                        // name: 'All',
+                        name: i18n.t('static.common.all'),
+                        id: -1,
+                        active: true,
+                    });
 
 
                     this.setState({
                         typeList: tempProgramList,
+                        typeList1: tempProgramList1,
                         roleArray: roleArray
                         // loading: false
                     }, () => {
@@ -1652,7 +1791,8 @@ class EquivalancyUnit extends Component {
                             id: parseInt(listArray[i].equivalencyUnitId),
                             active: listArray[i].active,
                             healthAreaList: listArray[i].healthAreaList,
-                            realm: listArray[i].realm
+                            realm: listArray[i].realm,
+                            program: listArray[i].program
                         }
                         tempList[i] = paJson
                     }
@@ -1863,11 +2003,12 @@ class EquivalancyUnit extends Component {
         data[2] = "";
         data[3] = "";
         data[4] = "";
-        data[5] = true;
-        data[6] = "";
+        data[5] = "";
+        data[6] = true;
         data[7] = "";
-        data[8] = 1;
+        data[8] = "";
         data[9] = 1;
+        data[10] = 1;
 
         elInstance.insertRow(
             data, 0, 1
@@ -1934,7 +2075,7 @@ class EquivalancyUnit extends Component {
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 console.log("8 map---" + map1.get("8"))
-                if (parseInt(map1.get("8")) === 1) {
+                if (parseInt(map1.get("9")) === 1) {
                     let healthAreaSplit = elInstance.getValueFromCoords(1, i).split(';');
                     console.log("healthAreaSplit--------->1", healthAreaSplit);
                     let healthAreaTempList = []
@@ -1953,8 +2094,9 @@ class EquivalancyUnit extends Component {
                         },
                         // healthArea: { id: parseInt(map1.get("2")) },
                         healthAreaList: healthAreaTempList,
-                        active: map1.get("5"),
-
+                        active: map1.get("6"),
+                        program: (parseInt(map1.get("4")) == -1 ? null : { id: parseInt(map1.get("4")) }),
+                        notes: map1.get("5")
 
                     }
                     changedpapuList.push(json);
@@ -2135,7 +2277,8 @@ class EquivalancyUnit extends Component {
                         equivalencyUnitMappingId: parseInt(map1.get("0")),
                         tracerCategory: { id: parseInt(map1.get("3")) },
                         forecastingUnit: { id: parseInt(map1.get("4")) },
-                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("1")), realm: equivalencyUnitObj.realm },
+                        //change here
+                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("1")), realm: equivalencyUnitObj.realm},
                         convertToEu: map1.get("6").toString().replace(/,/g, ""),
                         notes: map1.get("7"),
                         program: (parseInt(map1.get("8")) == -1 ? null : { id: parseInt(map1.get("8")) }),
@@ -2257,7 +2400,7 @@ class EquivalancyUnit extends Component {
         if (x == 1) {
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("B").concat(parseInt(y) + 1);
-
+            elInstance.setValueFromCoords(8, y, '', true);
             // let selectedEquivalencyUnitId = this.el.getValueFromCoords(1, y);
             // if (selectedEquivalencyUnitId != null && selectedEquivalencyUnitId != '' && selectedEquivalencyUnitId != undefined) {
             //     let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
@@ -2475,7 +2618,7 @@ class EquivalancyUnit extends Component {
         var json = elInstance.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var value = elInstance.getValueFromCoords(8, y);
+            var value = elInstance.getValueFromCoords(9, y);
             if (parseInt(value) == 1) {
                 //Equivalency unit
                 var budgetRegx = /^\S+(?: \S+)*$/;
@@ -2534,7 +2677,24 @@ class EquivalancyUnit extends Component {
                     this.el.setComments(col, "");
                 }
 
-
+                var col = ("E").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(4, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideThirdComponent();
+                        })
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
         }
         return valid;
@@ -2953,7 +3113,8 @@ class EquivalancyUnit extends Component {
 
                     </CardBody>
                     <CardFooter>
-                        {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
+                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
+                            || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) &&
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
@@ -3095,7 +3256,7 @@ class EquivalancyUnit extends Component {
                             <strong>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</strong>
                         </ModalHeader>
                         <ModalBody>
-                            <span><h5 style={{ color: this.state.color }} id="div3">{this.state.message}</h5></span>
+                            <span><h5 style={{ color: this.state.color, display: "none" }} id="div3">{this.state.message}</h5></span>
                             {/* <h6 className="red" id="div3"></h6> */}
                             <div>
                                 <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped consumptionDataEntryTable">
@@ -3105,7 +3266,8 @@ class EquivalancyUnit extends Component {
                         </ModalBody>
 
                         <ModalFooter>
-                            {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
+                            {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
+                                || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) &&
                                 <div className="mr-0">
                                     {this.state.isChanged1 && <Button type="submit" size="md" color="success" className="float-right" onClick={this.formSubmit1} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                     <Button color="info" size="md" className="float-right mr-1" id="eqUnitAddRow" type="button" onClick={() => this.addRow1()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>

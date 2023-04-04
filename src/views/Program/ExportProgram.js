@@ -374,7 +374,7 @@ export default class ExportProgram extends Component {
                                                                                             // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
                                                                                             console.log("Txt ", txt);
                                                                                             console.log("Txt 1", txt1);
-                                                                                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
 
                                                                                         }
 
