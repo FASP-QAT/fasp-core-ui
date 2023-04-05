@@ -82,6 +82,7 @@ const ListRealmCountry = React.lazy(() => import('../../views/RealmCountry/ListR
 const AddRealmCountry = React.lazy(() => import('../../views/RealmCountry/AddRealmCountryComponent'));
 const RealmCountry = React.lazy(() => import('../../views/RealmCountry/RealmCountry'));
 const AddProgramIntegration = React.lazy(() => import('../../views/Integration/AddProgramIntegration'));
+const ManualJsonTrigger = React.lazy(() => import('../../views/Integration/ManualJsonTrigger'));
 const AddCountrySpecificPrice = React.lazy(() => import('../../views/ProgramProduct/AddCountrySpecificPrice'));
 const ChangePassword = React.lazy(() => import('../../views/Pages/Login/ChangePasswordComponent'));
 const Logout = React.lazy(() => import('../../views/Pages/Login/LogoutComponent'));
@@ -496,6 +497,7 @@ const routes = [
   { path: '/realmCountry/addRealmCountry', exact: true, name: 'static.breadcrum.add', entityname: 'static.dashboard.realmcountry', component: AddRealmCountry },
   { path: '/realmCountry/realmCountry/:realmId', exact: true, name: 'static.dashboard.realmcountry', component: RealmCountry },
   { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
+  { path: '/program/addManualIntegration', exact: true, name: 'static.integration.manualProgramIntegration', component: ManualJsonTrigger },
   { path: '/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
 
   { path: '/changePassword', exact: true, name: 'static.dashboard.changepassword', component: ChangePassword },
@@ -1875,6 +1877,18 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-cogs',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION') && this.state.activeTab == 2 ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+
+                          {
+                            name: i18n.t('static.integration.manualProgramIntegration'),
+                            url: '/program/addManualIntegration',
+                            icon: 'fa fa-cogs',
+                            attributes: {
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_INTEGRATION') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
