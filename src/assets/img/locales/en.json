@@ -3027,5 +3027,6 @@
     "static.manualIntegration.jsonCreationDate":"JSON Creation Date",
     "static.manualIntegration.addManualIntegration":"Add Manual Integration",
     "static.manualIntegration.completed":"Completed",
-    "static.manualIntegration.requested":"Requested"
+    "static.manualIntegration.requested":"Requested",
+    "static.commitTree.puThatDoesNotAppearOnSelectedForecastTree":"Planning units that does not appear on any selected tree"
 }
