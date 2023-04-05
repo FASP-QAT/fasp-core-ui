@@ -2698,7 +2698,7 @@ export default class BuildTree extends Component {
             data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(P${parseInt(j) + 1 - lagInMonths}<0,0,P${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(P${parseInt(j) + 1}<0,0,P${parseInt(j) + 1})`;
             data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
             data[10] = this.state.currentScenario.manualChangesEffectFuture;
-            data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? fuPerMonth : this.state.noFURequired) : 1;
+            data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : this.state.noFURequired) : 1;
             data[12] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 var dataValue = 0;
@@ -4972,7 +4972,7 @@ export default class BuildTree extends Component {
             else {
                 if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
                     if (type == 1) {
-                        return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
+                        return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue).toFixed(2));
                     } else if (type == 3) {
                         console.log("get payload 2");
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
@@ -5088,13 +5088,13 @@ export default class BuildTree extends Component {
                                 }
 
                             }
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent" + val2 + (val < 0.01 ? addCommasThreeDecimal(val) : addCommasTwoDecimal(val)) + val1;
+                            return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue).toFixed(2)) + "% of parent" + val2 + (val < 0.01 ? addCommasThreeDecimal(Number(val).toFixed(3)) : addCommasTwoDecimal(Number(val).toFixed(2))) + val1;
 
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             console.log("payload get puNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier;
+                            return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue).toFixed(2)) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier;
                         } else {
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                            return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue).toFixed(2)) + "% of parent";
                         }
 
                     } else if (type == 3) {
@@ -5116,7 +5116,7 @@ export default class BuildTree extends Component {
                         }
                     } else {
                         console.log("get payload 8");
-                        return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue != null ? addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue) : "");
+                        return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue != null ? addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue).toFixed(2)) : "");
                     }
                 }
             }
@@ -8854,9 +8854,10 @@ export default class BuildTree extends Component {
                             nodeTypeId: this.state.currentItemConfig.context.payload.nodeType.id,
                             nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id,
                             forecastingUnitId: this.state.fuValues,
-                            tempPlanningUnitId: this.state.tempPlanningUnitId
+                            tempPlanningUnitId: this.state.tempPlanningUnitId,
+                            nodeValue: this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue),
                             // showFUValidation : true
-                            // percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[1])[0].dataValue
+                            percentageOfParent: this.state.currentScenario.dataValue
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -9432,7 +9433,7 @@ export default class BuildTree extends Component {
                                                                 bsSize="sm"
                                                                 readOnly={true}
                                                                 className="mr-2"
-                                                                value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) : this.state.noFURequired)}>
+                                                                value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? Number(this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod).toFixed(4) : this.state.noFURequired)}>
 
                                                             </Input>
                                                             {/* </FormGroup>
