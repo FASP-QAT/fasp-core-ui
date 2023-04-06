@@ -28,7 +28,7 @@ export default class ConsumptionDetails extends Component {
 
     constructor(props) {
         super(props);
-        var startDate = moment(Date.now()).subtract(1, 'months').startOf('month').format("YYYY-MM-DD");
+        var startDate = moment(Date.now()).subtract(3, 'months').startOf('month').format("YYYY-MM-DD");
         var endDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
         this.state = {
             integrationList: [],
@@ -117,6 +117,22 @@ export default class ConsumptionDetails extends Component {
         data[1] = "";
         data[2] = "";
         tableData[0] = data;
+        data[0] = "";
+        data[1] = "";
+        data[2] = "";
+        tableData[1] = data;
+        data[0] = "";
+        data[1] = "";
+        data[2] = "";
+        tableData[2] = data;
+        data[0] = "";
+        data[1] = "";
+        data[2] = "";
+        tableData[3] = data;
+        data[0] = "";
+        data[1] = "";
+        data[2] = "";
+        tableData[4] = data;
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -132,7 +148,7 @@ export default class ConsumptionDetails extends Component {
                     source: this.state.programList
                 },
                 {
-                    title: i18n.t('static.report.version'),
+                    title: i18n.t('static.report.versionFinal*'),
                     type: 'dropdown',
                     source: [],
                     filter: this.filterVersion
@@ -870,16 +886,22 @@ export default class ConsumptionDetails extends Component {
                 console.log(response.data);
                 var dataForJexcel = [];
                 if (realmCountryIds.length > 0 && programIds.length > 0) {
-                    dataForJexcel = response.data
+                    dataForJexcel = response.data.sort((a, b) => {
+                        var itemLabelA = a.createdDate;
+                        var itemLabelB = b.createdDate
+                        return itemLabelA < itemLabelB ? 1 : -1;
+                    });
                 }
                 if (response.status == "200") {
                     console.log("Response.data Test@@@123", response.data);
                     var data = [];
                     var tableData = []
                     for (var i = 0; i < dataForJexcel.length; i++) {
+                        var version=this.state.programList.filter(c=>c.id==dataForJexcel[i].program.id)[0].versionList.filter(c=>c.versionId==dataForJexcel[i].versionId)[0];
+                        var name = ((version.versionStatus.id == 2 && version.versionType.id == 2) ? version.versionId + '*' : version.versionId) + " (" + moment(version.createdDate).format(`MMM DD YYYY`) + ")";
                         data = [];
                         data[0] = dataForJexcel[i].program.code;
-                        data[1] = dataForJexcel[i].versionId;
+                        data[1] = name;
                         data[2] = dataForJexcel[i].integrationName.toUpperCase();
                         data[3] = dataForJexcel[i].createdBy.username;
                         data[4] = moment(dataForJexcel[i].createdDate).format(`YYYY-MM-DD HH:mm:ss`);
@@ -900,7 +922,7 @@ export default class ConsumptionDetails extends Component {
                                 type: 'text'
                             },
                             {
-                                title: i18n.t('static.report.version'),
+                                title: i18n.t('static.report.versionFinal*'),
                                 type: 'text'
                             },
                             {
@@ -1176,7 +1198,7 @@ export default class ConsumptionDetails extends Component {
                         </ModalBody>
                         <ModalFooter>
                             <Button color="info" id="addRowButtonId" size="md" className="float-right mr-1" type="button" onClick={this.addRowClicked}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
-                            {this.state.changedFlag && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.submitClicked}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}
+                            {this.state.changedFlag && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.submitClicked}> <i className="fa fa-check"></i> {i18n.t('static.manualIntegration.addManualIntegration')}</Button>}
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => this.modelOpenClose()}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                         </ModalFooter>
                     </Modal>

@@ -1627,7 +1627,7 @@ class AuthenticationService {
     setRecordCount(count) {
         var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
         var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD");
-        var startDate1 = moment(Date.now()).subtract(1, 'months').startOf('month').format("YYYY-MM-DD");
+        var startDate1 = moment(Date.now()).subtract(3, 'months').startOf('month').format("YYYY-MM-DD");
         var endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
         localStorage.setItem('sesRecordCount', count);
         localStorage.setItem('sesRangeValue', JSON.stringify({ from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }));
