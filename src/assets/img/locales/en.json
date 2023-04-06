@@ -3022,10 +3022,11 @@
     "static.QATForecastImport.convertedForecastConsumption": "Converted Forecasted Consumption (to be imported)",
     "static.QATForecastImport.currentForecastConsumption": "Current Forecasted Consumption (Supply Plan Module)",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.errorPage.error":"Error",
-    "static.errorPage.errorMessage":"We seem to have encountered an unexpected error. Please show this to one of our engineers so we can get someone working on this right away.",
-    "static.errorPage.errorReason":"Error reason -",
-    "static.errorPage.returnToDashboard":"Return to Dashboard",
-    "static.errorPage.userCommentPlaceholder":"Please describe what you were doing when this error occurred - the more details the better!",
-    "static.errorPage.raiseATicket":"Raise a Ticket"
+    "static.integration.manualProgramIntegration":"JSON Generation Status",
+    "static.manualIntegration.requester":"Requester",
+    "static.manualIntegration.jsonCreationDate":"JSON Creation Date",
+    "static.manualIntegration.addManualIntegration":"Request JSON",
+    "static.manualIntegration.completed":"Completed",
+    "static.manualIntegration.requested":"Requested",
+    "static.commitTree.puThatDoesNotAppearOnSelectedForecastTree":"Planning units that does not appear on any selected tree"
 }

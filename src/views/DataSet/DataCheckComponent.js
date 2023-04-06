@@ -779,7 +779,7 @@ export function exportPDF(props) {
     }
 
     doc.setFont('helvetica', 'normal')
-    planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree'), doc.internal.pageSize.width * 3 / 4);
+    planningText = doc.splitTextToSize("a. " + (props.state.includeOnlySelectedForecasts?i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree'):i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')), doc.internal.pageSize.width * 3 / 4);
     // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
     y = y + 10;
     for (var i = 0; i < planningText.length; i++) {
