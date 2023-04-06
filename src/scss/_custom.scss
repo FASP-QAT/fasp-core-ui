@@ -10040,3 +10040,23 @@ legend.scheduler-border {
   font-family: 'latin_modern_roman_slante10Rg';
   src: url('/src/assets/font_formulae/lmromanslant10-regular-webfont.woff') format('woff');
 }
+
+.z-index1000{
+  z-index: 1000;
+}
+
+.z-index1001{
+  z-index: 1001;
+}
+
+.cssTable th {
+  width: 120px !important;
+  white-space: normal !important;
+}
+
+.cssTable th:first-child,
+.cssTable th:nth-child(2) {
+  width: auto !important;
+  overflow: auto !important;
+  white-space: nowrap !important;
+}

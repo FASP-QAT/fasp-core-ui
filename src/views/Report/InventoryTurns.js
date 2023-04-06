@@ -111,6 +111,9 @@ export default class InventoryTurns extends Component {
     }
     formatterDouble = value => {
 
+        if(value == null){
+            return null;
+        }
         var cell1 = this.roundN(value)
         cell1 += '';
         var x = cell1.split('.');
@@ -560,13 +563,14 @@ export default class InventoryTurns extends Component {
         ),
             () => {
                 this.filterData();
+                this.formSubmit();
             })    
         }else{
             this.setState( prevState => ({ programList:[], programId:[], costOfInventory: [], costOfCountry:[], costOfProgram:[], CostOfInventoryInput : { ...prevState.CostOfInventoryInput, displayId: parseInt(2), country: [], programIds:[] }}
         ),
             () => {
                 this.filterData();
-                
+                this.formSubmit();
             })
         }
     }
@@ -860,8 +864,8 @@ export default class InventoryTurns extends Component {
                                 level1AverageStock = level1AverageStock / level1NoOfMonths;
                                 let level1InventoryTurns = tempData.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / tempData.length;
                                 let level1PlannedInventoryTurns = this.mode(tempData.map(arr => arr.plannedInventoryTurns));
-                                let level1Mape = tempData.reduce((prev,curr,index) => prev + curr.mape, 0) / tempData.length;
-                                let level1Mse = tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / tempData.length;
+                                let level1Mape = tempData.reduce((prev,curr,index) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length);
+                                let level1Mse = tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / (tempData.filter(arr => arr.mse != null).length);
                                 level1Data.push({
                                     id: this.state.CostOfInventoryInput.country[i],
                                     countryName: tempData[0].realmCountry.label.label_en,
@@ -882,8 +886,8 @@ export default class InventoryTurns extends Component {
                                     level2AverageStock = level2AverageStock / level2NoOfMonths;
                                     let level2InventoryTurns = temp.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / temp.length;
                                     let level2PlannedInventoryTurns = this.mode(temp.map(arr => arr.plannedInventoryTurns));
-                                    let level2Mape = temp.reduce((prev,curr,index) => prev + curr.mape, 0) / temp.length;
-                                    let level2Mse = temp.reduce((prev,curr,index) => prev + curr.mse, 0) / temp.length;
+                                    let level2Mape = temp.reduce((prev,curr,index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length);
+                                    let level2Mse = temp.reduce((prev,curr,index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length);
                                     level2Data.push({
                                         id: this.state.CostOfInventoryInput.country[i],
                                         programId: unique[j],
@@ -909,8 +913,8 @@ export default class InventoryTurns extends Component {
                                 level1AverageStock = level1AverageStock / level1NoOfMonths;
                                 let level1InventoryTurns = tempData.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / tempData.length;
                                 let level1PlannedInventoryTurns = this.mode(tempData.map(arr => arr.plannedInventoryTurns));
-                                let level1Mape = tempData.reduce((prev,curr,index) => prev + curr.mape, 0) / tempData.length;
-                                let level1Mse = tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / tempData.length;
+                                let level1Mape = tempData.reduce((prev,curr,index) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length);
+                                let level1Mse = tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / tempData.filter(arr => arr.mse != null).length;
                                 level1Data.push({
                                     id: this.state.CostOfInventoryInput.pu[i],
                                     countryName: tempData[0].productCategory.label.label_en,
@@ -931,8 +935,8 @@ export default class InventoryTurns extends Component {
                                     level2AverageStock = level2AverageStock / level2NoOfMonths;
                                     let level2InventoryTurns = temp.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / temp.length;
                                     let level2PlannedInventoryTurns = this.mode(temp.map(arr => arr.plannedInventoryTurns));
-                                    let level2Mape = temp.reduce((prev,curr,index) => prev + curr.mape, 0) / temp.length;
-                                    let level2Mse = temp.reduce((prev,curr,index) => prev + curr.mse, 0) / temp.length;
+                                    let level2Mape = temp.reduce((prev,curr,index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length);
+                                    let level2Mse = temp.reduce((prev,curr,index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length);
                                     level2Data.push({
                                         id: this.state.CostOfInventoryInput.pu[i],
                                         programId: unique[j],
@@ -1091,23 +1095,22 @@ export default class InventoryTurns extends Component {
                 mode = num;
             }
         }
-        console.log("Hello "+mode)
         return mode;
     }      
 
     getTableDiv() {
         return (
-          <Table className="table-bordered text-center overflowhide main-table " bordered size="sm" options={this.options}>
+          <Table className="table-bordered text-center overflowhide main-table cssTable" bordered size="sm" options={this.options}>
             <thead>
               <tr>
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
-                <th></th>
-                <th className="dataentryTdWidth sticky-col first-col clone z-index0">{i18n.t('static.dashboard.Productmenu')}</th>
+                <th className="sticky-col first-col clone1"></th>
+                <th className="dataentryTdWidth sticky-col first-col clone"></th>
                 <th>{i18n.t('static.planningunit.planningunit')}</th>
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
                 <th>{i18n.t('static.report.noofmonth')}</th>
-                <th>{i18n.t('static.dashboard.inventoryTurns')}</th>
+                <th>Actual {i18n.t('static.dashboard.inventoryTurns')}</th>
                 <th>Planned {i18n.t('static.dashboard.inventoryTurns')}</th>
                 <th>{i18n.t('static.extrapolation.mape')}</th>
                 <th>{i18n.t('static.extrapolation.mse')}</th>
@@ -1118,7 +1121,7 @@ export default class InventoryTurns extends Component {
 
                 return (<>
                   <tr className="hoverTd">
-                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.id)}>
+                    <td className="sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.id)}>
                         {item.id in this.state.childShowArr ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                     </td>
                     <td className="sticky-col first-col clone hoverTd" align="left">
@@ -1138,7 +1141,7 @@ export default class InventoryTurns extends Component {
 
                     return (<>
                     <tr className="hoverTd" style={{ display: r.id in this.state.childShowArr ? "" : "none" }}>
-                      <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion1(r.programId, item.id)}>
+                      <td className="sticky-col first-col clone1" onClick={() => this.toggleAccordion1(r.programId, item.id)}>
                         {this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(r.programId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i> : ""}
                       </td>
                       <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{r.programName}</td>  
@@ -1156,7 +1159,7 @@ export default class InventoryTurns extends Component {
                     {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
 
                         return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
-                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                        <td className="sticky-col first-col clone1"></td>
                         <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
                         <td></td>
                         <td>{this.formatter(arr1.totalConsumption)}</td>
@@ -1171,7 +1174,7 @@ export default class InventoryTurns extends Component {
                     {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
 
                         return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
-                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                        <td className="sticky-col first-col clone1"></td>
                         <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
                         <td></td>
                         <td>{this.formatter(arr1.totalConsumption)}</td>
@@ -1216,7 +1219,7 @@ export default class InventoryTurns extends Component {
         
             {
                 dataField: 'planningUnit.label',
-                text: i18n.t('static.planningunit.planningunit'),
+                text: "",
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1263,7 +1266,7 @@ export default class InventoryTurns extends Component {
             },
             {
                 dataField: 'inventoryTurns',
-                text: i18n.t('static.dashboard.inventoryTurns'),
+                text: "Actual "+i18n.t('static.dashboard.inventoryTurns'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1437,7 +1440,7 @@ export default class InventoryTurns extends Component {
                                                 <div className="controls ">
                                                     <Select
                                                         bsSize="sm"
-                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light')}
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light', 'z-index1001')}
                                                         name="puId"
                                                         id="puId"
                                                         onChange={(e) => {
@@ -1456,7 +1459,7 @@ export default class InventoryTurns extends Component {
                                                 <div className="controls ">
                                                 <Select
                                                         bsSize="sm"
-                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light')}
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light', 'z-index1001')}
                                                         name="countryId"
                                                         id="countryId"
                                                         onChange={(e) => {
@@ -1475,7 +1478,7 @@ export default class InventoryTurns extends Component {
                                                 <div className="controls ">
                                                 <Select
                                                         bsSize="sm"
-                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light')}
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light', 'z-index1000')}
                                                         name="programId"
                                                         id="programId"
                                                         onChange={(e) => {
