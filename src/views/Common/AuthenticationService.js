@@ -1223,7 +1223,8 @@ class AuthenticationService {
                     case "/report/supplyPlanVersionAndReview":
                     case "/report/editStatus/:programId/:versionId":
                     case "/report/supplyPlanVersionAndReview/:color/:message":
-                        if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW")) {
+                    case "/report/supplyPlanVersionAndReview/:statusId":    
+                    if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW")) {
                             return true;
                         }
                         break;
@@ -1423,7 +1424,7 @@ class AuthenticationService {
                     case "/dataSet/buildTree/":
                     case "/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal":
                     case "/dataSet/buildTree/template/:templateId":
-                        if (bfunction.includes("ROLE_BF_ADD_TREE")) {
+                        if (bfunction.includes("ROLE_BF_ADD_TREE") || bfunction.includes("ROLE_BF_VIEW_TREE") || bfunction.includes("ROLE_BF_EDIT_TREE")) {
                             return true;
                         }
                         break;
@@ -1433,23 +1434,23 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    case "/dataset/branchTemplate/:templateId":
-                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
-                            return true;
-                        }
-                        break;
+                    // case "/dataset/branchTemplate/:templateId":
+                    //     if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
+                    //         return true;
+                    //     }
+                    //     break;
                     case "/dataset/listTreeTemplate/":
                     case "/dataset/listTreeTemplate/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_TREE_TEMPLATE")) {
                             return true;
                         }
                         break;
-                    case "/dataset/listBranchTreeTemplate/":
-                    case "/dataset/listBranchTreeTemplate/:color/:message":
-                        if (bfunction.includes("ROLE_BF_LIST_TREE_TEMPLATE")) {
-                            return true;
-                        }
-                        break;
+                    // case "/dataset/listBranchTreeTemplate/":
+                    // case "/dataset/listBranchTreeTemplate/:color/:message":
+                    //     if (bfunction.includes("ROLE_BF_LIST_TREE_TEMPLATE")) {
+                    //         return true;
+                    //     }
+                    //     break;
 
                     case "/dataset/listTree/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_TREE")) {

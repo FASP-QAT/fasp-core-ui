@@ -45,9 +45,9 @@
 												</li>
 												<li style="font-size:13px;">There are three ways to adjust the data:
 													<ol type="a">
-														<li><b>Adjust for under-reporting</b>: The default value is 100% reporting every month. The user can change this to the correct value. QAT will calculate the adjusted consumption due to underreporting. </li>
+														<li><b>Adjust for under-reporting</b>: The default value is 100% reporting every month. The user can change this to the correct value. QAT will calculate the adjusted consumption due to underreporting. The calculation assumes that facilities that did not report any consumption had the same consumption rate as the ones that did. </li>
 														<li><b>Adjust for stock outs</b>: For imported data, the number of stock out days is pulled in from the QAT supply plan program, if data is collected. The default value for stock out days is zero days (product assumed always in stock). 
-															The user can change this to the correct value. The default value for number of days in a month are based on the calendar days, 
+															The user can change this to the correct value. The calculation assumes that the days the product was stocked out would have had the same consumption rate as the rest of the time the product was in stock. The default value for number of days in a month are based on the calendar days, 
 															but users can adjust the number of days used for the stock out calculation in '<a href="/#/dataset/versionSettings" target="_blank" style="text-decoration: underline;">Update Version Settings</a>'. </li>
 														<p class="pl-lg-5">
 															<span style="font-style: italic;"><b>Stock Out Rate</b> = Stocked Out (days)/ (# of Days in Month). </span><br>
@@ -55,7 +55,7 @@
 															<p>For example, if for a given month, a product had a consumption of 1,000 units, was out-of-stock for 5 out of 31 days in the month and the reporting rate was 98%: <br>
 																<span class="pl-lg-5" style="font-style: italic;"><b> Stock Out Rate </b>= 5 days stocked out /31 days in a month = 16.1%. </span>
 																<br><span class="pl-lg-5" style="font-style: italic;"><b>  Adjusted Consumption </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  </p>
-																<li>Interpolating missing values: Click the green "Interpolate" button in the middle right of the screen to search for periods where the consumption value is blank and replace them with an interpolated value. 
+																<li>Adjusting for missing values: Click the green "Interpolate" button in the middle right of the screen to search for periods where the consumption value is blank and replace them with an interpolated value. 
 																	QAT interpolates by finding the nearest values on either side (before or after the blank), 
 																	calculates the straight line in between them and uses that straight-line formula to 
 																	calculate the value for the blank(s).  Note that QAT will not interpolate for months 
@@ -70,7 +70,7 @@
 																	<span>
 																		<img class="formula-img-mr img-fluid mb-lg-0" src="../ShowGuidanceFiles/img/dataentryScreenshot-1.png" style="border: 1px solid rgb(255, 255, 255); width: 250px;"></span><br><span>
 																			<img class="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src="../ShowGuidanceFiles/img/dataentryScreenshot-2.png" style="border: 1px solid rgb(255, 255, 255); width: 250px;"></span></li>
-																		<li>Use the graph below the Detailed Data table to view the adjusted data  </li>
+																		<li>Use the graph below the Detailed Data table to view the adjusted data (note: graph will only update after clicking “submit”) </li>
 																	</ol>
 											</li>
 											<li style="font-size:13px;">Click "Submit" to save any entered data </li>
