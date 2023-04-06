@@ -208,9 +208,9 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
     }
     
     // Number of months you want to project data for
-    const count = 24;
+    const count = noOfProjectionMonths;
     // Confidence # that you Confidence Interval for
-    const confidenceLevel = 0.95;
+    const confidenceLevel = confidence;
     
     let sumOfXMinusXBarSqr = 0;
     let sumOfXMinusXBar = 0;
@@ -250,7 +250,7 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
     
     let varX = sumOfXMinusXBarSqr / data.length;
     let sqrtOfRegression = Math.pow(SSE / (data.length - 2), 0.5);
-    let criticalTValue = getCriticalTValue(data.length, confidenceLevel);
+    let criticalTValue = getCriticalTValue(data.length, Number(confidenceLevel));
     let sumYMinusY1Sqr = 0;
     let a = sqrtOfRegression / Math.pow(data.length, 0.5);
     var output = [];
@@ -267,9 +267,9 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
             let ciL = y - cLevel;
             let ciU = y + cLevel;
             ciString = " : " + ciL + " : " + ciU;
-            output.push({ month:(x + 1),actual:null, forecast:y,ci:cLevel})
+            output.push({ month:(x + 1),actual:null, forecast:y == 'NA' ? null : y > 0 ? y : 0,ci:cLevel})
         }else{
-            output.push({ month:(x + 1),actual:inputData[x].actual, forecast:y,ci:null})
+            output.push({ month:(x + 1),actual:inputData[x].actual, forecast:y == 'NA' ? null : y > 0 ? y : 0,ci:null})
         }
     }
     console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)

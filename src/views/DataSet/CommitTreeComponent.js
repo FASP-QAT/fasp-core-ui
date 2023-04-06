@@ -288,7 +288,7 @@ export default class CommitTreeComponent extends React.Component {
             } else {
                 this.setState({
                     loading: false,
-                    programId:""
+                    programId: ""
                 })
             }
         })
@@ -599,7 +599,7 @@ export default class CommitTreeComponent extends React.Component {
                             programQPLDetailsGetRequest.onsuccess = function (event) {
                                 var programQPLDetails = programQPLDetailsGetRequest.result;
                                 var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8).replaceAll("\"null\"",null);
                                 var datasetJson = JSON.parse(datasetData);
                                 var programJson = datasetJson;
                                 programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
@@ -649,6 +649,16 @@ export default class CommitTreeComponent extends React.Component {
                                     treeList[findTreeIndex] = tree;
                                     console.log("commit*** treeList---", treeList);
                                 }
+                                var consumptionExtrapolationToUpdate = programJson.consumptionExtrapolation;
+                                for (var ce = 0; ce < consumptionExtrapolationToUpdate.length; ce++) {
+                                    var cel = consumptionExtrapolationToUpdate[ce].extrapolationDataList;
+                                    console.log("Cel Test123", cel)
+                                    for (var c = 0; c < cel.length; c++) {
+                                        cel[c].amount = cel[c].amount < 0 ? 0 : cel[c].amount;
+                                    }
+                                    consumptionExtrapolationToUpdate[ce].extrapolationDataList=cel;
+                                }
+                                programJson.consumptionExtrapolation=consumptionExtrapolationToUpdate;
                                 programJson.treeList = treeList;
                                 console.log("commit*** final programJson---", programJson);
 

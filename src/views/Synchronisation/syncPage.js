@@ -11,7 +11,7 @@ import {
 } from 'reactstrap';
 import * as Yup from 'yup';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED, SPECIAL_CHARECTER_WITH_NUM, API_URL } from '../../Constants.js';
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, LOCAL_VERSION_COLOUR, LATEST_VERSION_COLOUR, PENDING_APPROVAL_VERSION_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, OPEN_PROBLEM_STATUS_ID, JEXCEL_PRO_KEY, FINAL_VERSION_TYPE, PROBLEM_STATUS_IN_COMPLIANCE, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, SHIPMENT_MODIFIED, SPECIAL_CHARECTER_WITH_NUM, API_URL, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
@@ -86,7 +86,8 @@ export default class syncPage extends Component {
       deletedRowsListLocal: [],
       deletedRowsListServer: [],
       shipmentAlreadyLinkedToOtherProgCount: 0,
-      conflictsCountErp: 0
+      conflictsCountErp: 0,
+      shipmentIdsToBeActivated: []
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -1132,116 +1133,317 @@ export default class syncPage extends Component {
       }
       shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => (c.shipmentId == 0 && c.erpFlag == true) || (c.shipmentId == 0 && c.active.toString() == "true")));
 
+      console.log("shipmentData Test@@@123", shipmentData)
+      //Make all active erp shipments not active
+      shipmentData.map((item, index) => {
+        if (item.erpFlag.toString() == "true") {
+          shipmentData[index].active = false;
+        }
+      })
+
       var shipmentLinkedJson = this.state.mergedShipmentLinkedJexcel.getJson();
-      var linkedShipmentListLocal = this.state.oldProgramData.shipmentLinkingList != null ? this.state.oldProgramData.shipmentLinkingList : [];
+      var linkedShipmentListLocal = this.state.oldShipmentLinkingList;
+      var originalShipmentLinkingList = this.state.oldShipmentLinkingList;
+      var linkedShipmentListServer = this.state.latestProgramData.shipmentLinkingList != null ? this.state.latestProgramData.shipmentLinkingList : [];
+      var listThatIsFiltered = [];
+      for (var c = 0; c < shipmentLinkedJson.length; c++) {
+        if (shipmentLinkedJson[c][21] == 3) {
+          listThatIsFiltered = listThatIsFiltered.concat(linkedShipmentListLocal.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) == shipmentLinkedJson[c][0]));
+          linkedShipmentListLocal = linkedShipmentListLocal.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) != shipmentLinkedJson[c][0])
+          // .map(item1 => {
+          //   item1.active = false;
+          // });
+          linkedShipmentListLocal = linkedShipmentListLocal.concat(linkedShipmentListServer.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) == shipmentLinkedJson[c][0]));
+          // .map(item => {
+          //   var linkedServerIndex = linkedShipmentListLocal.findIndex(d => item.shipmentLinkingId == d.shipmentLinkingId);
+          //   if (linkedServerIndex == -1) {
+          //     linkedShipmentListLocal.push(item)
+          //   } else {
+          //     linkedShipmentListLocal[linkedServerIndex] = item
+          //   }
+          // })
+
+
+          // if (shipmentLinkedJson[c][15].toString() == "true") {
+          var listOfChildShipments = linkedShipmentListServer.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) == shipmentLinkedJson[c][0]);
+          listOfChildShipments.map(item => {
+            var shipmentIndex1 = shipmentData.findIndex(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
+            var latestShipmentIndex = latestProgramDataShipment.findIndex(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
+            if (shipmentIndex1 != -1 && latestShipmentIndex != -1) {
+              shipmentData[shipmentIndex1] = latestProgramDataShipment[latestShipmentIndex];
+            }
+
+            var shipmentIndex2 = shipmentData.findIndex(c => item.parentShipmentId > 0 ? c.shipmentId == item.parentShipmentId : c.tempShipmentId == item.tempParentShipmentId);
+            var latestShipmentIndex1 = latestProgramDataShipment.findIndex(c => item.parentShipmentId > 0 ? c.shipmentId == item.parentShipmentId : c.tempShipmentId == item.tempParentShipmentId);
+            if (shipmentIndex2 != -1 && latestShipmentIndex1 != -1) {
+              shipmentData[shipmentIndex2] = latestProgramDataShipment[latestShipmentIndex1];
+            }
+
+
+            // console.log("Item Test@@@123", item)
+            // console.log("Shipment data Test@@@123", shipmentData)
+            var listOfLinkedParentShipments = latestProgramDataShipment.filter(c => item.parentShipmentId > 0 ? (c.parentLinkedShipmentId == item.parentShipmentId) : (c.tempParentLinkedShipmentId == item.tempParentShipmentId));
+            // console.log("listOfLinkedParentShipments Test@@@123", listOfLinkedParentShipments)
+            listOfLinkedParentShipments.map(item1 => {
+
+              var shipmentIndex2 = shipmentData.findIndex(c => item1.shipmentId > 0 ? c.shipmentId == item1.shipmentId : c.tempShipmentId == item1.tempShipmentId);
+              var latestShipmentIndex2 = latestProgramDataShipment.findIndex(c => item1.shipmentId > 0 ? c.shipmentId == item1.shipmentId : c.tempShipmentId == item1.tempShipmentId);
+              if (shipmentIndex2 != -1 && latestShipmentIndex2 != -1) {
+                shipmentData[shipmentIndex2] = latestProgramDataShipment[latestShipmentIndex2];
+              }
+
+            })
+
+            var listOfLinkedParentShipments = shipmentData.filter(c => item.parentShipmentId > 0 ? (c.parentLinkedShipmentId == item.parentShipmentId) : (c.tempParentLinkedShipmentId == item.tempParentShipmentId));
+            // console.log("listOfLinkedParentShipments Test@@@123", listOfLinkedParentShipments)
+            listOfLinkedParentShipments.map(item1 => {
+
+              var shipmentIndex2 = shipmentData.findIndex(c => item1.shipmentId > 0 ? c.shipmentId == item1.shipmentId : c.tempShipmentId == item1.tempShipmentId);
+              var latestShipmentIndex2 = latestProgramDataShipment.findIndex(c => item1.shipmentId > 0 ? c.shipmentId == item1.shipmentId : c.tempShipmentId == item1.tempShipmentId);
+              if (shipmentIndex2 != -1 && latestShipmentIndex2 != -1) {
+                shipmentData[shipmentIndex2] = latestProgramDataShipment[latestShipmentIndex2];
+              }
+
+            })
+
+          })
+
+          // }
+        }
+        // if (shipmentLinkedJson[c][21] == 4 && shipmentLinkedJson[c][18] != shipmentLinkedJson[c][19]) {
+        //   var existingList = linkedShipmentListServer.filter(d => (d.roNo.toString() + " - " + d.roPrimeLineNo.toString()) == shipmentLinkedJson[c][0]);
+        //   existingList.map(item => {
+        //     item.active = false
+        //   })
+        //   console.log("Existing list @@@@ Test@@@123",existingList)
+        //   console.log("ocal list Test@@@123",linkedShipmentListLocal)
+        //   linkedShipmentListLocal = linkedShipmentListLocal.concat(existingList);
+
+        // }
+      }
+
+      var setOfLocalShipmentLinkingIds = [...new Set(linkedShipmentListLocal.map(ele => (ele.shipmentLinkingId)))];
+      var listOfShipmentLinkingFromServer = linkedShipmentListServer.filter(c => !setOfLocalShipmentLinkingIds.includes(c.shipmentLinkingId));
+      listOfShipmentLinkingFromServer.map(item => {
+        item.active = false
+      })
+
+      var listOfShipmentLinkingFromLocal = originalShipmentLinkingList.filter(c => !setOfLocalShipmentLinkingIds.includes(c.shipmentLinkingId) && c.shipmentLinkingId != 0);
+      listOfShipmentLinkingFromLocal.map(item => {
+        item.active = false
+      })
+
+      var listOfShipmentLinkingFromLocalWith0 = listThatIsFiltered.filter(c => c.shipmentLinkingId == 0);
+      listOfShipmentLinkingFromLocalWith0.map(item => {
+        item.active = false
+      })
+      // console.log("List that is filtered Test@@@123", listThatIsFiltered)
+      linkedShipmentListLocal = linkedShipmentListLocal.concat(listOfShipmentLinkingFromServer).concat(listOfShipmentLinkingFromLocal).concat(listOfShipmentLinkingFromLocalWith0);
+      var uniquePlanningUnitsInShipmentLinking = [];
+      // mergedList.map(c => );
+
+      linkedShipmentListLocal.map(item1 => {
+        // console.log("Item 1 Test@@@123", item1)
+        uniquePlanningUnitsInShipmentLinking = uniquePlanningUnitsInShipmentLinking.concat(item1.qatPlanningUnitId)
+        if (item1.active.toString() == "true") {
+          var shipmentIndex = shipmentData.findIndex(c => item1.childShipmentId > 0 ? c.shipmentId == item1.childShipmentId : c.tempShipmentId == item1.tempChildShipmentId);
+          if (shipmentIndex != -1) {
+            shipmentData[shipmentIndex].active = true;
+          }
+        }
+      })
+
+      // var nonActiveERPShipmentList = shipmentData.filter(c => c.active.toString() == "false" && c.erpFlag.toString() == "true");
+      linkedShipmentListLocal.map(item1 => {
+        if (item1.active.toString() == "false") {
+          // console.log("Item1Test@@@123", item1)
+          var parentShipmentId = item1.parentShipmentId;
+          var tempParentShipmentId = item1.tempParentShipmentId;
+          // console.log("Shipment Data Test@@@123", shipmentData);
+          var checkIfThereAreAnyActiveChildShipments = shipmentData.filter(c => c.active.toString() == "true" && c.erpFlag.toString() == "true" && (parentShipmentId > 0 ? (c.parentShipmentId == parentShipmentId) : (c.tempParentShipmentId == tempParentShipmentId)));
+          // console.log("checkIfThereAreAnyActiveChildShipments Test@@@123", checkIfThereAreAnyActiveChildShipments);
+          if (checkIfThereAreAnyActiveChildShipments.length == 0) {
+            var shipmentIndex1 = shipmentData.findIndex(c => parentShipmentId > 0 ? (c.shipmentId > 0 ? (c.shipmentId == parentShipmentId) : (c.tempShipmentId == parentShipmentId)) : (c.shipmentId > 0 ? (c.shipmentId == tempParentShipmentId) : (c.tempShipmentId == tempParentShipmentId)));
+            if (shipmentIndex1 != -1) {
+              shipmentData[shipmentIndex1].active = true;
+              shipmentData[shipmentIndex1].erpFlag = false;
+            }
+            // Activate linked parent shipment Id
+            var linkedParentShipmentIdList = shipmentData.filter(c => parentShipmentId > 0 ? (c.parentLinkedShipmentId == parentShipmentId) : (c.tempParentLinkedShipmentId == tempParentShipmentId));
+            for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
+              var parentShipmentIndex1 = shipmentData.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
+              if (parentShipmentIndex1 != -1) {
+                shipmentData[parentShipmentIndex1].active = true;
+                shipmentData[parentShipmentIndex1].erpFlag = false;
+                shipmentData[parentShipmentIndex1].parentLinkedShipmentId = null;
+                shipmentData[parentShipmentIndex1].tempParentLinkedShipmentId = null;
+              }
+
+            }
+          }
+        }
+      })
+
+
+
+      // var nonActiveERPShipmentList = shipmentData.filter(c => c.active.toString() == "false" && c.erpFlag.toString() == "true");
+      // console.log("Non Active ERP Shipments Test@@@123",nonActiveERPShipmentList);
+      // var setOfShipmentIds = [...new Set(nonActiveERPShipmentList.filter(c => c.shipmentId > 0 && (c.parentShipmentId==0 && c.tempParentShipmentId==null)).map(ele => ele.shipmentId))];
+      // var setOfTempShipmentIds = [...new Set(nonActiveERPShipmentList.filter(c => c.shipmentId == 0 && (c.parentShipmentId>0 || c.tempParentShipmentId>0)).map(ele => ele.tempShipmentId))];
+      // console.log("Set Of ShipmentIds Test@@@123", setOfShipmentIds);
+      // console.log("Set Of  temp ShipmentIds Test@@@123", setOfTempShipmentIds);
+
+      // setOfShipmentIds.map(item1 => {
+      //   var checkIfExists = linkedShipmentListLocal.filter(c => c.active.toString() == "true" && c.parentShipmentId > 0 && c.parentShipmentId == item1);
+      //   console.log("Check If exists Test@@@123", checkIfExists)
+      //   console.log("Filter 1 Test@@@123", linkedShipmentListLocal.filter(c => c.active.toString() == "true"))
+      //   console.log("Filter 2 Test@@@123", linkedShipmentListLocal.filter(c => c.active.toString() == "true" && c.parentShipmentId > 0))
+      //   console.log("Filter 3 Test@@@123", linkedShipmentListLocal.filter(c => c.active.toString() == "true" && c.parentShipmentId > 0 && c.parentShipmentId == item1))
+      //   if (checkIfExists.length == 0) {
+      //     var shipmentNotExistsIndex = shipmentData.findIndex(c => c.shipmentId == item1);
+      //     shipmentData[shipmentNotExistsIndex].active = true;
+      //     shipmentData[shipmentNotExistsIndex].erpFlag = false;
+      //   }
+      // })
+
+      // setOfTempShipmentIds.map(item1 => {
+      //   var checkIfExists = linkedShipmentListLocal.filter(c => c.active.toString() == "true" && c.tempParentShipmentId > 0 && c.tempParentShipmentId == item1);
+      //   if (checkIfExists.length == 0) {
+      //     var shipmentNotExistsIndex = shipmentData.findIndex(c => c.tempShipmentId == item1);
+      //     shipmentData[shipmentNotExistsIndex].active = true;
+      //     shipmentData[shipmentNotExistsIndex].erpFlag = false;
+      //   }
+      // })
+
+      // linkedShipmentListLocal.map(item1 => {
+      //   if (item1.active.toString() == "true") {
+      //     if (item1.parentShipmentId > 0) {
+      //       var checkIfExists = setOfShipmentIds.includes(item1.parentShipmentId.toString());
+      //       console.log("Check If Exists Test@@@123",checkIfExists)
+      //       console.log("Item1 Test@@@123",item1)
+      //       if (!checkIfExists) {
+      //         var shipmentNotExistsIndex = shipmentData.findIndex(c => c.shipmentId == item1.parentShipmentId);
+      //         shipmentData[shipmentNotExistsIndex].active = true;
+      //         shipmentData[shipmentNotExistsIndex].erpFlag = false;
+      //       }
+      //     } else {
+      //       var checkIfExists = setOfTempShipmentIds.includes(item1.tempParentShipmentId.toString());
+      //       if (!checkIfExists) {
+      //         var shipmentNotExistsIndex = shipmentData.findIndex(c => c.tempShipmentId == item1.tempParentShipmentId);
+      //         shipmentData[shipmentNotExistsIndex].active = true;
+      //         shipmentData[shipmentNotExistsIndex].erpFlag = false;
+      //       }
+      //     }
+      //   }
+      // })
       // console.log("linkedShipmentListLocal@@@@@@@@@@@@@@@@@@", linkedShipmentListLocal)
-      var shipmentLinkingIdFromLocal = [...new Set(linkedShipmentListLocal.map(ele => ele.shipmentLinkingId))].filter(c => c !== 0);
-      // console.log("shipmentLinkingIdFromLocal@@@@@@@@@@@@@@@@@@", shipmentLinkingIdFromLocal)
-      var linkedShipmentListServer = this.state.latestProgramData.shipmentLinkingList != null ? this.state.latestProgramData.shipmentLinkingList.filter(c => !shipmentLinkingIdFromLocal.includes(c.shipmentLinkingId)) : [];
-      // console.log("linkedShipmentListServer@@@@@@@@@@@@@@@@@@", linkedShipmentListServer)
-      var mergedList = linkedShipmentListLocal.concat(linkedShipmentListServer);
-      // console.log("mergedList@@@@@@@@@@@@@@@@@@", mergedList)
-      for (var s = 0; s < shipmentLinkedJson.length; s++) {
-        //Accept server version
-        if (shipmentLinkedJson[s][11] == 3) {
-          // linkedShipmentList.push(shipmentLinkedJson[s][20]);
-          var index = mergedList.findIndex(c => c.shipmentLinkingId == shipmentLinkedJson[s][20].shipmentLinkingId);
-          mergedList[index] = shipmentLinkedJson[s][20];
-        }
-      }
-      //Perform delinking for server shipments and local shipments
-      var linkedShipmentsList = mergedList;
-      var deletedRowsListLocal = this.state.deletedRowsListLocal;
-      var deletedRowsListServer = this.state.deletedRowsListServer;
-      var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-      var curUser = AuthenticationService.getLoggedInUserId();
-      var username = AuthenticationService.getLoggedInUsername();
-      for (var dr = 0; dr < deletedRowsListLocal.length; dr++) {
-        var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (deletedRowsListLocal[dr].childShipmentId > 0 ? deletedRowsListLocal[dr].childShipmentId == c.childShipmentId : deletedRowsListLocal[dr].tempChildShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
-        var linkedShipmentsListFilter = linkedShipmentsList.filter(c => deletedRowsListLocal[dr].childShipmentId > 0 ? deletedRowsListLocal[dr].childShipmentId == c.childShipmentId : deletedRowsListLocal[dr].tempChildShipmentId == c.tempChildShipmentId);
-        linkedShipmentsList[linkedShipmentsListIndex].active = false;
-        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
-        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
-        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
-        var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active == true);
-        var activateParentShipment = false;
-        if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
-          activateParentShipment = true;
-        }
-        var shipmentIndex = shipmentData.findIndex(c => deletedRowsListLocal[dr].childShipmentId > 0 ? c.shipmentId == deletedRowsListLocal[dr].childShipmentId : c.tempShipmentId == deletedRowsListLocal[dr].tempChildShipmentId);
-        shipmentData[shipmentIndex].active = false;
-        shipmentData[shipmentIndex].lastModifiedBy.userId = curUser;
-        shipmentData[shipmentIndex].lastModifiedBy.username = username;
-        shipmentData[shipmentIndex].lastModifiedDate = curDate;
+      // var shipmentLinkingIdFromLocal = [...new Set(linkedShipmentListLocal.map(ele => ele.shipmentLinkingId))].filter(c => c !== 0);
+      // // console.log("shipmentLinkingIdFromLocal@@@@@@@@@@@@@@@@@@", shipmentLinkingIdFromLocal)
+      // var linkedShipmentListServer = this.state.latestProgramData.shipmentLinkingList != null ? this.state.latestProgramData.shipmentLinkingList.filter(c => !shipmentLinkingIdFromLocal.includes(c.shipmentLinkingId)) : [];
+      // // console.log("linkedShipmentListServer@@@@@@@@@@@@@@@@@@", linkedShipmentListServer)
+      // var mergedList = linkedShipmentListLocal.concat(linkedShipmentListServer);
+      // // console.log("mergedList@@@@@@@@@@@@@@@@@@", mergedList)
+      // for (var s = 0; s < shipmentLinkedJson.length; s++) {
+      //   //Accept server version
+      //   if (shipmentLinkedJson[s][12] == 3) {
+      //     // linkedShipmentList.push(shipmentLinkedJson[s][20]);
+      //     var index = mergedList.findIndex(c => c.shipmentLinkingId == shipmentLinkedJson[s][24].shipmentLinkingId);
+      //     mergedList[index] = shipmentLinkedJson[s][24];
+      //   }
+      // }
+      // //Perform delinking for server shipments and local shipments
+      // var linkedShipmentsList = mergedList;
+      // var deletedRowsListLocal = this.state.deletedRowsListLocal;
+      // var deletedRowsListServer = this.state.deletedRowsListServer;
+      // var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+      // var curUser = AuthenticationService.getLoggedInUserId();
+      // var username = AuthenticationService.getLoggedInUsername();
+      // for (var dr = 0; dr < deletedRowsListLocal.length; dr++) {
+      //   var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (deletedRowsListLocal[dr].childShipmentId > 0 ? deletedRowsListLocal[dr].childShipmentId == c.childShipmentId : deletedRowsListLocal[dr].tempChildShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
+      //   var linkedShipmentsListFilter = linkedShipmentsList.filter(c => deletedRowsListLocal[dr].childShipmentId > 0 ? deletedRowsListLocal[dr].childShipmentId == c.childShipmentId : deletedRowsListLocal[dr].tempChildShipmentId == c.tempChildShipmentId);
+      //   linkedShipmentsList[linkedShipmentsListIndex].active = false;
+      //   linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
+      //   linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
+      //   linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
+      //   var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active == true);
+      //   var activateParentShipment = false;
+      //   if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
+      //     activateParentShipment = true;
+      //   }
+      //   var shipmentIndex = shipmentData.findIndex(c => deletedRowsListLocal[dr].childShipmentId > 0 ? c.shipmentId == deletedRowsListLocal[dr].childShipmentId : c.tempShipmentId == deletedRowsListLocal[dr].tempChildShipmentId);
+      //   shipmentData[shipmentIndex].active = false;
+      //   shipmentData[shipmentIndex].lastModifiedBy.userId = curUser;
+      //   shipmentData[shipmentIndex].lastModifiedBy.username = username;
+      //   shipmentData[shipmentIndex].lastModifiedDate = curDate;
 
 
-        if (activateParentShipment) {
-          var parentShipmentIndex = shipmentData.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
-          shipmentData[parentShipmentIndex].active = true;
-          shipmentData[parentShipmentIndex].erpFlag = false;
-          shipmentData[parentShipmentIndex].lastModifiedBy.userId = curUser;
-          shipmentData[parentShipmentIndex].lastModifiedBy.username = username;
-          shipmentData[parentShipmentIndex].lastModifiedDate = curDate;
+      //   if (activateParentShipment) {
+      //     var parentShipmentIndex = shipmentData.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
+      //     shipmentData[parentShipmentIndex].active = true;
+      //     shipmentData[parentShipmentIndex].erpFlag = false;
+      //     shipmentData[parentShipmentIndex].lastModifiedBy.userId = curUser;
+      //     shipmentData[parentShipmentIndex].lastModifiedBy.username = username;
+      //     shipmentData[parentShipmentIndex].lastModifiedDate = curDate;
 
-          // Activate linked parent shipment Id
-          var linkedParentShipmentIdList = shipmentData.filter(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? (c.parentLinkedShipmentId == linkedShipmentsListFilter[0].parentShipmentId) : (c.tempParentLinkedShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId));
-          for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
-            var parentShipmentIndex1 = shipmentData.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
-            shipmentData[parentShipmentIndex1].active = true;
-            shipmentData[parentShipmentIndex1].erpFlag = false;
-            shipmentData[parentShipmentIndex1].lastModifiedBy.userId = curUser;
-            shipmentData[parentShipmentIndex1].lastModifiedBy.username = username;
-            shipmentData[parentShipmentIndex1].lastModifiedDate = curDate;
-            shipmentData[parentShipmentIndex1].parentLinkedShipmentId = null;
-            shipmentData[parentShipmentIndex1].tempParentLinkedShipmentId = null;
+      //     // Activate linked parent shipment Id
+      //     var linkedParentShipmentIdList = shipmentData.filter(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? (c.parentLinkedShipmentId == linkedShipmentsListFilter[0].parentShipmentId) : (c.tempParentLinkedShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId));
+      //     for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
+      //       var parentShipmentIndex1 = shipmentData.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
+      //       shipmentData[parentShipmentIndex1].active = true;
+      //       shipmentData[parentShipmentIndex1].erpFlag = false;
+      //       shipmentData[parentShipmentIndex1].lastModifiedBy.userId = curUser;
+      //       shipmentData[parentShipmentIndex1].lastModifiedBy.username = username;
+      //       shipmentData[parentShipmentIndex1].lastModifiedDate = curDate;
+      //       shipmentData[parentShipmentIndex1].parentLinkedShipmentId = null;
+      //       shipmentData[parentShipmentIndex1].tempParentLinkedShipmentId = null;
 
-          }
-        }
-      }
+      //     }
+      //   }
+      // }
 
-      for (var dr = 0; dr < deletedRowsListServer.length; dr++) {
-        var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (deletedRowsListServer[dr].childShipmentId > 0 ? deletedRowsListServer[dr].childShipmentId == c.childShipmentId : deletedRowsListServer[dr].tempChildShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
-        var linkedShipmentsListFilter = linkedShipmentsList.filter(c => deletedRowsListServer[dr].childShipmentId > 0 ? deletedRowsListServer[dr].childShipmentId == c.childShipmentId : deletedRowsListServer[dr].tempChildShipmentId == c.tempChildShipmentId);
-        linkedShipmentsList[linkedShipmentsListIndex].active = false;
-        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
-        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
-        linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
-        var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active == true);
-        var activateParentShipment = false;
-        if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
-          activateParentShipment = true;
-        }
-        // console.log("@@@@@@@@@@@@@@@@deletedRowsListServer[dr].childShipmentId", deletedRowsListServer[dr].childShipmentId);
-        // console.log("@@@@@@@@@@@@@@@@ShipmentData", shipmentData)
-        var shipmentIndex = shipmentData.findIndex(c => deletedRowsListServer[dr].childShipmentId > 0 ? c.shipmentId == deletedRowsListServer[dr].childShipmentId : c.tempShipmentId == deletedRowsListServer[dr].tempChildShipmentId);
-        // console.log("@@@@@@@@@@@@@@@@index", shipmentIndex);
-        shipmentData[shipmentIndex].active = false;
-        shipmentData[shipmentIndex].lastModifiedBy.userId = curUser;
-        shipmentData[shipmentIndex].lastModifiedBy.username = username;
-        shipmentData[shipmentIndex].lastModifiedDate = curDate;
+      // for (var dr = 0; dr < deletedRowsListServer.length; dr++) {
+      //   var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (deletedRowsListServer[dr].childShipmentId > 0 ? deletedRowsListServer[dr].childShipmentId == c.childShipmentId : deletedRowsListServer[dr].tempChildShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
+      //   var linkedShipmentsListFilter = linkedShipmentsList.filter(c => deletedRowsListServer[dr].childShipmentId > 0 ? deletedRowsListServer[dr].childShipmentId == c.childShipmentId : deletedRowsListServer[dr].tempChildShipmentId == c.tempChildShipmentId);
+      //   linkedShipmentsList[linkedShipmentsListIndex].active = false;
+      //   linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
+      //   linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
+      //   linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
+      //   var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId) && c.active == true);
+      //   var activateParentShipment = false;
+      //   if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
+      //     activateParentShipment = true;
+      //   }
+      //   // console.log("@@@@@@@@@@@@@@@@deletedRowsListServer[dr].childShipmentId", deletedRowsListServer[dr].childShipmentId);
+      //   // console.log("@@@@@@@@@@@@@@@@ShipmentData", shipmentData)
+      //   var shipmentIndex = shipmentData.findIndex(c => deletedRowsListServer[dr].childShipmentId > 0 ? c.shipmentId == deletedRowsListServer[dr].childShipmentId : c.tempShipmentId == deletedRowsListServer[dr].tempChildShipmentId);
+      //   // console.log("@@@@@@@@@@@@@@@@index", shipmentIndex);
+      //   shipmentData[shipmentIndex].active = false;
+      //   shipmentData[shipmentIndex].lastModifiedBy.userId = curUser;
+      //   shipmentData[shipmentIndex].lastModifiedBy.username = username;
+      //   shipmentData[shipmentIndex].lastModifiedDate = curDate;
 
-        if (activateParentShipment) {
-          var parentShipmentIndex = shipmentData.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
-          shipmentData[parentShipmentIndex].active = true;
-          shipmentData[parentShipmentIndex].erpFlag = false;
-          shipmentData[parentShipmentIndex].lastModifiedBy.userId = curUser;
-          shipmentData[parentShipmentIndex].lastModifiedBy.username = username;
-          shipmentData[parentShipmentIndex].lastModifiedDate = curDate;
-          // Activate linked parent shipment Id
-          var linkedParentShipmentIdList = shipmentData.filter(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? (c.parentLinkedShipmentId == linkedShipmentsListFilter[0].parentShipmentId) : (c.tempParentLinkedShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId));
-          for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
-            var parentShipmentIndex1 = shipmentData.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
-            shipmentData[parentShipmentIndex1].active = true;
-            shipmentData[parentShipmentIndex1].erpFlag = false;
-            shipmentData[parentShipmentIndex1].lastModifiedBy.userId = curUser;
-            shipmentData[parentShipmentIndex1].lastModifiedBy.username = username;
-            shipmentData[parentShipmentIndex1].lastModifiedDate = curDate;
-            shipmentData[parentShipmentIndex1].parentLinkedShipmentId = null;
-            shipmentData[parentShipmentIndex1].tempParentLinkedShipmentId = null;
+      //   if (activateParentShipment) {
+      //     var parentShipmentIndex = shipmentData.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
+      //     shipmentData[parentShipmentIndex].active = true;
+      //     shipmentData[parentShipmentIndex].erpFlag = false;
+      //     shipmentData[parentShipmentIndex].lastModifiedBy.userId = curUser;
+      //     shipmentData[parentShipmentIndex].lastModifiedBy.username = username;
+      //     shipmentData[parentShipmentIndex].lastModifiedDate = curDate;
+      //     // Activate linked parent shipment Id
+      //     var linkedParentShipmentIdList = shipmentData.filter(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? (c.parentLinkedShipmentId == linkedShipmentsListFilter[0].parentShipmentId) : (c.tempParentLinkedShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId));
+      //     for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
+      //       var parentShipmentIndex1 = shipmentData.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
+      //       shipmentData[parentShipmentIndex1].active = true;
+      //       shipmentData[parentShipmentIndex1].erpFlag = false;
+      //       shipmentData[parentShipmentIndex1].lastModifiedBy.userId = curUser;
+      //       shipmentData[parentShipmentIndex1].lastModifiedBy.username = username;
+      //       shipmentData[parentShipmentIndex1].lastModifiedDate = curDate;
+      //       shipmentData[parentShipmentIndex1].parentLinkedShipmentId = null;
+      //       shipmentData[parentShipmentIndex1].tempParentLinkedShipmentId = null;
 
-          }
-        }
-      }
+      //     }
+      //   }
+      // }
 
       var uniquePlanningUnitsInShipment = [];
       shipmentJson.map(c => uniquePlanningUnitsInShipment = uniquePlanningUnitsInShipment.concat(parseInt(c[1])));
@@ -1255,8 +1457,6 @@ export default class syncPage extends Component {
         });
       })
 
-      var uniquePlanningUnitsInShipmentLinking = [];
-      mergedList.map(c => uniquePlanningUnitsInShipmentLinking = uniquePlanningUnitsInShipmentLinking.concat(c.qatPlanningUnitId));
 
       uniquePlanningUnitsInShipmentLinking.map(c => {
         actionList.push({
@@ -1272,7 +1472,9 @@ export default class syncPage extends Component {
       programJson.inventoryList = inventoryData;
       programJson.shipmentList = shipmentData;
       programJson.actionList = actionList;
-      programJson.shipmentLinkingList = linkedShipmentsList.filter(c => (c.shipmentLinkingId > 0) || (c.shipmentLinkingId == 0 && c.active == true));
+      programJson.shipmentLinkingList = linkedShipmentListLocal.filter(c => (c.shipmentLinkingId > 0) || (c.shipmentLinkingId == 0 && c.active == true));
+      // console.log("Program Json Test@@@123", programJson);
+      // console.log("Program Json shipment list Test@@@123", programJson.shipmentList);
 
       var planningUnitDataListFromState = this.state.planningUnitDataList;
       var updatedJson = [];
@@ -1939,6 +2141,9 @@ export default class syncPage extends Component {
 
                                             }
                                             // console.log("+++Completion of basic flow", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                                            // console.log("Latest Program Data Test@123", latestProgramData);
+                                            // console.log("Old Program Data Test@123", oldProgramData);
+                                            // console.log("Downloaded Program Data Test@123", downloadedProgramData);
                                             var latestProgramDataConsumption = latestProgramData.consumptionList;
                                             var oldProgramDataConsumption = oldProgramData.consumptionList;
                                             var downloadedProgramDataConsumption = downloadedProgramData.consumptionList;
@@ -2492,11 +2697,13 @@ export default class syncPage extends Component {
                                             })
 
                                             // Shipment Linked part
+                                            // console.log("Old Program Data @@@@ Test123", oldProgramData);
                                             var latestProgramDataShipmentLinked = latestProgramData.shipmentLinkingList != null ? latestProgramData.shipmentLinkingList : [];
                                             var oldProgramDataShipmentLinked = oldProgramData.shipmentLinkingList != null ? oldProgramData.shipmentLinkingList.filter(c => c.shipmentLinkingId > 0 || (c.shipmentLinkingId == 0 && c.active == true)) : [];
                                             // console.log("latestProgramDataShipmentLinked@@@@@@@@@@@@@", latestProgramDataShipmentLinked)
-                                            // console.log("oldProgramDataShipmentLinked@@@@@@@@@@@@@", oldProgramDataShipmentLinked)
+                                            // console.log("oldProgramDataShipmentLinked Test@@@123 @@@@@@@@@@@@@", oldProgramData.shipmentLinkingList)
                                             var downloadedProgramDataShipmentLinked = downloadedProgramData.shipmentLinkingList != null ? downloadedProgramData.shipmentLinkingList : [];
+                                            // console.log("downloadedProgramDataShipmentLinked Test@@@123", downloadedProgramDataShipmentLinked)
 
                                             // var modifiedShipmentIds = []
                                             // latestProgramDataShipment.filter(c => c.versionId > oldProgramData.currentVersion.versionId || moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(oldProgramData.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")).map(item => { modifiedShipmentIds.push(item.shipmentId) });
@@ -2527,13 +2734,23 @@ export default class syncPage extends Component {
                                             var data = [];
                                             var mergedShipmentLinkedJexcel = [];
                                             var mergedData = (latestProgramDataShipmentLinked.concat(oldProgramDataShipmentLinked).concat(downloadedProgramDataShipmentLinked));
+                                            // console.log("Merged Data Test@@@123", mergedData)
                                             var uniqueRoNoAndRoPrimeLineNo = [...new Set(mergedData.map(ele => ele.roNo + "|" + ele.roPrimeLineNo))];
 
                                             for (var cd = 0; cd < uniqueRoNoAndRoPrimeLineNo.length; cd++) {
                                               data = [];
                                               var latestProgramDataShipmentLinkedFiltered = latestProgramDataShipmentLinked.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == (c.roNo + "|" + c.roPrimeLineNo))
+                                              if (latestProgramDataShipmentLinkedFiltered.filter(c => c.active.toString() == "true").length > 0) {
+                                                latestProgramDataShipmentLinkedFiltered = latestProgramDataShipmentLinkedFiltered.filter(c => c.active.toString() == "true");
+                                              }
                                               var oldProgramDataShipmentLinkedFiltered = oldProgramDataShipmentLinked.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == (c.roNo + "|" + c.roPrimeLineNo))
+                                              if (oldProgramDataShipmentLinkedFiltered.filter(c => c.active.toString() == "true").length > 0) {
+                                                oldProgramDataShipmentLinkedFiltered = oldProgramDataShipmentLinkedFiltered.filter(c => c.active.toString() == "true");
+                                              }
                                               var downloadedProgramDataShipmentLinkedFiltered = downloadedProgramDataShipmentLinked.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == (c.roNo + "|" + c.roPrimeLineNo))
+                                              if (downloadedProgramDataShipmentLinkedFiltered.filter(c => c.active.toString() == "true").length > 0) {
+                                                downloadedProgramDataShipmentLinkedFiltered = downloadedProgramDataShipmentLinkedFiltered.filter(c => c.active.toString() == "true");
+                                              }
                                               var listFromAPI = responseLinking.data;
                                               var listFromAPIFiltered = listFromAPI.filter(c => uniqueRoNoAndRoPrimeLineNo[cd] == c.roNo + "|" + c.roPrimeLineNo);
                                               // console.log("latestProgramDataShipmentLinkedFiltered@@@@@@@@@@@@@", latestProgramDataShipmentLinkedFiltered)
@@ -2541,6 +2758,7 @@ export default class syncPage extends Component {
                                               var arr = [];
                                               var arr1 = [];
                                               var arr2 = [];
+                                              var arrDownloaded = [];
                                               if (listFromAPIFiltered.length > 0) {
 
                                               } else {
@@ -2560,8 +2778,35 @@ export default class syncPage extends Component {
                                                   arr1.push(item.shipmentId)
                                                 })
                                               }
+
+                                              if (downloadedProgramDataShipmentLinkedFiltered.length > 0) {
+                                                arrDownloaded.push(downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId);
+                                                (downloadedProgramData.shipmentList.filter(c => downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId == 0 ? c.tempParentLinkedShipmentId == downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].tempParentShipmentId : c.parentLinkedShipmentId == downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].parentShipmentId)).map(item => {
+                                                  arrDownloaded.push(item.shipmentId)
+                                                })
+                                              }
                                               var oldShipmentDetails = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramData.shipmentList.filter(c => oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].childShipmentId > 0 ? c.shipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].childShipmentId : c.tempShipmentId == oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].tempChildShipmentId) : [];
+                                              var downloadedShipmentDetails = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramData.shipmentList.filter(c => downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].childShipmentId > 0 ? c.shipmentId == downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].childShipmentId : c.tempShipmentId == downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].tempChildShipmentId) : [];
                                               var latestShipmentDetails = latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramData.shipmentList.filter(c => latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].childShipmentId > 0 ? c.shipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].childShipmentId : c.tempShipmentId == latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].tempChildShipmentId) : [];
+                                              var shipmentQtyLocal = 0;
+                                              var shipmentQtyServer = 0;
+                                              var shipmentQtyDownloaded = 0;
+                                              var shipmentQtyOtherProgram = 0;
+                                              oldProgramDataShipmentLinkedFiltered.map(item => {
+                                                var sl = oldProgramData.shipmentList.filter(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
+                                                shipmentQtyLocal += sl[0].shipmentQty;
+                                              })
+                                              downloadedProgramDataShipmentLinkedFiltered.map(item => {
+                                                var sl = downloadedProgramData.shipmentList.filter(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
+                                                shipmentQtyDownloaded += sl[0].shipmentQty;
+                                              })
+                                              latestProgramDataShipmentLinkedFiltered.map(item => {
+                                                var sl = latestProgramData.shipmentList.filter(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId)
+                                                shipmentQtyServer += sl[0].shipmentQty;
+                                              })
+                                              listFromAPIFiltered.map(item => {
+                                                shipmentQtyOtherProgram += item.shipmentQty
+                                              })
                                               data[0] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[0] + " - " + uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                               data[1] = uniqueRoNoAndRoPrimeLineNo[cd].split("|")[1];
                                               data[2] = oldProgramDataShipmentLinkedFiltered.length > 0 ? getLabelText(oldProgramData.label, this.state.lang) : "";
@@ -2569,25 +2814,40 @@ export default class syncPage extends Component {
                                               data[4] = oldShipmentDetails.length > 0 ? getLabelText(oldShipmentDetails[0].realmCountryPlanningUnit.label, this.state.lang) : ""
                                               data[5] = oldProgramDataShipmentLinkedFiltered.length > 0 ? arr1 : "";
                                               data[6] = oldShipmentDetails.length > 0 ? oldShipmentDetails[0].realmCountryPlanningUnit.multiplier : "";
-                                              data[7] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].active == 1 || oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
-                                              data[8] = listFromAPIFiltered.length > 0 ? getLabelText(listFromAPIFiltered[0].program.label, this.state.lang) : latestProgramDataShipmentLinkedFiltered.length > 0 ? getLabelText(latestProgramData.label, this.state.lang) : "";
-                                              data[9] = listFromAPIFiltered.length > 0 ? getLabelText(listFromAPIFiltered[listFromAPIFiltered.length - 1].planningUnit.label) : latestShipmentDetails.length > 0 ? getLabelText(latestShipmentDetails[0].planningUnit.label) : "";
-                                              data[10] = listFromAPIFiltered.length > 0 ? getLabelText(listFromAPIFiltered[listFromAPIFiltered.length - 1].realmCountryPlanningUnit.label) : latestShipmentDetails.length > 0 ? getLabelText(latestShipmentDetails[0].realmCountryPlanningUnit.label) : "";
-                                              data[11] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].shipmentId : latestProgramDataShipmentLinkedFiltered.length > 0 ? arr : "";
-                                              data[12] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].realmCountryPlanningUnit.multiplier : latestShipmentDetails.length > 0 ? latestShipmentDetails[0].realmCountryPlanningUnit.multiplier : "";
-                                              data[13] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].conversionFactor : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].active == 1 || latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
-                                              data[14] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
-                                              data[15] = latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
-                                              data[16] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
-                                              data[17] = 4;
-                                              data[18] = (oldProgramDataShipmentLinkedFiltered.length > 0 && latestProgramDataShipmentLinkedFiltered.length == 0) || (oldProgramDataShipmentLinkedFiltered.length == 0 && latestProgramDataShipmentLinkedFiltered.length > 0) ? (oldProgramDataShipmentLinkedFiltered.length > 0 && latestProgramDataShipmentLinkedFiltered.length == 0) ? oldProgramData.currentVersion.versionId : latestProgramData.currentVersion.versionId : "";
-                                              data[19] = cd;
-                                              data[20] = oldProgramData.currentVersion.versionId;
-                                              data[21] = latestProgramData.currentVersion.versionId;
-                                              data[22] = [];
-                                              data[23] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1] : {};
-                                              data[24] = latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1] : {};
-                                              data[25] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].active : ""
+                                              data[7] = shipmentQtyLocal;
+                                              data[8] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered.filter(d => d.active == 1 || d.active == true).length > 0 ? true : false : false;
+                                              data[9] = listFromAPIFiltered.length > 0 ? getLabelText(listFromAPIFiltered[0].program.label, this.state.lang) : latestProgramDataShipmentLinkedFiltered.length > 0 ? getLabelText(latestProgramData.label, this.state.lang) : "";
+                                              data[10] = listFromAPIFiltered.length > 0 ? getLabelText(listFromAPIFiltered[listFromAPIFiltered.length - 1].planningUnit.label) : latestShipmentDetails.length > 0 ? getLabelText(latestShipmentDetails[0].planningUnit.label) : "";
+                                              data[11] = listFromAPIFiltered.length > 0 ? getLabelText(listFromAPIFiltered[listFromAPIFiltered.length - 1].realmCountryPlanningUnit.label) : latestShipmentDetails.length > 0 ? getLabelText(latestShipmentDetails[0].realmCountryPlanningUnit.label) : "";
+                                              data[12] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].shipmentId : latestProgramDataShipmentLinkedFiltered.length > 0 ? arr : "";
+                                              data[13] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].realmCountryPlanningUnit.multiplier : latestShipmentDetails.length > 0 ? latestShipmentDetails[0].realmCountryPlanningUnit.multiplier : "";
+                                              data[14] = listFromAPIFiltered.length > 0 ? shipmentQtyOtherProgram : latestProgramDataShipmentLinkedFiltered.length > 0 ? shipmentQtyServer : "";
+                                              data[15] = listFromAPIFiltered.length > 0 ? true : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered.filter(d => d.active == 1 || d.active == true).length > 0 ? true : false : false;
+
+                                              data[16] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[listFromAPIFiltered.length - 1].lastModifiedBy.username : latestShipmentDetails.length > 0 ? latestShipmentDetails[0].lastModifiedBy.username : "";
+                                              data[17] = listFromAPIFiltered.length > 0 ? moment(listFromAPIFiltered[listFromAPIFiltered.length - 1].lastModifiedDate).format("YYYY-MM-DD") : latestShipmentDetails.length > 0 ? moment(latestShipmentDetails[0].lastModifiedDate).format("YYYY-MM-DD") : "";
+
+                                              data[18] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
+                                              data[19] = latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
+                                              data[20] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
+                                              data[21] = 4;
+                                              data[22] = (oldProgramDataShipmentLinkedFiltered.length > 0 && latestProgramDataShipmentLinkedFiltered.length == 0) || (oldProgramDataShipmentLinkedFiltered.length == 0 && latestProgramDataShipmentLinkedFiltered.length > 0) ? (oldProgramDataShipmentLinkedFiltered.length > 0 && latestProgramDataShipmentLinkedFiltered.length == 0) ? oldProgramData.currentVersion.versionId : latestProgramData.currentVersion.versionId : "";
+                                              data[23] = cd;
+                                              data[24] = oldProgramData.currentVersion.versionId;
+                                              data[25] = latestProgramData.currentVersion.versionId;
+                                              data[26] = [];
+                                              data[27] = oldProgramDataShipmentLinkedFiltered.length > 0 ? oldProgramDataShipmentLinkedFiltered[oldProgramDataShipmentLinkedFiltered.length - 1] : {};
+                                              data[28] = latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramDataShipmentLinkedFiltered[latestProgramDataShipmentLinkedFiltered.length - 1] : {};
+                                              data[29] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].active : ""
+
+                                              data[30] = downloadedShipmentDetails.length > 0 ? getLabelText(downloadedShipmentDetails[0].planningUnit.label, this.state.lang) : ""
+                                              data[31] = downloadedShipmentDetails.length > 0 ? getLabelText(downloadedShipmentDetails[0].realmCountryPlanningUnit.label, this.state.lang) : ""
+                                              data[32] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? arrDownloaded : "";
+                                              data[33] = downloadedShipmentDetails.length > 0 ? downloadedShipmentDetails[0].realmCountryPlanningUnit.multiplier : "";
+                                              data[34] = shipmentQtyDownloaded;
+                                              data[35] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].active == 1 || downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
+                                              data[36] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
+
                                               // data[8] = mergedShipmentData[cd].dataSource.id;
                                               // data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
                                               // data[10] = mergedShipmentData[cd].suggestedQty;
@@ -2643,11 +2903,11 @@ export default class syncPage extends Component {
                                                 },
                                                 {
                                                   title: i18n.t('static.commit.local'),
-                                                  colspan: '6',
+                                                  colspan: '7',
                                                 },
                                                 {
                                                   title: i18n.t('static.commit.server'),
-                                                  colspan: '6',
+                                                  colspan: '9',
                                                 },
                                                 ],
 
@@ -2660,13 +2920,26 @@ export default class syncPage extends Component {
                                                 { type: 'text', title: i18n.t('static.dashboad.planningunitcountry'), width: 150 },
                                                 { type: 'text', title: i18n.t('static.report.id'), width: 100, },
                                                 { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'), width: 120 },
-                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 120, readonly: true },
+                                                { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##', width: 120 },
+                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 120 },
                                                 { type: 'text', title: i18n.t('static.dashboard.programheader'), width: 100 },
                                                 { type: 'text', title: i18n.t('static.report.planningUnit'), width: 150 },
                                                 { type: 'text', title: i18n.t('static.dashboad.planningunitcountry'), width: 150 },
                                                 { type: 'text', title: i18n.t('static.report.id'), width: 100, },
                                                 { type: 'text', title: i18n.t('static.manualTagging.conversionFactor'), width: 120 },
-                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 120, readonly: true },
+                                                { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##', width: 120 },
+                                                { type: 'checkbox', title: i18n.t('static.common.active'), width: 120 },
+                                                {
+                                                  title: i18n.t('static.common.lastModifiedBy'),
+                                                  type: 'text',
+                                                  // readOnly: true
+                                                },
+                                                {
+                                                  title: i18n.t('static.common.lastModifiedDate'),
+                                                  type: 'calendar',
+                                                  options: { format: JEXCEL_DATE_FORMAT_SM },
+                                                  // readOnly: true
+                                                },
                                                 // { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, width: 120 },
                                                 // { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, width: 120 },
                                                 // { type: 'text', title: i18n.t('static.supplyPlan.orderNoAndPrimeLineNo'), width: 150 },
@@ -2704,6 +2977,13 @@ export default class syncPage extends Component {
                                                 { type: 'hidden', title: 'index' },
                                                 { type: 'hidden', title: 'index' },
                                                 { type: 'hidden', title: 'index' },
+                                                { type: 'hidden', title: 'index' },
+                                                { type: 'hidden', title: 'index' },
+                                                { type: 'hidden', title: 'index' },
+                                                { type: 'hidden', title: 'index' },
+                                                { type: 'hidden', title: 'index' },
+                                                { type: 'hidden', title: 'index' },
+                                                { type: 'hidden', title: 'index' },
                                               ],
                                               pagination: localStorage.getItem("sesRecordCount"),
                                               paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -2716,7 +2996,7 @@ export default class syncPage extends Component {
                                               allowDeleteRow: false,
                                               editable: false,
                                               onload: this.loadedFunctionForMergeShipmentLinked,
-                                              onchangepage: this.onchangepage,
+                                              // onchangepage: this.onchangepage,
                                               filters: true,
                                               license: JEXCEL_PRO_KEY,
                                               text: {
@@ -2725,35 +3005,42 @@ export default class syncPage extends Component {
                                                 entries: '',
                                               },
                                               contextMenu: function (obj, x, y, e) {
+                                                // console.log("This.state.conflucts count Test123", this.state.conflictsCount)
+                                                // console.log("This.state.conflucts count ERP Test123", this.state.conflictsCountErp)
                                                 var items = [];
                                                 //Resolve conflicts
                                                 var rowData = obj.getRowData(y);
-                                                if (rowData[17].toString() == 1) {
+                                                if (rowData[21].toString() == 1) {
                                                   items.push({
                                                     title: "Accept local changes",
                                                     onclick: function () {
-                                                      var getServerParentShipmentId = obj.getValueFromCoords(11, y);
-                                                      var getLocalParentShipmentId = obj.getValueFromCoords(5, y);
-                                                      var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[5] === getServerParentShipmentId || c[11] === getServerParentShipmentId : c[5] === getLocalParentShipmentId || c[11] === getLocalParentShipmentId);
+                                                      var getServerParentShipmentId = obj.getValueFromCoords(12, y);//92871
+                                                      var getLocalParentShipmentId = obj.getValueFromCoords(5, y);//91575
+                                                      var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[5] === getServerParentShipmentId || c[12] === getServerParentShipmentId : c[5] === getLocalParentShipmentId || c[12] === getLocalParentShipmentId);
                                                       for (var rn = 0; rn < rowNumber.length; rn++) {
+                                                        var index = obj.getJson(null, false).findIndex(c => c[23] == rowNumber[rn][23]);
                                                         obj.options.editable = true;
                                                         obj.options.allowDeleteRow = true;
                                                         var deletedRowsListServer = this.state.deletedRowsListServer;
-                                                        if (rowNumber[rn][11] !== "" && rowNumber[rn][5] === "") {
-                                                          obj.deleteRow(parseInt(rowNumber[rn][19]))
-                                                          deletedRowsListServer.push(rowNumber[rn][24])
-                                                        } else if (rowNumber[rn][11] !== "" && rowNumber[rn][5] !== "") {
-                                                          obj.setValueFromCoords(8, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(9, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(10, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(11, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(12, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(13, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(15, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(18, rowNumber[rn][19], rowNumber[rn][20], true)
-                                                          deletedRowsListServer.push(rowNumber[rn][24])
-                                                        }
+                                                        // if (rowNumber[rn][12] !== "" && rowNumber[rn][5] === "") {
+                                                        //   obj.deleteRow(parseInt(index))
+                                                        //   deletedRowsListServer.push(rowNumber[rn][28])
+                                                        // } else if (rowNumber[rn][12] !== "" && rowNumber[rn][5] !== "") {
+                                                        obj.setValueFromCoords(9, index, '', true)
+                                                        obj.setValueFromCoords(10, index, '', true)
+                                                        obj.setValueFromCoords(11, index, '', true)
+                                                        obj.setValueFromCoords(12, index, '', true)
+                                                        obj.setValueFromCoords(13, index, '', true)
+                                                        obj.setValueFromCoords(14, index, '', true)
+                                                        obj.setValueFromCoords(15, index, '', true)
+                                                        obj.setValueFromCoords(16, index, '', true)
+                                                        obj.setValueFromCoords(17, index, '', true)
+                                                        obj.setValueFromCoords(19, index, '', true)
+                                                        obj.setValueFromCoords(22, index, rowNumber[rn][24], true)
+                                                        // deletedRowsListServer.push(rowNumber[rn][28])
+                                                        // }
                                                         obj.options.allowDeleteRow = false;
+                                                        obj.orderBy(21, 0);
                                                         obj.options.editable = false;
                                                         this.setState({
                                                           conflictsCount: this.state.conflictsCount - this.state.conflictsCountErp,
@@ -2771,29 +3058,32 @@ export default class syncPage extends Component {
                                                   items.push({
                                                     title: "Accept server changes",
                                                     onclick: function () {
-                                                      var getServerParentShipmentId = obj.getValueFromCoords(11, y);
+                                                      var getServerParentShipmentId = obj.getValueFromCoords(12, y);
                                                       var getLocalParentShipmentId = obj.getValueFromCoords(5, y);
-                                                      var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[5] === getServerParentShipmentId || c[11] === getServerParentShipmentId : c[5] === getLocalParentShipmentId || c[11] === getLocalParentShipmentId);
+                                                      var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[5] === getServerParentShipmentId || c[12] === getServerParentShipmentId : c[5] === getLocalParentShipmentId || c[12] === getLocalParentShipmentId);
                                                       for (var rn = 0; rn < rowNumber.length; rn++) {
+                                                        var index = obj.getJson(null, false).findIndex(c => c[23] == rowNumber[rn][23]);
                                                         obj.options.editable = true;
                                                         obj.options.allowDeleteRow = true;
                                                         var deletedRowsListLocal = this.state.deletedRowsListLocal;
-                                                        if (rowNumber[rn][5] !== "" && rowNumber[rn][11] === "") {
-                                                          obj.deleteRow(parseInt(rowNumber[rn][19]))
-                                                          deletedRowsListLocal.push(rowNumber[rn][23])
-                                                        } else if (rowNumber[rn][11] !== "" && rowNumber[rn][5] !== "") {
-                                                          obj.setValueFromCoords(2, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(3, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(4, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(5, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(6, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(7, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(14, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(16, rowNumber[rn][19], '', true)
-                                                          obj.setValueFromCoords(18, rowNumber[rn][19], rowNumber[rn][21], true)
-                                                          deletedRowsListLocal.push(rowNumber[rn][23])
-                                                        }
+                                                        // if (rowNumber[rn][5] !== "" && rowNumber[rn][12] === "") {
+                                                        //   obj.deleteRow(parseInt(index))
+                                                        //   deletedRowsListLocal.push(rowNumber[rn][27])
+                                                        // } else if (rowNumber[rn][12] !== "" && rowNumber[rn][5] !== "") {
+                                                        obj.setValueFromCoords(2, index, '', true)
+                                                        obj.setValueFromCoords(3, index, '', true)
+                                                        obj.setValueFromCoords(4, index, '', true)
+                                                        obj.setValueFromCoords(5, index, '', true)
+                                                        obj.setValueFromCoords(6, index, '', true)
+                                                        obj.setValueFromCoords(7, index, '', true)
+                                                        obj.setValueFromCoords(8, index, '', true)
+                                                        obj.setValueFromCoords(18, index, '', true)
+                                                        obj.setValueFromCoords(20, index, '', true)
+                                                        obj.setValueFromCoords(22, index, rowNumber[rn][25], true)
+                                                        // deletedRowsListLocal.push(rowNumber[rn][27])
+                                                        // }
                                                         obj.options.allowDeleteRow = false;
+                                                        obj.orderBy(21, 0);
                                                         obj.options.editable = false;
                                                         this.setState({
                                                           conflictsCount: this.state.conflictsCount - this.state.conflictsCountErp,
@@ -2808,20 +3098,22 @@ export default class syncPage extends Component {
                                                       this.recursiveConflictsForShipmentLinking(obj)
                                                     }.bind(this)
                                                   })
-                                                  if (rowData[5] === "" || rowData[11] === "") {
+                                                  if (rowData[5] === "" || rowData[12] === "") {
                                                     items.push({
                                                       title: "Accept both",
                                                       onclick: function () {
                                                         // this.setState({ loading: true })
                                                         // this.toggleLargeShipment(rowData[30], rowData[31], y, 'shipment');
                                                         // obj.setValueFromCoords(12,y,this.state.programId.split("_")[1],true);
-                                                        var getServerParentShipmentId = obj.getValueFromCoords(11, y);
+                                                        var getServerParentShipmentId = obj.getValueFromCoords(12, y);
                                                         var getLocalParentShipmentId = obj.getValueFromCoords(5, y);
-                                                        var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[5] === getServerParentShipmentId || c[11] === getServerParentShipmentId : c[5] === getLocalParentShipmentId || c[11] === getLocalParentShipmentId);
-                                                        var shipmentIdSetThatWhoseConflictsAreResolved = [...new Set(rowNumber.map(ele => ele[19]))];
+                                                        var rowNumber = obj.getJson(null, false).filter(c => getServerParentShipmentId !== "" ? c[5] === getServerParentShipmentId || c[12] === getServerParentShipmentId : c[5] === getLocalParentShipmentId || c[12] === getLocalParentShipmentId);
+                                                        var shipmentIdSetThatWhoseConflictsAreResolved = [...new Set(rowNumber.map(ele => ele[23]))];
                                                         for (var rn = 0; rn < rowNumber.length; rn++) {
+                                                          var index = obj.getJson(null, false).findIndex(c => c[23] == rowNumber[rn][23]);
                                                           obj.options.editable = true;
-                                                          obj.setValueFromCoords(22, rowNumber[rn][19], rowNumber[rn][22].concat(shipmentIdSetThatWhoseConflictsAreResolved), true);
+                                                          obj.setValueFromCoords(26, index, rowNumber[rn][26].concat(shipmentIdSetThatWhoseConflictsAreResolved), true);
+                                                          obj.orderBy(21, 0);
                                                           obj.options.editable = false;
                                                           this.setState({
                                                             conflictsCount: this.state.conflictsCount - this.state.conflictsCountErp,
@@ -2873,6 +3165,7 @@ export default class syncPage extends Component {
                                               latestProgramData: latestProgramData,
                                               oldProgramData: oldProgramData,
                                               downloadedProgramData: downloadedProgramData,
+                                              oldShipmentLinkingList: oldProgramDataShipmentLinked,
                                               loading: false
                                             }, () => {
                                               // Problem list
@@ -3235,113 +3528,113 @@ export default class syncPage extends Component {
   }
 
   onchangepage(el, pageNo, oldPageNo) {
-    var elInstance = el.jexcel;
-    var jsonData = elInstance.getJson(null, false);
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-    elInstance.options.editable = true;
-    var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
-    if (jsonLength == undefined) {
-      jsonLength = 15
-    }
-    if (jsonData.length < jsonLength) {
-      jsonLength = jsonData.length;
-    }
-    var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
-    for (var c = start; c < jsonLength; c++) {
+    // var elInstance = el.jexcel;
+    // var jsonData = elInstance.getJson(null, false);
+    // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z','AA','AB','AC','AD']
+    // elInstance.options.editable = true;
+    // var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+    // if (jsonLength == undefined) {
+    //   jsonLength = 15
+    // }
+    // if (jsonData.length < jsonLength) {
+    //   jsonLength = jsonData.length;
+    // }
+    // var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+    // for (var c = start; c < jsonLength; c++) {
 
-      if (jsonData[c][2] !== "" && jsonData[c][8] !== "" && jsonData[c][2] !== jsonData[c][8]) {
-        // this.setState({
-        //   conflictsCount: this.state.conflictsCount + 1,
-        //   shipmentAlreadyLinkedToOtherProgCount: this.state.shipmentAlreadyLinkedToOtherProgCount + 1
-        // })
-        elInstance.setValueFromCoords(17, c, 6, true);
-        for (var j = 0; j < colArr.length; j++) {
-          var col = (colArr[j]).concat(parseInt(c) + 1);
-          // elInstance.setStyle(col, "background-color", "transparent");
-          // elInstance.setStyle(col, "background-color", "red");
-          var cell = elInstance.getCell(col);
-          cell.classList.add('commitShipmentAlreadyLinkedToOtherPro');
-        }
-      } else {
-        var checkIfSameParentShipmentIdExists = jsonData.filter((d, index) => (((jsonData[c][5] !== "" && jsonData[c][5] === d[11] && jsonData[c][21] !== d[20]) || (jsonData[c][11] !== "" && jsonData[c][11] === d[5]) && jsonData[c][21] !== d[20]) && !jsonData[c][22].includes(index) && c != index)).length;
-        if (checkIfSameParentShipmentIdExists > 0) {
-          // this.setState({
-          //   conflictsCount: this.state.conflictsCount + 1
-          // })
-          elInstance.setValueFromCoords(17, c, 1, true);
-          for (var j = 0; j < colArr.length; j++) {
-            var col = (colArr[j]).concat(parseInt(c) + 1);
-            // elInstance.setStyle(col, "background-color", "transparent");
-            // elInstance.setStyle(col, "background-color", "yellow");
-            var cell = elInstance.getCell(col);
-            cell.classList.add('commitConflict');
-          }
-        } else {
-          if ((jsonData[c])[15] === "" && (jsonData[c])[14] === 0) {
-            elInstance.setValueFromCoords(17, c, 2, true);
-            for (var i = 0; i < colArr.length; i++) {
-              var col = (colArr[i]).concat(parseInt(c) + 1);
-              var cell = elInstance.getCell(col);
-              cell.classList.add('commitLocal');
+    //   if (jsonData[c][2] !== "" && jsonData[c][9] !== "" && jsonData[c][2] !== jsonData[c][9]) {
+    //     // this.setState({
+    //     //   conflictsCount: this.state.conflictsCount + 1,
+    //     //   shipmentAlreadyLinkedToOtherProgCount: this.state.shipmentAlreadyLinkedToOtherProgCount + 1
+    //     // })
+    //     elInstance.setValueFromCoords(21, c, 0, true);
+    //     for (var j = 0; j < colArr.length; j++) {
+    //       var col = (colArr[j]).concat(parseInt(c) + 1);
+    //       // elInstance.setStyle(col, "background-color", "transparent");
+    //       // elInstance.setStyle(col, "background-color", "red");
+    //       var cell = elInstance.getCell(col);
+    //       cell.classList.add('commitShipmentAlreadyLinkedToOtherPro');
+    //     }
+    //   } else {
+    //     var checkIfSameParentShipmentIdExists = jsonData.filter((d, index) => (((jsonData[c][5] !== "" && jsonData[c][5] === d[12] && jsonData[c][25] !== d[24]) || (jsonData[c][12] !== "" && jsonData[c][12] === d[5]) && jsonData[c][25] !== d[24]) && !jsonData[c][26].includes(index) && c != index)).length;
+    //     if (checkIfSameParentShipmentIdExists > 0) {
+    //       // this.setState({
+    //       //   conflictsCount: this.state.conflictsCount + 1
+    //       // })
+    //       elInstance.setValueFromCoords(21, c, 1, true);
+    //       for (var j = 0; j < colArr.length; j++) {
+    //         var col = (colArr[j]).concat(parseInt(c) + 1);
+    //         // elInstance.setStyle(col, "background-color", "transparent");
+    //         // elInstance.setStyle(col, "background-color", "yellow");
+    //         var cell = elInstance.getCell(col);
+    //         cell.classList.add('commitConflict');
+    //       }
+    //     } else {
+    //       if ((jsonData[c])[19] === "" && (jsonData[c])[18] === 0) {
+    //         elInstance.setValueFromCoords(21, c, 2, true);
+    //         for (var i = 0; i < colArr.length; i++) {
+    //           var col = (colArr[i]).concat(parseInt(c) + 1);
+    //           var cell = elInstance.getCell(col);
+    //           cell.classList.add('commitLocal');
 
-            }
-            // this.setState({
-            //   isChanged: true
-            // })
-          } else if ((jsonData[c])[14] === "" && (jsonData[c])[15] != (jsonData[c])[16]) {
-            // console.log("In else if")
-            elInstance.setValueFromCoords(17, c, 3, true);
-            for (var i = 0; i < colArr.length; i++) {
-              var col = (colArr[i]).concat(parseInt(c) + 1);
-              var cell = elInstance.getCell(col);
-              cell.classList.add('commitServer');
+    //         }
+    //         // this.setState({
+    //         //   isChanged: true
+    //         // })
+    //       } else if ((jsonData[c])[18] === "" && (jsonData[c])[19] != (jsonData[c])[20]) {
+    //         // console.log("In else if")
+    //         elInstance.setValueFromCoords(21, c, 3, true);
+    //         for (var i = 0; i < colArr.length; i++) {
+    //           var col = (colArr[i]).concat(parseInt(c) + 1);
+    //           var cell = elInstance.getCell(col);
+    //           cell.classList.add('commitServer');
 
-            }
-            // this.setState({
-            //   isChanged: true
-            // })
-          } else if ((jsonData[c])[15] == (jsonData[c])[14]) {
-            if ((jsonData[c])[7] != (jsonData[c])[13]) {
-              if ((jsonData[c])[7] == (jsonData[c])[25]) {
-                elInstance.setValueFromCoords(17, c, 3, true);
-                var col = (colArr[13]).concat(parseInt(c) + 1);
-                var cell = elInstance.getCell(col);
-                cell.classList.add('commitServer');
-                // this.setState({
-                //   isChanged: true
-                // })
+    //         }
+    //         // this.setState({
+    //         //   isChanged: true
+    //         // })
+    //       } else if ((jsonData[c])[19] == (jsonData[c])[18]) {
+    //         if ((jsonData[c])[8] != (jsonData[c])[15]) {
+    //           if ((jsonData[c])[8] == (jsonData[c])[29]) {
+    //             elInstance.setValueFromCoords(21, c, 3, true);
+    //             var col = (colArr[15]).concat(parseInt(c) + 1);
+    //             var cell = elInstance.getCell(col);
+    //             cell.classList.add('commitServer');
+    //             // this.setState({
+    //             //   isChanged: true
+    //             // })
 
-              } else if ((jsonData[c])[13] == (jsonData[c])[25]) {
-                elInstance.setValueFromCoords(17, c, 3, true);
-                var col = (colArr[7]).concat(parseInt(c) + 1);
-                var cell = elInstance.getCell(col);
-                cell.classList.add('commitLocal');
-                // this.setState({
-                //   isChanged: true
-                // })
-              }
-            } else {
-              for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(c) + 1);
-                var cell = elInstance.getCell(col);
-                cell.classList.add('commitNoChange');
-              }
-            }
-          } else if ((jsonData[c])[15] !== "" && (jsonData[c])[14] !== "" && (jsonData[c])[14] !== (jsonData[c])[15]) {
-            // this.setState({
-            //   conflictsCount: this.state.conflictsCount + 1
-            // })
-            elInstance.setValueFromCoords(17, c, 1, true);
-            for (var j = 0; j < colArr.length; j++) {
-              var col = (colArr[j]).concat(parseInt(c) + 1);
-              var cell = elInstance.getCell(col);
-              cell.classList.add('commitConflict');
-            }
-          }
-        }
-      }
-    }
-    elInstance.options.editable = false;
+    //           } else if ((jsonData[c])[15] == (jsonData[c])[29]) {
+    //             elInstance.setValueFromCoords(21, c, 3, true);
+    //             var col = (colArr[8]).concat(parseInt(c) + 1);
+    //             var cell = elInstance.getCell(col);
+    //             cell.classList.add('commitLocal');
+    //             // this.setState({
+    //             //   isChanged: true
+    //             // })
+    //           }
+    //         } else {
+    //           for (var j = 0; j < colArr.length; j++) {
+    //             var col = (colArr[j]).concat(parseInt(c) + 1);
+    //             var cell = elInstance.getCell(col);
+    //             cell.classList.add('commitNoChange');
+    //           }
+    //         }
+    //       } else if ((jsonData[c])[19] !== "" && (jsonData[c])[18] !== "" && (jsonData[c])[18] !== (jsonData[c])[19]) {
+    //         // this.setState({
+    //         //   conflictsCount: this.state.conflictsCount + 1
+    //         // })
+    //         elInstance.setValueFromCoords(21, c, 1, true);
+    //         for (var j = 0; j < colArr.length; j++) {
+    //           var col = (colArr[j]).concat(parseInt(c) + 1);
+    //           var cell = elInstance.getCell(col);
+    //           cell.classList.add('commitConflict');
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+    // elInstance.options.editable = false;
   }
 
   recursiveConflictsForShipmentLinking(instance) {
@@ -3360,136 +3653,261 @@ export default class syncPage extends Component {
     // if (jsonData.length < jsonLength) {
     //   jsonLength = jsonData.length;
     // }
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD']
     elInstance.options.editable = true;
+    var localDataChanged = 0;
+    var serverDataChanged = 0;
     for (var c = 0; c < jsonLength; c++) {
-      if (jsonData[c][2] !== "" && jsonData[c][8] !== "" && jsonData[c][2] !== jsonData[c][8]) {
+      localDataChanged = 0;
+      serverDataChanged = 0;
+      elInstance.setStyle(("I").concat(parseInt(c) + 1), "pointer-events", "");
+      elInstance.setStyle(("P").concat(parseInt(c) + 1), "pointer-events", "");
+      elInstance.setStyle(("I").concat(parseInt(c) + 1), "pointer-events", "none");
+      elInstance.setStyle(("P").concat(parseInt(c) + 1), "pointer-events", "none");
+      if (jsonData[c][2] !== "" && jsonData[c][9] !== "" && jsonData[c][2] !== jsonData[c][9]) {
         this.setState({
           conflictsCount: this.state.conflictsCount + 1,
           conflictsCountErp: this.state.conflictsCountErp + 1,
           shipmentAlreadyLinkedToOtherProgCount: this.state.shipmentAlreadyLinkedToOtherProgCount + 1
         })
-        elInstance.setValueFromCoords(17, c, 6, true);
+        elInstance.setValueFromCoords(21, c, 0, true);
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(c) + 1);
-          // elInstance.setStyle(col, "background-color", "transparent");
-          // elInstance.setStyle(col, "background-color", "red");
-          try {
-            var cell = elInstance.getCell(col);
-            cell.classList.add('commitShipmentAlreadyLinkedToOtherPro');
-          } catch (err) {
-
-          }
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", "yellow");
+          elInstance.setStyle(col, "color", "red");
+          elInstance.setStyle(col, "font-weight", "");
+          elInstance.setStyle(col, "font-weight", "bold");
         }
       } else {
-        var checkIfSameParentShipmentIdExists = jsonData.filter((d, index) => (((jsonData[c][5] !== "" && jsonData[c][5] === d[11] && jsonData[c][21] !== d[20]) || (jsonData[c][11] !== "" && jsonData[c][11] === d[5]) && jsonData[c][21] !== d[20]) && !jsonData[c][22].includes(index) && c != index)).length;
+        // Need to change this logic
+        // var checkIfSameParentShipmentIdExists = jsonData.filter((d, index) => (((jsonData[c][5] !== "" && jsonData[c][5] === d[12] && jsonData[c][25] !== d[24]) || (jsonData[c][12] !== "" && jsonData[c][12] === d[5]) && jsonData[c][25] !== d[24]) && !jsonData[c][26].includes(index) && c != index)).length;
+        var checkIfSameParentShipmentIdExists = -1;
         if (checkIfSameParentShipmentIdExists > 0) {
           this.setState({
             conflictsCount: this.state.conflictsCount + 1,
             conflictsCountErp: this.state.conflictsCountErp + 1,
           })
-          elInstance.setValueFromCoords(17, c, 1, true);
+          elInstance.setValueFromCoords(21, c, 1, true);
           for (var j = 0; j < colArr.length; j++) {
             var col = (colArr[j]).concat(parseInt(c) + 1);
-            // elInstance.setStyle(col, "background-color", "transparent");
-            // elInstance.setStyle(col, "background-color", "yellow");
-            try {
-              var cell = elInstance.getCell(col);
-              cell.classList.add('commitConflict');
-            } catch (err) {
-
-            }
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
           }
         } else {
-          if ((jsonData[c])[15] === "" && (jsonData[c])[14] === 0) {
-            elInstance.setValueFromCoords(17, c, 2, true);
+          if ((jsonData[c])[19] === "" && ((jsonData[c])[18] === 0 || jsonData[c][3] != jsonData[c][30] || jsonData[c][4] != jsonData[c][31] || jsonData[c][5] != jsonData[c][32] || jsonData[c][6] != jsonData[c][33] || jsonData[c][8] != jsonData[c][35])) {
+            elInstance.setValueFromCoords(21, c, 2, true);
             for (var i = 0; i < colArr.length; i++) {
               var col = (colArr[i]).concat(parseInt(c) + 1);
-              try {
-                var cell = elInstance.getCell(col);
-                cell.classList.add('commitLocal');
-              } catch (err) {
-
-              }
-
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
             }
             this.setState({
               isChanged: true
             })
-          } else if ((jsonData[c])[14] === "" && (jsonData[c])[15] !== (jsonData[c])[16]) {
+          } else if ((jsonData[c])[18] === "" && (jsonData[c])[19] !== (jsonData[c])[20]) {
             // console.log("In else if")
-            elInstance.setValueFromCoords(17, c, 3, true);
+            elInstance.setValueFromCoords(21, c, 3, true);
             for (var i = 0; i < colArr.length; i++) {
               var col = (colArr[i]).concat(parseInt(c) + 1);
-              try {
-                var cell = elInstance.getCell(col);
-                cell.classList.add('commitServer');
-              } catch (err) {
-
-              }
-
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
             }
             this.setState({
               isChanged: true
             })
-          } else if ((jsonData[c])[15] == (jsonData[c])[14]) {
-            if ((jsonData[c])[7] != (jsonData[c])[13]) {
-              if ((jsonData[c])[7] == (jsonData[c])[25]) {
-                elInstance.setValueFromCoords(17, c, 3, true);
-                var col = (colArr[13]).concat(parseInt(c) + 1);
-                try {
-                  var cell = elInstance.getCell(col);
-                  cell.classList.add('commitServer');
-                } catch (err) {
+          } else if (jsonData[c][3] !== "" && jsonData[c][10] !== "") {
+            if (jsonData[c][3] == jsonData[c][10]) {
 
-                }
-                this.setState({
-                  isChanged: true
-                })
-
-              } else if ((jsonData[c])[13] == (jsonData[c])[25]) {
-                elInstance.setValueFromCoords(17, c, 3, true);
-                var col = (colArr[7]).concat(parseInt(c) + 1);
-                try {
-                  var cell = elInstance.getCell(col);
-                  cell.classList.add('commitLocal');
-                } catch (err) {
-
-                }
-                this.setState({
-                  isChanged: true
-                })
-              }
+            } else if (jsonData[c][3] == jsonData[c][30]) {
+              this.setState({
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 3, true);
+              var col = ("K").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+              serverDataChanged += 1;
+            } else if (jsonData[c][10] == jsonData[c][30]) {
+              this.setState({
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 2, true);
+              var col = ("D").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+              localDataChanged += 1;
             } else {
+              this.setState({
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountErp: this.state.conflictsCountErp + 1,
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 1, true);
               for (var j = 0; j < colArr.length; j++) {
                 var col = (colArr[j]).concat(parseInt(c) + 1);
-                try {
-                  var cell = elInstance.getCell(col);
-                  cell.classList.add('commitNoChange');
-                } catch (err) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+              }
+            }
 
+            if (jsonData[c][4] == jsonData[c][11]) {
+
+            } else if (jsonData[c][4] == jsonData[c][31]) {
+              this.setState({
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 3, true);
+              var col = ("L").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+              serverDataChanged += 1;
+            } else if (jsonData[c][11] == jsonData[c][31]) {
+              this.setState({
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 2, true);
+              var col = ("E").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+              localDataChanged += 1;
+            } else {
+              this.setState({
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountErp: this.state.conflictsCountErp + 1,
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 1, true);
+              for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+              }
+            }
+
+            if (jsonData[c][8].toString() == "true" && jsonData[c][15].toString() == "true") {
+              if (jsonData[c][5].toString() == jsonData[c][12].toString()) {
+
+              } else if (jsonData[c][5].toString() == jsonData[c][32].toString() && jsonData[c][35].toString() == "true") {
+                this.setState({
+                  isChanged: true
+                })
+                elInstance.setValueFromCoords(21, c, 3, true);
+                var col = ("M").concat(parseInt(c) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+                serverDataChanged += 1;
+              } else if (jsonData[c][12].toString() == jsonData[c][32].toString() && jsonData[c][35].toString() == "true") {
+                this.setState({
+                  isChanged: true
+                })
+                elInstance.setValueFromCoords(21, c, 2, true);
+                var col = ("F").concat(parseInt(c) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                localDataChanged += 1;
+              } else {
+                this.setState({
+                  conflictsCount: this.state.conflictsCount + 1,
+                  conflictsCountErp: this.state.conflictsCountErp + 1,
+                  isChanged: true
+                })
+                elInstance.setValueFromCoords(21, c, 1, true);
+                for (var j = 0; j < colArr.length; j++) {
+                  var col = (colArr[j]).concat(parseInt(c) + 1);
+                  elInstance.setStyle(col, "background-color", "transparent");
+                  elInstance.setStyle(col, "background-color", "yellow");
                 }
               }
             }
-          } else if ((jsonData[c])[15] !== "" && (jsonData[c])[14] !== "" && (jsonData[c])[14] !== (jsonData[c])[15]) {
-            this.setState({
-              conflictsCount: this.state.conflictsCount + 1,
-              conflictsCountErp: this.state.conflictsCountErp + 1,
-            })
-            elInstance.setValueFromCoords(17, c, 1, true);
-            for (var j = 0; j < colArr.length; j++) {
-              var col = (colArr[j]).concat(parseInt(c) + 1);
-              try {
-                var cell = elInstance.getCell(col);
-                cell.classList.add('commitConflict');
-              } catch (err) {
 
+            if (jsonData[c][6].toString() == jsonData[c][13].toString()) {
+
+            } else if (jsonData[c][6].toString() == jsonData[c][33].toString()) {
+              this.setState({
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 3, true);
+              var col = ("N").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+              serverDataChanged += 1;
+            } else if (jsonData[c][13].toString() == jsonData[c][33].toString()) {
+              this.setState({
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 2, true);
+              var col = ("G").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+              localDataChanged += 1;
+            } else {
+              this.setState({
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountErp: this.state.conflictsCountErp + 1,
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 1, true);
+              for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
               }
             }
+
+            if (jsonData[c][8].toString() == jsonData[c][15].toString()) {
+
+            } else if (jsonData[c][8].toString() == jsonData[c][35].toString()) {
+              this.setState({
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 3, true);
+              var col = ("P").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+              serverDataChanged += 1;
+            } else if (jsonData[c][15].toString() == jsonData[c][35].toString()) {
+              this.setState({
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 2, true);
+              var col = ("I").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+              localDataChanged += 1;
+            } else {
+              this.setState({
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountErp: this.state.conflictsCountErp + 1,
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 1, true);
+              for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+              }
+            }
+
+            if (localDataChanged > 0 && serverDataChanged > 0) {
+              this.setState({
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountErp: this.state.conflictsCountErp + 1,
+                isChanged: true
+              })
+              elInstance.setValueFromCoords(21, c, 1, true);
+              for (var j = 0; j < colArr.length; j++) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+              }
+            }
+
           }
         }
       }
     }
+    elInstance.orderBy(21, 0);
     elInstance.options.editable = false;
     if (this.state.conflictsCount == 0) {
       this.generateDataAfterResolveConflictsForQPL();
@@ -3508,6 +3926,7 @@ export default class syncPage extends Component {
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI']
     elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
+      // if (jsonData[c][26].toString() != "true") {
       // console.log("(jsonData[c])[34] Mohit", (jsonData[c])[34] == "")
       if ((jsonData[c])[34] == "") {
         for (var i = 0; i < colArr.length; i++) {
@@ -3543,30 +3962,36 @@ export default class syncPage extends Component {
             this.setState({
               isChanged: true
             })
-            if ((jsonData[c])[35] != "" && oldData[j] == downloadedData[j]) {
-              var col = (colArr[j]).concat(parseInt(c) + 1);
-              elInstance.setValueFromCoords(j, c, latestData[j], true);
-              elInstance.setStyle(col, "background-color", "transparent");
-              // console.log("Mohit above latest 1")
-              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
-              elInstance.setValueFromCoords(36, c, 3, true);
-              (jsonData[c])[36] = 3;
-            } else if ((jsonData[c])[35] != "" && latestData[j] == downloadedData[j]) {
-              var col = (colArr[j]).concat(parseInt(c) + 1);
-              elInstance.setStyle(col, "background-color", "transparent");
-              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-              elInstance.setValueFromCoords(36, c, 2, true);
-              (jsonData[c])[36] = 2;
-            } else {
-              this.setState({
-                conflictsCount: this.state.conflictsCount + 1
-              })
-              elInstance.setValueFromCoords(36, c, 1, true);
-              (jsonData[c])[36] = 1;
-              for (var j = 0; j < colArr.length; j++) {
+            if (jsonData[c][26].toString() != "true") {
+              // console.log("In if Test@@@123", c)
+              // console.log("jsonData[c][26].toString()", jsonData[c][26].toString())
+              if ((jsonData[c])[35] != "" && oldData[j] == downloadedData[j]) {
+                var col = (colArr[j]).concat(parseInt(c) + 1);
+                if (j == 26 && latestData[j].toString() != "true") {
+                  elInstance.setValueFromCoords(j, c, latestData[j], true);
+                  elInstance.setStyle(col, "background-color", "transparent");
+                  // console.log("Mohit above latest 1")
+                  elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+                  elInstance.setValueFromCoords(36, c, 3, true);
+                  (jsonData[c])[36] = 3;
+                }
+              } else if ((jsonData[c])[35] != "" && latestData[j] == downloadedData[j]) {
                 var col = (colArr[j]).concat(parseInt(c) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                elInstance.setValueFromCoords(36, c, 2, true);
+                (jsonData[c])[36] = 2;
+              } else {
+                this.setState({
+                  conflictsCount: this.state.conflictsCount + 1
+                })
+                elInstance.setValueFromCoords(36, c, 1, true);
+                (jsonData[c])[36] = 1;
+                for (var j = 0; j < colArr.length; j++) {
+                  var col = (colArr[j]).concat(parseInt(c) + 1);
+                  elInstance.setStyle(col, "background-color", "transparent");
+                  elInstance.setStyle(col, "background-color", "yellow");
+                }
               }
             }
           }
@@ -3594,19 +4019,22 @@ export default class syncPage extends Component {
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(36, c, 2, true);
             } else {
-              this.setState({
-                conflictsCount: this.state.conflictsCount + 1
-              })
-              elInstance.setValueFromCoords(36, c, 1, true);
-              for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(c) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
+              if (jsonData[c][26].toString() != "true") {
+                this.setState({
+                  conflictsCount: this.state.conflictsCount + 1
+                })
+                elInstance.setValueFromCoords(36, c, 1, true);
+                for (var j = 0; j < colArr.length; j++) {
+                  var col = (colArr[j]).concat(parseInt(c) + 1);
+                  elInstance.setStyle(col, "background-color", "transparent");
+                  elInstance.setStyle(col, "background-color", "yellow");
+                }
               }
             }
           }
         }
       }
+      // }
     }
     elInstance.orderBy(36, 0);
     // console.log("ElInstance.getJsonMohit", elInstance.getJson(null, false))
@@ -4278,6 +4706,7 @@ export default class syncPage extends Component {
   // }
 
   synchronize() {
+    console.log("CommitLogs --- 1 inside synchronize function")
     this.setState({ loading: true });
     var checkValidations = true;
     if (checkValidations) {
@@ -4403,6 +4832,13 @@ export default class syncPage extends Component {
                 batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
                 supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
               }
+              var sl=shipmentList.filter(c=>c.budget.id==="");
+              sl.map(item=>{
+                var index=shipmentList.findIndex(c=>item.shipmentId>0?c.shipmentId==item.shipmentId:c.tempShipmentId==item.tempShipmentId);
+                if(index!=-1){
+                shipmentList[index].budget.id=0;
+                }
+              })
               var programJson = generalJson;
               programJson.consumptionList = consumptionList;
               programJson.inventoryList = inventoryList;
@@ -4483,6 +4919,13 @@ export default class syncPage extends Component {
                 batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
                 supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
               }
+              var sl=shipmentList.filter(c=>c.budget.id==="");
+              sl.map(item=>{
+                var index=shipmentList.findIndex(c=>item.shipmentId>0?c.shipmentId==item.shipmentId:c.tempShipmentId==item.tempShipmentId);
+                if(index!=-1){
+                shipmentList[index].budget.id=0;
+                }
+              })
               var programJson = generalJson;
               programJson.consumptionList = consumptionList;
               programJson.inventoryList = inventoryList;
@@ -4561,8 +5004,11 @@ export default class syncPage extends Component {
               // ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
               // if (response1.status == 200) {
               // if (response1.data == false) {
+                console.log("Program Json Final Test@@@123",programJson)
+              console.log("CommitLogs --- 2 Log before sending data to server")
               ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
+                  console.log("CommitLogs --- 3 Log after response 200")
                   // console.log(")))) Commit Request generated successfully");
                   // var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
                   // var programDataOs1 = programDataTransaction1.objectStore('programData');
@@ -4634,11 +5080,13 @@ export default class syncPage extends Component {
                     progressPer: 50
                     , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
                   }, () => {
+                    console.log("CommitLogs --- 4 After 50% completed before redirect to dashboard")
                     this.hideFirstComponent();
                     this.redirectToDashbaord(response.data);
                   })
                   // }.bind(this)
                 } else {
+                  console.log("CommitLogs --- 5 in else response not 200")
                   this.setState({
                     message: response.data.messageCode,
                     color: "red",
@@ -4649,6 +5097,10 @@ export default class syncPage extends Component {
               })
                 .catch(
                   error => {
+                    console.log("CommitLogs --- 6 inside error", error)
+                    console.log("CommitLogs --- 7 inside error.message", error.message)
+                    console.log("CommitLogs --- 8 inside error.response", error.response ? error.response.status : "")
+
                     // console.log("@@@Error4", error);
                     // console.log("@@@Error4", error.message);
                     // console.log("@@@Error4", error.response ? error.response.status : "")
@@ -4883,25 +5335,35 @@ export default class syncPage extends Component {
   }
 
   redirectToDashbaord(commitRequestId) {
+    console.log("CommitLogs --- 9 inside redirect to dashboard", commitRequestId)
     this.setState({ loading: true });
     // console.log("method called", commitRequestId);
     AuthenticationService.setupAxiosInterceptors();
     ProgramService.sendNotificationAsync(commitRequestId).then(resp => {
+      console.log("CommitLogs --- 10 send notification async Response", resp)
+      console.log("CommitLogs --- 11 send notification async Response data", resp.data)
+      console.log("CommitLogs --- 12 send notification async created by user Id", resp.data.createdBy.userId)
+      console.log("CommitLogs --- 13 send notification async status", resp.data.status)
       var curUser = AuthenticationService.getLoggedInUserId();
       if (resp.data.createdBy.userId == curUser && resp.data.status == 1) {
+        console.log("CommitLogs --- 14 inside status 1")
         setTimeout(function () {
+          console.log("CommitLogs --- 15 Again call for redirect to dashboard")
           this.redirectToDashbaord(commitRequestId)
         }.bind(this), 10000);
       } else if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
+        console.log("CommitLogs --- 14 inside else if for status is 2")
         this.setState({
           progressPer: 75
           , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
         }, () => {
           this.hideFirstComponent();
+          console.log("CommitLogs --- 15 call to bring latest program")
           this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
         })
         // eventBus.dispatch("testDataAccess", { openModal: true, notificationDetails: resp.data });
       } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
+        console.log("CommitLogs --- 15 inside else if for status is 3")
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -4947,11 +5409,13 @@ export default class syncPage extends Component {
 
     }).catch(
       error => {
+        console.log("CommitLogs --- 16 in catch before calling redirect to dashboard")
         this.redirectToDashbaord(commitRequestId)
       })
   }
 
   getLatestProgram(notificationDetails) {
+    console.log("CommitLogs --- 17 in get latest program")
     // console.log(")))) inside getting latest version")
     this.setState({ loading: true });
     var checkboxesChecked = [];
@@ -4969,6 +5433,7 @@ export default class syncPage extends Component {
     // console.log(")))) Before calling get notification api")
     ProgramService.getAllProgramData(checkboxesChecked)
       .then(response => {
+        console.log("CommitLogs --- 18 after getting latest program from server")
         // console.log(")))) After calling get notification api")
         // console.log("Resposne+++", response);
         var json = response.data;

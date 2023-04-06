@@ -97,6 +97,7 @@ export default class ExportDataset extends Component {
             getRequest.onsuccess = function (event) {
                 console.log("in success")
                 var json = getRequest.result;
+                console.log("Json Test123",json);
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < json.length; i++) {
@@ -106,6 +107,7 @@ export default class ExportDataset extends Component {
                     var bytes1 = CryptoJS.AES.decrypt(json[i].programData, SECRET_KEY);
                     var programData = bytes1.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
+                    console.log("Program Json Test123",programJson);
                     if (json[i].userId == userId) {
                         // if (programNameLabel != "") {
                         //     prgList.push({ value: json[i].id, label: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + json[i].version })
@@ -349,7 +351,7 @@ export default class ExportDataset extends Component {
                                                                                                     console.log("Txt-unencrept data ", txt);
                                                                                                     console.log("Txt 1-unencrept data", txt1);
 
-                                                                                                    zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                                    zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
 
                                                                                                 }
 

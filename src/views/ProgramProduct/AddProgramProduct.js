@@ -475,7 +475,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     readOnly: true
                                                                 },
                                                                 {
-                                                                    title: 'Active',
+                                                                    title: i18n.t('static.common.active'),
                                                                     type: 'checkbox'
                                                                 },
                                                                 {

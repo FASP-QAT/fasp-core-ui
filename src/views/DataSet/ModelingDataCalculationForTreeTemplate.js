@@ -210,8 +210,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 //Linear number
                                 if (nodeDataModeling.modelingType.id == 2 || nodeDataModeling.modelingType.id == 5) {
                                     if (nodeDataModeling.transferNodeDataId > 0) {
-                                        transfer += Number(nodeDataModelingValue);
-                                        transferWMC += Number(nodeDataModelingValue);
+                                        transfer = Number(nodeDataModelingValue);
+                                        transferWMC = Number(nodeDataModelingValue);
                                         if (endValue + Number(nodeDataModelingValue) >= 0) {
                                             endValue += Number(nodeDataModelingValue);
                                             endValueWMC += Number(nodeDataModelingValue);
@@ -265,8 +265,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         }
                                     }
                                     if (nodeDataModeling.transferNodeDataId > 0) {
-                                        transfer += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
-                                        transferWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                        transfer = Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                        transferWMC = Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
                                         console.log("Transfer+++++++++++++@@@@@", transfer);
                                         if (endValue + Number((Number(dv) * Number(nodeDataModelingValue)) / 100) >= 0) {
                                             endValue += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
@@ -303,8 +303,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 //Exponential %
                                 else if (nodeDataModeling.modelingType.id == 4) {
                                     if (nodeDataModeling.transferNodeDataId > 0) {
-                                        transfer += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
-                                        transferWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        transfer = Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        transferWMC = Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
                                         if (endValue + Number((Number(startValue) * Number(nodeDataModelingValue)) / 100) >= 0) {
                                             endValue += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
                                             endValueWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
@@ -465,9 +465,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (nodeDataMapForScenario.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                     } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                         if (payload.nodeType.id == 4) {
-                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                         } else {
-                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                         }
                                     }
                                     console.log("noFURequired@@@@@@@@@@@", noFURequired);
@@ -529,7 +529,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     }
                                     console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                     if (grandParentNodeData != undefined) {
-                                        var minusNumber = (nodeDataMapForScenario.month == 1 ? nodeDataMapForScenario.month - 2 : nodeDataMapForScenario.month - 1);
+                                        var minusNumber = (nodeDataMapForScenario.monthNo == 1 ? nodeDataMapForScenario.monthNo - 2 : nodeDataMapForScenario.monthNo - 1);
                                         var grandParentPrevMonthMMDValue = []
                                         if (flatList[fl].level != 1) {
                                             grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
@@ -539,7 +539,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         } else {
                                             var grandParentCurMonthMMDValue = [];
                                             if (flatList[fl].level != 1) {
-                                                grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == nodeDataMapForScenario.month);
+                                                grandParentCurMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == nodeDataMapForScenario.monthNo);
                                             }
                                             if (grandParentCurMonthMMDValue.length > 0) {
                                                 patients = grandParentCurMonthMMDValue[0].calculatedValue;
@@ -694,7 +694,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (parentNodeNodeData.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                     } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                         // if (payload.nodeType.id == 4) {
-                                            noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                            noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
                                         // } else {
                                             // noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
                                         // }
