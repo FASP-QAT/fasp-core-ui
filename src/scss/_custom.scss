@@ -10042,20 +10042,20 @@ legend.scheduler-border {
 }
 
 .z-index1000{
-  z-index: 1000;
+  z-index: 1000 !important;
 }
 
 .z-index1001{
   z-index: 1001;
 }
 
-.cssTable th {
+.inventoryTurnsTable th {
   width: 120px !important;
   white-space: normal !important;
 }
 
-.cssTable th:first-child,
-.cssTable th:nth-child(2) {
+.inventoryTurnsTable th:first-child,
+.inventoryTurnsTable th:nth-child(2) {
   width: auto !important;
   overflow: auto !important;
   white-space: nowrap !important;

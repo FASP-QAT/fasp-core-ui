@@ -438,9 +438,9 @@ export default class InventoryTurns extends Component {
             selectedArray.push(value[p].value);
         }
 
-        if (selectedArray.includes(1)) {
+        if (selectedArray.includes(0)) {
             this.setState({ puId: [] });
-            var list = this.state.puList.filter(c => c.value != 1)
+            var list = this.state.puList.filter(c => c.value != 0)
             this.setState({ puId: list });
             var puId = list;
         } else {
@@ -655,7 +655,7 @@ export default class InventoryTurns extends Component {
                         var json = (response.data).filter(c => c.payload.active == true);
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].id, label: json[i].payload.label.label_en }
+                            regList[i] = { value: json[i].payload.productCategoryId, label: json[i].payload.label.label_en }
                         }
                         var listArray = regList;
                         
@@ -842,7 +842,6 @@ export default class InventoryTurns extends Component {
             "dt": moment(this.state.CostOfInventoryInput.dt).startOf('month').format('YYYY-MM-DD'),
             "includePlannedShipments": this.state.CostOfInventoryInput.includePlanningShipments.toString() == "true" ? 1 : 0
         }
-        console.log("Hello "+JSON.stringify(inputJson))
         // AuthenticationService.setupAxiosInterceptors();
 
         if(inputJson.programIds.length > 0){
@@ -1100,11 +1099,11 @@ export default class InventoryTurns extends Component {
 
     getTableDiv() {
         return (
-          <Table className="table-bordered text-center overflowhide main-table cssTable" bordered size="sm" options={this.options}>
+          <Table className="table-bordered text-center overflowhide main-table inventoryTurnsTable" bordered size="sm" options={this.options}>
             <thead>
               <tr>
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
-                <th className="sticky-col first-col clone1"></th>
+                <th className="sticky-col first-col clone1 z-index1000"></th>
                 <th className="dataentryTdWidth sticky-col first-col clone"></th>
                 <th>{i18n.t('static.planningunit.planningunit')}</th>
                 <th>{i18n.t('static.report.totconsumption')}</th>
