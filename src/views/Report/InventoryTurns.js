@@ -1109,8 +1109,8 @@ export default class InventoryTurns extends Component {
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
                 <th>{i18n.t('static.report.noofmonth')}</th>
-                <th>Actual {i18n.t('static.dashboard.inventoryTurns')}</th>
-                <th>Planned {i18n.t('static.dashboard.inventoryTurns')}</th>
+                <th>{i18n.t('static.inventoryTurns.actual')}</th>
+                <th>{i18n.t('static.inventoryTurns.planned')}</th>
                 <th>{i18n.t('static.extrapolation.mape')}</th>
                 <th>{i18n.t('static.extrapolation.mse')}</th>
               </tr>
@@ -1265,7 +1265,7 @@ export default class InventoryTurns extends Component {
             },
             {
                 dataField: 'inventoryTurns',
-                text: "Actual "+i18n.t('static.dashboard.inventoryTurns'),
+                text: i18n.t('static.inventoryTurns.actual'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1274,7 +1274,7 @@ export default class InventoryTurns extends Component {
             },
             {
                 dataField: 'plannedInventoryTurns',
-                text: "Planned "+i18n.t('static.dashboard.inventoryTurns'),
+                text: i18n.t('static.inventoryTurns.planned'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
