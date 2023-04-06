@@ -3022,10 +3022,10 @@
     "static.QATForecastImport.convertedForecastConsumption": "Converted Forecasted Consumption (to be imported)",
     "static.QATForecastImport.currentForecastConsumption": "Current Forecasted Consumption (Supply Plan Module)",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.integration.manualProgramIntegration":"Manual Integration",
+    "static.integration.manualProgramIntegration":"JSON Generation Status",
     "static.manualIntegration.requester":"Requester",
     "static.manualIntegration.jsonCreationDate":"JSON Creation Date",
-    "static.manualIntegration.addManualIntegration":"Add Manual Integration",
+    "static.manualIntegration.addManualIntegration":"Request JSON",
     "static.manualIntegration.completed":"Completed",
     "static.manualIntegration.requested":"Requested",
     "static.commitTree.puThatDoesNotAppearOnSelectedForecastTree":"Planning units that does not appear on any selected tree"
