@@ -2657,8 +2657,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             <th>{i18n.t('static.dataentry.regionalPer')}</th>
           </tr>
         </thead>
-        <tbody>{console.log("Hello "+JSON.stringify(this.state.planningUnitList))}
-        {console.log("Hello1 "+JSON.stringify(this.state.regionList))}
+        <tbody>
           {this.state.planningUnitList.map(item => {
             var total = 0;
             var totalPU = 0;
