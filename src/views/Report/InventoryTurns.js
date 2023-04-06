@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col, Form } from 'reactstrap';
+import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col, Form, Table } from 'reactstrap';
+import Select from 'react-select';
 import i18n from '../../i18n'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -30,6 +31,14 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import classNames from 'classnames';
+import CountryService from "../../api/CountryService";
+import ProductCategoryService from "../../api/PoroductCategoryService";
+import RealmCountryService from '../../api/RealmCountryService';
+import { json } from 'mathjs';
+import { de } from 'date-fns/locale';
+
+
 export const PSM_PROCUREMENT_AGENT_ID = 1
 export const CANCELLED_SHIPMENT_STATUS = 8
 
@@ -46,32 +55,43 @@ export default class InventoryTurns extends Component {
         super(props);
         this.state = {
             CostOfInventoryInput: {
-                programId: '',
                 planningUnitIds: [],
-                regionIds: [],
-                versionId: 0,
                 dt: new Date(),
                 includePlanningShipments: true,
-                programId: '',
-                versionId: ''
+                country: [],
+                pu: [],
+                programIds: [],
+                displayId: ''
             },
-            programs: [],
-            planningUnitList: [],
             costOfInventory: [],
+            costOfCountry:[],
+            costOfProgram:[],
             versions: [],
             message: '',
+            countryList: [],
+            countryId: [],
+            puList: [],
+            puId: [],
+            programList: [],
+            programId: [],
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            loading: true
-
+            loading: true,
+            childShowArr: {},
+            childShowArr1: []
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
-        this.setProgramId = this.setProgramId.bind(this);
-        this.setVersionId = this.setVersionId.bind(this);
+        this.radioChange = this.radioChange.bind(this);
+        this.filterData = this.filterData.bind(this);
+        this.updateCountryData = this.updateCountryData.bind(this);
+        this.updatePUData = this.updatePUData.bind(this);
+        this.toggleAccordion = this.toggleAccordion.bind(this);
+        this.toggleAccordion1 = this.toggleAccordion1.bind(this);
+
 
     }
     makeText = m => {
@@ -85,316 +105,15 @@ export default class InventoryTurns extends Component {
         return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
     }
 
-    getPrograms = () => {
-        if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
-                .then(response => {
-                    console.log(JSON.stringify(response.data))
-                    this.setState({
-                        programs: response.data, message: '', loading: false
-                    }, () => { this.consolidatedProgramList() })
-                }).catch(
-                    error => {
-                        this.setState({
-                            programs: [], loading: false
-                        }, () => { this.consolidatedProgramList() })
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                // message: 'static.unkownError',
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
-            // .catch(
-            //     error => {
-            //         this.setState({
-            //             programs: [], loading: false
-            //         }, () => { this.consolidatedProgramList() })
-            //         if (error.message === "Network Error") {
-            //             this.setState({ loading: false, message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-            //                     break;
-            //                 default:
-            //                     this.setState({ loading: false, message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
-
-        } else {
-            console.log('offline')
-            this.setState({ loading: false })
-            this.consolidatedProgramList()
-        }
-
-    }
-    consolidatedProgramList = () => {
-        const lan = 'en';
-        const { programs } = this.state
-        var proList = programs;
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
-
-                        var f = 0
-                        for (var k = 0; k < this.state.programs.length; k++) {
-                            if (this.state.programs[k].programId == programData.programId) {
-                                f = 1;
-                                console.log('already exist')
-                            }
-                        }
-                        if (f == 0) {
-                            proList.push(programData)
-                        }
-                    }
-
-
-                }
-                var lang = this.state.lang;
-
-                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
-                    this.setState({
-                        programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        }),
-                        programId: localStorage.getItem("sesProgramIdReport")
-                    }, () => {
-                        let costOfInventoryInput = this.state.CostOfInventoryInput;
-                        costOfInventoryInput.programId = localStorage.getItem("sesProgramIdReport");
-                        this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
-                        this.filterVersion();
-                    })
-                } else {
-                    this.setState({
-                        programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        })
-                    })
-                }
-
-
-            }.bind(this);
-
-        }.bind(this);
-
-
-    }
-
-
-    filterVersion = () => {
-        // let programId = document.getElementById("programId").value;
-        let programId = this.state.programId;
-        let costOfInventoryInput = this.state.CostOfInventoryInput;
-        costOfInventoryInput.versionId = 0
-        if (programId != 0) {
-
-            localStorage.setItem("sesProgramIdReport", programId);
-            const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
-            if (program.length == 1) {
-                if (isSiteOnline()) {
-                    this.setState({
-                        costOfInventoryInput,
-                        versions: []
-                    }, () => {
-                        this.setState({
-                            costOfInventoryInput,
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
-                    });
-
-
-                } else {
-                    this.setState({
-                        costOfInventoryInput,
-                        versions: []
-                    }, () => { this.consolidatedVersionList(programId) })
-                }
-            } else {
-
-                this.setState({
-                    costOfInventoryInput,
-                    versions: []
-                })
-
-            }
-        } else {
-            this.setState({
-                costOfInventoryInput,
-                versions: []
-            })
-        }
-    }
-    consolidatedVersionList = (programId) => {
-        const lan = 'en';
-        const { versions } = this.state
-        var verList = versions;
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
-                        var programData = databytes.toString(CryptoJS.enc.Utf8)
-                        var version = JSON.parse(programData).currentVersion
-
-                        version.versionId = `${version.versionId} (Local)`
-                        verList.push(version)
-
-                    }
-
-
-                }
-
-                console.log(verList);
-                let versionList = verList.filter(function (x, i, a) {
-                    return a.indexOf(x) === i;
-                });
-                versionList.reverse();
-
-                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-                    // this.setState({
-                    //     versions: versionList,
-                    //     versionId: localStorage.getItem("sesVersionIdReport")
-                    // }, () => {
-                    //     let costOfInventoryInput = this.state.CostOfInventoryInput;
-                    //     costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
-                    //     this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
-                    // })
-
-                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
-                    if (versionVar.length != 0) {
-                        this.setState({
-                            versions: versionList,
-                            versionId: localStorage.getItem("sesVersionIdReport")
-                        }, () => {
-                            let costOfInventoryInput = this.state.CostOfInventoryInput;
-                            costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
-                            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
-                        })
-                    } else {
-                        this.setState({
-                            versions: versionList,
-                            versionId: versionList[0].versionId
-                        }, () => {
-                            let costOfInventoryInput = this.state.CostOfInventoryInput;
-                            costOfInventoryInput.versionId = versionList[0].versionId;
-                            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
-                        })
-                    }
-                } else {
-                    this.setState({
-                        versions: versionList,
-                        versionId: versionList[0].versionId
-                    }, () => {
-                        let costOfInventoryInput = this.state.CostOfInventoryInput;
-                        costOfInventoryInput.versionId = versionList[0].versionId;
-                        this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
-                    })
-                }
-
-
-            }.bind(this);
-
-
-
-        }.bind(this)
-
-
-    }
-
     dateformatter = value => {
         var dt = new Date(value)
         return moment(dt).format('DD-MMM-YY');
     }
     formatterDouble = value => {
 
+        if(value == null){
+            return null;
+        }
         var cell1 = this.roundN(value)
         cell1 += '';
         var x = cell1.split('.');
@@ -426,9 +145,10 @@ export default class InventoryTurns extends Component {
 
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.forecastReport.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory'))).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') + ' : ' + this.state.countryId.map(e => {return e.label}) : i18n.t('static.productCategory.productCategory')  + ' : ' + this.state.puId.map(e => {return e.label})).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + this.state.programId.map(e => {return e.label})).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
@@ -439,7 +159,27 @@ export default class InventoryTurns extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.round(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)])));
+        // this.state.costOfInventory.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.totalConsumption, this.round(ele.avergeStock), ele.noOfMonths, this.roundN(ele.inventoryTurns)])));
+
+        {this.state.costOfCountry.map(item => {
+
+            A.push(this.addDoubleQuoteToRowContent([(item.countryName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length, this.formatter(item.totalConsumption), this.round(item.avergeStock), "", this.roundN(item.inventoryTurns), this.roundN(item.plannedInventoryTurns), this.roundN(item.mape), this.roundN(item.mse)])) 
+                    
+            {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
+                
+                A.push(this.addDoubleQuoteToRowContent([(r.programName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, this.formatter(r.totalConsumption), this.round(r.avergeStock), "", this.roundN(r.inventoryTurns), this.roundN(r.plannedInventoryTurns), this.roundN(r.mape), this.roundN(r.mse)]))
+                        
+                {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN(arr1.mse)]))          
+                })}
+
+                {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN(arr1.mse)]))  
+                })}
+                
+            })}
+        
+        })}
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -492,16 +232,19 @@ export default class InventoryTurns extends Component {
                     doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.forecastReport.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory')) , doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
 
+                    var level1Text = doc.splitTextToSize((this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') + ' : ' + this.state.countryId.map(e => {return e.label}) : i18n.t('static.productCategory.productCategory')  + ' : ' + this.state.puId.map(e => {return e.label})), doc.internal.pageSize.width * 3 / 4)
+                    doc.text(doc.internal.pageSize.width / 8, 150, level1Text)
+                    
+                    var level2Text = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programId.map(e => {return e.label})), doc.internal.pageSize.width * 3 / 4)
+                    doc.text(doc.internal.pageSize.width / 8, this.state.CostOfInventoryInput.displayId == 1 ? 170 + this.state.countryId.length*1.5 : 170 + this.state.puId.length*2, level2Text)
+                    
                 }
 
             }
@@ -527,16 +270,37 @@ export default class InventoryTurns extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.totalConsumption), this.formatter(ele.avergeStock), this.formatter(ele.noOfMonths), this.formatterDouble(ele.inventoryTurns)]);
+        
+        // const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.totalConsumption), this.formatter(ele.avergeStock), this.formatter(ele.noOfMonths), this.formatterDouble(ele.inventoryTurns)]);
 
+        const data=[];
+        {this.state.costOfCountry.map(item => {
+
+            data.push([item.countryName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length, this.formatter(item.totalConsumption), this.formatter(item.avergeStock), "", this.formatterDouble(item.inventoryTurns), this.formatterDouble(item.plannedInventoryTurns), this.formatterDouble(item.mape), this.formatterDouble(item.mse)])  
+                    
+            {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
+                
+                data.push([r.programName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, this.formatter(r.totalConsumption), this.formatter(r.avergeStock), "", this.formatterDouble(r.inventoryTurns), this.formatterDouble(r.plannedInventoryTurns), this.formatterDouble(r.mape), this.formatterDouble(r.mse)])
+                
+                {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), this.formatter(arr1.noOfMonths), this.formatterDouble(arr1.inventoryTurns), this.formatterDouble(arr1.plannedInventoryTurns), this.formatterDouble(arr1.mape), this.formatterDouble(arr1.mse)])          
+                })}
+
+                {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), this.formatter(arr1.noOfMonths), this.formatterDouble(arr1.inventoryTurns), this.formatterDouble(arr1.plannedInventoryTurns), this.formatterDouble(arr1.mape), this.formatterDouble(arr1.mse)])  
+                })}
+                
+            })}
+        
+        })}
         let content = {
             margin: { top: 80, bottom: 50 },
-            startY: 170,
+            startY: this.state.CostOfInventoryInput.displayId == 1 ? 170 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 170 + this.state.puId.length*2 + this.state.programId.length*2,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 96 },
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 65 },
             columnStyles: {
-                1: { cellWidth: 281.89 },
+                0: { cellWidth: 255 },
             }
         };
         doc.autoTable(content);
@@ -565,48 +329,392 @@ export default class InventoryTurns extends Component {
 
     dataChange(event) {
         let costOfInventoryInput = this.state.CostOfInventoryInput;
-        if (event.target.name == "programId") {
-            costOfInventoryInput.programId = event.target.value;
 
-        }
         if (event.target.name == "includePlanningShipments") {
             costOfInventoryInput.includePlanningShipments = event.target.value;
 
         }
-        if (event.target.name == "versionId") {
-            costOfInventoryInput.versionId = event.target.value;
-
-        }
+        
         this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
     }
 
+    updateCountryData(value) {
+
+        var selectedArray = [];
+        for (var p = 0; p < value.length; p++) {
+            selectedArray.push(value[p].value);
+        }
+
+        if (selectedArray.includes("-1")) {
+            this.setState({ countryId: [] });
+            var list = this.state.countryList.filter(c => c.value != -1)
+            this.setState({ countryId: list });
+            var countryId = list;
+        } else {
+            this.setState({ countryId: value });
+            var countryId = value;
+        }
+
+        var countryArray = [];
+        for (var i = 0; i < countryId.length; i++) {
+            countryArray[i] = countryId[i].value;
+        }
+        this.setState( prevState => ({ CostOfInventoryInput : { ...prevState.CostOfInventoryInput, country: countryArray} } ));
+        ProgramService.getProgramListByRealmCountryIdList(countryArray).then(response => {
+            let programIdArray = [];
+            response.data.map(e => programIdArray.push(e.id));
+            var json = (response.data).filter(c => c.label.active == true);
+            var regList = [];
+            for (var i = 0; i < json.length; i++) {
+                regList[i] = { value: json[i].id, label: json[i].code }
+            }
+            var listArray = regList;
+            listArray.sort((a, b) => {
+                var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            listArray.unshift({ value: "-1", label: i18n.t("static.common.all") });
+                        
+            console.log("getProgramListByRealmCountryIdList=====>", programIdArray);
+            this.setState( prevState => ({ programList: listArray, programId: listArray.slice(1), CostOfInventoryInput : { ...prevState.CostOfInventoryInput, programIds: programIdArray} } ),
+            () => this.formSubmit());            
+        }).catch(
+            error => {
+                this.setState({
+                    costOfInventory: [],
+                    loading: false
+                }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
+                });
+                if (error.message === "Network Error") {
+                    this.setState({
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+        
+    }
+
+    updatePUData(value) {
+
+        var selectedArray = [];
+        for (var p = 0; p < value.length; p++) {
+            selectedArray.push(value[p].value);
+        }
+
+        if (selectedArray.includes(0)) {
+            this.setState({ puId: [] });
+            var list = this.state.puList.filter(c => c.value != 0)
+            this.setState({ puId: list });
+            var puId = list;
+        } else {
+            this.setState({ puId: value });
+            var puId = value;
+        }
+
+        var puArray = [];
+        for (var i = 0; i < puId.length; i++) {
+            puArray[i] = puId[i].value;
+        }
+        this.setState( prevState => ({ CostOfInventoryInput : { ...prevState.CostOfInventoryInput, pu: puArray} }));
+        ProgramService.getProgramListByProductCategoryIdList(puArray).then(response => {
+            let programIdArray = [];
+            response.data.map(e => programIdArray.push(e.id));
+
+            var json = (response.data).filter(c => c.label.active == true);
+            var regList = [];
+            for (var i = 0; i < json.length; i++) {
+                regList[i] = { value: json[i].id, label: json[i].code }
+            }
+            var listArray = regList;
+            listArray.sort((a, b) => {
+                var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            listArray.unshift({ value: "-1", label: i18n.t("static.common.all") });
+
+            console.log("getProgramListByProductCategoryIdList=====>", programIdArray);
+            this.setState( prevState => ({ programList:listArray, programId: listArray.slice(1), CostOfInventoryInput : { ...prevState.CostOfInventoryInput, programIds: programIdArray} } ),
+            () => this.formSubmit());
+        }).catch(
+            error => {
+                this.setState({
+                    costOfInventory: [],
+                    loading: false
+                }, () => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
+                });
+                if (error.message === "Network Error") {
+                    this.setState({
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+    }
+
+    updateProgramData(value){
+        var selectedArray = [];
+        for (var p = 0; p < value.length; p++) {
+            selectedArray.push(value[p].value);
+        }
+
+        if (selectedArray.includes("-1")) {
+            this.setState({ programId: [] });
+            var list = this.state.programList.filter(c => c.value != -1)
+            this.setState({ programId: list });
+            var programId = list;
+        } else {
+            this.setState({ programId: value });
+            var programId = value;
+        }
+
+        var programArray = [];
+        for (var i = 0; i < programId.length; i++) {
+            programArray[i] = programId[i].value;
+        }
+        this.setState( prevState => ({ CostOfInventoryInput : { ...prevState.CostOfInventoryInput, programIds: programArray} } ),
+        ()=>this.formSubmit());
+    }
+
+    filterData() {
+        let displayId = this.state.CostOfInventoryInput.displayId;
+        (displayId == 1 ? document.getElementById("hideCountryDiv").style.display = "block" : document.getElementById("hideCountryDiv").style.display = "none");
+        (displayId == 2 ? document.getElementById("hideProductDiv").style.display = "block" : document.getElementById("hideProductDiv").style.display = "none");
+
+    }
+
+    radioChange(event) {
+        let tempId = event.target.id;
+
+        if(tempId === "displayId1"){
+            this.setState( prevState => ({ programList:[], programId:[], costOfInventory: [], costOfCountry:[], costOfProgram:[], CostOfInventoryInput : { ...prevState.CostOfInventoryInput, displayId: parseInt(1), pu: [0], programIds:[] }}
+        ),
+            () => {
+                this.filterData();
+                this.formSubmit();
+            })    
+        }else{
+            this.setState( prevState => ({ programList:[], programId:[], costOfInventory: [], costOfCountry:[], costOfProgram:[], CostOfInventoryInput : { ...prevState.CostOfInventoryInput, displayId: parseInt(2), country: [], programIds:[] }}
+        ),
+            () => {
+                this.filterData();
+                this.formSubmit();
+            })
+        }
+    }
+
     componentDidMount() {
-        this.getPrograms()
-    }
+       
+        document.getElementById("hideProductDiv").style.display = "none";
+        document.getElementById("hideCountryDiv").style.display = "none";
 
-    setProgramId(event) {
-        this.setState({
-            programId: event.target.value,
-            versionId: ''
-        }, () => {
-            localStorage.setItem("sesVersionIdReport", '');
-            let costOfInventoryInput = this.state.CostOfInventoryInput;
-            costOfInventoryInput.programId = this.state.programId;
-            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
-            this.filterVersion();
-        })
+        RealmCountryService.getRealmCountryListAll()
+                .then(response => {
+                    console.log("Realm Country List list---", response.data);
+                    if (response.status == 200) {
+                        var json = (response.data).filter(c => c.active == true);
+                        var regList = [];
+                        for (var i = 0; i < json.length; i++) {
+                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                        }
+                        var listArray = regList;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        listArray.unshift({ value: "-1", label: i18n.t("static.common.all") });
+                        this.setState({
+                            countryList: listArray,
+                            loading: false
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-    }
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
 
-    setVersionId(event) {
-        this.setState({
-            versionId: event.target.value
-        }, () => {
-            let costOfInventoryInput = this.state.CostOfInventoryInput;
-            costOfInventoryInput.versionId = this.state.versionId;
-            this.setState({ costOfInventoryInput }, () => { this.formSubmit() })
-        })
+                ProductCategoryService.getProductCategoryListByRealmId(AuthenticationService.getRealmId())
+                .then(response => {
+                    console.log("Planning Unit List list---", response.data);
+                    if (response.status == 200) {
+                        // var json = response.data;
+                        var json = (response.data).filter(c => c.payload.active == true);
+                        var regList = [];
+                        for (var i = 0; i < json.length; i++) {
+                            regList[i] = { value: json[i].payload.productCategoryId, label: json[i].payload.label.label_en }
+                        }
+                        var listArray = regList;
+                        
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        // listArray.unshift({ value: "-1", label: i18n.t("static.common.all") });
+                        this.setState({
+                            puList: listArray,
+                            loading: false
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
     }
 
 
@@ -725,246 +833,198 @@ export default class InventoryTurns extends Component {
 
 
     formSubmit() {
-        var programId = this.state.CostOfInventoryInput.programId;
-        var versionId = this.state.CostOfInventoryInput.versionId.toString();
-        if (programId != 0 && versionId != 0) {
-            localStorage.setItem("sesVersionIdReport", versionId);
-            if (versionId.includes('Local')) {
-                var startDate = moment(new Date(this.state.singleValue2.year - 1, this.state.singleValue2.month, 1));
-                var endDate = moment(this.state.CostOfInventoryInput.dt);
-                var db1;
-                var storeOS;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function (event) {
-                    this.setState({
-                        message: i18n.t('static.program.errortext'),
-                        loading: false
-                    })
-                }.bind(this);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-                    var version = (versionId.split('(')[0]).trim()
-                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                    var program = `${programId}_v${version}_uId_${userId}`
-                    var programDataOs = programDataTransaction.objectStore('programData');
-                    console.log(program)
-                    var programRequest = programDataOs.get(program);
-                    programRequest.onerror = function (event) {
-                        this.setState({
-                            message: i18n.t('static.program.errortext'),
-                            loading: false
-                        })
-                    }.bind(this);
-                    programRequest.onsuccess = function (e) {
-                        this.setState({ loading: true })
-                        console.log(programRequest)
-                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                        // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        // var programJson = JSON.parse(programData);
-                        var proList = []
-                        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                        var planningunitRequest = planningunitOs.getAll();
-                        planningunitRequest.onerror = function (event) {
-                            // Handle errors!
-                            this.setState({
-                                loading: false
-                            })
-                        };
-                        planningunitRequest.onsuccess = function (e) {
-                            var myResult = [];
-                            myResult = planningunitRequest.result;
+        this.setState({loading: true})
+        var inputJson = {
+            "country": this.state.CostOfInventoryInput.country,
+            "programIds": this.state.CostOfInventoryInput.programIds,
+            "productCategoryIds": this.state.CostOfInventoryInput.pu,
+            "viewBy": this.state.CostOfInventoryInput.displayId,
+            "dt": moment(this.state.CostOfInventoryInput.dt).startOf('month').format('YYYY-MM-DD'),
+            "includePlannedShipments": this.state.CostOfInventoryInput.includePlanningShipments.toString() == "true" ? 1 : 0
+        }
+        // AuthenticationService.setupAxiosInterceptors();
 
-                            for (var i = 0, j = 0; i < myResult.length; i++) {
-                                if (myResult[i].program.id == programId && myResult[i].active == true) {
-                                    proList[j++] = myResult[i]
+        if(inputJson.programIds.length > 0){
+            ReportService.inventoryTurns(inputJson).then(response => {
+                console.log("costOfInentory=====>", JSON.stringify(response.data));
+
+                if(response.data.length > 0){
+                    const level1Data = [];
+                    const level2Data = [];
+                    
+                    if(this.state.CostOfInventoryInput.displayId == 1){
+                        for(let i=0; i < this.state.CostOfInventoryInput.country.length; i++){
+                            let tempData = response.data.filter(e => e.realmCountry.id == this.state.CostOfInventoryInput.country[i]);
+                            if(tempData.length > 0){
+                                let level1Consumption = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                                let unique = [...new Set(tempData.map((item) => item.program.id))];
+                                let level1NoOfMonths = tempData.reduce((prev,curr,index) => prev + curr.noOfMonths, 0);
+                                let level1AverageStock = tempData.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
+                                level1AverageStock = level1AverageStock / level1NoOfMonths;
+                                let level1InventoryTurns = tempData.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / tempData.length;
+                                let level1PlannedInventoryTurns = this.mode(tempData.map(arr => arr.plannedInventoryTurns));
+                                let level1Mape = tempData.reduce((prev,curr,index) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length);
+                                let level1Mse = tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / (tempData.filter(arr => arr.mse != null).length);
+                                level1Data.push({
+                                    id: this.state.CostOfInventoryInput.country[i],
+                                    countryName: tempData[0].realmCountry.label.label_en,
+                                    totalConsumption: level1Consumption,
+                                    programIds: unique,
+                                    avergeStock: level1AverageStock,
+                                    inventoryTurns: level1InventoryTurns,
+                                    plannedInventoryTurns: level1PlannedInventoryTurns,
+                                    mape: level1Mape,
+                                    mse: level1Mse
+                                })
+                            
+                                for(let j=0; j<unique.length; j++){
+                                    let temp = response.data.filter(e =>  e.realmCountry.id == this.state.CostOfInventoryInput.country[i] && e.program.id == unique[j])
+                                    let level2Consumption = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                                    let level2NoOfMonths = temp.reduce((prev,curr,index) => prev + curr.noOfMonths, 0);
+                                    let level2AverageStock = temp.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
+                                    level2AverageStock = level2AverageStock / level2NoOfMonths;
+                                    let level2InventoryTurns = temp.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / temp.length;
+                                    let level2PlannedInventoryTurns = this.mode(temp.map(arr => arr.plannedInventoryTurns));
+                                    let level2Mape = temp.reduce((prev,curr,index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length);
+                                    let level2Mse = temp.reduce((prev,curr,index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length);
+                                    level2Data.push({
+                                        id: this.state.CostOfInventoryInput.country[i],
+                                        programId: unique[j],
+                                        programName: temp[0].program.code,
+                                        totalConsumption: level2Consumption,
+                                        avergeStock: level2AverageStock,
+                                        inventoryTurns: level2InventoryTurns,
+                                        plannedInventoryTurns: level2PlannedInventoryTurns,
+                                        mape: level2Mape,
+                                        mse: level2Mse
+                                    })
                                 }
-                            }
-
-                            var data = []
-
-                            var TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN = 12
-                            var m = this.getMonthArray(startDate)
-                            console.log('proList', proList)
-                            proList.map(planningUnit => {
-                                var endingBalanceArray = [];
-                                var monthcnt = 0;
-                                var totalConsumption = 0;
-                                var totalClosingBalance = 0;
-                                var reportList = []
-                                for (var n = 0; n < 12; n++) {
-                                    var dtstr = m[n].startDate
-                                    var enddtStr = m[n].endDate
-
-                                    var dt = dtstr;
-                                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnit.planningUnit.id);
-                                    var programJson = {}
-                                    if (planningUnitDataIndex != -1) {
-                                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnit.planningUnit.id))[0];
-                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                        programJson = JSON.parse(programData);
-                                    } else {
-                                        programJson = {
-                                            consumptionList: [],
-                                            inventoryList: [],
-                                            shipmentList: [],
-                                            batchInfoList: [],
-                                            supplyPlan: []
-                                        }
-                                    }
-                                    var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dt)
-                                    //console.log(dtstr, ' ', enddtStr,' list',list)
-                                    reportList = [...reportList, ...list]
-                                    if (list.length > 0) {
-                                        if (document.getElementById("includePlanningShipments").value.toString() == 'true') {
-                                            endingBalanceArray[n] = list[0].closingBalance
-                                            totalConsumption = totalConsumption + Number(list[0].consumptionQty == null ? 0 : list[0].consumptionQty)
-                                            totalClosingBalance = totalClosingBalance + Number(list[0].closingBalance)
-                                            monthcnt++
-                                            // if(list[0].consumptionQty>0|| list[0].closingBalance>0){
-                                            //     monthcnt++
-
-                                            // }
-                                        } else {
-                                            endingBalanceArray[n] = list[0].closingBalanceWps
-                                            totalConsumption = totalConsumption + Number(list[0].consumptionQty == null ? 0 : list[0].consumptionQty)
-                                            monthcnt++
-                                            // totalClosingBalance=totalClosingBalance+list[0].closingBalanceWps
-                                            // if(list[0].consumptionQty>0|| list[0].closingBalanceWps>0){
-                                            //     monthcnt++
-
-                                            // }
-                                        }
-                                    } else {
-                                        endingBalanceArray[n] = ''
-                                    }
-
-
-
-
-                                }
-
-
-
-                                // var totalmonthincalculation = 0
-                                // console.log(endingBalanceArray)
-
-                                // for (var i = 0; i < endingBalanceArray.length; i++) {
-                                //     totalClosingBalance += endingBalanceArray[i]
-                                //     if (endingBalanceArray[i] != '') {
-                                //         totalmonthincalculation++;
-                                //     }
-                                // }
-
-                                console.log(reportList)
-                                var avergeStock = monthcnt > 0 ? totalClosingBalance / (monthcnt) : 0
-
-
-                                var json = {
-                                    totalConsumption: totalConsumption,
-                                    planningUnit: planningUnit.planningUnit,
-                                    avergeStock: avergeStock,
-                                    noOfMonths: monthcnt,
-                                    inventoryTurns: avergeStock > 0 ? this.roundN(totalConsumption / avergeStock) : 0
-
-                                }
-                                data.push(json)
-
-
-                            })
-                            console.log(data)
-                            this.setState({
-                                costOfInventory: data
-                                , message: ''
-                            }, () => {
-                                this.buildJExcel();
-                            });
-                        }.bind(this)
-                    }.bind(this)
-                }.bind(this)
-            } else {
-                this.setState({ loading: true })
-                var inputJson = {
-                    "programId": this.state.CostOfInventoryInput.programId,
-                    "versionId": this.state.CostOfInventoryInput.versionId,
-                    "dt": moment(this.state.CostOfInventoryInput.dt).startOf('month').format('YYYY-MM-DD'),
-                    "includePlannedShipments": this.state.CostOfInventoryInput.includePlanningShipments.toString() == "true" ? 1 : 0
-                }
-                // AuthenticationService.setupAxiosInterceptors();
-                ReportService.inventoryTurns(inputJson).then(response => {
-                    console.log("costOfInentory=====>", response.data);
-                    this.setState({
-                        costOfInventory: response.data, message: ''
-                    }, () => {
-                        this.buildJExcel();
-                    });
-                }).catch(
-                    error => {
-                        this.setState({
-                            costOfInventory: [],
-                            loading: false
-                        }, () => {
-                            this.el = jexcel(document.getElementById("tableDiv"), '');
-                            // this.el.destroy();
-                            jexcel.destroy(document.getElementById("tableDiv"), true);
-                        });
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                // message: 'static.unkownError',
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
                             }
                         }
+                    }else{
+                        for(let i=0; i < this.state.CostOfInventoryInput.pu.length; i++){
+                            let tempData = response.data.filter(e => e.productCategory.id == this.state.CostOfInventoryInput.pu[i]);
+                            if(tempData.length > 0){
+                                let level1Consumption = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                                let unique = [...new Set(tempData.map((item) => item.program.id))];
+                                let level1NoOfMonths = tempData.reduce((prev,curr,index) => prev + curr.noOfMonths, 0);
+                                let level1AverageStock = tempData.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
+                                level1AverageStock = level1AverageStock / level1NoOfMonths;
+                                let level1InventoryTurns = tempData.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / tempData.length;
+                                let level1PlannedInventoryTurns = this.mode(tempData.map(arr => arr.plannedInventoryTurns));
+                                let level1Mape = tempData.reduce((prev,curr,index) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length);
+                                let level1Mse = tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / tempData.filter(arr => arr.mse != null).length;
+                                level1Data.push({
+                                    id: this.state.CostOfInventoryInput.pu[i],
+                                    countryName: tempData[0].productCategory.label.label_en,
+                                    totalConsumption: level1Consumption,
+                                    programIds: unique,
+                                    avergeStock: level1AverageStock,
+                                    inventoryTurns: level1InventoryTurns,
+                                    plannedInventoryTurns: level1PlannedInventoryTurns,
+                                    mape: level1Mape,
+                                    mse: level1Mse
+                                })
+                            
+                                for(let j=0; j<unique.length; j++){
+                                    let temp = response.data.filter(e =>  e.productCategory.id == this.state.CostOfInventoryInput.pu[i] && e.program.id == unique[j])
+                                    let level2Consumption = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
+                                    let level2NoOfMonths = temp.reduce((prev,curr,index) => prev + curr.noOfMonths, 0);
+                                    let level2AverageStock = temp.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
+                                    level2AverageStock = level2AverageStock / level2NoOfMonths;
+                                    let level2InventoryTurns = temp.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / temp.length;
+                                    let level2PlannedInventoryTurns = this.mode(temp.map(arr => arr.plannedInventoryTurns));
+                                    let level2Mape = temp.reduce((prev,curr,index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length);
+                                    let level2Mse = temp.reduce((prev,curr,index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length);
+                                    level2Data.push({
+                                        id: this.state.CostOfInventoryInput.pu[i],
+                                        programId: unique[j],
+                                        programName: temp[0].program.code,
+                                        totalConsumption: level2Consumption,
+                                        avergeStock: level2AverageStock,
+                                        inventoryTurns: level2InventoryTurns,
+                                        plannedInventoryTurns: level2PlannedInventoryTurns,
+                                        mape: level2Mape,
+                                        mse: level2Mse
+                                    })
+                                }
+                            }
+                        }
+                    } 
+
+                    this.setState({
+                        costOfInventory: response.data, 
+                        costOfCountry: level1Data,
+                        costOfProgram: level2Data,
+                        loading: false,
+                        message: ''
+                    }, () => {
+                        this.setState({
+                        isTableLoaded: this.getTableDiv()
+                        })
+                    });
+                }
+            }).catch(
+                error => {
+                    this.setState({
+                        costOfInventory: [],
+                        loading: false
+                    }, () => {
+                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv"), true);
+                    });
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
-                );
-            }
-        } else if (this.state.CostOfInventoryInput.programId == 0) {
-            this.setState({ loading: false, costOfInventory: [], message: i18n.t('static.common.selectProgram') }, () => {
-                this.el = jexcel(document.getElementById("tableDiv"), '');
-                // this.el.destroy();
-                jexcel.destroy(document.getElementById("tableDiv"), true);
+                }
+            );
+        }else{
+            this.setState({
+                costOfInventory: [],
+                costOfCountry: [],
+                costOfProgram: [],
+                loading: false
+            },() => {
+                this.setState({
+                    isTableLoaded: this.getTableDiv()
+                })
             });
-        } else {
-            this.setState({ loading: false, costOfInventory: [], message: i18n.t('static.program.validversion') }, () => {
-                this.el = jexcel(document.getElementById("tableDiv"), '');
-                // this.el.destroy();
-                jexcel.destroy(document.getElementById("tableDiv"), true);
-            });
+            
         }
     }
     formatLabel(cell, row) {
@@ -973,6 +1033,170 @@ export default class InventoryTurns extends Component {
             return getLabelText(cell, this.state.lang);
         }
     }
+
+    toggleAccordion(parentId) {
+        var childShowArr = this.state.childShowArr;
+        if (parentId in childShowArr) {
+          delete childShowArr[parentId]
+        } else {
+          childShowArr[parentId]=[]
+        }
+        this.setState({
+            childShowArr: childShowArr
+        }, () => {
+          this.setState({
+            isTableLoaded: this.getTableDiv()
+          })
+        })
+        
+    }
+
+    toggleAccordion1(childId, parentId) {
+        var childShowArr = this.state.childShowArr;
+        var temp = childShowArr[parentId];
+        if (temp.includes(childId)) {
+          childShowArr[parentId] = temp.filter(c => c != childId);
+        } else {
+          childShowArr[parentId].push(childId)
+        }
+        this.setState({
+            childShowArr: childShowArr
+        }, () => {
+          this.setState({
+            isTableLoaded: this.getTableDiv()
+          })
+        })
+        
+    }
+    
+    mode(numbers) {
+        // Create an object to store the count of each number
+        var counts = {};
+        var maxCount = 0;
+        var mode;
+      
+        // Loop through the array of numbers
+        for (var i = 0; i < numbers.length; i++) {
+            var num = numbers[i];
+        
+            // If this is the first time we've seen this number, initialize its count to 1
+            if (counts[num] === undefined) {
+                counts[num] = 1;
+            }
+            // Otherwise, increment its count
+            else {
+                counts[num]++;
+            }
+      
+            // Update the maximum count and mode if necessary
+            if (counts[num] > maxCount) {
+                maxCount = counts[num];
+                mode = num;
+            }
+        }
+        return mode;
+    }      
+
+    getTableDiv() {
+        return (
+          <Table className="table-bordered text-center overflowhide main-table inventoryTurnsTable" bordered size="sm" options={this.options}>
+            <thead>
+              <tr>
+                {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
+                <th className="sticky-col first-col clone1 z-index1000"></th>
+                <th className="dataentryTdWidth sticky-col first-col clone"></th>
+                <th>{i18n.t('static.planningunit.planningunit')}</th>
+                <th>{i18n.t('static.report.totconsumption')}</th>
+                <th>{i18n.t('static.report.avergeStock')}</th>
+                <th>{i18n.t('static.report.noofmonth')}</th>
+                <th>{i18n.t('static.inventoryTurns.actual')}</th>
+                <th>{i18n.t('static.inventoryTurns.planned')}</th>
+                <th>{i18n.t('static.extrapolation.mape')}</th>
+                <th>{i18n.t('static.extrapolation.mse')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.costOfCountry.map(item => {
+
+                return (<>
+                  <tr className="hoverTd">
+                    <td className="sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.id)}>
+                        {item.id in this.state.childShowArr ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                    </td>
+                    <td className="sticky-col first-col clone hoverTd" align="left">
+                        {item.countryName}  
+                    </td>
+                    <td>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length }</td>
+                    <td>{this.formatter(item.totalConsumption)}</td>
+                    <td>{this.formatter(item.avergeStock)}</td>
+                    <td></td>
+                    <td>{this.formatterDouble(item.inventoryTurns)}</td>
+                    {/* <td>{this.formatterDouble(this.mode(this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).map(arr => arr.plannedInventoryTurns) : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).map(arr => arr.plannedInventoryTurns)))}</td> */}
+                    <td>{this.formatterDouble(item.plannedInventoryTurns)}</td>
+                    <td>{this.formatterDouble(item.mape)}</td>
+                    <td>{this.formatterDouble(item.mse)}</td>
+                  </tr>
+                  {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
+
+                    return (<>
+                    <tr className="hoverTd" style={{ display: r.id in this.state.childShowArr ? "" : "none" }}>
+                      <td className="sticky-col first-col clone1" onClick={() => this.toggleAccordion1(r.programId, item.id)}>
+                        {this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(r.programId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i> : ""}
+                      </td>
+                      <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{r.programName}</td>  
+                      <td>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length }</td>
+                      <td>{this.formatter(r.totalConsumption)}</td>
+                      <td>{this.formatter(r.avergeStock)}</td>
+                      <td></td>
+                      <td>{this.formatterDouble(r.inventoryTurns)}</td>
+                      {/* <td>{this.formatterDouble(this.mode(this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map( arr => arr.plannedInventoryTurns ) : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map( arr => arr.plannedInventoryTurns) ))}</td> */}
+                      <td>{this.formatterDouble(r.plannedInventoryTurns)}</td>
+                      <td>{this.formatterDouble(r.mape)}</td>
+                      <td>{this.formatterDouble(r.mse)}</td>
+                    </tr>
+
+                    {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+
+                        return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
+                        <td className="sticky-col first-col clone1"></td>
+                        <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
+                        <td></td>
+                        <td>{this.formatter(arr1.totalConsumption)}</td>
+                        <td>{this.formatter(arr1.avergeStock)}</td>
+                        <td>{arr1.noOfMonths}</td>
+                        <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
+                        <td>{this.formatterDouble(arr1.plannedInventoryTurns)}</td>
+                        <td>{this.formatterDouble(arr1.mape)}</td>
+                        <td>{this.formatterDouble(arr1.mse)}</td>
+                        </tr>)
+                    })}
+                    {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+
+                        return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
+                        <td className="sticky-col first-col clone1"></td>
+                        <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
+                        <td></td>
+                        <td>{this.formatter(arr1.totalConsumption)}</td>
+                        <td>{this.formatter(arr1.avergeStock)}</td>
+                        <td>{arr1.noOfMonths}</td>
+                        <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
+                        <td>{this.formatterDouble(arr1.plannedInventoryTurns)}</td>
+                        <td>{this.formatterDouble(arr1.mape)}</td>
+                        <td>{this.formatterDouble(arr1.mse)}</td>
+                        </tr>)
+                    })}
+                    </>)
+
+                  })}
+
+                </>)
+              }
+              )}
+    
+            </tbody>
+          </Table>
+        )
+      }
 
 
     render() {
@@ -983,28 +1207,6 @@ export default class InventoryTurns extends Component {
 
         const { singleValue2 } = this.state
 
-        const { programs } = this.state;
-        let programList = programs.length > 0
-            && programs.map((item, i) => {
-                return (
-                    <option key={i} value={item.programId}>
-                        {/* {getLabelText(item.label, this.state.lang)} */}
-                        {(item.programCode)}
-                    </option>
-                )
-            }, this);
-
-        const { versions } = this.state;
-        let versionList = versions.length > 0
-            && versions.map((item, i) => {
-                return (
-                    <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
-                    </option>
-                )
-            }, this);
-
-
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -1013,22 +1215,25 @@ export default class InventoryTurns extends Component {
         );
 
         const columns = [
-            {
-                dataField: 'planningUnit.id',
-                text: i18n.t('static.report.qatPID'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                style: { align: 'center' }
-            },
+        
             {
                 dataField: 'planningUnit.label',
-                text: i18n.t('static.planningunit.planningunit'),
+                text: "",
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 style: { align: 'center', width: '480px' },
                 formatter: this.formatLabel
+            },
+            {
+                dataField: 'noOfPlanningUnits',
+                text: i18n.t('static.planningunit.planningunit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { align: 'center', width: '200px' },
+                formatter: this.formatter
+
             },
             {
                 dataField: 'totalConsumption',
@@ -1060,7 +1265,34 @@ export default class InventoryTurns extends Component {
             },
             {
                 dataField: 'inventoryTurns',
-                text: i18n.t('static.dashboard.inventoryTurns'),
+                text: i18n.t('static.inventoryTurns.actual'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { align: 'center', width: '200px' },
+                formatter: this.formatterDouble
+            },
+            {
+                dataField: 'plannedInventoryTurns',
+                text: i18n.t('static.inventoryTurns.planned'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { align: 'center', width: '200px' },
+                formatter: this.formatterDouble
+            },
+            {
+                dataField: 'mape',
+                text: i18n.t('static.extrapolation.mape'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { align: 'center', width: '200px' },
+                formatter: this.formatterDouble
+            },
+            {
+                dataField: 'mse',
+                text: i18n.t('static.extrapolation.mse'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1117,13 +1349,13 @@ export default class InventoryTurns extends Component {
                         </div>
                     </div>
                     <CardBody className="pt-lg-0 pb-lg-2">
-                        <div className="TableCust" >
+                        <div>
                             <div ref={ref}>
 
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                            <FormGroup className="col-md-3 pl-0">
+                                            <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.month')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker
@@ -1140,47 +1372,6 @@ export default class InventoryTurns extends Component {
                                                 </div>
 
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.programMaster')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="programId"
-                                                            id="programId"
-                                                            bsSize="sm"
-                                                            // onChange={(e) => { this.dataChange(e); this.filterVersion(); }}
-                                                            onChange={(e) => { this.setProgramId(e) }}
-                                                            value={this.state.programId}
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {programList}
-                                                        </Input>
-
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="versionId"
-                                                            id="versionId"
-                                                            bsSize="sm"
-                                                            // onChange={(e) => { this.dataChange(e) }}
-                                                            onChange={(e) => { this.setVersionId(e) }}
-                                                            value={this.state.versionId}
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {versionList}
-                                                        </Input>
-
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-
 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
@@ -1201,11 +1392,115 @@ export default class InventoryTurns extends Component {
                                                 </div>
                                             </FormGroup>
 
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.display')}</Label>
+                                                <div className="controls " style={{ marginLeft: '-51px' }}>
+
+                                                    <FormGroup check inline style={{ marginRight: '-36px' }}>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="displayId1"
+                                                            name="displayId"
+                                                            value={1}
+                                                            checked={this.state.CostOfInventoryInput.displayId == 1}
+                                                            onChange={(e) => { this.radioChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio1">
+                                                            {i18n.t('static.country.countryMaster')}
+                                                        </Label>
+                                                    </FormGroup>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="displayId2"
+                                                            name="displayId"
+                                                            value={2}
+                                                            checked={this.state.CostOfInventoryInput.displayId == 2}
+                                                            onChange={(e) => { this.radioChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.productCategory.productCategory')}
+                                                        </Label>
+                                                    </FormGroup>
+                                                </div>
+                                            </FormGroup>
+
+                                        </div>
+                                        
+                                        <div className="row">
+                                            <FormGroup className="col-md-12" id="hideProductDiv">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.productCategory.productCategory')}</Label>
+                                                <div className="controls ">
+                                                    <Select
+                                                        bsSize="sm"
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light', 'z-index1001')}
+                                                        name="puId"
+                                                        id="puId"
+                                                        onChange={(e) => {
+                                                            this.updatePUData(e);
+                                                        }}
+                                                        
+                                                        multi
+                                                        options={this.state.puList}
+                                                        value={this.state.CostOfInventoryInput.pu}
+                                                    />
+                                                </div>
+                                            </FormGroup>
+
+                                            <FormGroup className="col-md-12" id="hideCountryDiv">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.country.countryMaster')}</Label>
+                                                <div className="controls ">
+                                                <Select
+                                                        bsSize="sm"
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light', 'z-index1001')}
+                                                        name="countryId"
+                                                        id="countryId"
+                                                        onChange={(e) => {
+                                                            this.updateCountryData(e);
+                                                        }}
+                                                        
+                                                        multi
+                                                        options={this.state.countryList}
+                                                        value={this.state.CostOfInventoryInput.country}
+                                                    />
+                                                </div>
+                                            </FormGroup>
+
+                                            <FormGroup className="col-md-12" id="programDiv">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                <div className="controls ">
+                                                <Select
+                                                        bsSize="sm"
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light', 'z-index1000')}
+                                                        name="programId"
+                                                        id="programId"
+                                                        onChange={(e) => {
+                                                            this.updateProgramData(e);
+                                                        }}
+                                                        
+                                                        multi
+                                                        options={this.state.programList}
+                                                        value={this.state.CostOfInventoryInput.programIds}
+                                                    />
+                                                </div>
+                                            </FormGroup>
+
 
 
                                         </div>
                                     </div>
                                 </Form>
+                            </div>
+                        </div>
+                        <div className="table-scroll">
+                            <div className="table-wrap DataEntryTable table-responsive fixTableHeadSupplyPlan">
+                                {this.state.isTableLoaded}
                             </div>
                         </div>
                         <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>

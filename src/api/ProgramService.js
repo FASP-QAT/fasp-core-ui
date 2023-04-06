@@ -267,5 +267,13 @@ class ProgramService {
     getProgramForDropDown(programTypeId) {
         return axios.get(`${API_URL}/api/programForDropDown/programType/${programTypeId}`, {});
     }
+
+    getProgramListByRealmCountryIdList(realmCountryIds) {
+        return axios.post(`${API_URL}/api/program/realmCountryList`, realmCountryIds, {});
+    }
+
+    getProgramListByProductCategoryIdList(productCategoryIds) {
+        return axios.post(`${API_URL}/api/program/productCategoryList`, productCategoryIds, {});
+    }
 }
 export default new ProgramService()
