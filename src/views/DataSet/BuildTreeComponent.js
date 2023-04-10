@@ -2575,7 +2575,11 @@ export default class BuildTree extends Component {
             if (this.state.selectedScenario != "") {
                 var scenarioList = this.state.scenarioList;
                 var minScenarioId = Math.min(...scenarioList.map(o => o.id));
-                if (minScenarioId != this.state.selectedScenario) {
+                console.log("scenarioList.length------------>",scenarioList.length)
+                console.log("minScenarioId------------>",minScenarioId)
+                console.log("this.state.selectedScenario------------>",this.state.selectedScenario)
+                // if (minScenarioId != this.state.selectedScenario) {
+                    if (scenarioList.length>1) {
                     confirmAlert({
                         message: "Are you sure you want to delete this scenario.",
                         buttons: [
@@ -12925,8 +12929,8 @@ export default class BuildTree extends Component {
                 className={'modal-xl '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                     <strong>{i18n.t('static.tree.Add/EditNode')}</strong>
-                    {this.state.activeTab1[0] == '1' && this.state.currentItemConfig.context.payload.nodeType.id == 5 && <div className="HeaderNodeText"> {
-                        <>
+                    {<div className="HeaderNodeText"> {
+                    <>
                             <Popover placement="top" isOpen={this.state.popoverOpenSenariotree} target="Popover1" trigger="hover" toggle={this.toggleSenariotree}>
                                 <PopoverBody>{i18n.t('static.tooltip.scenario')}</PopoverBody>
                             </Popover>
@@ -12935,7 +12939,7 @@ export default class BuildTree extends Component {
                         </>
                     }</div>}
 
-                    {this.state.activeTab1[0] != '1' && <div className="HeaderNodeText"> {
+                    {<div className="HeaderNodeText"> {
                         this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
                             (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
                                 (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
