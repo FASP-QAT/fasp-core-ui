@@ -888,7 +888,7 @@ export default class BuildTree extends Component {
             showDate: false,
             modelingChanged: false,
             missingPUList: [],
-            autoCalculate: true,
+            autoCalculate: localStorage.getItem('sesAutoCalculate')!="" && localStorage.getItem('sesAutoCalculate')!=undefined?(localStorage.getItem('sesAutoCalculate').toString()=="true"?true:false):true,
             hideActionButtons: false,
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
@@ -6531,6 +6531,7 @@ export default class BuildTree extends Component {
         console.log("val test", val)
         var prevVal = this.state.autoCalculate;
         console.log("prev val test", prevVal)
+        localStorage.setItem('sesAutoCalculate',val)
         this.setState({
             autoCalculate: val
         }, () => {
