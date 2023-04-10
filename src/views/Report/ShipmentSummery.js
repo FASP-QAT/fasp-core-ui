@@ -46,7 +46,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -363,7 +363,7 @@ class ShipmentSummery extends Component {
             ((re[item].budget.code == null || re[item].budget.code == "") ? '' : (re[item].budget.code).replaceAll(' ', '%20')),
             // (re[item].budget.code).replaceAll(' ', '%20'),
             (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-            viewById == 1 ? re[item].shipmentQty : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate).format(DATE_FORMAT_CAP).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            viewById == 1 ? re[item].shipmentQty : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2), (moment(re[item].expectedDeliveryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(',', ' ')).replaceAll(' ', '%20'),
             Number(re[item].productCost).toFixed(2),
             Number(re[item].freightCost).toFixed(2),
             Number(re[item].totalCost).toFixed(2),

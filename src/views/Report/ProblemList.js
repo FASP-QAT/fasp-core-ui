@@ -1,4 +1,4 @@
-import { DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
+import { DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants';
 
 import React, { isValidElement } from "react";
 import ReactDOM from 'react-dom';
@@ -932,7 +932,7 @@ export default class ConsumptionDetails extends React.Component {
                 this.getNote(ele, this.state.lang) == null ? "" : this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
                 ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
                 ele.reviewNotes == null ? '' : (ele.reviewNotes).replaceAll(' ', '%20'),
-                (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP}`).replaceAll(' ', '%20'),
+                (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`).replaceAll(' ', '%20'),
                 getLabelText(ele.realmProblem.criticality.label, this.state.lang).replaceAll(' ', '%20')
             ])));
         for (var i = 0; i < A.length; i++) {
