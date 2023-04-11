@@ -1886,7 +1886,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.integration.manualProgramIntegration'),
                             url: '/program/addManualIntegration',
-                            icon: 'fa fa-cogs',
+                            icon: 'fa fa-share-alt',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_INTEGRATION') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
