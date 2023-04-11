@@ -12,7 +12,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from "../../api/ProgramService";
 import IntegrationService from "../../api/IntegrationService";
-import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SPV_REPORT_DATEPICKER_START_MONTH } from "../../Constants";
 import { checkValidtion, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionOnlyHideRowOld } from "../../CommonComponent/JExcelCommonFunctions";
 import moment from "moment";
 import AuthenticationService from "../Common/AuthenticationService";
@@ -28,8 +28,10 @@ export default class ConsumptionDetails extends Component {
 
     constructor(props) {
         super(props);
-        var startDate = moment(Date.now()).subtract(3, 'months').startOf('month').format("YYYY-MM-DD");
-        var endDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - SPV_REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth());
         this.state = {
             integrationList: [],
             programList: [],
@@ -39,7 +41,7 @@ export default class ConsumptionDetails extends Component {
             message: "",
             color: "",
             isModalOpen: false,
-            rangeValue: localStorage.getItem("sesRangeValueManualJson") != "" ? JSON.parse(localStorage.getItem("sesRangeValueManualJson")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
+            rangeValue: localStorage.getItem("sesRangeValueManualJson") != "" ? JSON.parse(localStorage.getItem("sesRangeValueManualJson")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 }},
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             integrationList: [],
@@ -113,26 +115,13 @@ export default class ConsumptionDetails extends Component {
     showModal() {
         var data = [];
         var tableData = []
-        data[0] = "";
-        data[1] = "";
-        data[2] = "";
-        tableData[0] = data;
-        data[0] = "";
-        data[1] = "";
-        data[2] = "";
-        tableData[1] = data;
-        data[0] = "";
-        data[1] = "";
-        data[2] = "";
-        tableData[2] = data;
-        data[0] = "";
-        data[1] = "";
-        data[2] = "";
-        tableData[3] = data;
-        data[0] = "";
-        data[1] = "";
-        data[2] = "";
-        tableData[4] = data;
+        for (var i = 0; i < 5; i++) {
+            data[0] = "";
+            data[1] = "";
+            data[2] = "";
+            tableData.push(data);
+            data = []
+        }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -643,12 +632,9 @@ export default class ConsumptionDetails extends Component {
     }
 
     submitClicked() {
-        this.setState({
-            loading: true
-        })
         var validation = this.checkValidations();
         if (validation == true) {
-            var json = this.state.dataEL.getJson(null, false);
+            var json = this.state.dataEL.getJson(null, false).filter(c => c[0] != "" || c[1] != "" || c[2] != "");
             var list = [];
             json.map(item => {
                 list.push({
@@ -659,6 +645,7 @@ export default class ConsumptionDetails extends Component {
                     integrationId: item[2]
                 })
             })
+            console.log("List Test@@@123", list)
             IntegrationService.addManualJson(list)
                 .then(response => {
                     console.log(response.data);
@@ -742,23 +729,30 @@ export default class ConsumptionDetails extends Component {
     checkValidations() {
         var valid = true;
         var elInstance = this.state.dataEL;
-        var json = elInstance.getJson(null, false);
+        var json = elInstance.getJson(null, false).filter(c => c[0] != "" || c[1] != "" || c[2] != "");
+        console.log("Json Test@@@123", json)
         var validation = "";
         for (var y = 0; y < json.length; y++) {
+            console.log("y Test@@@123", y)
             var rowData = elInstance.getRowData(y);
+            console.log("Row Data Test@@@123", rowData);
             validation = checkValidtion("text", "A", y, rowData[0], elInstance);
+            console.log("Validation 1 Test@@@123", validation)
             if (validation == false) {
                 valid = false;
             }
             validation = checkValidtion("text", "B", y, rowData[1], elInstance);
+            console.log("Validation 2 Test@@@123", validation)
             if (validation == false) {
                 valid = false;
             }
             validation = checkValidtion("text", "C", y, rowData[2], elInstance);
+            console.log("Validation 3 Test@@@123", validation)
             if (validation == false) {
                 valid = false;
             }
         }
+        console.log("Valid Test@@@123", valid)
         return valid;
     }
 
@@ -897,7 +891,7 @@ export default class ConsumptionDetails extends Component {
                     var data = [];
                     var tableData = []
                     for (var i = 0; i < dataForJexcel.length; i++) {
-                        var version=this.state.programList.filter(c=>c.id==dataForJexcel[i].program.id)[0].versionList.filter(c=>c.versionId==dataForJexcel[i].versionId)[0];
+                        var version = this.state.programList.filter(c => c.id == dataForJexcel[i].program.id)[0].versionList.filter(c => c.versionId == dataForJexcel[i].versionId)[0];
                         var name = ((version.versionStatus.id == 2 && version.versionType.id == 2) ? version.versionId + '*' : version.versionId) + " (" + moment(version.createdDate).format(`MMM DD YYYY`) + ")";
                         data = [];
                         data[0] = dataForJexcel[i].program.code;
