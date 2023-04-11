@@ -578,7 +578,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         var programIdSplit = programId != 0 ? programId.split("_")[0] : 0;
-        if (versionId != 0 && programIdSplit > 0 && forecastProgramId > 0) {
+        if (versionId != 0 && programIdSplit > 0 && forecastProgramId > 0 && (this.state.rangeValue.from.year != '' && this.state.rangeValue.from.month != '' && this.state.rangeValue.to.year != '' && this.state.rangeValue.to.month != '')) {
             let selectedSupplyPlanProgram = this.state.programObj;
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
 
@@ -1029,6 +1029,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         let defaultForecastStartYear = forecastStartDate.getFullYear();
         let defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
+        let defaultForecastStopYear = forecastStopDate.getFullYear();
+        let defaultForecastStopMonth = forecastStopDate.getMonth() + 1;
 
         let updatedForecastStartYear = forecastStartDate.getFullYear();
         let updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
@@ -1095,6 +1097,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             defaultForecastStartYear = "";
             defaultForecastStartMonth = "";
+            defaultForecastStopYear = "";
+            defaultForecastStopMonth = "";
 
             updatedForecastStartYear = formattedDate.getFullYear();
             updatedForecastStartMonth = formattedDate.getMonth() + 1;
@@ -1102,6 +1106,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (isForecastOver) {
             defaultForecastStartYear = "";
             defaultForecastStartMonth = "";
+            defaultForecastStopYear = "";
+            defaultForecastStopMonth = "";
 
             updatedForecastStartYear = "";
             updatedForecastStartMonth = "";
@@ -1113,6 +1119,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             defaultForecastStartYear = forecastStartDate.getFullYear();
             defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
+            defaultForecastStopYear = forecastStopDate.getFullYear();;
+            defaultForecastStopMonth = forecastStopDate.getMonth() + 1;
 
             // updatedForecastStartYear = formattedDate.getFullYear();
             // updatedForecastStartMonth = formattedDate.getMonth() + 1;
@@ -1133,7 +1141,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             versionId: event.target.value,
             minDate: { year: updatedForecastStartYear, month: updatedForecastStartMonth },
             maxDate: { year: updatedForecastStopYear, month: updatedForecastStopMonth },
-            rangeValue: { from: { year: defaultForecastStartYear, month: defaultForecastStartMonth }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+            rangeValue: { from: { year: defaultForecastStartYear, month: defaultForecastStartMonth }, to: { year: defaultForecastStopYear, month: defaultForecastStopMonth } },
             forecastPeriod: moment(forecastStartDate).format("MMM-YYYY") + " ~ " + moment(forecastStopDate).format("MMM-YYYY")
         }, () => {
             this.filterData();
