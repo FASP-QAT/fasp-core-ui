@@ -173,9 +173,9 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.consumption.daysofstockout") + " = 10"}<br></br>
                     {i18n.t("static.supplyPlanFormula.noOfDaysInMonth") + " = 30"}<br></br>
                     {i18n.t("static.dataentry.adjustedConsumption") + " = " + i18n.t("static.report.actualConsumption") + " * " + i18n.t("static.supplyPlanFormula.noOfDaysInMonth") + " / (" + i18n.t("static.supplyPlanFormula.noOfDaysInMonth") + " - " + i18n.t("static.consumption.daysofstockout") + ")"}<br></br>
-                    {i18n.t("static.dataentry.adjustedConsumption") + " = 1000 * 30 / (30-10)"}<br></br>
-                    {i18n.t("static.dataentry.adjustedConsumption") + " = 30000 / 20"}<br></br>
-                    {i18n.t("static.dataentry.adjustedConsumption") + " = 1500"}<br></br>
+                    {i18n.t("static.dataentry.adjustedConsumption") + " = 10,000 * 30 / (30-10)"}<br></br>
+                    {/* {i18n.t("static.dataentry.adjustedConsumption") + " = 30000 / 20"}<br></br> */}
+                    {i18n.t("static.dataentry.adjustedConsumption") + " = 15,000"}<br></br>
                   </p>
                 </ListGroupItemText>
               </ListGroupItem>
