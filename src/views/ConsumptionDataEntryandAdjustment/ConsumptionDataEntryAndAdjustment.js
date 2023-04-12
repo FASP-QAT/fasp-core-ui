@@ -3097,7 +3097,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
                         <span className="pl-lg-5" style={{ fontStyle: 'italic' }}><b>  {i18n.t('static.dataEntryAndAdjustments.AdjustedConsumption')} </b>= 1,000 units / 98% Reporting / (1 - 16.1%) = 1,217</span>  </p>
 
-                      <li>{i18n.t('static.dataEntryAndAdjustments.Interpolating')}: {i18n.t('static.dataEntryAndAdjustments.ClickInterpolate')}  {i18n.t('static.dataEntryAndAdjustments.InterpolateForMonths')}
+                      <li><b>{i18n.t('static.dataEntryAndAdjustments.Interpolating')}</b>: {i18n.t('static.dataEntryAndAdjustments.ClickInterpolate')}  {i18n.t('static.dataEntryAndAdjustments.InterpolateForMonths')}
                         <br></br>
                         {i18n.t('static.dataEntryAndAdjustments.Mathematically')}:<br></br>
                         <ul>
