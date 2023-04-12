@@ -158,7 +158,20 @@ class SupplyPlanFormulas extends Component {
         <Modal isOpen={this.state.modal} className={'modal-xl ' + this.props.className} >
           <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong className="TextWhite" >{i18n.t('static.common.formulae')}</strong></ModalHeader>
           <ModalBody >
-            <ListGroup style={{ height: '490px', overflowY: 'scroll' }}>
+            <ListGroup style={{ height: "calc(100vh - 110px)", overflowY: 'scroll' }}>
+              <ListGroupItem >
+                <ListGroupItemHeading className="formulasheading">{i18n.t('static.supplyPlan.openingBalance')}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+                  <img src={openingbalance} className="formula-img-mr img-fluid" />
+
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+
+                    {i18n.t("static.supplyPlanFormula.openingBalanceEx1") + " = 10,653"}<br></br>
+                    <br></br>
+                    {i18n.t("static.supplyPlanFormula.openingBalanceEx2")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.openingBalanceEx3") + " = 10,653"}</p>
+                </ListGroupItemText>
+              </ListGroupItem>
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t('static.dataentry.adjustedConsumption')}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
@@ -180,16 +193,243 @@ class SupplyPlanFormulas extends Component {
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">{i18n.t('static.supplyPlan.openingBalance')}</ListGroupItemHeading>
+                <ListGroupItemHeading className="formulasheading">{i18n.t('static.formula.suggestedText1')}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
-                  <img src={openingbalance} className="formula-img-mr img-fluid" />
 
+                  <p><i>{i18n.t('static.formula.suggestedText2')}<a href='/#/programProduct/addProgramProduct' target="_blank">{i18n.t('static.formula.suggestedText3')}</a>{i18n.t('static.formula.suggestedText4')}</i></p>
+
+                  <div className='formulaBox borderedBoxforformulae'>
+                    <i>
+                      <p>{i18n.t('static.formula.suggestedText5')}</p>
+                      <p>{i18n.t('static.formula.suggestedText6')}</p>
+                      <p>{i18n.t('static.formula.suggestedText7')}</p>
+                      <p>
+                        <ol type='a' style={{ marginTop: '-14px' }}>
+                          <li>
+                            {i18n.t("static.formula.suggestedText8")} &lt; {i18n.t('static.formula.suggestedText9') + " "}<b>{i18n.t('static.formula.suggestedText10')}</b>{i18n.t('static.formula.suggestedText11')}
+                          </li>
+                          <li>
+                            {i18n.t('static.formula.suggestedText12')} &gt; {i18n.t('static.formula.suggestedText13') + " "} <b>{i18n.t('static.formula.suggestedText14')}</b>.
+                            {" " + i18n.t('static.formula.suggestedText15')}
+                          </li>
+                        </ol></p>
+                      <p>{i18n.t('static.formula.suggestedText16')} &lt; {i18n.t('static.formula.suggestedText17')}</p>
+
+                      <ol type='a' style={{ marginTop: '-14px' }}>
+                        <li>
+                          {i18n.t("static.formula.suggestedText18") + " "} <b>{i18n.t('static.formula.suggestedText19')}</b>.
+                          {" " + i18n.t('static.formula.suggestedText20')}
+                        </li>
+                        <li>{i18n.t('static.formula.suggestedText21')}</li>
+                      </ol>
+                    </i>
+                  </div>
+
+                  <p ><span className='formulastext-p'>{i18n.t('static.formula.suggestedText22')}</span>
+                    <ul type='disc'>
+                      <li>
+                        {i18n.t('static.formula.suggestedText23')}
+                      </li>
+                      <li>
+                        {i18n.t('static.formula.suggestedText24')}
+                      </li>
+                      <li>{i18n.t('static.formula.suggestedText25')}
+                        {i18n.t('static.formula.suggestedText26')}</li>
+                      <li>
+                        {i18n.t('static.formula.suggestedText27')}
+                      </li>
+                      <li>{i18n.t('static.formula.suggestedText28')}</li>
+
+                    </ul>
+                  </p>
+                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText29')}</span>
+                    <ul type='disc'>
+                      <li>{i18n.t('static.formula.suggestedText30')}</li>
+                      <li>{i18n.t('static.formula.suggestedText31')}</li>
+                      <li>{i18n.t('static.formula.suggestedText32')}
+
+                      </li>
+                    </ul>
+                    <ul className='pl-5'>
+                      <li>{i18n.t('static.formula.suggestedText33') + " "} <b>{i18n.t('static.formula.suggestedText34')}</b>:
+                        <br></br>
+                        {i18n.t('static.formula.suggestedText35')}
+                        <br></br>
+                        = 15*3,000 - 30,000
+                        <br></br>
+                        = 15,000</li>
+                    </ul>
+                  </p>
+                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText36')}</span>
+                    <ul type='disc'>
+                      <li>{i18n.t('static.formula.suggestedText37')}</li>
+                      <li>{i18n.t('static.formula.suggestedText38')}</li>
+                      <li>{i18n.t('static.formula.suggestedText39')}
+                        {i18n.t('static.formula.suggestedText40')}
+                      </li>
+                      <li>
+                        {i18n.t('static.formula.suggestedText41')}
+                      </li>
+                      <li>{i18n.t('static.formula.suggestedText42')}</li>
+                    </ul>
+                  </p>
+                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText43')}</span>
+                    <ul type="disc">
+                      <li>{i18n.t('static.formula.suggestedText44')}</li>
+                      <li>{i18n.t('static.formula.suggestedText45')}</li>
+
+                    </ul>
+                    <ul className='pl-5'>
+                      <li>&nbsp;{i18n.t('static.formula.suggestedText46')} &gt; {i18n.t('static.formula.suggestedText47')}</li>
+                      <li> &nbsp;{i18n.t('static.formula.suggestedText48')}<br />
+                        {i18n.t('static.formula.suggestedText49')}<br />
+                        = 12*3,000 - 0 + 0<br />
+                        = 36,000<br />
+                      </li>
+                    </ul>
+                  </p>
+
+                </ListGroupItemText>
+              </ListGroupItem>
+
+              {/* <ListGroupItem >
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.suggestedOrderQty")}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+
+                  <img className="formula-img-mr img-fluid" src={suggestorderqty} />
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-
-                    {i18n.t("static.supplyPlanFormula.openingBalanceEx1") + " = 10,653"}<br></br>
+                    <b>{i18n.t('static.supplyPlan.whenToSuggestQty1')}</b><br></br><br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
                     <br></br>
-                    {i18n.t("static.supplyPlanFormula.openingBalanceEx2")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.openingBalanceEx3") + " = 10,653"}</p>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx3")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx5")}</p><br></br>
+                  <b>{i18n.t("static.supplyPlan.whenToSuggestQty2")}</b><br></br><br></br>
+                  {i18n.t("static.supplyPlan.suggestedMaxQty1")}<br></br>
+                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
+                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx6")}<br></br><br></br>
+
+                  {i18n.t("static.supplyPlan.suggestedMaxQty2")}<br></br>
+                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>
+                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx5")}<br></br>
+                </ListGroupItemText>
+              </ListGroupItem> */}
+
+              <ListGroupItem>
+                <ListGroupItemHeading className="formulasheading">{i18n.t('static.formula.suggestedText50')}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+                  <p><i>{i18n.t('static.formula.suggestedText51')}<a href='/#/programProduct/addProgramProduct' target="_blank">{i18n.t('static.formula.suggestedText3')}</a>{i18n.t('static.formula.suggestedText4')}</i></p>
+
+                  <div className='formulaBox borderedBoxforformulae'>
+                    <p>{i18n.t('static.formula.suggestedText52')}</p>
+                    <p>{i18n.t('static.formula.suggestedText53')}</p>
+                    <p>{i18n.t('static.formula.suggestedText54')}</p>
+                    <p>
+                      <ol type='a' style={{ marginTop: '-14px' }}>
+                        <li>{i18n.t('static.formula.suggestedText55')}&lt; {i18n.t('static.formula.suggestedText56') + " "} <b>{i18n.t('static.formula.suggestedText57')}</b>.
+                          {i18n.t('static.formula.suggestedText58')}
+                        </li>
+                        <li>{i18n.t('static.formula.suggestedText59')} &gt; {i18n.t('static.formula.suggestedText60') + " "} <b>{i18n.t('static.formula.suggestedText61')}</b>.
+                          {i18n.t('static.formula.suggestedText62')}
+                        </li>
+                      </ol></p>
+                    <p>
+                      {i18n.t('static.formula.suggestedText63')} &lt;{i18n.t('static.formula.suggestedText64')}
+                    </p>
+                    <p>
+                      <ol type='a' style={{ marginTop: '-14px' }}>
+                        <li>{i18n.t('static.formula.suggestedText65') + " "}<b>{i18n.t('static.formula.suggestedText66')}</b>.
+                          {i18n.t('static.formula.suggestedText67')}</li>
+                        <li>{i18n.t('static.formula.suggestedText68')}</li>
+                      </ol></p>
+                    <p>{i18n.t('static.formula.suggestedText69')}</p>
+                  </div>
+
+                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText70')}</span>
+                    <p>{i18n.t('static.formula.suggestedText71')}</p>
+                    <div><img src={suggestedShipmentplan1}></img></div>
+                    {i18n.t("static.formula.suggestedText72")}
+                    <br></br>
+                    {i18n.t("static.formula.suggestedText73")}
+                    <br></br>
+                    {i18n.t('static.formula.suggestedText74')}
+                    <br></br>
+                    {i18n.t('static.formula.suggestedText75')}
+                    <br></br>
+                    {i18n.t('static.formula.suggestedText76')}
+
+                  </p>
+
+                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText77')}</span>
+                    <ul type="disc">
+                      <li>{i18n.t('static.formula.suggestedText78')}</li>
+                      <li>{i18n.t('static.formula.suggestedText79')}</li>
+                      <li>{i18n.t('static.formula.suggestedText80')}</li>
+
+                    </ul>
+                    <ul>
+                      <li>{i18n.t('static.formula.suggestedText81') + " "}<b>{i18n.t('static.formula.suggestedText82')}</b>
+                        <br></br>{i18n.t('static.formula.suggestedText83')}
+                        <br></br>{i18n.t('static.formula.suggestedText84')}
+                        <br></br>= 1,600 - 900
+                        <br></br>{i18n.t('static.formula.suggestedText85')}
+                      </li>
+                    </ul>
+                  </p>
+
+                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText86')}</span>
+                    <p>{i18n.t('static.formula.suggestedText87')}</p>
+                    <div> <img src={suggestedShipmentplan2}></img></div>
+                    <p>
+
+                      {i18n.t('static.formula.suggestedText88')}
+                      <br></br>
+                      {i18n.t('static.formula.suggestedText89')}
+                      <br></br>
+                      {i18n.t('static.formula.suggestedText90')}
+                      <br></br>
+                      {i18n.t('static.formula.suggestedText91')}
+                      <br></br>
+                      {i18n.t('static.formula.suggestedText92')}
+                    </p>
+
+                    <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText93')}</span>
+                      <ul type="disc">
+                        <li >{i18n.t('static.formula.suggestedText94')}</li>
+                        <li>{i18n.t('static.formula.suggestedText95')}</li>
+                      </ul>
+                      <ul className='pl-5'>
+                        <li>
+                          {i18n.t('static.formula.suggestedText96')} &gt; {i18n.t('static.formula.suggestedText97')} &gt; {i18n.t('static.formula.suggestedText98')}
+                        </li>
+                        <li>
+                          {i18n.t('static.formula.suggestedText99') + " "} <b>{i18n.t('static.formula.suggestedText100')}</b>
+                          <br></br>{i18n.t('static.formula.suggestedText101')}<br></br>
+                          = 1,000 - 0 + 20 <br></br>{i18n.t('static.formula.suggestedText102')}
+                        </li>
+
+
+                      </ul>
+                    </p>
+                  </p>
+                </ListGroupItemText>
+              </ListGroupItem>
+              <ListGroupItem >
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.expiredStock")}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+
+                  <img className="formula-img-mr img-fluid" src={exipredStock} />
+                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.expiredStockEx1")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.expiredStockEx2")}<br></br>
+                    <br></br>
+                    {i18n.t("static.supplyPlanFormula.expiredStockEx")}<br></br>
+                    {i18n.t("static.supplyPlanFormula.expiredStockEx3")}</p>
+                  <p>
+                    <span className="formulastext-p">{i18n.t("static.program.notes") + " :"}</span><br></br>
+                    {i18n.t("static.supplyPlanFormula.expiredStockNote")}
+                  </p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
@@ -225,23 +465,7 @@ class SupplyPlanFormulas extends Component {
                   {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
                 </ListGroupItemText>
               </ListGroupItem>
-              <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.expiredStock")}</ListGroupItemHeading>
-                <ListGroupItemText className="formulastext">
 
-                  <img className="formula-img-mr img-fluid" src={exipredStock} />
-                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-                    {i18n.t("static.supplyPlanFormula.expiredStockEx1")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.expiredStockEx2")}<br></br>
-                    <br></br>
-                    {i18n.t("static.supplyPlanFormula.expiredStockEx")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.expiredStockEx3")}</p>
-                  <p>
-                    <span className="formulastext-p">{i18n.t("static.program.notes") + " :"}</span><br></br>
-                    {i18n.t("static.supplyPlanFormula.expiredStockNote")}
-                  </p>
-                </ListGroupItemText>
-              </ListGroupItem>
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
@@ -396,231 +620,9 @@ class SupplyPlanFormulas extends Component {
                   </p>
                 </ListGroupItemText>
               </ListGroupItem> */}
-              <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">{i18n.t('static.formula.suggestedText1')}</ListGroupItemHeading>
-                <ListGroupItemText className="formulastext">
 
-                  <p><i>{i18n.t('static.formula.suggestedText2')}<a href='/#/programProduct/addProgramProduct' target="_blank">{i18n.t('static.formula.suggestedText3')}</a>{i18n.t('static.formula.suggestedText4')}</i></p>
-
-                  <div className='formulaBox borderedBoxforformulae'>
-                    <i>
-                      <p>{i18n.t('static.formula.suggestedText5')}</p>
-                      <p>{i18n.t('static.formula.suggestedText6')}</p>
-                      <p>{i18n.t('static.formula.suggestedText7')}</p>
-                      <p>
-                        <ol type='a' style={{ marginTop: '-14px' }}>
-                          <li>
-                            {i18n.t("static.formula.suggestedText8")} &lt; {i18n.t('static.formula.suggestedText9')+" "}<b>{i18n.t('static.formula.suggestedText10')}</b>{i18n.t('static.formula.suggestedText11')}
-                          </li>
-                          <li>
-                            {i18n.t('static.formula.suggestedText12')} &gt; {i18n.t('static.formula.suggestedText13')+" "} <b>{i18n.t('static.formula.suggestedText14')}</b>.
-                            {" "+i18n.t('static.formula.suggestedText15')}
-                          </li>
-                        </ol></p>
-                      <p>{i18n.t('static.formula.suggestedText16')} &lt; {i18n.t('static.formula.suggestedText17')}</p>
-
-                      <ol type='a' style={{ marginTop: '-14px' }}>
-                        <li>
-                          {i18n.t("static.formula.suggestedText18")+" "} <b>{i18n.t('static.formula.suggestedText19')}</b>.
-                          {" "+i18n.t('static.formula.suggestedText20')}
-                        </li>
-                        <li>{i18n.t('static.formula.suggestedText21')}</li>
-                      </ol>
-                    </i>
-                  </div>
-
-                  <p ><span className='formulastext-p'>{i18n.t('static.formula.suggestedText22')}</span>
-                    <ul type='disc'>
-                      <li>
-                        {i18n.t('static.formula.suggestedText23')}
-                      </li>
-                      <li>
-                        {i18n.t('static.formula.suggestedText24')}
-                      </li>
-                      <li>{i18n.t('static.formula.suggestedText25')}
-                        {i18n.t('static.formula.suggestedText26')}</li>
-                      <li>
-                        {i18n.t('static.formula.suggestedText27')}
-                      </li>
-                      <li>{i18n.t('static.formula.suggestedText28')}</li>
-
-                    </ul>
-                  </p>
-                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText29')}</span>
-                    <ul type='disc'>
-                      <li>{i18n.t('static.formula.suggestedText30')}</li>
-                      <li>{i18n.t('static.formula.suggestedText31')}</li>
-                      <li>{i18n.t('static.formula.suggestedText32')}
-
-                      </li>
-                    </ul>
-                    <ul className='pl-5'>
-                      <li>{i18n.t('static.formula.suggestedText33')+" "} <b>{i18n.t('static.formula.suggestedText34')}</b>:
-                        <br></br>
-                        {i18n.t('static.formula.suggestedText35')}
-                        <br></br>
-                        = 15*3,000 - 30,000
-                        <br></br>
-                        = 15,000</li>
-                    </ul>
-                  </p>
-                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText36')}</span>
-                    <ul type='disc'>
-                      <li>{i18n.t('static.formula.suggestedText37')}</li>
-                      <li>{i18n.t('static.formula.suggestedText38')}</li>
-                      <li>{i18n.t('static.formula.suggestedText39')}
-                        {i18n.t('static.formula.suggestedText40')}
-                      </li>
-                      <li>
-                        {i18n.t('static.formula.suggestedText41')}
-                      </li>
-                      <li>{i18n.t('static.formula.suggestedText42')}</li>
-                    </ul>
-                  </p>
-                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText43')}</span>
-                    <ul type="disc">
-                      <li>{i18n.t('static.formula.suggestedText44')}</li>
-                      <li>{i18n.t('static.formula.suggestedText45')}</li>
-
-                    </ul>
-                    <ul className='pl-5'>
-                      <li>&nbsp;{i18n.t('static.formula.suggestedText46')} &gt; {i18n.t('static.formula.suggestedText47')}</li>
-                      <li> &nbsp;{i18n.t('static.formula.suggestedText48')}<br/>
-                        {i18n.t('static.formula.suggestedText49')}<br/>
-                        = 12*3,000 - 0 + 0<br/>
-                        = 36,000<br/>
-                      </li>
-                    </ul>
-                  </p>
-
-                </ListGroupItemText>
-              </ListGroupItem>
 
               {/* <ListGroupItem >
-                <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.suggestedOrderQty")}</ListGroupItemHeading>
-                <ListGroupItemText className="formulastext">
-
-                  <img className="formula-img-mr img-fluid" src={suggestorderqty} />
-                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-                    <b>{i18n.t('static.supplyPlan.whenToSuggestQty1')}</b><br></br><br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx1")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
-                    <br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx3")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>
-                    {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx5")}</p><br></br>
-                  <b>{i18n.t("static.supplyPlan.whenToSuggestQty2")}</b><br></br><br></br>
-                  {i18n.t("static.supplyPlan.suggestedMaxQty1")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx2")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx6")}<br></br><br></br>
-
-                  {i18n.t("static.supplyPlan.suggestedMaxQty2")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx4")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.suggestedOrderQtyEx5")}<br></br>
-                </ListGroupItemText>
-              </ListGroupItem> */}
-
-              <ListGroupItem>
-                <ListGroupItemHeading className="formulasheading">{i18n.t('static.formula.suggestedText50')}</ListGroupItemHeading>
-                <ListGroupItemText className="formulastext">
-                  <p><i>{i18n.t('static.formula.suggestedText51')}<a href='/#/programProduct/addProgramProduct' target="_blank">{i18n.t('static.formula.suggestedText3')}</a>{i18n.t('static.formula.suggestedText4')}</i></p>
-
-                  <div className='formulaBox borderedBoxforformulae'>
-                    <p>{i18n.t('static.formula.suggestedText52')}</p>
-                    <p>{i18n.t('static.formula.suggestedText53')}</p>
-                    <p>{i18n.t('static.formula.suggestedText54')}</p>
-                    <p>
-                      <ol type='a' style={{ marginTop: '-14px' }}>
-                        <li>{i18n.t('static.formula.suggestedText55')}&lt; {i18n.t('static.formula.suggestedText56')+" "} <b>{i18n.t('static.formula.suggestedText57')}</b>.
-                          {i18n.t('static.formula.suggestedText58')}
-                        </li>
-                        <li>{i18n.t('static.formula.suggestedText59')} &gt; {i18n.t('static.formula.suggestedText60')+" "} <b>{i18n.t('static.formula.suggestedText61')}</b>.
-                          {i18n.t('static.formula.suggestedText62')}
-                        </li>
-                      </ol></p>
-                    <p>
-                      {i18n.t('static.formula.suggestedText63')} &lt;{i18n.t('static.formula.suggestedText64')}
-                    </p>
-                    <p>
-                      <ol type='a' style={{ marginTop: '-14px' }}>
-                        <li>{i18n.t('static.formula.suggestedText65')+" "}<b>{i18n.t('static.formula.suggestedText66')}</b>.
-                          {i18n.t('static.formula.suggestedText67')}</li>
-                        <li>{i18n.t('static.formula.suggestedText68')}</li>
-                      </ol></p>
-                    <p>{i18n.t('static.formula.suggestedText69')}</p>
-                  </div>
-
-                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText70')}</span>
-                    <p>{i18n.t('static.formula.suggestedText71')}</p>
-                    <div><img src={suggestedShipmentplan1}></img></div>
-                    {i18n.t("static.formula.suggestedText72")}
-                    <br></br>
-                    {i18n.t("static.formula.suggestedText73")}
-                    <br></br>
-                    {i18n.t('static.formula.suggestedText74')}
-                    <br></br>
-                    {i18n.t('static.formula.suggestedText75')}
-                    <br></br>
-                    {i18n.t('static.formula.suggestedText76')}
-
-                  </p>
-
-                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText77')}</span>
-                    <ul type="disc">
-                      <li>{i18n.t('static.formula.suggestedText78')}</li>
-                      <li>{i18n.t('static.formula.suggestedText79')}</li>
-                      <li>{i18n.t('static.formula.suggestedText80')}</li>
-
-                    </ul>
-                    <ul>
-                      <li>{i18n.t('static.formula.suggestedText81')+" "}<b>{i18n.t('static.formula.suggestedText82')}</b>
-                        <br></br>{i18n.t('static.formula.suggestedText83')}
-                        <br></br>{i18n.t('static.formula.suggestedText84')}
-                        <br></br>= 1,600 - 900
-                        <br></br>{i18n.t('static.formula.suggestedText85')}
-                      </li>
-                    </ul>
-                  </p>
-
-                  <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText86')}</span>
-                    <p>{i18n.t('static.formula.suggestedText87')}</p>
-                    <div> <img src={suggestedShipmentplan2}></img></div>
-                    <p>
-
-                      {i18n.t('static.formula.suggestedText88')}
-                      <br></br>
-                      {i18n.t('static.formula.suggestedText89')}
-                      <br></br>
-                      {i18n.t('static.formula.suggestedText90')}
-                      <br></br>
-                      {i18n.t('static.formula.suggestedText91')}
-                      <br></br>
-                      {i18n.t('static.formula.suggestedText92')}
-                    </p>
-
-                    <p><span className='formulastext-p'>{i18n.t('static.formula.suggestedText93')}</span>
-                      <ul type="disc">
-                        <li >{i18n.t('static.formula.suggestedText94')}</li>
-                        <li>{i18n.t('static.formula.suggestedText95')}</li>
-                      </ul>
-                      <ul className='pl-5'>
-                        <li>
-                          {i18n.t('static.formula.suggestedText96')} &gt; {i18n.t('static.formula.suggestedText97')} &gt; {i18n.t('static.formula.suggestedText98')}
-                        </li>
-                        <li>
-                          {i18n.t('static.formula.suggestedText99')+" "} <b>{i18n.t('static.formula.suggestedText100')}</b>
-                          <br></br>{i18n.t('static.formula.suggestedText101')}<br></br>
-                          = 1,000 - 0 + 20 <br></br>{i18n.t('static.formula.suggestedText102')}
-                        </li>
-
-
-                      </ul>
-                    </p>
-                  </p>
-                </ListGroupItemText>
-              </ListGroupItem>
-
-              <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.monthsOfStock")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
 
@@ -633,7 +635,7 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
                     {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}</p>
                 </ListGroupItemText>
-              </ListGroupItem>
+              </ListGroupItem> */}
 
             </ListGroup>
 
