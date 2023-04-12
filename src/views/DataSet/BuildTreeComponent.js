@@ -2596,7 +2596,7 @@ export default class BuildTree extends Component {
                     });
                 } else {
                     confirmAlert({
-                        message: "You can't delete the default scenario.",
+                        message: "You must have at least one scenario.",
                         buttons: [
                             {
                                 label: i18n.t('static.report.ok')
