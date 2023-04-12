@@ -41,7 +41,7 @@ export default class ConsumptionDetails extends Component {
             message: "",
             color: "",
             isModalOpen: false,
-            rangeValue: localStorage.getItem("sesRangeValueManualJson") != "" ? JSON.parse(localStorage.getItem("sesRangeValueManualJson")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 }},
+            rangeValue: localStorage.getItem("sesRangeValueManualJson") != "" ? JSON.parse(localStorage.getItem("sesRangeValueManualJson")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             integrationList: [],
@@ -601,9 +601,6 @@ export default class ConsumptionDetails extends Component {
     }.bind(this);
 
     addRowClicked() {
-        this.setState({
-            changedFlag: true
-        })
         var obj = this.state.dataEL;
         var data = [];
         data[0] = "";
@@ -635,6 +632,7 @@ export default class ConsumptionDetails extends Component {
         var validation = this.checkValidations();
         if (validation == true) {
             var json = this.state.dataEL.getJson(null, false).filter(c => c[0] != "" || c[1] != "" || c[2] != "");
+            if(json.length>0){
             var list = [];
             json.map(item => {
                 list.push({
@@ -716,6 +714,14 @@ export default class ConsumptionDetails extends Component {
                         }
                     }
                 );
+            }else{
+                this.setState({
+                    messageModal: 'No data found',
+                    color: 'red'
+                }, () => {
+                    this.hideSecondComponent()
+                })
+            }
         } else {
             this.setState({
                 messageModal: 'static.supplyPlan.validationFailed',
@@ -729,27 +735,29 @@ export default class ConsumptionDetails extends Component {
     checkValidations() {
         var valid = true;
         var elInstance = this.state.dataEL;
-        var json = elInstance.getJson(null, false).filter(c => c[0] != "" || c[1] != "" || c[2] != "");
+        var json = elInstance.getJson(null, false);
         console.log("Json Test@@@123", json)
         var validation = "";
         for (var y = 0; y < json.length; y++) {
-            console.log("y Test@@@123", y)
-            var rowData = elInstance.getRowData(y);
-            console.log("Row Data Test@@@123", rowData);
-            validation = checkValidtion("text", "A", y, rowData[0], elInstance);
-            console.log("Validation 1 Test@@@123", validation)
-            if (validation == false) {
-                valid = false;
-            }
-            validation = checkValidtion("text", "B", y, rowData[1], elInstance);
-            console.log("Validation 2 Test@@@123", validation)
-            if (validation == false) {
-                valid = false;
-            }
-            validation = checkValidtion("text", "C", y, rowData[2], elInstance);
-            console.log("Validation 3 Test@@@123", validation)
-            if (validation == false) {
-                valid = false;
+            if (json[y][0] != "" || json[y][1] != "" || json[y][2] != "") {
+                console.log("y Test@@@123", y)
+                var rowData = elInstance.getRowData(y);
+                console.log("Row Data Test@@@123", rowData);
+                validation = checkValidtion("text", "A", y, rowData[0], elInstance);
+                console.log("Validation 1 Test@@@123", validation)
+                if (validation == false) {
+                    valid = false;
+                }
+                validation = checkValidtion("text", "B", y, rowData[1], elInstance);
+                console.log("Validation 2 Test@@@123", validation)
+                if (validation == false) {
+                    valid = false;
+                }
+                validation = checkValidtion("text", "C", y, rowData[2], elInstance);
+                console.log("Validation 3 Test@@@123", validation)
+                if (validation == false) {
+                    valid = false;
+                }
             }
         }
         console.log("Valid Test@@@123", valid)
