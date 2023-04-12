@@ -376,10 +376,12 @@ class ProductValidation extends Component {
                     var levelForNode = node.flatItem.level
                     for (var j = 0; j < (levelForNode); j++) {
                         var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
-                        console.log("ParentNode@@@+++", parentNode)
-                        console.log("Node parent@@@+++", node.flatItem.parent)
-                        parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
-                        node = parentNode;
+                        if (parentNode != undefined) {
+                            console.log("ParentNode@@@+++", parentNode)
+                            console.log("Node parent@@@+++", node.flatItem.parent)
+                            parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
+                            node = parentNode;
+                        }
                     }
                     console.log("Parent Label list+++", parentLabelList)
                     var name = "";
@@ -439,7 +441,11 @@ class ProductValidation extends Component {
                 usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
                 var unitList = this.state.unitList;
                 // selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
+                try{
                 selectedText = getLabelText(unitList.filter(c => c.unitId == nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang);
+                }catch(err){
+                    
+                }
                 // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
                 console.log("finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit", finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit);
                 try {
