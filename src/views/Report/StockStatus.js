@@ -3931,8 +3931,28 @@ class StockStatus extends Component {
                     <>
                       <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
                         <ul className="legendcommitversion list-group">
-                          {this.state.stockStatusList[0].planBasedOn == 1 ? <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.formatter(this.state.stockStatusList[0].minMos)}</span></li>
-                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}</span></li></> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.stockStatusList[0].minStock)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.stockStatusList[0].distributionLeadTime)}</span></li>
+                          {this.state.stockStatusList[0].planBasedOn == 1 ? <>
+                          <li><span className="redlegend "></span> 
+                            <span className="legendcommitversionText">
+                              {i18n.t("static.supplyPlan.minStockMos")} : {this.formatter(this.state.stockStatusList[0].minMos)}
+                            </span>
+                          </li>
+                          <li><span className="redlegend "></span> 
+                            <span className="legendcommitversionText">
+                              {i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}
+                            </span>
+                          </li>
+                          <li><span className="redlegend "></span> 
+                            <span className="legendcommitversionText">
+                              {i18n.t("static.supplyPlan.amcPast")} : {(this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]).monthsInPastForAmc}
+                            </span>
+                          </li>
+                          <li><span className="redlegend "></span> 
+                            <span className="legendcommitversionText">
+                              {i18n.t("static.supplyPlan.amcFuture")} : {(this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]).monthsInFutureForAmc}
+                            </span>
+                          </li>
+                          </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.stockStatusList[0].minStock)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.stockStatusList[0].distributionLeadTime)}</span></li>
                           </>}
                         </ul>
                       </FormGroup>
