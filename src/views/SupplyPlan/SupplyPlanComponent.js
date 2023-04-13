@@ -1448,8 +1448,9 @@ export default class SupplyPlanComponent extends React.Component {
                     pointRadius: 0,
                     showInLegend: true,
                     data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
-                }, {
-                    label: i18n.t('static.supplyPlan.consumption'),
+                },
+                {
+                    label: i18n.t('static.report.actualConsumption'),
                     type: 'line',
                     stack: 3,
                     yAxisID: 'A',
@@ -1464,7 +1465,25 @@ export default class SupplyPlanComponent extends React.Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                    data: this.state.jsonArrForGraph.map((item, index) => ((item.actualFlag == 1 || (index != this.state.jsonArrForGraph.length - 1 && index > 0 && this.state.jsonArrForGraph[index - 1].actualFlag == 1 && this.state.jsonArrForGraph[index + 1].actualFlag == null)) ? item.consumption : null))
+                },
+                {
+                    label: i18n.t('static.supplyPlanFormula.forecastConsumption'),
+                    type: 'line',
+                    stack: 3,
+                    yAxisID: 'A',
+                    backgroundColor: 'transparent',
+                    borderColor: '#ffaec9',
+                    borderStyle: 'dotted',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: true,
+                    data: this.state.jsonArrForGraph.map((item, index) => ((item.actualFlag == null || (index != this.state.jsonArrForGraph.length - 1 && index > 0 && this.state.jsonArrForGraph[index - 1].actualFlag == null && this.state.jsonArrForGraph[index + 1].actualFlag == 1)) ? item.consumption : null))
                 },
                 {
                     label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
@@ -3925,7 +3944,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     maxMos: maxStockMoSQty,
                                     minQty: jsonList[0].minStock,
                                     maxQty: jsonList[0].maxStock,
-                                    planBasedOn: programPlanningUnit.planBasedOn
+                                    planBasedOn: programPlanningUnit.planBasedOn,
+                                    actualFlag: jsonList[0].actualFlag
                                 }
                                 jsonArrForGraph.push(json);
                             } else {
@@ -3973,7 +3993,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     maxMos: maxStockMoSQty,
                                     minQty: 0,
                                     maxQty: 0,
-                                    planBasedOn: programPlanningUnit.planBasedOn
+                                    planBasedOn: programPlanningUnit.planBasedOn,
+                                    actualFlag: null
                                 }
                                 jsonArrForGraph.push(json);
                             }
