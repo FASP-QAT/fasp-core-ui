@@ -1367,6 +1367,7 @@ export default class SupplyPlanComponent extends React.Component {
         }
 
         let bar = {}
+        console.log("Json Array for graph Test@@@123",this.state.jsonArrForGraph)
         if (this.state.jsonArrForGraph.length > 0) {
             var datasets = [
                 {
@@ -1465,7 +1466,7 @@ export default class SupplyPlanComponent extends React.Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => ((item.actualFlag == 1 || (index != this.state.jsonArrForGraph.length - 1 && index > 0 && this.state.jsonArrForGraph[index - 1].actualFlag == 1 && this.state.jsonArrForGraph[index + 1].actualFlag == null)) ? item.consumption : null))
+                    data: this.state.jsonArrForGraph.map((item, index) => ((item.actualFlag == 1 || (index != this.state.jsonArrForGraph.length - 1 && index > 0 && this.state.jsonArrForGraph[index - 1].actualFlag == 1 && this.state.jsonArrForGraph[index + 1].actualFlag != 1)) ? item.consumption : null))
                 },
                 {
                     label: i18n.t('static.supplyPlanFormula.forecastConsumption'),
@@ -1483,7 +1484,7 @@ export default class SupplyPlanComponent extends React.Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => ((item.actualFlag == null || (index != this.state.jsonArrForGraph.length - 1 && index > 0 && this.state.jsonArrForGraph[index - 1].actualFlag == null && this.state.jsonArrForGraph[index + 1].actualFlag == 1)) ? item.consumption : null))
+                    data: this.state.jsonArrForGraph.map((item, index) => ((item.actualFlag != 1 || (index != this.state.jsonArrForGraph.length - 1 && index > 0 && this.state.jsonArrForGraph[index - 1].actualFlag != 1 && this.state.jsonArrForGraph[index + 1].actualFlag == 1)) ? item.consumption : null))
                 },
                 {
                     label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
@@ -1548,6 +1549,7 @@ export default class SupplyPlanComponent extends React.Component {
                     data: this.state.jsonArrForGraph.map((item, index) => (item.mos))
                 })
             }
+            console.log("Datasets Test@@@123",datasets)
             bar = {
 
                 labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
