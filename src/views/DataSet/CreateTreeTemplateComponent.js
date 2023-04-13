@@ -6207,6 +6207,7 @@ export default class CreateTreeTemplate extends Component {
                                     nodeDataMomList: [],
                                     monthNo: 1,
                                     dataValue: '0',
+                                    displayDataValue:'',
                                     calculatedDataValue: '0',
                                     fuNode: {
                                         forecastingUnit: {

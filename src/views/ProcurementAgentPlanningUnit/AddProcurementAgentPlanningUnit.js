@@ -876,7 +876,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         for (var i = 0; i < planningUnitList.length; i++) {
                                                             tempPlanningUnitArrayList[i] = planningUnitList[i].planningUnitId;
                                                             var puJson = {
-                                                                name: getLabelText(planningUnitList[i].label, this.state.lang),
+                                                                name: getLabelText(planningUnitList[i].label, this.state.lang) + " | " + planningUnitList[i].planningUnitId,
                                                                 id: parseInt(planningUnitList[i].planningUnitId),
                                                                 active: planningUnitList[i].active
                                                             }
