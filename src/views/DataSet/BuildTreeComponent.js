@@ -11585,41 +11585,35 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
 
                             var items = this.state.items;
                             event.stopPropagation();
-                            // const temp = this.state.items.filter((e) => e.parent == itemConfig.payload.nodeId);
                             var updatedItems = items;
                             
                             if(this.state.toggleArray.includes(itemConfig.id)){
                                 var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
-                                // for(var i=0; i<temp.length;i++){
-                                    updatedItems = updatedItems.map(item => {
-                                        if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
-                                            tempToggleArray = tempToggleArray.filter((e) => e != item.id)
-                                            console.log("Here: "+tempToggleArray)
-                                            return { ...item, isVisible: true };
-                                        }
-                                        return item;
-                                    });
-                                // }
+                                updatedItems = updatedItems.map(item => {
+                                    if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
+                                        tempToggleArray = tempToggleArray.filter((e) => e != item.id)
+                                        console.log("Here: "+tempToggleArray)
+                                        return { ...item, isVisible: true };
+                                    }
+                                    return item;
+                                });
                                 this.setState({toggleArray: tempToggleArray})
                             }else{
                                 this.setState(prevState => ({
                                     toggleArray: [...prevState.toggleArray, itemConfig.id]
                                 }))
-                                // for(var i=0; i<temp.length;i++){
-                                    updatedItems = updatedItems.map(item => {
-                                        if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
-                                            return { ...item, isVisible: false };                                        
-                                        }
-                                        return item;
-                                    });
-                                // }
+                                updatedItems = updatedItems.map(item => {
+                                    if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
+                                        return { ...item, isVisible: false };                                        
+                                    }
+                                    return item;
+                                });
                             }
                             
                             this.setState({ items: updatedItems })
-                            console.log("toggleArray: "+this.state.toggleArray)
 
                         }}>
-                        {this.state.toggleArray.includes(itemConfig.id) ? <i class="fa fa-minus" aria-hidden="true"></i> : <i class="fa fa-plus" aria-hidden="true"></i> }    
+                        {this.state.toggleArray.includes(itemConfig.id) ? <i class="fa fa-caret-square-o-down" aria-hidden="true"></i> : <i class="fa fa-caret-square-o-up" aria-hidden="true"></i> }    
                     </button>
 
                 </>
