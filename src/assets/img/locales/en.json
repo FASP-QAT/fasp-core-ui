@@ -3028,5 +3028,14 @@
     "static.manualIntegration.addManualIntegration":"Request JSON",
     "static.manualIntegration.completed":"Completed",
     "static.manualIntegration.requested":"Requested",
-    "static.commitTree.puThatDoesNotAppearOnSelectedForecastTree":"Planning units that does not appear on any selected tree"
+    "static.commitTree.puThatDoesNotAppearOnSelectedForecastTree":"Planning units that does not appear on any selected tree",
+    "static.showFormula.endingBalance1":"= Opening balance + Adjustments + Shipments - Consumption – Projected Expired Stock",
+    "static.showFormula.endingBalance2":"(use actual consumption if available, else use forecast)",
+    "static.showFormula.endingBalance3":"= Max (Projected Inventory, 0)",
+    "static.showFormula.endingBalance4":"Demand during Stockout (0 if forecast)",
+    "static.showFormula.endingBalance5":"= (Actual consumption * Days stocked out) / (Days in Month – Days Stocked out)",
+    "static.showFormula.endingBalance6":"= 0 – Projected Inventory*  – Demand during Stockout (* if Projected Inventory is <0)",
+    "static.showFormula.endingBalance7":"Stockout days",
+    "static.showFormula.endingBalance8":"Days in Month",
+    "static.showFormula.endingBalance9":"Adjusted Consumption = (Actual consumption * Days in month) / (Days in Month – Days Stocked out)"
 }
