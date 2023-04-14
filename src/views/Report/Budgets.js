@@ -563,7 +563,11 @@ class Budgets extends Component {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
                                     OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
                                 });
-                                console.log("B** order shipment budget ---", OrderedShipmentbudget);
+
+                                var remainingbudget = Math.floor(budgetList[l].budgetAmt - (OrderedShipmentbudget + plannedShipmentbudget))
+
+
+                                console.log("B** order shipment budget ---", remainingbudget);
                                 console.log("B** budget list l ==>", budgetList[l]);
                                 var json = {
                                     budget: { id: budgetList[l].budgetId, label: budgetList[l].label, code: budgetList[l].budgetCode },
@@ -576,7 +580,8 @@ class Budgets extends Component {
                                     orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
                                     startDate: budgetList[l].startDate,
                                     stopDate: budgetList[l].stopDate,
-                                    budgetAmt: budgetList[l].budgetAmt
+                                    budgetAmt: budgetList[l].budgetAmt,
+                                    remainingBudgetAmtUsd: remainingbudget
 
                                 }
 
@@ -1159,16 +1164,20 @@ class Budgets extends Component {
         let data1 = []
         let data2 = []
         let data3 = []
+        let data4 = []
+
         for (var i = 0; i < budgets.length; i++) {
-            console.log(this.state.selBudget.filter(c => c.budget.id = budgets[i].id))
+            console.log("data3===", this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
             // data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.orderedBudgetAmt)))
             // data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.plannedBudgetAmt)))
             // data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
 
             data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.orderedBudgetAmt)))
             data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.plannedBudgetAmt)))
-            data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
+            data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt)) > 0 ? (Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))) : 0))
+            data4 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt)) < 0 ? (Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))) : 0))
         }
+        console.log("data3==", data3, "===", data4)
 
         const bar = {
 
@@ -1198,9 +1207,8 @@ class Budgets extends Component {
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
                     data: data2
                 },
-
                 {
-                    label: i18n.t('static.report.remainingBudgetAmt'),
+                    label: "Positive " + i18n.t('static.report.remainingBudgetAmt'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#cfcdc9',
@@ -1210,6 +1218,18 @@ class Budgets extends Component {
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
                     data: data3
+                },
+                {
+                    label: "Negative " + i18n.t('static.report.remainingBudgetAmt'),
+                    type: 'horizontalBar',
+                    stack: 1,
+                    backgroundColor: '#BA0C2F',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: data4
                 }
             ],
 
@@ -1580,93 +1600,92 @@ class Budgets extends Component {
     buildJexcel() {
         // this.el = jexcel(document.getElementById("budgetTable"), '');
         // this.el.destroy();
-        if(this.state.programId!=0 && this.state.programId!="" && this.state.versionId!="" && this.state.versionId!=0 && this.state.fundingSourceValues.length>0){
-        jexcel.destroy(document.getElementById("budgetTable"), true);
+        if (this.state.programId != 0 && this.state.programId != "" && this.state.versionId != "" && this.state.versionId != 0 && this.state.fundingSourceValues.length > 0) {
+            jexcel.destroy(document.getElementById("budgetTable"), true);
 
-        var data = this.state.selBudget;
-        let outPutListArray = [];
-        let count = 0;
+            var data = this.state.selBudget;
+            let outPutListArray = [];
+            let count = 0;
 
-        for (var j = 0; j < data.length; j++) {
-            var data1 = [];
+            for (var j = 0; j < data.length; j++) {
+                var data1 = [];
+                data1[0] = getLabelText(data[j].budget.label, this.state.lang)
+                data1[1] = data[j].budget.code
+                data1[2] = data[j].fundingSource.code
+                data1[3] = getLabelText(data[j].currency.label, this.state.lang)
+                data1[4] = data[j].budgetAmt;
+                data1[5] = data[j].plannedBudgetAmt;
+                data1[6] = data[j].orderedBudgetAmt;
+                data1[7] = data[j].remainingBudgetAmtUsd;
+                data1[8] = data[j].startDate;
+                data1[9] = data[j].stopDate;
+                data1[10] = data[j].budget.id
 
-            data1[0] = getLabelText(data[j].budget.label, this.state.lang)
-            data1[1] = data[j].budget.code
-            data1[2] = data[j].fundingSource.code
-            data1[3] = getLabelText(data[j].currency.label, this.state.lang)
-            data1[4] = data[j].budgetAmt;
-            data1[5] = data[j].plannedBudgetAmt;
-            data1[6] = data[j].orderedBudgetAmt;
-            data1[7] = data[j].remainingBudgetAmtUsd;
-            data1[8] = data[j].startDate;
-            data1[9] = data[j].stopDate;
-            data1[10] = data[j].budget.id
+                outPutListArray[count] = data1;
+                count++;
+                //     indexVar = indexVar + 1;
+            }
 
-            outPutListArray[count] = data1;
-            count++;
-            //     indexVar = indexVar + 1;
-        }
+            var options = {
+                data: outPutListArray,
+                columnDrag: false,
+                // colWidths: [20, 100, 200, 50, 50, 50],
+                columns: [
+                    { title: i18n.t('static.budget.budget'), type: 'text' },//0 A
+                    { title: i18n.t('static.budget.budgetCode'), type: 'text' },//1 B
+                    { title: i18n.t('static.budget.fundingsource'), type: 'text' },//2 C
+                    { title: i18n.t('static.dashboard.currency'), type: 'text' },//2 C
+                    { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##' },//3 D
+                    { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##', },//4 E
+                    { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
+                    { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
+                    { title: i18n.t('static.common.startdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
+                    { title: i18n.t('static.common.stopdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
+                    { title: 'Budget Id', type: 'hidden' },//4 E
 
-        var options = {
-            data: outPutListArray,
-            columnDrag: false,
-            // colWidths: [20, 100, 200, 50, 50, 50],
-            columns: [
-                { title: i18n.t('static.budget.budget'), type: 'text' },//0 A
-                { title: i18n.t('static.budget.budgetCode'), type: 'text' },//1 B
-                { title: i18n.t('static.budget.fundingsource'), type: 'text' },//2 C
-                { title: i18n.t('static.dashboard.currency'), type: 'text' },//2 C
-                { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##' },//3 D
-                { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##', },//4 E
-                { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
-                { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
-                { title: i18n.t('static.common.startdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
-                { title: i18n.t('static.common.stopdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
-                { title: 'Budget Id', type: 'hidden' },//4 E
-
-            ],
-            // text: {
-            //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //   show: '',
-            //   entries: '',
-            // },
-            onload: this.loaded,
-            pagination: localStorage.getItem("sesRecordCount"),
-            filters: false,
-            search: false,
-            columnSorting: true,
-            wordWrap: true,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            copyCompatibility: false,
-            allowManualInsertRow: false,
-            parseFormulas: true,
-            editable: false,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                var items = [];
-                if (y != null) {
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.supplyPlan.shipmentsDetails'),
-                            onclick: function () {
-                                window.open(window.location.origin + `/#/report/shipmentSummery/${this.el.getValueFromCoords(10, y)}/${this.el.getValueFromCoords(1, y)}`);
-                            }.bind(this)
-                        });
+                ],
+                // text: {
+                //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //   show: '',
+                //   entries: '',
+                // },
+                onload: this.loaded,
+                pagination: localStorage.getItem("sesRecordCount"),
+                filters: false,
+                search: false,
+                columnSorting: true,
+                wordWrap: true,
+                paginationOptions: JEXCEL_PAGINATION_OPTION,
+                position: 'top',
+                allowInsertColumn: false,
+                allowManualInsertColumn: false,
+                allowDeleteRow: false,
+                copyCompatibility: false,
+                allowManualInsertRow: false,
+                parseFormulas: true,
+                editable: false,
+                license: JEXCEL_PRO_KEY,
+                contextMenu: function (obj, x, y, e) {
+                    var items = [];
+                    if (y != null) {
+                        if (obj.options.allowInsertRow == true) {
+                            items.push({
+                                title: i18n.t('static.supplyPlan.shipmentsDetails'),
+                                onclick: function () {
+                                    window.open(window.location.origin + `/#/report/shipmentSummery/${this.el.getValueFromCoords(10, y)}/${this.el.getValueFromCoords(1, y)}`);
+                                }.bind(this)
+                            });
+                        }
                     }
-                }
-                return items;
-            }.bind(this),
-        };
-        var jexcelDataEl = jexcel(document.getElementById("budgetTable"), options);
-        this.el = jexcelDataEl;
-    }else{
-        jexcel.destroy(document.getElementById("budgetTable"), true);
-    }
+                    return items;
+                }.bind(this),
+            };
+            var jexcelDataEl = jexcel(document.getElementById("budgetTable"), options);
+            this.el = jexcelDataEl;
+        } else {
+            jexcel.destroy(document.getElementById("budgetTable"), true);
+        }
         // this.setState({
         //     jexcelDataEl: jexcelDataEl
         // })
