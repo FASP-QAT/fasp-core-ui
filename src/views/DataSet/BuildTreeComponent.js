@@ -8367,7 +8367,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                 showMomData: false,
                 showMomDataPercent: false,
                 addNodeFlag: false,
-                openAddNodeModal: true,
+                openAddNodeModal: false,
                 orgCurrentItemConfig: JSON.parse(JSON.stringify(data.context)),
                 currentItemConfig: JSON.parse(JSON.stringify(data)),
                 level0: (data.context.level == 0 ? false : true),
@@ -11266,7 +11266,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
         const config = {
             ...this.state,
             // pageFitMode: PageFitMode.Enabled,
-            pageFitMode: PageFitMode.None,
+            pageFitMode: PageFitMode.Auto,
             // highlightItem: 0,
             hasSelectorCheckbox: Enabled.False,
             hasButtons: Enabled.True,
