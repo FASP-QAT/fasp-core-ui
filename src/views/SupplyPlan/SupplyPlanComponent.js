@@ -1463,10 +1463,11 @@ export default class SupplyPlanComponent extends React.Component {
                         fontColor: 'transparent',
                     },
                     lineTension: 0,
-                    pointStyle: 'line',
-                    pointRadius: 0,
+                    pointStyle: 'circle',
+                    pointRadius: 1,
+                    pointBackgroundColor:'#ba0c2f',
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => ((item.actualFlag == 1 || (index != this.state.jsonArrForGraph.length - 1 && index > 0 && this.state.jsonArrForGraph[index - 1].actualFlag == 1 && this.state.jsonArrForGraph[index + 1].actualFlag != 1)) ? item.consumption : null))
+                    data: this.state.jsonArrForGraph.map((item, index) => ((item.actualFlag == 1) ? item.consumption : null))
                 },
                 {
                     label: i18n.t('static.supplyPlanFormula.forecastConsumption'),
@@ -1481,10 +1482,11 @@ export default class SupplyPlanComponent extends React.Component {
                         fontColor: 'transparent',
                     },
                     lineTension: 0,
-                    pointStyle: 'line',
-                    pointRadius: 0,
+                    pointStyle: 'circle',
+                    pointRadius: 1,
+                    pointBackgroundColor:'#ffaec9',
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => ((item.actualFlag != 1 || (index != this.state.jsonArrForGraph.length - 1 && index > 0 && this.state.jsonArrForGraph[index - 1].actualFlag != 1 && this.state.jsonArrForGraph[index + 1].actualFlag == 1)) ? item.consumption : null))
+                    data: this.state.jsonArrForGraph.map((item, index) => ((item.actualFlag != 1) ? item.consumption : null))
                 },
                 {
                     label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
