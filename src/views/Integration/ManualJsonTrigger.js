@@ -41,7 +41,7 @@ export default class ConsumptionDetails extends Component {
             message: "",
             color: "",
             isModalOpen: false,
-            rangeValue: localStorage.getItem("sesRangeValueManualJson") != "" ? JSON.parse(localStorage.getItem("sesRangeValueManualJson")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            rangeValue: localStorage.getItem("sesRangeValueManualJson") != "" && localStorage.getItem("sesRangeValueManualJson")!=undefined && localStorage.getItem("sesRangeValueManualJson")!=null ? JSON.parse(localStorage.getItem("sesRangeValueManualJson")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             integrationList: [],
@@ -652,6 +652,7 @@ export default class ConsumptionDetails extends Component {
                             changedFlag: false,
                             message: i18n.t('static.message.updateSuccess', { entityname }),
                             color: "green",
+                            messageModal:"",
                             isModalOpen: !this.state.isModalOpen
                         }, () => {
                             this.hideFirstComponent()
