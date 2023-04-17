@@ -8,7 +8,7 @@ import {
     CardFooter, Button, Col, Form, InputGroup, Modal, FormFeedback, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT, TITLE_FONT, JEXCEL_PRO_KEY, DATE_FORMAT_CAP } from "../../Constants";
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT, TITLE_FONT, JEXCEL_PRO_KEY, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS } from "../../Constants";
 import i18n from '../../i18n';
 import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
@@ -2133,7 +2133,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var arimaDataFilter = this.state.arimaData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             console.log("consumptionData--->", consumptionData)
             B.push(
-                moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
+                moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
                 consumptionData.length > 0 ? consumptionData[0].puAmount : "")
             if (this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null) {
                 B.push(movingAvgDataFilter[0].forecast.toFixed(2))
