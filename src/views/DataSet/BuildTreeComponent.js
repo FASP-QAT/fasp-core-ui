@@ -2576,7 +2576,11 @@ export default class BuildTree extends Component {
             if (this.state.selectedScenario != "") {
                 var scenarioList = this.state.scenarioList;
                 var minScenarioId = Math.min(...scenarioList.map(o => o.id));
-                if (minScenarioId != this.state.selectedScenario) {
+                console.log("scenarioList.length------------>",scenarioList.length)
+                console.log("minScenarioId------------>",minScenarioId)
+                console.log("this.state.selectedScenario------------>",this.state.selectedScenario)
+                // if (minScenarioId != this.state.selectedScenario) {
+                    if (scenarioList.length>1) {
                     confirmAlert({
                         message: "Are you sure you want to delete this scenario.",
                         buttons: [
@@ -2593,7 +2597,7 @@ export default class BuildTree extends Component {
                     });
                 } else {
                     confirmAlert({
-                        message: "You can't delete the default scenario.",
+                        message: "You must have at least one scenario.",
                         buttons: [
                             {
                                 label: i18n.t('static.report.ok')
