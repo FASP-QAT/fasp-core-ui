@@ -2356,6 +2356,7 @@ export default class syncPage extends Component {
                                                     f.region != null && f.region.id != 0 && oldModifiedInventoryData[c].region != null && oldModifiedInventoryData[c].region.id != 0 && f.region.id == oldModifiedInventoryData[c].region.id &&
                                                     (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) &&
                                                     f.realmCountryPlanningUnit.id == oldModifiedInventoryData[c].realmCountryPlanningUnit.id &&
+                                                    f.dataSource.id == oldModifiedInventoryData[c].dataSource.id &&
                                                     !existingInventoryId.includes(f.inventoryId)
                                                   );
                                                 } else {
@@ -2371,6 +2372,7 @@ export default class syncPage extends Component {
                                                     f.region != null && f.region.id != 0 && oldModifiedInventoryData[c].region != null && oldModifiedInventoryData[c].region.id != 0 && f.region.id == oldModifiedInventoryData[c].region.id &&
                                                     (f.actualQty != null && f.actualQty.toString() != "" && f.actualQty != undefined) == (oldModifiedInventoryData[c].actualQty != null && oldModifiedInventoryData[c].actualQty != "" && oldModifiedInventoryData[c].actualQty != undefined) &&
                                                     f.realmCountryPlanningUnit.id == oldModifiedInventoryData[c].realmCountryPlanningUnit.id &&
+                                                    f.dataSource.id == oldModifiedInventoryData[c].dataSource.id &&
                                                     !existingInventoryId.includes(f.inventoryId)
                                                   );
                                                   oldProgramDataInventory[index1].inventoryId = latestProgramDataInventory[index].inventoryId;
