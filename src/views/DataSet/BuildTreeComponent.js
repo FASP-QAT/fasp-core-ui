@@ -7200,7 +7200,7 @@ export default class BuildTree extends Component {
                 });
                 console.log("myResult===============6", myResult);
                 console.log("fuIdArray---", fuIdArray);
-                var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1 && el.active);
+                var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1 && el.active && (el.program == null || el.program.id == this.state.programId.split("_")[0]));
                 console.log("before usageTemplateList All===============>", usageTemplateListAll)
                 console.log("before1 usageTemplateList All===============>", myResult.filter(el => el.forecastingUnit.id == 2665))
                 console.log("before2 usageTemplateList All===============>", myResult.filter(el => el.forecastingUnit.id == 915))
