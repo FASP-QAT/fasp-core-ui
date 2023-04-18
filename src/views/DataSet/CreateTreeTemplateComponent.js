@@ -1205,7 +1205,7 @@ export default class CreateTreeTemplate extends Component {
                 currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
             }
             if(type==2){
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
+                currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
             }
         }
         this.setState({ qatCalculatedPUPerVisit });
@@ -4184,7 +4184,7 @@ export default class CreateTreeTemplate extends Component {
 
             }
         }
-        if (x != 11) {
+        if (x != 11 && x!=9) {
             instance.setValueFromCoords(11, y, 1, true);
             this.setState({ isChanged: true });
         }
@@ -5016,7 +5016,7 @@ export default class CreateTreeTemplate extends Component {
                 }
                 if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
                     var sharePu;
-                    if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit.toString() != "true") {
+                    if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit != "true") {
                         sharePu = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit != "" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit : "";
                     } else {
                         sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
@@ -6205,6 +6205,7 @@ export default class CreateTreeTemplate extends Component {
                                     nodeDataMomList: [],
                                     monthNo: 1,
                                     dataValue: '0',
+                                    displayDataValue:'',
                                     calculatedDataValue: '0',
                                     fuNode: {
                                         forecastingUnit: {

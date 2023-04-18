@@ -28,13 +28,23 @@ class IntegrationSerice {
     }
 
     addprogramIntegration(json) {
-        console.log("json papu---",json);
+        console.log("json papu---", json);
         return axios.put(`${API_URL}/api/integrationProgram/`, json, {}
         );
     }
 
     getProgramIntegrationByProgramId(programId) {
         return axios.get(`${API_URL}/api/integrationProgram/program/${programId}`, {
+        });
+    }
+
+    addManualJson(json) {
+        return axios.post(`${API_URL}/api/integrationProgram/manualJson/`, json, {
+        });
+    }
+
+    reportForManualIntegration(json) {
+        return axios.post(`${API_URL}/api/report/manualJson/`, json, {
         });
     }
 }

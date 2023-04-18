@@ -1488,7 +1488,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         }
                         console.log("rangeValue123---", rangeValue1);
                         let stopDate;
-                        let startDate = this.state.rangeValue1.from.year + '-' + this.state.rangeValue1.from.month + '-01';
+                        let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
                         let rangeStopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
                         if (moment(forecastStopDate).format('YYYY-MM-DD') > moment(rangeStopDate).format('YYYY-MM-DD')) {
                             stopDate = forecastStopDate;
@@ -1682,7 +1682,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 semiAvgId, linearRegressionId, smoothingId, arimaId,
                                 filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length,
                                 nodeDataExtrapolationOptionList, movingAvgId, monthsForMovingAverage, seasonality,
-                                movingAvgData, semiAvgData, linearRegressionData, tesData, arimaData,
+                                movingAvgData, semiAvgData, linearRegressionData, tesData, arimaData,rangeValue1
                                 // extrapolationLoader: false
                             }, () => {
                                 console.log("obj------>>>", this.state.nodeDataExtrapolation);
