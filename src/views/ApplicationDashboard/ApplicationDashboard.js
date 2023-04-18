@@ -57,7 +57,6 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from 'react-bootstrap-table-next';
 import imageHelp from '../../assets/img/help-icon.png';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -460,7 +459,7 @@ class ApplicationDashboard extends Component {
   }
   checkNewerVersions(programs) {
     console.log("T***going to call check newer versions dashboard---", programs)
-    if (isSiteOnline()) {
+    if (localStorage.getItem('sessionType') === 'Online') {
       // AuthenticationService.setupAxiosInterceptors()
       ProgramService.checkNewerVersions(programs)
         .then(response => {
@@ -616,7 +615,7 @@ class ApplicationDashboard extends Component {
 
   }
   componentDidMount() {
-    if (isSiteOnline()) {
+    if (localStorage.getItem('sessionType') === 'Online') {
       if (this.state.id == 1) {
         DashboardService.applicationLevelDashboard()
           .then(response => {
