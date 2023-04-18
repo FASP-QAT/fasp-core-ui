@@ -2264,7 +2264,7 @@
     "static.mt.linkColumn": "Link?",
     "static.commitVersion.sendLocalToServer": "Send local version to server",
     "static.importFromQATSupplyPlan.currentQATConsumption": "Current QAT Consumption",
-    "static.mt.orderNoAndPrimeLineNo": "Order No|Prime line No",
+    "static.mt.orderNoAndPrimeLineNo": "Order No | Prime line No",
     "static.monthlyForecast.GraphView": "For the graph view, there are 3 ways you can hide which products are being displayed:",
     "static.loadDelDataset.forForecastPeriod": "for forecast period",
     "static.supplyPlan.maxStockMos": "Max MOS",
