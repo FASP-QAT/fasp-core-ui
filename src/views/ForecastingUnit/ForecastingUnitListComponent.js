@@ -930,8 +930,8 @@ export default class ForecastingUnitListComponent extends Component {
             let realmId = AuthenticationService.getRealmId();
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
-                    console.log("product category list---", JSON.stringify(response.data))
-                    var listArray = response.data;
+                    console.log("product category list---", response.data)
+                    var listArray = response.data.filter(c => c.payload.active);
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -1072,7 +1072,7 @@ export default class ForecastingUnitListComponent extends Component {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 if (response.status == 200) {
-                    var listArray = response.data;
+                    var listArray = response.data.filter(c => c.active);
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
