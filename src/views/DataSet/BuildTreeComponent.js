@@ -11079,7 +11079,11 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
 
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+                (itemConfig.expanded ?                     
+                <div style={{background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed" , width: "8px", height: "8px", borderRadius: "8px"}}>
 
+                </div>
+                :
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
                     <div className={itemConfig.payload.nodeType.id == 5
                         || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
@@ -11118,8 +11122,57 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                         <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{this.getPayloadData(itemConfig, 2)}</p></div>
                         {this.state.showModelingValidation && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? i18n.t('static.ManageTree.SumofChildren') + ": " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
                     </div>
-                </div>
+                </div>)
             ))
+        }
+
+        const HighlightNode = ({ itemConfig }) => {
+            let itemTitleColor = Colors.RoyalBlue;
+            
+
+            return (
+                // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+                
+                <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''} style={{height: "88px", width: "200px", zIndex: "1"}}>
+                    <div className={itemConfig.payload.nodeType.id == 5
+                        || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
+                        (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
+                    >
+                        <div className={itemConfig.payload.nodeType.id == 5 ||
+                            itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
+                            "ContactTitle TitleColor"}>
+                            {/* <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '128px', float: 'left', fontWeight: 'bold', }}>
+                                {itemConfig.payload.label.label_en}</div> */}
+                            <div title={itemConfig.payload.label.label_en} className="NodeTitletext">
+                                {itemConfig.payload.label.label_en}</div>
+                            <div style={{ float: 'right' }}>
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                <b style={{ color: '#212721', float: 'right' }}>
+                                    {itemConfig.payload.nodeType.id == 2 ?
+                                        <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
+                                        (itemConfig.payload.nodeType.id == 3 ?
+                                            <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
+                                            (itemConfig.payload.nodeType.id == 4 ?
+                                                <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                                (itemConfig.payload.nodeType.id == 5 ?
+                                                    <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                                    (itemConfig.payload.nodeType.id == 1 ?
+                                                        // <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b>
+                                                        <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div className="ContactPhone ContactPhoneValue">
+                        <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
+                        <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{this.getPayloadData(itemConfig, 2)}</p></div>
+                        {this.state.showModelingValidation && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? i18n.t('static.ManageTree.SumofChildren') + ": " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
+                    </div>
+                </div>
+            )
         }
 
 
@@ -11281,7 +11334,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
             templates: [{
                 hasButtons: Enabled.True,
                 name: "contactTemplate",
-                itemSize: { width: 200, height: 88 },
+                itemSize: { width: 200, height: 100 },
                 minimizedItemSize: { width: 2, height: 2 },
                 highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
                 highlightBorderWidth: 1,
@@ -11569,51 +11622,68 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                 }}>
                                 {/* <FontAwesomeIcon icon={faPlus} /> */}
                                 <i class="fa fa-plus-square-o" aria-hidden="true"></i>
-                            </button>}    
-                        <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
-                            onClick={(event) => {
-    
-                                var items = this.state.items;
-                                event.stopPropagation();
-                                var updatedItems = items;
-                                
-                                if(this.state.toggleArray.includes(itemConfig.id)){
-                                    var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
-                                    updatedItems = updatedItems.map(item => {
-                                        if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
-                                            tempToggleArray = tempToggleArray.filter((e) => e != item.id)
-                                            console.log("Here: "+tempToggleArray)
-                                            return { ...item, templateName: "contactTemplateMin" };
-                                        }
-                                        return item;
-                                    });
-                                    this.setState({toggleArray: tempToggleArray})
-                                }else{
+                            </button>}
+                        {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&    
+                            <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
+                                onClick={(event) => {
+        
+                                    var items = this.state.items;
+                                    event.stopPropagation();
+                                    var updatedItems = items;
                                     this.setState(prevState => ({
                                         toggleArray: [...prevState.toggleArray, itemConfig.id]
                                     }))
-                                    updatedItems = updatedItems.map(item => {
-                                        if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
-                                            return { ...item, templateName: "contactTemplate" };                                        
-                                        }
-                                        return item;
-                                    });
-                                }
-                                
-                                this.setState({ items: updatedItems })
-    
-                            }}>
-                            {this.state.toggleArray.includes(itemConfig.id) ? <i class="fa fa-caret-square-o-down" aria-hidden="true"></i> : <i class="fa fa-caret-square-o-up" aria-hidden="true"></i> }    
-                        </button>
+                                    if(this.state.toggleArray.includes(itemConfig.id)){
+                                        var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
+                                        updatedItems = updatedItems.map(item => {
+                                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
+                                                tempToggleArray = tempToggleArray.filter((e) => e != item.id)
+                                                console.log("Here: "+tempToggleArray)
+                                                return { ...item, templateName: "contactTemplateMin", expanded: true };
+                                            }
+                                            return item;
+                                        });
+                                        this.setState({toggleArray: tempToggleArray})
+                                    }else{
+                                        this.setState(prevState => ({
+                                            toggleArray: [...prevState.toggleArray, itemConfig.id]
+                                        }))
+                                        updatedItems = updatedItems.map(item => {
+                                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
+                                                return { ...item, templateName: "contactTemplate", expanded: false };                                        
+                                            }
+                                            return item;
+                                        });
+                                    }
+                                    
+                                    this.setState({ items: updatedItems })
+        
+                                }}>
+                                {this.state.toggleArray.includes(itemConfig.id) ? <i class="fa fa-caret-square-o-down" aria-hidden="true"></i> : <i class="fa fa-caret-square-o-up" aria-hidden="true"></i> }    
+                            </button>
+                        }
     
                     </>
                 }),
             },
             {
                 name: "contactTemplateMin",
-                itemSize: { width: 4, height: 4 },
+                itemSize: { width: 8, height: 8 },
                 minimizedItemSize: { width: 2, height: 2 },
-                
+                onItemRender: ({ context: itemConfig }) => {
+                    return <NodeDragDropSource
+                        itemConfig={itemConfig}
+                        onRemoveItem={this.onRemoveItem}
+                    // canDropItem={this.canDropItem}
+                    // onMoveItem={this.onMoveItem}
+                    />;
+                },
+                onHighlightRender: ({ context: itemConfig }) => {
+                    return <HighlightNode
+                    itemConfig={itemConfig}
+                    onRemoveItem={this.onRemoveItem}
+                    />;
+                },
             }]
         }
         return <div className="">
