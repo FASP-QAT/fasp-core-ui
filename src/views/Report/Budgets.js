@@ -1220,7 +1220,7 @@ class Budgets extends Component {
                     label: "Positive " + i18n.t('static.report.remainingBudgetAmt'),
                     type: 'horizontalBar',
                     stack: 1,
-                    backgroundColor: '#A7C6ED',
+                    backgroundColor: '#002f6c',
                     borderColor: 'rgba(179,181,198,1)',
                     pointBackgroundColor: 'rgba(179,181,198,1)',
                     pointBorderColor: '#fff',
