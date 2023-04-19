@@ -5092,7 +5092,13 @@ export default class CreateTreeTemplate extends Component {
                         if (isUsageTemplate > 0) {
                             this.getPlanningUnitListByFUId(isUsageTemplate);
                         } else {
-                            this.setState({ planningUnitList: [] });
+                            if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id != undefined && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id != "") {
+                                if (this.state.forecastingUnitMultiList.filter(c => c.value == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id).length != 0) {
+                                    this.getPlanningUnitListByFUId((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                                } else {
+                                    this.setState({ planningUnitList: [] });
+                                }
+                            }
                         }
                     }
                     // else {
@@ -6207,7 +6213,7 @@ export default class CreateTreeTemplate extends Component {
                                     nodeDataMomList: [],
                                     monthNo: 1,
                                     dataValue: '0',
-                                    displayDataValue:'',
+                                    displayDataValue: '',
                                     calculatedDataValue: '0',
                                     fuNode: {
                                         forecastingUnit: {

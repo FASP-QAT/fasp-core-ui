@@ -888,7 +888,7 @@ export default class BuildTree extends Component {
             showDate: false,
             modelingChanged: false,
             missingPUList: [],
-            autoCalculate: localStorage.getItem('sesAutoCalculate')!="" && localStorage.getItem('sesAutoCalculate')!=undefined?(localStorage.getItem('sesAutoCalculate').toString()=="true"?true:false):true,
+            autoCalculate: localStorage.getItem('sesAutoCalculate') != "" && localStorage.getItem('sesAutoCalculate') != undefined ? (localStorage.getItem('sesAutoCalculate').toString() == "true" ? true : false) : true,
             hideActionButtons: false,
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
@@ -2575,11 +2575,11 @@ export default class BuildTree extends Component {
             if (this.state.selectedScenario != "") {
                 var scenarioList = this.state.scenarioList;
                 var minScenarioId = Math.min(...scenarioList.map(o => o.id));
-                console.log("scenarioList.length------------>",scenarioList.length)
-                console.log("minScenarioId------------>",minScenarioId)
-                console.log("this.state.selectedScenario------------>",this.state.selectedScenario)
+                console.log("scenarioList.length------------>", scenarioList.length)
+                console.log("minScenarioId------------>", minScenarioId)
+                console.log("this.state.selectedScenario------------>", this.state.selectedScenario)
                 // if (minScenarioId != this.state.selectedScenario) {
-                    if (scenarioList.length>1) {
+                if (scenarioList.length > 1) {
                     confirmAlert({
                         message: "Are you sure you want to delete this scenario.",
                         buttons: [
@@ -6478,7 +6478,7 @@ export default class BuildTree extends Component {
         console.log("tracer category result---", result);
         this.setState({
             forecastingUnitMultiList,
-            fuValues: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && this.state.currentScenario.fuNode.forecastingUnit.id != "" && filteredForecastingUnitList.filter(x => x.id == this.state.currentScenario.fuNode.forecastingUnit.id).length > 0 ? { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id } : []),
+            fuValues: tracerCategoryId == undefined ? [] : (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && this.state.currentScenario.fuNode.forecastingUnit.id != "" && filteredForecastingUnitList.filter(x => x.id == this.state.currentScenario.fuNode.forecastingUnit.id).length > 0 ? { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id } : []),
             tempPlanningUnitId: tracerCategoryId == "" || tracerCategoryId == undefined ? '' : this.state.tempPlanningUnitId,
             planningUnitList: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : this.state.planningUnitList
         }, () => {
@@ -6519,7 +6519,13 @@ export default class BuildTree extends Component {
                 if (isUsageTemplate > 0) {
                     this.getPlanningUnitListByFUId(isUsageTemplate);
                 } else {
-                    this.setState({ planningUnitList: [] });
+                    if (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && this.state.currentScenario.fuNode.forecastingUnit.id != "") {
+                        if (this.state.forecastingUnitMultiList.filter(c => c.value == this.state.currentScenario.fuNode.forecastingUnit.id).length != 0) {
+                            this.getPlanningUnitListByFUId(this.state.currentScenario.fuNode.forecastingUnit.id);
+                        } else {
+                            this.setState({ planningUnitList: [] });
+                        }
+                    }
                 }
             }
 
@@ -6538,7 +6544,7 @@ export default class BuildTree extends Component {
         console.log("val test", val)
         var prevVal = this.state.autoCalculate;
         console.log("prev val test", prevVal)
-        localStorage.setItem('sesAutoCalculate',val)
+        localStorage.setItem('sesAutoCalculate', val)
         this.setState({
             autoCalculate: val
         }, () => {
@@ -12931,7 +12937,7 @@ export default class BuildTree extends Component {
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                     <strong>{i18n.t('static.tree.Add/EditNode')}</strong>
                     {<div className="HeaderNodeText"> {
-                    <>
+                        <>
                             <Popover placement="top" isOpen={this.state.popoverOpenSenariotree} target="Popover1" trigger="hover" toggle={this.toggleSenariotree}>
                                 <PopoverBody>{i18n.t('static.tooltip.scenario')}</PopoverBody>
                             </Popover>

@@ -39,7 +39,7 @@ import ExtrapolationshowguidanceEn from '../../../src/ShowGuidanceFiles/Extrapol
 import ExtrapolationshowguidanceFr from '../../../src/ShowGuidanceFiles/ExtrapolationFr.html'
 import ExtrapolationshowguidanceSp from '../../../src/ShowGuidanceFiles/ExtrapolationSp.html'
 import ExtrapolationshowguidancePr from '../../../src/ShowGuidanceFiles/ExtrapolationPr.html'
-
+import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const entityname = i18n.t('static.dashboard.extrapolation');
 const pickerLang = {
@@ -312,7 +312,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             checkIfAnyMissingActualConsumption: false,
             extrapolateClicked: false,
             showDate: false,
-            seasonality: 1
+            seasonality: 1,
+            offlineTESArima: false
         }
         // this.toggleD = this.toggleD.bind(this);
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
@@ -971,12 +972,24 @@ export default class ExtrapolateDataComponent extends React.Component {
                     calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false);
                 }
                 console.log("inputDataTes.length+++", inputDataTes.length);
-                // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
                 if (this.state.smoothingId && inputDataMovingAvg.filter(c => c.actual != null).length >= 24) {
-                    calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
+                    if(this.state.smoothingId && isSiteOnline()){
+                        calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
+                    }else{
+                        this.setState({
+                            offlineTESArima: true
+                        })
+                    }
                 }
+
                 if (this.state.arimaId && ((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2))) {
-                    calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false, this.state.seasonality);
+                    if(this.state.arimaId && isSiteOnline()){
+                        calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false, this.state.seasonality);
+                    }else{
+                        this.setState({
+                            offlineTESArima: true
+                        })
+                    }
                 } else {
                     this.buildActualJxl();
                 }
@@ -3882,6 +3895,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"> </i>Submit</Button>
                             </div> */}
                                         {/* </Form> */}
+                                        {this.state.offlineTESArima && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
                                         <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                         {/* Graph */}
                                         <div style={{ display: !this.state.loading ? "block" : "none" }}>
