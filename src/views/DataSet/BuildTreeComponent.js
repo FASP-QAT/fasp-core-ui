@@ -3370,7 +3370,7 @@ export default class BuildTree extends Component {
                     for (var i = 0; i < tableJson.length; i++) {
                         var map1 = new Map(Object.entries(tableJson[i]));
                         console.log("10 map---" + map1.get("10"));
-                        if (parseInt(map1.get("11")) === 1 && parseInt(map1.get("12")) != 1) {
+                        if (parseInt(map1.get("12")) != 1) {
                             console.log("10 map true---");
 
                             var parts1 = map1.get("1").split('-');
