@@ -245,6 +245,7 @@ class StockStatus extends Component {
     var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0];
     csvRow.push('"' + (i18n.t('static.supplyPlan.amcPast').replaceAll(' ', '%20') + ' : ' + ppu.monthsInPastForAmc + '"'))
     csvRow.push('"' + (i18n.t('static.supplyPlan.amcFuture').replaceAll(' ', '%20') + ' : ' + ppu.monthsInFutureForAmc + '"'))
+    csvRow.push('"' + (i18n.t('static.report.shelfLife').replaceAll(' ', '%20') + ' : ' + ppu.shelfLife + '"'))
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -296,6 +297,7 @@ class StockStatus extends Component {
         var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
         csvRow.push('"' + (i18n.t('static.supplyPlan.amcPast').replaceAll(' ', '%20') + ' : ' + ppu.monthsInPastForAmc + '"'))
         csvRow.push('"' + (i18n.t('static.supplyPlan.amcFuture').replaceAll(' ', '%20') + ' : ' + ppu.monthsInFutureForAmc + '"'))
+        csvRow.push('"' + (i18n.t('static.report.shelfLife').replaceAll(' ', '%20') + ' : ' + ppu.shelfLife + '"'))
         csvRow.push("")
         const headers = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
@@ -3952,6 +3954,11 @@ class StockStatus extends Component {
                           <li><span className="redlegend "></span> 
                             <span className="legendcommitversionText">
                               {i18n.t("static.supplyPlan.amcFuture")} : {(this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]).monthsInFutureForAmc}
+                            </span>
+                          </li>
+                          <li><span className="redlegend "></span> 
+                            <span className="legendcommitversionText">
+                              {i18n.t("static.report.shelfLife")} : {(this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]).shelfLife}
                             </span>
                           </li>
                           </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.stockStatusList[0].minStock)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.stockStatusList[0].distributionLeadTime)}</span></li>
