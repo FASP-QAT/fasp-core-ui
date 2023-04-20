@@ -564,6 +564,34 @@ function addCommas(cell1, row) {
     }
 }
 
+function addCommasNodeValue(cell1, row) {
+
+    if (cell1 != null && cell1 !== "") {
+        console.log("Comma---Inside if");
+        cell1 += '';
+        console.log("Comma---append blank");
+        var x = cell1.replaceAll(",", "").split('.');
+        console.log("Comma---x---", x);
+        var x1 = x[0];
+        console.log("Comma---x1---", x1);
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
+        console.log("Comma---x2---", x2);
+        var rgx = /(\d+)(\d{3})/;
+        console.log("Comma---reg");
+        while (rgx.test(x1)) {
+            console.log("Comma---indide while");
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            console.log("Comma---x1 replace---", x1);
+        }
+        console.log("Comma---x1+x2---", x1 + x2);
+        return x1 + x2;
+        // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    } else {
+        console.log("Comma---");
+        return "";
+    }
+}
+
 
 function addCommasTwoDecimal(cell1, row) {
     if (cell1 != null && cell1 != "") {
@@ -3371,7 +3399,7 @@ export default class BuildTree extends Component {
                     for (var i = 0; i < tableJson.length; i++) {
                         var map1 = new Map(Object.entries(tableJson[i]));
                         console.log("10 map---" + map1.get("10"));
-                        if (parseInt(map1.get("11")) === 1 && parseInt(map1.get("12")) != 1) {
+                        if (parseInt(map1.get("12")) != 1) {
                             console.log("10 map true---");
 
                             var parts1 = map1.get("1").split('-');
@@ -9169,7 +9197,7 @@ export default class BuildTree extends Component {
                                                         }}
                                                         // step={.01}
                                                         // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
-                                                        value={this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)}
+                                                        value={this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(this.state.currentScenario.calculatedDataValue) : addCommasNodeValue(this.state.currentScenario.dataValue)}
                                                     ></Input>
                                                     <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                 </FormGroup>
@@ -9370,7 +9398,7 @@ export default class BuildTree extends Component {
                                                                     handleChange(e);
                                                                     this.dataChange(e)
                                                                 }}
-                                                                value={(this.state.currentItemConfig.context.payload.nodeType.id == 2 ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue)) + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
+                                                                value={(this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(this.state.currentScenario.calculatedDataValue) : addCommasNodeValue(this.state.currentScenario.dataValue)) + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
                                                             ></Input>
                                                             <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                         </FormGroup>
