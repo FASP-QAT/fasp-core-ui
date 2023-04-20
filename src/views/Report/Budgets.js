@@ -532,9 +532,40 @@ class Budgets extends Component {
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (event) {
-                            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            // var programJson = JSON.parse(programData);
+                            // var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+                            // var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
+                            // var programDataRequest = programDataOs.get(program);
+                            // programDataRequest.onsuccess = function (event) {
+
+                            //     var planningUnitProgramDataList = programDataRequest.result.programData.planningUnitDataList;
+                            //     var programDataShipmentList = [];
+                            //     for (var pu = 0; pu < planningUnitProgramDataList.length; pu++) {
+                            //         var planningUnitData = planningUnitProgramDataList[pu];
+                            //         var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            //         var programJson = JSON.parse(programData);
+                            //         var sList = programJson.shipmentList;
+                            //         programDataShipmentList = programDataShipmentList.concat(sList);
+                            //     }
+                            //     for (var l = 0; l < budgetList.length; l++) {
+                            //         shipmentList = programDataShipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+                            //         shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
+                            //         var plannedShipmentbudget = 0;
+                            //         (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
+                            //             console.log(ele)
+                            //             plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
+                            //         });
+                            //         var OrderedShipmentbudget = 0;
+                            //         var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
+                            //         shiplist.map(ele => {
+                            //             console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
+                            //             OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
+                            //         });
+                            //         oldShipmentbudget = ((plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) + (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd))
+                            //     }
+                            // }.bind(this);
+
+
                             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                             var shipmentList = [];
                             for (var pu = 0; pu < planningUnitDataList.length; pu++) {
@@ -551,13 +582,12 @@ class Budgets extends Component {
                                 shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 console.log("B** shipment list ---", shipmentList);
                                 var plannedShipmentbudget = 0;
-                                (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
-                                    console.log(ele)
+                                (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
                                     plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
                                 });
                                 console.log("B** planned shipment budget ---", plannedShipmentbudget);
                                 var OrderedShipmentbudget = 0;
-                                var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7)))
+                                var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
                                 console.log("B** shiplist ---", shiplist);
                                 shiplist.map(ele => {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
