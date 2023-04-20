@@ -1648,10 +1648,6 @@ class Budgets extends Component {
 
             for (var j = 0; j < data.length; j++) {
                 var data1 = [];
-<<<<<<< HEAD
-=======
-
->>>>>>> QAT-3034
                 data1[0] = getLabelText(data[j].budget.label, this.state.lang)
                 data1[1] = data[j].budget.code
                 data1[2] = data[j].fundingSource.code
