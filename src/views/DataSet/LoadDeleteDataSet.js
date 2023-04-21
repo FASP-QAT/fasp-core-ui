@@ -165,12 +165,12 @@ class LoadDeleteDataSet extends Component {
     }
     checkNewerVersions(programs) {
         if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors()
-            // ProgramService.checkNewerVersions(programs)
-            //     .then(response => {
-            //         localStorage.removeItem("sesLatestProgram");
-            //         localStorage.setItem("sesLatestProgram", response.data);
-            //     })
+            AuthenticationService.setupAxiosInterceptors()
+            ProgramService.checkNewerVersions(programs)
+                .then(response => {
+                    localStorage.removeItem("sesLatestDataset");
+                    localStorage.setItem("sesLatestDataset", response.data);
+                })
         }
     }
     hideSecondComponent() {
