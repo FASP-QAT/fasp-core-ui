@@ -1076,7 +1076,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "yellow");
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
         elInstance.setComments(col, "Please enter any positive number upto 100");
-      } else if (!(reg.test(value))) {
+      }else if (value == 0) {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setStyle(col, "background-color", "yellow");
+        // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        elInstance.setComments(col, i18n.t('static.currency.conversionrateMin'));
+      }
+       else if (!(reg.test(value))) {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
@@ -1241,6 +1248,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "yellow");
             //elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             elInstance.setComments(col, "Please enter any positive number upto 100");
+            valid = false;
+          }else if (value == 0) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            elInstance.setComments(col, i18n.t('static.currency.conversionrateMin'));
             valid = false;
           } else if (!(reg.test(value))) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
