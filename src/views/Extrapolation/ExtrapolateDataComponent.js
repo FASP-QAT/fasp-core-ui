@@ -314,7 +314,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             extrapolateClicked: false,
             showDate: false,
             seasonality: 1,
-            offlineTESArima: false
+            offlineTES: false,
+            offlineArima: false
         }
         // this.toggleD = this.toggleD.bind(this);
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
@@ -942,7 +943,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
                     }else{
                         this.setState({
-                            offlineTESArima: true
+                            offlineTES: true
                         })
                     }
                 }
@@ -952,7 +953,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false, this.state.seasonality);
                     }else{
                         this.setState({
-                            offlineTESArima: true
+                            offlineArima: true
                         })
                     }
                 } else {
@@ -2502,7 +2503,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             smoothingId: smoothingId,
             // show:false,
-            dataChanged: true
+            dataChanged: true,
+            offlineTES: false
         }, () => {
             this.buildActualJxl()
         })
@@ -2512,7 +2514,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             arimaId: arimaId,
             // show:false,
-            dataChanged: true
+            dataChanged: true,
+            offlineArima: false
         }, () => {
             this.buildActualJxl()
         })
@@ -3857,7 +3860,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"> </i>Submit</Button>
                             </div> */}
                                         {/* </Form> */}
-                                        {this.state.offlineTESArima && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
+                                        {(this.state.offlineTES || this.state.offlineArima)  && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
                                         <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                         {/* Graph */}
                                         <div style={{ display: !this.state.loading ? "block" : "none" }}>
