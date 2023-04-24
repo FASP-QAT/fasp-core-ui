@@ -31,6 +31,7 @@ import LanguageService from '../../api/LanguageService';
 import eventBus from '../../containers/DefaultLayout/eventBus';
 import { ProgressBar, Step } from "react-step-progress-bar";
 import "../../../node_modules/react-step-progress-bar/styles.css"
+import pako from 'pako';
 
 const entityname = i18n.t('static.dashboard.commitVersion')
 
@@ -1837,6 +1838,19 @@ export default class syncPage extends Component {
           ProgramService.getAllProgramData(programRequestJson)
             .then(response => {
               if (response.status == 200) {
+                const compressedData = atob(response.data);
+
+                // convert the compressed data to a byte array
+                const byteArray = new Uint8Array(compressedData.length);
+                for (let i = 0; i < compressedData.length; i++) {
+                  byteArray[i] = compressedData.charCodeAt(i);
+                }
+
+                // decompress the byte array using pako
+                const decompressedData = pako.inflate(byteArray, { to: 'string' });
+                console.log("decompressed 1 Test@@@123", decompressedData)
+                var json = JSON.parse(decompressedData);
+                response.data = json;
                 // console.log("+++Response for latest version success", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                 AuthenticationService.setupAxiosInterceptors();
@@ -5462,7 +5476,18 @@ export default class syncPage extends Component {
         console.log("CommitLogs --- 18 after getting latest program from server")
         // console.log(")))) After calling get notification api")
         // console.log("Resposne+++", response);
-        var json = response.data;
+        const compressedData = atob(response.data);
+
+        // convert the compressed data to a byte array
+        const byteArray = new Uint8Array(compressedData.length);
+        for (let i = 0; i < compressedData.length; i++) {
+          byteArray[i] = compressedData.charCodeAt(i);
+        }
+
+        // decompress the byte array using pako
+        const decompressedData = pako.inflate(byteArray, { to: 'string' });
+        console.log("decompressed 1 Test@@@123", decompressedData)
+        var json = JSON.parse(decompressedData);
         var updatedJson = [];
         for (var r = 0; r < json.length; r++) {
           var planningUnitList = json[r].planningUnitList;

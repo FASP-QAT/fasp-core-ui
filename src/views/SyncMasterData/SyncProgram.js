@@ -26,13 +26,14 @@ import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
+import pako from 'pako';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
 
 export default class SyncProgram extends Component {
 
     constructor(props) {
         super(props);
-        var pIds=this.props.location.state != undefined ? this.props.location.state.programIds : [];
+        var pIds = this.props.location.state != undefined ? this.props.location.state.programIds : [];
         this.state = {
             totalMasters: 0,
             syncedMasters: 0,
@@ -45,7 +46,7 @@ export default class SyncProgram extends Component {
             loading: true,
             programIdsToLoad: [],
             datasetIdsToLoad: [],
-            programIds:pIds
+            programIds: pIds
         }
         this.syncPrograms = this.syncPrograms.bind(this)
     }
@@ -585,7 +586,7 @@ export default class SyncProgram extends Component {
                                                         syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                     }, () => {
                                                         if (this.state.syncedMasters == this.state.totalMasters) {
-                                                            this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.state.programIds, "treeId": this.props.location.state != undefined && this.props.location.state.treeId != undefined ? this.props.location.state.treeId : "","isFullSync": this.props.location.state != undefined && this.props.location.state.isFullSync != undefined ? this.props.location.state.isFullSync : false } })
+                                                            this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.state.programIds, "treeId": this.props.location.state != undefined && this.props.location.state.treeId != undefined ? this.props.location.state.treeId : "", "isFullSync": this.props.location.state != undefined && this.props.location.state.isFullSync != undefined ? this.props.location.state.isFullSync : false } })
                                                         }
                                                     })
                                                     // this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
@@ -673,7 +674,7 @@ export default class SyncProgram extends Component {
                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                 }, () => {
                                     if (this.state.syncedMasters == this.state.totalMasters) {
-                                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.state.programIds, "treeId": this.props.location.state != undefined && this.props.location.state.treeId != undefined ? this.props.location.state.treeId : "","isFullSync": this.props.location.state != undefined && this.props.location.state.isFullSync != undefined ? this.props.location.state.isFullSync : false } })
+                                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.state.programIds, "treeId": this.props.location.state != undefined && this.props.location.state.treeId != undefined ? this.props.location.state.treeId : "", "isFullSync": this.props.location.state != undefined && this.props.location.state.isFullSync != undefined ? this.props.location.state.isFullSync : false } })
                                     }
                                 })
                                 // this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
@@ -701,7 +702,18 @@ export default class SyncProgram extends Component {
                 .then(response => {
                     console.log(")))) After calling get notification api")
                     console.log("Resposne+++", response);
-                    var json = response.data;
+                    const compressedData = atob(response.data);
+
+                    // convert the compressed data to a byte array
+                    const byteArray = new Uint8Array(compressedData.length);
+                    for (let i = 0; i < compressedData.length; i++) {
+                        byteArray[i] = compressedData.charCodeAt(i);
+                    }
+
+                    // decompress the byte array using pako
+                    const decompressedData = pako.inflate(byteArray, { to: 'string' });
+                    console.log("decompressed 1 Test@@@123", decompressedData)
+                    var json = JSON.parse(decompressedData);
                     var updatedJson = [];
                     for (var r = 0; r < json.length; r++) {
                         var planningUnitList = json[r].planningUnitList;
@@ -871,10 +883,10 @@ export default class SyncProgram extends Component {
                                                     this.setState({
                                                         syncedMasters: syncedMasters + 1,
                                                         syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100),
-                                                        programIds:pIds
+                                                        programIds: pIds
                                                     }, () => {
                                                         if (this.state.syncedMasters == this.state.totalMasters) {
-                                                            this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.state.programIds, "treeId": this.props.location.state != undefined && this.props.location.state.treeId != undefined ? this.props.location.state.treeId : "","isFullSync": this.props.location.state != undefined && this.props.location.state.isFullSync != undefined ? this.props.location.state.isFullSync : false } })
+                                                            this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.state.programIds, "treeId": this.props.location.state != undefined && this.props.location.state.treeId != undefined ? this.props.location.state.treeId : "", "isFullSync": this.props.location.state != undefined && this.props.location.state.isFullSync != undefined ? this.props.location.state.isFullSync : false } })
                                                         }
                                                     })
                                                     // this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
@@ -962,7 +974,7 @@ export default class SyncProgram extends Component {
                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                 }, () => {
                                     if (this.state.syncedMasters == this.state.totalMasters) {
-                                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.state.programIds, "treeId": this.props.location.state != undefined && this.props.location.state.treeId != undefined ? this.props.location.state.treeId : "","isFullSync": this.props.location.state != undefined && this.props.location.state.isFullSync != undefined ? this.props.location.state.isFullSync : false } })
+                                        this.props.history.push({ pathname: `/masterDataSync/green/` + i18n.t('static.masterDataSync.success'), state: { "programIds": this.state.programIds, "treeId": this.props.location.state != undefined && this.props.location.state.treeId != undefined ? this.props.location.state.treeId : "", "isFullSync": this.props.location.state != undefined && this.props.location.state.isFullSync != undefined ? this.props.location.state.isFullSync : false } })
                                     }
                                 })
                                 // this.props.history.push(`/masterDataSync/green/` + i18n.t('static.masterDataSync.success'))
