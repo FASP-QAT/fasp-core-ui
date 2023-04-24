@@ -29,6 +29,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import moment from "moment";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import cleanUp from '../../assets/img/cleanUp.png';
+import pako from 'pako';
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 
 const entityname = i18n.t('static.dashboard.downloadprogram')
@@ -1071,9 +1072,19 @@ class Program extends Component {
                 console.log("Start Time Test@@@123",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
-                        // console.log("ProgramThenCount", programThenCount)
-                        // console.log("Response data", response.data)
-                        var json = response.data;
+                        console.log("Response Test@@@123", response.data)
+                        const compressedData = atob(response.data);
+
+                        // convert the compressed data to a byte array
+                        const byteArray = new Uint8Array(compressedData.length);
+                        for (let i = 0; i < compressedData.length; i++) {
+                            byteArray[i] = compressedData.charCodeAt(i);
+                        }
+
+                        // decompress the byte array using pako
+                        const decompressedData = pako.inflate(byteArray, { to: 'string' });
+                        console.log("decompressed 1 Test@@@123", decompressedData)
+                        var json = JSON.parse(decompressedData);
                         var updatedJson = [];
                         for (var r = 0; r < json.length; r++) {
                             var planningUnitList = json[r].planningUnitList;
