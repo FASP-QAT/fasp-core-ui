@@ -333,6 +333,8 @@ export default class TreeExtrapolationComponent extends React.Component {
             tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             noDataMessage: "",
+            offlineTES: false,
+            offlineArima: false
         }
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this);
         this.toggleChooseMethod = this.toggleChooseMethod.bind(this);
@@ -1209,31 +1211,44 @@ export default class TreeExtrapolationComponent extends React.Component {
                             })
                         }
                         if (this.state.smoothingId) {
-                            console.log("tes inside if")
-                            calculateTES(JSON.parse(JSON.stringify(inputDataTes)), this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1);
+                            if(isSiteOnline()){
+                                console.log("tes inside if")
+                                calculateTES(JSON.parse(JSON.stringify(inputDataTes)), this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1);    
+                            }else{
+                                this.setState({
+                                    offlineTES: true
+                                })
+                            } 
                         } else {
                             this.setState({
                                 tesData: [],
                                 ci: 0,
-                                tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                                tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                                offlineTES: false
                             })
                         }
                         if (this.state.arimaId) {
-                            try {
-                                calculateArima(JSON.parse(JSON.stringify(inputDataArima)), this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1, this.state.seasonality);
-                            } catch (error) {
+                            if(isSiteOnline()){
+                                try {
+                                    calculateArima(JSON.parse(JSON.stringify(inputDataArima)), this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1, this.state.seasonality);
+                                } catch (error) {
+                                    this.setState({
+                                        noDataMessage: i18n.t('static.extrapolation.errorOccured'),
+                                        arimaData: [],
+                                        arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                                    })
+                                }
+                            }else{
                                 this.setState({
-                                    noDataMessage: i18n.t('static.extrapolation.errorOccured'),
-                                    arimaData: [],
-                                    arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                                    offlineArima: true
                                 })
-                            }
-
+                            }    
                         } else {
                             this.setState({
                                 arimaData: [],
                                 arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
-                                noDataMessage: ""
+                                noDataMessage: "",
+                                offlineArima: false                                
                             })
                         }
                     } else {
@@ -2483,7 +2498,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId,
-            isChanged: true
+            isChanged: true,
+            offlineTES: false
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (smoothingId) {
@@ -2533,7 +2549,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId,
-            isChanged: true
+            isChanged: true,
+            offlineArima: false
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (arimaId) {
@@ -3749,7 +3766,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tree.startMonthForHistoricData')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <div className="controls edit">
                                                         {/* <Picker
 
@@ -4236,6 +4253,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             <div className="col-md-12 row text-left pt-lg-0 pl-lg-0">
 
                                                 <div className="col-md-6 pl-lg-0">
+                                                    {(this.state.offlineTES || this.state.offlineArima)  && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
                                                     <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                                     {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <><Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>{i18n.t('static.tree.interpolate')}</Button>
                                                         <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.extrapolate')}</Button></>}
