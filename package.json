@@ -68,6 +68,7 @@
     "mathjs": "^10.0.2",
     "moment": "^2.24.0",
     "multiselect-react-dropdown": "^1.5.7",
+    "pako": "^2.1.0",
     "pdfkit-nodejs-webpack": "0.0.2",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
