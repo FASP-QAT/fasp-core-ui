@@ -474,7 +474,7 @@ class ApplicationDashboard extends Component {
 
   checkNewerVersionsDataset(programs) {
     console.log("T***going to call check newer versions dashboard---", programs)
-    if (isSiteOnline()) {
+    if (localStorage.getItem('sessionType') === 'Online') {
       // AuthenticationService.setupAxiosInterceptors()
       ProgramService.checkNewerVersions(programs)
         .then(response => {
