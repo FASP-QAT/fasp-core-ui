@@ -200,6 +200,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
     showShipmentData() {
         // var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
+        console.log("General program Json Test@@@123",generalProgramJson)
         this.setState({
             actualProgramId: generalProgramJson.programId
         })
@@ -510,6 +511,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                             }
                                             console.log("ShipmentListMohit@@@@@", shipmentList)
                                             for (var i = 0; i < shipmentList.length; i++) {
+                                                var shipmentLinkingList=(generalProgramJson.shipmentLinkingList == null || generalProgramJson.shipmentLinkingList == undefined) ? [] : generalProgramJson.shipmentLinkingList;
+                                                var orderNo=shipmentList[i].orderNo;
+                                                if(shipmentList[i].erpFlag.toString()=="true"){
+                                                    var shipmentLinkingListFilter=shipmentLinkingList.filter(c=>shipmentList[i].shipmentId>0?c.childShipmentId==shipmentList[i].shipmentId:c.tempChildShipmentId==shipmentList[i].tempShipmentId);
+                                                    if(shipmentLinkingListFilter.length>0){
+                                                        orderNo=shipmentLinkingListFilter[0].roNo + " - " + shipmentLinkingListFilter[0].roPrimeLineNo+ " | " + (shipmentLinkingListFilter[0].orderNo + " - " + shipmentLinkingListFilter[0].primeLineNo) + (shipmentLinkingListFilter[0].knShipmentNo != "" && shipmentLinkingListFilter[0].knShipmentNo != null ? " | " + shipmentLinkingListFilter[0].knShipmentNo : "")
+                                                    }
+                                                }
                                                 var shipmentListUnFiltered = this.props.items.puData.filter(c => c.id == shipmentList[i].planningUnit.id)[0].shipmentListUnFiltered;
                                                 var index;
                                                 if (shipmentList[i].shipmentId != 0) {
@@ -527,15 +536,15 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 if (shipmentList[i].shipmentMode == "Air") {
                                                     shipmentMode = 2;
                                                 }
-                                                if (shipmentList[i].erpFlag.toString() == "true" && this.props.shipmentPage != "shipmentDataEntry") {
-                                                    erpType = "text";
-                                                    erpVisible = true
+                                                // if (shipmentList[i].erpFlag.toString() == "true" && this.props.shipmentPage != "shipmentDataEntry") {
+                                                //     erpType = "text";
+                                                //     erpVisible = true
 
-                                                }
-                                                if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentTypeIds).includes(2)) {
-                                                    erpType = "text";
-                                                    erpVisible = true
-                                                }
+                                                // }
+                                                // if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentTypeIds).includes(2)) {
+                                                //     erpType = "text";
+                                                //     erpVisible = true
+                                                // }
 
                                                 if (this.props.shipmentPage != "shipmentDataEntry" && shipmentList[i].erpFlag.toString() == "true") {
                                                     shipmentEditable = false;
@@ -582,7 +591,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[6] = shipmentMode;//G
                                                 data[7] = shipmentList[i].procurementAgent.id;//H
                                                 data[8] = shipmentList[i].localProcurement;//I
-                                                data[9] = shipmentList[i].orderNo;//J
+                                                data[9] = orderNo;
                                                 data[10] = shipmentList[i].primeLineNo;//K
                                                 data[11] = shipmentList[i].realmCountryPlanningUnit.id//L
                                                 data[12] = Math.round(shipmentList[i].shipmentRcpuQty);//M
@@ -673,7 +682,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                     { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
                                                     { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80, readOnly: !shipmentEditable },
-                                                    { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
+                                                    { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 150 },
                                                     { type: erpType, visible: erpVisible, title: erpVisible ? i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo') : "", width: 100, readOnly: true, autoCasting: false },
                                                     { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                                                     { type: 'numeric', title: i18n.t("static.shipment.shipmentQtyARU"), width: 130, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
@@ -3950,9 +3959,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                         shipmentDataList[parseInt(map.get("27"))].accountFlag = map.get("0");
                                         shipmentDataList[parseInt(map.get("27"))].localProcurement = map.get("8");
                                         shipmentDataList[parseInt(map.get("27"))].active = map.get("33");
-
-                                        shipmentDataList[parseInt(map.get("27"))].orderNo = map.get("9").toString().trim();
-
+                                        if (map.get("1").toString()=="false") {
+                                            shipmentDataList[parseInt(map.get("27"))].orderNo = map.get("9").toString().trim();
+                                        }
                                         shipmentDataList[parseInt(map.get("27"))].emergencyOrder = map.get("15");
                                         var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
                                         shipmentDataList[parseInt(map.get("27"))].currency = c;
@@ -4256,6 +4265,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                 date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                             })
                             programJson.shipmentList = shipmentDataList;
+                            console.log("Shipment data list Test@@@123",shipmentDataList);
                             if (planningUnitDataIndex != -1) {
                                 planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             } else {
