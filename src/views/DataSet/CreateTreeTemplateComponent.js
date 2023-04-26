@@ -6126,7 +6126,7 @@ export default class CreateTreeTemplate extends Component {
                                                 multiplier: ''
                                             },
                                             refillMonths: '',
-                                            sharePlanningUnit: "false"
+                                            sharePlanningUnit: "true"
                                         },
                                         nodeDataModelingList: [],
                                         nodeDataOverrideList: [],
@@ -6241,7 +6241,7 @@ export default class CreateTreeTemplate extends Component {
                                             multiplier: ''
                                         },
                                         refillMonths: '',
-                                        sharePlanningUnit: "false"
+                                        sharePlanningUnit: "true"
                                     }
                                 }]
                             ]
@@ -6874,7 +6874,7 @@ export default class CreateTreeTemplate extends Component {
         }
 
 
-        (newItem.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit = false;
+        (newItem.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit = true;
         (newItem.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier = pu.multiplier;
         (newItem.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = pu.unit.id;
 
@@ -10132,7 +10132,7 @@ export default class CreateTreeTemplate extends Component {
                                                                     multiplier: ''
                                                                 },
                                                                 refillMonths: '',
-                                                                sharePlanningUnit: "false"
+                                                                sharePlanningUnit: "true"
                                                             }
                                                         }
                                                     ]
