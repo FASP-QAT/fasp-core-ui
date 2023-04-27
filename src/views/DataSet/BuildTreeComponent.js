@@ -888,7 +888,7 @@ export default class BuildTree extends Component {
             showDate: false,
             modelingChanged: false,
             missingPUList: [],
-            autoCalculate: true,
+            autoCalculate: localStorage.getItem('sesAutoCalculate')!="" && localStorage.getItem('sesAutoCalculate')!=undefined?(localStorage.getItem('sesAutoCalculate').toString()=="true"?true:false):true,
             hideActionButtons: false,
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
@@ -2576,7 +2576,11 @@ export default class BuildTree extends Component {
             if (this.state.selectedScenario != "") {
                 var scenarioList = this.state.scenarioList;
                 var minScenarioId = Math.min(...scenarioList.map(o => o.id));
-                if (minScenarioId != this.state.selectedScenario) {
+                console.log("scenarioList.length------------>",scenarioList.length)
+                console.log("minScenarioId------------>",minScenarioId)
+                console.log("this.state.selectedScenario------------>",this.state.selectedScenario)
+                // if (minScenarioId != this.state.selectedScenario) {
+                    if (scenarioList.length>1) {
                     confirmAlert({
                         message: "Are you sure you want to delete this scenario.",
                         buttons: [
@@ -2593,7 +2597,7 @@ export default class BuildTree extends Component {
                     });
                 } else {
                     confirmAlert({
-                        message: "You can't delete the default scenario.",
+                        message: "You must have at least one scenario.",
                         buttons: [
                             {
                                 label: i18n.t('static.report.ok')
@@ -3366,7 +3370,7 @@ export default class BuildTree extends Component {
                     for (var i = 0; i < tableJson.length; i++) {
                         var map1 = new Map(Object.entries(tableJson[i]));
                         console.log("10 map---" + map1.get("10"));
-                        if (parseInt(map1.get("11")) === 1 && parseInt(map1.get("12")) != 1) {
+                        if (parseInt(map1.get("12")) != 1) {
                             console.log("10 map true---");
 
                             var parts1 = map1.get("1").split('-');
@@ -4814,7 +4818,7 @@ export default class BuildTree extends Component {
                 }
             }
         }
-        if (x != 11) {
+        if (x != 11 && x!=9) {
             instance.setValueFromCoords(11, y, 1, true);
             this.setState({ isChanged: true });
         }
@@ -6531,6 +6535,7 @@ export default class BuildTree extends Component {
         console.log("val test", val)
         var prevVal = this.state.autoCalculate;
         console.log("prev val test", prevVal)
+        localStorage.setItem('sesAutoCalculate',val)
         this.setState({
             autoCalculate: val
         }, () => {
@@ -7200,7 +7205,7 @@ export default class BuildTree extends Component {
                 });
                 console.log("myResult===============6", myResult);
                 console.log("fuIdArray---", fuIdArray);
-                var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1 && el.active);
+                var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1 && el.active && (el.program == null || el.program.id == this.state.programId.split("_")[0]));
                 console.log("before usageTemplateList All===============>", usageTemplateListAll)
                 console.log("before1 usageTemplateList All===============>", myResult.filter(el => el.forecastingUnit.id == 2665))
                 console.log("before2 usageTemplateList All===============>", myResult.filter(el => el.forecastingUnit.id == 915))
@@ -12923,8 +12928,8 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                 className={'modal-xl '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
                     <strong>{i18n.t('static.tree.Add/EditNode')}</strong>
-                    {this.state.activeTab1[0] == '1' && this.state.currentItemConfig.context.payload.nodeType.id == 5 && <div className="HeaderNodeText"> {
-                        <>
+                    {<div className="HeaderNodeText"> {
+                    <>
                             <Popover placement="top" isOpen={this.state.popoverOpenSenariotree} target="Popover1" trigger="hover" toggle={this.toggleSenariotree}>
                                 <PopoverBody>{i18n.t('static.tooltip.scenario')}</PopoverBody>
                             </Popover>
@@ -12933,7 +12938,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                         </>
                     }</div>}
 
-                    {this.state.activeTab1[0] != '1' && <div className="HeaderNodeText"> {
+                    {<div className="HeaderNodeText"> {
                         this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
                             (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
                                 (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
