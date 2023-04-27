@@ -6316,6 +6316,7 @@ export default class CreateTreeTemplate extends Component {
     nodeTypeChange(value) {
         var nodeTypeId = value;
         console.log("node type value---", nodeTypeId)
+        var { currentItemConfig } = this.state;
         if (nodeTypeId == 1) {
             this.setState({
                 numberNode: false,
@@ -6339,6 +6340,45 @@ export default class CreateTreeTemplate extends Component {
         }
         else if (nodeTypeId == 4) {
             // Forecasting unit node
+            if (currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == null || currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == "" || currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == undefined) {
+                currentItemConfig.context.payload.nodeDataMap[0][0].fuNode = {
+                    oneTimeUsage: "false",
+                    lagInMonths: 0,
+                    forecastingUnit: {
+                        tracerCategory: {
+
+                        },
+                        unit: {
+
+                        },
+                        label: {
+                            label_en: ""
+                        }
+                    },
+                    usageType: {
+
+                    },
+                    usagePeriod: {
+                        usagePeriodId: 1
+                    },
+                    repeatCount: '',
+                    repeatUsagePeriod: {
+                        usagePeriodId: 1
+                    }
+                }
+
+                currentItemConfig.context.payload.nodeDataMap[0][0].puNode = {
+                    planningUnit: {
+                        id: '',
+                        unit: {
+                            id: ""
+                        },
+                        multiplier: ''
+                    },
+                    refillMonths: '',
+                    sharePlanningUnit: "false"
+                }
+            }
             this.setState({
                 numberNode: true,
                 aggregationNode: true
@@ -6346,7 +6386,7 @@ export default class CreateTreeTemplate extends Component {
                 this.getNodeUnitOfPrent();
             });
         }
-        var { currentItemConfig } = this.state;
+        // var { currentItemConfig } = this.state;
         if ((nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) && this.state.addNodeFlag && currentItemConfig.context.payload.nodeDataMap[0][0].dataValue == "") {
             currentItemConfig.context.payload.nodeDataMap[0][0].dataValue = 100;
             console.log("parent value template---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].calculatedDataValue);
