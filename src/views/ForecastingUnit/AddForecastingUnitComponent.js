@@ -275,7 +275,7 @@ export default class AddForecastingUnitComponent extends Component {
 
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
-                var listArray = response.data;
+                var listArray = response.data.filter(c => c.active);
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   

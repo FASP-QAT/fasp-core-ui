@@ -64,9 +64,9 @@
 						with values close to 1 favoring recent values and values close to 0 favoring older values. 
 						Users utilizing triple exponential smoothing can choose from four parameters:
 						<ul>
-							<li>Alpha</li>
-							<li>Beta</li>
-							<li>Gamma</li>
+							<li>alpha, applies to the level or baseline of the dataset. Higher alpha values give more weight to the more recent data</li>
+							<li>beta, determines how strongly recent trends should be valued as compared to older trends</li>
+							<li>gamma, reflects the seasonal component of the forecast. Seasonal generally refers to repeating patterns within a year. The higher the gamma, the more weight will be applied to the most recent seasonal component of the data.</li>
 							<li>Seasonality: In QAT, a season can be described as the expected length (in months) of any repetitive pattern in the consumption</li>
 							<li>Confidence interval:  between 0% and 100% (exclusive) e.g. 90% confidence level indicates 
 								90% of future points are to fall within this radius from prediction.
