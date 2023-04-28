@@ -697,15 +697,17 @@ export default class ExpiredInventory extends Component {
                                         }
                                     });
                                     
-                                    if(temp1.length > 0 && temp1[0].shipmentQty > 0 && temp1[0].shipmentQty != null){
+                                    if(temp1.length > 0){
+                                        // if(temp1.length > 0 && temp1[0].shipmentQty > 0 && temp1[0].shipmentQty != null)
                                         // freightCost == null => 0, shipmentquantity == 0 || null => catalog price
-                                        let freightCost;
-                                        if(temp1[0].freightCost == null || temp1[0].freightCost == ""){
-                                            freightCost = 0;
-                                        }else{
-                                            freightCost = temp1[0].freightCost;
-                                        }
-                                        cost = (temp1[0].productCost + freightCost) / temp1[0].shipmentQty;
+                                        // let freightCost;
+                                        // if(temp1[0].freightCost == null || temp1[0].freightCost == ""){
+                                        //     freightCost = 0;
+                                        // }else{
+                                        //     freightCost = temp1[0].freightCost;
+                                        // }
+                                        // cost = (temp1[0].productCost + freightCost) / temp1[0].shipmentQty;
+                                        cost = temp1[0].rate;
                                     }
                                     let expiredQuantity = document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty : ele1.expiredQtyWps;
 
