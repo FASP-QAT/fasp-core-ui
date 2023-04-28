@@ -1509,7 +1509,7 @@ export default class CreateTreeTemplate extends Component {
         }, () => {
             // alert("load 2")
             setTimeout(() => {
-                console.log("inside set timeout")
+                console.log("inside set timeout", buttonClick)
                 this.formSubmit(buttonClick);
             }, 0);
         })
@@ -1828,6 +1828,7 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
             console.log("validation---", validation);
+            console.log("this.state.isSubmitClicked", this.state.isSubmitClicked)
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
                     var tableJson = this.state.modelingEl.getJson(null, false);
@@ -1887,6 +1888,7 @@ export default class CreateTreeTemplate extends Component {
                     console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
                         if (this.state.isValidError.toString() == "false") {
+                            // if (buttonClick == 2) {
                             item.payload = this.state.currentItemConfig.context.payload;
                             if (dataArr.length > 0) {
                                 (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
@@ -1911,6 +1913,25 @@ export default class CreateTreeTemplate extends Component {
                                 console.log("going to call MOM data");
                                 this.calculateMOMData(0, 0);
                             });
+                            // } else if (buttonClick == 1) {
+                            // if (!this.state.isSubmitClicked) {
+                            this.setState({ loading: true, openAddNodeModal: buttonClick == 1 ? false : true, isSubmitClicked: !this.state.isSubmitClicked ? true : this.state.isSubmitClicked }, () => {
+                                console.log("all ok>>>");
+                                setTimeout(() => {
+                                    console.log("inside set timeout on submit")
+                                    if (this.state.addNodeFlag) {
+                                        this.onAddButtonClick(this.state.currentItemConfig)
+                                    } else {
+                                        this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                    }
+                                    this.setState({
+                                        cursorItem: 0,
+                                        highlightItem: 0
+                                    })
+                                }, 0);
+                            })
+                            // }
+                            // }
                         } else {
                             console.log("inside else form submit");
                             this.setState({
@@ -8436,11 +8457,9 @@ export default class CreateTreeTemplate extends Component {
                                                                         this.dataChange(e)
                                                                     }}
                                                                     value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit : ""}>
-
                                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                                     <option value="true">Yes</option>
                                                                     <option value="false">No</option>
-
                                                                 </Input> */}
                                                                 <FormGroup check inline>
                                                                     <Input
@@ -8653,14 +8672,12 @@ export default class CreateTreeTemplate extends Component {
                                                             }
                                                             console.log("autocomplete data---", this.state.currentItemConfig)
                                                             this.getForecastingUnitUnitByFUId(value.value);
-
                                                         }} // prints the selected value
                                                         renderInput={(params) => <TextField {...params} variant="outlined"
                                                             onChange={(e) => {
                                                                 // this.searchErpOrderData(e.target.value)
                                                             }} />}
                                                     />
-
                                                 </div> */}
                                             </FormGroup>
                                             <Input type="hidden"
@@ -9091,7 +9108,6 @@ export default class CreateTreeTemplate extends Component {
                             <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
-
                             </a>
                         </div>
                     </div> */}
@@ -9101,7 +9117,6 @@ export default class CreateTreeTemplate extends Component {
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
                         <FormGroup className="col-md-4 pl-lg-0">
-
                             <Input type="text"
                                 id="nodeTitleModeling"
                                 name="nodeTitleModeling"
