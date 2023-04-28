@@ -11623,37 +11623,39 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                                 {/* <FontAwesomeIcon icon={faPlus} /> */}
                                 <i class="fa fa-plus-square-o" aria-hidden="true"></i>
                             </button>}
-                        {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&    
+                        {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && 
+                            this.state.items.filter(e => e.parent==itemConfig.id).length > 0 &&    
                             <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
         
                                     var items = this.state.items;
                                     event.stopPropagation();
                                     var updatedItems = items;
-                                    this.setState(prevState => ({
-                                        toggleArray: [...prevState.toggleArray, itemConfig.id]
-                                    }))
+                                    // this.setState(prevState => ({
+                                    //     toggleArray: [...prevState.toggleArray, itemConfig.id]
+                                    // }))
                                     if(this.state.toggleArray.includes(itemConfig.id)){
                                         var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
                                         updatedItems = updatedItems.map(item => {
                                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
                                                 tempToggleArray = tempToggleArray.filter((e) => e != item.id)
+                                                return { ...item, templateName: "contactTemplate", expanded: false };                                        
+                                            }
+                                            return item;
+                                        });
+                                        this.setState({toggleArray: tempToggleArray})
+                                    }else{
+                                        var tempToggleArray = this.state.toggleArray;
+                                        tempToggleArray.push(itemConfig.id);
+                                        updatedItems = updatedItems.map(item => {
+                                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
+                                                tempToggleArray.push(item.id);
                                                 console.log("Here: "+tempToggleArray)
                                                 return { ...item, templateName: "contactTemplateMin", expanded: true };
                                             }
                                             return item;
                                         });
                                         this.setState({toggleArray: tempToggleArray})
-                                    }else{
-                                        this.setState(prevState => ({
-                                            toggleArray: [...prevState.toggleArray, itemConfig.id]
-                                        }))
-                                        updatedItems = updatedItems.map(item => {
-                                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
-                                                return { ...item, templateName: "contactTemplate", expanded: false };                                        
-                                            }
-                                            return item;
-                                        });
                                     }
                                     
                                     this.setState({ items: updatedItems })
