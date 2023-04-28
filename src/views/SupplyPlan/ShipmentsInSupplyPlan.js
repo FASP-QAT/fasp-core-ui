@@ -1555,6 +1555,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (rowData[1].toString() == "true") {
 
                     var cell = shipmentInstance.getCell(col)
+                    cell.classList.add('shipmentErp');
                     cell.classList.add('readonly');
 
                 }
@@ -1633,6 +1634,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (rowData[1].toString() == "true") {
 
                     var cell = shipmentInstance.getCell(col)
+                    cell.classList.add('shipmentErp');
                     cell.classList.add('readonly');
 
                 }
@@ -2485,6 +2487,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var col = (colArr[j]).concat(parseInt(y) + 1);
                 if (rowData[1].toString() == "true") {
                     var cell = elInstance.getCell(col)
+                    cell.classList.add('shipmentErp');
                     cell.classList.add('readonly');
                 }
                 if (rowData[33].toString() == "false") {
