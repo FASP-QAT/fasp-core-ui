@@ -768,6 +768,13 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false }
                                                 ],
+                                                onbeforepaste: function (instance, data, x, y) {
+                                                    if (y != null) {
+                                                        if (x == 20) {
+                                                            return false
+                                                        }
+                                                    }
+                                                },
                                                 editable: true,
                                                 pagination: paginationOption,
                                                 paginationOptions: paginationArray,
