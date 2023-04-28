@@ -1410,7 +1410,7 @@ class StockStatus extends Component {
           "versionId": versionId,
           "startDate": startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
           "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-          "planningUnitId": planningUnitId,
+          "planningUnitIds": [planningUnitId],
           "allPlanningUnits": false
 
         }
@@ -1445,9 +1445,9 @@ class StockStatus extends Component {
             var inventoryList = [];
             var consumptionList = [];
             var shipmentList = [];
-            var responseData = response.data;
+            var responseData = response.data[0];
             let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-            var filteredResponseData = (response.data).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
+            var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
             filteredResponseData.map(c => {
               c.inventoryInfo.map(i => inventoryList.push(i))
               c.consumptionInfo.map(ci => consumptionList.push(ci))
@@ -1456,8 +1456,8 @@ class StockStatus extends Component {
             );
             console.log("ConsumptionList+++", filteredResponseData);
             this.setState({
-              firstMonthRegionCount: response.data.length > 0 ? response.data[0].regionCount : 1,
-              firstMonthRegionCountForStock: response.data.length > 0 ? response.data[0].regionCountForStock : 0,
+              firstMonthRegionCount: responseData.length > 0 ? responseData[0].regionCount : 1,
+              firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
               stockStatusList: filteredResponseData,
               message: '', loading: false,
               planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text,
@@ -2283,9 +2283,7 @@ class StockStatus extends Component {
         "versionId": versionId,
         "startDate": startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
         "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-        "planningUnitId": planningUnitId,
-        "allPlanningUnits": true
-
+        "planningUnitIds": [...new Set(this.state.planningUnitIdsExport.map(item=>item.value))],
       }
       ReportService.getStockStatusData(inputjson)
         .then(response => {
