@@ -736,6 +736,8 @@ class EditUserComponent extends Component {
         if (value != -1) {
             proListByCountryId = this.state.programListForFilter.filter(c => c.id == -1 || c.realmCountryId == value);
             if (healthAreavalue != -1) {
+                var programListWithAll=proListByCountryId.filter(c=>c.id==-1)[0];
+                proList.push(programListWithAll);    
                 for (var i = 1; i < proListByCountryId.length; i++) {
                     proListByHealthAreaId = [];
                     proListByHealthAreaId = proListByCountryId[i].healthAreaList.filter(c => c.id == healthAreavalue);
@@ -748,6 +750,8 @@ class EditUserComponent extends Component {
             }
         }else if(healthAreavalue != -1){
             proListByCountryId = this.state.programListForFilter;
+            var programListWithAll=proListByCountryId.filter(c=>c.id==-1)[0];
+            proList.push(programListWithAll);
             for (var i = 1; i < proListByCountryId.length; i++) {
                 proListByHealthAreaId = [];
                 proListByHealthAreaId = proListByCountryId[i].healthAreaList.filter(c => c.id == healthAreavalue);
