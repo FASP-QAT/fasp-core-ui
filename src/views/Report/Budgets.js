@@ -532,9 +532,40 @@ class Budgets extends Component {
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (event) {
-                            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            // var programJson = JSON.parse(programData);
+                            // var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+                            // var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
+                            // var programDataRequest = programDataOs.get(program);
+                            // programDataRequest.onsuccess = function (event) {
+
+                            //     var planningUnitProgramDataList = programDataRequest.result.programData.planningUnitDataList;
+                            //     var programDataShipmentList = [];
+                            //     for (var pu = 0; pu < planningUnitProgramDataList.length; pu++) {
+                            //         var planningUnitData = planningUnitProgramDataList[pu];
+                            //         var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                            //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            //         var programJson = JSON.parse(programData);
+                            //         var sList = programJson.shipmentList;
+                            //         programDataShipmentList = programDataShipmentList.concat(sList);
+                            //     }
+                            //     for (var l = 0; l < budgetList.length; l++) {
+                            //         shipmentList = programDataShipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+                            //         shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
+                            //         var plannedShipmentbudget = 0;
+                            //         (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
+                            //             console.log(ele)
+                            //             plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
+                            //         });
+                            //         var OrderedShipmentbudget = 0;
+                            //         var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
+                            //         shiplist.map(ele => {
+                            //             console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
+                            //             OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
+                            //         });
+                            //         oldShipmentbudget = ((plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) + (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd))
+                            //     }
+                            // }.bind(this);
+
+
                             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                             var shipmentList = [];
                             for (var pu = 0; pu < planningUnitDataList.length; pu++) {
@@ -551,13 +582,12 @@ class Budgets extends Component {
                                 shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 console.log("B** shipment list ---", shipmentList);
                                 var plannedShipmentbudget = 0;
-                                (shipmentList.filter(s => (s.shipmentStatus.id == 1 || s.shipmentStatus.id == 2 || s.shipmentStatus.id == 3 || s.shipmentStatus.id == 9))).map(ele => {
-                                    console.log(ele)
+                                (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
                                     plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
                                 });
                                 console.log("B** planned shipment budget ---", plannedShipmentbudget);
                                 var OrderedShipmentbudget = 0;
-                                var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7)))
+                                var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
                                 console.log("B** shiplist ---", shiplist);
                                 shiplist.map(ele => {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
@@ -576,7 +606,8 @@ class Budgets extends Component {
                                     orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
                                     startDate: budgetList[l].startDate,
                                     stopDate: budgetList[l].stopDate,
-                                    budgetAmt: budgetList[l].budgetAmt
+                                    budgetAmt: budgetList[l].budgetAmt,
+                                    remainingBudgetAmtUsd: (budgetList[l].budgetUsdAmt - budgetList[l].usedUsdAmt)
 
                                 }
 
@@ -1589,93 +1620,93 @@ class Budgets extends Component {
     buildJexcel() {
         // this.el = jexcel(document.getElementById("budgetTable"), '');
         // this.el.destroy();
-        if(this.state.programId!=0 && this.state.programId!="" && this.state.versionId!="" && this.state.versionId!=0 && this.state.fundingSourceValues.length>0){
-        jexcel.destroy(document.getElementById("budgetTable"), true);
+        if (this.state.programId != 0 && this.state.programId != "" && this.state.versionId != "" && this.state.versionId != 0 && this.state.fundingSourceValues.length > 0) {
+            jexcel.destroy(document.getElementById("budgetTable"), true);
 
-        var data = this.state.selBudget;
-        let outPutListArray = [];
-        let count = 0;
+            var data = this.state.selBudget;
+            let outPutListArray = [];
+            let count = 0;
 
-        for (var j = 0; j < data.length; j++) {
-            var data1 = [];
+            for (var j = 0; j < data.length; j++) {
+                var data1 = [];
 
-            data1[0] = getLabelText(data[j].budget.label, this.state.lang)
-            data1[1] = data[j].budget.code
-            data1[2] = data[j].fundingSource.code
-            data1[3] = getLabelText(data[j].currency.label, this.state.lang)
-            data1[4] = data[j].budgetAmt;
-            data1[5] = data[j].plannedBudgetAmt;
-            data1[6] = data[j].orderedBudgetAmt;
-            data1[7] = data[j].remainingBudgetAmtUsd;
-            data1[8] = data[j].startDate;
-            data1[9] = data[j].stopDate;
-            data1[10] = data[j].budget.id
+                data1[0] = getLabelText(data[j].budget.label, this.state.lang)
+                data1[1] = data[j].budget.code
+                data1[2] = data[j].fundingSource.code
+                data1[3] = getLabelText(data[j].currency.label, this.state.lang)
+                data1[4] = data[j].budgetAmt;
+                data1[5] = data[j].plannedBudgetAmt;
+                data1[6] = data[j].orderedBudgetAmt;
+                data1[7] = data[j].remainingBudgetAmtUsd;
+                data1[8] = data[j].startDate;
+                data1[9] = data[j].stopDate;
+                data1[10] = data[j].budget.id
 
-            outPutListArray[count] = data1;
-            count++;
-            //     indexVar = indexVar + 1;
-        }
+                outPutListArray[count] = data1;
+                count++;
+                //     indexVar = indexVar + 1;
+            }
 
-        var options = {
-            data: outPutListArray,
-            columnDrag: false,
-            // colWidths: [20, 100, 200, 50, 50, 50],
-            columns: [
-                { title: i18n.t('static.budget.budget'), type: 'text' },//0 A
-                { title: i18n.t('static.budget.budgetCode'), type: 'text' },//1 B
-                { title: i18n.t('static.budget.fundingsource'), type: 'text' },//2 C
-                { title: i18n.t('static.dashboard.currency'), type: 'text' },//2 C
-                { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##' },//3 D
-                { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##', },//4 E
-                { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
-                { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
-                { title: i18n.t('static.common.startdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
-                { title: i18n.t('static.common.stopdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
-                { title: 'Budget Id', type: 'hidden' },//4 E
+            var options = {
+                data: outPutListArray,
+                columnDrag: false,
+                // colWidths: [20, 100, 200, 50, 50, 50],
+                columns: [
+                    { title: i18n.t('static.budget.budget'), type: 'text' },//0 A
+                    { title: i18n.t('static.budget.budgetCode'), type: 'text' },//1 B
+                    { title: i18n.t('static.budget.fundingsource'), type: 'text' },//2 C
+                    { title: i18n.t('static.dashboard.currency'), type: 'text' },//2 C
+                    { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##' },//3 D
+                    { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##', },//4 E
+                    { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
+                    { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##' },//4 E
+                    { title: i18n.t('static.common.startdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
+                    { title: i18n.t('static.common.stopdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },//4 E
+                    { title: 'Budget Id', type: 'hidden' },//4 E
 
-            ],
-            // text: {
-            //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //   show: '',
-            //   entries: '',
-            // },
-            onload: this.loaded,
-            pagination: localStorage.getItem("sesRecordCount"),
-            filters: false,
-            search: false,
-            columnSorting: true,
-            wordWrap: true,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            copyCompatibility: false,
-            allowManualInsertRow: false,
-            parseFormulas: true,
-            editable: false,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                var items = [];
-                if (y != null) {
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: i18n.t('static.supplyPlan.shipmentsDetails'),
-                            onclick: function () {
-                                window.open(window.location.origin + `/#/report/shipmentSummery/${this.el.getValueFromCoords(10, y)}/${this.el.getValueFromCoords(1, y)}`);
-                            }.bind(this)
-                        });
+                ],
+                // text: {
+                //   // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //   show: '',
+                //   entries: '',
+                // },
+                onload: this.loaded,
+                pagination: localStorage.getItem("sesRecordCount"),
+                filters: false,
+                search: false,
+                columnSorting: true,
+                wordWrap: true,
+                paginationOptions: JEXCEL_PAGINATION_OPTION,
+                position: 'top',
+                allowInsertColumn: false,
+                allowManualInsertColumn: false,
+                allowDeleteRow: false,
+                copyCompatibility: false,
+                allowManualInsertRow: false,
+                parseFormulas: true,
+                editable: false,
+                license: JEXCEL_PRO_KEY,
+                contextMenu: function (obj, x, y, e) {
+                    var items = [];
+                    if (y != null) {
+                        if (obj.options.allowInsertRow == true) {
+                            items.push({
+                                title: i18n.t('static.supplyPlan.shipmentsDetails'),
+                                onclick: function () {
+                                    window.open(window.location.origin + `/#/report/shipmentSummery/${this.el.getValueFromCoords(10, y)}/${this.el.getValueFromCoords(1, y)}`);
+                                }.bind(this)
+                            });
+                        }
                     }
-                }
-                return items;
-            }.bind(this),
-        };
-        var jexcelDataEl = jexcel(document.getElementById("budgetTable"), options);
-        this.el = jexcelDataEl;
-    }else{
-        jexcel.destroy(document.getElementById("budgetTable"), true);
-    }
+                    return items;
+                }.bind(this),
+            };
+            var jexcelDataEl = jexcel(document.getElementById("budgetTable"), options);
+            this.el = jexcelDataEl;
+        } else {
+            jexcel.destroy(document.getElementById("budgetTable"), true);
+        }
         // this.setState({
         //     jexcelDataEl: jexcelDataEl
         // })
