@@ -8893,7 +8893,15 @@ export default class BuildTree extends Component {
                             tempPlanningUnitId: this.state.tempPlanningUnitId,
                             nodeValue: this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue),
                             // showFUValidation : true
-                            percentageOfParent: this.state.currentScenario.dataValue
+                            percentageOfParent: this.state.currentScenario.dataValue,
+                            usageTypeIdFU:"",
+                            lagInMonths:"",
+                            noOfPersons:"",
+                            forecastingUnitPerPersonsFC:"",
+                            repeatCount:"",
+                            usageFrequencyCon:"",
+                            usageFrequencyDis:"",
+                            oneTimeUsage:""
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
