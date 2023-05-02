@@ -5956,6 +5956,7 @@ export default class BuildTree extends Component {
         var sortOrder = itemConfig.sortOrder;
         console.log("childList---", childList);
         var scenarioList = this.state.scenarioList;
+        var childListBasedOnScenarion=[];
         for (let i = 0; i < childList.length; i++) {
             var child = JSON.parse(JSON.stringify(childList[i]));
             console.log("child before---", child);
@@ -6002,6 +6003,10 @@ export default class BuildTree extends Component {
             }
             if (scenarioList.length > 0) {
                 for (let i = 0; i < scenarioList.length; i++) {
+                    childListBasedOnScenarion.push({
+                        oldId:(child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId,
+                        newId:maxNodeDataId
+                    });
                     (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
                     maxNodeDataId++;
                 }
@@ -6010,7 +6015,21 @@ export default class BuildTree extends Component {
             items.push(child);
             // childList.push(immidiateChilds[i]);
         }
-
+        
+        childListArr.map(item => {
+            var indexItems = items.findIndex(i => i.id == item.newId);
+            if (indexItems != -1) {
+                for (let i = 0; i < scenarioList.length; i++) {
+                    var nodeDataModelingList = (items[indexItems].payload.nodeDataMap[scenarioList[i].id])[0].nodeDataModelingList;
+                    if (nodeDataModelingList.length > 0) {
+                        nodeDataModelingList.map((item1, c) => {
+                            var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
+                            item1.transferNodeDataId = newTransferId[0].newId;
+                        })
+                    }
+                }
+            }
+        })
 
         console.log("duplicate button clicked value after update---", items);
         this.setState({
