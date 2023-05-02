@@ -264,7 +264,7 @@ class Login extends Component {
       apiVersionForDisplay = "Offline"
       setTimeout(function () {
         this.checkIfApiIsActive();
-      }.bind(this), 20000);
+      }.bind(this), 180000);
     } else {
       LoginService.getApiVersion()
         .then(response => {
