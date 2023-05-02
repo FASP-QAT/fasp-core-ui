@@ -174,6 +174,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.updateTESData = this.updateTESData.bind(this);
     this.updateArimaData = this.updateArimaData.bind(this);
     this.formulaChanged = this.formulaChanged.bind(this);
+    this.pickAMonth2 = React.createRef();
   }
 
   makeText = m => {
@@ -1075,7 +1076,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "yellow");
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
         elInstance.setComments(col, "Please enter any positive number upto 100");
-      } else if (!(reg.test(value))) {
+      }else if (value == 0) {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setStyle(col, "background-color", "yellow");
+        // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        elInstance.setComments(col, i18n.t('static.currency.conversionrateMin'));
+      }
+       else if (!(reg.test(value))) {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
@@ -1240,6 +1248,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "yellow");
             //elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             elInstance.setComments(col, "Please enter any positive number upto 100");
+            valid = false;
+          }else if (value == 0) {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "yellow");
+            // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            elInstance.setComments(col, i18n.t('static.currency.conversionrateMin'));
             valid = false;
           } else if (!(reg.test(value))) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -2598,7 +2613,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   handleClickMonthBox2 = (e) => {
-    this.refs.pickAMonth2.show()
+    this.pickAMonth2.current.show()
   }
 
   handleAMonthDissmis2 = (value) => {
@@ -2975,7 +2990,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                 <div className="controls edit">
                                   <Picker
-                                    ref="pickAMonth2"
+                                    ref={this.pickAMonth2}
                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                     value={this.state.singleValue2}
                                     key={JSON.stringify(this.state.singleValue2)}
