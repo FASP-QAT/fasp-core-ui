@@ -152,13 +152,13 @@ class DefaultHeader extends Component {
             AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {localStorage.getItem("sesLatestProgram") == "true" &&
+                {localStorage.getItem("sesLatestDataset") == "true" &&
                   // <img src={iconsDownarrowRed} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />
                   <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F', lineHeight: '57px' }} ></i>
                 }
-                {/* {localStorage.getItem("sesLatestProgram") == "false" &&
+                {/* {localStorage.getItem("sesLatestDataset") == "false" &&
                   <img src={iconsDownarrowBlue} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />} */}
-                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed', lineHeight: '57px' }} ></i>}
+                {localStorage.getItem("sesLatestDataset") == "false" && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed', lineHeight: '57px' }} ></i>}
               </NavLink>
             </NavItem>
           }

@@ -250,6 +250,7 @@ class ApplicationDashboard extends Component {
     this.previousProgramSlide = this.previousProgramSlide.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
+    this.checkNewerVersionsDataset = this.checkNewerVersionsDataset.bind(this);
     this.updateState = this.updateState.bind(this);
     this.getDataSetList = this.getDataSetList.bind(this);
     this.deleteProgram = this.deleteProgram.bind(this);
@@ -471,6 +472,19 @@ class ApplicationDashboard extends Component {
     }
   }
 
+  checkNewerVersionsDataset(programs) {
+    console.log("T***going to call check newer versions dashboard---", programs)
+    if (localStorage.getItem('sessionType') === 'Online') {
+      // AuthenticationService.setupAxiosInterceptors()
+      ProgramService.checkNewerVersions(programs)
+        .then(response => {
+          console.log("T***dashboard program response.data---", response.data);
+          localStorage.removeItem("sesLatestDataset");
+          localStorage.setItem("sesLatestDataset", response.data);
+        })
+    }
+  }
+
   getPrograms() {
     // console.log("T***get programs called");
     var db1;
@@ -606,7 +620,7 @@ class ApplicationDashboard extends Component {
         // this.setState({
         //     programs: proList
         // })
-        // this.checkNewerVersions(programList);
+        this.checkNewerVersionsDataset(datasetList);
         // if (this.props.updateState != undefined) {
         //     this.props.updateState(false);
         //     this.props.fetchData();
