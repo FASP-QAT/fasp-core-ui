@@ -171,10 +171,13 @@ export default class SupplyPlanComponent extends React.Component {
             showBatchSaveButton: false,
             programQPLDetails: [],
             replanModal: false,
+            exportModal: false,
             singleValue: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDateSingle: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             maxDateSingle: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             planningUnitIdsPlan: [],
+            planningUnitIdsExport: [],
+            type: 0,
             procurementAgentListPlan: [],
             procurementAgentId: TBD_PROCUREMENT_AGENT_ID,
             fundingSourceListPlan: [],
@@ -225,6 +228,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.hideFourthComponent = this.hideFourthComponent.bind(this);
         this.hideFifthComponent = this.hideFifthComponent.bind(this);
         this.toggleReplan = this.toggleReplan.bind(this);
+        this.toggleExport = this.toggleExport.bind(this);
         this.setProcurementAgentId = this.setProcurementAgentId.bind(this);
         this.setFundingSourceId = this.setFundingSourceId.bind(this);
         this.setBudgetId = this.setBudgetId.bind(this);
@@ -466,95 +470,95 @@ export default class SupplyPlanComponent extends React.Component {
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
 
-        csvRow.push('')
-        csvRow.push("\"" + (i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' : ' + ((this.state.planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20') + "\"")
-        csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
-        csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
-        csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
-        if (this.state.planBasedOn == 1) {
-            csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
-        } else {
-            csvRow.push("\"" + i18n.t("static.product.minQuantity").replaceAll(' ', '%20') + ' : ' + this.state.minQtyPpu + "\"")
-        }
-        csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
-        if (this.state.planBasedOn == 1) {
-            csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
-        } else {
-            csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
-        }
+        // csvRow.push('')
+        // csvRow.push("\"" + (i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' : ' + ((this.state.planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20') + "\"")
+        // csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
+        // csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
+        // csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
+        // if (this.state.planBasedOn == 1) {
+        //     csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
+        // } else {
+        //     csvRow.push("\"" + i18n.t("static.product.minQuantity").replaceAll(' ', '%20') + ' : ' + this.state.minQtyPpu + "\"")
+        // }
+        // csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
+        // if (this.state.planBasedOn == 1) {
+        //     csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
+        // } else {
+        //     csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
+        // }
 
-        csvRow.push('')
+        // csvRow.push('')
 
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             ("\'").concat(item.monthName).concat('%20').concat(item.monthYear)
         ))
         )]
-        var A = [header]
-
-        var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ...this.state.openingBalanceArray.map(item => item.balance)]
-        var consumptionArr = [...["\'" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\'"], ...this.state.consumptionTotalData]
-        var shipmentArr = [...["\'" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\'"], ...this.state.shipmentsTotalData]
-        var suggestedArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20') + "\""], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
-        var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...this.state.manualShipmentsTotalData]
-
-        var deliveredShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...this.state.deliveredShipmentsTotalData.map(item => item.qty)]
-        var shippedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...this.state.shippedShipmentsTotalData.map(item => item.qty)]
-        var orderedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
-        var plannedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
-
-        var erpShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.erpShipments')).replaceAll(' ', '%20') + "\""], ...this.state.erpShipmentsTotalData]
-        var deliveredErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...this.state.deliveredErpShipmentsTotalData.map(item => item.qty)]
-        var shippedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...this.state.shippedErpShipmentsTotalData.map(item => item.qty)]
-        var orderedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...this.state.orderedErpShipmentsTotalData.map(item => item.qty)]
-        var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
-
-        var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...this.state.inventoryTotalData]
-        var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...this.state.expiredStockArr.map(item => item.qty)]
-        var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...this.state.closingBalanceArray.map(item => item.balance)]
-        var monthsOfStockArr = [...["\"" + (i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20') + "\""], ... this.state.monthsOfStockArray]
-        var maxQtyArr = [...["\"" + (i18n.t('static.supplyPlan.maxQty')).replaceAll(' ', '%20') + "\""], ... this.state.maxQtyArray]
-        var amcgArr = [...["\"" + (i18n.t('static.supplyPlan.amc')).replaceAll(' ', '%20') + "\""], ...this.state.amcTotalData]
-
-        // var minStocArr = [...["\"" + (i18n.t('static.supplyPlan.minStockMos')).replaceAll(' ', '%20') + "\""], ...this.state.minStockMoS]
-        // var maxStockArr = [...["\"" + (i18n.t('static.supplyPlan.maxStockMos')).replaceAll(' ', '%20') + "\""], ...this.state.maxStockMoS]
-        var unmetDemandArr = [...["\"" + (i18n.t('static.supplyPlan.unmetDemandStr')).replaceAll(' ', '%20') + "\""], ...this.state.unmetDemand]
+        var A = "";
 
 
-        A.push(openningArr)
-        A.push(consumptionArr.map((c, item) => item != 0 ? c.consumptionQty : c))
-        A.push(shipmentArr)
-        A.push(suggestedArr)
-        A.push(manualEntryShipmentsArr)
-        A.push(deliveredShipmentArr)
-        A.push(shippedShipmentArr)
-        A.push(orderedShipmentArr)
-        A.push(plannedShipmentArr)
-        A.push(erpShipmentsArr)
-        A.push(deliveredErpShipmentArr)
-        A.push(shippedErpShipmentArr)
-        A.push(orderedErpShipmentArr)
-        A.push(plannedErpShipmentArr)
-        A.push(inventoryArr)
-        A.push(expiredStockArr)
-        A.push(closingBalanceArr)
-        A.push(this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? c : i18n.t("static.supplyPlanFormula.na"))) : maxQtyArr.map(c => c != null ? c : ""))
-        A.push(amcgArr)
+        // var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ...this.state.openingBalanceArray.map(item => item.balance)]
+        // var consumptionArr = [...["\'" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\'"], ...this.state.consumptionTotalData]
+        // var shipmentArr = [...["\'" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\'"], ...this.state.shipmentsTotalData]
+        // var suggestedArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20') + "\""], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
+        // var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...this.state.manualShipmentsTotalData]
 
-        // A.push(minStocArr)
-        // A.push(maxStockArr)
-        A.push(unmetDemandArr)
+        // var deliveredShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...this.state.deliveredShipmentsTotalData.map(item => item.qty)]
+        // var shippedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...this.state.shippedShipmentsTotalData.map(item => item.qty)]
+        // var orderedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
+        // var plannedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
 
+        // var erpShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.erpShipments')).replaceAll(' ', '%20') + "\""], ...this.state.erpShipmentsTotalData]
+        // var deliveredErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...this.state.deliveredErpShipmentsTotalData.map(item => item.qty)]
+        // var shippedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...this.state.shippedErpShipmentsTotalData.map(item => item.qty)]
+        // var orderedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...this.state.orderedErpShipmentsTotalData.map(item => item.qty)]
+        // var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
-        for (var i = 0; i < A.length; i++) {
-            csvRow.push(A[i].join(","))
-        }
+        // var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...this.state.inventoryTotalData]
+        // var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...this.state.expiredStockArr.map(item => item.qty)]
+        // var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...this.state.closingBalanceArray.map(item => item.balance)]
+        // var monthsOfStockArr = [...["\"" + (i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20') + "\""], ... this.state.monthsOfStockArray]
+        // var maxQtyArr = [...["\"" + (i18n.t('static.supplyPlan.maxQty')).replaceAll(' ', '%20') + "\""], ... this.state.maxQtyArray]
+        // var amcgArr = [...["\"" + (i18n.t('static.supplyPlan.amc')).replaceAll(' ', '%20') + "\""], ...this.state.amcTotalData]
 
-
-        var planningUnitData = this.state.planningUnitData
+        // // var minStocArr = [...["\"" + (i18n.t('static.supplyPlan.minStockMos')).replaceAll(' ', '%20') + "\""], ...this.state.minStockMoS]
+        // // var maxStockArr = [...["\"" + (i18n.t('static.supplyPlan.maxStockMos')).replaceAll(' ', '%20') + "\""], ...this.state.maxStockMoS]
+        // var unmetDemandArr = [...["\"" + (i18n.t('static.supplyPlan.unmetDemandStr')).replaceAll(' ', '%20') + "\""], ...this.state.unmetDemand]
 
 
-        var list = planningUnitData.filter(c => c.planningUnit.id != this.state.planningUnitId);
-        list.map(ele => {
+        // A.push(openningArr)
+        // A.push(consumptionArr.map((c, item) => item != 0 ? c.consumptionQty : c))
+        // A.push(shipmentArr)
+        // A.push(suggestedArr)
+        // A.push(manualEntryShipmentsArr)
+        // A.push(deliveredShipmentArr)
+        // A.push(shippedShipmentArr)
+        // A.push(orderedShipmentArr)
+        // A.push(plannedShipmentArr)
+        // A.push(erpShipmentsArr)
+        // A.push(deliveredErpShipmentArr)
+        // A.push(shippedErpShipmentArr)
+        // A.push(orderedErpShipmentArr)
+        // A.push(plannedErpShipmentArr)
+        // A.push(inventoryArr)
+        // A.push(expiredStockArr)
+        // A.push(closingBalanceArr)
+        // A.push(this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? c : i18n.t("static.supplyPlanFormula.na"))) : maxQtyArr.map(c => c != null ? c : ""))
+        // A.push(amcgArr)
+
+        // // A.push(minStocArr)
+        // // A.push(maxStockArr)
+        // A.push(unmetDemandArr)
+
+
+        // for (var i = 0; i < A.length; i++) {
+        //     csvRow.push(A[i].join(","))
+        // }
+
+
+        var planningUnitData = this.state.planningUnitData;
+
+        var list = planningUnitData;
+        list.map((ele, index) => {
 
             var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ...ele.data.openingBalanceArray.map(item => item.balance)]
             var consumptionArr = [...["\'" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\'"], ...ele.data.consumptionTotalData]
@@ -585,8 +589,10 @@ export default class SupplyPlanComponent extends React.Component {
             var unmetDemandArr = [...["\"" + (i18n.t('static.supplyPlan.unmetDemandStr')).replaceAll(' ', '%20') + "\""], ...ele.data.unmetDemand]
 
             csvRow.push('')
-            csvRow.push('')
-            csvRow.push('')
+            if (index != 0) {
+                csvRow.push('')
+                csvRow.push('')
+            }
             csvRow.push("\"" + (i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' : ' + (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20') + "\"")
             csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + ele.info.monthsInPastForAMC + "\"")
             csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + ele.info.monthsInFutureForAMC + "\"")
@@ -706,39 +712,39 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label, doc.internal.pageSize.width / 10, 80, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnit).label, doc.internal.pageSize.width / 10, 90, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.supplyPlan.amcPast') + ' : ' + this.state.monthsInPastForAMC, doc.internal.pageSize.width / 10, 100, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.supplyPlan.amcFuture') + ' : ' + this.state.monthsInFutureForAMC, doc.internal.pageSize.width / 10, 110, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.report.shelfLife') + ' : ' + this.state.shelfLife, doc.internal.pageSize.width / 10, 120, {
-                        align: 'left'
-                    })
-                    if (this.state.planBasedOn == 1) {
-                        doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + this.state.minStockMoSQty, doc.internal.pageSize.width / 10, 130, {
-                            align: 'left'
-                        })
-                    } else {
-                        doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(this.state.minQtyPpu), doc.internal.pageSize.width / 10, 130, {
-                            align: 'left'
-                        })
-                    }
-                    doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + this.state.reorderFrequency, doc.internal.pageSize.width / 10, 140, {
-                        align: 'left'
-                    })
-                    if (this.state.planBasedOn == 1) {
-                        doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 150, {
-                            align: 'left'
-                        })
-                    } else {
-                        doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(this.state.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
-                            align: 'left'
-                        })
-                    }
+                    // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnit).label, doc.internal.pageSize.width / 10, 90, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.supplyPlan.amcPast') + ' : ' + this.state.monthsInPastForAMC, doc.internal.pageSize.width / 10, 100, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.supplyPlan.amcFuture') + ' : ' + this.state.monthsInFutureForAMC, doc.internal.pageSize.width / 10, 110, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.report.shelfLife') + ' : ' + this.state.shelfLife, doc.internal.pageSize.width / 10, 120, {
+                    //     align: 'left'
+                    // })
+                    // if (this.state.planBasedOn == 1) {
+                    //     doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + this.state.minStockMoSQty, doc.internal.pageSize.width / 10, 130, {
+                    //         align: 'left'
+                    //     })
+                    // } else {
+                    //     doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(this.state.minQtyPpu), doc.internal.pageSize.width / 10, 130, {
+                    //         align: 'left'
+                    //     })
+                    // }
+                    // doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + this.state.reorderFrequency, doc.internal.pageSize.width / 10, 140, {
+                    //     align: 'left'
+                    // })
+                    // if (this.state.planBasedOn == 1) {
+                    //     doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 150, {
+                    //         align: 'left'
+                    //     })
+                    // } else {
+                    //     doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(this.state.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
+                    //         align: 'left'
+                    //     })
+                    // }
                 }
 
             }
@@ -752,16 +758,16 @@ export default class SupplyPlanComponent extends React.Component {
 
         doc.setFontSize(15);
 
-        var canvas = document.getElementById("cool-canvas");
-        //creates image
+        // var canvas = document.getElementById("cool-canvas");
+        // //creates image
 
-        var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
+        // var canvasImg = canvas.toDataURL("image/png", 1.0);
+        // var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
-        var h1 = 100;
-        var aspectwidth1 = (width - h1);
+        // var h1 = 100;
+        // var aspectwidth1 = (width - h1);
 
-        doc.addImage(canvasImg, 'png', 50, 160, 750, 290, 'CANVAS');
+        // doc.addImage(canvasImg, 'png', 50, 160, 750, 290, 'CANVAS');
         // doc.addImage(canvasImg, 'png', 50, 110, aspectwidth1, (height - h1) * 3 / 4);
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             item.monthName.concat(" ").concat(item.monthYear)
@@ -769,186 +775,190 @@ export default class SupplyPlanComponent extends React.Component {
         )]
 
         const headers = [header];
-        var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ... this.state.openingBalanceArray.map(item => item.balance)]
-        var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...this.state.consumptionTotalData]
-        var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments'))], ...this.state.shipmentsTotalData]
-        var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments'))], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
-        var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments'))], ...this.state.manualShipmentsTotalData]
+        // var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ... this.state.openingBalanceArray.map(item => item.balance)]
+        // var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...this.state.consumptionTotalData]
+        // var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments'))], ...this.state.shipmentsTotalData]
+        // var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments'))], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
+        // var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments'))], ...this.state.manualShipmentsTotalData]
 
-        var deliveredShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...this.state.deliveredShipmentsTotalData.map(item => item.qty)]
-        var shippedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...this.state.shippedShipmentsTotalData.map(item => item.qty)]
-        var orderedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
-        var plannedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
+        // var deliveredShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...this.state.deliveredShipmentsTotalData.map(item => item.qty)]
+        // var shippedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...this.state.shippedShipmentsTotalData.map(item => item.qty)]
+        // var orderedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
+        // var plannedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
 
-        var erpShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.erpShipments'))], ...this.state.erpShipmentsTotalData]
-        var deliveredErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...this.state.deliveredErpShipmentsTotalData.map(item => item.qty)]
-        var shippedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...this.state.shippedErpShipmentsTotalData.map(item => item.qty)]
-        var orderedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...this.state.orderedErpShipmentsTotalData.map(item => item.qty)]
-        var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
+        // var erpShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.erpShipments'))], ...this.state.erpShipmentsTotalData]
+        // var deliveredErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...this.state.deliveredErpShipmentsTotalData.map(item => item.qty)]
+        // var shippedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...this.state.shippedErpShipmentsTotalData.map(item => item.qty)]
+        // var orderedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...this.state.orderedErpShipmentsTotalData.map(item => item.qty)]
+        // var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
-        var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...this.state.inventoryTotalData]
-        var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...this.state.expiredStockArr.map(item => item.qty)]
-        var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...this.state.closingBalanceArray.map(item => item.balance)]
-        var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock'))], ... this.state.monthsOfStockArray]
-        var maxQtyArr = [...[(i18n.t('static.supplyPlan.maxQty'))], ... this.state.maxQtyArray]
-        var amcgArr = [...[(i18n.t('static.supplyPlan.amc'))], ...this.state.amcTotalData]
+        // var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...this.state.inventoryTotalData]
+        // var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...this.state.expiredStockArr.map(item => item.qty)]
+        // var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...this.state.closingBalanceArray.map(item => item.balance)]
+        // var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock'))], ... this.state.monthsOfStockArray]
+        // var maxQtyArr = [...[(i18n.t('static.supplyPlan.maxQty'))], ... this.state.maxQtyArray]
+        // var amcgArr = [...[(i18n.t('static.supplyPlan.amc'))], ...this.state.amcTotalData]
 
-        // var minStocArr = [...[(i18n.t('static.supplyPlan.minStockMos'))], ...this.state.minStockMoS]
-        // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
-        var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
+        // // var minStocArr = [...[(i18n.t('static.supplyPlan.minStockMos'))], ...this.state.minStockMoS]
+        // // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
+        // var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na'))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : '')), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+        // const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na'))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : '')), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
-        let content = {
-            margin: { top: 80, bottom: 70 },
-            startY: height,
-            head: headers,
-            body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 39, halign: 'center' },
-            columnStyles: {
-                0: { cellWidth: 59.89 }
-            }
-        };
-        doc.autoTable(content);
+        // let content = {
+        //     margin: { top: 80, bottom: 70 },
+        //     startY: height,
+        //     head: headers,
+        //     body: data,
+        //     styles: { lineWidth: 1, fontSize: 8, cellWidth: 39, halign: 'center' },
+        //     columnStyles: {
+        //         0: { cellWidth: 59.89 }
+        //     }
+        // };
+        // doc.autoTable(content);
 
 
-        doc.setFontSize(8)
-        doc.setFont('helvetica', 'bold')
-        var y = doc.lastAutoTable.finalY + 20
-        if (y + 100 > height) {
-            doc.addPage();
-            y = 80
-        }
-        doc.text(i18n.t('static.program.notes'), doc.internal.pageSize.width / 9, y, {
-            align: 'left'
-        })
-        doc.setFont('helvetica', 'normal')
-        var cnt = 0
-        this.state.inList.map(ele => {
+        // doc.setFontSize(8)
+        // doc.setFont('helvetica', 'bold')
+        // var y = doc.lastAutoTable.finalY + 20
+        // if (y + 100 > height) {
+        //     doc.addPage();
+        //     y = 80
+        // }
+        // doc.text(i18n.t('static.program.notes'), doc.internal.pageSize.width / 9, y, {
+        //     align: 'left'
+        // })
+        // doc.setFont('helvetica', 'normal')
+        // var cnt = 0
+        // this.state.inList.map(ele => {
 
-            if (ele.notes != null && ele.notes != '') {
-                cnt = cnt + 1
-                if (cnt == 1) {
-                    y = y + 20
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.inventory.inventory'), doc.internal.pageSize.width / 8, y, {
-                        align: 'left'
-                    })
-                }
-                doc.setFontSize(8)
-                y = y + 20
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
+        //     if (ele.notes != null && ele.notes != '') {
+        //         cnt = cnt + 1
+        //         if (cnt == 1) {
+        //             y = y + 20
+        //             doc.setFontSize(8)
+        //             doc.text(i18n.t('static.inventory.inventory'), doc.internal.pageSize.width / 8, y, {
+        //                 align: 'left'
+        //             })
+        //         }
+        //         doc.setFontSize(8)
+        //         y = y + 20
+        //         if (y > doc.internal.pageSize.height - 100) {
+        //             doc.addPage();
+        //             y = 80;
 
-                }
-                doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
-                    align: 'left'
-                })
-                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                for (var i = 0; i < splitTitle.length; i++) {
-                    if (y > doc.internal.pageSize.height - 100) {
-                        doc.addPage();
-                        y = 80;
-                    } else {
-                        y = y + 3
-                    }
-                }
-                if (splitTitle.length > 1) {
-                    y = y + (5 * (splitTitle.length - 1));
-                }
-            }
-        })
+        //         }
+        //         doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
+        //             align: 'left'
+        //         })
+        //         var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+        //         doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+        //         for (var i = 0; i < splitTitle.length; i++) {
+        //             if (y > doc.internal.pageSize.height - 100) {
+        //                 doc.addPage();
+        //                 y = 80;
+        //             } else {
+        //                 y = y + 3
+        //             }
+        //         }
+        //         if (splitTitle.length > 1) {
+        //             y = y + (5 * (splitTitle.length - 1));
+        //         }
+        //     }
+        // })
 
-        cnt = 0
+        // cnt = 0
 
-        this.state.coList.map(ele => {
-            if (ele.notes != null && ele.notes != '') {
-                cnt = cnt + 1
-                if (cnt == 1) {
-                    y = y + 20
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.supplyPlan.consumption'), doc.internal.pageSize.width / 8, y, {
-                        align: 'left'
-                    })
-                }
-                doc.setFontSize(8)
-                y = y + 20
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
+        // this.state.coList.map(ele => {
+        //     if (ele.notes != null && ele.notes != '') {
+        //         cnt = cnt + 1
+        //         if (cnt == 1) {
+        //             y = y + 20
+        //             doc.setFontSize(8)
+        //             doc.text(i18n.t('static.supplyPlan.consumption'), doc.internal.pageSize.width / 8, y, {
+        //                 align: 'left'
+        //             })
+        //         }
+        //         doc.setFontSize(8)
+        //         y = y + 20
+        //         if (y > doc.internal.pageSize.height - 100) {
+        //             doc.addPage();
+        //             y = 80;
 
-                }
-                doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
-                    align: 'left'
-                })
-                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                for (var i = 0; i < splitTitle.length; i++) {
-                    if (y > doc.internal.pageSize.height - 100) {
-                        doc.addPage();
-                        y = 80;
-                    } else {
-                        y = y + 3
-                    }
-                }
-                if (splitTitle.length > 1) {
-                    y = y + (5 * (splitTitle.length - 1));
-                }
-            }
-        })
+        //         }
+        //         doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
+        //             align: 'left'
+        //         })
+        //         var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+        //         doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+        //         for (var i = 0; i < splitTitle.length; i++) {
+        //             if (y > doc.internal.pageSize.height - 100) {
+        //                 doc.addPage();
+        //                 y = 80;
+        //             } else {
+        //                 y = y + 3
+        //             }
+        //         }
+        //         if (splitTitle.length > 1) {
+        //             y = y + (5 * (splitTitle.length - 1));
+        //         }
+        //     }
+        // })
 
-        cnt = 0
+        // cnt = 0
 
-        this.state.shList.map(ele => {
-            if (ele.notes != null && ele.notes != '') {
-                cnt = cnt + 1
-                if (cnt == 1) {
-                    y = y + 20
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
-                        align: 'left'
-                    })
-                }
-                doc.setFontSize(8)
-                y = y + 20
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
+        // this.state.shList.map(ele => {
+        //     if (ele.notes != null && ele.notes != '') {
+        //         cnt = cnt + 1
+        //         if (cnt == 1) {
+        //             y = y + 20
+        //             doc.setFontSize(8)
+        //             doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
+        //                 align: 'left'
+        //             })
+        //         }
+        //         doc.setFontSize(8)
+        //         y = y + 20
+        //         if (y > doc.internal.pageSize.height - 100) {
+        //             doc.addPage();
+        //             y = 80;
 
-                }
-                doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
-                    align: 'left'
-                })
-                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                for (var i = 0; i < splitTitle.length; i++) {
-                    if (y > doc.internal.pageSize.height - 100) {
-                        doc.addPage();
-                        y = 80;
-                    } else {
-                        y = y + 3
-                    }
-                }
-                if (splitTitle.length > 1) {
-                    y = y + (5 * (splitTitle.length - 1));
-                }
+        //         }
+        //         doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
+        //             align: 'left'
+        //         })
+        //         var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+        //         doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+        //         for (var i = 0; i < splitTitle.length; i++) {
+        //             if (y > doc.internal.pageSize.height - 100) {
+        //                 doc.addPage();
+        //                 y = 80;
+        //             } else {
+        //                 y = y + 3
+        //             }
+        //         }
+        //         if (splitTitle.length > 1) {
+        //             y = y + (5 * (splitTitle.length - 1));
+        //         }
 
-            }
-        }
-        )
+        //     }
+        // }
+        // )
 
 
         var planningUnitData = this.state.planningUnitData
 
 
-        var list = planningUnitData.filter(c => c.planningUnit.id != this.state.planningUnitId);
+        var list = planningUnitData;
         var count = 0;
-        list.map(ele => {
-            doc.addPage();
+        list.map((ele, index) => {
+            // doc.setTextColor("#002f6c");
+            if (index != 0) {
+                doc.addPage();
+            }
             y = 80
             doc.setFontSize(8)
+            doc.setTextColor("#002f6c");
             doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(ele.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
                 align: 'left'
             })
@@ -982,7 +992,7 @@ export default class SupplyPlanComponent extends React.Component {
                     align: 'left'
                 })
             }
-
+            doc.setTextColor("#000");
             var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ...ele.data.openingBalanceArray.map(item => item.balance)]
             var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...ele.data.consumptionTotalData]
             var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments'))], ...ele.data.shipmentsTotalData]
@@ -1552,8 +1562,8 @@ export default class SupplyPlanComponent extends React.Component {
                     <div id="supplyPlanTableId" style={{ display: this.state.display }}>
                         <Row className="float-right">
                             <div className="col-md-12">
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.getDataforExport(1)} />
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.getDataforExport(2)} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.toggleExport(1)} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.toggleExport(2)} />
 
                             </div>
                         </Row>
@@ -1935,7 +1945,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 {/* <CreateCanvas ref="child" chartOptions={chartOptions}/> */}
                                             </div>
                                             <div id="bars_div" style={{ display: "none" }}>
-                                                {this.state.planningUnitData.filter(c => c.planningUnit.id != this.state.planningUnitId).map((ele, index) => {
+                                                {this.state.planningUnitData.map((ele, index) => {
                                                     return (<>{ele.planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
                                                         {ele.planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
                                                     </>)
@@ -2317,7 +2327,8 @@ export default class SupplyPlanComponent extends React.Component {
                             <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                             <ul className="legendcommitversion list-group" style={{ display: 'inline-flex' }}>
                                 <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
-                                <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
+                                <li><span className=" mediumGreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
+                                <li><span className=" readonlylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.shipment.erpShipment')} </span></li>
                             </ul>
                             <div className="card-header-actions" style={{ marginTop: '19px' }}>
                                 <a className="card-header-action">
@@ -2557,6 +2568,37 @@ export default class SupplyPlanComponent extends React.Component {
                                         </ModalFooter>
                                     </Form>
                                 )} />
+                    </Modal>
+
+                    <Modal isOpen={this.state.exportModal}
+                        className={'modal-md'}>
+                        <ModalHeader toggle={() => this.toggleExport(0)} className="modalHeaderSupplyPlan" id="shipmentModalHeader">
+                            {/* <strong>{i18n.t("static.supplyPlan.")}</strong> */}
+                        </ModalHeader>
+                        <ModalBody>
+                            <>
+                                <FormGroup className="col-md-12">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.product.product')}
+                                        <span className="reportdown-box-icon  fa fa-sort-desc"></span>
+                                    </Label>
+                                    <div className="controls ">
+                                        {/* <InputGroup className="box"> */}
+                                        <MultiSelect
+                                            name="planningUnitIdsExport"
+                                            id="planningUnitIdsExport"
+                                            options={this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
+                                            value={this.state.planningUnitIdsExport}
+                                            onChange={(e) => { this.setPlanningUnitIdsExport(e) }}
+                                            // onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                            labelledBy={i18n.t('static.common.select')}
+                                        />
+                                    </div>
+                                </FormGroup>
+                            </>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.getDataforExport(this.state.type)} ><i className="fa fa-check"></i>{i18n.t("static.common.submit")}</Button>
+                        </ModalFooter>
                     </Modal>
 
                     {/* Expired Stock modal */}
@@ -4632,6 +4674,15 @@ export default class SupplyPlanComponent extends React.Component {
         })
     }
 
+    toggleExport(type) {
+        var list = this.state.planningUnitList;
+        this.setState({
+            exportModal: !this.state.exportModal,
+            planningUnitIdsExport: type != 0 ? list.filter(c => c.value == this.state.planningUnitId) : [],
+            type: type
+        })
+    }
+
     render() {
         const { programList } = this.state;
         const pickerLang = {
@@ -5079,7 +5130,7 @@ export default class SupplyPlanComponent extends React.Component {
     getDataforExport = (report) => {
 
         document.getElementById("bars_div").style.display = 'block';
-        this.setState({ loading: true }, () => {
+        this.setState({ exportModal: false, loading: true }, () => {
             var m = this.state.monthsArray
             var db1;
             var storeOS;
@@ -5114,12 +5165,17 @@ export default class SupplyPlanComponent extends React.Component {
                     var programResult = programRequest.result.programData;
                     var planningUnitData = [];
                     var selectedPlanningUnitdata = {};
-                    var selectedplanningunit = this.state.planningUnitList.filter(c => c.value == this.state.planningUnitId)
-
-                    var planningunitList = this.state.planningUnitList.filter(c => c.value != this.state.planningUnitId)
-                    planningunitList.push(selectedplanningunit[0])
-                    var pcnt = 0
-                    planningunitList.map(planningUnit => {
+                    // var selectedplanningunit = this.state.planningUnitList.filter(c => c.value == this.state.planningUnitId)
+                    // var filteredPlanningUnitList=
+                    // var planningunitList = this.state.planningUnitList.filter(c => c.value != this.state.planningUnitId)
+                    // planningunitList.push(selectedplanningunit[0])
+                    var pcnt = 0;
+                    var sortedPlanningUnitData = this.state.planningUnitIdsExport;
+                    // if (this.state.planningUnitIdsExport.filter(c => c.value == this.state.planningUnitId).length > 0) {
+                    //     sortedPlanningUnitData.push(this.state.planningUnitIdsExport.filter(c => c.value == this.state.planningUnitId)[0])
+                    // }
+                    // sortedPlanningUnitData = sortedPlanningUnitData.concat(this.state.planningUnitIdsExport.filter(c => c.value != this.state.planningUnitId));
+                    sortedPlanningUnitData.map(planningUnit => {
 
                         var planningUnitId = planningUnit.value
                         var programJson = {}
@@ -6185,24 +6241,24 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     }
                                     console.log("PlanningUnitDataForExport@@@@@@@@@@", planningUnitDataforExport)
-                                    if (this.state.planningUnitId != programPlanningUnit.planningUnit.id) {
-                                        planningUnitData.push(planningUnitDataforExport)
-                                        // this.setState({
-                                        //     planningUnitData: planningUnitData,
-                                        //         loading: false
-                                        // })
-                                    }
-                                    else {
-                                        selectedPlanningUnitdata = planningUnitDataforExport
-                                        this.setState({
-                                            inList: invList,
-                                            coList: conList,
-                                            shList: shiList,
-                                        })
-                                    }
+                                    // if (this.state.planningUnitId != programPlanningUnit.planningUnit.id) {
+                                    planningUnitData.push(planningUnitDataforExport)
+                                    // this.setState({
+                                    //     planningUnitData: planningUnitData,
+                                    //         loading: false
+                                    // })
+                                    // }
+                                    // else {
+                                    //     selectedPlanningUnitdata = planningUnitDataforExport
+                                    //     this.setState({
+                                    //         inList: invList,
+                                    //         coList: conList,
+                                    //         shList: shiList,
+                                    //     })
+                                    // }
                                     pcnt = pcnt + 1
-                                    if (pcnt == this.state.planningUnitList.length) {
-                                        planningUnitData.push(selectedPlanningUnitdata)
+                                    if (pcnt == this.state.planningUnitIdsExport.length) {
+                                        // planningUnitData.push(selectedPlanningUnitdata)
                                         this.setState({
                                             planningUnitData: planningUnitData,
                                             loading: false
@@ -6249,6 +6305,12 @@ export default class SupplyPlanComponent extends React.Component {
     setPlanningUnitIdsPlan(e) {
         this.setState({
             planningUnitIdsPlan: e,
+        })
+    }
+
+    setPlanningUnitIdsExport(e) {
+        this.setState({
+            planningUnitIdsExport: e,
         })
     }
 
