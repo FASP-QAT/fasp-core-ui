@@ -177,7 +177,7 @@ class EditUserComponent extends Component {
             user.username = event.target.value;
         }
         if (event.target.name == "emailId") {
-            user.emailId = event.target.value;
+            user.emailId = event.target.value.replace(/[\u200B-\u200D\u2060\uFEFF]/g, '');
         }
         // if (event.target.name == "phoneNumber") {
         //     user.phoneNumber = event.target.value;
@@ -745,10 +745,10 @@ class EditUserComponent extends Component {
                         proList.push(proListByCountryId[i])
                     }
                 }
-            }else{
-                proList= proListByCountryId;
+            } else {
+                proList = proListByCountryId;
             }
-        }else if(healthAreavalue != -1){
+        } else if (healthAreavalue != -1) {
             proListByCountryId = this.state.programListForFilter;
             var programListWithAll=proListByCountryId.filter(c=>c.id==-1)[0];
             proList.push(programListWithAll);
@@ -759,7 +759,7 @@ class EditUserComponent extends Component {
                     proList.push(proListByCountryId[i])
                 }
             }
-        }else {
+        } else {
             proList = this.state.programListForFilter;
         }
         return proList;
@@ -1540,7 +1540,7 @@ class EditUserComponent extends Component {
                                     let isValid = this.checkValidation();
                                     if (isValid) {
                                         let user = this.state.user;
-
+                                        user.emailId = user.emailId.replace(/[\u200B-\u200D\u2060\uFEFF]/g, '')
                                         var tableJson = this.el.getJson(null, false);
                                         let userAcls = [];
                                         for (var i = 0; i < tableJson.length; i++) {
@@ -1902,7 +1902,7 @@ class EditUserComponent extends Component {
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
-       
+
                                             <CardFooter style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
