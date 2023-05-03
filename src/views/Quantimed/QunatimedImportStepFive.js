@@ -19,7 +19,7 @@ import QuantimedImportService from '../../api/QuantimedImportService';
 import moment from "moment";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY, JEXCEL_PRO_KEY, FORECASTED_CONSUMPTION_MODIFIED } from '../../Constants';
+import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, JEXCEL_PAGINATION_OPTION, QUANTIMED_DATA_SOURCE_ID, SECRET_KEY, JEXCEL_PRO_KEY, FORECASTED_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MONTHS_IN_PAST } from '../../Constants';
 import CryptoJS from 'crypto-js'
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
@@ -70,6 +70,7 @@ export default class QunatimedImportStepFive extends Component {
         this.updateState = this.updateState.bind(this);
         this.redirectToDashbaord = this.redirectToDashbaord.bind(this);
         this.changedImport = this.changedImport.bind(this);
+        this.changeColor = this.changeColor.bind(this);
     }
 
     touchAllThree(setTouched, errors) {
@@ -122,6 +123,11 @@ export default class QunatimedImportStepFive extends Component {
     changedImport = function (instance, cell, x, y, value) {
 
 
+    }
+
+    monthDiff(dateFrom, dateTo) {
+        return dateTo.getMonth() - dateFrom.getMonth() +
+            (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
     }
 
     formSubmit() {
@@ -361,17 +367,37 @@ export default class QunatimedImportStepFive extends Component {
         }
     }
 
+    changeColor() {
+
+        var elInstance = this.state.importEl;
+
+        var json = elInstance.getJson();
+
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        for (var j = 0; j < json.length; j++) {
+            var rowData = elInstance.getRowData(j);
+            var isOldDate = rowData[9];
+
+            if (!isOldDate) {
+                for (var i = 0; i < colArr.length; i++) {
+                    var cell1 = elInstance.getCell(`${colArr[i]}${parseInt(j) + 1}`)
+                    cell1.classList.add('readonly');
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                }
+            }
+        }
+    }
+
     showFinalData() {
 
         this.setState({
             loading: true
         })
 
-        this.el = jexcel(document.getElementById("recordsDiv"), '');
+        // this.el = jexcel(document.getElementById("recordsDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("recordsDiv"), true);
 
-        var myVar = "";
         var json = this.props.items.importData.records;
         console.log("Json+++", json);
         console.log("Json+++", this.props.items);
@@ -470,7 +496,8 @@ export default class QunatimedImportStepFive extends Component {
                 var records = [];
 
                 for (var i = 0; i < finalList.length; i++) {
-
+                    var diff = this.monthDiff(new Date(finalList[i].dtmPeriod), new Date());
+                    var isOldDate = diff < FORECASTED_CONSUMPTION_MONTHS_IN_PAST;
 
                     data_1 = [];
                     data_1[0] = finalList[i].productId;// A
@@ -482,7 +509,7 @@ export default class QunatimedImportStepFive extends Component {
                     data_1[6] = finalList[i].product.multiplier;// G 
                     data_1[7] = finalList[i].updateConsumptionQuantity;// H 
                     data_1[8] = finalList[i].existingConsumptionQty;// I                     
-                    data_1[9] = true;// J                                              
+                    data_1[9] = isOldDate ? true : false;// J                                              
                     records.push(data_1);
                 }
 
@@ -528,17 +555,15 @@ export default class QunatimedImportStepFive extends Component {
                 };
 
 
-                myVar = jexcel(document.getElementById("recordsDiv"), options);
+                var myVar = jexcel(document.getElementById("recordsDiv"), options);
                 this.el = myVar;
                 this.setState({
                     importEl: myVar,
-                    programId: this.props.items.program.programId
-                })
-
-                this.setState({
+                    programId: this.props.items.program.programId,
                     loading: false
+                }, () => {
+                    this.changeColor();
                 })
-
 
             }.bind(this);
         }.bind(this);
@@ -568,8 +593,8 @@ export default class QunatimedImportStepFive extends Component {
 
                         <Col xs="12" sm="12">
                             <div className='consumptionDataEntryTable'>
-                            <div id="recordsDiv" >
-                            </div>
+                                <div id="recordsDiv" >
+                                </div>
                             </div>
 
                         </Col>
