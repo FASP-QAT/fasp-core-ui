@@ -7977,6 +7977,7 @@ export default class BuildTree extends Component {
         console.log("Seema currentItemConfig", currentItemConfig)
         console.log("Seema [this.state.selectedScenario]", [this.state.selectedScenario])
         console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]", currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])
+        console.log("inside changed data")
         this.setState({
             currentItemConfig,
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
