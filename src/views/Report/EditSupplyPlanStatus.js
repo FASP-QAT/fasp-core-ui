@@ -259,6 +259,8 @@ class EditSupplyPlanStatus extends Component {
             isSubmitClicked: false,
             criticalities: [],
             criticalitiesList: [],
+            submitMessage: "",
+            submitColor: ""
 
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -382,6 +384,13 @@ class EditSupplyPlanStatus extends Component {
 
     hideFifthComponent() {
 
+    }
+
+    hideMessageComponent() {
+        document.getElementById('div3').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
+        }, 30000);
     }
 
     getMonthArray(currentDate) {
@@ -916,124 +925,124 @@ class EditSupplyPlanStatus extends Component {
                             realmCountryPlanningUnitList: rcpuList
                         })
 
-                    ShipmentStatusService.getShipmentStatusListActive().then(response1 => {
-                        var shipmentStatusList = [];
-                        response1.data.map(c => {
-                            shipmentStatusList.push({
-                                name: getLabelText(c.label, this.state.lang),
-                                id: c.shipmentStatusId,
-                                active: c.active,
-                                label: c.label
-                            })
-                        })
-                        this.setState({
-                            shipmentStatusList: shipmentStatusList
-                        })
-
-                        ProcurementAgentService.getProcurementAgentListAll().then(response2 => {
-                            var paList = [];
-                            response2.data.map(c => {
-                                paList.push({
-                                    name: c.procurementAgentCode,
-                                    id: c.procurementAgentId,
+                        ShipmentStatusService.getShipmentStatusListActive().then(response1 => {
+                            var shipmentStatusList = [];
+                            response1.data.map(c => {
+                                shipmentStatusList.push({
+                                    name: getLabelText(c.label, this.state.lang),
+                                    id: c.shipmentStatusId,
                                     active: c.active,
                                     label: c.label
                                 })
                             })
                             this.setState({
-                                procurementAgentList: paList
+                                shipmentStatusList: shipmentStatusList
                             })
 
-                            FundingSourceService.getFundingSourceListAll().then(response3 => {
-                                var fsList = [];
-                                response3.data.map(c => {
-                                    fsList.push({
-                                        name: c.fundingSourceCode,
-                                        id: c.fundingSourceId,
+                            ProcurementAgentService.getProcurementAgentListAll().then(response2 => {
+                                var paList = [];
+                                response2.data.map(c => {
+                                    paList.push({
+                                        name: c.procurementAgentCode,
+                                        id: c.procurementAgentId,
                                         active: c.active,
                                         label: c.label
                                     })
                                 })
                                 this.setState({
-                                    fundingSourceList: fsList
+                                    procurementAgentList: paList
                                 })
 
-                                BudgetService.getBudgetList().then(response4 => {
-                                    var bList = [];
-                                    response4.data.map(c => {
-                                        bList.push({
-                                            name: c.budgetCode,
-                                            id: c.budgetId,
-                                            fundingSource: c.fundingSource,
-                                            currency: c.currency,
-                                            budgetAmt: c.budgetAmt,
+                                FundingSourceService.getFundingSourceListAll().then(response3 => {
+                                    var fsList = [];
+                                    response3.data.map(c => {
+                                        fsList.push({
+                                            name: c.fundingSourceCode,
+                                            id: c.fundingSourceId,
                                             active: c.active,
-                                            programId: c.program.id,
-                                            label: c.label,
-                                            startDate: c.startDate,
-                                            stopDate: c.stopDate
+                                            label: c.label
                                         })
                                     })
                                     this.setState({
-                                        budgetList: bList
+                                        fundingSourceList: fsList
                                     })
 
-                                    CurrencyService.getCurrencyList().then(response5 => {
-                                        var cList = [];
-                                        response5.data.map(c => {
-                                            cList.push({
-                                                name: getLabelText(c.label, this.state.lang),
-                                                id: c.currencyId,
+                                    BudgetService.getBudgetList().then(response4 => {
+                                        var bList = [];
+                                        response4.data.map(c => {
+                                            bList.push({
+                                                name: c.budgetCode,
+                                                id: c.budgetId,
+                                                fundingSource: c.fundingSource,
+                                                currency: c.currency,
+                                                budgetAmt: c.budgetAmt,
                                                 active: c.active,
-                                                label: c.label
+                                                programId: c.program.id,
+                                                label: c.label,
+                                                startDate: c.startDate,
+                                                stopDate: c.stopDate
                                             })
                                         })
                                         this.setState({
-                                            currencyList: cList
+                                            budgetList: bList
                                         })
 
-                                        // var tableEditableBasedOnSupplyPlan = true;
-                                        if (supplyPlanType == 'deliveredShipments') {
-                                            shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
-                                        } else if (supplyPlanType == 'shippedShipments') {
-                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
-                                        } else if (supplyPlanType == 'orderedShipments') {
-                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                                        } else if (supplyPlanType == 'plannedShipments') {
-                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-                                        } else if (supplyPlanType == 'deliveredErpShipments') {
-                                            shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
-                                        } else if (supplyPlanType == 'shippedErpShipments') {
-                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
-                                        } else if (supplyPlanType == 'orderedErpShipments') {
-                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                                        } else if (supplyPlanType == 'plannedErpShipments') {
-                                            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-                                        } else {
-                                            shipmentList = []
-                                        }
-                                        this.setState({
-                                            showShipments: 1,
-                                            shipmentList: shipmentList,
-                                            shipmentListUnFiltered: shipmentListUnFiltered,
-                                            programJson: programJson,
-                                            generalProgramJson: programJson,
-                                        }, () => {
-                                            if (this.refs.shipmentChild != undefined) {
-                                                this.refs.shipmentChild.showShipmentData();
-                                            } else {
-                                                this.setState({
-                                                    loading: false
+                                        CurrencyService.getCurrencyList().then(response5 => {
+                                            var cList = [];
+                                            response5.data.map(c => {
+                                                cList.push({
+                                                    name: getLabelText(c.label, this.state.lang),
+                                                    id: c.currencyId,
+                                                    active: c.active,
+                                                    label: c.label
                                                 })
+                                            })
+                                            this.setState({
+                                                currencyList: cList
+                                            })
+
+                                            // var tableEditableBasedOnSupplyPlan = true;
+                                            if (supplyPlanType == 'deliveredShipments') {
+                                                shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                                            } else if (supplyPlanType == 'shippedShipments') {
+                                                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
+                                            } else if (supplyPlanType == 'orderedShipments') {
+                                                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                                            } else if (supplyPlanType == 'plannedShipments') {
+                                                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                                            } else if (supplyPlanType == 'deliveredErpShipments') {
+                                                shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                                            } else if (supplyPlanType == 'shippedErpShipments') {
+                                                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
+                                            } else if (supplyPlanType == 'orderedErpShipments') {
+                                                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                                            } else if (supplyPlanType == 'plannedErpShipments') {
+                                                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                                            } else {
+                                                shipmentList = []
                                             }
-                                        })
+                                            this.setState({
+                                                showShipments: 1,
+                                                shipmentList: shipmentList,
+                                                shipmentListUnFiltered: shipmentListUnFiltered,
+                                                programJson: programJson,
+                                                generalProgramJson: programJson,
+                                            }, () => {
+                                                if (this.refs.shipmentChild != undefined) {
+                                                    this.refs.shipmentChild.showShipmentData();
+                                                } else {
+                                                    this.setState({
+                                                        loading: false
+                                                    })
+                                                }
+                                            })
+                                        }).catch(error => { console.log("Error+++", error) });
                                     }).catch(error => { console.log("Error+++", error) });
                                 }).catch(error => { console.log("Error+++", error) });
                             }).catch(error => { console.log("Error+++", error) });
                         }).catch(error => { console.log("Error+++", error) });
                     }).catch(error => { console.log("Error+++", error) });
                 }).catch(error => { console.log("Error+++", error) });
-            }).catch(error => { console.log("Error+++", error) });
             }.bind(this)
         }.bind(this)
     }
@@ -3951,53 +3960,53 @@ class EditSupplyPlanStatus extends Component {
                     // title: 'problemReportId',
                     // type: 'hidden',
                     // width: 0
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     // title: 'problemActionIndex',
                     // type: 'hidden',
                     // width: 0
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     // title: i18n.t('static.program.programCode'),
                     // type: 'hidden',
                     // width: 0
                     // readOnly:true
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     // title: i18n.t('static.program.versionId'),
                     // type: 'hidden',
                     // readOnly: true,
                     // width: 70
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     // title: i18n.t('static.region.region'),
                     // type: 'hidden',
                     // width: 0
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     title: i18n.t('static.planningunit.planningunit'),
@@ -4009,11 +4018,11 @@ class EditSupplyPlanStatus extends Component {
                     // title: i18n.t('static.report.month'),
                     // type: 'hidden',
                     // width: 0
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     title: i18n.t("static.problemActionReport.problemCategory"),
@@ -4040,7 +4049,7 @@ class EditSupplyPlanStatus extends Component {
                     source: this.state.problemStatusListForEdit,
                     width: 80,
                     filter: this.filterProblemStatus,
-                    readOnly:!this.state.editable
+                    readOnly: !this.state.editable
                 },
                 {
                     title: i18n.t('static.program.notes'),
@@ -4052,51 +4061,51 @@ class EditSupplyPlanStatus extends Component {
                     // title: i18n.t('static.common.action'),
                     // type: 'hidden',
                     // width: 0
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     // title: 'planningUnitId',
                     // type: 'hidden',
                     // width: 0
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     // title: 'problemId',
                     // type: 'hidden',
                     // width: 0
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     // title: 'actionUrl',
                     // type: 'hidden',
                     // width: 0
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     // title: 'criticalitiId',
                     // type: 'hidden',
                     // width: 0
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
 
                 {
@@ -4127,10 +4136,10 @@ class EditSupplyPlanStatus extends Component {
                     readOnly: !this.state.editable
                 },
                 {
-                    title: !this.state.editable?'A':i18n.t('static.supplyPlanReview.reviewNotes'),
+                    title: !this.state.editable ? 'A' : i18n.t('static.supplyPlanReview.reviewNotes'),
                     type: !this.state.editable ? 'text' : 'text',
-                    visible:!this.state.editable?false:true,
-                    readOnly:!this.state.editable,
+                    visible: !this.state.editable ? false : true,
+                    readOnly: !this.state.editable,
                     width: 120,
                 },
 
@@ -4138,11 +4147,11 @@ class EditSupplyPlanStatus extends Component {
                     // title: 'isChanged',
                     // type: 'hidden',
                     // width: 0
-                    title:'A',
-                    type:'text',
-                    visible:false,
-                    width:0,
-                    readOnly:true,autoCasting: false
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
+                    width: 0,
+                    readOnly: true, autoCasting: false
                 },
                 {
                     title: 'transList',
@@ -4537,6 +4546,7 @@ class EditSupplyPlanStatus extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.submitColor} id="div3">{i18n.t(this.state.submitMessage)}</h5>
 
                 <Col sm={12} sm={12} style={{ flexBasis: 'auto' }}>
                     <Card>
@@ -5411,15 +5421,30 @@ class EditSupplyPlanStatus extends Component {
                                     ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
                                         .then(response => {
                                             console.log("messageCode", response)
-                                            this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                            // this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                            this.setState({
+                                                submitMessage: "static.message.supplyplanversionapprovedsuccess",
+                                                submitColor: "green",
+                                                problemReportChanged: 0,
+
+                                                // isModalOpen: !this.state.isModalOpen,
+                                            }, () => {
+                                                this.hideMessageComponent()
+                                                document.getElementById("submitButton").disabled = false;
+                                                this.componentDidMount();
+                                            })
+
                                         })
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
                                                         // message: 'static.unkownError',
-                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                        submitMessage: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                        submitColor: "red",
                                                         loading: false
+                                                    }, () => {
+                                                        this.hideMessageComponent()
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
@@ -5434,20 +5459,29 @@ class EditSupplyPlanStatus extends Component {
                                                         case 404:
                                                         case 406:
                                                             this.setState({
-                                                                message: error.response.data.messageCode,
+                                                                submitMessage: error.response.data.messageCode,
+                                                                submitColor: "red",
                                                                 loading: false
+                                                            }, () => {
+                                                                this.hideMessageComponent()
                                                             });
                                                             break;
                                                         case 412:
                                                             this.setState({
-                                                                message: error.response.data.messageCode,
+                                                                submitMessage: error.response.data.messageCode,
+                                                                submitColor: "red",
                                                                 loading: false
+                                                            }, () => {
+                                                                this.hideMessageComponent()
                                                             });
                                                             break;
                                                         default:
                                                             this.setState({
-                                                                message: 'static.unkownError',
+                                                                submitMessage: 'static.unkownError',
+                                                                submitColor: "red",
                                                                 loading: false
+                                                            }, () => {
+                                                                this.hideMessageComponent()
                                                             });
                                                             break;
                                                     }
