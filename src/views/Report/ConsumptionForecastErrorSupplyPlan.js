@@ -1591,7 +1591,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             equivalencyUnitLabel:equivalencyUnitLable
                         },() => {
                             this.hideFirstComponent();
-                        }).bind(this)
+                        })
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {
