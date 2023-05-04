@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -208,7 +208,7 @@ class StockStatus extends Component {
   }
 
   dateFormatterCSV = value => {
-    return moment(value).format(DATE_FORMAT_CAP)
+    return moment(value).format(DATE_FORMAT_CAP_FOUR_DIGITS)
   }
 
   addDoubleQuoteToRowContent = (arr) => {
