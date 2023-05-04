@@ -22,7 +22,7 @@ import { qatProblemActions } from '../../CommonComponent/QatProblemActions'
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
-import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
+// import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';

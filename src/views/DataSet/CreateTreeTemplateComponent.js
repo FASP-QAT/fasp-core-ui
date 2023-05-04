@@ -5113,7 +5113,13 @@ export default class CreateTreeTemplate extends Component {
                         if (isUsageTemplate > 0) {
                             this.getPlanningUnitListByFUId(isUsageTemplate);
                         } else {
-                            this.setState({ planningUnitList: [] });
+                            if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id != undefined && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id != "") {
+                                if (this.state.forecastingUnitMultiList.filter(c => c.value == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id).length != 0) {
+                                    this.getPlanningUnitListByFUId((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                                } else {
+                                    this.setState({ planningUnitList: [] });
+                                }
+                            }
                         }
                     }
                     // else {
@@ -7674,7 +7680,15 @@ export default class CreateTreeTemplate extends Component {
                             nodeValue: this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue : this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue,
                             percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue,
                             forecastingUnitId: this.state.fuValues,
-                            tempPlanningUnitId: this.state.tempPlanningUnitId
+                            tempPlanningUnitId: this.state.tempPlanningUnitId,
+                            usageTypeIdFU:"",
+                            lagInMonths:"",
+                            noOfPersons:"",
+                            forecastingUnitPerPersonsFC:"",
+                            repeatCount:"",
+                            usageFrequencyCon:"",
+                            usageFrequencyDis:"",
+                            oneTimeUsage:""
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
