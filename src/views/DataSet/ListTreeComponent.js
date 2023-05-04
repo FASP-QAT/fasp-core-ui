@@ -138,6 +138,7 @@ export default class ListTreeComponent extends Component {
             treeTemplateList: [],
             treeData: [],
             datasetList: [],
+            downloadedProgramList: [],
             datasetListJexcel: [],
             message: '',
             loading: true,
@@ -961,6 +962,11 @@ export default class ListTreeComponent extends Component {
                         datasetId: proList[0].programId,
                         loading: false,
                         downloadedProgramData: downloadedProgramData,
+                        downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+                            a = (a.programCode).toLowerCase();
+                            b = (b.programCode).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
                     }, () => {
                         console.log("programs------------------>", this.state.datasetList);
 
@@ -977,6 +983,11 @@ export default class ListTreeComponent extends Component {
                             }),
                             datasetId: this.props.match.params.programId,
                             downloadedProgramData: downloadedProgramData,
+                            downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
                             loading: false
                         }, () => {
                             console.log("programs------------------>", this.state.datasetList);
@@ -997,6 +1008,11 @@ export default class ListTreeComponent extends Component {
                             datasetId: datasetId,
                             loading: false,
                             downloadedProgramData: downloadedProgramData,
+                            downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            })
                         }, () => {
                             console.log("programs------------------>", this.state.datasetList);
 
@@ -1011,6 +1027,11 @@ export default class ListTreeComponent extends Component {
                             }),
                             loading: false,
                             downloadedProgramData: downloadedProgramData,
+                            downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            })
                         }, () => {
                             console.log("programs------------------>1", this.state.datasetList);
                         })
@@ -1762,7 +1783,7 @@ export default class ListTreeComponent extends Component {
                                 loading: false
                             }, () => {
                                 // this.hideFirstComponent()
-                                this.props.history.push({ pathname: `/syncProgram`, state: { "programIds": programIds, "treeId": treeId } })
+                                this.props.history.push({ pathname: `/masterDataSyncForTree`, state: { "programIds": programIds, "treeId": treeId } })
 
                             })
                         }.bind(this);
@@ -1808,6 +1829,16 @@ export default class ListTreeComponent extends Component {
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
+                return (
+                    <option key={i} value={item.programId}>
+                        {item.programCode}
+                    </option>
+                )
+            }, this);
+
+            const { downloadedProgramList } = this.state;    
+            let downloadedDatasets = downloadedProgramList.length > 0
+            && downloadedProgramList.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
                         {item.programCode}
@@ -2117,7 +2148,7 @@ export default class ListTreeComponent extends Component {
                                                                         value={this.state.datasetIdModal}
                                                                     >
                                                                         <option value="">{i18n.t('static.mt.selectProgram')}</option>
-                                                                        {datasets}
+                                                                        {downloadedDatasets}
                                                                     </Input>
                                                                     <FormFeedback>{errors.datasetIdModal}</FormFeedback>
                                                                 </div>

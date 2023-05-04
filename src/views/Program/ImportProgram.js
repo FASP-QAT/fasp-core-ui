@@ -23,7 +23,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import bsCustomFileInput from 'bs-custom-file-input'
 import AuthenticationService from '../Common/AuthenticationService';
-import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
+// import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
 import ProgramService from "../../api/ProgramService"
 import moment from 'moment';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
@@ -788,7 +788,7 @@ export default class ImportProgram extends Component {
     render() {
         return (
             <>
-                <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion>
+                {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
                 <h5 className="red" id="div2">
                     {i18n.t(this.state.message, { entityname })}</h5>
                 <AuthenticationServiceComponent history={this.props.history} />

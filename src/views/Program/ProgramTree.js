@@ -83,7 +83,7 @@ class Program extends Component {
                     this.setState({
                         message: response.data.messageCode,
                         loading: false,
-                        color: "#BA0C2F"
+                        color: "red"
                     }, () => {
                         this.hideFirstComponent()
                     })
@@ -95,7 +95,7 @@ class Program extends Component {
                             // message: 'static.common.networkError',
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false,
-                            color: "#BA0C2F"
+                            color: "red"
                         }, () => {
                             this.hideFirstComponent()
                         })
@@ -114,7 +114,7 @@ class Program extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "#BA0C2F"
+                                    color: "red"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -123,7 +123,7 @@ class Program extends Component {
                                 this.setState({
                                     message: error.response.data.messageCode,
                                     loading: false,
-                                    color: "#BA0C2F"
+                                    color: "red"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -132,7 +132,7 @@ class Program extends Component {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false,
-                                    color: "#BA0C2F"
+                                    color: "red"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -189,7 +189,7 @@ class Program extends Component {
                         })
                     } else {
                         this.setState({
-                            message: response.data.messageCode, loading: false, color: "#BA0C2F"
+                            message: response.data.messageCode, loading: false, color: "red"
                         }, () => {
                             this.hideFirstComponent()
                         })
@@ -201,7 +201,7 @@ class Program extends Component {
                                 // message: 'static.common.networkError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false,
-                                color: "#BA0C2F"
+                                color: "red"
                             }, () => {
                                 this.hideFirstComponent()
                             })
@@ -220,7 +220,7 @@ class Program extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "#BA0C2F"
+                                        color: "red"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -229,7 +229,7 @@ class Program extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "#BA0C2F"
+                                        color: "red"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -238,7 +238,7 @@ class Program extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: "#BA0C2F"
+                                        color: "red"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -265,7 +265,7 @@ class Program extends Component {
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext'),
                 loading: false,
-                color: "#BA0C2F"
+                color: "red"
             }, () => {
                 this.hideFirstComponent()
             })
@@ -354,7 +354,7 @@ class Program extends Component {
                                     this.setState({
                                         message: response.data.messageCode,
                                         loading: false,
-                                        color: "#BA0C2F"
+                                        color: "red"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -366,7 +366,7 @@ class Program extends Component {
                                             // message: 'static.common.networkError',
                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false,
-                                            color: "#BA0C2F"
+                                            color: "red"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -385,7 +385,7 @@ class Program extends Component {
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false,
-                                                    color: "#BA0C2F"
+                                                    color: "red"
                                                 }, () => {
                                                     this.hideFirstComponent()
                                                 })
@@ -394,7 +394,7 @@ class Program extends Component {
                                                 this.setState({
                                                     message: error.response.data.messageCode,
                                                     loading: false,
-                                                    color: "#BA0C2F"
+                                                    color: "red"
                                                 }, () => {
                                                     this.hideFirstComponent()
                                                 })
@@ -403,7 +403,7 @@ class Program extends Component {
                                                 this.setState({
                                                     message: 'static.unkownError',
                                                     loading: false,
-                                                    color: "#BA0C2F"
+                                                    color: "red"
                                                 }, () => {
                                                     this.hideFirstComponent()
                                                 })
@@ -447,7 +447,7 @@ class Program extends Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            loading: false, color: "#BA0C2F"
+                            loading: false, color: "red"
                         }, () => {
                             this.hideFirstComponent()
                         })
@@ -459,7 +459,7 @@ class Program extends Component {
                                 // message: 'static.common.networkError',
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false,
-                                color: "#BA0C2F"
+                                color: "red"
                             }, () => {
                                 this.hideFirstComponent()
                             })
@@ -478,7 +478,7 @@ class Program extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "#BA0C2F"
+                                        color: "red"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -487,7 +487,7 @@ class Program extends Component {
                                     this.setState({
                                         message: error.response.data.messageCode,
                                         loading: false,
-                                        color: "#BA0C2F"
+                                        color: "red"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -496,7 +496,7 @@ class Program extends Component {
                                     this.setState({
                                         message: 'static.unkownError',
                                         loading: false,
-                                        color: "#BA0C2F"
+                                        color: "red"
                                     }, () => {
                                         this.hideFirstComponent()
                                     })
@@ -510,7 +510,7 @@ class Program extends Component {
             document.getElementById("treeDiv").style.display = "none";
             this.setState({
                 message: i18n.t('static.common.realmtext'),
-                color: "#BA0C2F"
+                color: "red"
             }, () => {
                 this.hideFirstComponent()
             })
@@ -545,7 +545,7 @@ class Program extends Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: '#BA0C2F'
+                color: 'red'
             }, () => {
                 this.hideFirstComponent()
             })
@@ -562,7 +562,7 @@ class Program extends Component {
             getRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: '#BA0C2F',
+                    color: 'red',
                     loading: false
                 }, () => {
                     this.hideFirstComponent()
@@ -905,54 +905,6 @@ class Program extends Component {
                 }.bind(this)
             }.bind(this)
         }.bind(this)
-
-
-
-
-
-
-
-
-
-
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var programTransaction = transaction.objectStore('datasetData');
-            var deleteRequest = programTransaction.delete(id);
-            deleteRequest.onsuccess = function (event) {
-                var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
-                var deleteRequest1 = programTransaction1.delete(id);
-                deleteRequest1.onsuccess = function (event) {
-                    var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
-                    var programTransaction2 = transaction2.objectStore('datasetDetails');
-                    var deleteRequest2 = programTransaction2.delete(id);
-                    deleteRequest2.onsuccess = function (event) {
-                        // alert("Delete successfully");
-                        if (i == length - 1) {
-                            this.setState({
-                                loading: false,
-                                message: "Dataset delete succesfully.",
-                                color: 'green'
-                            }, () => {
-                                this.hideFirstComponent()
-                            })
-                            this.getPrograms();
-                            this.getLocalPrograms();
-                        }
-
-
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        }.bind(this)
     }
 
     deleteCleanUpIcon(programId) {
@@ -1005,12 +957,12 @@ class Program extends Component {
                     label: i18n.t('static.program.no'),
                     onClick: () => {
                         this.setState({
-                            message: i18n.t('static.actionCancelled'), loading: false, color: "#BA0C2F"
+                            message: i18n.t('static.actionCancelled'), color: "red", loading: false
                         })
-                        this.setState({ loading: false, color: "#BA0C2F" }, () => {
+                        this.setState({ loading: false, color: "red" }, () => {
                             this.hideFirstComponent()
                         })
-                        this.props.history.push(`/dataSet/loadDeleteDataSet`)
+                        this.props.history.push(`/program/downloadProgram`)
                     }
                 }
             ]
@@ -1098,7 +1050,7 @@ class Program extends Component {
         if (programCheckedCount == 0) {
             this.setState({
                 message: i18n.t('static.program.errorSelectAtleastOneProgram'),
-                loading: false, color: "#BA0C2F"
+                loading: false, color: "red"
             },
                 () => {
                     this.hideFirstComponent();
@@ -1311,9 +1263,9 @@ class Program extends Component {
                                                 label: i18n.t('static.program.no'),
                                                 onClick: () => {
                                                     this.setState({
-                                                        message: i18n.t('static.program.actioncancelled'), loading: false, color: "#BA0C2F"
+                                                        message: i18n.t('static.program.actioncancelled'), loading: false, color: "red"
                                                     })
-                                                    this.setState({ loading: false, color: "#BA0C2F" }, () => {
+                                                    this.setState({ loading: false, color: "red" }, () => {
                                                         this.hideFirstComponent()
                                                     })
                                                     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
@@ -1424,7 +1376,7 @@ class Program extends Component {
                                     // message: 'static.common.networkError',
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false,
-                                    color: "#BA0C2F"
+                                    color: "red"
                                 }, () => {
                                     this.hideFirstComponent()
                                 })
@@ -1443,7 +1395,7 @@ class Program extends Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false,
-                                            color: "#BA0C2F"
+                                            color: "red"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -1452,7 +1404,7 @@ class Program extends Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false,
-                                            color: "#BA0C2F"
+                                            color: "red"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -1461,7 +1413,7 @@ class Program extends Component {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false,
-                                            color: "#BA0C2F"
+                                            color: "red"
                                         }, () => {
                                             this.hideFirstComponent()
                                         })
@@ -1472,7 +1424,7 @@ class Program extends Component {
                     );
 
             } else {
-                this.setState({ loading: false, color: "#BA0C2F" }, () => {
+                this.setState({ loading: false, color: "red" }, () => {
                     this.hideFirstComponent()
                 })
                 alert(i18n.t('static.common.online'))

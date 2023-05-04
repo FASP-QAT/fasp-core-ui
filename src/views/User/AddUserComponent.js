@@ -226,7 +226,7 @@ class AddUserComponent extends Component {
             user.username = event.target.value;
         }
         if (event.target.name == "emailId") {
-            user.emailId = event.target.value;
+            user.emailId = event.target.value.replace(/[\u200B-\u200D\u2060\uFEFF]/g, '');
         }
         // if (event.target.name == "phoneNumber") {
         //     user.phoneNumber = event.target.value;
@@ -788,10 +788,12 @@ class AddUserComponent extends Component {
         var proList = [];
         var proListByCountryId = [];
         var proListByHealthAreaId = [];
-       
+
         if (value != -1) {
             proListByCountryId = this.state.programListForFilter.filter(c => c.id == -1 || c.realmCountryId == value);
             if (healthAreavalue != -1) {
+                var programListWithAll=proListByCountryId.filter(c=>c.id==-1)[0];
+                proList.push(programListWithAll);    
                 for (var i = 1; i < proListByCountryId.length; i++) {
                     proListByHealthAreaId = [];
                     proListByHealthAreaId = proListByCountryId[i].healthAreaList.filter(c => c.id == healthAreavalue);
@@ -799,11 +801,13 @@ class AddUserComponent extends Component {
                         proList.push(proListByCountryId[i])
                     }
                 }
-            }else{
-                proList= proListByCountryId;
+            } else {
+                proList = proListByCountryId;
             }
-        }else if(healthAreavalue != -1){
+        } else if (healthAreavalue != -1) {
             proListByCountryId = this.state.programListForFilter;
+            var programListWithAll=proListByCountryId.filter(c=>c.id==-1)[0];
+            proList.push(programListWithAll);
             for (var i = 1; i < proListByCountryId.length; i++) {
                 proListByHealthAreaId = [];
                 proListByHealthAreaId = proListByCountryId[i].healthAreaList.filter(c => c.id == healthAreavalue);
@@ -811,7 +815,7 @@ class AddUserComponent extends Component {
                     proList.push(proListByCountryId[i])
                 }
             }
-        }else {
+        } else {
             proList = this.state.programListForFilter;
         }
         return proList;

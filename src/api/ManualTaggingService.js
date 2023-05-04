@@ -71,16 +71,18 @@ class ManualTaggingSerice {
         });
     }
 
-    autocompleteDataOrderNo(roNo, programId, erpPlanningUnit,qatPlanningUnit) {
-        return axios.get(`${API_URL}/api/erpLinking/autoCompleteOrder/${programId}/${erpPlanningUnit}/${roNo}/${qatPlanningUnit}`, {
+    autocompleteDataOrderNo(json) {
+        console.log("Json Test@@@123",json)
+        return axios.post(`${API_URL}/api/erpLinking/autoCompleteOrder`,json, {
         });
     }
 
-    autocompletePlanningUnit(planningUnitId, term,programId) {
+    autocompletePlanningUnit(planningUnitId, term,programId,listToExclude) {
         var json={
             planningUnitId:planningUnitId,
             puName:term,
-            programId:programId
+            programId:programId,
+            delinkedList:listToExclude
         }
         console.log("Planning Unit @@@@@@@@@@@@@@@@",json)
         return axios.post(`${API_URL}/api/erpLinking/autoCompletePu`, json,{

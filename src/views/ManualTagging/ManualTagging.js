@@ -1839,9 +1839,13 @@ export default class ManualTagging extends Component {
                     var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                     var generalProgramJson = JSON.parse(generalProgramData);
                     var actionList = generalProgramJson.actionList;
+                    var delinkList = generalProgramJson.delinkList;
                     var linkedShipmentsList = generalProgramJson.shipmentLinkingList == null ? [] : generalProgramJson.shipmentLinkingList;
                     if (actionList == undefined) {
                         actionList = []
+                    }
+                    if (delinkList == undefined) {
+                        delinkList = []
                     }
                     for (var pu = 0; pu < setOfPlanningUnitIds.length; pu++) {
                         var planningUnitId = setOfPlanningUnitIds[pu];
@@ -1876,6 +1880,12 @@ export default class ManualTagging extends Component {
                             if (selectedShipment[ss][17].planningUnit.id == planningUnitId) {
                                 var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (selectedShipment[ss][17].shipmentId > 0 ? selectedShipment[ss][17].shipmentId == c.childShipmentId : selectedShipment[ss][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
                                 var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (selectedShipment[ss][17].shipmentId > 0 ? selectedShipment[ss][17].shipmentId == c.childShipmentId : selectedShipment[ss][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
+                                var checkIfAlreadyExistsInDelinkList = delinkList.findIndex(c => c.roNo == linkedShipmentsList[linkedShipmentsListIndex].roNo && c.roPrimeLineNo == linkedShipmentsList[linkedShipmentsListIndex].roPrimeLineNo);
+                                if (checkIfAlreadyExistsInDelinkList == -1) {
+                                    delinkList.push({
+                                        "roNo": linkedShipmentsList[linkedShipmentsListIndex].roNo, "roPrimeLineNo": linkedShipmentsList[linkedShipmentsListIndex].roPrimeLineNo
+                                    })
+                                }
                                 linkedShipmentsList[linkedShipmentsListIndex].active = false;
                                 linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
                                 linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
@@ -1998,6 +2008,7 @@ export default class ManualTagging extends Component {
                         }
                     }
                     generalProgramJson.actionList = actionList;
+                    generalProgramJson.delinkList = delinkList;
                     generalProgramJson.shipmentLinkingList = linkedShipmentsList;
                     console.log("General Program Json@@@@@@@@@@@@@@@@", generalProgramJson);
                     programDataJson.planningUnitDataList = planningUnitDataList;
@@ -2487,6 +2498,7 @@ export default class ManualTagging extends Component {
         var versionId = this.state.active1 ? this.state.versionId.toString().split(" ")[0] : 0;
         var erpPlanningUnitId = (this.state.planningUnitIdUpdated != null && this.state.planningUnitIdUpdated != "" ? this.state.planningUnitIdUpdated : 0);
         var linkedRoNoAndRoPrimeLineNo = [];
+        var listToExclude = [];
         if (this.state.active1) {
             var localProgramList = this.state.localProgramList;
             var localProgramListFilter = localProgramList.filter(c => c.programId == this.state.programId && c.version == this.state.versionId.split(" ")[0]);
@@ -2495,6 +2507,13 @@ export default class ManualTagging extends Component {
             var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
             var generalProgramJson = JSON.parse(generalProgramData);
             var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
+            var delinkList = generalProgramJson.delinkList != undefined ? generalProgramJson.delinkList : [];
+            delinkList.map(item => {
+                var findIndexFromLinkedShipmentsList = linkedShipmentsList.findIndex(c => c.roNo == item.roNo && c.roPrimeLineNo == item.roPrimeLineNo && c.active.toString() == "true");
+                if (findIndexFromLinkedShipmentsList == -1) {
+                    listToExclude.push(item);
+                }
+            })
 
             linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
                 linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
@@ -2524,10 +2543,11 @@ export default class ManualTagging extends Component {
                 shipmentPlanningUnitId: this.state.active3 ? this.state.outputListAfterSearch[0].erpPlanningUnit.id : shipmentPlanningUnitId,
                 roNo: roNoOrderNo == 0 ? "" : roNoOrderNo,
                 filterPlanningUnitId: erpPlanningUnitId,
-                realmCountryId: this.state.active1 ? 0 : this.state.countryId
-
+                realmCountryId: this.state.active1 ? 0 : this.state.countryId,
+                delinkedList: listToExclude
             }
             console.log("JsonMohit tab 3@@@@@@@@@@@@@@@@@@@", json)
+            console.log("JsonMohit tab 3 delink list@@@@@@@@@@@@@@@@@@@", listToExclude)
             ManualTaggingService.getOrderDetails(json)
                 .then(response => {
                     console.log("response.data------", response.data)
@@ -3007,6 +3027,7 @@ export default class ManualTagging extends Component {
                     var gprogramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
                     var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
                     var gprogramJson = JSON.parse(gprogramData);
+                    console.log("GprogramJson Test@@@123", gprogramJson);
                     var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
                     console.log("Linked Shipments List@@@@@@@@@@@", linkedShipmentsList)
                     for (var pu = 0; pu < planningUnitIds.length; pu++) {
@@ -3107,7 +3128,25 @@ export default class ManualTagging extends Component {
     getPlanningUnitListByTracerCategory = (term) => {
         this.setState({ planningUnitName: term });
         var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
-        ManualTaggingService.autocompletePlanningUnit(this.state.planningUnitId, term.toUpperCase(), programId)
+        var listToExclude = [];
+        if (this.state.active1) {
+            var localProgramList = this.state.localProgramList;
+            var localProgramListFilter = localProgramList.filter(c => c.programId == this.state.programId && c.version == this.state.versionId.split(" ")[0]);
+            console.log("localProgramListFilter@@@@@@@@@@@@@", localProgramListFilter)
+            var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
+            var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+            var generalProgramJson = JSON.parse(generalProgramData);
+            var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
+            var delinkList = generalProgramJson.delinkList != undefined ? generalProgramJson.delinkList : [];
+            delinkList.map(item => {
+                var findIndexFromLinkedShipmentsList = linkedShipmentsList.findIndex(c => c.roNo == item.roNo && c.roPrimeLineNo == item.roPrimeLineNo && c.active.toString() == "true");
+                if (findIndexFromLinkedShipmentsList == -1) {
+                    listToExclude.push(item);
+                }
+            })
+        }
+        console.log("List To exclude Test@@@123", listToExclude)
+        ManualTaggingService.autocompletePlanningUnit(this.state.planningUnitId, term.toUpperCase(), programId, listToExclude)
             .then(response => {
                 console.log("Response@@@@@@@@@@@@@@@@@@", response)
                 var tracercategoryPlanningUnit = [];
@@ -3187,7 +3226,33 @@ export default class ManualTagging extends Component {
             var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
             var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
             console.log("selectedRowPlanningUnit@@@@@@@@@@@@@@@@", this.state.selectedRowPlanningUnit)
-            ManualTaggingService.autocompleteDataOrderNo(term.toUpperCase(), (programId != null && programId != "" ? programId : 0), (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0), shipmentPlanningUnitId)
+            var listToExclude = [];
+            if (this.state.active1) {
+                var localProgramList = this.state.localProgramList;
+                var localProgramListFilter = localProgramList.filter(c => c.programId == this.state.programId && c.version == this.state.versionId.split(" ")[0]);
+                console.log("localProgramListFilter@@@@@@@@@@@@@", localProgramListFilter)
+                var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
+                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                var generalProgramJson = JSON.parse(generalProgramData);
+                var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
+                var delinkList = generalProgramJson.delinkList != undefined ? generalProgramJson.delinkList : [];
+                delinkList.map(item => {
+                    var findIndexFromLinkedShipmentsList = linkedShipmentsList.findIndex(c => c.roNo == item.roNo && c.roPrimeLineNo == item.roPrimeLineNo && c.active.toString() == "true");
+                    if (findIndexFromLinkedShipmentsList == -1) {
+                        listToExclude.push(item);
+                    }
+                })
+            }
+            console.log("List To exclude Test@@@123", listToExclude)
+            var json = {
+                "roPo": term.toUpperCase(),
+                "programId": (programId != null && programId != "" ? programId : 0),
+                "erpPlanningUnitId": (erpPlanningUnitId != null && erpPlanningUnitId != "" ? erpPlanningUnitId : 0),
+                "qatPlanningUnitId": shipmentPlanningUnitId,
+                "delinkedList": listToExclude
+            }
+            console.log("Json Test@@@123",json)
+            ManualTaggingService.autocompleteDataOrderNo(json)
                 .then(response => {
                     console.log("Response@@@@@@@@@@@@@@@@@@@@@", response)
                     var autocompleteData = [];
@@ -3632,11 +3697,11 @@ export default class ManualTagging extends Component {
                         totalQuantity: this.addCommas(Math.round(qty)),
                         displayTotalQty: (qty > 0 ? true : false)
                     });
-                    if(document.getElementById("tableDiv1")!=null){
-                    console.log("TableDiv1@@@@@@@@@@@@@@@@@@@@@", document.getElementById("tableDiv1"))
-                    this.el = jexcel(document.getElementById("tableDiv1"), '');
-                    // this.el.destroy();
-                    jexcel.destroy(document.getElementById("tableDiv1"), true);
+                    if (document.getElementById("tableDiv1") != null) {
+                        console.log("TableDiv1@@@@@@@@@@@@@@@@@@@@@", document.getElementById("tableDiv1"))
+                        this.el = jexcel(document.getElementById("tableDiv1"), '');
+                        // this.el.destroy();
+                        jexcel.destroy(document.getElementById("tableDiv1"), true);
                     }
 
                     var json = [];
