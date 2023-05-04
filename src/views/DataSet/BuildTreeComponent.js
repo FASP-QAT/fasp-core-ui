@@ -5235,7 +5235,7 @@ export default class BuildTree extends Component {
                 row = row.concat(addCommas(this.getPayloadData(items[i], 1)))
                 row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
             } else {
-                row = row.concat(this.getPayloadData(items[i], 1))
+                row = row.concat(this.getPayloadData(items[i], 1)).concat(" ").concat(this.getPayloadData(items[i], 2))
                 row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
             }
             dataArray.push(new Paragraph({
