@@ -114,9 +114,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             forecastingUnitId: "",
             equivalencyUnitId: "",
             dataList: [],
-            show: false
+            show: false,
+            consumptionAdjForStockOutId:false
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
+            document.getElementById("consumptionAdjusted").checked=false;
             this.filterVersion();
             this.filterRegion();
         })
@@ -460,11 +462,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                             var programData = databytes.toString(CryptoJS.enc.Utf8)
                             var region = JSON.parse(programData).regionList
-                            regionList.concat(region)
+                            regionList=region
+                            console.log("regionList region--->",region)
+                            console.log("regionList regionList.concat(region)--->",regionList.concat(region))
+                            
                         }
                     }
                 }
-                
+                console.log("regionList--->",regionList)
                 var regionIds = regionList.map((item, i) => {
                     return ({ label: getLabelText(item.label, this.state.lang), value: item.regionId })
                 }, this)
@@ -483,6 +488,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
     }
 
     setPlanningUnit(e) {
+        console.log("In setPlanningUnit")
         var planningUnitId = document.getElementById("planningUnitId");
         var selectedText = planningUnitId.options[planningUnitId.selectedIndex].text;
         this.setState({
@@ -490,11 +496,13 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnitLabel: selectedText,
             show: false,
             dataList: [],
-            isEquUnitChecked:false
+            isEquUnitChecked:false,
+            consumptionAdjForStockOutId:false
         }, () => {
             document.getElementById('div1').style.display = 'none';
             document.getElementById("equivelencyUnitDiv").style.display = "none";
             document.getElementById("yaxisEquUnitCb").checked=false;
+            document.getElementById("consumptionAdjusted").checked=false;
             this.fetchData();
         })
     }
@@ -724,7 +732,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             forecastingUnitId: e.target.value,
             forecastingUnitLabel: selectedText,
             dataList: [],
-            isEquUnitChecked:false
+            isEquUnitChecked:false,
+            consumptionAdjForStockOutId:false
         }, () => {
             // this.filterPlanningUnit()
             // if (this.state.viewById == 2 && forecastingUnitId) {
@@ -733,6 +742,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             document.getElementById('div1').style.display = 'none';
             document.getElementById("equivelencyUnitDiv").style.display = "none";
             document.getElementById("yaxisEquUnitCb").checked=false;
+            document.getElementById("consumptionAdjusted").checked=false;
             this.fetchData();
         })
     }
@@ -777,6 +787,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
        if (falg) {
         this.setState({
             consumptionAdjForStockOutId:true
+        }, () => {
+            this.fetchData();
+        })
+       }else{
+        this.setState({
+            consumptionAdjForStockOutId:false
         }, () => {
             this.fetchData();
         })
@@ -1641,42 +1657,23 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
     exportCSV() {
 
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        // csvRow.push('"' + ('Report View' + ' : ' + document.getElementById("viewById").value == 1 ? 'PlanningUnit' : 'ForecastingUnit').replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
+        csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].label.label_en).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ': ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         if (document.getElementById("viewById").value == 1) {
-            csvRow.push('"' + ('Planning Unit' + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
+            csvRow.push('"' + ('Planning Unit' + ': ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         } else {
-            csvRow.push('"' + ('Forecasting unit' + ' : ' + document.getElementById("forecastingUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
+            csvRow.push('"' + ('Forecasting unit' + ': ' + document.getElementById("forecastingUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         }
         this.state.regions.map(ele =>
-            csvRow.push('"' + ('Region' + ' : ' + getLabelText(ele.label, this.state.lang)).replaceAll(' ', '%20') + '"'))
-        csvRow.push('')
-        this.state.consumptionAdjForStockOutId ? csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + true).replaceAll(' ', '%20') + '"'):
-        csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + false).replaceAll(' ', '%20') + '"')
-        // csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + this.state.consumptionAdjForStockOutId ? true :false).replaceAll(' ', '%20') + '"')
-        // csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + document.getElementById("consumptionAdjusted")).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        // csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
-        csvRow.push('')
-        csvRow.push('')
-
+            csvRow.push('"' + ('Region' + ': ' + getLabelText(ele.label, this.state.lang)).replaceAll(' ', '%20') + '"'))
+        this.state.consumptionAdjForStockOutId ? csvRow.push('"' + ('Show consumption adjusted for stock out' + ': ' + true).replaceAll(' ', '%20') + '"'):
+        csvRow.push('"' + ('Show consumption adjusted for stock out' + ': ' + false).replaceAll(' ', '%20') + '"')
+        csvRow.push('"'+(i18n.t('static.report.timeWindow')+': '+document.getElementById("timeWindow").value).replaceAll(' ', '%20') + '"')
+        csvRow.push('');
         var columns = [];
         columns.push('');
         this.state.monthArray.map(item => (
@@ -1696,7 +1693,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var totalDifference = 0;
         var countDifference = 0;
         var datacsv = [];
-        datacsv.push([(('Error*').replaceAll(',', ' ')).replaceAll(' ', '%20')])
+        datacsv.push([(('Error').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
             totalError += Number(isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : parseFloat(data[0].errorPerc*100));
@@ -1709,7 +1706,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         A.push(this.addDoubleQuoteToRowContent(datacsv))
 
         datacsv = [];
-        datacsv.push([(('Forecaste').replaceAll(',', ' ')).replaceAll(' ', '%20')])
+        datacsv.push([(('Forecast').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
             totalForcaste += Number(data[0].forecastQty);
@@ -1723,7 +1720,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var datacsv = [];
             var totalRegion = 0;
             var totalRegionCount = 0;
-            datacsv.push((getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
+            datacsv.push('>> '+(getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
             {
                 this.state.monthArray.map((item1, count) => {
                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
@@ -1751,7 +1748,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var datacsv = [];
             var totalRegion = 0;
             var totalRegionCount = 0;
-            datacsv.push((getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
+            datacsv.push('>> '+(getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
             {
                 this.state.monthArray.map((item1, count) => {
                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
@@ -1778,7 +1775,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var datacsv = [];
             var totalRegion = 0;
             var totalRegionCount = 0;
-            datacsv.push((getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
+            datacsv.push('>> '+(getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
             {
                 this.state.monthArray.map((item1, count) => {
                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
@@ -1852,24 +1849,24 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
                     align: 'right'
                 })
-                doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].label.label_en, doc.internal.pageSize.width - 40, 60, {
                     align: 'right'
                 })
                 doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.monthlyForecast'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.report.forecasterrorovertime'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
                     doc.setFont('helvetica', 'normal')
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 150, {
+                    // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    //     align: 'left'
+                    // })
+                    doc.text(i18n.t('static.report.dateRange') + ': ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
                     // doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
@@ -1879,22 +1876,26 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     //     align: 'left'
                     // })
                     if (document.getElementById("viewById").value == 1) {
-                        doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 230, {
+                        doc.text(i18n.t('static.planningunit.planningunit') + ': ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                             align: 'left'
                         })
                     }
                     else {
-                        doc.text(i18n.t('static.forecastingunit.forecastingunit') + ' : ' + document.getElementById("forecastingUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 230, {
+                        doc.text(i18n.t('static.forecastingunit.forecastingunit') + ': ' + document.getElementById("forecastingUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                             align: 'left'
                         })
                     }
                     // let startY1 = 0;
 
-                    var regionText = doc.splitTextToSize(('Region' + ' : ' + this.state.regionLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 250, regionText)
-                    doc.text('Show consumption adjusted for stock out' + ' : Yes', doc.internal.pageSize.width / 8, 270, {
+                    var regionText = doc.splitTextToSize(('Region' + ': ' + this.state.regionLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 150, regionText)
+                    doc.text('Show consumption adjusted for stock out' + ': '+this.state.consumptionAdjForStockOutId, doc.internal.pageSize.width / 8, 170, {
                         align: 'left'
                     })
+                    doc.text(i18n.t('static.report.timeWindow') + ': '+document.getElementById("timeWindow").value, doc.internal.pageSize.width / 8, 190, {
+                        align: 'left'
+                    })
+
                 }
 
             }
@@ -2060,8 +2061,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             columnStyles: [
                 { halign: "left" },
                 { halign: "left" },
-            ]
-
+            ],
+            didParseCell: function (data) {
+              if(data.row.index == 0 || data.row.index == 1 || data.row.index == 3 || data.row.index == 5){
+                data.cell.styles.fontStyle = 'bold';
+              }
+              if(data.cell.raw<0){
+                data.cell.styles.textColor = [255,0,0];    
+              }      
+              }.bind(this)
         };
 
         doc.autoTable(content);
@@ -2224,6 +2232,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 }]
             },
             tooltips: {
+                enabled: false,
+                custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
 
@@ -2239,26 +2249,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         while (rgx.test(x1)) {
                             x1 = x1.replace(rgx, '$1' + ',' + '$2');
                         }
+                        if(data.datasets[tooltipItem.datasetIndex].label=='Error'){
+                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2+'%';    
+                        }
                         return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                     }
-                },
-                // callbacks: {
-                //     label: function (tooltipItems, data) {
-                //         if (tooltipItems.datasetIndex == 0) {
-                //             var details = this.state.expiredStockArr[tooltipItems.index].details;
-                //             var infoToShow = [];
-                //             details.map(c => {
-                //                 infoToShow.push(c.batchNo + " - " + c.expiredQty.toLocaleString());
-                //             });
-                //             return (infoToShow.join(' | '));
-                //         } else {
-                //             return (tooltipItems.yLabel.toLocaleString());
-                //         }
-                //     }.bind(this)
-                // },
-                enabled: false,
-                // intersect: false,
-                custom: CustomTooltips
+                }
             },
             maintainAspectRatio: false
             ,
@@ -2295,7 +2291,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             }
             datasetListForGraph.push({
                 label: 'Error',
-                data: this.state.dataList.map(item => (item.errorPerc !== "" ? item.errorPerc*100 : null)),
+                data: this.state.dataList.map(item => (item.errorPerc !== "" ? (Number(item.errorPerc*100).toFixed(2)): null)),
                 type: 'line',
                 yAxisID: 'B',
                 // backgroundColor: (this.state.yaxisEquUnit > 0 ? '#002F6C' : 'transparent'),
@@ -2655,7 +2651,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         <thead>
                                                             <tr>
                                                                 <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                <th className="dataentryTdWidth sticky-col first-col clone"></th>
+                                                                <th className="sticky-col first-col clone"></th>
                                                                 {this.state.monthArray.map((item, count) => {
                                                                     return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
                                                                 })}
@@ -2665,7 +2661,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         <tbody>
                                                             <tr className="hoverTd">
                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Error*</b></td>
+                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Error</b></td>
                                                                 {this.state.monthArray.map((item1, count) => {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalError += isNaN(data[0].errorPerc) ? 0 : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? 0 : data[0].errorPerc*100;

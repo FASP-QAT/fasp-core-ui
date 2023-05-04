@@ -4086,20 +4086,10 @@ class DefaultLayout extends Component {
                                     this.refreshPage();
                                   }
                                 }
-                              }, {
-                                name: i18n.t('static.report.forecasterrorovertime'),
-                                url: '/report/forecastOverTheTime',
-                                icon: 'fa fa-line-chart',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
                               },
-                              // {
-                              //   name: 'Forecast Error (Monthly) (New)',
-                              //   url: '/report/consumptionForecastErrorSupplyPlan',
+                              //  {
+                              //   name: i18n.t('static.report.forecasterrorovertime'),
+                              //   url: '/report/forecastOverTheTime',
                               //   icon: 'fa fa-line-chart',
                               //   attributes: {
                               //     hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
@@ -4108,6 +4098,17 @@ class DefaultLayout extends Component {
                               //     }
                               //   }
                               // },
+                              {
+                                name: i18n.t('static.report.forecasterrorovertime'),
+                                url: '/report/consumptionForecastErrorSupplyPlan',
+                                icon: 'fa fa-line-chart',
+                                attributes: {
+                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
+                                  onClick: e => {
+                                    this.refreshPage();
+                                  }
+                                }
+                              },
                             ]
                           },
 
