@@ -1564,7 +1564,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 if (rowData[1].toString() == "true") {
 
                     var cell = shipmentInstance.getCell(col)
+                    cell.classList.add('shipmentErp');
                     cell.classList.add('readonly');
+                    
 
                 }
                 if (rowData[0].toString() == "false" || rowData[4] == CANCELLED_SHIPMENT_STATUS) {
@@ -1670,6 +1672,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 if (rowData[1].toString() == "true") {
 
                     var cell = shipmentInstance.getCell(col)
+                    cell.classList.add('shipmentErp');
                     cell.classList.add('readonly');
 
                 }
@@ -2623,7 +2626,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 var col = (colArr[j]).concat(parseInt(y) + 1);
                 if (rowData[1].toString() == "true") {
                     var cell = elInstance.getCell(col)
+                    cell.classList.add('shipmentErp');
                     cell.classList.add('readonly');
+                    
                 }
                 if (rowData[33].toString() == "false") {
                     elInstance.setStyle(col, "color", "#000");

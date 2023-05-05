@@ -4432,6 +4432,7 @@ export default class CreateTreeTemplate extends Component {
         var sortOrder = itemConfig.sortOrder;
         console.log("childList---", childList);
         // var scenarioList = this.state.scenarioList;
+        var childListBasedOnScenarion = [];
         for (let i = 0; i < childList.length; i++) {
             var child = JSON.parse(JSON.stringify(childList[i]));
             console.log("child before---", child);
@@ -4480,6 +4481,10 @@ export default class CreateTreeTemplate extends Component {
             // if (scenarioList.length > 0) {
             // for (let i = 0; i < scenarioList.length; i++) {
             maxNodeDataId++;
+            childListBasedOnScenarion.push({
+                oldId: (child.payload.nodeDataMap[0])[0].nodeDataId,
+                newId: maxNodeDataId
+            });
             (child.payload.nodeDataMap[0])[0].nodeDataId = maxNodeDataId;
 
             // }
@@ -4488,6 +4493,20 @@ export default class CreateTreeTemplate extends Component {
             items.push(child);
         }
 
+        childListArr.map(item => {
+            var indexItems = items.findIndex(i => i.id == item.newId);
+            if (indexItems != -1) {
+                // for (let i = 0; i < scenarioList.length; i++) {
+                var nodeDataModelingList = (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList;
+                if (nodeDataModelingList.length > 0) {
+                    nodeDataModelingList.map((item1, c) => {
+                        var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
+                        item1.transferNodeDataId = newTransferId[0].newId;
+                    })
+                }
+                // }
+            }
+        })
 
         console.log("duplicate button clicked value after update---", items);
         this.setState({
@@ -6118,7 +6137,7 @@ export default class CreateTreeTemplate extends Component {
                                     [{
                                         nodeDataId: 1,
                                         notes: '',
-                                        monthNo: 1,
+                                        monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                         dataValue: '0',
                                         calculatedDataValue: '0',
                                         fuNode: {
@@ -6232,7 +6251,7 @@ export default class CreateTreeTemplate extends Component {
                                     nodeDataModelingList: [],
                                     nodeDataOverrideList: [],
                                     nodeDataMomList: [],
-                                    monthNo: 1,
+                                    monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                     dataValue: '0',
                                     displayDataValue: '',
                                     calculatedDataValue: '0',
@@ -7721,14 +7740,14 @@ export default class CreateTreeTemplate extends Component {
                             percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue,
                             forecastingUnitId: this.state.fuValues,
                             tempPlanningUnitId: this.state.tempPlanningUnitId,
-                            usageTypeIdFU:"",
-                            lagInMonths:"",
-                            noOfPersons:"",
-                            forecastingUnitPerPersonsFC:"",
-                            repeatCount:"",
-                            usageFrequencyCon:"",
-                            usageFrequencyDis:"",
-                            oneTimeUsage:""
+                            usageTypeIdFU: "",
+                            lagInMonths: "",
+                            noOfPersons: "",
+                            forecastingUnitPerPersonsFC: "",
+                            repeatCount: "",
+                            usageFrequencyCon: "",
+                            usageFrequencyDis: "",
+                            oneTimeUsage: ""
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -10165,7 +10184,7 @@ export default class CreateTreeTemplate extends Component {
                                                             nodeDataModelingList: [],
                                                             nodeDataOverrideList: [],
                                                             nodeDataMomList: [],
-                                                            monthNo: 1,
+                                                            monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                                             dataValue: '',
                                                             calculatedDataValue: '',
                                                             notes: '',

@@ -503,9 +503,9 @@ class ForecastOutput extends Component {
         // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ': ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.display') + ': ' + document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.display') + ': ' + document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         // csvRow.push('')
         // if (document.getElementById("viewById").value == 1) {//planning unit
         //     this.state.planningUnitLabels.map(ele =>
@@ -515,7 +515,7 @@ class ForecastOutput extends Component {
         //         csvRow.push('"' + (i18n.t('static.product.unit1') + ': ' + ele.toString()).replaceAll(' ', '%20') + '"'))
         // }
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.forecastReport.xAxisAggregateByYear') + ': ' + document.getElementById("xaxis").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.forecastReport.xAxisAggregateByYear') + ': ' + document.getElementById("xaxis").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
 
         // csvRow.push('')
         csvRow.push('')
@@ -557,8 +557,8 @@ class ForecastOutput extends Component {
             ));
 
             return (A.push(this.addDoubleQuoteToRowContent([
-                ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                ((ele.scenario.label != null ? ele.scenario.label : "").replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
+                ((ele.scenario.label != null ? ele.scenario.label : "").replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
             ].concat(propertyName))))
         }
         );
@@ -569,7 +569,7 @@ class ForecastOutput extends Component {
                 this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty : ''
             ));
             A.push(this.addDoubleQuoteToRowContent([
-                ((i18n.t('static.supplyPlan.total') + this.state.equivalencyUnitLabel).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                ((i18n.t('static.supplyPlan.total') + this.state.equivalencyUnitLabel).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
                 '',
             ].concat(propertyName)));
         }
@@ -584,8 +584,8 @@ class ForecastOutput extends Component {
 
             return (
                 A.push(this.addDoubleQuoteToRowContent([
-                    ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20'),
-                    ((ele.scenario.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                    ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
+                    ((ele.scenario.label).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
                 ].concat(propertyName)))
             )
         }
@@ -596,7 +596,7 @@ class ForecastOutput extends Component {
                 this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty : ''
             ));
             A.push(this.addDoubleQuoteToRowContent([
-                ((i18n.t('static.supplyPlan.total') + this.state.equivalencyUnitLabel).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                ((i18n.t('static.supplyPlan.total') + this.state.equivalencyUnitLabel).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
                 '',
             ].concat(propertyName)));
 

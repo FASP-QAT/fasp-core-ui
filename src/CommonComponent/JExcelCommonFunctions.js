@@ -347,7 +347,7 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
-        document.getElementsByClassName("jss_search")[1].value = "";
+        document.getElementsByClassName("jss_search")[number].value = "";
         elInstance.search('')
     };
     clearBtn.appendChild(clarText);
@@ -370,18 +370,19 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
     // obj.pagination.appendChild(paginationPages);
     //  obj.pagination.appendChild(paginationUpdateContainer);
 
-    var jexcel_pagination = document.getElementsByClassName('jss_pagination')[1];
+    var jexcel_pagination = document.getElementsByClassName('jss_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
-    var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[0];
-    // pageSelect.options[pageSelect.options.length] = new Option('All', 5000000);
+    // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
+    // document.getElementsByClassName('jexcel_pagination')[number].value = 25
+    var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[number];
     pageSelect.options[3].innerHTML = "All";
 
-    pageSelect.addEventListener("change", () => paginationChange(1));
+    pageSelect.addEventListener("change", () => paginationChange(number));
 
-    var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[1];
+    var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');
