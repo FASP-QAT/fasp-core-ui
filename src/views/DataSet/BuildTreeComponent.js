@@ -5235,7 +5235,7 @@ export default class BuildTree extends Component {
                 row = row.concat(addCommas(this.getPayloadData(items[i], 1)))
                 row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
             } else {
-                row = row.concat(this.getPayloadData(items[i], 1))
+                row = row.concat(this.getPayloadData(items[i], 1)).concat(" ").concat(this.getPayloadData(items[i], 2))
                 row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
             }
             dataArray.push(new Paragraph({
@@ -7977,6 +7977,7 @@ export default class BuildTree extends Component {
         console.log("Seema currentItemConfig", currentItemConfig)
         console.log("Seema [this.state.selectedScenario]", [this.state.selectedScenario])
         console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]", currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])
+        console.log("inside changed data")
         this.setState({
             currentItemConfig,
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
