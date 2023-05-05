@@ -10049,14 +10049,18 @@ legend.scheduler-border {
   z-index: 1001;
 }
 
-.inventoryTurnsTable th {
-  width: 120px !important;
-  white-space: normal !important;
+.z-index1002{
+  z-index: 1002;
 }
 
-.inventoryTurnsTable th:first-child,
-.inventoryTurnsTable th:nth-child(2) {
-  width: auto !important;
-  overflow: auto !important;
-  white-space: nowrap !important;
-}
+// .inventoryTurnsTable th {
+//   width: 120px !important;
+//   white-space: normal !important;
+// }
+
+// .inventoryTurnsTable th:first-child,
+// .inventoryTurnsTable th:nth-child(2) {
+//   width: auto !important;
+//   overflow: auto !important;
+//   white-space: nowrap !important;
+// }
