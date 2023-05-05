@@ -68,7 +68,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             loading: true,
             defaultTimeWindow: true,
             yaxisEquUnit:0,
-            isEquUnitChecked:false,
+            // isEquUnitChecked:false,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 }
@@ -496,27 +496,27 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnitLabel: selectedText,
             show: false,
             dataList: [],
-            isEquUnitChecked:false,
+            equivalencyUnitList:[],
+            yaxisEquUnit:0,
+            // isEquUnitChecked:false,
             consumptionAdjForStockOutId:false
         }, () => {
             document.getElementById('div1').style.display = 'none';
-            document.getElementById("equivelencyUnitDiv").style.display = "none";
-            document.getElementById("yaxisEquUnitCb").checked=false;
+            // document.getElementById("equivelencyUnitDiv").style.display = "none";
             document.getElementById("consumptionAdjusted").checked=false;
+            this.getEquivalencyUnitData();
             this.fetchData();
         })
     }
 
     setYaxisEquUnitId(e) {
-        var equivalencyUnitId = document.getElementById("equivelencyUnitDiv");
-        var selectedText = equivalencyUnitId.options[equivalencyUnitId.selectedIndex].text;
+        var yaxisEquUnit = e.target.value;
+        console.log("e.target.value+++", e.target.value)
         this.setState({
-            equivalencyUnitId: e.target.value,
-            equivalencyUnitLabel: selectedText,
-            show: false
+            yaxisEquUnit: yaxisEquUnit
         }, () => {
-            this.fetchData();
-        })
+                this.fetchData();
+          })
     }
 
     getPlanningUnitAndForcastingUnit = () => {
@@ -732,17 +732,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             forecastingUnitId: e.target.value,
             forecastingUnitLabel: selectedText,
             dataList: [],
-            isEquUnitChecked:false,
+            equivalencyUnitList:[],
+            yaxisEquUnit:0,
+            // isEquUnitChecked:false,
             consumptionAdjForStockOutId:false
         }, () => {
-            // this.filterPlanningUnit()
-            // if (this.state.viewById == 2 && forecastingUnitId) {
-            //     this.showData();
-            // }
             document.getElementById('div1').style.display = 'none';
-            document.getElementById("equivelencyUnitDiv").style.display = "none";
-            document.getElementById("yaxisEquUnitCb").checked=false;
+            // document.getElementById("equivelencyUnitDiv").style.display = "none";
             document.getElementById("consumptionAdjusted").checked=false;
+            this.getEquivalencyUnitData();
             this.fetchData();
         })
     }
@@ -762,24 +760,24 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         })
     }
 
-    yaxisEquUnitCheckbox(event) {
+    // yaxisEquUnitCheckbox(event) {
 
-        var falg = event.target.checked ? 1 : 0
-        if (falg) {
-            this.setState({
-                isEquUnitChecked:true
-            }, () => {
-                this.getEquivalencyUnitData();
-            })
-        } else {
-            document.getElementById("equivelencyUnitDiv").style.display = "none";
-            this.setState({
-                isEquUnitChecked:false
-            }, () => {
-                this.fetchData();
-            })
-        }
-    }
+    //     var falg = event.target.checked ? 1 : 0
+    //     if (falg) {
+    //         this.setState({
+    //             isEquUnitChecked:true
+    //         }, () => {
+    //             this.getEquivalencyUnitData();
+    //         })
+    //     } else {
+    //         document.getElementById("equivelencyUnitDiv").style.display = "none";
+    //         this.setState({
+    //             isEquUnitChecked:false
+    //         }, () => {
+    //             this.fetchData();
+    //         })
+    //     }
+    // }
 
     consumptionStockOutCheckbox(event) {
         var falg = event.target.checked ? 1 : 0
@@ -871,11 +869,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 }
                             }
                             if (filteredEquList.length == 0) {
-                                document.getElementById("equivelencyUnitDiv").style.display = "none";
+                                // document.getElementById("equivelencyUnitDiv").style.display = "none";
                                 console.log("filteredEquList---Result-->", filteredEquList);
                                 console.log("No EquivalencyUnitData")
                                 this.setState({ 
-                                    message: "No equivalency unit data available", 
+                                    // message: "No equivalency unit data available", 
                                     equivalencyUnitList: [],
                                         },() => {
                                     this.hideFirstComponent();
@@ -883,9 +881,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             }
                         } else {
 
-                            document.getElementById("equivelencyUnitDiv").style.display = "none";
+                            // document.getElementById("equivelencyUnitDiv").style.display = "none";
                             this.setState({ 
-                                message: "No equivalency unit data available for the selected forecasting unit ", 
+                                // message: "No equivalency unit data available for the selected forecasting unit ", 
                                 equivalencyUnitList: []
                             },() => {
                                     this.hideFirstComponent();
@@ -895,7 +893,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         console.log("filteredEQUnit---Result-->", filteredEQUnit);
                         let EquiUnitList = [];
                         if (filteredEquList.length > 0) {
-                            document.getElementById("equivelencyUnitDiv").style.display = "block";
+                            // document.getElementById("equivelencyUnitDiv").style.display = "block";
                             // EquiUnitList = filteredEquList.map(c => c.equivalencyUnit);
                             EquiUnitList = filteredEquList;
                             console.log("EquiUnitList", EquiUnitList);
@@ -930,10 +928,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         console.log("EQ1------->", response.data);
                         var listArray = response.data;
                         if (listArray.length == 0) {
-                            document.getElementById("equivelencyUnitDiv").style.display = "none";
+                            // document.getElementById("equivelencyUnitDiv").style.display = "none";
                             this.setState({ message: 'No equivalency unit data available for the selected forecasting unit' });
                         } else {
-                            document.getElementById("equivelencyUnitDiv").style.display = "block";
+                            // document.getElementById("equivelencyUnitDiv").style.display = "block";
 
                             var listArray = response.data;
                             listArray.sort((a, b) => {
@@ -1073,12 +1071,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         let regionList = this.state.regions;
         let monthInCalc = document.getElementById("timeWindow").value;
         var dataList = [];
-        let equivalencyUnitId = -1;
+        let equivalencyUnitId = 0;
         let planningUnitId = -1;
         let forecastingUnitId = -1;
         var FilterEquivalencyUnit="";
         var equivalencyUnitLable="";
-        equivalencyUnitId = this.state.isEquUnitChecked?document.getElementById("yaxisEquUnit").value:0;
+        equivalencyUnitId = document.getElementById("yaxisEquUnit").value;
+        console.log("equivalencyUnitId----", equivalencyUnitId)
+        
         if(equivalencyUnitId>0){
             FilterEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == equivalencyUnitId);
             equivalencyUnitLable=FilterEquivalencyUnit[0].equivalencyUnit.label.label_en;
@@ -2587,7 +2587,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 </div>
                                             </FormGroup>
 
-                                            <FormGroup className="col-md-3">
+                                            {/* <FormGroup className="col-md-3">
                                                 <div className="tab-ml-1" style={{ marginTop: '30px' }}>
                                                     <Input
                                                         className="form-check-input checkboxMargin"
@@ -2604,9 +2604,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         Y-axis in equivalency unit?
                                                     </Label>
                                                 </div>
-                                            </FormGroup>
+                                            </FormGroup> */}
 
-                                            <FormGroup className="col-md-3" id="equivelencyUnitDiv" style={{ display: "none" }}>
+                                            <FormGroup className="col-md-3" id="equivelencyUnitDiv">
                                                 <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -2620,6 +2620,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         // onChange={(e) => { this.yAxisChange(e); }}
                                                         // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
                                                         >
+                                                             <option value="0">{i18n.t('static.program.no')}</option>
                                                             {equivalencyUnitList1}
                                                         </Input>
 
