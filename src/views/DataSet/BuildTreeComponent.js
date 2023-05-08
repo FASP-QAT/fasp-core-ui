@@ -7520,7 +7520,9 @@ export default class BuildTree extends Component {
 
                     if (this.state.momEl != "") {
                         // this.state.momEl.destroy();
+                        if(document.getElementById('momJexcel')!=null){
                         jexcel.destroy(document.getElementById('momJexcel'), true);
+                        }
 
                     }
                     else if (this.state.momElPer != "") {
