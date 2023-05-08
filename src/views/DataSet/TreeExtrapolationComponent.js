@@ -565,6 +565,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         return new Date(a.month) - new Date(b.month);
                     });
                 console.log("gap2---", dataList)
+            if (dataList.length > 0) {
                 var result = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(dataList[0].month).format("YYYY-MM") && moment(c.month).format("YYYY-MM") < moment(dataList[dataList.length - 1].month).format("YYYY-MM") && (c.amount == ''))
                 console.log("dataList[0]---", dataList[0]);
                 console.log("dataList[dataList.length - 1]---", dataList[dataList.length - 1]);
@@ -597,6 +598,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                         this.buildExtrapolationMom();
                     }
                 }
+            }else{
+                console.log("Loader 2 Test123")
+                    this.setState({ extrapolationLoader: false }, () => {
+                        setTimeout(() => {
+                            alert("Please fill in the blank actual values or interpolate.")
+                        }, 0);
+                    });
+            }
             }, 0);
         });
     }
@@ -1302,11 +1311,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                 for (var i = 0; i < tableJson.length; i++) {
                     var map1 = new Map(Object.entries(tableJson[i]));
                     console.log("10 map---" + map1.get("10"));
-                    var result = jexcelDataArr.filter(x => x.amount != "");
-                    resultCount = (map1.get("1") != "" && map1.get("1") != 0) || result.length > 0 ? resultCount + 1 : resultCount;
+                    var result = jexcelDataArr.filter(x => x.amount !== "");
+                    resultCount = (map1.get("1") !== "" || result.length > 0) ? resultCount + 1 : resultCount;
                     var json = {
                         month: map1.get("0"),
-                        amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
+                        amount: map1.get("1") !== "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
                         reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                         monthNo: resultCount,
                         manualChange: map1.get("10").toString().replaceAll(",", ""),
@@ -1315,6 +1324,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     jexcelDataArr.push(json);
                 }
                 this.setState({ jexcelDataArr }, () => {
+                    var interpolatedMonths = [];
                     for (var j = 0; j < monthArray.length; j++) {
                         var dataArr = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))[0];
                         console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "dataArr---", dataArr);
@@ -1338,6 +1348,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endVal---", endVal);
                                 var endMonthVal = endValList[0].month;
                                 console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endMonthVal---", endMonthVal);
+                                interpolatedMonths.push({ month: moment(monthArray[j]).format("YYYY-MM") });
                                 const monthDifference = Math.round(Number(moment(new Date(monthArray[j])).diff(new Date(startMonthVal), 'months', true)));
                                 const monthDiff = Math.round(Number(moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true)));
                                 var missingActualData = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
@@ -1368,6 +1379,9 @@ export default class TreeExtrapolationComponent extends React.Component {
                         .sort(function (a, b) {
                             return new Date(a.month) - new Date(b.month);
                         });
+                        if (interpolatedMonths.length == 0) {
+                            window.alert(i18n.t('static.consumptionDataEntryAndAdjustment.nothingToInterpolate'));
+                          }
                     this.setState({
                         minMonth: valList[0].month,
                         nodeDataExtrapolation,
@@ -1436,6 +1450,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             linearRegressionId: true,
             smoothingId: true,
             arimaId: true,
+            jexcelDataArr: [],
             nodeDataExtrapolationOptionList: [],
             movingAvgData: [],
             semiAvgData: [],
