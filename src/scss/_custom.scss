@@ -10041,8 +10041,11 @@ legend.scheduler-border {
   src: url('/src/assets/font_formulae/lmromanslant10-regular-webfont.woff') format('woff');
 }
 
+@media screen and (min-width: 769px){
+
 .MonthPickerUpdateInfo .month-picker > .rmp-container .rmp-popup.show {
   opacity: 1;
   transform: unset !important;
   top: -62px !important;
+}
 }
