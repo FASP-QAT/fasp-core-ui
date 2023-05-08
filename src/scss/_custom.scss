@@ -10064,3 +10064,19 @@ legend.scheduler-border {
 //   overflow: auto !important;
 //   white-space: nowrap !important;
 // }
+.zIndexField1 .Select.bg-light {
+  background-color: transparent !important;
+  z-index: 10;
+}
+.zIndexField2 .Select.bg-light {
+  background-color: transparent !important;
+  z-index: 9;
+}
+.zIndexField3 .Select.bg-light {
+  background-color: transparent !important;
+  z-index: 8;
+}
+.inventoryTurnsTableZindex .clone1 {
+  left: 0;
+  z-index: 3!important;
+}

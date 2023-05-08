@@ -1100,7 +1100,7 @@ export default class InventoryTurns extends Component {
 
     getTableDiv() {
         return (
-          <Table className="table-bordered text-center overflowhide main-table inventoryTurnsTable" bordered size="sm" options={this.options}>
+          <Table className="table-bordered text-center overflowhide main-table inventoryTurnsTable inventoryTurnsTableZindex" bordered size="sm" options={this.options}>
             <thead>
               <tr>
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
@@ -1437,7 +1437,7 @@ export default class InventoryTurns extends Component {
                                         <div className="row">
                                             <FormGroup className="col-md-12" id="hideProductDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.productCategory.productCategory')}</Label>
-                                                <div className="controls ">
+                                                <div className="controls zIndexField1">
                                                     <Select
                                                         bsSize="sm"
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light')}
@@ -1456,7 +1456,7 @@ export default class InventoryTurns extends Component {
 
                                             <FormGroup className="col-md-12" id="hideCountryDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.country.countryMaster')}</Label>
-                                                <div className="controls ">
+                                                <div className="controls zIndexField2">
                                                 <Select
                                                         bsSize="sm"
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light')}
@@ -1475,7 +1475,7 @@ export default class InventoryTurns extends Component {
 
                                             <FormGroup className="col-md-12" id="programDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                <div className="controls ">
+                                                <div className="controls zIndexField3">
                                                 <Select
                                                         bsSize="sm"
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light')}
@@ -1491,10 +1491,7 @@ export default class InventoryTurns extends Component {
                                                     />
                                                 </div>
                                             </FormGroup>
-
-
-
-                                        </div>
+                                    </div>
                                     </div>
                                 </Form>
                             </div>
