@@ -146,7 +146,7 @@ class Login extends Component {
       var transaction = db1.transaction(['language'], 'readwrite');
       var program = transaction.objectStore('language');
       delete axios.defaults.headers.common["Authorization"];
-      if (isSiteOnline()) {
+      // if (isSiteOnline()) {
 
         // var transaction1 = db1.transaction(['lastSyncDate'], 'readwrite');
         // var lastSyncDateTransaction = transaction1.objectStore('lastSyncDate');
@@ -198,10 +198,12 @@ class Login extends Component {
           }
           this.getAllLanguages();
 
+        }).catch(error=>{
+          this.getAllLanguages();  
         });
-      } else {
-        this.getAllLanguages();
-      }
+      // } else {
+      //   this.getAllLanguages();
+      // }
     }.bind(this)
 
 
@@ -246,11 +248,11 @@ class Login extends Component {
     this.logoutMessagehide();
     // console.log("--------Going to call version api-----------")
     AuthenticationService.clearUserDetails()
-    if (isSiteOnline()) {
+    // if (isSiteOnline()) {
 
-    } else {
-      console.log("############## Offline so can't fetch version #####################");
-    }
+    // } else {
+    //   console.log("############## Offline so can't fetch version #####################");
+    // }
     AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
     console.log("timeout going to change language")
     this.getLanguageList();
@@ -260,43 +262,54 @@ class Login extends Component {
 
   checkIfApiIsActive() {
     var apiVersionForDisplay = "";
-    if (!isSiteOnline()) {
-      apiVersionForDisplay = "Offline"
-      setTimeout(function () {
-        this.checkIfApiIsActive();
-      }.bind(this), 180000);
-    } else {
-      LoginService.getApiVersion()
-        .then(response => {
-          // console.log("--------version api success----------->", response)
-          if (response != null && response != "") {
-            this.setState({
-              apiVersionForDisplay: response.data.app.version,
-              apiVersion: response.data.app.version,
-            }, () => {
-              if (this.state.popupShown == 0 && response.data.app.frontEndVersion != APP_VERSION_REACT) {
-                this.setState({
-                  popupShown: 1
-                })
-                confirmAlert({
-                  message: i18n.t('static.coreui.oldVersion'),
-                  buttons: [
-                    {
-                      label: i18n.t('static.report.ok')
-                    }
-                  ]
-                });
-              }
-              setTimeout(function () {
-                this.checkIfApiIsActive();
-              }.bind(this), 10000);
-            })
-            // console.log("response---", response.data.app.version)
-          }
-        }).catch(error => {
-          // console.log("--------version api error----------->", error)
+    // if (!isSiteOnline()) {
+    //   apiVersionForDisplay = "Offline"
+    //   setTimeout(function () {
+    //     this.checkIfApiIsActive();
+    //   }.bind(this), 180000);
+    // } else {
+    LoginService.getApiVersion()
+      .then(response => {
+        console.log("In then Test@@@123")
+        // console.log("--------version api success----------->", response)
+        if (response != null && response != "") {
+          this.setState({
+            apiVersionForDisplay: response.data.app.version,
+            apiVersion: response.data.app.version,
+          }, () => {
+            if (this.state.popupShown == 0 && response.data.app.frontEndVersion != APP_VERSION_REACT) {
+              this.setState({
+                popupShown: 1
+              })
+              confirmAlert({
+                message: i18n.t('static.coreui.oldVersion'),
+                buttons: [
+                  {
+                    label: i18n.t('static.report.ok')
+                  }
+                ]
+              });
+            }
+            setTimeout(function () {
+              this.checkIfApiIsActive();
+            }.bind(this), 180000);
+          })
+          // console.log("response---", response.data.app.version)
+        } else {
+          console.log("In else Test@@@123")
+        }
+      }).catch(error => {
+
+        apiVersionForDisplay = "Offline"
+        this.setState({
+          apiVersionForDisplay: apiVersionForDisplay
         })
-    }
+        setTimeout(function () {
+          this.checkIfApiIsActive();
+        }.bind(this), 180000);
+        // console.log("--------version api error----------->", error)
+      })
+    // }
     this.setState({
       apiVersionForDisplay: apiVersionForDisplay
     })
@@ -602,7 +615,7 @@ class Login extends Component {
                                   required />
                                 <FormFeedback>{errors.password}</FormFeedback>
                               </InputGroup>
-                              {isSiteOnline() && <Row>
+                              {this.state.apiVersionForDisplay!="Offline" && <Row>
                                 <InputGroup check inline className="mb-4 ml-3">
                                   <Input
                                     type="checkbox"
