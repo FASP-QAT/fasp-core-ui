@@ -6453,7 +6453,9 @@ export default class CreateTreeTemplate extends Component {
             this.setState({ isValidError: isValid });
 
             if (this.state.currentItemConfig.context.payload.nodeType.id == 1) {
-                this.showMomData();
+                if(tab == 2){
+                    this.showMomData();
+                }
             }
             if (tab == 2) {
                 console.log("***>>>", this.state.currentItemConfig);
