@@ -2584,7 +2584,7 @@ class ShipmentSummery extends Component {
                                                 {this.state.shipmentDetailsFundingSourceList.length > 0 &&
                                                 <div>
                                                      {/* <div className='fixTableHead'> */}
-                                                        <Table id="mytable1" responsive className="table-bordered table-striped text-center " style={{width: '50%',marginLeft: '370px'}}>
+                                                        <Table id="mytable1" responsive className="table-bordered table-striped text-center " style={{width: '50%',margin: 'auto'}}>
                                                             <thead>
                                                                 <tr>
                                                                     <th style={{ width: '25px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
