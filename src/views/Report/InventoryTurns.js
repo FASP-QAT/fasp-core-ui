@@ -70,6 +70,7 @@ export default class InventoryTurns extends Component {
             message: '',
             countryList: [],
             countryId: [],
+            countryArray: [],
             puList: [],
             puId: [],
             programList: [],
@@ -596,8 +597,14 @@ export default class InventoryTurns extends Component {
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         listArray.unshift({ value: "-1", label: i18n.t("static.common.all") });
+                        
+                        var countryArray = [];
+                        for (var i = 0; i < response.data.length; i++) {
+                            countryArray[i] = response.data[i].realmCountryId;
+                        }
                         this.setState({
                             countryList: listArray,
+                            countryArray: countryArray, 
                             loading: false
                         })
                     } else {
@@ -846,8 +853,8 @@ export default class InventoryTurns extends Component {
 
         if(inputJson.programIds.length > 0){
             ReportService.inventoryTurns(inputJson).then(response => {
-                console.log("costOfInentory=====>", JSON.stringify(response.data));
-
+                console.log("costOfInentory=====>", (response.data));
+                console.log("Hello "+JSON.stringify(inputJson))
                 if(response.data.length > 0){
                     const level1Data = [];
                     const level2Data = [];
@@ -1110,6 +1117,8 @@ export default class InventoryTurns extends Component {
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
                 <th>{i18n.t('static.report.noofmonth')}</th>
+                <th>{i18n.t('static.supplyPlan.reorderInterval')}</th>
+                <th>{i18n.t('static.product.minMonthOfStock')}</th>
                 <th>{i18n.t('static.inventoryTurns.actual')}</th>
                 <th>{i18n.t('static.inventoryTurns.planned')}</th>
                 <th>{i18n.t('static.extrapolation.mape')}</th>
@@ -1128,8 +1137,12 @@ export default class InventoryTurns extends Component {
                         {item.countryName}  
                     </td>
                     <td>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length }</td>
-                    <td>{this.formatter(item.totalConsumption)}</td>
-                    <td>{this.formatter(item.avergeStock)}</td>
+                    {/* <td>{this.formatter(item.totalConsumption)}</td> */}
+                    {/* <td>{this.formatter(item.avergeStock)}</td> */}
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                     <td></td>
                     <td>{this.formatterDouble(item.inventoryTurns)}</td>
                     {/* <td>{this.formatterDouble(this.mode(this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).map(arr => arr.plannedInventoryTurns) : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).map(arr => arr.plannedInventoryTurns)))}</td> */}
@@ -1140,14 +1153,18 @@ export default class InventoryTurns extends Component {
                   {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
 
                     return (<>
-                    <tr className="hoverTd" style={{ display: r.id in this.state.childShowArr ? "" : "none" }}>
+                    <tr style={{ display: r.id in this.state.childShowArr ? "" : "none" }}>
                       <td className="sticky-col first-col clone1" onClick={() => this.toggleAccordion1(r.programId, item.id)}>
                         {this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(r.programId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i> : ""}
                       </td>
                       <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{r.programName}</td>  
                       <td>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length }</td>
-                      <td>{this.formatter(r.totalConsumption)}</td>
-                      <td>{this.formatter(r.avergeStock)}</td>
+                      {/* <td>{this.formatter(r.totalConsumption)}</td> */}
+                      {/* <td>{this.formatter(r.avergeStock)}</td> */}
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
                       <td></td>
                       <td>{this.formatterDouble(r.inventoryTurns)}</td>
                       {/* <td>{this.formatterDouble(this.mode(this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map( arr => arr.plannedInventoryTurns ) : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map( arr => arr.plannedInventoryTurns) ))}</td> */}
@@ -1164,7 +1181,9 @@ export default class InventoryTurns extends Component {
                         <td></td>
                         <td>{this.formatter(arr1.totalConsumption)}</td>
                         <td>{this.formatter(arr1.avergeStock)}</td>
-                        <td>{arr1.noOfMonths}</td>
+                        <td>{arr1.noOfMonths >= 6 ? arr1.noOfMonths : ""}</td>
+                        <td>{arr1.reorderFrequencyInMonths}</td>
+                        <td>{arr1.minMonthsOfStock}</td>
                         <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
                         <td>{this.formatterDouble(arr1.plannedInventoryTurns)}</td>
                         <td>{this.formatterDouble(arr1.mape)}</td>
@@ -1180,6 +1199,8 @@ export default class InventoryTurns extends Component {
                         <td>{this.formatter(arr1.totalConsumption)}</td>
                         <td>{this.formatter(arr1.avergeStock)}</td>
                         <td>{arr1.noOfMonths}</td>
+                        <td>{arr1.reorderFrequencyInMonths}</td>
+                        <td>{arr1.minMonthsOfStock}</td>
                         <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
                         <td>{this.formatterDouble(arr1.plannedInventoryTurns)}</td>
                         <td>{this.formatterDouble(arr1.mape)}</td>
