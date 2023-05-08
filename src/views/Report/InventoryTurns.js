@@ -1111,8 +1111,8 @@ export default class InventoryTurns extends Component {
             <thead>
               <tr>
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
-                <th className="sticky-col first-col clone1"></th>
-                <th className="sticky-col first-col clone" align="left"></th>
+                <th className="sticky-col first-col clone1" style={{zIndex:'4'}} ></th>
+                <th className="FixedWdthcolumn sticky-col first-col clone" align="left" style={{whiteSpace:'inherit', zIndex:'5'}} ></th>
                 <th>{i18n.t('static.planningunit.planningunit')}</th>
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
@@ -1517,8 +1517,8 @@ export default class InventoryTurns extends Component {
                                 </Form>
                             </div>
                         </div>
-                        <div className="table-scroll">
-                            <div className="table-wrap DataEntryTable table-responsive fixTableHeadSupplyPlan">
+                        <div className="TableWidthCoumnBorder table-scroll">
+                            <div className="table-wrap TableWidthCoumn DataEntryTable ZindexInventory table-responsive fixTableHeadSupplyPlan">
                                 {this.state.isTableLoaded}
                             </div>
                         </div>

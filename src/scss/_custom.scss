@@ -10078,5 +10078,18 @@ legend.scheduler-border {
 }
 .inventoryTurnsTableZindex .clone1 {
   left: 0;
-  z-index: 3!important;
+  z-index: 3;
+}
+.ZindexInventory .clone{
+  z-index: 4;
+}
+.TableWidthCoumn .FixedWdthcolumn .table-scroll th, .table-scroll td {
+  padding: 5px 10px;
+  white-space: inherit!important;
+  max-width: 200px!important;
+  vertical-align: top;
+}
+
+.TableWidthCoumnBorder{
+  border-top: 1px solid #c8ced3!important;
 }
