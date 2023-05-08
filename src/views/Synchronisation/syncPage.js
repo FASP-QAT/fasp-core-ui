@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Formik } from 'formik';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
@@ -257,11 +257,11 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'downloaded data' },
         { type: 'hidden', title: 'result of compare' },
       ],
-      text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
+      // text: {
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
       pagination: false,
       search: false,
       filters: false,
@@ -270,12 +270,12 @@ export default class syncPage extends Component {
         return false;
       }.bind(this),
       columnSorting: false,
-      tableOverflow: false,
+      // tableOverflow: false,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
       allowDeleteRow: false,
-      tableOverflow: false,
+      // tableOverflow: false,
       editable: false,
       onload: this.loadedResolveConflicts
     };
@@ -290,8 +290,8 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflicts = function (instance) {
-    jExcelLoadedFunctionOnlyHideRowOld(instance);
-    var elInstance = instance.jexcel;
+    jExcelLoadedFunctionOnlyHideRow(instance);
+    var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     for (var j = 1; j < 13; j++) {
@@ -436,20 +436,20 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'downloaded data' },
         { type: 'hidden', title: 'result of compare' },
       ],
-      text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
+      // text: {
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
       pagination: false,
       search: false,
       columnSorting: false,
-      tableOverflow: false,
+      // tableOverflow: false,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
       allowDeleteRow: false,
-      tableOverflow: false,
+      // tableOverflow: false,
       editable: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
@@ -469,8 +469,8 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsInventory = function (instance) {
-    jExcelLoadedFunctionOnlyHideRowOld(instance);
-    var elInstance = instance.jexcel;
+    jExcelLoadedFunctionOnlyHideRow(instance);
+    var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
     for (var j = 1; j < 14; j++) {
@@ -632,20 +632,20 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'downloaded data' },
         { type: 'hidden', title: 'result of compare' },
       ],
-      text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
+      // text: {
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
       pagination: false,
       search: false,
       columnSorting: false,
-      tableOverflow: false,
+      // tableOverflow: false,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
       allowDeleteRow: false,
-      tableOverflow: false,
+      // tableOverflow: false,
       editable: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
@@ -747,20 +747,20 @@ export default class syncPage extends Component {
         { type: 'hidden', title: 'downloaded data' },
         { type: 'hidden', title: 'result of compare' },
       ],
-      text: {
-        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        show: '',
-        entries: '',
-      },
+      // text: {
+      //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+      //   show: '',
+      //   entries: '',
+      // },
       pagination: false,
       search: false,
       columnSorting: false,
-      tableOverflow: false,
+      // tableOverflow: false,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
       allowDeleteRow: false,
-      tableOverflow: false,
+      // tableOverflow: false,
       editable: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
@@ -780,8 +780,8 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsShipment = function (instance) {
-    jExcelLoadedFunctionOnlyHideRowOld(instance);
-    var elInstance = instance.jexcel;
+    jExcelLoadedFunctionOnlyHideRow(instance);
+    var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI']
     for (var j = 1; j < 31; j++) {
@@ -899,8 +899,8 @@ export default class syncPage extends Component {
 
 
   loadedResolveConflictsProblem = function (instance) {
-    jExcelLoadedFunctionOnlyHideRowOld(instance);
-    var elInstance = instance.jexcel;
+    jExcelLoadedFunctionOnlyHideRow(instance);
+    var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var j = 0; j < 17; j++) {
@@ -1696,19 +1696,29 @@ export default class syncPage extends Component {
       mergedShipmentLinkedJexcel: ""
     })
     if (this.state.mergedConsumptionJexcel != "" && this.state.mergedConsumptionJexcel != undefined) {
-      this.state.mergedConsumptionJexcel.destroy();
+      // this.state.mergedConsumptionJexcel.destroy();
+      jexcel.destroy(document.getElementById("mergedVersionConsumption"), true);
+
     }
     if (this.state.mergedInventoryJexcel != "" && this.state.mergedInventoryJexcel != undefined) {
-      this.state.mergedInventoryJexcel.destroy();
+      // this.state.mergedInventoryJexcel.destroy();
+      jexcel.destroy(document.getElementById("mergedVersionInventory"), true);
+
     }
     if (this.state.mergedShipmentJexcel != "" && this.state.mergedShipmentJexcel != undefined) {
-      this.state.mergedShipmentJexcel.destroy();
+      // this.state.mergedShipmentJexcel.destroy();
+      jexcel.destroy(document.getElementById("mergedVersionShipment"), true);
+
     }
     if (this.state.mergedShipmentLinkedJexcel != "" && this.state.mergedShipmentLinkedJexcel != undefined) {
-      this.state.mergedShipmentLinkedJexcel.destroy();
+      // this.state.mergedShipmentLinkedJexcel.destroy();
+      jexcel.destroy(document.getElementById("mergedVersionShipmentLinked"), true);
+
     }
     if (this.state.mergedProblemListJexcel != "" && this.state.mergedProblemListJexcel != undefined) {
-      this.state.mergedProblemListJexcel.destroy();
+      // this.state.mergedProblemListJexcel.destroy();
+      jexcel.destroy(document.getElementById("mergedVersionProblemList"), true);
+
     }
 
     var programId = value != "" && value != undefined ? value.value : 0;
@@ -2271,18 +2281,18 @@ export default class syncPage extends Component {
                                               paginationOptions: JEXCEL_PAGINATION_OPTION,
                                               search: true,
                                               columnSorting: true,
-                                              tableOverflow: true,
+                                              // tableOverflow: true,
                                               wordWrap: true,
                                               allowInsertColumn: false,
                                               allowManualInsertColumn: false,
                                               allowDeleteRow: false,
                                               editable: false,
                                               onload: this.loadedFunctionForMerge,
-                                              text: {
-                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                show: '',
-                                                entries: '',
-                                              },
+                                              // text: {
+                                              //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                              //   show: '',
+                                              //   entries: '',
+                                              // },
                                               filters: true,
                                               license: JEXCEL_PRO_KEY,
                                               contextMenu: function (obj, x, y, e) {
@@ -2459,18 +2469,18 @@ export default class syncPage extends Component {
                                               paginationOptions: JEXCEL_PAGINATION_OPTION,
                                               search: true,
                                               columnSorting: true,
-                                              tableOverflow: true,
+                                              // tableOverflow: true,
                                               wordWrap: true,
                                               allowInsertColumn: false,
                                               allowManualInsertColumn: false,
                                               allowDeleteRow: false,
                                               editable: false,
                                               onload: this.loadedFunctionForMergeInventory,
-                                              text: {
-                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                show: '',
-                                                entries: '',
-                                              },
+                                              // text: {
+                                              //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                              //   show: '',
+                                              //   entries: '',
+                                              // },
                                               filters: true,
                                               license: JEXCEL_PRO_KEY,
                                               contextMenu: function (obj, x, y, e) {
@@ -2650,7 +2660,7 @@ export default class syncPage extends Component {
                                               paginationOptions: JEXCEL_PAGINATION_OPTION,
                                               search: true,
                                               columnSorting: true,
-                                              tableOverflow: true,
+                                              // tableOverflow: true,
                                               wordWrap: true,
                                               allowInsertColumn: false,
                                               allowManualInsertColumn: false,
@@ -2659,11 +2669,11 @@ export default class syncPage extends Component {
                                               onload: this.loadedFunctionForMergeShipment,
                                               filters: true,
                                               license: JEXCEL_PRO_KEY,
-                                              text: {
-                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                show: '',
-                                                entries: '',
-                                              },
+                                              // text: {
+                                              //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                              //   show: '',
+                                              //   entries: '',
+                                              // },
                                               contextMenu: function (obj, x, y, e) {
                                                 var items = [];
                                                 //Resolve conflicts
@@ -2991,7 +3001,7 @@ export default class syncPage extends Component {
                                               paginationOptions: JEXCEL_PAGINATION_OPTION,
                                               search: true,
                                               columnSorting: true,
-                                              tableOverflow: true,
+                                              // tableOverflow: true,
                                               wordWrap: true,
                                               allowInsertColumn: false,
                                               allowManualInsertColumn: false,
@@ -3001,11 +3011,11 @@ export default class syncPage extends Component {
                                               // onchangepage: this.onchangepage,
                                               filters: true,
                                               license: JEXCEL_PRO_KEY,
-                                              text: {
-                                                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                                                show: '',
-                                                entries: '',
-                                              },
+                                              // text: {
+                                              //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                              //   show: '',
+                                              //   entries: '',
+                                              // },
                                               contextMenu: function (obj, x, y, e) {
                                                 // console.log("This.state.conflucts count Test123", this.state.conflictsCount)
                                                 // console.log("This.state.conflucts count ERP Test123", this.state.conflictsCountErp)
@@ -3314,8 +3324,8 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMerge = function (instance) {
-    jExcelLoadedFunctionOld(instance, 0);
-    var elInstance = instance.jexcel;
+    jExcelLoadedFunction(instance, 0);
+    var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     elInstance.options.editable = true;
@@ -3361,6 +3371,8 @@ export default class syncPage extends Component {
               (jsonData[c])[18] = 3;
             } else if ((jsonData[c])[17] != "" && latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
+              console.log("mergedVersionConsumption12", LOCAL_VERSION_COLOUR)
+
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 2, true);
@@ -3421,13 +3433,14 @@ export default class syncPage extends Component {
 
 
   loadedFunctionForMergeInventory = function (instance) {
-    jExcelLoadedFunctionOld(instance, 1);
-    var elInstance = instance.jexcel;
+    jExcelLoadedFunction(instance, 1);
+    var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
 
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
     elInstance.options.editable = true;
     for (var c = 0; c < jsonData.length; c++) {
+      console.log("cell no 6===>", jsonData[c][6])
       if ((jsonData[c])[17] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -3917,13 +3930,13 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeShipmentLinked = function (instance) {
-    jExcelLoadedFunctionOld(instance, 3);
-    this.recursiveConflictsForShipmentLinking(instance.jexcel)
+    jExcelLoadedFunction(instance, 3);
+    this.recursiveConflictsForShipmentLinking(instance.worksheets[0])
   }
 
   loadedFunctionForMergeShipment = function (instance) {
-    jExcelLoadedFunctionOld(instance, 2);
-    var elInstance = instance.jexcel;
+    jExcelLoadedFunction(instance, 2);
+    var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI']
     elInstance.options.editable = true;
@@ -4055,8 +4068,8 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
-    jExcelLoadedFunctionOld(instance, 4);
-    var elInstance = instance.jexcel;
+    jExcelLoadedFunction(instance, 4);
+    var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     elInstance.options.editable = true;
@@ -4240,7 +4253,7 @@ export default class syncPage extends Component {
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0 pr-lg-0" id="realmDiv">
-                <div className="table-responsive RemoveStriped consumptionDataEntryTable">
+                <div className="table-responsive consumptionDataEntryTable">
                   <div id="mergedVersionConsumption" />
                 </div>
               </Col>
@@ -4297,6 +4310,11 @@ export default class syncPage extends Component {
   }
 
   render = () => {
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
+
     const { versionTypeList } = this.state;
     let versionTypes = versionTypeList.length > 0
       && versionTypeList.map((item, i) => {
@@ -4834,11 +4852,11 @@ export default class syncPage extends Component {
                 batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
                 supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
               }
-              var sl=shipmentList.filter(c=>c.budget.id==="");
-              sl.map(item=>{
-                var index=shipmentList.findIndex(c=>item.shipmentId>0?c.shipmentId==item.shipmentId:c.tempShipmentId==item.tempShipmentId);
-                if(index!=-1){
-                shipmentList[index].budget.id=0;
+              var sl = shipmentList.filter(c => c.budget.id === "");
+              sl.map(item => {
+                var index = shipmentList.findIndex(c => item.shipmentId > 0 ? c.shipmentId == item.shipmentId : c.tempShipmentId == item.tempShipmentId);
+                if (index != -1) {
+                  shipmentList[index].budget.id = 0;
                 }
               })
               var programJson = generalJson;
@@ -4921,11 +4939,11 @@ export default class syncPage extends Component {
                 batchInfoList = batchInfoList.concat(planningUnitDataJson.batchInfoList);
                 supplyPlan = supplyPlan.concat(planningUnitDataJson.supplyPlan);
               }
-              var sl=shipmentList.filter(c=>c.budget.id==="");
-              sl.map(item=>{
-                var index=shipmentList.findIndex(c=>item.shipmentId>0?c.shipmentId==item.shipmentId:c.tempShipmentId==item.tempShipmentId);
-                if(index!=-1){
-                shipmentList[index].budget.id=0;
+              var sl = shipmentList.filter(c => c.budget.id === "");
+              sl.map(item => {
+                var index = shipmentList.findIndex(c => item.shipmentId > 0 ? c.shipmentId == item.shipmentId : c.tempShipmentId == item.tempShipmentId);
+                if (index != -1) {
+                  shipmentList[index].budget.id = 0;
                 }
               })
               var programJson = generalJson;
@@ -5006,7 +5024,7 @@ export default class syncPage extends Component {
               // ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
               // if (response1.status == 200) {
               // if (response1.data == false) {
-                console.log("Program Json Final Test@@@123",programJson)
+              console.log("Program Json Final Test@@@123", programJson)
               console.log("CommitLogs --- 2 Log before sending data to server")
               ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
@@ -5876,7 +5894,7 @@ export default class syncPage extends Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           search: true,
           columnSorting: true,
-          tableOverflow: true,
+          // tableOverflow: true,
           wordWrap: true,
           allowInsertColumn: false,
           allowManualInsertColumn: false,
@@ -5885,11 +5903,11 @@ export default class syncPage extends Component {
           onload: this.loadedFunctionForMergeProblemList,
           filters: true,
           license: JEXCEL_PRO_KEY,
-          text: {
-            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            show: '',
-            entries: '',
-          },
+          // text: {
+          //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+          //   show: '',
+          //   entries: '',
+          // },
           contextMenu: function (obj, x, y, e) {
             var items = [];
             //Resolve conflicts
