@@ -1128,8 +1128,8 @@ export default class InventoryTurns extends Component {
             <thead>
               <tr>
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
-                <th className="sticky-col first-col clone1" style={{zIndex:'4'}} ></th>
-                <th className="FixedWdthcolumn sticky-col first-col clone" align="left" style={{whiteSpace:'inherit', zIndex:'5'}} ></th>
+                <th className="FirstcolumInventry sticky-col first-col clone1" style={{zIndex:'4'}} ></th>
+                <th className="supplyplanTdWidthInventry sticky-col first-col clone" align="left" style={{whiteSpace:'inherit', zIndex:'5'}} ></th>
                 <th>{i18n.t('static.planningunit.planningunit')}</th>
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
@@ -1153,12 +1153,12 @@ export default class InventoryTurns extends Component {
                     <td className="sticky-col first-col clone" align="left">
                         {item.countryName}  
                     </td>
-                    <td>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length }</td>
+                    <td className='borderNoneInventry1'>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length }</td>
                     {/* <td>{this.formatter(item.totalConsumption)}</td> */}
                     {/* <td>{this.formatter(item.avergeStock)}</td> */}
                     <td></td>
                     <td></td>
-                    <td></td>
+                    <td className='borderNoneInventry'></td>
                     <td></td>
                     <td></td>
                     <td>{this.formatterDouble(item.inventoryTurns)}</td>
@@ -1171,16 +1171,16 @@ export default class InventoryTurns extends Component {
 
                     return (<>
                     <tr style={{ display: r.id in this.state.childShowArr ? "" : "none" }}>
-                      <td className="sticky-col first-col clone1" onClick={() => this.toggleAccordion1(r.programId, item.id)}>
+                      <td className="sticky-col first-col clone1 borderNoneInventry1" onClick={() => this.toggleAccordion1(r.programId, item.id)}>
                         {this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(r.programId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i> : ""}
                       </td>
-                      <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{r.programName}</td>  
-                      <td>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length }</td>
+                      <td className="sticky-col first-col clone text-left " style={{ textIndent: '30px' }}>{r.programName}</td>  
+                      <td className='borderNoneInventry1'>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length }</td>
                       {/* <td>{this.formatter(r.totalConsumption)}</td> */}
                       {/* <td>{this.formatter(r.avergeStock)}</td> */}
                       <td></td>
                       <td></td>
-                      <td></td>
+                      <td className='borderNoneInventry'></td>
                       <td></td>
                       <td></td>
                       <td>{this.formatterDouble(r.inventoryTurns)}</td>
@@ -1193,12 +1193,12 @@ export default class InventoryTurns extends Component {
                     {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
 
                         return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
-                        <td className="sticky-col first-col clone1"></td>
-                        <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
-                        <td></td>
+                        <td className="sticky-col first-col clone1 borderNoneInventry"></td>
+                        <td className="sticky-col first-col clone text-left PaddingLeftIndent">{arr1.planningUnit.label.label_en}</td>  
+                        <td className='borderNoneInventry'></td>
                         <td>{this.formatter(arr1.totalConsumption)}</td>
                         <td>{this.formatter(arr1.avergeStock)}</td>
-                        <td>{arr1.noOfMonths >= 6 ? arr1.noOfMonths : ""}</td>
+                        <td className='borderNoneInventry1'>{arr1.noOfMonths >= 6 ? arr1.noOfMonths : ""}</td>
                         <td>{arr1.reorderFrequencyInMonths}</td>
                         <td>{arr1.minMonthsOfStock}</td>
                         <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
@@ -1210,12 +1210,12 @@ export default class InventoryTurns extends Component {
                     {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
 
                         return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
-                        <td className="sticky-col first-col clone1"></td>
-                        <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
-                        <td></td>
+                        <td className="sticky-col first-col clone1 "></td>
+                        <td className="sticky-col first-col clone text-left PaddingLeftIndent">{arr1.planningUnit.label.label_en}</td>  
+                        <td className='borderNoneInventry'></td>
                         <td>{this.formatter(arr1.totalConsumption)}</td>
                         <td>{this.formatter(arr1.avergeStock)}</td>
-                        <td>{arr1.noOfMonths}</td>
+                        <td className='borderNoneInventry1'>{arr1.noOfMonths}</td>
                         <td>{arr1.reorderFrequencyInMonths}</td>
                         <td>{arr1.minMonthsOfStock}</td>
                         <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
