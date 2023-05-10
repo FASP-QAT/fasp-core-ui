@@ -567,7 +567,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         return new Date(a.month) - new Date(b.month);
                     });
                 console.log("gap2---", dataList)
-            if (dataList.length > 0) {
+                if (dataList.length > 0) {
                 var result = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(dataList[0].month).format("YYYY-MM") && moment(c.month).format("YYYY-MM") < moment(dataList[dataList.length - 1].month).format("YYYY-MM") && (c.amount == ''))
                 console.log("dataList[0]---", dataList[0]);
                 console.log("dataList[dataList.length - 1]---", dataList[dataList.length - 1]);
@@ -602,11 +602,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                 }
             }else{
                 console.log("Loader 2 Test123")
-                    this.setState({ extrapolationLoader: false }, () => {
-                        setTimeout(() => {
-                            alert("Please fill in the blank actual values or interpolate.")
-                        }, 0);
-                    });
+                this.setState({ extrapolationLoader: false }, () => {
+                    setTimeout(() => {
+                        alert("Please fill in the blank actual values or interpolate.")
+                    }, 0);
+                });
             }
             }, 0);
         });
