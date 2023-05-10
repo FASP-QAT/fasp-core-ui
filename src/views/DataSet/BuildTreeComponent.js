@@ -376,7 +376,7 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value));
                     if ((document.getElementById("nodeTypeId").value == 5)) {
-                        var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
+                        var testNumber = (/^\d{0,12}(\.\d{1,8})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
                         if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
                             return false;
                         } else {
@@ -534,6 +534,23 @@ const getErrorsFromValidationErrorLevel = (validationError) => {
             [error.path]: error.errors[FIRST_ERROR],
         }
     }, {})
+}
+
+function addCommasWith8Decimals(cell1, row) {
+    if (cell1 != null && cell1 != "") {
+        cell1 += '';
+        var x = cell1.replaceAll(",", "").split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+        // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    } else {
+        return "";
+    }
 }
 
 function addCommas(cell1, row) {
@@ -1264,7 +1281,7 @@ export default class BuildTree extends Component {
                     // console.log("refillMonths qat cal---", refillMonths)
                     // console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
                     // qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
-                    qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
+                    qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
                 } else {
                     // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
                     //     qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
@@ -1272,7 +1289,7 @@ export default class BuildTree extends Component {
                     //     qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                     // }
                     // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-                    qatCalculatedPUPerVisit = addCommas(this.state.noFURequired / pu.multiplier);
+                    qatCalculatedPUPerVisit = addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
                     // } else {
                     // qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                     // }
@@ -1431,11 +1448,11 @@ export default class BuildTree extends Component {
             console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
             // console.log("PUPERVISIT noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
             // puPerVisit = this.round(parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(4));
-            puPerVisit = parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(4);
+            puPerVisit = parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(8);
             console.log("PUPERVISIT puPerVisit---", puPerVisit);
         } else if (parentScenario.fuNode.usageType.id == 1) {
             // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-            puPerVisit = addCommas(this.state.noFURequired / conversionFactor);
+            puPerVisit = addCommasWith8Decimals(this.state.noFURequired / conversionFactor);
             // } else {
             // puPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / conversionFactor);
             // }
@@ -6447,13 +6464,13 @@ export default class BuildTree extends Component {
                         // } else {
                         //     sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
                         // }
-                        console.log("sharePu---", sharePu);
-                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommas(sharePu) + " " + planningUnit;
+                        console.log("sharePu---===>", sharePu);
+                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommasWith8Decimals(sharePu) + " " + planningUnit;
                     } else {
 
                         var puPerInterval = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit;
-                        console.log("puPerInterval---", puPerInterval);
-                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommas(puPerInterval) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + this.state.currentScenario.puNode.refillMonths + " " + i18n.t('static.report.month');
+                        console.log("puPerInterval---==>", puPerInterval);
+                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommasWith8Decimals(puPerInterval) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + this.state.currentScenario.puNode.refillMonths + " " + i18n.t('static.report.month');
                     }
                 } else {
                     usageText = "";
@@ -8031,10 +8048,10 @@ export default class BuildTree extends Component {
                 (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = refillMonths;
                 console.log("AUTO refillMonths---", refillMonths);
                 console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                puPerVisit = parseFloat(((itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
+                puPerVisit = parseFloat(((itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
             } else {
                 console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                puPerVisit = this.state.noFURequired / pu.multiplier;
+                puPerVisit = this.addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
             }
 
             console.log("AUTO puPerVisit---", puPerVisit);
@@ -8507,12 +8524,12 @@ export default class BuildTree extends Component {
                     var refillMonths = this.round(parseFloat(pu.multiplier / (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
                     console.log("AUTO refillMonths---", refillMonths);
                     console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                    puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
+                    puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
                     puNode.refillMonths = refillMonths;
                     puNode.puPerVisit = puPerVisit;
                 } else {
                     console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                    puPerVisit = this.state.noFURequired / pu.multiplier;
+                    puPerVisit = this.addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
                     puNode.puPerVisit = puPerVisit;
                 }
 
@@ -8894,14 +8911,14 @@ export default class BuildTree extends Component {
                             nodeValue: this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue),
                             // showFUValidation : true
                             percentageOfParent: this.state.currentScenario.dataValue,
-                            usageTypeIdFU:"",
-                            lagInMonths:"",
-                            noOfPersons:"",
-                            forecastingUnitPerPersonsFC:"",
-                            repeatCount:"",
-                            usageFrequencyCon:"",
-                            usageFrequencyDis:"",
-                            oneTimeUsage:""
+                            usageTypeIdFU: "",
+                            lagInMonths: "",
+                            noOfPersons: "",
+                            forecastingUnitPerPersonsFC: "",
+                            repeatCount: "",
+                            usageFrequencyCon: "",
+                            usageFrequencyDis: "",
+                            oneTimeUsage: ""
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -9668,7 +9685,7 @@ export default class BuildTree extends Component {
                                                                     value={this.state.currentItemConfig.parentItem != null
                                                                         && this.state.parentScenario.fuNode != null ?
                                                                         (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
-                                                                            addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noFURequired / this.state.conversionFactor) : ""}
+                                                                            addCommasWith8Decimals(this.state.currentScenario.puNode.puPerVisit) : addCommasWith8Decimals(this.state.noFURequired / this.state.conversionFactor) : ""}
                                                                 // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
                                                                 //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
                                                                 >
@@ -9774,7 +9791,7 @@ export default class BuildTree extends Component {
                                                                     value={this.state.currentItemConfig.parentItem != null
                                                                         && this.state.parentScenario.fuNode != null ?
                                                                         (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
-                                                                            addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noFURequired / this.state.conversionFactor) : ""}
+                                                                            addCommasWith8Decimals(this.state.currentScenario.puNode.puPerVisit) : addCommasWith8Decimals(this.state.noFURequired / this.state.conversionFactor) : ""}
                                                                 // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
                                                                 //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
                                                                 >
