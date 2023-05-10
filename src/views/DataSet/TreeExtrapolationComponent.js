@@ -1327,7 +1327,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     var map1 = new Map(Object.entries(tableJson[i]));
                     console.log("10 map---" + map1.get("10"));
                     var result = jexcelDataArr.filter(x => x.amount !== "");
-                    resultCount = (map1.get("1") !== "" || result.length > 0) ? resultCount + 1 : resultCount;
+                    resultCount = (map1.get("1") !== "") || result.length > 0 ? resultCount + 1 : resultCount;
                     var json = {
                         month: map1.get("0"),
                         amount: map1.get("1") !== "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
@@ -1339,7 +1339,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     jexcelDataArr.push(json);
                 }
                 this.setState({ jexcelDataArr }, () => {
-                    var interpolatedMonths = [];
+                var interpolatedMonths = [];
                     for (var j = 0; j < monthArray.length; j++) {
                         console.log("Month Array of J TEST123",monthArray[j])
                         var dataArr = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))[0];
@@ -1404,11 +1404,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                         .sort(function (a, b) {
                             return new Date(a.month) - new Date(b.month);
                         });
-                        if (interpolatedMonths.length == 0) {
+                        console.log("valList-------",valList)
+                    if (interpolatedMonths.length == 0) {
                             window.alert(i18n.t('static.consumptionDataEntryAndAdjustment.nothingToInterpolate'));
-                          }
+                    }    
                     this.setState({
-                        minMonth: valList[0].month,
+                        minMonth: valList.length!=0?valList[0].month:'',
                         nodeDataExtrapolation,
                         dataChanged: true
                     }, () => { this.buildJexcel() });
