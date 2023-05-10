@@ -313,7 +313,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             checkIfAnyMissingActualConsumption: false,
             extrapolateClicked: false,
             showDate: false,
-            seasonality: 1
+            seasonality: 1,
+            extrapolationNotes:null
         }
         // this.toggleD = this.toggleD.bind(this);
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
@@ -330,6 +331,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
         this.pickRange1 = React.createRef();
         this.seasonalityCheckbox = this.seasonalityCheckbox.bind(this);
+        this.changeNotes = this.changeNotes.bind(this);
     }
 
     seasonalityCheckbox(event) {
@@ -1107,7 +1109,12 @@ export default class ExtrapolateDataComponent extends React.Component {
         }
     }
 
-
+    changeNotes(notes) {
+        console.log("Seema notes",notes)
+        this.setState({
+            extrapolationNotes:notes
+        })
+    }
 
     saveForecastConsumptionExtrapolation() {
         // if ((this.state.movingAvgId && !this.state.monthsForMovingAverageValidate) ||
@@ -1118,6 +1125,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             loading: true
         })
+        console.log("Seema this.state.extrapolationNotes",this.state.extrapolationNotes)
         var db1;
         var storeOS;
         getDatabase();
@@ -1206,7 +1214,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     "userId": curUser
                                 },
                                 "createdDate": curDate,
-                                "extrapolationDataList": data
+                                "extrapolationDataList": data,
+                                "notes":this.state.extrapolationNotes
                             })
                         id += 1;
                     }
@@ -1236,7 +1245,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     "userId": curUser
                                 },
                                 "createdDate": curDate,
-                                "extrapolationDataList": data
+                                "extrapolationDataList": data,
+                                "notes":this.state.extrapolationNotes
                             })
                         id += 1;
 
@@ -1265,7 +1275,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     "userId": curUser
                                 },
                                 "createdDate": curDate,
-                                "extrapolationDataList": data
+                                "extrapolationDataList": data,
+                                "notes":this.state.extrapolationNotes
                             })
                         id += 1;
                     }
@@ -1299,7 +1310,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     "userId": curUser
                                 },
                                 "createdDate": curDate,
-                                "extrapolationDataList": data
+                                "extrapolationDataList": data,
+                                "notes":this.state.extrapolationNotes
                             })
                         id += 1;
                     }
@@ -1334,7 +1346,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     "userId": curUser
                                 },
                                 "createdDate": curDate,
-                                "extrapolationDataList": data
+                                "extrapolationDataList": data,
+                                "notes":this.state.extrapolationNotes
                             })
                         id += 1;
                     }
@@ -1465,6 +1478,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             var datasetJson = this.state.datasetJson;
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            var extrapolationNotes=null;
+
             if (consumptionExtrapolationList.length > 1 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                 this.setState({ loading: true })
                 var startDate1 = moment.min((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
@@ -1498,6 +1513,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         maxDate = { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) };
                         actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(endDate1).format("YYYY-MM"));
                         curDate1 = startDate1;
+                        extrapolationNotes = consumptionExtrapolationMovingData[0].notes;
                     }
                 } else if (consumptionExtrapolationSemiAvg.length > 0) {
                     if (consumptionExtrapolationSemiAvg[0].jsonProperties.startDate != undefined) {
@@ -1663,6 +1679,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 console.log("ActualConsumptionList@@@@@@@@@@@@@", actualConsumptionList)
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
+                    extrapolationNotes:extrapolationNotes,
                     startDate: startDate1,
                     stopDate: endDate1,
                     rangeValue1: rangeValue2,
@@ -3839,6 +3856,19 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 <b>{i18n.t('static.extrapolation.seasonality')}</b>
                                                             </Label>
                                                         </div>
+                                                    </div>
+                                                    <div className=" col-md-4 pt-lg-2">
+                                                        <Label htmlFor="currencyId">{i18n.t('static.ManageTree.Notes')}</Label>
+                                                        <InputGroup>
+                                                            <Input
+                                                                type="textarea"
+                                                                name="extrapolationNotes"
+                                                                id="extrapolationNotes"
+                                                                bsSize="sm"
+                                                                value={this.state.extrapolationNotes}
+                                                                onChange={(e) => { this.changeNotes(e.target.value) }}
+                                                            ></Input>
+                                                    </InputGroup>
                                                     </div>
                                                 </div>
                                             </FormGroup>
