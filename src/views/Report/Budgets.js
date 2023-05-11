@@ -1223,7 +1223,7 @@ class Budgets extends Component {
             labels: budgets.map(ele => getLabelText(ele.label, this.state.lang)),
             datasets: [
                 {
-                    label: i18n.t('static.budget.allocatedShipmentOrdered'),
+                    label: i18n.t('static.budget.allocatedShipmentPlanned'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#118b70',
@@ -1232,22 +1232,10 @@ class Budgets extends Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: data1
-                },
-                {
-                    label: i18n.t('static.budget.allocatedShipmentPlanned'),
-                    type: 'horizontalBar',
-                    stack: 1,
-                    backgroundColor: '#EDB944',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
                     data: data2
                 },
                 {
-                    label: "Positive " + i18n.t('static.report.remainingBudgetAmt'),
+                    label: i18n.t('static.budget.allocatedShipmentOrdered'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#002f6c',
@@ -1256,10 +1244,22 @@ class Budgets extends Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: data3
+                    data: data1
                 },
                 {
-                    label: "Negative " + i18n.t('static.report.remainingBudgetAmt'),
+                    label: i18n.t('static.report.overspentBudget'),
+                    type: 'horizontalBar',
+                    stack: 1,
+                    backgroundColor: '#BA0C2F',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: data4
+                },
+                {
+                    label: i18n.t('static.report.budgetRemaining'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#cfcdc9',
@@ -1268,7 +1268,7 @@ class Budgets extends Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: data4
+                    data: data3
                 }
             ],
 
