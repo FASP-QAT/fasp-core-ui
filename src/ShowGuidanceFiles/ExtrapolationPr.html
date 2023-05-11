@@ -75,9 +75,9 @@
 			a 1 favorecendo valores recentes e valores próximos a 0 favorecendo valores mais antigos. 
 			Os usuários que utilizam a suavização exponencial tripla podem escolher entre quatro parâmetros:
 			<ul>
-				<li>Alfa</li>
-				<li>Beta</li>
-				<li>Gama</li>
+				<li>alfa, aplica-se ao nível ou linha de base do conjunto de dados. Valores alfa mais altos dão mais peso aos dados mais recentes</li>
+				<li>beta, determina quão fortemente as tendências recentes devem ser valorizadas em comparação com as tendências mais antigas</li>
+				<li>gama, reflete o componente sazonal da previsão. Sazonal geralmente se refere a padrões repetidos dentro de um ano. Quanto maior o gama, mais peso será aplicado ao componente sazonal mais recente dos dados.</li>
 				<li>Sazonalidade: No QAT, uma estação pode ser descrita como a duração esperada (em meses) de qualquer padrão repetitivo no consumo</li>
 				<li>Intervalo de confiança:  entre 0% e 100% (exclusivo), por exemplo, nível de confiança de 
 					90% indica que 90% dos pontos futuros devem cair dentro deste raio de previsão.
