@@ -529,7 +529,8 @@ label.arrow_label:after {
 
 .table thead tr th {
   position: sticky;
-  top: -1px;
+  // top: -1px;
+  top: 0px;
   padding: 6px 4px 5px 4px !important;
   // padding: 5px !important;
   background: #fff;
@@ -10039,4 +10040,11 @@ legend.scheduler-border {
 @font-face {
   font-family: 'latin_modern_roman_slante10Rg';
   src: url('/src/assets/font_formulae/lmromanslant10-regular-webfont.woff') format('woff');
+}
+
+.ChartGraphHeight .chart-graph-report {
+  height: 50vmax!important;
+}
+.table-scroll1 .ForecastOutputBottom .table thead th {
+  border-bottom: 1px solid #c8ced3 !important;
 }
