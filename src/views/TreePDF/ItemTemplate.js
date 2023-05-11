@@ -47,8 +47,8 @@ export default function ItemTemplate(options, itemTemplateConfig) {
 
     /* item border */
     doc.roundedRect(position.x, position.y, 200, 110, 0)
-      .lineWidth(_config.itemBorderWidth)
-      .stroke('#dddddd');
+      .lineWidth((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].isPUMappingCorrect==0?2:_config.itemBorderWidth)
+      .stroke((itemConfig.payload.nodeDataMap[itemConfig.scenarioId])[0].isPUMappingCorrect==0?'#BA0C2F':'#dddddd');
 
     /* title background */
     doc.fillColor(itemConfig.payload.nodeType.id == 5
