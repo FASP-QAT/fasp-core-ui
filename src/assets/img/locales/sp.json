@@ -3029,5 +3029,7 @@
     "static.QATForecastImport.forcastConsumption": "Consumo previsto (módulo de previsión)",
     "static.QATForecastImport.convertedForecastConsumption": "Consumo previsto convertido (a importar)",
     "static.QATForecastImport.currentForecastConsumption": "Consumo Pronosticado Actual (Módulo Plan de Abastecimiento)",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.report.overspentBudget": "Presupuesto gastado en exceso",
+    "static.report.budgetRemaining": "Presupuesto restante"
 }
