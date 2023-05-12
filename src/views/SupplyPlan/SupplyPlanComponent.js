@@ -2572,7 +2572,7 @@ export default class SupplyPlanComponent extends React.Component {
                     <Modal isOpen={this.state.exportModal}
                         className={'modal-md'}>
                         <ModalHeader toggle={() => this.toggleExport(0)} className="modalHeaderSupplyPlan" id="shipmentModalHeader">
-                            {/* <strong>{i18n.t("static.supplyPlan.")}</strong> */}
+                            <strong>{this.state.type==1?i18n.t("static.supplyPlan.exportAsPDF"):i18n.t("static.supplyPlan.exportAsCsv")}</strong>
                         </ModalHeader>
                         <ModalBody>
                             <>
@@ -5169,7 +5169,11 @@ export default class SupplyPlanComponent extends React.Component {
                     // var planningunitList = this.state.planningUnitList.filter(c => c.value != this.state.planningUnitId)
                     // planningunitList.push(selectedplanningunit[0])
                     var pcnt = 0;
-                    var sortedPlanningUnitData = this.state.planningUnitIdsExport;
+                    var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
+                        a = a.label.toLowerCase();
+                        b = b.label.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    });
                     // if (this.state.planningUnitIdsExport.filter(c => c.value == this.state.planningUnitId).length > 0) {
                     //     sortedPlanningUnitData.push(this.state.planningUnitIdsExport.filter(c => c.value == this.state.planningUnitId)[0])
                     // }
