@@ -1576,6 +1576,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         // maxDate = { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) };
                         actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(endDate1).format("YYYY-MM"));
                         curDate1 = startDate1;
+                        extrapolationNotes = consumptionExtrapolationSemiAvg[0].notes;
                     }
                 } else if (consumptionExtrapolationRegression.length > 0) {
                     if (consumptionExtrapolationRegression[0].jsonProperties.startDate != undefined) {
@@ -1587,6 +1588,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         // maxDate = { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) };
                         actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(endDate1).format("YYYY-MM"));
                         curDate1 = startDate1;
+                        extrapolationNotes = consumptionExtrapolationRegression[0].notes;
                     }
                 } else if (consumptionExtrapolationTESM.length > 0) {
                     if (consumptionExtrapolationTESM[0].jsonProperties.startDate != undefined) {
@@ -1598,6 +1600,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         // maxDate = { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) };
                         actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(endDate1).format("YYYY-MM"));
                         curDate1 = startDate1;
+                        extrapolationNotes = consumptionExtrapolationTESM[0].notes;
                     }
                 } else if (consumptionExtrapolationArima.length > 0) {
                     if (consumptionExtrapolationArima[0].jsonProperties.startDate != undefined) {
@@ -1609,6 +1612,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         // maxDate = { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) };
                         actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(endDate1).format("YYYY-MM"));
                         curDate1 = startDate1;
+                        extrapolationNotes = consumptionExtrapolationArima[0].notes;
                     }
                 }
 
