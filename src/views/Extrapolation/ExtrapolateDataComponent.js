@@ -1048,7 +1048,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                 } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
                     planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
                     event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
-                }
+                }else if (this.props.match.params.planningUnitId > 0) {
+                    planningUnitId = this.props.match.params.planningUnitId;
+                    event.target.value = this.props.match.params.planningUnitId;
+                  }
 
                 var regionId = "";
                 var regionEvent = {
@@ -1112,7 +1115,9 @@ export default class ExtrapolateDataComponent extends React.Component {
     changeNotes(notes) {
         console.log("Seema notes",notes)
         this.setState({
-            extrapolationNotes:notes
+            extrapolationNotes:notes,
+            dataChanged: true,
+            extrapolateClicked: true
         })
     }
 
@@ -3857,22 +3862,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             </Label>
                                                         </div>
                                                     </div>
-                                                    <div className=" col-md-4 pt-lg-2">
-                                                        <Label htmlFor="currencyId">{i18n.t('static.ManageTree.Notes')}</Label>
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="textarea"
-                                                                name="extrapolationNotes"
-                                                                id="extrapolationNotes"
-                                                                bsSize="sm"
-                                                                value={this.state.extrapolationNotes}
-                                                                onChange={(e) => { this.changeNotes(e.target.value) }}
-                                                            ></Input>
-                                                    </InputGroup>
-                                                    </div>
                                                 </div>
                                             </FormGroup>
                                         </div>
+                                        <div className=" col-md-4 pt-lg-0">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.ManageTree.Notes')}</Label>
+                                                            <Input
+                                                                className="controls"
+                                                                bsSize="sm"
+                                                                type="textarea"
+                                                                name="extrapolationNotes"
+                                                                id="extrapolationNotes"
+                                                                value={this.state.extrapolationNotes}
+                                                                onChange={(e) => { this.changeNotes(e.target.value) }}
+                                                            ></Input>
+                                                    </div>
 
                                         {/* </div> */}
                                         {/* <div className="col-md-12">
