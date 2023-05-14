@@ -1672,7 +1672,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             csvRow.push('"' + ('Region' + ': ' + getLabelText(ele.label, this.state.lang)).replaceAll(' ', '%20') + '"'))
         this.state.consumptionAdjForStockOutId ? csvRow.push('"' + ('Show consumption adjusted for stock out' + ': ' + true).replaceAll(' ', '%20') + '"'):
         csvRow.push('"' + ('Show consumption adjusted for stock out' + ': ' + false).replaceAll(' ', '%20') + '"')
-        csvRow.push('"'+(i18n.t('static.report.timeWindow')+': '+document.getElementById("timeWindow").value).replaceAll(' ', '%20') + '"')
+        csvRow.push('"'+(i18n.t('static.report.timeWindow')+': ' + (document.getElementById("timeWindow").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         csvRow.push('');
         var columns = [];
         columns.push('');
@@ -1892,7 +1892,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     doc.text('Show consumption adjusted for stock out' + ': '+this.state.consumptionAdjForStockOutId, doc.internal.pageSize.width / 8, 170, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.timeWindow') + ': '+document.getElementById("timeWindow").value, doc.internal.pageSize.width / 8, 190, {
+                    doc.text(i18n.t('static.report.timeWindow') + ': '+document.getElementById("timeWindow").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
                         align: 'left'
                     })
 
