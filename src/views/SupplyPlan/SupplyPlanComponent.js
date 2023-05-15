@@ -184,7 +184,9 @@ export default class SupplyPlanComponent extends React.Component {
             budgetListPlanAll: [],
             programResult: "",
             showPlanningUnitAndQty: 0,
-            showPlanningUnitAndQtyList: []
+            showPlanningUnitAndQtyList: [],
+            shipmentQtyTotalForPopup: 0,
+            batchQtyTotalForPopup: 0
             // startDateFormat:curDate
         }
 
@@ -230,6 +232,18 @@ export default class SupplyPlanComponent extends React.Component {
         this.setBudgetId = this.setBudgetId.bind(this);
         this.planShipment = this.planShipment.bind(this)
         this.pickAMonthSingle = React.createRef();
+    }
+
+    addCommas(cell, row) {
+        cell += '';
+        var x = cell.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
     }
 
     _handleClickRangeBox(e) {
@@ -2364,6 +2378,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.shipmentChild != undefined && <Button color="info" size="md" id="addRowBatchId" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                    <b><h3 className="float-right mr-2">{i18n.t("static.supplyPlan.shipmentQty") + " : " + this.addCommas(this.state.shipmentQtyTotalForPopup) + " / " + i18n.t("static.supplyPlan.batchQty") + " : " + this.addCommas(this.state.batchQtyTotalForPopup)}</h3></b>
                                 </div>
                                 <div className="pt-4"></div>
                             </ModalBody>
