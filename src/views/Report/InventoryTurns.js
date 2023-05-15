@@ -147,7 +147,7 @@ export default class InventoryTurns extends Component {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.forecastReport.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory'))).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.inventoryTurns.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory'))).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') + ' : ' + this.state.countryId.map(e => {return e.label}) : i18n.t('static.productCategory.productCategory')  + ' : ' + this.state.puId.map(e => {return e.label})).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + this.state.programId.map(e => {return e.label})).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -164,18 +164,18 @@ export default class InventoryTurns extends Component {
 
         {this.state.costOfCountry.map(item => {
 
-            A.push(this.addDoubleQuoteToRowContent([(item.countryName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length, this.formatter(item.totalConsumption), this.round(item.avergeStock), "", this.roundN(item.inventoryTurns), this.roundN(item.plannedInventoryTurns), this.roundN(item.mape), this.roundN(item.mse)])) 
+            A.push(this.addDoubleQuoteToRowContent([(item.countryName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length, this.formatter(item.totalConsumption), this.round(item.avergeStock), "",  "", "", this.roundN(item.inventoryTurns), this.roundN(item.plannedInventoryTurns), this.roundN(item.mape), this.roundN(item.mse)])) 
                     
             {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
                 
-                A.push(this.addDoubleQuoteToRowContent([(r.programName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, this.formatter(r.totalConsumption), this.round(r.avergeStock), "", this.roundN(r.inventoryTurns), this.roundN(r.plannedInventoryTurns), this.roundN(r.mape), this.roundN(r.mse)]))
+                A.push(this.addDoubleQuoteToRowContent([(r.programName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, this.formatter(r.totalConsumption), this.round(r.avergeStock), "", "", "", this.roundN(r.inventoryTurns), this.roundN(r.plannedInventoryTurns), this.roundN(r.mape), this.roundN(r.mse)]))
                         
                 {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN(arr1.mse)]))          
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 6 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN(arr1.mse)]))          
                 })}
 
                 {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN(arr1.mse)]))  
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 6 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN(arr1.mse)]))  
                 })}
                 
             })}
@@ -236,7 +236,7 @@ export default class InventoryTurns extends Component {
                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.forecastReport.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory')) , doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.inventoryTurns.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory')) , doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
 
@@ -277,18 +277,18 @@ export default class InventoryTurns extends Component {
         const data=[];
         {this.state.costOfCountry.map(item => {
 
-            data.push([item.countryName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length, this.formatter(item.totalConsumption), this.formatter(item.avergeStock), "", this.formatterDouble(item.inventoryTurns), this.formatterDouble(item.plannedInventoryTurns), this.formatterDouble(item.mape), this.formatterDouble(item.mse)])  
+            data.push([" "+item.countryName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length, this.formatter(item.totalConsumption), this.formatter(item.avergeStock), "",  "", "", this.formatterDouble(item.inventoryTurns), this.formatterDouble(item.plannedInventoryTurns), this.formatterDouble(item.mape), this.formatterDouble(item.mse)])  
                     
             {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
                 
-                data.push(["      "+r.programName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, this.formatter(r.totalConsumption), this.formatter(r.avergeStock), "", this.formatterDouble(r.inventoryTurns), this.formatterDouble(r.plannedInventoryTurns), this.formatterDouble(r.mape), this.formatterDouble(r.mse)])
+                data.push(["      "+r.programName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, this.formatter(r.totalConsumption), this.formatter(r.avergeStock), "",  "", "", this.formatterDouble(r.inventoryTurns), this.formatterDouble(r.plannedInventoryTurns), this.formatterDouble(r.mape), this.formatterDouble(r.mse)])
                 
                 {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    data.push(["            "+getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), this.formatter(arr1.noOfMonths), this.formatterDouble(arr1.inventoryTurns), this.formatterDouble(arr1.plannedInventoryTurns), this.formatterDouble(arr1.mape), this.formatterDouble(arr1.mse)])          
+                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), arr1.noOfMonths >= 6 ? this.formatter(arr1.noOfMonths) : "", this.formatter(arr1.reorderFrequencyInMonths), this.formatter(arr1.minMonthsOfStock), this.formatterDouble(arr1.inventoryTurns), this.formatterDouble(arr1.plannedInventoryTurns), this.formatterDouble(arr1.mape), this.formatterDouble(arr1.mse)])          
                 })}
 
                 {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    data.push(["            "+getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), this.formatter(arr1.noOfMonths), this.formatterDouble(arr1.inventoryTurns), this.formatterDouble(arr1.plannedInventoryTurns), this.formatterDouble(arr1.mape), this.formatterDouble(arr1.mse)])  
+                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), arr1.noOfMonths >= 6 ? this.formatter(arr1.noOfMonths) : "", this.formatter(arr1.reorderFrequencyInMonths), this.formatter(arr1.minMonthsOfStock), this.formatterDouble(arr1.inventoryTurns), this.formatterDouble(arr1.plannedInventoryTurns), this.formatterDouble(arr1.mape), this.formatterDouble(arr1.mse)])  
                 })}
                 
             })}
@@ -299,11 +299,20 @@ export default class InventoryTurns extends Component {
             startY: this.state.CostOfInventoryInput.displayId == 1 ? 170 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 170 + this.state.puId.length*2 + this.state.programId.length*2,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 65 },
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 60, textColor: [0,0,0] },
             columnStyles: {
-                0: { cellWidth: 255, halign: 'left'},
+                0: { cellWidth: 170, halign: 'left'},
+            },
+            didParseCell: function (data) {
+
+                if(data.section=="body" && data.column.index == 0){
+                    if(data.cell.raw[0]!=" "){
+                        data.cell.styles.cellPadding = {left: 30,right: 5, top: 5, bottom: 5};
+                    }
+                }
             }
         };
+        var maxSecondColumnWidth = 0;
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
@@ -662,7 +671,7 @@ export default class InventoryTurns extends Component {
                         var json = (response.data).filter(c => c.payload.active == true);
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].payload.productCategoryId, label: json[i].payload.label.label_en }
+                            regList[i] = { value: json[i].payload.productCategoryId, label: json[i].payload.label.label_en, sortOrder: json[i].sortOrder }
                         }
                         var listArray = regList;
                         
@@ -854,7 +863,6 @@ export default class InventoryTurns extends Component {
         if(inputJson.programIds.length > 0){
             ReportService.inventoryTurns(inputJson).then(response => {
                 console.log("costOfInentory=====>", (response.data));
-                console.log("Hello "+JSON.stringify(inputJson))
                 if(response.data.length > 0){
                     const level1Data = [];
                     const level2Data = [];
@@ -909,9 +917,16 @@ export default class InventoryTurns extends Component {
                             }
                         }
                     }else{
-                        console.log("Try",this.state.CostOfInventoryInput)
                         for(let i=0; i < this.state.CostOfInventoryInput.pu.length; i++){
-                            let tempData = response.data.filter(e => e.productCategory.id == this.state.CostOfInventoryInput.pu[i]);
+                            let sortOrderList = [];
+                            let sortOrder = this.state.puList.filter(e => e.value == this.state.CostOfInventoryInput.pu[i])[0].sortOrder;
+                            let updatedItems = this.state.puList.map(item => {
+                                if (item.sortOrder.toString().startsWith(sortOrder.toString())) {
+                                    sortOrderList.push(item.value);
+                                }
+                            });
+                            let tempData = response.data.filter(e => sortOrderList.includes(e.productCategory.id));
+                            let tempPU = this.state.puList.filter(e => e.value == this.state.CostOfInventoryInput.pu[i])[0].label;
                             if(tempData.length > 0){
                                 let level1Consumption = tempData.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
                                 let unique = [...new Set(tempData.map((item) => item.program.id))];
@@ -924,7 +939,7 @@ export default class InventoryTurns extends Component {
                                 let level1Mse = tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / tempData.filter(arr => arr.mse != null).length;
                                 level1Data.push({
                                     id: this.state.CostOfInventoryInput.pu[i],
-                                    countryName: tempData[0].productCategory.label.label_en,
+                                    countryName: tempPU,
                                     totalConsumption: level1Consumption,
                                     programIds: unique,
                                     avergeStock: level1AverageStock,
@@ -935,7 +950,7 @@ export default class InventoryTurns extends Component {
                                 })
                             
                                 for(let j=0; j<unique.length; j++){
-                                    let temp = response.data.filter(e =>  e.productCategory.id == this.state.CostOfInventoryInput.pu[i] && e.program.id == unique[j])
+                                    let temp = response.data.filter(e =>  sortOrderList.includes(e.productCategory.id) && e.program.id == unique[j])
                                     let level2Consumption = temp.reduce((prev,curr,index) => prev + curr.totalConsumption, 0);
                                     let level2NoOfMonths = temp.reduce((prev,curr,index) => prev + curr.noOfMonths, 0);
                                     let level2AverageStock = temp.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
@@ -1106,14 +1121,15 @@ export default class InventoryTurns extends Component {
     }      
 
     getTableDiv() {
+        
         return (
           <Table className="table-bordered text-center overflowhide main-table inventoryTurnsTable inventoryTurnsTableZindex" bordered size="sm" options={this.options}>
             <thead>
               <tr>
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
-                <th className="sticky-col first-col clone1"></th>
-                <th className="sticky-col first-col clone" align="left"></th>
-                <th>{i18n.t('static.planningunit.planningunit')}</th>
+                <th className="FirstcolumInventry sticky-col first-col clone1" style={{zIndex:'4'}} ></th>
+                <th className="supplyplanTdWidthInventry sticky-col first-col clone" align="left" style={{whiteSpace:'inherit', zIndex:'5'}} ></th>
+                <th>{i18n.t('static.inventoryTurns.noofplanningunits')}</th>
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
                 <th>{i18n.t('static.report.noofmonth')}</th>
@@ -1127,7 +1143,13 @@ export default class InventoryTurns extends Component {
             </thead>
             <tbody>
               {this.state.costOfCountry.map(item => {
-
+                let sortOrderList = [];
+                let sortOrder = this.state.puList.filter(e => e.value == item.id)[0].sortOrder;
+                let updatedItems = this.state.puList.map(item1 => {
+                    if (item1.sortOrder.toString().startsWith(sortOrder.toString())) {
+                        sortOrderList.push(item1.value);
+                    }
+                });
                 return (<>
                   <tr>
                     <td className="sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.id)}>
@@ -1136,12 +1158,12 @@ export default class InventoryTurns extends Component {
                     <td className="sticky-col first-col clone" align="left">
                         {item.countryName}  
                     </td>
-                    <td>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length }</td>
+                    <td className='borderNoneInventry1'>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => sortOrderList.includes(arr.productCategory.id)).length }</td>
                     {/* <td>{this.formatter(item.totalConsumption)}</td> */}
                     {/* <td>{this.formatter(item.avergeStock)}</td> */}
                     <td></td>
                     <td></td>
-                    <td></td>
+                    <td className='borderNoneInventry'></td>
                     <td></td>
                     <td></td>
                     <td>{this.formatterDouble(item.inventoryTurns)}</td>
@@ -1154,16 +1176,16 @@ export default class InventoryTurns extends Component {
 
                     return (<>
                     <tr style={{ display: r.id in this.state.childShowArr ? "" : "none" }}>
-                      <td className="sticky-col first-col clone1" onClick={() => this.toggleAccordion1(r.programId, item.id)}>
+                      <td className="sticky-col first-col clone1 borderNoneInventry1" onClick={() => this.toggleAccordion1(r.programId, item.id)}>
                         {this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(r.programId) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i> : ""}
                       </td>
-                      <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{r.programName}</td>  
-                      <td>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length }</td>
+                      <td className="sticky-col first-col clone text-left " style={{ textIndent: '30px' }}>{r.programName}</td>  
+                      <td className='borderNoneInventry1'>{this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => sortOrderList.includes(arr.productCategory.id) && arr.program.id == r.programId ).length }</td>
                       {/* <td>{this.formatter(r.totalConsumption)}</td> */}
                       {/* <td>{this.formatter(r.avergeStock)}</td> */}
                       <td></td>
                       <td></td>
-                      <td></td>
+                      <td className='borderNoneInventry'></td>
                       <td></td>
                       <td></td>
                       <td>{this.formatterDouble(r.inventoryTurns)}</td>
@@ -1176,12 +1198,12 @@ export default class InventoryTurns extends Component {
                     {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
 
                         return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
-                        <td className="sticky-col first-col clone1"></td>
-                        <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
-                        <td></td>
+                        <td className="sticky-col first-col clone1 borderNoneInventry"></td>
+                        <td className="sticky-col first-col clone text-left PaddingLeftIndent">{arr1.planningUnit.label.label_en}</td>  
+                        <td className='borderNoneInventry'></td>
                         <td>{this.formatter(arr1.totalConsumption)}</td>
                         <td>{this.formatter(arr1.avergeStock)}</td>
-                        <td>{arr1.noOfMonths >= 6 ? arr1.noOfMonths : ""}</td>
+                        <td className='borderNoneInventry1'>{arr1.noOfMonths >= 6 ? arr1.noOfMonths : ""}</td>
                         <td>{arr1.reorderFrequencyInMonths}</td>
                         <td>{arr1.minMonthsOfStock}</td>
                         <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
@@ -1190,15 +1212,15 @@ export default class InventoryTurns extends Component {
                         <td>{this.formatterDouble(arr1.mse)}</td>
                         </tr>)
                     })}
-                    {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
+                    {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => sortOrderList.includes(item.id) && arr.program.id == r.programId ).map(arr1 => {
 
                         return (<tr style={{ display: this.state.childShowArr[item.id] ? this.state.childShowArr[item.id].includes(arr1.program.id) ? "" : "none" : "none" }}>
-                        <td className="sticky-col first-col clone1"></td>
-                        <td className="sticky-col first-col clone text-left" style={{ textIndent: '60px' }}>{arr1.planningUnit.label.label_en}</td>  
-                        <td></td>
+                        <td className="sticky-col first-col clone1 "></td>
+                        <td className="sticky-col first-col clone text-left PaddingLeftIndent">{arr1.planningUnit.label.label_en}</td>  
+                        <td className='borderNoneInventry'></td>
                         <td>{this.formatter(arr1.totalConsumption)}</td>
                         <td>{this.formatter(arr1.avergeStock)}</td>
-                        <td>{arr1.noOfMonths}</td>
+                        <td className='borderNoneInventry1'>{arr1.noOfMonths}</td>
                         <td>{arr1.reorderFrequencyInMonths}</td>
                         <td>{arr1.minMonthsOfStock}</td>
                         <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
@@ -1244,16 +1266,16 @@ export default class InventoryTurns extends Component {
                 sort: true,
                 align: 'left',
                 headerAlign: 'left',
-                style: { align: 'left', width: '480px' },
+                style: { align: 'left', width: '380px' },
                 formatter: this.formatLabel
             },
             {
                 dataField: 'noOfPlanningUnits',
-                text: i18n.t('static.planningunit.planningunit'),
+                text: i18n.t('static.inventoryTurns.noofplanningunits'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
+                style: { align: 'center', width: '170px' },
                 formatter: this.formatter
 
             },
@@ -1263,7 +1285,7 @@ export default class InventoryTurns extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
+                style: { align: 'center', width: '170px' },
                 formatter: this.formatter
 
             },
@@ -1273,7 +1295,7 @@ export default class InventoryTurns extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
+                style: { align: 'center', width: '170px' },
                 formatter: this.formatter
             },
             {
@@ -1282,7 +1304,25 @@ export default class InventoryTurns extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
+                style: { align: 'center', width: '170px' },
+                formatter: this.formatter
+            },
+            {
+                dataField: 'reorderInterval',
+                text: i18n.t('static.supplyPlan.reorderInterval'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { align: 'center', width: '170px' },
+                formatter: this.formatter
+            },
+            {
+                dataField: 'minMonthOfStock',
+                text: i18n.t('static.product.minMonthOfStock'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { align: 'center', width: '170px' },
                 formatter: this.formatter
             },
             {
@@ -1291,7 +1331,7 @@ export default class InventoryTurns extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
+                style: { align: 'center', width: '170px' },
                 formatter: this.formatterDouble
             },
             {
@@ -1300,7 +1340,7 @@ export default class InventoryTurns extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
+                style: { align: 'center', width: '170px' },
                 formatter: this.formatterDouble
             },
             {
@@ -1309,7 +1349,7 @@ export default class InventoryTurns extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
+                style: { align: 'center', width: '170px' },
                 formatter: this.formatterDouble
             },
             {
@@ -1318,7 +1358,7 @@ export default class InventoryTurns extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { align: 'center', width: '200px' },
+                style: { align: 'center', width: '170px' },
                 formatter: this.formatterDouble
             }
         ];
@@ -1415,7 +1455,7 @@ export default class InventoryTurns extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.display')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.inventoryTurns.display')}</Label>
                                                 <div className="controls " style={{ marginLeft: '-51px' }}>
 
                                                     <FormGroup check inline style={{ marginRight: '-36px' }}>
@@ -1517,8 +1557,8 @@ export default class InventoryTurns extends Component {
                                 </Form>
                             </div>
                         </div>
-                        <div className="table-scroll">
-                            <div className="table-wrap DataEntryTable table-responsive fixTableHeadSupplyPlan">
+                        <div className="TableWidthCoumnBorder table-scroll">
+                            <div className="table-wrap TableWidthCoumn DataEntryTable ZindexInventory table-responsive fixTableHeadSupplyPlan">
                                 {this.state.isTableLoaded}
                             </div>
                         </div>

@@ -11140,8 +11140,8 @@ export default class BuildTree extends Component {
                 var planningUnitList=[];
                 if(this.state.programId!=null && this.state.programId!=""){
                 planningUnitList=this.state.programDataListForPuCheck.filter(c=>c.id==this.state.programId)[0].programData.planningUnitList;
-                var planningUnitListFilter=planningUnitList.filter(c=>c.planningUnit.id==planningUnitId)[0];
-                if(planningUnitListFilter.planningUnit.forecastingUnit.id==forecastingUnitId){
+                var planningUnitListFilter=planningUnitList.filter(c=>c.planningUnit.id==planningUnitId);
+                if(planningUnitListFilter.length>0 && planningUnitListFilter[0].planningUnit.forecastingUnit.id==forecastingUnitId){
                     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect=1
                 }else{
                     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect=0
@@ -11216,6 +11216,7 @@ export default class BuildTree extends Component {
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 <b style={{ color: '#212721', float: 'right' }}>
+                                    {itemConfig.payload.nodeType.id == 4 ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}
                                     {itemConfig.payload.nodeType.id == 2 ?
                                         <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
                                         (itemConfig.payload.nodeType.id == 3 ?
