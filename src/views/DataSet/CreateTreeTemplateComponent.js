@@ -6114,7 +6114,7 @@ export default class CreateTreeTemplate extends Component {
                                     [{
                                         nodeDataId: 1,
                                         notes: '',
-                                        monthNo: 1,
+                                        monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                         dataValue: '0',
                                         calculatedDataValue: '0',
                                         fuNode: {
@@ -6228,7 +6228,7 @@ export default class CreateTreeTemplate extends Component {
                                     nodeDataModelingList: [],
                                     nodeDataOverrideList: [],
                                     nodeDataMomList: [],
-                                    monthNo: 1,
+                                    monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                     dataValue: '0',
                                     displayDataValue: '',
                                     calculatedDataValue: '0',
@@ -10129,7 +10129,7 @@ export default class CreateTreeTemplate extends Component {
                                                             nodeDataModelingList: [],
                                                             nodeDataOverrideList: [],
                                                             nodeDataMomList: [],
-                                                            monthNo: 1,
+                                                            monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                                             dataValue: '',
                                                             calculatedDataValue: '',
                                                             notes: '',
