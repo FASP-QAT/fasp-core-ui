@@ -305,14 +305,6 @@ export default class InventoryTurns extends Component {
             },
             didParseCell: function (data) {
 
-                var row = data.row;
-                var colCount = row.length;
-                    console.log("Hello "+JSON.stringify(data))
-                if (row.raw[0] === " " && row.raw[1] === " ") {
-                    
-                        row.styles.fillColor = [255, 0, 0];
-                    
-                }
                 if(data.section=="body" && data.column.index == 0){
                     if(data.cell.raw[0]!=" "){
                         data.cell.styles.cellPadding = {left: 30,right: 5, top: 5, bottom: 5};
