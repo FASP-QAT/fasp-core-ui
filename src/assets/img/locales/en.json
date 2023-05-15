@@ -3040,5 +3040,10 @@
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.report.overspentBudget": "Overspent Budget",
     "static.report.budgetRemaining": "Budget Remaining",
-    "static.supplyPlan.exportAsPDF":"Export as PDF"
+    "static.supplyPlan.exportAsPDF":"Export as PDF",
+    "static.supplyPlan.batchQty":"Batch Quantity",
+    "static.inventoryTurns.actual":"Actual Inventory Turns",
+    "static.inventoryTurns.planned":"Planned Inventory Turns",
+    "static.inventoryTurns.display":"Display report by",
+    "static.inventoryTurns.noofplanningunits":"Number of planning units"
 }

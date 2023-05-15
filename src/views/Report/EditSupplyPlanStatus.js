@@ -244,6 +244,8 @@ class EditSupplyPlanStatus extends Component {
                 regionArray: [],
                 regionList: [],
                 problemStatusListForEdit: [],
+                shipmentQtyTotalForPopup: 0,
+                batchQtyTotalForPopup: 0
             },
             statuses: [],
             regionList: [],
@@ -277,6 +279,18 @@ class EditSupplyPlanStatus extends Component {
         this.loaded1 = this.loaded1.bind(this);
         this.addMannualProblem = this.addMannualProblem.bind(this);
         this.modelOpenClose = this.modelOpenClose.bind(this);
+    }
+
+    addCommas(cell, row) {
+        cell += '';
+        var x = cell.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
     }
 
     getProblemCriticality() {
@@ -4973,6 +4987,7 @@ class EditSupplyPlanStatus extends Component {
                                     </div>
                                     <div id="showShipmentBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                         <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <b><h3 className="float-right mr-2">{i18n.t("static.supplyPlan.shipmentQty") + " : " + this.addCommas(this.state.shipmentQtyTotalForPopup) + " / " + i18n.t("static.supplyPlan.batchQty") + " : " + this.addCommas(this.state.batchQtyTotalForPopup)}</h3></b>
                                     </div>
                                     <div className="pt-4"></div>
                                 </ModalBody>

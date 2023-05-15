@@ -123,7 +123,9 @@ export default class ShipmentDetails extends React.Component {
             planningUnit: [],
             puData: [],
             shipmentListForSelectedPlanningUnits: [],
-            shipmentListForSelectedPlanningUnitsUnfiltered: []
+            shipmentListForSelectedPlanningUnitsUnfiltered: [],
+            shipmentQtyTotalForPopup: 0,
+            batchQtyTotalForPopup: 0
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -150,6 +152,17 @@ export default class ShipmentDetails extends React.Component {
         this.planShipment = this.planShipment.bind(this)
     }
 
+    addCommas(cell, row) {
+        cell += '';
+        var x = cell.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
 
     exportCSV() {
 
@@ -839,7 +852,7 @@ export default class ShipmentDetails extends React.Component {
                                             var productJson = {
                                                 label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
                                                 value: myResult[i].planningUnit.id,
-                                                actualLabel:myResult[i].planningUnit.label
+                                                actualLabel: myResult[i].planningUnit.label
                                             }
                                             proList.push(productJson)
                                             var productJson1 = {
@@ -1404,6 +1417,7 @@ export default class ShipmentDetails extends React.Component {
                             <Button id="shipmentDetailsPopCancelButton" size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                             {this.refs.shipmentChild != undefined && <Button color="info" id="addShipmentBatchRowId" size="md" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                            <b><h3 className="float-right mr-2">{i18n.t("static.supplyPlan.shipmentQty") + " : " + this.addCommas(this.state.shipmentQtyTotalForPopup) + " / " + i18n.t("static.supplyPlan.batchQty") + " : " + this.addCommas(this.state.batchQtyTotalForPopup)}</h3></b>
                         </div>
                         <div id="showSaveShipmentsDatesButtonsDiv" style={{ display: 'none' }} className="mr-0">
                             <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -1938,9 +1952,9 @@ export default class ShipmentDetails extends React.Component {
                                                         },
                                                         suggestedQty: suggestedOrd,
                                                         budget: {
-                                                            id: this.state.budgetId!=""?this.state.budgetId:"",
-                                                            code: this.state.budgetId!=""?this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].budgetCode:"",
-                                                            label: this.state.budgetId!=""?this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].label:{},
+                                                            id: this.state.budgetId != "" ? this.state.budgetId : "",
+                                                            code: this.state.budgetId != "" ? this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].budgetCode : "",
+                                                            label: this.state.budgetId != "" ? this.state.budgetListPlanAll.filter(c => c.budgetId == this.state.budgetId)[0].label : {},
                                                         },
                                                         emergencyOrder: false,
                                                         currency: c,
