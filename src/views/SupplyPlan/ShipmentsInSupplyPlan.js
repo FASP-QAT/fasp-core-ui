@@ -1757,6 +1757,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         // var elInstance=this.state.plannedPsmShipmentsEl;
 
         var batchInfo = rowData[28];
+        var batchQtyTotalForPopup = 0;
+        if (batchInfo != "") {
+            batchInfo.map(item => {
+                batchQtyTotalForPopup += item.shipmentQty
+            })
+        }
+        this.props.updateState("shipmentQtyTotalForPopup", rowData[12]);
+        this.props.updateState("batchQtyTotalForPopup", batchQtyTotalForPopup);
         var tableEditable = shipmentEditable;
         if (rowData[1].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
             tableEditable = false;
@@ -2456,6 +2464,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 }
             }
             elInstance.setValueFromCoords(21, y, "", true);
+            this.props.updateState('shipmentQtyTotalForPopup', elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
         }
 
         if (x == 19) {
@@ -2730,6 +2739,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
         if (x == 2) {
             checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
+            var batchInfoList = elInstance.getJson(null, false);
+            var batchQtyTotalForPopup = 0;
+            batchInfoList.map(item => {
+                batchQtyTotalForPopup += Number(item[2])
+            })
+            this.props.updateState("batchQtyTotalForPopup", batchQtyTotalForPopup);
         }
         this.props.updateState("shipmentBatchInfoChangedFlag", 1);
     }.bind(this)
