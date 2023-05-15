@@ -5241,9 +5241,41 @@ export default class WhatIfReportComponent extends React.Component {
                                                     this.state.plannedShipmentsTotalData.map(item1 => {
                                                         if (item1.toString() != "") {
                                                             if (item1.textColor == "#fff") {
-                                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : item1.isNewlyAddedShipment ? "emergencyCommentNewlyAddedShipment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : item1.isNewlyAddedShipment ? "newlyAddedShipment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                var className="hoverTd ";
+                                                                if(item1.isEmergencyOrder && item1.isLocalProcurementAgent && item1.isNewlyAddedShipment){
+                                                                    className=className.concat("localProcurement1EmergencyCommentNewlyAddedShipment")
+                                                                }else if(item1.isEmergencyOrder && item1.isLocalProcurementAgent && !item1.isNewlyAddedShipment){
+                                                                    className=className.concat("localProcurement1EmergencyComment")
+                                                                }else if(item1.isEmergencyOrder && !item1.isLocalProcurementAgent && item1.isNewlyAddedShipment){
+                                                                    className=className.concat("emergencyCommentNewlyAddedShipment")
+                                                                }else if(item1.isEmergencyOrder && !item1.isLocalProcurementAgent && !item1.isNewlyAddedShipment){
+                                                                    className=className.concat("emergencyComment")
+                                                                }else if(!item1.isEmergencyOrder && item1.isLocalProcurementAgent && item1.isNewlyAddedShipment){
+                                                                    className=className.concat("localProcurement1NewlyAddedShipment")
+                                                                }else if(!item1.isEmergencyOrder && item1.isLocalProcurementAgent && !item1.isNewlyAddedShipment){
+                                                                    className=className.concat("localProcurementAgent1")
+                                                                }else if(!item1.isEmergencyOrder && !item1.isLocalProcurementAgent && item1.isNewlyAddedShipment){
+                                                                    className=className.concat("newlyAddedShipment")
+                                                                }
+                                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={className} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                             } else {
-                                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : item1.isNewlyAddedShipment ? "emergencyCommentNewlyAddedShipment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : item1.isNewlyAddedShipment ? "newlyAddedShipment hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                var className="hoverTd ";
+                                                                if(item1.isEmergencyOrder && item1.isLocalProcurementAgent && item1.isNewlyAddedShipment){
+                                                                    className=className.concat("localProcurement2EmergencyCommentNewlyAddedShipment")
+                                                                }else if(item1.isEmergencyOrder && item1.isLocalProcurementAgent && !item1.isNewlyAddedShipment){
+                                                                    className=className.concat("localProcurement2EmergencyComment")
+                                                                }else if(item1.isEmergencyOrder && !item1.isLocalProcurementAgent && item1.isNewlyAddedShipment){
+                                                                    className=className.concat("emergencyCommentNewlyAddedShipment")
+                                                                }else if(item1.isEmergencyOrder && !item1.isLocalProcurementAgent && !item1.isNewlyAddedShipment){
+                                                                    className=className.concat("emergencyComment")
+                                                                }else if(!item1.isEmergencyOrder && item1.isLocalProcurementAgent && item1.isNewlyAddedShipment){
+                                                                    className=className.concat("localProcurement2NewlyAddedShipment")
+                                                                }else if(!item1.isEmergencyOrder && item1.isLocalProcurementAgent && !item1.isNewlyAddedShipment){
+                                                                    className=className.concat("localProcurementAgent2")
+                                                                }else if(!item1.isEmergencyOrder && !item1.isLocalProcurementAgent && item1.isNewlyAddedShipment){
+                                                                    className=className.concat("newlyAddedShipment")
+                                                                }
+                                                                return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={className} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                             }
                                                         } else {
                                                             return (<td align="right" >{item1}</td>)
