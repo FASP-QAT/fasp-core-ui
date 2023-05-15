@@ -147,7 +147,7 @@ export default class InventoryTurns extends Component {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.forecastReport.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory'))).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.inventoryTurns.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory'))).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') + ' : ' + this.state.countryId.map(e => {return e.label}) : i18n.t('static.productCategory.productCategory')  + ' : ' + this.state.puId.map(e => {return e.label})).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + this.state.programId.map(e => {return e.label})).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -236,7 +236,7 @@ export default class InventoryTurns extends Component {
                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.forecastReport.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory')) , doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.inventoryTurns.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory')) , doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
 
@@ -1129,7 +1129,7 @@ export default class InventoryTurns extends Component {
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
                 <th className="FirstcolumInventry sticky-col first-col clone1" style={{zIndex:'4'}} ></th>
                 <th className="supplyplanTdWidthInventry sticky-col first-col clone" align="left" style={{whiteSpace:'inherit', zIndex:'5'}} ></th>
-                <th>{i18n.t('static.planningunit.planningunit')}</th>
+                <th>{i18n.t('static.inventoryTurns.noofplanningunits')}</th>
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
                 <th>{i18n.t('static.report.noofmonth')}</th>
@@ -1271,7 +1271,7 @@ export default class InventoryTurns extends Component {
             },
             {
                 dataField: 'noOfPlanningUnits',
-                text: i18n.t('static.planningunit.planningunit'),
+                text: i18n.t('static.inventoryTurns.noofplanningunits'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1455,7 +1455,7 @@ export default class InventoryTurns extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.display')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.inventoryTurns.display')}</Label>
                                                 <div className="controls " style={{ marginLeft: '-51px' }}>
 
                                                     <FormGroup check inline style={{ marginRight: '-36px' }}>
