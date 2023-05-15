@@ -3039,5 +3039,6 @@
     "static.QATForecastImport.currentForecastConsumption": "Current Forecasted Consumption (Supply Plan Module)",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.report.overspentBudget": "Overspent Budget",
-    "static.report.budgetRemaining": "Budget Remaining"
+    "static.report.budgetRemaining": "Budget Remaining",
+    "static.supplyPlan.exportAsPDF":"Export as PDF"
 }

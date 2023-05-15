@@ -1653,7 +1653,11 @@ class StockStatus extends Component {
                   // planningunitList.push(selectedplanningunit)
                   var pcnt = 0
                   // console.log('planningunitList', planningunitList)
-                  var sortedPlanningUnitData = this.state.planningUnitIdsExport;
+                  var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
+                    a = a.label.toLowerCase();
+                    b = b.label.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                  });
                   // if (this.state.planningUnitIdsExport.filter(c => c.value == document.getElementById("planningUnitId").value).length > 0) {
                   //   sortedPlanningUnitData.push(this.state.planningUnitIdsExport.filter(c => c.value == document.getElementById("planningUnitId").value)[0])
                   // }
@@ -4117,7 +4121,7 @@ class StockStatus extends Component {
             <Modal isOpen={this.state.exportModal}
               className={'modal-md'}>
               <ModalHeader toggle={() => this.toggleExport(0)} className="modalHeaderSupplyPlan" id="shipmentModalHeader">
-                {/* <strong>{i18n.t("static.supplyPlan.")}</strong> */}
+                <strong>{this.state.type==1?i18n.t("static.supplyPlan.exportAsPDF"):i18n.t("static.supplyPlan.exportAsCsv")}</strong>
               </ModalHeader>
               <ModalBody>
                 <>
