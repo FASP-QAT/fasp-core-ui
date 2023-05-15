@@ -10064,3 +10064,42 @@ legend.scheduler-border {
   font-family: 'latin_modern_roman_slante10Rg';
   src: url('/src/assets/font_formulae/lmromanslant10-regular-webfont.woff') format('woff');
 }
+
+  
+@media only screen   
+and (min-width: 1030px)   
+and (max-width: 1366px)  
+{
+  .MonthPickerUpdateInfo .month-picker > .rmp-container .rmp-popup.show {
+    opacity: 1;
+    transform: unset !important;
+    top: -62px;
+  }
+ } 
+ 
+ @media only screen   
+and (min-width: 1370px)  
+and (max-width: 1605px)  
+{ 
+  .MonthPickerUpdateInfo .month-picker > .rmp-container .rmp-popup.show {
+    opacity: 1;
+    transform: unset !important;
+    top: -62px;
+  }
+}  
+// @media screen and (min-width: 769px){
+
+// .MonthPickerUpdateInfo .month-picker > .rmp-container .rmp-popup.show {
+//   opacity: 1;
+//   transform: unset !important;
+//   top: -62px;
+// }
+// }
+
+@media screen and (min-zoom: 25%) and (max-zoom: 50%) {
+  .MonthPickerUpdateInfo .month-picker > .rmp-container .rmp-popup.show
+  { 
+    opacity: 1;
+    transform : translate3d(0, 0, 0)!important;
+  } 
+}

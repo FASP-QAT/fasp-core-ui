@@ -1260,7 +1260,7 @@ export default class AddForecastProgram extends Component {
 
                                                 <FormGroup>
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.forecastEnd')}<span class="red Reqasterisk">*</span></Label>
-                                                    <div className="controls edit">
+                                                    <div className="controls edit MonthPickerUpdateInfo">
                                                         <Picker
                                                             // ref="pickAMonth2"
                                                             ref={this.pickRange}
