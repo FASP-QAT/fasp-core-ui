@@ -595,7 +595,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[17] = shipmentList[i].budget.id;//R
                                                 data[18] = shipmentList[i].currency.currencyId;//S
                                                 data[19] = shipmentList[i].rate != undefined ? Number(shipmentList[i].rate).toFixed(2) : "";//T
-                                                data[20] = shipmentList[i].erpFlag.toString()=="true"?Number(shipmentList[i].productCost).toFixed(2):`=ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)`;//U
+                                                data[20] = shipmentList[i].erpFlag.toString() == "true" ? Number(shipmentList[i].productCost).toFixed(2) : `=ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)`;//U
                                                 data[21] = shipmentList[i].freightCost != undefined ? Number(shipmentList[i].freightCost).toFixed(2) : "";//V
 
                                                 data[22] = `=ROUND(ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)+V${parseInt(i) + 1},2)`;
@@ -641,9 +641,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[17] = "";
                                                 data[18] = USD_CURRENCY_ID;
                                                 data[19] = "";
-                                                data[20] = `=ROUND(T${parseInt(0) + 1}*M${parseInt(0) + 1},2)`;
+                                                data[20] = `=ROUND(T${parseInt(0) + 1}*O${parseInt(0) + 1},2)`;
                                                 data[21] = "";
-                                                data[22] = `=ROUND(ROUND(M${parseInt(0) + 1}*T${parseInt(0) + 1},2)+V${parseInt(0) + 1},2)`;
+                                                data[22] = `=ROUND(ROUND(O${parseInt(0) + 1}*T${parseInt(0) + 1},2)+V${parseInt(0) + 1},2)`;
                                                 data[23] = NONE_SELECTED_DATA_SOURCE_ID;
                                                 data[24] = "";
                                                 data[25] = moment(Date.now()).format("YYYY-MM-DD");
@@ -1378,9 +1378,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         data[17] = "";
         data[18] = USD_CURRENCY_ID;
         data[19] = "";
-        data[20] = `=ROUND(T${parseInt(json.length) + 1}*M${parseInt(json.length) + 1},2)`;
+        data[20] = `=ROUND(T${parseInt(json.length) + 1}*O${parseInt(json.length) + 1},2)`;
         data[21] = "";
-        data[22] = `=ROUND(ROUND(M${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},2)+V${parseInt(json.length) + 1},2)`;
+        data[22] = `=ROUND(ROUND(O${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},2)+V${parseInt(json.length) + 1},2)`;
         data[23] = NONE_SELECTED_DATA_SOURCE_ID;
         data[24] = "";
         data[25] = moment(Date.now()).format("YYYY-MM-DD");
@@ -2120,6 +2120,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[11].toString().split(";")[0])[0]).multiplier;
                 elInstance.setValueFromCoords(13, y, multiplier, true);
             }
+            if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+            } else {
+                elInstance.setValueFromCoords(21, y, "", true);
+            }
         }
 
         if (x == 9) {
@@ -2544,6 +2549,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             var valid = checkValidtion("number", "T", y, elInstance.getValue(`T${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
             if (valid == false) {
                 elInstance.setValueFromCoords(34, y, 1, true);
+            }
+            if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+            } else {
+                elInstance.setValueFromCoords(21, y, "", true);
             }
         }
 
