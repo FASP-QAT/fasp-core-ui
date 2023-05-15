@@ -812,6 +812,7 @@ class ShipmentSummery extends Component {
     buildJExcel() {
 
         let shipmentDetailsList = this.state.shipmentDetailsList;
+    console.log("shipmentDetailsList--->",shipmentDetailsList)
         let shipmentDetailsListArray = [];
         let count = 0;
         for (var j = 0; j < shipmentDetailsList.length; j++) {
@@ -994,9 +995,9 @@ class ShipmentSummery extends Component {
             var rowData = elInstance.getRowData(j);
             var emergencyOrder = rowData[2];
             if (emergencyOrder) {
-                // console.log("hi*** there")
                 for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', '#FF0000');
+                    var cell = elInstance.getCell((colArr[i]).concat(parseInt(j) + 1))
+                    cell.classList.add('shipmentEntryEmergency');
                 }
             }
         }
