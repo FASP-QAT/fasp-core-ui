@@ -529,7 +529,8 @@ label.arrow_label:after {
 
 .table thead tr th {
   position: sticky;
-  top: -1px;
+  // top: -1px;
+  top: 0px;
   padding: 6px 4px 5px 4px !important;
   // padding: 5px !important;
   background: #fff;
@@ -11765,4 +11766,10 @@ and (max-width: 1605px)
 .contactTemplateBorderRed{
   border-color: #BA0C2F;
   border-width: 2px;
+}
+.ChartGraphHeight .chart-graph-report {
+  height: 50vmax!important;
+}
+.table-scroll1 .ForecastOutputBottom .table thead th {
+  border-bottom: 1px solid #c8ced3 !important;
 }
