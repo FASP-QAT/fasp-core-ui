@@ -4409,6 +4409,7 @@ export default class CreateTreeTemplate extends Component {
         var sortOrder = itemConfig.sortOrder;
         console.log("childList---", childList);
         // var scenarioList = this.state.scenarioList;
+        var childListBasedOnScenarion=[];
         for (let i = 0; i < childList.length; i++) {
             var child = JSON.parse(JSON.stringify(childList[i]));
             console.log("child before---", child);
@@ -4457,6 +4458,10 @@ export default class CreateTreeTemplate extends Component {
             // if (scenarioList.length > 0) {
             // for (let i = 0; i < scenarioList.length; i++) {
             maxNodeDataId++;
+            childListBasedOnScenarion.push({
+                oldId:(child.payload.nodeDataMap[0])[0].nodeDataId,
+                newId:maxNodeDataId
+            });
             (child.payload.nodeDataMap[0])[0].nodeDataId = maxNodeDataId;
 
             // }
@@ -4465,6 +4470,20 @@ export default class CreateTreeTemplate extends Component {
             items.push(child);
         }
 
+        childListArr.map(item => {
+            var indexItems = items.findIndex(i => i.id == item.newId);
+            if (indexItems != -1) {
+                // for (let i = 0; i < scenarioList.length; i++) {
+                    var nodeDataModelingList = (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList;
+                    if (nodeDataModelingList.length > 0) {
+                        nodeDataModelingList.map((item1, c) => {
+                            var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
+                            item1.transferNodeDataId = newTransferId[0].newId;
+                        })
+                    }
+                // }
+            }
+        })
 
         console.log("duplicate button clicked value after update---", items);
         this.setState({
@@ -6095,7 +6114,7 @@ export default class CreateTreeTemplate extends Component {
                                     [{
                                         nodeDataId: 1,
                                         notes: '',
-                                        monthNo: 1,
+                                        monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                         dataValue: '0',
                                         calculatedDataValue: '0',
                                         fuNode: {
@@ -6209,7 +6228,7 @@ export default class CreateTreeTemplate extends Component {
                                     nodeDataModelingList: [],
                                     nodeDataOverrideList: [],
                                     nodeDataMomList: [],
-                                    monthNo: 1,
+                                    monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                     dataValue: '0',
                                     displayDataValue: '',
                                     calculatedDataValue: '0',
@@ -6314,6 +6333,7 @@ export default class CreateTreeTemplate extends Component {
     nodeTypeChange(value) {
         var nodeTypeId = value;
         console.log("node type value---", nodeTypeId)
+        var { currentItemConfig } = this.state;
         if (nodeTypeId == 1) {
             this.setState({
                 numberNode: false,
@@ -6337,6 +6357,45 @@ export default class CreateTreeTemplate extends Component {
         }
         else if (nodeTypeId == 4) {
             // Forecasting unit node
+            if (currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == null || currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == "" || currentItemConfig.context.payload.nodeDataMap[0][0].fuNode == undefined) {
+                currentItemConfig.context.payload.nodeDataMap[0][0].fuNode = {
+                    oneTimeUsage: "false",
+                    lagInMonths: 0,
+                    forecastingUnit: {
+                        tracerCategory: {
+
+                        },
+                        unit: {
+
+                        },
+                        label: {
+                            label_en: ""
+                        }
+                    },
+                    usageType: {
+
+                    },
+                    usagePeriod: {
+                        usagePeriodId: 1
+                    },
+                    repeatCount: '',
+                    repeatUsagePeriod: {
+                        usagePeriodId: 1
+                    }
+                }
+
+                currentItemConfig.context.payload.nodeDataMap[0][0].puNode = {
+                    planningUnit: {
+                        id: '',
+                        unit: {
+                            id: ""
+                        },
+                        multiplier: ''
+                    },
+                    refillMonths: '',
+                    sharePlanningUnit: "false"
+                }
+            }
             this.setState({
                 numberNode: true,
                 aggregationNode: true
@@ -6344,7 +6403,7 @@ export default class CreateTreeTemplate extends Component {
                 this.getNodeUnitOfPrent();
             });
         }
-        var { currentItemConfig } = this.state;
+        // var { currentItemConfig } = this.state;
         if ((nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) && this.state.addNodeFlag && currentItemConfig.context.payload.nodeDataMap[0][0].dataValue == "") {
             currentItemConfig.context.payload.nodeDataMap[0][0].dataValue = 100;
             console.log("parent value template---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].calculatedDataValue);
@@ -6371,7 +6430,9 @@ export default class CreateTreeTemplate extends Component {
             this.setState({ isValidError: isValid });
 
             if (this.state.currentItemConfig.context.payload.nodeType.id == 1) {
-                this.showMomData();
+                if(tab == 2){
+                    this.showMomData();
+                }
             }
             if (tab == 2) {
                 console.log("***>>>", this.state.currentItemConfig);
@@ -10108,7 +10169,7 @@ export default class CreateTreeTemplate extends Component {
                                                             nodeDataModelingList: [],
                                                             nodeDataOverrideList: [],
                                                             nodeDataMomList: [],
-                                                            monthNo: 1,
+                                                            monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                                             dataValue: '',
                                                             calculatedDataValue: '',
                                                             notes: '',
