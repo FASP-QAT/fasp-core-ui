@@ -8367,7 +8367,7 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                 showMomData: false,
                 showMomDataPercent: false,
                 addNodeFlag: false,
-                openAddNodeModal: true,
+                openAddNodeModal: data.context.templateName ? data.context.templateName == "contactTemplateMin" ? false : true : true ,
                 orgCurrentItemConfig: JSON.parse(JSON.stringify(data.context)),
                 currentItemConfig: JSON.parse(JSON.stringify(data)),
                 level0: (data.context.level == 0 ? false : true),
@@ -8379,6 +8379,46 @@ console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.sele
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0],
 
             }, () => {
+
+                if(data.context.templateName ? data.context.templateName == "contactTemplateMin" ? true : false : false){
+                    var itemConfig = data.context;
+                    var items = this.state.items;
+                    var updatedItems = items;
+                    // this.setState(prevState => ({
+                    //     toggleArray: [...prevState.toggleArray, itemConfig.id]
+                    // }))
+                    if(this.state.toggleArray.includes(itemConfig.id)){
+
+                        var parentId = itemConfig.payload.parentNodeId;
+                        var parentNode = items.filter(e => e.id == parentId);
+                        
+                        var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
+                        if(parentNode.templateName ? parentNode.templateName == "contactTemplateMin" ? false : true : true){
+                            tempToggleArray = tempToggleArray.filter((e) => e != parentId)
+                        }
+                        updatedItems = updatedItems.map(item => {
+                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString())) {
+                                tempToggleArray = tempToggleArray.filter((e) => e != item.id)
+                                return { ...item, templateName: "contactTemplate", expanded: false };                                        
+                            }
+                            return item;
+                        });
+                        this.setState({toggleArray: tempToggleArray})
+                    }else{
+                        var tempToggleArray = this.state.toggleArray;
+                        tempToggleArray.push(itemConfig.id);
+                        updatedItems = updatedItems.map(item => {
+                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString())) {
+                                tempToggleArray.push(item.id);
+                                console.log("Here: "+tempToggleArray)
+                                return { ...item, templateName: "contactTemplateMin", expanded: true };
+                            }
+                            return item;
+                        });
+                        this.setState({toggleArray: tempToggleArray})
+                    }               
+                    this.setState({ items: updatedItems })
+                }
                 console.log("555>>>", this.state.items);
                 // const ids = this.state.items.map(o => o.id)
                 // const filtered = this.state.items.filter(({ id }, index) => !ids.includes(id, index + 1))
