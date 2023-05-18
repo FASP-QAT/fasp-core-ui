@@ -1130,9 +1130,9 @@ class ForecastSummary extends Component {
                         var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                         for (var i = 0; i < filteredGetRequestList.length; i++) {
 
-                            var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
+                            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                            var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
+                            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson1 = JSON.parse(programData);
                             console.log("programJson1-------->1", programJson1);
@@ -2447,11 +2447,11 @@ class ForecastSummary extends Component {
                         ...tempObj
                     }
 
-                    let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
-                    let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+                    let startDateSplit = selectedForecastProgram.currentVersion.forecastStartDate.split('-');
+                    let stopDateSplit = selectedForecastProgram.currentVersion.forecastStopDate.split('-');
 
 
-                    let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+                    let forecastStopDate = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
                     forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
                     let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
@@ -2481,10 +2481,10 @@ class ForecastSummary extends Component {
                     forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
                     console.log("Test-----------------111", startDateSplit);
 
-                    let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
-                    let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+                    let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
+                    let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
 
-                    let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                    let beforeEndDateDisplay = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
                     beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
                     this.setState({
@@ -2518,11 +2518,11 @@ class ForecastSummary extends Component {
                     ...tempObj
                 }
 
-                let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
-                let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+                let startDateSplit = selectedVersion.forecastStartDate.split('-');
+                let stopDateSplit = selectedVersion.forecastStopDate.split('-');
 
 
-                let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+                let forecastStopDate = new Date(selectedVersion.forecastStartDate);
                 forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
                 let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
@@ -2550,10 +2550,10 @@ class ForecastSummary extends Component {
                 forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
                 console.log("Test-----------------111", startDateSplit);
 
-                let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
-                let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+                let forecastStartDateNew = selectedVersion.forecastStartDate;
+                let forecastStopDateNew = selectedVersion.forecastStopDate;
 
-                let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                let beforeEndDateDisplay = new Date(selectedVersion.forecastStartDate);
                 beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
                 this.setState({
