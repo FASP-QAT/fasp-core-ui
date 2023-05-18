@@ -1102,7 +1102,7 @@ export default class CreateTreeTemplate extends Component {
                     var listArray = response.data;
                 var planningUnitId=(items[i].payload.nodeDataMap[0])[0].puNode.planningUnit.id;
                 var planningUnitList=listArray;
-                var planningUnitListFilter=planningUnitList.filter(c=>c.planningUnit.id==planningUnitId);
+                var planningUnitListFilter=planningUnitList.filter(c=>c.planningUnitId==planningUnitId);
                 if(planningUnitListFilter.length>0){
                     (items[i].payload.nodeDataMap[0])[0].isPUMappingCorrect=1
                 }else{
