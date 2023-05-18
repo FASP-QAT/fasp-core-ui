@@ -1831,7 +1831,7 @@ export default class CreateTreeTemplate extends Component {
             console.log("this.state.isSubmitClicked", this.state.isSubmitClicked)
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
-                    var tableJson = this.state.modelingEl.getJson(null, false);
+                    var tableJson = this.state.modelingChanged ? this.state.modelingEl.getJson(null, false) : "";
                     var data = this.state.scalingList;
                     var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
                     var obj;
@@ -1885,7 +1885,7 @@ export default class CreateTreeTemplate extends Component {
                         }
                     }
                     console.log("obj---", obj);
-                    console.log("dataArr--->>>", dataArr);
+                    console.log("dataArr===>>>", dataArr);
                     if (itemIndex1 != -1) {
                         if (this.state.isValidError.toString() == "false") {
                             // if (buttonClick == 2) {
