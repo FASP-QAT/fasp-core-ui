@@ -1867,7 +1867,7 @@ export default class CreateTreeTemplate extends Component {
             console.log("this.state.isSubmitClicked", this.state.isSubmitClicked)
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
-                    var tableJson = this.state.modelingEl.getJson(null, false);
+                    var tableJson = this.state.modelingChanged ? this.state.modelingEl.getJson(null, false) : "";
                     var data = this.state.scalingList;
                     var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
                     var obj;
@@ -1921,7 +1921,7 @@ export default class CreateTreeTemplate extends Component {
                         }
                     }
                     console.log("obj---", obj);
-                    console.log("dataArr--->>>", dataArr);
+                    console.log("dataArr===>>>", dataArr);
                     if (itemIndex1 != -1) {
                         if (this.state.isValidError.toString() == "false") {
                             // if (buttonClick == 2) {
@@ -1951,21 +1951,20 @@ export default class CreateTreeTemplate extends Component {
                             });
                             // } else if (buttonClick == 1) {
                             // if (!this.state.isSubmitClicked) {
-                            this.setState({ loading: true, openAddNodeModal: buttonClick == 1 ? false : true, isSubmitClicked: !this.state.isSubmitClicked ? true : this.state.isSubmitClicked }, () => {
-                                console.log("all ok>>>");
-                                setTimeout(() => {
-                                    console.log("inside set timeout on submit")
-                                    if (this.state.addNodeFlag) {
-                                        this.onAddButtonClick(this.state.currentItemConfig)
-                                    } else {
-                                        this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                    }
-                                    this.setState({
-                                        cursorItem: 0,
-                                        highlightItem: 0
-                                    })
-                                }, 0);
-                            })
+                            // this.setState({ loading: true, openAddNodeModal: buttonClick == 1 ? false : true, isSubmitClicked: !this.state.isSubmitClicked ? true : this.state.isSubmitClicked }, () => {
+                            //     console.log("all ok>>>");
+                            //     setTimeout(() => {
+                            //         if (!this.state.addNodeFlag) {
+                            //             this.onAddButtonClick(this.state.currentItemConfig)
+                            //         } else {
+                            //             this.updateNodeInfoInJson(this.state.currentItemConfig)
+                            //         }
+                            //         this.setState({
+                            //             cursorItem: 0,
+                            //             highlightItem: 0
+                            //         })
+                            //     }, 0);
+                            // })
                             // }
                             // }
                         } else {
@@ -1991,6 +1990,7 @@ export default class CreateTreeTemplate extends Component {
 
                         }
                     }
+                    this.setState({ openAddNodeModal: buttonClick == 1 ? false : true, isSubmitClicked: !this.state.isSubmitClicked ? true : this.state.isSubmitClicked })
                 } catch (err) {
                     console.log("scaling err---", err);
                     localStorage.setItem("scalingErrorTemplate", err);
@@ -7788,25 +7788,25 @@ export default class CreateTreeTemplate extends Component {
                             oneTimeUsage: ""
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
-                            if (!this.state.isSubmitClicked) {
-                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
-                                    console.log("all ok>>>");
-                                    setTimeout(() => {
-                                        console.log("inside set timeout on submit")
-                                        if (this.state.addNodeFlag) {
-                                            this.onAddButtonClick(this.state.currentItemConfig)
-                                        } else {
-                                            this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                        }
-                                        this.setState({
-                                            cursorItem: 0,
-                                            highlightItem: 0
-                                        })
-                                    }, 0);
-                                })
-                            }
-                        }}
+                        // onSubmit={(values, { setSubmitting, setErrors }) => {
+                        //     if (!this.state.isSubmitClicked) {
+                        //         this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                        //             console.log("all ok>>>");
+                        //             setTimeout(() => {
+                        //                 console.log("inside set timeout on submit")
+                        //                 if (this.state.addNodeFlag) {
+                        //                     this.onAddButtonClick(this.state.currentItemConfig)
+                        //                 } else {
+                        //                     this.updateNodeInfoInJson(this.state.currentItemConfig)
+                        //                 }
+                        //                 this.setState({
+                        //                     cursorItem: 0,
+                        //                     highlightItem: 0
+                        //                 })
+                        //             }, 0);
+                        //         })
+                        //     }
+                        // }}
                         render={
                             ({
                                 values,
