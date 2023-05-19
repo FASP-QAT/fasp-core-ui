@@ -3,11 +3,7 @@
 // export const API_URL = 'http://localhost:8084'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
-<<<<<<< HEAD
-export const API_URL = 'https://uat-api.quantificationanalytics.org'
-=======
 //  export const API_URL = 'https://uat-api.quantificationanalytics.org'
->>>>>>> QAT-3092A
 // export const API_URL = 'https://api.quantificationanalytics.org'
 // export const API_URL = 'https://demo-api.quantificationanalytics.org'
 
