@@ -3917,6 +3917,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </div>
                                             </FormGroup>
                                         </div>
+                                        {this.state.showData &&
                                         <div className=" col-md-4 pt-lg-0">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.ManageTree.Notes')}</Label>
                                                             <Input
@@ -3928,7 +3929,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 value={this.state.extrapolationNotes}
                                                                 onChange={(e) => { this.changeNotes(e.target.value) }}
                                                             ></Input>
-                                                    </div>
+                                                    </div>}
 
                                         {/* </div> */}
                                         {/* <div className="col-md-12">
