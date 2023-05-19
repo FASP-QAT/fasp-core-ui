@@ -1915,21 +1915,20 @@ export default class CreateTreeTemplate extends Component {
                             });
                             // } else if (buttonClick == 1) {
                             // if (!this.state.isSubmitClicked) {
-                            this.setState({ loading: true, openAddNodeModal: buttonClick == 1 ? false : true, isSubmitClicked: !this.state.isSubmitClicked ? true : this.state.isSubmitClicked }, () => {
-                                console.log("all ok>>>");
-                                setTimeout(() => {
-                                    console.log("inside set timeout on submit")
-                                    if (this.state.addNodeFlag) {
-                                        this.onAddButtonClick(this.state.currentItemConfig)
-                                    } else {
-                                        this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                    }
-                                    this.setState({
-                                        cursorItem: 0,
-                                        highlightItem: 0
-                                    })
-                                }, 0);
-                            })
+                            // this.setState({ loading: true, openAddNodeModal: buttonClick == 1 ? false : true, isSubmitClicked: !this.state.isSubmitClicked ? true : this.state.isSubmitClicked }, () => {
+                            //     console.log("all ok>>>");
+                            //     setTimeout(() => {
+                            //         if (!this.state.addNodeFlag) {
+                            //             this.onAddButtonClick(this.state.currentItemConfig)
+                            //         } else {
+                            //             this.updateNodeInfoInJson(this.state.currentItemConfig)
+                            //         }
+                            //         this.setState({
+                            //             cursorItem: 0,
+                            //             highlightItem: 0
+                            //         })
+                            //     }, 0);
+                            // })
                             // }
                             // }
                         } else {
@@ -1955,6 +1954,7 @@ export default class CreateTreeTemplate extends Component {
 
                         }
                     }
+                    this.setState({ openAddNodeModal: buttonClick == 1 ? false : true, isSubmitClicked: !this.state.isSubmitClicked ? true : this.state.isSubmitClicked })
                 } catch (err) {
                     console.log("scaling err---", err);
                     localStorage.setItem("scalingErrorTemplate", err);
@@ -7681,35 +7681,35 @@ export default class CreateTreeTemplate extends Component {
                             percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue,
                             forecastingUnitId: this.state.fuValues,
                             tempPlanningUnitId: this.state.tempPlanningUnitId,
-                            usageTypeIdFU:"",
-                            lagInMonths:"",
-                            noOfPersons:"",
-                            forecastingUnitPerPersonsFC:"",
-                            repeatCount:"",
-                            usageFrequencyCon:"",
-                            usageFrequencyDis:"",
-                            oneTimeUsage:""
+                            usageTypeIdFU: "",
+                            lagInMonths: "",
+                            noOfPersons: "",
+                            forecastingUnitPerPersonsFC: "",
+                            repeatCount: "",
+                            usageFrequencyCon: "",
+                            usageFrequencyDis: "",
+                            oneTimeUsage: ""
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {
-                            if (!this.state.isSubmitClicked) {
-                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
-                                    console.log("all ok>>>");
-                                    setTimeout(() => {
-                                        console.log("inside set timeout on submit")
-                                        if (this.state.addNodeFlag) {
-                                            this.onAddButtonClick(this.state.currentItemConfig)
-                                        } else {
-                                            this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                        }
-                                        this.setState({
-                                            cursorItem: 0,
-                                            highlightItem: 0
-                                        })
-                                    }, 0);
-                                })
-                            }
-                        }}
+                        // onSubmit={(values, { setSubmitting, setErrors }) => {
+                        //     if (!this.state.isSubmitClicked) {
+                        //         this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                        //             console.log("all ok>>>");
+                        //             setTimeout(() => {
+                        //                 console.log("inside set timeout on submit")
+                        //                 if (this.state.addNodeFlag) {
+                        //                     this.onAddButtonClick(this.state.currentItemConfig)
+                        //                 } else {
+                        //                     this.updateNodeInfoInJson(this.state.currentItemConfig)
+                        //                 }
+                        //                 this.setState({
+                        //                     cursorItem: 0,
+                        //                     highlightItem: 0
+                        //                 })
+                        //             }, 0);
+                        //         })
+                        //     }
+                        // }}
                         render={
                             ({
                                 values,
