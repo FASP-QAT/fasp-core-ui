@@ -3031,5 +3031,7 @@
     "static.QATForecastImport.currentForecastConsumption": "Consumo Pronosticado Actual (Módulo Plan de Abastecimiento)",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
     "static.report.overspentBudget": "Presupuesto gastado en exceso",
-    "static.report.budgetRemaining": "Presupuesto restante"
+    "static.report.budgetRemaining": "Presupuesto restante",
+    "static.forecastValidation.noConsumptionExtrapolationNotesFound":"No se han encontrado notas de extrapolación de consumo",
+    "static.forecastValidation.consumptionExtrapolationNotes":"Notas de extrapolación de consumo"
 }

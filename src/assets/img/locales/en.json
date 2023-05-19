@@ -3046,5 +3046,8 @@
     "static.inventoryTurns.planned":"Planned Inventory Turns",
     "static.inventoryTurns.display":"Display report by",
     "static.inventoryTurns.noofplanningunits":"Number of planning units",
-    "static.supplyPlan.recommendToChangeBatchName":"Recommended to change the batch number"
+    "static.supplyPlan.recommendToChangeBatchName":"Recommended to change the batch number",
+    "static.forecastValidation.noConsumptionExtrapolationNotesFound":"No consumption extrapolation notes found",
+    "static.forecastValidation.consumptionExtrapolationNotes":"Consumption Extrapolation Notes"
+    
 }
