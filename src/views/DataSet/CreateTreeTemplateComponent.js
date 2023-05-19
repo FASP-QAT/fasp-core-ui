@@ -1864,10 +1864,9 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
             console.log("validation---", validation);
-            console.log("this.state.isSubmitClicked", this.state.isSubmitClicked)
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
-                    var tableJson = this.state.modelingChanged ? this.state.modelingEl.getJson(null, false) : "";
+                    var tableJson = this.state.modelingEl.getJson(null, false);
                     var data = this.state.scalingList;
                     var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
                     var obj;
@@ -1921,10 +1920,9 @@ export default class CreateTreeTemplate extends Component {
                         }
                     }
                     console.log("obj---", obj);
-                    console.log("dataArr===>>>", dataArr);
+                    console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
                         if (this.state.isValidError.toString() == "false") {
-                            // if (buttonClick == 2) {
                             item.payload = this.state.currentItemConfig.context.payload;
                             if (dataArr.length > 0) {
                                 (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
@@ -1949,24 +1947,6 @@ export default class CreateTreeTemplate extends Component {
                                 console.log("going to call MOM data");
                                 this.calculateMOMData(0, 0);
                             });
-                            // } else if (buttonClick == 1) {
-                            // if (!this.state.isSubmitClicked) {
-                            // this.setState({ loading: true, openAddNodeModal: buttonClick == 1 ? false : true, isSubmitClicked: !this.state.isSubmitClicked ? true : this.state.isSubmitClicked }, () => {
-                            //     console.log("all ok>>>");
-                            //     setTimeout(() => {
-                            //         if (!this.state.addNodeFlag) {
-                            //             this.onAddButtonClick(this.state.currentItemConfig)
-                            //         } else {
-                            //             this.updateNodeInfoInJson(this.state.currentItemConfig)
-                            //         }
-                            //         this.setState({
-                            //             cursorItem: 0,
-                            //             highlightItem: 0
-                            //         })
-                            //     }, 0);
-                            // })
-                            // }
-                            // }
                         } else {
                             console.log("inside else form submit");
                             this.setState({
@@ -1990,13 +1970,15 @@ export default class CreateTreeTemplate extends Component {
 
                         }
                     }
-                    this.setState({ openAddNodeModal: buttonClick == 1 ? false : true, isSubmitClicked: !this.state.isSubmitClicked ? true : this.state.isSubmitClicked })
                 } catch (err) {
                     console.log("scaling err---", err);
                     localStorage.setItem("scalingErrorTemplate", err);
                 }
             } else {
                 this.setState({ modelingJexcelLoader: false })
+            }
+            if (buttonClick == 1) {
+                this.setState({ openAddNodeModal: false, isSubmitClicked: true })
             }
         }
     }
@@ -7788,25 +7770,27 @@ export default class CreateTreeTemplate extends Component {
                             oneTimeUsage: ""
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
-                        // onSubmit={(values, { setSubmitting, setErrors }) => {
-                        //     if (!this.state.isSubmitClicked) {
-                        //         this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
-                        //             console.log("all ok>>>");
-                        //             setTimeout(() => {
-                        //                 console.log("inside set timeout on submit")
-                        //                 if (this.state.addNodeFlag) {
-                        //                     this.onAddButtonClick(this.state.currentItemConfig)
-                        //                 } else {
-                        //                     this.updateNodeInfoInJson(this.state.currentItemConfig)
-                        //                 }
-                        //                 this.setState({
-                        //                     cursorItem: 0,
-                        //                     highlightItem: 0
-                        //                 })
-                        //             }, 0);
-                        //         })
-                        //     }
-                        // }}
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                            if (!this.state.isSubmitClicked && !this.state.modelingChanged) {
+                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                    console.log("all ok>>>");
+                                    setTimeout(() => {
+                                        console.log("inside set timeout on submit")
+                                        if (this.state.addNodeFlag) {
+                                            this.onAddButtonClick(this.state.currentItemConfig)
+                                        } else {
+                                            this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                        }
+                                        this.setState({
+                                            cursorItem: 0,
+                                            highlightItem: 0
+                                        })
+                                    }, 0);
+                                })
+                            } else {
+                                this.formSubmitLoader(1);
+                            }
+                        }}
                         render={
                             ({
                                 values,
@@ -9153,8 +9137,8 @@ export default class CreateTreeTemplate extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1') })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={(e) => this.formSubmitLoader(1)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
+                                        {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
                             )} />
@@ -9243,7 +9227,7 @@ export default class CreateTreeTemplate extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(2)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.aggregationNode && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(0)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>
