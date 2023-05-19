@@ -1693,10 +1693,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var totalDifference = 0;
         var countDifference = 0;
         var datacsv = [];
+        console.log("this.state.dataList===========>",this.state.dataList)
         datacsv.push([(('Error').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalError += Number(isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : parseFloat(data[0].errorPerc*100));
+            // totalError += Number(isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : parseFloat(data[0].errorPerc*100));
+            totalError += isNaN(data[0].errorPerc) ? 0 : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? 0 : parseFloat(data[0].errorPerc*100);
             countError += 1;
             datacsv.push(isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : this.PercentageFormatter(data[0].errorPerc*100))
         })
@@ -1709,9 +1711,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         datacsv.push([(('Forecast').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalForcaste += Number(data[0].forecastQty);
+            totalForcaste += isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty;
             countForcaste += 1;
-            datacsv.push(Number(data[0].forecastQty).toFixed(2))
+            datacsv.push(isNaN(data[0].forecastQty)? '' : data[0].forecastQty.toFixed(2))
         })
         datacsv.push(Number(totalForcaste / countForcaste).toFixed(2));
         A.push(this.addDoubleQuoteToRowContent(datacsv))
@@ -1724,12 +1726,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             {
                 this.state.monthArray.map((item1, count) => {
                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalRegion += Number(data[0].forecastQty);
+                    totalRegion += isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty;
                     totalRegionCount += 1;
-                    datacsv.push(Number(data[0].forecastQty).toFixed(2))
+                    datacsv.push(isNaN(data[0].forecastQty) ? '' : data[0].forecastQty.toFixed(2))
                 })
             }
-            datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
+            datacsv.push((totalRegion / totalRegionCount).toFixed(2));
             A.push(this.addDoubleQuoteToRowContent(datacsv))
         });
 
@@ -1737,11 +1739,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         datacsv.push([(('Actual').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalActual += Number(data[0].actualQty);
+            totalActual += isNaN(data[0].actualQty) ? 0 : data[0].actualQty;
             countActual += 1;
-            datacsv.push((Number((data[0].actualQty)).toFixed(2)))
+            datacsv.push(isNaN(data[0].actualQty) ? '' : data[0].actualQty.toFixed(2))
         })
-        datacsv.push(Number(totalActual / countActual).toFixed(2));
+        datacsv.push((totalActual / countActual).toFixed(2));
         A.push(this.addDoubleQuoteToRowContent(datacsv))
 
         this.state.regions.map(r => {
@@ -1752,23 +1754,23 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             {
                 this.state.monthArray.map((item1, count) => {
                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalRegion += Number(data[0].actualQty);
+                    totalRegion += isNaN(data[0].actualQty) ? 0 : data[0].actualQty;
                     totalRegionCount += 1;
-                    datacsv.push(Number(data[0].actualQty).toFixed(2))
+                    datacsv.push(isNaN(data[0].actualQty) ? '' :data[0].actualQty.toFixed(2))
                 })
             }
-            datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
+            datacsv.push((totalRegion / totalRegionCount).toFixed(2));
             A.push(this.addDoubleQuoteToRowContent(datacsv))
         });
         datacsv = [];
         datacsv.push([(('Difference').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalDifference += Number(data[0].actualQty) - Number(data[0].forecastQty);
+            totalDifference += (isNaN(data[0].actualQty) ? 0 : data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 :data[0].forecastQty);
             countDifference += 1;
-            datacsv.push((Number(data[0].actualQty) - Number(data[0].forecastQty)).toFixed(2))
+            datacsv.push((isNaN(data[0].actualQty) ? 0 : data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty).toFixed(2))
         })
-        datacsv.push(Number(totalDifference / countDifference).toFixed(2));
+        datacsv.push((totalDifference / countDifference).toFixed(2));
         A.push(this.addDoubleQuoteToRowContent(datacsv))
 
         this.state.regions.map(r => {
@@ -1779,12 +1781,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             {
                 this.state.monthArray.map((item1, count) => {
                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalRegion += Number(data[0].actualQty) - Number(data[0].forecastQty);
+                    totalRegion += (isNaN(data[0].actualQty) ? 0 :data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 :data[0].forecastQty);
                     totalRegionCount += 1;
-                    datacsv.push((Number(data[0].actualQty) - Number(data[0].forecastQty)).toFixed(2))
+                    datacsv.push(((isNaN(data[0].actualQty) ? 0 :data[0].actualQty) -(isNaN(data[0].forecastQty) ? 0 :data[0].forecastQty)).toFixed(2))
                 })
             }
-            datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
+            datacsv.push((totalRegion / totalRegionCount).toFixed(2));
             A.push(this.addDoubleQuoteToRowContent(datacsv))
         });
 
@@ -1941,9 +1943,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countError = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalError += Number(isNaN(datavalue[0].errorPerc) ? '' : datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity' ? '' : datavalue[0].errorPerc*100);
+                totalError += isNaN(datavalue[0].errorPerc) ? 0 : (datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity') ? 0 : datavalue[0].errorPerc*100;
                 countError += 1;
-                A.push(isNaN(datavalue[0].errorPerc) ? '' : datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity' ? '' : this.PercentageFormatter(datavalue[0].errorPerc*100))
+                A.push(isNaN(datavalue[0].errorPerc) ? '' : (datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(datavalue[0].errorPerc*100))
             })
             A.push(this.PercentageFormatter(totalError / countError))
         }
@@ -1956,11 +1958,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countForecast = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalForecast += Number(datavalue[0].forecastQty);
+                totalForecast += isNaN(datavalue[0].forecastQty)? 0 : datavalue[0].forecastQty;
                 countForecast += 1;
-                A.push((Number(datavalue[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push((isNaN(datavalue[0].forecastQty) ? '' : datavalue[0].forecastQty.toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
-            A.push((Number(totalForecast / countForecast).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+            A.push(((totalForecast / countForecast).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
         }
         data.push(A);
         A = [];
@@ -1972,12 +1974,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 {
                     this.state.monthArray.map((item1, count) => {
                         var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                        totalRegion += Number(datavalue[0].forecastQty);
+                        totalRegion += isNaN(datavalue[0].forecastQty)? 0 : datavalue[0].forecastQty;
                         totalRegionCount += 1;
-                        A.push((Number(datavalue[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                        A.push((isNaN(datavalue[0].forecastQty) ? '' : datavalue[0].forecastQty.toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                     })
                 }
-                A.push((Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push(((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
         }
         data.push(A);
@@ -1989,11 +1991,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countActal = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalActal += Number(datavalue[0].actualQty);
+                totalActal += isNaN(datavalue[0].actualQty) ? 0 : datavalue[0].actualQty;
                 countActal += 1;
-                A.push((Number(datavalue[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push((isNaN(datavalue[0].actualQty) ? '' : datavalue[0].actualQty.toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
-            A.push((Number(totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+            A.push(((totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
         }
         data.push(A);
         A = [];
@@ -2005,12 +2007,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 {
                     this.state.monthArray.map((item1, count) => {
                         var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                        totalRegion += Number(datavalue[0].actualQty);
+                        totalRegion += isNaN(datavalue[0].actualQty) ? 0 : datavalue[0].actualQty;
                         totalRegionCount += 1;
-                        A.push((Number(datavalue[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
+                        A.push((isNaN(datavalue[0].actualQty) ? '' : datavalue[0].actualQty.toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
                     })
                 }
-                A.push((Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push(((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
         }
         data.push(A);
@@ -2022,11 +2024,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countDiff = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalDiff += Number(datavalue[0].actualQty) - Number(datavalue[0].forecastQty);
+                totalDiff += (isNaN(datavalue[0].actualQty) ? 0 : datavalue[0].actualQty) - (isNaN(datavalue[0].forecastQty) ? 0 :datavalue[0].forecastQty);
                 countDiff += 1;
-                A.push((Number((datavalue[0].actualQty)- datavalue[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push((((isNaN(datavalue[0].actualQty) ? 0 : datavalue[0].actualQty) - (isNaN(datavalue[0].forecastQty) ? 0 :datavalue[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
-            A.push((Number(totalDiff / countDiff).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+            A.push(((totalDiff / countDiff).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
         }
         data.push(A);
         A = [];
@@ -2038,9 +2040,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 {
                     this.state.monthArray.map((item1, count) => {
                         var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                        totalRegion += Number(datavalue[0].actualQty) - Number(datavalue[0].forecastQty);
+                        totalRegion += (isNaN(datavalue[0].actualQty) ? 0 : datavalue[0].actualQty) - (isNaN(datavalue[0].forecastQty) ? 0 :datavalue[0].forecastQty);       
                         totalRegionCount += 1;
-                        A.push((Number((datavalue[0].actualQty) - Number(datavalue[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                        A.push((((isNaN(datavalue[0].actualQty) ? 0 : datavalue[0].actualQty) - (isNaN(datavalue[0].forecastQty) ? 0 :datavalue[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                     })
                 }
                 A.push((Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
