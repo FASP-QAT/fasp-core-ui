@@ -683,6 +683,7 @@ class EditUserComponent extends Component {
 
         //TechnicalArea
         if (x == 2) {
+            this.el.setValueFromCoords(4, y, '', true);
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
