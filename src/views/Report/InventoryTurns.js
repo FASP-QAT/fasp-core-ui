@@ -61,7 +61,8 @@ export default class InventoryTurns extends Component {
                 country: [],
                 pu: [],
                 programIds: [],
-                displayId: ''
+                displayId: '',
+                useApprovedSupplyPlanOnly: true
             },
             costOfInventory: [],
             costOfCountry:[],
@@ -102,6 +103,9 @@ export default class InventoryTurns extends Component {
     roundN = num => {
         return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
     }
+    roundN1 = num => {
+        return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(1);
+    }
     round = num => {
         return Number(Math.round(num * Math.pow(10, 0)) / Math.pow(10, 0));
     }
@@ -120,6 +124,22 @@ export default class InventoryTurns extends Component {
         var x = cell1.split('.');
         var x1 = x[0];
         var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+    formatterSingle = value => {
+
+        if(value == null){
+            return null;
+        }
+        var cell1 = this.roundN1(value)
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1][0] : '';
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
@@ -145,7 +165,7 @@ export default class InventoryTurns extends Component {
     exportCSV = (columns) => {
 
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.ManageTree.Month') + ' : ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.inventoryTurns.display') + ' : ' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') : i18n.t('static.productCategory.productCategory'))).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (this.state.CostOfInventoryInput.displayId == 1 ? i18n.t('static.country.countryMaster') + ' : ' + this.state.countryId.map(e => {return e.label}) : i18n.t('static.productCategory.productCategory')  + ' : ' + this.state.puId.map(e => {return e.label})).replaceAll(' ', '%20') + '"')
@@ -164,18 +184,18 @@ export default class InventoryTurns extends Component {
 
         {this.state.costOfCountry.map(item => {
 
-            A.push(this.addDoubleQuoteToRowContent([(item.countryName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length, this.formatter(item.totalConsumption), this.round(item.avergeStock), "",  "", "", this.roundN(item.inventoryTurns), this.roundN(item.plannedInventoryTurns), this.roundN(item.mape), this.roundN(item.mse)])) 
+            A.push(this.addDoubleQuoteToRowContent([(item.countryName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length, "", "", "",  "", "", this.roundN(item.inventoryTurns), this.roundN1(item.plannedInventoryTurns), this.roundN(item.mape), this.roundN(item.mse)])) 
                     
             {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
                 
-                A.push(this.addDoubleQuoteToRowContent([(r.programName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, this.formatter(r.totalConsumption), this.round(r.avergeStock), "", "", "", this.roundN(r.inventoryTurns), this.roundN(r.plannedInventoryTurns), this.roundN(r.mape), this.roundN(r.mse)]))
+                A.push(this.addDoubleQuoteToRowContent([(r.programName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, "", "", "", "", "", this.roundN(r.inventoryTurns), this.roundN1(r.plannedInventoryTurns), this.roundN(r.mape), this.roundN(r.mse)]))
                         
                 {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 6 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN(arr1.mse)]))          
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 6 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN(arr1.inventoryTurns), this.roundN1(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN(arr1.mse)]))          
                 })}
 
                 {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 6 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN(arr1.mse)]))  
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 6 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN(arr1.inventoryTurns), this.roundN1(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN(arr1.mse)]))  
                 })}
                 
             })}
@@ -230,7 +250,7 @@ export default class InventoryTurns extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
+                    doc.text(i18n.t('static.ManageTree.Month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
                     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -277,18 +297,18 @@ export default class InventoryTurns extends Component {
         const data=[];
         {this.state.costOfCountry.map(item => {
 
-            data.push([" "+item.countryName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length, this.formatter(item.totalConsumption), this.formatter(item.avergeStock), "",  "", "", this.formatterDouble(item.inventoryTurns), this.formatterDouble(item.plannedInventoryTurns), this.formatterDouble(item.mape), this.formatterDouble(item.mse)])  
+            data.push([" "+item.countryName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).length, "", "", "",  "", "", this.formatterDouble(item.inventoryTurns), this.formatterSingle(item.plannedInventoryTurns), this.formatterDouble(item.mape), this.formatterDouble(item.mse)])  
                     
             {this.state.costOfProgram.filter(e => e.id == item.id).map(r => {
                 
-                data.push(["      "+r.programName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, this.formatter(r.totalConsumption), this.formatter(r.avergeStock), "",  "", "", this.formatterDouble(r.inventoryTurns), this.formatterDouble(r.plannedInventoryTurns), this.formatterDouble(r.mape), this.formatterDouble(r.mse)])
+                data.push(["      "+r.programName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).length, "", "", "",  "", "", this.formatterDouble(r.inventoryTurns), this.formatterSingle(r.plannedInventoryTurns), this.formatterDouble(r.mape), this.formatterDouble(r.mse)])
                 
                 {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), arr1.noOfMonths >= 6 ? this.formatter(arr1.noOfMonths) : "", this.formatter(arr1.reorderFrequencyInMonths), this.formatter(arr1.minMonthsOfStock), this.formatterDouble(arr1.inventoryTurns), this.formatterDouble(arr1.plannedInventoryTurns), this.formatterDouble(arr1.mape), this.formatterDouble(arr1.mse)])          
+                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), arr1.noOfMonths >= 6 ? this.formatter(arr1.noOfMonths) : " ", this.formatter(arr1.reorderFrequencyInMonths), this.formatter(arr1.minMonthsOfStock), this.formatterDouble(arr1.inventoryTurns), this.formatterSingle(arr1.plannedInventoryTurns), this.formatterDouble(arr1.mape), this.formatterDouble(arr1.mse)])          
                 })}
 
                 {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), arr1.noOfMonths >= 6 ? this.formatter(arr1.noOfMonths) : "", this.formatter(arr1.reorderFrequencyInMonths), this.formatter(arr1.minMonthsOfStock), this.formatterDouble(arr1.inventoryTurns), this.formatterDouble(arr1.plannedInventoryTurns), this.formatterDouble(arr1.mape), this.formatterDouble(arr1.mse)])  
+                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), arr1.noOfMonths >= 6 ? this.formatter(arr1.noOfMonths) : " ", this.formatter(arr1.reorderFrequencyInMonths), this.formatter(arr1.minMonthsOfStock), this.formatterDouble(arr1.inventoryTurns), this.formatterSingle(arr1.plannedInventoryTurns), this.formatterDouble(arr1.mape), this.formatterDouble(arr1.mse)])  
                 })}
                 
             })}
@@ -308,6 +328,11 @@ export default class InventoryTurns extends Component {
                 if(data.section=="body" && data.column.index == 0){
                     if(data.cell.raw[0]!=" "){
                         data.cell.styles.cellPadding = {left: 30,right: 5, top: 5, bottom: 5};
+                    }
+                }
+                if(data.section=="body" && data.column.index == 4){
+                    if(data.cell.raw == " "){
+                        data.cell.styles.fillColor = "#BA0C2F";
                     }
                 }
             }
@@ -342,6 +367,10 @@ export default class InventoryTurns extends Component {
 
         if (event.target.name == "includePlanningShipments") {
             costOfInventoryInput.includePlanningShipments = event.target.value;
+
+        }
+        if (event.target.name == "includeApprovedVersions") {
+            costOfInventoryInput.useApprovedSupplyPlanOnly = event.target.value;
 
         }
         
@@ -590,6 +619,12 @@ export default class InventoryTurns extends Component {
         document.getElementById("hideProductDiv").style.display = "none";
         document.getElementById("hideCountryDiv").style.display = "none";
 
+        this.setState( prevState => ({ programList:[], programId:[], costOfInventory: [], costOfCountry:[], costOfProgram:[], CostOfInventoryInput : { ...prevState.CostOfInventoryInput, displayId: parseInt(1), pu: [0], programIds:[] }}),
+            () => {
+                this.filterData();
+                this.formSubmit();
+            })    
+        
         RealmCountryService.getRealmCountryListAll()
                 .then(response => {
                     console.log("Realm Country List list---", response.data);
@@ -797,7 +832,7 @@ export default class InventoryTurns extends Component {
                     // readOnly: true
                 },
                 {
-                    title: i18n.t('static.report.noofmonth'),
+                    title: i18n.t('static.inventoryTurns.noofmonths'),
                     type: 'numeric', mask: '#,##',
                     // readOnly: true
                 },
@@ -856,7 +891,8 @@ export default class InventoryTurns extends Component {
             "productCategoryIds": this.state.CostOfInventoryInput.pu,
             "viewBy": this.state.CostOfInventoryInput.displayId,
             "dt": moment(this.state.CostOfInventoryInput.dt).startOf('month').format('YYYY-MM-DD'),
-            "includePlannedShipments": this.state.CostOfInventoryInput.includePlanningShipments.toString() == "true" ? 1 : 0
+            "includePlannedShipments": this.state.CostOfInventoryInput.includePlanningShipments.toString() == "true" ? 1 : 0,
+            "useApprovedSupplyPlanOnly": this.state.CostOfInventoryInput.useApprovedSupplyPlanOnly.toString() == "true" ? 1 : 0
         }
         // AuthenticationService.setupAxiosInterceptors();
 
@@ -877,7 +913,7 @@ export default class InventoryTurns extends Component {
                                 let level1AverageStock = tempData.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                 level1AverageStock = level1AverageStock / level1NoOfMonths;
                                 let level1InventoryTurns = tempData.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / tempData.length;
-                                let level1PlannedInventoryTurns = this.mode(tempData.map(arr => arr.plannedInventoryTurns));
+                                let level1PlannedInventoryTurns = this.mode(tempData.map(arr => parseFloat(arr.plannedInventoryTurns.toFixed(1))));
                                 let level1Mape = tempData.reduce((prev,curr,index) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length);
                                 let level1Mse = tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / (tempData.filter(arr => arr.mse != null).length);
                                 level1Data.push({
@@ -899,7 +935,7 @@ export default class InventoryTurns extends Component {
                                     let level2AverageStock = temp.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                     level2AverageStock = level2AverageStock / level2NoOfMonths;
                                     let level2InventoryTurns = temp.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / temp.length;
-                                    let level2PlannedInventoryTurns = this.mode(temp.map(arr => arr.plannedInventoryTurns));
+                                    let level2PlannedInventoryTurns = this.mode(temp.map(arr => parseFloat(arr.plannedInventoryTurns.toFixed(1))));
                                     let level2Mape = temp.reduce((prev,curr,index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length);
                                     let level2Mse = temp.reduce((prev,curr,index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length);
                                     level2Data.push({
@@ -934,7 +970,7 @@ export default class InventoryTurns extends Component {
                                 let level1AverageStock = tempData.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                 level1AverageStock = level1AverageStock / level1NoOfMonths;
                                 let level1InventoryTurns = tempData.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / tempData.length;
-                                let level1PlannedInventoryTurns = this.mode(tempData.map(arr => arr.plannedInventoryTurns));
+                                let level1PlannedInventoryTurns = this.mode(tempData.map(arr => parseFloat(arr.plannedInventoryTurns.toFixed(1))));
                                 let level1Mape = tempData.reduce((prev,curr,index) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length);
                                 let level1Mse = tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / tempData.filter(arr => arr.mse != null).length;
                                 level1Data.push({
@@ -956,7 +992,7 @@ export default class InventoryTurns extends Component {
                                     let level2AverageStock = temp.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                     level2AverageStock = level2AverageStock / level2NoOfMonths;
                                     let level2InventoryTurns = temp.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / temp.length;
-                                    let level2PlannedInventoryTurns = this.mode(temp.map(arr => arr.plannedInventoryTurns));
+                                    let level2PlannedInventoryTurns = this.mode(temp.map(arr => parseFloat(arr.plannedInventoryTurns.toFixed(1))));
                                     let level2Mape = temp.reduce((prev,curr,index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length);
                                     let level2Mse = temp.reduce((prev,curr,index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length);
                                     level2Data.push({
@@ -1097,7 +1133,7 @@ export default class InventoryTurns extends Component {
         var counts = {};
         var maxCount = 0;
         var mode;
-      
+        console.log("Hello ",numbers)
         // Loop through the array of numbers
         for (var i = 0; i < numbers.length; i++) {
             var num = numbers[i];
@@ -1117,6 +1153,7 @@ export default class InventoryTurns extends Component {
                 mode = num;
             }
         }
+        console.log("Hello1 ",mode)
         return mode;
     }      
 
@@ -1132,7 +1169,7 @@ export default class InventoryTurns extends Component {
                 <th>{i18n.t('static.inventoryTurns.noofplanningunits')}</th>
                 <th>{i18n.t('static.report.totconsumption')}</th>
                 <th>{i18n.t('static.report.avergeStock')}</th>
-                <th>{i18n.t('static.report.noofmonth')}</th>
+                <th>{i18n.t('static.inventoryTurns.noofmonths')}</th>
                 <th>{i18n.t('static.supplyPlan.reorderInterval')}</th>
                 <th>{i18n.t('static.product.minMonthOfStock')}</th>
                 <th>{i18n.t('static.inventoryTurns.actual')}</th>
@@ -1168,7 +1205,7 @@ export default class InventoryTurns extends Component {
                     <td></td>
                     <td>{this.formatterDouble(item.inventoryTurns)}</td>
                     {/* <td>{this.formatterDouble(this.mode(this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id).map(arr => arr.plannedInventoryTurns) : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id).map(arr => arr.plannedInventoryTurns)))}</td> */}
-                    <td>{this.formatterDouble(item.plannedInventoryTurns)}</td>
+                    <td>{this.formatterSingle(item.plannedInventoryTurns)}</td>
                     <td>{this.formatterDouble(item.mape)}</td>
                     <td>{this.formatterDouble(item.mse)}</td>
                   </tr>
@@ -1190,7 +1227,7 @@ export default class InventoryTurns extends Component {
                       <td></td>
                       <td>{this.formatterDouble(r.inventoryTurns)}</td>
                       {/* <td>{this.formatterDouble(this.mode(this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map( arr => arr.plannedInventoryTurns ) : this.state.costOfInventory.filter(arr => arr.productCategory.id == item.id && arr.program.id == r.programId ).map( arr => arr.plannedInventoryTurns) ))}</td> */}
-                      <td>{this.formatterDouble(r.plannedInventoryTurns)}</td>
+                      <td>{this.formatterSingle(r.plannedInventoryTurns)}</td>
                       <td>{this.formatterDouble(r.mape)}</td>
                       <td>{this.formatterDouble(r.mse)}</td>
                     </tr>
@@ -1203,11 +1240,11 @@ export default class InventoryTurns extends Component {
                         <td className='borderNoneInventry'></td>
                         <td>{this.formatter(arr1.totalConsumption)}</td>
                         <td>{this.formatter(arr1.avergeStock)}</td>
-                        <td className='borderNoneInventry1'>{arr1.noOfMonths >= 6 ? arr1.noOfMonths : ""}</td>
+                        <td style={{ background: arr1.noOfMonths >= 6 ? "" : "#BA0C2F"}} className='borderNoneInventry1'>{arr1.noOfMonths >= 6 ? arr1.noOfMonths : ""}</td>
                         <td>{arr1.reorderFrequencyInMonths}</td>
                         <td>{arr1.minMonthsOfStock}</td>
                         <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
-                        <td>{this.formatterDouble(arr1.plannedInventoryTurns)}</td>
+                        <td>{this.formatterSingle(arr1.plannedInventoryTurns)}</td>
                         <td>{this.formatterDouble(arr1.mape)}</td>
                         <td>{this.formatterDouble(arr1.mse)}</td>
                         </tr>)
@@ -1220,11 +1257,11 @@ export default class InventoryTurns extends Component {
                         <td className='borderNoneInventry'></td>
                         <td>{this.formatter(arr1.totalConsumption)}</td>
                         <td>{this.formatter(arr1.avergeStock)}</td>
-                        <td className='borderNoneInventry1'>{arr1.noOfMonths}</td>
+                        <td style={{ background: arr1.noOfMonths >= 6 ? "" : "#BA0C2F"}} className='borderNoneInventry1'>{arr1.noOfMonths >= 6 ? arr1.noOfMonths : ""}</td>
                         <td>{arr1.reorderFrequencyInMonths}</td>
                         <td>{arr1.minMonthsOfStock}</td>
                         <td>{this.formatterDouble(arr1.inventoryTurns)}</td>
-                        <td>{this.formatterDouble(arr1.plannedInventoryTurns)}</td>
+                        <td>{this.formatterSingle(arr1.plannedInventoryTurns)}</td>
                         <td>{this.formatterDouble(arr1.mape)}</td>
                         <td>{this.formatterDouble(arr1.mse)}</td>
                         </tr>)
@@ -1300,7 +1337,7 @@ export default class InventoryTurns extends Component {
             },
             {
                 dataField: 'noOfMonths',
-                text: i18n.t('static.report.noofmonth'),
+                text: i18n.t('static.inventoryTurns.noofmonths'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
@@ -1493,6 +1530,24 @@ export default class InventoryTurns extends Component {
                                                 </div>
                                             </FormGroup>
 
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="includeApprovedVersions"
+                                                            id="includeApprovedVersions"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.dataChange(e) }}
+                                                        >
+                                                            <option value="true">{i18n.t('static.program.yes')}</option>
+                                                            <option value="false">{i18n.t('static.program.no')}</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
                                         </div>
                                         
                                         <div className="row">
