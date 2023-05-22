@@ -516,7 +516,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 if (shipmentList[i].erpFlag.toString() == "true") {
                                                     var shipmentLinkingListFilter = shipmentLinkingList.filter(c => shipmentList[i].shipmentId > 0 ? c.childShipmentId == shipmentList[i].shipmentId : c.tempChildShipmentId == shipmentList[i].tempShipmentId);
                                                     if (shipmentLinkingListFilter.length > 0) {
-                                                        orderNo = shipmentLinkingListFilter[0].roNo + " - " + shipmentLinkingListFilter[0].roPrimeLineNo + " | " + (shipmentLinkingListFilter[0].orderNo + " - " + shipmentLinkingListFilter[0].primeLineNo) + (shipmentLinkingListFilter[0].knShipmentNo != "" && shipmentLinkingListFilter[0].knShipmentNo != null ? " | " + shipmentLinkingListFilter[0].knShipmentNo : "")
+                                                        orderNo = shipmentLinkingListFilter[0].roNo + " - " + shipmentLinkingListFilter[0].roPrimeLineNo + " | " + (shipmentLinkingListFilter[0].orderNo + " - " + shipmentLinkingListFilter[0].primeLineNo)
                                                     }
                                                 }
 
