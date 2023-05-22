@@ -617,7 +617,19 @@ export default class CommitTreeComponent extends React.Component {
                                 for (var tl = 0; tl < treeList.length; tl++) {
                                     var tree = treeList[tl];
                                     var scenarioList = tree.scenarioList;
+                                    var scenarioIdsSet=[...new Set(scenarioList.map(ele => Number(ele.id)))];
+                                    console.log("Scenario Ids Set Test@123",scenarioIdsSet);
                                     var completeFlatList = (tree.tree).flatList;
+                                    for (let i = 0; i < completeFlatList.length; i++) {
+                                        var node = completeFlatList[i];
+                                        var scenarioKeys=Object.keys(node.payload.nodeDataMap);
+                                        for(var sk=0;sk<scenarioKeys.length;sk++){
+                                            console.log("scenarioKeys[sk] Test@123",scenarioKeys[sk])
+                                            if(!(scenarioIdsSet.includes(Number(scenarioKeys[sk])))){
+                                                delete node.payload.nodeDataMap[scenarioKeys[sk]];
+                                            }
+                                        }
+                                    }
                                     for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                                         console.log("commit*** completeFlatList before---", completeFlatList);
                                         for (let i = 0; i < completeFlatList.length; i++) {
