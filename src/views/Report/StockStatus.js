@@ -1317,7 +1317,7 @@ class StockStatus extends Component {
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
-                            actualConsumptionQty: Number(totalActualConsumption),
+                            actualConsumptionQty: list[0].actualFlag?Number(totalActualConsumption):null,
                             actualConsumption: list[0].actualFlag,
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
@@ -1344,6 +1344,7 @@ class StockStatus extends Component {
                             dt: new Date(from, month - 1),
                             consumptionQty: 0,
                             actualConsumption: false,
+                            actualConsumptionQty:null,
                             shipmentQty: 0,
                             shipmentInfo: [],
                             adjustment: 0,
@@ -1807,7 +1808,7 @@ class StockStatus extends Component {
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
-                            actualConsumptionQty: Number(totalActualConsumption),
+                            actualConsumptionQty: totalActualConsumption!=null?Number(totalActualConsumption):null,
                             actualConsumption: list[0].actualFlag,
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
@@ -1834,6 +1835,7 @@ class StockStatus extends Component {
                             dt: new Date(from, month - 1),
                             consumptionQty: 0,
                             actualConsumption: false,
+                            actualConsumptionQty:null,
                             shipmentQty: 0,
                             shipmentInfo: [],
                             adjustment: 0,
@@ -1863,7 +1865,7 @@ class StockStatus extends Component {
                               yAxisID: 'A',
                               type: 'line',
                               stack: 7,
-                              data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
+                              data: data.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
                               fill: false,
                               borderColor: 'rgb(75, 192, 192)',
                               tension: 0.1,
@@ -1874,6 +1876,38 @@ class StockStatus extends Component {
                               pointRadius: 10
 
                             },
+                            {
+                              type: "line",
+                              yAxisID: 'A',
+                              label: i18n.t('static.supplyPlan.consumption'),
+                              backgroundColor: 'transparent',
+                              borderColor: '#ba0c2f',
+                              ticks: {
+                                fontSize: 2,
+                                fontColor: 'transparent',
+                              },
+                              lineTension: 0,
+                              showInLegend: true,
+                              pointStyle: 'line',
+                              pointRadius: 0,
+                              yValueFormatString: "$#,##0",
+                              data: data.map((item, index) => (item.finalConsumptionQty))
+                            },
+                            {
+                              label: i18n.t('static.report.actualConsumption'),
+                              yAxisID: 'A',
+                              type: 'line',
+                              stack: 7,
+                              data: data.map((item, index) => (item.actualConsumptionQty)),
+                              fill: false,
+                              borderColor: 'rgb(75, 192, 192)',
+                              tension: 0.1,
+                              showLine: false,
+                              pointStyle: 'point',
+                              pointBackgroundColor: '#ba0c2f',
+                              pointBorderColor: '#ba0c2f',
+                              pointRadius: 3
+                          },
                             {
                               label: i18n.t('static.supplyPlan.delivered'),
                               yAxisID: 'A',
@@ -1888,7 +1922,7 @@ class StockStatus extends Component {
                                 let count = 0;
                                 (item.shipmentInfo.map((ele, index) => {
 
-                                  ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
+                                  ele.shipmentStatus.id == 7 ? count = count + Number(ele.shipmentQty) : count = count
                                 }))
                                 return count
                               })
@@ -1906,7 +1940,7 @@ class StockStatus extends Component {
                               data: data.map((item, index) => {
                                 let count = 0;
                                 (item.shipmentInfo.map((ele, index) => {
-                                  (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
+                                  (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + Number(ele.shipmentQty) : count = count
                                 }))
                                 return count
                               })
@@ -1925,7 +1959,7 @@ class StockStatus extends Component {
                               data: data.map((item, index) => {
                                 let count = 0;
                                 (item.shipmentInfo.map((ele, index) => {
-                                  (ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
+                                  (ele.shipmentStatus.id == 4) ? count = count + Number(ele.shipmentQty) : count = count
                                 }))
                                 return count
                               })
@@ -1943,10 +1977,25 @@ class StockStatus extends Component {
                               data: data.map((item, index) => {
                                 let count = 0;
                                 (item.shipmentInfo.map((ele, index) => {
-                                  (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
+                                  (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + Number(ele.shipmentQty) : count = count
                                 }))
                                 return count
                               })
+                            },
+                            {
+                              label: i18n.t('static.report.stock'),
+                              yAxisID: 'A',
+                              type: 'line',
+                              borderColor: '#cfcdc9',
+                              ticks: {
+                                fontSize: 2,
+                                fontColor: 'transparent',
+                              },
+                              lineTension: 0,
+                              pointStyle: 'line',
+                              pointRadius: 0,
+                              showInLegend: true,
+                              data: data.map((item, index) => (Number(item.closingBalance)))
                             },
                             {
                               type: "line",
@@ -1990,39 +2039,7 @@ class StockStatus extends Component {
                               yValueFormatString: "$#,##0",
                               data: data.map((item, index) => (data[0].planBasedOn == 1 ? item.maxMos : item.maxStock))
                             }
-
-                            , {
-                              type: "line",
-                              yAxisID: 'A',
-                              label: i18n.t('static.supplyPlan.consumption'),
-                              backgroundColor: 'transparent',
-                              borderColor: '#ba0c2f',
-                              ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                              },
-                              lineTension: 0,
-                              showInLegend: true,
-                              pointStyle: 'line',
-                              pointRadius: 0,
-                              yValueFormatString: "$#,##0",
-                              data: data.map((item, index) => (item.finalConsumptionQty))
-                            },
-                            {
-                              label: i18n.t('static.report.stock'),
-                              yAxisID: 'A',
-                              type: 'line',
-                              borderColor: '#cfcdc9',
-                              ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                              },
-                              lineTension: 0,
-                              pointStyle: 'line',
-                              pointRadius: 0,
-                              showInLegend: true,
-                              data: data.map((item, index) => (item.closingBalance))
-                            }
+                            
 
                           ];
                           if (data.length > 0 && data[0].planBasedOn == 1) {
@@ -2313,7 +2330,7 @@ class StockStatus extends Component {
                   yAxisID: 'A',
                   type: 'line',
                   stack: 7,
-                  data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
+                  data: filteredPlanningUnitData.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
                   fill: false,
                   borderColor: 'rgb(75, 192, 192)',
                   tension: 0.1,
@@ -2324,6 +2341,38 @@ class StockStatus extends Component {
                   pointRadius: 10
 
                 },
+                {
+                  type: "line",
+                  yAxisID: 'A',
+                  label: i18n.t('static.supplyPlan.consumption'),
+                  backgroundColor: 'transparent',
+                  borderColor: '#ba0c2f',
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                  },
+                  lineTension: 0,
+                  showInLegend: true,
+                  pointStyle: 'line',
+                  pointRadius: 0,
+                  yValueFormatString: "$#,##0",
+                  data: filteredPlanningUnitData.map((item, index) => (item.finalConsumptionQty))
+                },
+                {
+                  label: i18n.t('static.report.actualConsumption'),
+                  yAxisID: 'A',
+                  type: 'line',
+                  stack: 7,
+                  data: filteredPlanningUnitData.map((item, index) => (item.actualConsumptionQty)),
+                  fill: false,
+                  borderColor: 'rgb(75, 192, 192)',
+                  tension: 0.1,
+                  showLine: false,
+                  pointStyle: 'point',
+                  pointBackgroundColor: '#ba0c2f',
+                  pointBorderColor: '#ba0c2f',
+                  pointRadius: 3
+              },
                 {
                   label: i18n.t('static.supplyPlan.delivered'),
                   yAxisID: 'A',
@@ -2399,6 +2448,21 @@ class StockStatus extends Component {
                   })
                 },
                 {
+                  label: i18n.t('static.report.stock'),
+                  yAxisID: 'A',
+                  type: 'line',
+                  borderColor: '#cfcdc9',
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                  },
+                  lineTension: 0,
+                  pointStyle: 'line',
+                  pointRadius: 0,
+                  showInLegend: true,
+                  data: filteredPlanningUnitData.map((item, index) => (item.closingBalance))
+                },
+                {
                   type: "line",
                   yAxisID: 'B',
                   label: i18n.t('static.report.minmonth'),
@@ -2456,38 +2520,6 @@ class StockStatus extends Component {
                   pointRadius: 0,
                   yValueFormatString: "$#,##0",
                   data: filteredPlanningUnitData.map((item, index) => (this.roundN(item.mos)))
-                }
-                , {
-                  type: "line",
-                  yAxisID: 'A',
-                  label: i18n.t('static.supplyPlan.consumption'),
-                  backgroundColor: 'transparent',
-                  borderColor: '#ba0c2f',
-                  ticks: {
-                    fontSize: 2,
-                    fontColor: 'transparent',
-                  },
-                  lineTension: 0,
-                  showInLegend: true,
-                  pointStyle: 'line',
-                  pointRadius: 0,
-                  yValueFormatString: "$#,##0",
-                  data: filteredPlanningUnitData.map((item, index) => (item.finalConsumptionQty))
-                },
-                {
-                  label: i18n.t('static.report.stock'),
-                  yAxisID: 'A',
-                  type: 'line',
-                  borderColor: '#cfcdc9',
-                  ticks: {
-                    fontSize: 2,
-                    fontColor: 'transparent',
-                  },
-                  lineTension: 0,
-                  pointStyle: 'line',
-                  pointRadius: 0,
-                  showInLegend: true,
-                  data: filteredPlanningUnitData.map((item, index) => (item.closingBalance))
                 }
 
               ],
@@ -3644,6 +3676,38 @@ class StockStatus extends Component {
 
       },
       {
+        type: "line",
+        yAxisID: 'A',
+        label: i18n.t('static.supplyPlan.consumption'),
+        backgroundColor: 'transparent',
+        borderColor: '#ba0c2f',
+        ticks: {
+          fontSize: 2,
+          fontColor: 'transparent',
+        },
+        lineTension: 0,
+        showInLegend: true,
+        pointStyle: 'line',
+        pointRadius: 0,
+        yValueFormatString: "$#,##0",
+        data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
+      },
+      {
+        label: i18n.t('static.report.actualConsumption'),
+        yAxisID: 'A',
+        type: 'line',
+        stack: 7,
+        data: this.state.stockStatusList.map((item, index) => (item.actualConsumptionQty)),
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1,
+        showLine: false,
+        pointStyle: 'point',
+        pointBackgroundColor: '#ba0c2f',
+        pointBorderColor: '#ba0c2f',
+        pointRadius: 3
+    },
+      {
         label: i18n.t('static.supplyPlan.delivered'),
         yAxisID: 'A',
         stack: 1,
@@ -3718,6 +3782,21 @@ class StockStatus extends Component {
         })
       },
       {
+        label: i18n.t('static.report.stock'),
+        yAxisID: 'A',
+        type: 'line',
+        borderColor: '#cfcdc9',
+        ticks: {
+          fontSize: 2,
+          fontColor: 'transparent',
+        },
+        lineTension: 0,
+        pointStyle: 'line',
+        pointRadius: 0,
+        showInLegend: true,
+        data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
+      },
+      {
         type: "line",
         yAxisID: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? 'B' : 'A',
         label: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
@@ -3758,39 +3837,6 @@ class StockStatus extends Component {
         showInLegend: true,
         yValueFormatString: "$#,##0",
         data: this.state.stockStatusList.map((item, index) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? item.maxMos : item.maxStock))
-      }
-
-      , {
-        type: "line",
-        yAxisID: 'A',
-        label: i18n.t('static.supplyPlan.consumption'),
-        backgroundColor: 'transparent',
-        borderColor: '#ba0c2f',
-        ticks: {
-          fontSize: 2,
-          fontColor: 'transparent',
-        },
-        lineTension: 0,
-        showInLegend: true,
-        pointStyle: 'line',
-        pointRadius: 0,
-        yValueFormatString: "$#,##0",
-        data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
-      },
-      {
-        label: i18n.t('static.report.stock'),
-        yAxisID: 'A',
-        type: 'line',
-        borderColor: '#cfcdc9',
-        ticks: {
-          fontSize: 2,
-          fontColor: 'transparent',
-        },
-        lineTension: 0,
-        pointStyle: 'line',
-        pointRadius: 0,
-        showInLegend: true,
-        data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
       }
 
     ]
