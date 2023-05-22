@@ -1874,49 +1874,50 @@ export default class CreateTreeTemplate extends Component {
                     var items = this.state.items;
                     var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
                     const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-                    // if (itemIndex1 != -1) {
-                    for (var i = 0; i < tableJson.length; i++) {
-                        var map1 = new Map(Object.entries(tableJson[i]));
-                        console.log("11 map---" + map1.get("11"))
-                        if (parseInt(map1.get("12")) != 1) {
-                            var startDate = map1.get("1");
-                            var stopDate = map1.get("2");
-                            if (map1.get("10") != "" && map1.get("10") != 0) {
-                                const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("10"));
-                                console.log("data[itemIndex]---", data[itemIndex]);
-                                obj = data.filter(x => x.nodeDataModelingId == map1.get("10"))[0];
-                                console.log("obj--->>>>>", obj);
-                                var transfer = map1[3] != "" ? map1.get("3").split('_')[0] : '';
-                                console.log("transfer---", transfer);
-                                obj.transferNodeDataId = transfer;
-                                obj.notes = map1.get("0");
-                                obj.modelingType.id = map1.get("4");
-                                obj.startDateNo = startDate;
-                                obj.stopDateNo = stopDate;
-                                obj.increaseDecrease = map1.get("5");
-                                obj.dataValue = map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0];
-                                obj.nodeDataModelingId = map1.get("10")
+                    if (this.state.modelingChanged) {
+                        for (var i = 0; i < tableJson.length; i++) {
+                            var map1 = new Map(Object.entries(tableJson[i]));
+                            console.log("11 map---" + map1.get("11"))
+                            if (parseInt(map1.get("12")) != 1) {
+                                var startDate = map1.get("1");
+                                var stopDate = map1.get("2");
+                                if (map1.get("10") != "" && map1.get("10") != 0) {
+                                    const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("10"));
+                                    console.log("data[itemIndex]---", data[itemIndex]);
+                                    obj = data.filter(x => x.nodeDataModelingId == map1.get("10"))[0];
+                                    console.log("obj--->>>>>", obj);
+                                    var transfer = map1[3] != "" ? map1.get("3").split('_')[0] : '';
+                                    console.log("transfer---", transfer);
+                                    obj.transferNodeDataId = transfer;
+                                    obj.notes = map1.get("0");
+                                    obj.modelingType.id = map1.get("4");
+                                    obj.startDateNo = startDate;
+                                    obj.stopDateNo = stopDate;
+                                    obj.increaseDecrease = map1.get("5");
+                                    obj.dataValue = map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0];
+                                    obj.nodeDataModelingId = map1.get("10")
 
-                                // data[itemIndex] = obj;
-                            } else {
-                                console.log("maxModelingId---", maxModelingId);
-                                obj = {
-                                    transferNodeDataId: map1[3] != "" ? map1.get("3").split('_')[0] : '',
-                                    notes: map1.get("0"),
-                                    modelingType: {
-                                        id: map1.get("4")
-                                    },
-                                    increaseDecrease: map1.get("5"),
-                                    startDateNo: startDate,
-                                    stopDateNo: stopDate,
-                                    dataValue: map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0],
-                                    nodeDataModelingId: parseInt(maxModelingId) + 1
+                                    // data[itemIndex] = obj;
+                                } else {
+                                    console.log("maxModelingId---", maxModelingId);
+                                    obj = {
+                                        transferNodeDataId: map1[3] != "" ? map1.get("3").split('_')[0] : '',
+                                        notes: map1.get("0"),
+                                        modelingType: {
+                                            id: map1.get("4")
+                                        },
+                                        increaseDecrease: map1.get("5"),
+                                        startDateNo: startDate,
+                                        stopDateNo: stopDate,
+                                        dataValue: map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0],
+                                        nodeDataModelingId: parseInt(maxModelingId) + 1
+                                    }
+                                    maxModelingId++;
+                                    console.log("obj to push---", obj);
+                                    // data.push(obj);
                                 }
-                                maxModelingId++;
-                                console.log("obj to push---", obj);
-                                // data.push(obj);
+                                dataArr.push(obj);
                             }
-                            dataArr.push(obj);
                         }
                     }
                     console.log("obj---", obj);
