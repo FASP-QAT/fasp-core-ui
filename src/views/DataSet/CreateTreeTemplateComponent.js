@@ -1091,6 +1091,14 @@ export default class CreateTreeTemplate extends Component {
                 }else{
                     (items[i].payload.nodeDataMap[0])[0].isPUMappingCorrect=0
                 }
+                if((items.length-1)==i){
+                    this.setState({
+                        items
+                    }, () => {
+                        console.log("final updated items---", this.state.items);
+                        // this.calculateValuesForAggregateNode(this.state.items);
+                    })
+                }
             }).catch(error=>{
 
             })
