@@ -557,9 +557,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (nodeDataMapForScenario.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                                 } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                                     if (payload.nodeType.id == 4) {
-                                                        noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                                        noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                                     } else {
-                                                        noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                                        noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                                     }
                                                 }
                                                 if (nodeDataMapForScenario.fuNode.usageType.id == 2) {
@@ -698,8 +698,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                 } else {
                                                     var filter1 = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
                                                     var filter2 = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-1, 'months').format("YYYY-MM-DD"));
-                                                    if (filter1.length > 0 && filter2.length > 0) {
-                                                        deltaPatients = filter1[0].calculatedValue - filter2[0].calculatedValue;
+                                                    if (filter1.length > 0 || filter2.length > 0) {
+                                                        var val1 = 0;
+                                                        var val2 = 0;
+                                                        if (filter1.length > 0) {
+                                                            val1 = filter1[0].calculatedValue;
+                                                        }
+                                                        if (filter2.length > 0) {
+                                                            val2 = filter2[0].calculatedValue;
+                                                        }
+                                                        deltaPatients = val1 - val2;
                                                     }
                                                 }
                                                 console.log("deltaPatients$$$%%%", deltaPatients);
@@ -762,7 +770,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                 // }
                                                 console.log("CalculatedMmdValueForPU$$$$###", calculatedMmdValue)
                                                 // console.log("calculatedMMDValuePU$$$%%%", calculatedMmdValue);
-                                            }else{
+                                            } else {
                                                 var usagePeriodId;
                                                 var usageTypeId;
                                                 var usageFrequency;
@@ -790,9 +798,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                         // var noOfFUPatient = this.state.noOfFUPatient;
                                                         var noOfFUPatient;
                                                         // if (payload.nodeType.id == 4) {
-                                                            noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                                        noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
                                                         // } else {
-                                                            // noOfFUPatient = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                                        // noOfFUPatient = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                                         // }
                                                         noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                                                     }
@@ -807,12 +815,12 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (parentNodeNodeData.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                                 } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                                     // if (payload.nodeType.id == 4) {
-                                                        noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                                    noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
                                                     // } else {
-                                                        // noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                                    // noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
                                                     // }
                                                 }
-                                                var puMultiplier=0;
+                                                var puMultiplier = 0;
                                                 if (!isTemplate) {
                                                     var puFilter = (datasetJson.planningUnitList).filter(c => c.planningUnit.id == nodeDataMapForScenario.puNode.planningUnit.id);
                                                     if (puFilter.length > 0) {
@@ -822,10 +830,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                 } else {
                                                     puMultiplier = nodeDataMapForScenario.puNode.planningUnit.multiplier;
                                                 }
-                                                console.log("Calculated Value@ Test",calculatedValue)
-                                                console.log("NoFU Required Test",noFURequired)
-                                                calculatedValue=(calculatedValue/(noFURequired/puMultiplier))*nodeDataMapForScenario.puNode.puPerVisit;
-                                                calculatedMmdValue=(calculatedMmdValue/(noFURequired/puMultiplier))*nodeDataMapForScenario.puNode.puPerVisit;
+                                                console.log("Calculated Value@ Test", calculatedValue)
+                                                console.log("NoFU Required Test", noFURequired)
+                                                calculatedValue = (calculatedValue / (noFURequired / puMultiplier)) * nodeDataMapForScenario.puNode.puPerVisit;
+                                                calculatedMmdValue = (calculatedMmdValue / (noFURequired / puMultiplier)) * nodeDataMapForScenario.puNode.puPerVisit;
                                             }
                                         }
 
