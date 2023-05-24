@@ -248,7 +248,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 }), loading: false,
                                 planningUnitListJexcel: tempList
                             }, () => {
-                                this.filterData();
+                                this.filterData(true);
                             })
 
                         }.bind(this);
@@ -396,6 +396,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     componentDidMount() {
+        console.log("inside compinen")
         document.getElementById("stepOneBtn").disabled = true;
         this.getProgramDetails();
     }
@@ -553,7 +554,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value },
             () => {
-                this.filterData();
+                this.filterData(false);
             })
     }
 
@@ -566,7 +567,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         return '?'
     }
 
-    filterData() {
+    filterData(loadJexcel) {
         this.setState({
             loading: true
         })
@@ -590,72 +591,74 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 this.props.updateStepOneData("startDate", startDate);
                 this.props.updateStepOneData("stopDate", stopDate);
 
-
                 // document.getElementById("stepOneBtn").disabled = false;
-                PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
-                    .then(response => {
-                        if (response.status == 200) {
-                            var planningUnitList = response.data.filter(c => c.active)
-                            this.setState({
-                                programPlanningUnitList: planningUnitList,
-                                selSource: planningUnitList,
-                                message: ''
-                            }, () => {
-                                if (planningUnitList.length == 0) {
-                                    document.getElementById("stepOneBtn").disabled = true;
-                                }
-                                this.buildJexcel();
-                            })
-                        } else {
-                            this.setState({
-                                programPlanningUnitList: []
-                            });
-                        }
-                    }).catch(
-                        error => {
-                            if (error.message === "Network Error") {
+                if (loadJexcel || loadJexcel == undefined) {
+                    PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
+                        .then(response => {
+                            if (response.status == 200) {
+                                var planningUnitList = response.data.filter(c => c.active)
                                 this.setState({
-                                    // message: 'static.unkownError',
-                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                    loading: false, color: 'red'
-                                });
+                                    programPlanningUnitList: planningUnitList,
+                                    selSource: planningUnitList,
+                                    message: ''
+                                }, () => {
+                                    if (planningUnitList.length == 0) {
+                                        document.getElementById("stepOneBtn").disabled = true;
+                                    }
+                                    this.buildJexcel();
+                                })
                             } else {
-                                switch (error.response ? error.response.status : "") {
+                                this.setState({
+                                    programPlanningUnitList: []
+                                });
+                            }
+                        }).catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false, color: 'red'
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
 
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false, color: 'red'
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false, color: 'red'
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false, color: 'red'
-                                        });
-                                        break;
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false, color: 'red'
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false, color: 'red'
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false, color: 'red'
+                                            });
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                    );
+                        );
+                }
             } else {
                 this.setState({
                     message: i18n.t('static.importFromQATSupplyPlan.belongsSameCountry'),
-                    color: 'red'
+                    color: 'red',
+                    loading: false
                 },
                     () => {
                         // this.hideSecondComponent();
@@ -667,6 +670,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 programPlanningUnitList: [],
                 selSource: [],
                 message: i18n.t('static.importFromQATSupplyPlan.pleaseSelectForecastProgram'),
+                loading: false
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
@@ -677,6 +681,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 programPlanningUnitList: [],
                 selSource: [],
                 message: i18n.t('static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion'),
+                loading: false
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
@@ -687,6 +692,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 programPlanningUnitList: [],
                 selSource: [],
                 message: i18n.t('static.importFromQATSupplyPlan.selectSupplyPlanProgram'),
+                loading: false
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             // this.el.destroy();
@@ -696,7 +702,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.setState({
                 programPlanningUnitList: [],
                 selSource: [],
-                message: ''
+                message: '',
+                loading: false
             })
             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
             jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
@@ -1129,7 +1136,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             rangeValue: { from: { year: defaultForecastStartYear, month: defaultForecastStartMonth }, to: { year: defaultForecastStopYear, month: defaultForecastStopMonth } },
             forecastPeriod: moment(forecastStartDate).format("MMM-YYYY") + " ~ " + moment(forecastStopDate).format("MMM-YYYY")
         }, () => {
-            this.filterData();
+            this.filterData(true);
         })
 
     }
@@ -1150,7 +1157,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         }, () => {
             this.filterVersion();
-            this.filterData();
+            this.filterData(true);
         })
     }
 
