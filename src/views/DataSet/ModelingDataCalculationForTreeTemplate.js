@@ -607,7 +607,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                 val2 = filter2[0].calculatedValue;
                                             }
                                             deltaPatients = val1 - val2;
-                                            deltaPatients = filter1[0].calculatedValue - filter2[0].calculatedValue;
+                                            // deltaPatients = filter1[0].calculatedValue - filter2[0].calculatedValue;
                                         }
                                     }
                                     console.log("deltaPatients$$$%%%", deltaPatients);
