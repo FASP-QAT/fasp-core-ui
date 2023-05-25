@@ -1521,7 +1521,7 @@ export default class BuildTree extends Component {
         return maxNodeDataId;
     }
 
-    formSubmitLoader(buttonClick) {
+    formSubmitLoader() {
         // console.log("node id cur node---", this.state.currentItemConfig.context.payload);
         // console.log("validate---", validateNodeData(validationSchemaNodeData));
         this.setState({
@@ -1529,8 +1529,9 @@ export default class BuildTree extends Component {
         }, () => {
             // alert("load 2")
             setTimeout(() => {
-                console.log("inside set timeout", buttonClick)
-                this.formSubmit(buttonClick);
+                console.log("inside set timeout")
+                this.formSubmit();
+
             }, 0);
         })
     }
@@ -3399,10 +3400,8 @@ export default class BuildTree extends Component {
     //         [parameterName]: value
     //     })
     // }
-    formSubmit(buttonClick) {
+    formSubmit() {
         console.log("entry ---", new Date())
-        var isValid = document.getElementById('isValidError').value;
-        this.setState({ isValidError: isValid });
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
             console.log("validation---", validation);
@@ -3469,7 +3468,7 @@ export default class BuildTree extends Component {
 
                         }
                     }
-                    console.log("dataArr--->>>", this.state.isValidError);
+                    console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
                         if (this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
@@ -3503,13 +3502,13 @@ export default class BuildTree extends Component {
                                 lastRowDeleted: false,
                                 modelingChanged: false,
                                 // openAddNodeModal: false,
-                                activeTab1: buttonClick == 1 ? new Array(2).fill('1') : new Array(2).fill('2')
+                                activeTab1: new Array(2).fill('2')
                             }, () => {
                                 console.log("save tree data items 2>>>", this.state.items);
                                 this.calculateMOMData(0, 0);
                             });
                         } else {
-                            console.log("inside else form submit 1");
+                            console.log("inside else form submit");
                             this.setState({
                                 modelingJexcelLoader: false
                             }, () => {
@@ -3523,7 +3522,7 @@ export default class BuildTree extends Component {
                             console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
-                            console.log("inside else form submit 2");
+                            console.log("inside else form submit");
                             this.setState({
                                 modelingJexcelLoader: false
                             }, () => {
@@ -5625,7 +5624,7 @@ export default class BuildTree extends Component {
     handleFUChange = (regionIds) => {
         console.log("regionIds---", regionIds);
         const { currentItemConfig } = this.state;
-        console.log("inside changed handleFUChange")
+
         this.setState({
             fuValues: regionIds != null ? regionIds : "",
             isChanged: true
@@ -5870,13 +5869,11 @@ export default class BuildTree extends Component {
                     treeData: proList,
                     programDataListForPuCheck:programDataListForPuCheck
                 }, () => {
-                    console.log("tree data templateId--->", this.props.match.params);
+                    console.log("tree data --->", this.state.treeData);
                     if (this.state.treeId != "" && this.state.treeId != 0) {
                         this.getTreeByTreeId(this.state.treeId);
                     }
-                    if (this.props.match.params.templateId != undefined) {
-                        this.getTreeTemplateById(this.props.match.params.templateId);
-                    }
+                    this.getTreeTemplateById(this.props.match.params.templateId);
                 });
 
             }.bind(this);
@@ -8010,7 +8007,7 @@ export default class BuildTree extends Component {
         console.log("Seema currentItemConfig", currentItemConfig)
         console.log("Seema [this.state.selectedScenario]", [this.state.selectedScenario])
         console.log("Seema currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]", currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])
-        console.log("inside changed data")
+
         this.setState({
             currentItemConfig,
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
@@ -10400,8 +10397,8 @@ export default class BuildTree extends Component {
                                     <FormGroup className="pb-lg-3">
                                         {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, isChanged: false, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={(e) => this.formSubmitLoader(1)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
+                                        {(!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
                             )} />
@@ -10517,7 +10514,7 @@ export default class BuildTree extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(2)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.aggregationNode && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>

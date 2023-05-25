@@ -1093,32 +1093,32 @@ export default class CreateTreeTemplate extends Component {
                 // (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
                 (items[i].payload.nodeDataMap[0])[0].fuPerMonth = fuPerMonth;
             }
-            console.log("This.state Test@123",this.state)
-            if(items[i].payload.nodeType.id==5){
+            console.log("This.state Test@123", this.state)
+            if (items[i].payload.nodeType.id == 5) {
                 var findNodeIndexFU = items.findIndex(n => n.id == items[i].parent);
                 var forecastingUnitId = (items[findNodeIndexFU].payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id;
                 PlanningUnitService.getActivePlanningUnitListByFUId(forecastingUnitId).then(response => {
                     console.log("response---", response.data)
                     var listArray = response.data;
-                var planningUnitId=(items[i].payload.nodeDataMap[0])[0].puNode.planningUnit.id;
-                var planningUnitList=listArray;
-                var planningUnitListFilter=planningUnitList.filter(c=>c.planningUnitId==planningUnitId);
-                if(planningUnitListFilter.length>0){
-                    (items[i].payload.nodeDataMap[0])[0].isPUMappingCorrect=1
-                }else{
-                    (items[i].payload.nodeDataMap[0])[0].isPUMappingCorrect=0
-                }
-                if((items.length-1)==i){
-                    this.setState({
-                        items
-                    }, () => {
-                        console.log("final updated items---", this.state.items);
-                        // this.calculateValuesForAggregateNode(this.state.items);
-                    })
-                }
-            }).catch(error=>{
+                    var planningUnitId = (items[i].payload.nodeDataMap[0])[0].puNode.planningUnit.id;
+                    var planningUnitList = listArray;
+                    var planningUnitListFilter = planningUnitList.filter(c => c.planningUnitId == planningUnitId);
+                    if (planningUnitListFilter.length > 0) {
+                        (items[i].payload.nodeDataMap[0])[0].isPUMappingCorrect = 1
+                    } else {
+                        (items[i].payload.nodeDataMap[0])[0].isPUMappingCorrect = 0
+                    }
+                    if ((items.length - 1) == i) {
+                        this.setState({
+                            items
+                        }, () => {
+                            console.log("final updated items---", this.state.items);
+                            // this.calculateValuesForAggregateNode(this.state.items);
+                        })
+                    }
+                }).catch(error => {
 
-            })
+                })
             }
             // else if (items[i].payload.nodeType.id == 5) {
             //     var item = items.filter(x => x.id == items[i].parent)[0];
@@ -1546,15 +1546,15 @@ export default class CreateTreeTemplate extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
-    formSubmitLoader(buttonClick) {
+    formSubmitLoader() {
         // alert("load 1")
         this.setState({
             modelingJexcelLoader: true
         }, () => {
             // alert("load 2")
             setTimeout(() => {
-                console.log("inside set timeout", buttonClick)
-                this.formSubmit(buttonClick);
+                console.log("inside set timeout")
+                this.formSubmit();
             }, 0);
         })
     }
@@ -1868,7 +1868,7 @@ export default class CreateTreeTemplate extends Component {
         });
     }
 
-    formSubmit(buttonClick) {
+    formSubmit() {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
             console.log("validation---", validation);
@@ -1882,50 +1882,49 @@ export default class CreateTreeTemplate extends Component {
                     var items = this.state.items;
                     var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
                     const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-                    if (this.state.modelingChanged) {
-                        for (var i = 0; i < tableJson.length; i++) {
-                            var map1 = new Map(Object.entries(tableJson[i]));
-                            console.log("11 map---" + map1.get("11"))
-                            if (parseInt(map1.get("12")) != 1) {
-                                var startDate = map1.get("1");
-                                var stopDate = map1.get("2");
-                                if (map1.get("10") != "" && map1.get("10") != 0) {
-                                    const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("10"));
-                                    console.log("data[itemIndex]---", data[itemIndex]);
-                                    obj = data.filter(x => x.nodeDataModelingId == map1.get("10"))[0];
-                                    console.log("obj--->>>>>", obj);
-                                    var transfer = map1[3] != "" ? map1.get("3").split('_')[0] : '';
-                                    console.log("transfer---", transfer);
-                                    obj.transferNodeDataId = transfer;
-                                    obj.notes = map1.get("0");
-                                    obj.modelingType.id = map1.get("4");
-                                    obj.startDateNo = startDate;
-                                    obj.stopDateNo = stopDate;
-                                    obj.increaseDecrease = map1.get("5");
-                                    obj.dataValue = map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0];
-                                    obj.nodeDataModelingId = map1.get("10")
+                    // if (itemIndex1 != -1) {
+                    for (var i = 0; i < tableJson.length; i++) {
+                        var map1 = new Map(Object.entries(tableJson[i]));
+                        console.log("11 map---" + map1.get("11"))
+                        if (parseInt(map1.get("12")) != 1) {
+                            var startDate = map1.get("1");
+                            var stopDate = map1.get("2");
+                            if (map1.get("10") != "" && map1.get("10") != 0) {
+                                const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("10"));
+                                console.log("data[itemIndex]---", data[itemIndex]);
+                                obj = data.filter(x => x.nodeDataModelingId == map1.get("10"))[0];
+                                console.log("obj--->>>>>", obj);
+                                var transfer = map1[3] != "" ? map1.get("3").split('_')[0] : '';
+                                console.log("transfer---", transfer);
+                                obj.transferNodeDataId = transfer;
+                                obj.notes = map1.get("0");
+                                obj.modelingType.id = map1.get("4");
+                                obj.startDateNo = startDate;
+                                obj.stopDateNo = stopDate;
+                                obj.increaseDecrease = map1.get("5");
+                                obj.dataValue = map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0];
+                                obj.nodeDataModelingId = map1.get("10")
 
-                                    // data[itemIndex] = obj;
-                                } else {
-                                    console.log("maxModelingId---", maxModelingId);
-                                    obj = {
-                                        transferNodeDataId: map1[3] != "" ? map1.get("3").split('_')[0] : '',
-                                        notes: map1.get("0"),
-                                        modelingType: {
-                                            id: map1.get("4")
-                                        },
-                                        increaseDecrease: map1.get("5"),
-                                        startDateNo: startDate,
-                                        stopDateNo: stopDate,
-                                        dataValue: map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0],
-                                        nodeDataModelingId: parseInt(maxModelingId) + 1
-                                    }
-                                    maxModelingId++;
-                                    console.log("obj to push---", obj);
-                                    // data.push(obj);
+                                // data[itemIndex] = obj;
+                            } else {
+                                console.log("maxModelingId---", maxModelingId);
+                                obj = {
+                                    transferNodeDataId: map1[3] != "" ? map1.get("3").split('_')[0] : '',
+                                    notes: map1.get("0"),
+                                    modelingType: {
+                                        id: map1.get("4")
+                                    },
+                                    increaseDecrease: map1.get("5"),
+                                    startDateNo: startDate,
+                                    stopDateNo: stopDate,
+                                    dataValue: map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0],
+                                    nodeDataModelingId: parseInt(maxModelingId) + 1
                                 }
-                                dataArr.push(obj);
+                                maxModelingId++;
+                                console.log("obj to push---", obj);
+                                // data.push(obj);
                             }
+                            dataArr.push(obj);
                         }
                     }
                     console.log("obj---", obj);
@@ -1949,9 +1948,7 @@ export default class CreateTreeTemplate extends Component {
                                 lastRowDeleted: false,
                                 modelingChanged: false,
                                 // openAddNodeModal: false,
-                                // activeTab1: new Array(2).fill('2')
-                                activeTab1: buttonClick == 1 ? new Array(2).fill('1') : new Array(2).fill('2')
-
+                                activeTab1: new Array(2).fill('2')
                             }, () => {
                                 console.log("going to call MOM data");
                                 this.calculateMOMData(0, 0);
@@ -1985,9 +1982,6 @@ export default class CreateTreeTemplate extends Component {
                 }
             } else {
                 this.setState({ modelingJexcelLoader: false })
-            }
-            if (buttonClick == 1) {
-                this.setState({ openAddNodeModal: false, isSubmitClicked: true })
             }
         }
     }
@@ -6480,7 +6474,7 @@ export default class CreateTreeTemplate extends Component {
             this.setState({ isValidError: isValid });
 
             if (this.state.currentItemConfig.context.payload.nodeType.id == 1) {
-                if(tab == 2){
+                if (tab == 2) {
                     this.showMomData();
                 }
             }
@@ -7780,7 +7774,7 @@ export default class CreateTreeTemplate extends Component {
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            if (!this.state.isSubmitClicked && !this.state.modelingChanged) {
+                            if (!this.state.isSubmitClicked) {
                                 this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
                                     console.log("all ok>>>");
                                     setTimeout(() => {
@@ -7796,8 +7790,6 @@ export default class CreateTreeTemplate extends Component {
                                         })
                                     }, 0);
                                 })
-                            } else {
-                                this.formSubmitLoader(1);
                             }
                         }}
                         render={
@@ -8507,9 +8499,11 @@ export default class CreateTreeTemplate extends Component {
                                                                         this.dataChange(e)
                                                                     }}
                                                                     value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit : ""}>
+
                                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                                     <option value="true">Yes</option>
                                                                     <option value="false">No</option>
+
                                                                 </Input> */}
                                                                 <FormGroup check inline>
                                                                     <Input
@@ -8722,12 +8716,14 @@ export default class CreateTreeTemplate extends Component {
                                                             }
                                                             console.log("autocomplete data---", this.state.currentItemConfig)
                                                             this.getForecastingUnitUnitByFUId(value.value);
+
                                                         }} // prints the selected value
                                                         renderInput={(params) => <TextField {...params} variant="outlined"
                                                             onChange={(e) => {
                                                                 // this.searchErpOrderData(e.target.value)
                                                             }} />}
                                                     />
+
                                                 </div> */}
                                             </FormGroup>
                                             <Input type="hidden"
@@ -9158,6 +9154,7 @@ export default class CreateTreeTemplate extends Component {
                             <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
+
                             </a>
                         </div>
                     </div> */}
@@ -9167,6 +9164,7 @@ export default class CreateTreeTemplate extends Component {
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
                         <FormGroup className="col-md-4 pl-lg-0">
+
                             <Input type="text"
                                 id="nodeTitleModeling"
                                 name="nodeTitleModeling"
@@ -9236,7 +9234,7 @@ export default class CreateTreeTemplate extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(0)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.aggregationNode && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>
@@ -9933,7 +9931,7 @@ export default class CreateTreeTemplate extends Component {
 
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-                <div className={itemConfig.payload.nodeDataMap[0] != undefined && itemConfig.payload.nodeDataMap[0][0].isPUMappingCorrect==0?"ContactTemplate boxContactTemplate contactTemplateBorderRed":"ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[0][0].notes}>
+                <div className={itemConfig.payload.nodeDataMap[0] != undefined && itemConfig.payload.nodeDataMap[0][0].isPUMappingCorrect == 0 ? "ContactTemplate boxContactTemplate contactTemplateBorderRed" : "ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[0][0].notes}>
                     <div className={itemConfig.payload.nodeType.id == 5
                         || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                         (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
