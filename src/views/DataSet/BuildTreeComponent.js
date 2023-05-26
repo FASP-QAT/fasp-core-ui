@@ -8051,7 +8051,7 @@ export default class BuildTree extends Component {
                 puPerVisit = parseFloat(((itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
             } else {
                 console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                puPerVisit = this.addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
+                puPerVisit = addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
             }
 
             console.log("AUTO puPerVisit---", puPerVisit);
@@ -8529,7 +8529,7 @@ export default class BuildTree extends Component {
                     puNode.puPerVisit = puPerVisit;
                 } else {
                     console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                    puPerVisit = this.addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
+                    puPerVisit = addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
                     puNode.puPerVisit = puPerVisit;
                 }
 
