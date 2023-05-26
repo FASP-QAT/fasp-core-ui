@@ -6713,6 +6713,28 @@ export default class BuildTree extends Component {
         });
     }
 
+    expandCollapse(){
+        var updatedItems = this.state.items;
+        var tempToggleArray = this.state.toggleArray;
+        if(this.state.toggleArray.length == 0){
+            updatedItems = updatedItems.map(item => {
+                tempToggleArray.push(item.id);
+                if(item.parent != null){
+                    return { ...item, templateName: "contactTemplateMin", expanded: true };  
+                }
+                return item;
+            });
+            this.setState({toggleArray: tempToggleArray})
+        }else{
+            updatedItems = updatedItems.map(item => {
+                tempToggleArray = tempToggleArray.filter((e) => e != item.id)
+                return { ...item, templateName: "contactTemplate", expanded: false };                                        
+            });
+            this.setState({toggleArray: tempToggleArray})
+        }
+        this.setState({ items: updatedItems })
+    }
+
     touchAllScenario(setTouched, errors) {
         setTouched({
             scenarioName: true
@@ -11777,7 +11799,6 @@ export default class BuildTree extends Component {
                                 <i class="fa fa-plus-square-o" aria-hidden="true"></i>
                             </button>}
                         {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && 
-                            this.state.items.filter(e => e.parent==itemConfig.id).length > 0 &&    
                             <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
         
@@ -11801,7 +11822,7 @@ export default class BuildTree extends Component {
                                         var tempToggleArray = this.state.toggleArray;
                                         tempToggleArray.push(itemConfig.id);
                                         updatedItems = updatedItems.map(item => {
-                                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
+                                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.parent != null) {
                                                 tempToggleArray.push(item.id);
                                                 console.log("Here: "+tempToggleArray)
                                                 return { ...item, templateName: "contactTemplateMin", expanded: true };
@@ -12377,7 +12398,14 @@ export default class BuildTree extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
-
+                                            
+                                            <div className="row pr-lg-4">
+                                                <div className="col-md-12">
+                                                    <a style={{ float: 'right' }}>
+                                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.expandCollapse() }}><small className="supplyplanformulas">{this.state.toggleArray.length == 0 ? "Collapse Tree" : "Expand Tree"}</small></span>
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div className="pb-lg-0" style={{ marginTop: '-2%' }}>
