@@ -2524,6 +2524,8 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
                         elInstance.setValueFromCoords(21, y, freightCost.toFixed(2), true);
                     }
+                }else{
+                    elInstance.setValueFromCoords(21, y, "", true);
                 }
                 if ((rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) && (rowData[30].expectedDeliveryDate == "" || rowData[30].expectedDeliveryDate == null || rowData[30].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
