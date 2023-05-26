@@ -142,12 +142,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                 }
             }
-            console.log("isOldDate", isOldDate)
-            if (!isOldDate) {
+
+            if (!isOldDate && currentForecastedValue !== "") {
                 for (var i = 0; i < colArr.length; i++) {
-                    var cell1 = elInstance.getCell(`${colArr[i]}${parseInt(j) + 1}`)
+                    var cell1 = elInstance.getCell(`J${parseInt(j) + 1}`)
                     cell1.classList.add('readonly');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    cell1.classList.add('commitConflict');
                 }
             }
         }
