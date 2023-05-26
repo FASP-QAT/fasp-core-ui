@@ -11622,7 +11622,7 @@ export default class BuildTree extends Component {
                                                     multiplier: ''
                                                 },
                                                 refillMonths: '',
-                                                sharePlanningUnit: "false"
+                                                sharePlanningUnit: "true"
                                             }
                                         };
                                         tempArray.push(tempJson);
