@@ -319,9 +319,15 @@ class ShipmentSummery extends Component {
 
 
         var re;
-        var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'), (i18n.t('static.report.orders')).replaceAll(' ', '%20'), (i18n.t('static.report.qtyBaseUnit')).replaceAll(' ', '%20'), (i18n.t('static.report.costUsd')).replaceAll(' ', '%20')])]
+        var A = [this.addDoubleQuoteToRowContent([(i18n.t('static.budget.fundingsource')).replaceAll(' ', '%20'),
+                                                  (i18n.t('static.report.orders')).replaceAll(' ', '%20'), 
+                                                //   (i18n.t('static.report.qtyBaseUnit')).replaceAll(' ', '%20'), 
+                                                  (i18n.t('static.report.costUsd')).replaceAll(' ', '%20')])]
 
-        this.state.shipmentDetailsFundingSourceList.map(ele => A.push(this.addDoubleQuoteToRowContent([(ele.fundingSource.code).replaceAll(' ', '%20'), ele.orderCount, ele.quantity, ele.cost])))
+        this.state.shipmentDetailsFundingSourceList.map(ele => A.push(this.addDoubleQuoteToRowContent([(ele.fundingSource.code).replaceAll(' ', '%20'), 
+                                                                                                        ele.orderCount, 
+                                                                                                        // ele.quantity, 
+                                                                                                        ele.cost])))
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -2577,14 +2583,15 @@ class ShipmentSummery extends Component {
                                         <div className="row">
                                             <div className="col-md-12 pl-0 pr-0">
                                                 {this.state.shipmentDetailsFundingSourceList.length > 0 &&
-                                                    <div className='fixTableHead'>
-                                                        <Table id="mytable1" responsive className="table-bordered table-striped text-center ">
+                                                <div>
+                                                     {/* <div className='fixTableHead'> */}
+                                                        <Table id="mytable1" responsive className="table-bordered table-striped text-center " style={{width: '50%',margin: 'auto'}}>
                                                             <thead>
                                                                 <tr>
-                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.orders')}</th>
-                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th>
-                                                                    <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.costUsd')}</th>
+                                                                    <th style={{ width: '25px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.budget.fundingsource')}</th>
+                                                                    <th style={{ width: '25px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.report.orders')}</th>
+                                                                    {/* <th style={{ width: '225px', cursor: 'pointer', 'text-align': 'right' }}>{i18n.t('static.report.qtyBaseUnit')}</th> */}
+                                                                    <th style={{ width: '25px', cursor: 'pointer', 'text-align': 'center' }}>{i18n.t('static.report.costUsd')}</th>
                                                                 </tr>
                                                             </thead>
                                                             {/* <tbody>
@@ -2606,9 +2613,9 @@ class ShipmentSummery extends Component {
                                                                     this.state.shipmentDetailsFundingSourceList.map((item, idx) =>
                                                                         <tr id="addr0" key={idx} >
                                                                             <td style={{ 'text-align': 'center' }}>{getLabelText(this.state.shipmentDetailsFundingSourceList[idx].fundingSource.label, this.state.lang)}</td>
-                                                                            <td style={{ 'text-align': 'right' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
-                                                                            <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                            <td style={{ 'text-align': 'right' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                            <td style={{ 'text-align': 'center' }}>{this.state.shipmentDetailsFundingSourceList[idx].orderCount}</td>
+                                                                            {/* <td style={{ 'text-align': 'right' }}>{(this.state.shipmentDetailsFundingSourceList[idx].quantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> */}
+                                                                            <td style={{ 'text-align': 'center' }}>{(Number(this.state.shipmentDetailsFundingSourceList[idx].cost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                         </tr>
                                                                     )}
                                                             </tbody>
