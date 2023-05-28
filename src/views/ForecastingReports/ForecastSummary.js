@@ -2447,11 +2447,11 @@ class ForecastSummary extends Component {
                         ...tempObj
                     }
 
-                    let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
-                    let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+                    let startDateSplit = selectedForecastProgram.currentVersion.forecastStartDate.split('-');
+                    let stopDateSplit = selectedForecastProgram.currentVersion.forecastStopDate.split('-');
 
 
-                    let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+                    let forecastStopDate = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
                     forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
                     let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
@@ -2481,10 +2481,10 @@ class ForecastSummary extends Component {
                     forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
                     console.log("Test-----------------111", startDateSplit);
 
-                    let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
-                    let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+                    let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
+                    let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
 
-                    let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                    let beforeEndDateDisplay = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
                     beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
                     this.setState({
@@ -2518,11 +2518,11 @@ class ForecastSummary extends Component {
                     ...tempObj
                 }
 
-                let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
-                let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+                let startDateSplit = selectedVersion.forecastStartDate.split('-');
+                let stopDateSplit = selectedVersion.forecastStopDate.split('-');
 
 
-                let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+                let forecastStopDate = new Date(selectedVersion.forecastStartDate);
                 forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
                 let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
@@ -2550,10 +2550,10 @@ class ForecastSummary extends Component {
                 forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
                 console.log("Test-----------------111", startDateSplit);
 
-                let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
-                let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+                let forecastStartDateNew = selectedVersion.forecastStartDate;
+                let forecastStopDateNew = selectedVersion.forecastStopDate;
 
-                let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                let beforeEndDateDisplay = new Date(selectedVersion.forecastStartDate);
                 beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
                 this.setState({
@@ -3558,7 +3558,7 @@ class ForecastSummary extends Component {
                                                 {/* {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && */}
                                                 {this.state.displayId == 2 &&
                                                     <div className='ForecastSummaryTable datdEntryRow'>
-                                                        <div id="tableDiv" className="consumptionDataEntryTable">
+                                                        <div id="tableDiv" className="consumptionDataEntryTable custom-display">
                                                         </div>
                                                     </div>
 
