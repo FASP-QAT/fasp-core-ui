@@ -11796,7 +11796,7 @@ export default class BuildTree extends Component {
                                     }
                                 }}>
                                 {/* <FontAwesomeIcon icon={faPlus} /> */}
-                                <i class="fa fa-plus-square-o" aria-hidden="true"></i>
+                                <i class="fa fa-plus" aria-hidden="true"></i>
                             </button>}
                         {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && 
                             <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
@@ -11835,7 +11835,7 @@ export default class BuildTree extends Component {
                                     this.setState({ items: updatedItems })
         
                                 }}>
-                                {this.state.toggleArray.includes(itemConfig.id) ? <i class="fa fa-caret-square-o-down" aria-hidden="true"></i> : <i class="fa fa-caret-square-o-up" aria-hidden="true"></i> }    
+                                {this.state.toggleArray.includes(itemConfig.id) ? <i class="fa fa-caret-square-o-left" aria-hidden="true"></i> : <i class="fa fa-caret-square-o-down" aria-hidden="true"></i> }    
                             </button>
                         }
     
@@ -12384,6 +12384,25 @@ export default class BuildTree extends Component {
                                                         <Input
                                                             className="form-check-input checkboxMargin"
                                                             type="checkbox"
+                                                            id="active9"
+                                                            name="active9"
+                                                            checked={this.state.toggleArray.length != 0 }
+                                                            onClick={(e) => { this.expandCollapse(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.tree.collapseTree')}</b>
+                                                        </Label>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+                                            {/* <FormGroup className="col-md-2" >
+                                                <div className="check inline  pl-lg-0 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
                                                             id="hideButtons"
                                                             name="hideButtons"
                                                             checked={this.state.hideActionButtons}
@@ -12397,7 +12416,7 @@ export default class BuildTree extends Component {
                                                         </Label>
                                                     </div>
                                                 </div>
-                                            </FormGroup>
+                                            </FormGroup> */}
                                             
                                             <div className="row pr-lg-4">
                                                 <div className="col-md-12">
