@@ -12418,13 +12418,6 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </FormGroup> */}
                                             
-                                            <div className="row pr-lg-4">
-                                                <div className="col-md-12">
-                                                    <a style={{ float: 'right' }}>
-                                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.expandCollapse() }}><small className="supplyplanformulas">{this.state.toggleArray.length == 0 ? "Collapse Tree" : "Expand Tree"}</small></span>
-                                                    </a>
-                                                </div>
-                                            </div>
                                         </div>
 
                                         <div className="pb-lg-0" style={{ marginTop: '-2%' }}>
