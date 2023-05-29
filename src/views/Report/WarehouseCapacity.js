@@ -33,7 +33,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling, API_URL } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -52,6 +52,7 @@ import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 
 class warehouseCapacity extends Component {
     constructor(props) {
@@ -96,7 +97,7 @@ class warehouseCapacity extends Component {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
             this.getCountrylist();
-            this.getPrograms();
+            // this.getPrograms();
         } else {
             this.getPrograms();
         }
@@ -310,9 +311,10 @@ class warehouseCapacity extends Component {
     getCountrylist() {
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryForProgram(realmId)
+        // RealmCountryService.getRealmCountryForProgram(realmId)
+        DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
-                var listArray = response.data.map(ele => ele.realmCountry);
+                var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -439,7 +441,8 @@ class warehouseCapacity extends Component {
             countryValues: countrysId.map(ele => ele),
             countryLabels: countrysId.map(ele => ele.label)
         }, () => {
-            this.filterProgram()
+            // this.filterProgram()
+            this.getPrograms();
 
         })
     }
@@ -460,62 +463,76 @@ class warehouseCapacity extends Component {
     getPrograms() {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
-                .then(response => {
-                    // console.log(JSON.stringify(response.data))
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        programs: listArray, loading: false,
-                    })
-                }).catch(
-                    error => {
-                        this.setState({
-                            programs: [], loading: false
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                // message: 'static.unkownError',
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
+            // ProgramService.getProgramList()
+            let countryIds = this.state.countryValues.map(ele => ele.value);
 
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
+            // let newTracerCategoryIdList = tracerCategoryIdList.concat(tracerCategoryListOfMappingData);
+            let newCountryList = [... new Set(countryIds)];
+            if (countryIds != "") {
+                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+                    .then(response => {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            programs: listArray, loading: false
+                        }, () => {
+                            this.fetchData()
+                        });
+                    }).catch(
+                        error => {
+                            this.setState({
+                                programs: [], loading: false
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
                             }
                         }
-                    }
-                );
+                    );
+            } else {
+                this.setState({
+                    programs: [], loading: false, programValues: []
+                }, () => {
+                    this.fetchData()
+                })
+            }
             // .catch(
             //     error => {
             //         this.setState({
@@ -708,14 +725,14 @@ class warehouseCapacity extends Component {
                 //     }
                 // );
 
-            } else if (this.state.programValues.length == 0) {
-                this.setState({ message: i18n.t('static.common.selectProgram'), data: [] }, () => {
+            } else if (this.state.countryValues.length == 0) {
+                this.setState({ message: i18n.t('static.healtharea.countrytext'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     // this.el.destroy();
                     jexcel.destroy(document.getElementById("tableDiv"), true);
                 });
-            } else if (this.state.countryValues.length == 0) {
-                this.setState({ message: i18n.t('static.healtharea.countrytext'), data: [] }, () => {
+            } else if (this.state.programValues.length == 0) {
+                this.setState({ message: i18n.t('static.common.selectProgram'), data: [] }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     // this.el.destroy();
                     jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -930,14 +947,14 @@ class warehouseCapacity extends Component {
         //             </option>
         //         )
         //     }, this);
-        const { programLst } = this.state;
+        const { programs } = this.state;
         let programList = [];
-        programList = programLst.length > 0
-            && programLst.map((item, i) => {
+        programList = programs.length > 0
+            && programs.map((item, i) => {
                 return (
 
                     // { label: getLabelText(item.label, this.state.lang), value: item.programId }
-                    { label: (item.programCode), value: item.programId }
+                    { label: (item.code), value: item.id }
 
                 )
             }, this);
