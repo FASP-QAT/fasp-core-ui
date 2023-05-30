@@ -383,14 +383,14 @@ export default class ImportDataset extends Component {
                                                 var programn = transactionn.objectStore('datasetData');
                                                 var addProgramDataRequest = programn.put(json);
                                                 transactionn.oncomplete = function (event) {
-                                                    var json1 = JSON.parse(fileData.split("@~-~@")[1]);
-                                                    var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                                    var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
-                                                    json1.userId = userId1;
-                                                    json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1
-                                                    var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
-                                                    var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
-                                                    var programJson1 = JSON.parse(programData1);
+                                                    // var json1 = JSON.parse(fileData.split("@~-~@")[1]);
+                                                    // var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                    // var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
+                                                    // json1.userId = userId1;
+                                                    // json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1
+                                                    // var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
+                                                    // var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                    // var programJson1 = JSON.parse(programData1);
 
                                                     // Adding data to program QPL details
                                                     // var paList = programJson.problemReportList;
@@ -423,13 +423,13 @@ export default class ImportDataset extends Component {
 
                                                         // Adding data in downloaded program data
 
-                                                        var transaction3 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                                        var program3 = transaction3.objectStore('downloadedDatasetData');
+                                                        // var transaction3 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                                        // var program3 = transaction3.objectStore('downloadedDatasetData');
 
 
-                                                        var addProgramDataRequest1 = program3.put(json1);
+                                                        // var addProgramDataRequest1 = program3.put(json1);
 
-                                                        transaction3.oncomplete = function (event) {
+                                                        // transaction3.oncomplete = function (event) {
                                                             this.setState({
                                                                 message: i18n.t('static.program.dataimportsuccess'),
                                                                 loading: false
@@ -440,7 +440,7 @@ export default class ImportDataset extends Component {
                                                             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
                                                         }.bind(this)
                                                     }.bind(this)
-                                                }.bind(this)
+                                                // }.bind(this)
                                             }
 
                                         }
@@ -622,14 +622,14 @@ export default class ImportDataset extends Component {
                                                                 var addProgramDataRequest = programn.put(json);
                                                                 transactionn.oncomplete = function (event) {
 
-                                                                    var json1 = JSON.parse(fileData.split("@~-~@")[1]);
-                                                                    var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                                                    var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
-                                                                    json1.userId = userId1;
-                                                                    json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1;
-                                                                    var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
-                                                                    var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
-                                                                    var programJson1 = JSON.parse(programData1);
+                                                                    // var json1 = JSON.parse(fileData.split("@~-~@")[1]);
+                                                                    // var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                                    // var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
+                                                                    // json1.userId = userId1;
+                                                                    // json1.id = json1.programId + "_v" + json1.version + "_uId_" + userId1;
+                                                                    // var programDataBytes1 = CryptoJS.AES.decrypt(json1.programData, SECRET_KEY);
+                                                                    // var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                                    // var programJson1 = JSON.parse(programData1);
 
                                                                     // Adding data to program QPL details
                                                                     // var paList = programJson.problemReportList;
@@ -661,10 +661,10 @@ export default class ImportDataset extends Component {
                                                                     programQPLDetailsTransaction.oncomplete = function (event) {
                                                                         // Adding data in downloaded program data
 
-                                                                        var transaction3 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                                                        var program3 = transaction3.objectStore('downloadedDatasetData');
-                                                                        var addProgramDataRequest1 = program3.put(json1);
-                                                                        transaction3.oncomplete = function (event) {
+                                                                        // var transaction3 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                                                        // var program3 = transaction3.objectStore('downloadedDatasetData');
+                                                                        // var addProgramDataRequest1 = program3.put(json1);
+                                                                        // transaction3.oncomplete = function (event) {
                                                                             this.setState({
                                                                                 message: i18n.t('static.program.dataimportsuccess'),
                                                                                 loading: false
@@ -675,7 +675,7 @@ export default class ImportDataset extends Component {
                                                                             this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
                                                                         }.bind(this)
                                                                     }.bind(this)
-                                                                }.bind(this)
+                                                                // }.bind(this)
                                                             }
 
                                                         }
