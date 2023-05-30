@@ -612,6 +612,7 @@ export default class ExpiredInventory extends Component {
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
                     var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+                    var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                     var version = (versionId.split('(')[0]).trim()
                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -624,6 +625,22 @@ export default class ExpiredInventory extends Component {
                             message: i18n.t('static.program.errortext'), loading: false
                         })
                     }.bind(this);
+
+                    var program1 = programPlanningUnitTransaction.objectStore('programPlanningUnit');
+                    var getRequest1 = program1.getAll();
+                    var programPlanningUnitList = [];
+
+                    getRequest1.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: '#BA0C2F',
+                            loading: false
+                        })
+                    }.bind(this);
+                    getRequest1.onsuccess = function (event) {
+                        programPlanningUnitList = getRequest1.result;
+                    }
+
                     programRequest.onsuccess = function (e) {
                         console.log("2----", programRequest)
                         this.setState({
@@ -635,7 +652,8 @@ export default class ExpiredInventory extends Component {
                         var generalProgramJson = JSON.parse(generalProgramData);
 
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                        var supplyPlan = []
+                        var supplyPlan = [];
+                        var shipmentList = [];
                         for (var pu = 0; pu < planningUnitDataList.length; pu++) {
                             var planningUnitData = planningUnitDataList[pu];
                             var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
@@ -643,6 +661,8 @@ export default class ExpiredInventory extends Component {
                             var programJson = JSON.parse(programData);
                             var spList = programJson.supplyPlan;
                             supplyPlan = supplyPlan.concat(spList);
+                            var smList = programJson.shipmentList;
+                            shipmentList = shipmentList.concat(smList);
                         }
 
                         this.setState({
@@ -663,12 +683,42 @@ export default class ExpiredInventory extends Component {
                                 }
                                 list1.map(ele1 => {
                                     // ele1.createdDate=ele.transDate
+                                    var cost = programPlanningUnitList.filter(c => c.planningUnit.id == pu.planningUnit.id)[0].catalogPrice;
+                                    
+                                    const temp1 = shipmentList.filter((c) => {
+                                        if(c.batchInfoList.length > 0){
+                                        
+                                            const batchIds = c.batchInfoList.map((p) => p.batch.batchNo);
+                                            const expiries = c.batchInfoList.map((p) => moment(p.batch.expiryDate).format("YYYY-MM"));
+                                            
+                                            return c.planningUnit.id === pu.planningUnit.id  && 
+                                                batchIds.includes(ele1.batchNo) &&
+                                                expiries.includes(moment(ele1.expiryDate).format("YYYY-MM"));
+                                        }
+                                    });
+                                    
+                                    if(temp1.length > 0){
+                                        // if(temp1.length > 0 && temp1[0].shipmentQty > 0 && temp1[0].shipmentQty != null)
+                                        // freightCost == null => 0, shipmentquantity == 0 || null => catalog price
+                                        // let freightCost;
+                                        // if(temp1[0].freightCost == null || temp1[0].freightCost == ""){
+                                        //     freightCost = 0;
+                                        // }else{
+                                        //     freightCost = temp1[0].freightCost;
+                                        // }
+                                        // cost = (temp1[0].productCost + freightCost) / temp1[0].shipmentQty;
+                                        cost = temp1[0].rate;
+                                    }
+                                    let expiredQuantity = document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty : ele1.expiredQtyWps;
+
+                                    // cost = cost * expiredQuantity;
                                     var json = {
                                         planningUnit: pu.planningUnit,
                                         shelfLife: pu.shelfLife,
                                         batchInfo: ele1,
                                         expiredQty: document.getElementById("includePlanningShipments").value.toString() == 'true' ? ele1.expiredQty : ele1.expiredQtyWps,
-                                        program: { id: generalProgramJson.programId, label: generalProgramJson.label, code: generalProgramJson.programCode }
+                                        program: { id: generalProgramJson.programId, label: generalProgramJson.label, code: generalProgramJson.programCode },
+                                        cost: cost
                                     }
                                     data.push(json)
                                 })
@@ -844,7 +894,7 @@ export default class ExpiredInventory extends Component {
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.outPutList.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), (this.dateformatterCSV(ele.batchInfo.createdDate)).replaceAll(' ', '%20'), this.formatter(ele.shelfLife), (this.dateformatterCSV(ele.batchInfo.expiryDate)).replaceAll(' ', '%20')])));
+        this.state.outPutList.map(ele => A.push(this.addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), (this.dateformatterCSV(ele.batchInfo.createdDate)).replaceAll(' ', '%20'), this.formatter(ele.shelfLife), (this.dateformatterCSV(ele.batchInfo.expiryDate)).replaceAll(' ', '%20'), (this.formatter(Math.round(ele.cost * ele.expiredQty))).replaceAll(' ', '%20')])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -932,7 +982,7 @@ export default class ExpiredInventory extends Component {
         // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.outPutList.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), this.dateformatter(ele.batchInfo.createdDate), ele.shelfLife, this.dateformatter(ele.batchInfo.expiryDate)]);
+        const data = this.state.outPutList.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), this.formatter(ele.expiredQty), ele.batchInfo.batchNo, ele.batchInfo.autoGenerated == true ? i18n.t('static.program.yes') : i18n.t('static.program.no'), this.dateformatter(ele.batchInfo.createdDate), ele.shelfLife, this.dateformatter(ele.batchInfo.expiryDate), (this.formatter(Math.round(ele.cost * ele.expiredQty)))]);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -966,6 +1016,7 @@ export default class ExpiredInventory extends Component {
             data[6] = (outPutList[j].batchInfo.expiryDate ? moment(outPutList[j].batchInfo.expiryDate).format(`YYYY-MM-DD`) : null)
             data[7] = outPutList[j].batchInfo.batchId;
             data[8] = outPutList[j].planningUnit.id;
+            data[9] = outPutList[j].cost * outPutList[j].expiredQty;
 
             outPutListArray[count] = data;
             count++;
@@ -1029,6 +1080,10 @@ export default class ExpiredInventory extends Component {
                 },
                 {
                     type: 'hidden'
+                },
+                {
+                    title: i18n.t('static.shipment.totalCost'),
+                    type: 'numeric', mask: '#,##',
                 }
             ],
             // text: {
@@ -1254,6 +1309,27 @@ export default class ExpiredInventory extends Component {
                         (row.batchInfo.expiryDate ? moment(row.batchInfo.expiryDate).format(`${DATE_FORMAT_CAP}`) : null)
                         // (row.lastLoginDate ? moment(row.lastLoginDate).format('DD-MMM-YY hh:mm A') : null)
                     );
+                }
+
+            },
+            {
+                dataField: 'cost',
+                text: i18n.t('static.shipment.totalCost'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '170px' },
+                formatter: (cell, row) => {
+                    var decimalFixedValue = cell;
+                    decimalFixedValue += '';
+                    var x = decimalFixedValue.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
                 }
 
             },

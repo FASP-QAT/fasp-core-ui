@@ -3466,7 +3466,7 @@ export default class ManualTagging extends Component {
                         data1[4] = list[i].orderNo;
                         data1[5] = getLabelText(list[i].realmCountryPlanningUnit.label, this.state.lang)
                         data1[6] = list[i].shipmentTransId;
-                        data1[7] = list[i].expectedDeliveryDate;
+                        data1[7] = list[i].receivedDate != "" && list[i].receivedDate != null && list[i].receivedDate != undefined && list[i].receivedDate != "Invalid date" ? list[i].receivedDate : list[i].expectedDeliveryDate;
                         data1[8] = getLabelText(list[i].shipmentStatus.label, this.state.lang)
                         data1[9] = list[i].shipmentQty
                         data1[10] = list[i].realmCountryPlanningUnit.multiplier
