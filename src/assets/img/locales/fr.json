@@ -1211,6 +1211,7 @@
     "static.report.localProcurementAgentLeadTime": "Délai d`exécution de l`agent d`approvisionnement local «Planifié à reçu»",
     "static.commitTree.showValidation": "Afficher la validation",
     "static.dashboard.languageheader": "Langue",
+    "static.supplyPlan.batchQty": "Quantité de lot",
     "static.extrapolation.dateRangeForHistoricData": "Sélectionner une période pour les données historiques",
     "static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.": "Toutes les valeurs ci-dessous sont en unités de planification des approvisionnements.",
     "static.integration.addIntegration": "Ajouter une intégration",
@@ -2043,6 +2044,7 @@
     "static.report.stockout": "Rupture de stock",
     "static.CompareSelect.WillUtilize": "Si 6 mois de données ne sont pas disponibles, QAT utilisera autant de mois que disponibles et l'indiquera dans cette colonne.",
     "static.common.customWarningEquivalencyUnit": "Utiliser cette page pour définir les unités d'équivalence, qui sont utilisées dans le menu ''Comparaison et sélection de la prévision'' et ''Prévision mensuelle''. Si vous ne voyez pas l'unité d'équivalence dont vous avez besoin, veuillez cliquer sur le bouton \"Gérer l'unité d'équivalence\".",
+    "static.report.budgetRemaining": "Budget restant",
     "static.supplyPlan.submittedDate": "Date soumis",
     "static.realm.minMosMinGaurdraillabel": "Min Guardrail pour Min MdS",
     "static.dashboard.exportprogram": "Exporter le programme",
@@ -2252,6 +2254,7 @@
     "static.supplyplan.shipmentDataEntry": "Entrée de données d`expédition",
     "static.importFromQATSupplyPlan.isRegionInForecastProgram": "La région est-elle dans le programme de prévision ?",
     "static.realm.no": "Non",
+    "static.supplyPlan.exportAsPDF": "Exporter au format PDF",
     "static.importFromQATSupplyPlan.importFromQATSupplyPlan": "Importation à partir du module Planification des approvisionnements de QAT",
     "static.supplyPlan.maxStock": "Stock maximum",
     "static.program.arrivedToReceivedLeadTime": "Entrez le délai entre l`arrivé et la reception «Arrivé à Reçu» (en mois)",
@@ -2780,6 +2783,7 @@
     "static.language.languagetext": "Saisir la langue",
     "static.supplyPlanFormula.expiredStock": "Stock expiré",
     "static.formula.suggestedText10": "MOS maximale",
+    "static.supplyPlan.recommendToChangeBatchName": "Recommandé de changer le numéro de lot",
     "static.common.month": "Mois",
     "static.tooltip.ChooseMethod": "Sélectionner la méthode d'extrapolation à utiliser pour la valeur du nœud.",
     "static.problemAction.criticality": "Criticité",
@@ -3013,6 +3017,7 @@
     "static.equivalancyUnit.SelectedForecasts": "écran, l'utilisateur peut afficher ses prévisions sélectionnées par unités de planification individuelles, ou agréger les unités de planification si elles sont connectées par des UE.",
     "static.pipeline.save": "Enregistrer",
     "static.procurementUnit.validMinValueText": "Un minimum de 14 caractères est requis",
+    "static.report.overspentBudget": "Budget dépassé",
     "static.subfundingsource.subfundingsource": "Source de sous-financement",
     "static.currency.conversionrateusd": "Taux de conversion à 1 USD",
     "static.logout.confirmLogout": "Voulez vous vraiment vous déconnecter?",
@@ -3035,7 +3040,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.report.overspentBudget": "Budget dépassé",
-    "static.report.budgetRemaining": ""
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
 }
