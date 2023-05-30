@@ -156,213 +156,213 @@ export default class PlanningUnitSetting extends Component {
             // var value = this.el.getValueFromCoords(10, y);
             // if (parseInt(value) == 1) {
 
-                //tracer category
-                var col = ("A").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(0, y);
-                console.log("value-----", value);
-                if (value == "") {
+            //tracer category
+            var col = ("A").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(0, y);
+            console.log("value-----", value);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            //planning unit
+            var col = ("B").concat(parseInt(y) + 1);
+            // var value = this.el.getValueFromCoords(1, y);
+            var value = this.el.getRowData(parseInt(y))[1];
+            console.log("value-----", value);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                for (var i = (json.length - 1); i >= 0; i--) {
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    if (planningUnitValue == value && y != i && i > y && map.get("16").toString() == "true" && json[y][16].toString() == "true") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        i = -1;
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+            }
+
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(4, y);
+            }
+            // var value = this.el.getValueFromCoords(4, y);
+            var reg = JEXCEL_INTEGER_REGEX;
+            console.log("value------------->E", value);
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                // valid = false;
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(5, y);
+            }
+            // var value = this.el.getValueFromCoords(5, y);
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                // valid = false;
+            } else {
+                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     valid = false;
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
+
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(6, y);
+            }
+            // var value = this.el.getValueFromCoords(6, y);
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                // valid = false;
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else if (parseInt(value) > 99) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            //procurement agent
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(7, y);
+            console.log("value-----", value);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            console.log("Anchal--------->1", value);
+            if (value == "") {
+                console.log("Anchal--------->2", value);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                console.log("Anchal--------->3", value);
+                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (Number(value) < 0) {//negative value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {//regex check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
                     valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
 
-                //planning unit
-                var col = ("B").concat(parseInt(y) + 1);
-                // var value = this.el.getValueFromCoords(1, y);
-                var value = this.el.getRowData(parseInt(y))[1];
-                console.log("value-----", value);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    for (var i = (json.length - 1); i >= 0; i--) {
-                        var map = new Map(Object.entries(json[i]));
-                        var planningUnitValue = map.get("1");
-                        if (planningUnitValue == value && y != i && i > y && map.get("16").toString()=="true" && json[y][16].toString()=="true") {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
-                            i = -1;
-                            valid = false;
-                        } else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
-                        }
-                    }
-                }
-
-                var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                if (value == '' || value == null) {
-                    value = this.el.getValueFromCoords(4, y);
-                }
-                // var value = this.el.getValueFromCoords(4, y);
-                var reg = JEXCEL_INTEGER_REGEX;
-                console.log("value------------->E", value);
-                if (value == "") {
-                    // this.el.setStyle(col, "background-color", "transparent");
-                    // this.el.setStyle(col, "background-color", "yellow");
-                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    // valid = false;
-                } else {
-                    if (isNaN(parseInt(value))) {//string value check
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
-                        valid = false;
-                    } else if (!Number.isInteger(Number(value))) {//decimal value check
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
-                        valid = false;
-                    } else if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-
-                var col = ("F").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                if (value == '' || value == null) {
-                    value = this.el.getValueFromCoords(5, y);
-                }
-                // var value = this.el.getValueFromCoords(5, y);
-                var reg = JEXCEL_INTEGER_REGEX;
-                if (value == "") {
-                    // this.el.setStyle(col, "background-color", "transparent");
-                    // this.el.setStyle(col, "background-color", "yellow");
-                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    // valid = false;
-                } else {
-                    // if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    //     this.el.setStyle(col, "background-color", "transparent");
-                    //     this.el.setStyle(col, "background-color", "yellow");
-                    //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    //     valid = false;
-                    // } else {
-                    //     this.el.setStyle(col, "background-color", "transparent");
-                    //     this.el.setComments(col, "");
-                    // }
-
-                    if (isNaN(parseInt(value))) {//string value check
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
-                        valid = false;
-                    } else if (!Number.isInteger(Number(value))) {//decimal value check
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
-                        valid = false;
-                    } else if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-
-                var col = ("G").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                if (value == '' || value == null) {
-                    value = this.el.getValueFromCoords(6, y);
-                }
-                // var value = this.el.getValueFromCoords(6, y);
-                var reg = JEXCEL_INTEGER_REGEX;
-                if (value == "") {
-                    // this.el.setStyle(col, "background-color", "transparent");
-                    // this.el.setStyle(col, "background-color", "yellow");
-                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    // valid = false;
-                } else {
-                    if (isNaN(parseInt(value))) {//string value check
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
-                        valid = false;
-                    } else if (!Number.isInteger(Number(value))) {//decimal value check
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
-                        valid = false;
-                    } else if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
-                        valid = false;
-                    } else if (parseInt(value) > 99) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-
-                //procurement agent
-                var col = ("H").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(7, y);
-                console.log("value-----", value);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-
-                var col = ("I").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                console.log("Anchal--------->1", value);
-                if (value == "") {
-                    console.log("Anchal--------->2", value);
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    console.log("Anchal--------->3", value);
-                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                    if (isNaN(parseInt(value))) {//string value check
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
-                        valid = false;
-                    } else if (Number(value) < 0) {//negative value check
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'));
-                        valid = false;
-                    } else if (!(reg.test(value))) {//regex check
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-
-                }
+            }
 
 
 
@@ -2592,6 +2592,7 @@ export default class PlanningUnitSetting extends Component {
 
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
+                console.log("Final-------------->10", parseInt(map1.get("10")));
 
                 // let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
                 let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
@@ -2654,21 +2655,7 @@ export default class PlanningUnitSetting extends Component {
                     let planningUnitobj1 = originalPlanningUnitList[indexVar];
                     let tempJson = {
                         "programPlanningUnitId": parseInt(map1.get("9")),
-                        "planningUnit": {
-                            "id": parseInt(map1.get("1")),
-                            "label": planningUnitObj.label,
-                            "unit": planningUnitObj.unit,
-                            "multiplier": planningUnitObj.multiplier,
-                            "forecastingUnit": {
-                                "id": planningUnitObj.forecastingUnit.id,
-                                "label": planningUnitObj.forecastingUnit.label,
-                                "unit": planningUnitObj.forecastingUnit.unit,
-                                "productCategory": planningUnitObj.forecastingUnit.productCategory,
-                                "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                                "idString": "" + planningUnitObj.forecastingUnit.id
-                            },
-                            "idString": "" + parseInt(map1.get("1"))
-                        },
+                        "planningUnit": planningUnitobj1.planningUnit,
                         "consuptionForecast": map1.get("2"),
                         "treeForecast": map1.get("3"),
                         // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
@@ -2750,7 +2737,7 @@ export default class PlanningUnitSetting extends Component {
 
             }
 
-            console.log("Final-------------->1", planningUnitList);
+            console.log("Final-------------->1111", planningUnitList);
 
             programData.planningUnitList = planningUnitList;
 
@@ -3371,7 +3358,7 @@ export default class PlanningUnitSetting extends Component {
                             </div>
                         </Col>}
 
-                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable leftAlignTablePlanningUnit" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv">
                             </div>
                         </div>
