@@ -2198,7 +2198,7 @@ class CompareAndSelectScenario extends Component {
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h6 className="mt-success" id="div1" className={this.props.match.params.color}>{i18n.t(this.props.match.params.message)}</h6> */}
-                <h5 className="red" id="div1" className={this.state.color}>{i18n.t(this.state.message)}</h5>
+                <h5 id="div1" className={`red ${this.state.color}`}>{i18n.t(this.state.message)}</h5>
 
                 <Card>
 
@@ -2329,7 +2329,7 @@ class CompareAndSelectScenario extends Component {
                                                 <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                             </ul><br />
                                             <div className="table-responsive RemoveStriped">
-                                                <div id="table1" className="compareAndSelect"></div>
+                                                <div id="table1" className="compareAndSelect displayBlock"></div>
                                             </div>
 
                                             <br></br>
@@ -2455,15 +2455,14 @@ class CompareAndSelectScenario extends Component {
                                                             <InputGroup>
                                                                 <Input
                                                                     type="select"
-                                                                    className="selectWrapText"
+                                                                    // className="selectWrapText"
                                                                     name="equivalencyUnitId"
                                                                     id="equivalencyUnitId"
                                                                     // disabled={true}
                                                                     value={this.state.equivalencyUnitId}
                                                                     onChange={this.setEquivalencyUnit}
                                                                     bsSize="sm"
-                                                                    className="selectWrapText removeDropdownArrow"
-                                                                >
+                                                                    className="selectWrapText removeDropdownArrow">
                                                                     <option value="0">{i18n.t('static.common.select')}</option>
                                                                     {equivalencies}
                                                                 </Input>
