@@ -87,7 +87,11 @@ export default class syncPage extends Component {
       deletedRowsListServer: [],
       shipmentAlreadyLinkedToOtherProgCount: 0,
       conflictsCountErp: 0,
-      shipmentIdsToBeActivated: []
+      shipmentIdsToBeActivated: [],
+      conflictsCountConsumption: 0,
+      conflictsCountInventory: 0,
+      conflictsCountShipment: 0,
+      conflictsCountQPL: 0
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -352,7 +356,8 @@ export default class syncPage extends Component {
       consumptionInstance.setValueFromCoords(18, index, 2, true);
     }
     this.setState({
-      conflictsCount: this.state.conflictsCount - 1
+      conflictsCount: this.state.conflictsCount - 1,
+      conflictsCountConsumption: this.state.conflictsCountConsumption - 1
     }, () => {
       if (this.state.conflictsCount == 0) {
         this.generateDataAfterResolveConflictsForQPL();
@@ -397,7 +402,8 @@ export default class syncPage extends Component {
     consumptionInstance.orderBy(18, 0);
     consumptionInstance.options.editable = false;
     this.setState({
-      conflictsCount: this.state.conflictsCount - 1
+      conflictsCount: this.state.conflictsCount - 1,
+      conflictsCountConsumption: this.state.conflictsCountConsumption - 1
     }, () => {
       if (this.state.conflictsCount == 0) {
         this.generateDataAfterResolveConflictsForQPL();
@@ -533,7 +539,8 @@ export default class syncPage extends Component {
     inventoryInstance.orderBy(19, 0);
     inventoryInstance.options.editable = false;
     this.setState({
-      conflictsCount: this.state.conflictsCount - 1
+      conflictsCount: this.state.conflictsCount - 1,
+      conflictsCountInventory: this.state.conflictsCountInventory - 1
     }, () => {
       if (this.state.conflictsCount == 0) {
         this.generateDataAfterResolveConflictsForQPL();
@@ -576,7 +583,8 @@ export default class syncPage extends Component {
     inventoryInstance.orderBy(19, 0);
     inventoryInstance.options.editable = false;
     this.setState({
-      conflictsCount: this.state.conflictsCount - 1
+      conflictsCount: this.state.conflictsCount - 1,
+      conflictsCountInventory: this.state.conflictsCountInventory - 1
     }, () => {
       if (this.state.conflictsCount == 0) {
         this.generateDataAfterResolveConflictsForQPL();
@@ -844,7 +852,8 @@ export default class syncPage extends Component {
     shipmentInstance.orderBy(36, 0);
     shipmentInstance.options.editable = false;
     this.setState({
-      conflictsCount: this.state.conflictsCount - 1
+      conflictsCount: this.state.conflictsCount - 1,
+      conflictsCountShipment: this.state.conflictsCountShipment - 1
     }, () => {
       if (this.state.conflictsCount == 0) {
         this.generateDataAfterResolveConflictsForQPL();
@@ -887,7 +896,8 @@ export default class syncPage extends Component {
     shipmentInstance.orderBy(36, 0);
     shipmentInstance.options.editable = false;
     this.setState({
-      conflictsCount: this.state.conflictsCount - 1
+      conflictsCount: this.state.conflictsCount - 1,
+      conflictsCountShipment: this.state.conflictsCountShipment - 1
     }, () => {
       if (this.state.conflictsCount == 0) {
         this.generateDataAfterResolveConflictsForQPL();
@@ -952,6 +962,7 @@ export default class syncPage extends Component {
     var openCount = json.filter(c => c[12] == OPEN_PROBLEM_STATUS_ID).length;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1,
+      conflictsCountQPL: this.state.conflictsCountQPL - 1,
       openCount: openCount
     }, () => {
       if (this.state.conflictsCount == 0) {
@@ -1003,6 +1014,7 @@ export default class syncPage extends Component {
     var openCount = json.filter(c => c[12] == OPEN_PROBLEM_STATUS_ID).length;
     this.setState({
       conflictsCount: this.state.conflictsCount - 1,
+      conflictsCountQPL: this.state.conflictsCountQPL - 1,
       openCount: openCount
     }, () => {
       if (this.state.conflictsCount == 0) {
@@ -3379,7 +3391,8 @@ export default class syncPage extends Component {
               (jsonData[c])[18] = 2;
             } else {
               this.setState({
-                conflictsCount: this.state.conflictsCount + 1
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountConsumption: this.state.conflictsCountConsumption + 1
               })
               elInstance.setValueFromCoords(18, c, 1, true);
               (jsonData[c])[18] = 1;
@@ -3414,7 +3427,8 @@ export default class syncPage extends Component {
               elInstance.setValueFromCoords(18, c, 2, true);
             } else {
               this.setState({
-                conflictsCount: this.state.conflictsCount + 1
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountConsumption: this.state.conflictsCountConsumption + 1
               })
               elInstance.setValueFromCoords(18, c, 1, true);
               for (var j = 0; j < colArr.length; j++) {
@@ -3490,7 +3504,8 @@ export default class syncPage extends Component {
               (jsonData[c])[19] = 2;
             } else {
               this.setState({
-                conflictsCount: this.state.conflictsCount + 1
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountInventory: this.state.conflictsCountInventory + 1
               })
               elInstance.setValueFromCoords(19, c, 1, true);
               (jsonData[c])[19] = 1;
@@ -3525,7 +3540,8 @@ export default class syncPage extends Component {
               elInstance.setValueFromCoords(19, c, 2, true);
             } else {
               this.setState({
-                conflictsCount: this.state.conflictsCount + 1
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountInventory: this.state.conflictsCountInventory + 1
               })
               elInstance.setValueFromCoords(19, c, 1, true);
               for (var j = 0; j < colArr.length; j++) {
@@ -3998,7 +4014,8 @@ export default class syncPage extends Component {
                 (jsonData[c])[36] = 2;
               } else {
                 this.setState({
-                  conflictsCount: this.state.conflictsCount + 1
+                  conflictsCount: this.state.conflictsCount + 1,
+                  conflictsCountShipment: this.state.conflictsCountShipment + 1
                 })
                 elInstance.setValueFromCoords(36, c, 1, true);
                 (jsonData[c])[36] = 1;
@@ -4036,7 +4053,8 @@ export default class syncPage extends Component {
             } else {
               if (jsonData[c][26].toString() != "true") {
                 this.setState({
-                  conflictsCount: this.state.conflictsCount + 1
+                  conflictsCount: this.state.conflictsCount + 1,
+                  conflictsCountShipment: this.state.conflictsCountShipment + 1
                 })
                 elInstance.setValueFromCoords(36, c, 1, true);
                 for (var j = 0; j < colArr.length; j++) {
@@ -4169,7 +4187,8 @@ export default class syncPage extends Component {
           } else {
             if (oldData[12] != PROBLEM_STATUS_IN_COMPLIANCE && latestData[12] != PROBLEM_STATUS_IN_COMPLIANCE) {
               this.setState({
-                conflictsCount: this.state.conflictsCount + 1
+                conflictsCount: this.state.conflictsCount + 1,
+                conflictsCountQPL: this.state.conflictsCountQPL
               })
               elInstance.setValueFromCoords(20, c, 1, true);
               (jsonData[c])[20] = 1;
@@ -4516,6 +4535,7 @@ export default class syncPage extends Component {
                         <Nav tabs>
                           <NavItem>
                             <NavLink
+                              style={{ background: this.state.conflictsCountConsumption > 0 ? "yellow" : "" }}
                               active={this.state.activeTab[0] === '1'}
                               onClick={() => { this.toggle(0, '1'); }}
                             >
@@ -4524,6 +4544,7 @@ export default class syncPage extends Component {
                           </NavItem>
                           <NavItem>
                             <NavLink
+                              style={{ background: this.state.conflictsCountInventory > 0 ? "yellow" : "" }}
                               active={this.state.activeTab[0] === '2'}
                               onClick={() => { this.toggle(0, '2'); }}
                             >
@@ -4533,6 +4554,7 @@ export default class syncPage extends Component {
 
                           <NavItem>
                             <NavLink
+                              style={{ background: this.state.conflictsCountShipment > 0 ? "yellow" : "" }}
                               active={this.state.activeTab[0] === '3'}
                               onClick={() => { this.toggle(0, '3'); }}
                             >
@@ -4541,6 +4563,7 @@ export default class syncPage extends Component {
                           </NavItem>
                           <NavItem>
                             <NavLink
+                              style={{ background: this.state.conflictsCountErp > 0 ? "yellow" : "" }}
                               active={this.state.activeTab[0] === '4'}
                               onClick={() => { this.toggle(0, '4'); }}
                             >
@@ -4549,6 +4572,7 @@ export default class syncPage extends Component {
                           </NavItem>
                           <NavItem>
                             <NavLink
+                              style={{ background: this.state.conflictsCountQPL > 0 ? "yellow" : "" }}
                               active={this.state.activeTab[0] === '5'}
                               onClick={() => { this.toggle(0, '5'); }}
                             >
