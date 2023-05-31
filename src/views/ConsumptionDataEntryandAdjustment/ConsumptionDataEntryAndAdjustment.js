@@ -3028,7 +3028,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                 <div className="row">
                                       {this.state.showDetailTable &&
                                         <>
-                                          <FormGroup className="col-md-4">
+                                          <FormGroup  className="col-md-4 tap">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.for')} {i18n.t('static.dashboard.planningunitheader')}: <b>{getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)}</b>
                                             </Label><br />
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
@@ -3042,7 +3042,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                           </FormGroup>
                                         </>
                                       }
-                                      <FormGroup className="col-md-4" style={{ display: this.state.showDetailTable ? 'block' : 'none' }}>
+                                      <FormGroup className="col-md-4 tap" style={{ display: this.state.showDetailTable ? 'block' : 'none' }}>
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.consumptionNotes')}</Label>
                                         <div className="controls ">
                                           <InputGroup>
@@ -3070,7 +3070,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
                                 <div className="row">
                                   <div className="col-md-12 pl-2 pr-2 datdEntryRow consumptionDataEntryTable">
-                                    <div id="tableDiv" className="leftAlignTable">
+                                    <div id="tableDiv" className="leftAlignTable displayBlock">
                                     </div>
                                   </div>
                                 </div>

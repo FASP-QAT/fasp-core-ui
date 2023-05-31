@@ -516,7 +516,7 @@ label.arrow_label:after {
 }
 
 .sidebar .nav-link .nav-dropdown-toggle::before {
-  transform: rotate(-180deg !important);
+  transform: rotate(-180deg) !important;
 }
 
 .draggable tr:nth-of-type(odd) {
@@ -7823,7 +7823,9 @@ legend.scheduler-border {
 .FiltermomjexcelPer .jexcel_filters {
   position: fixed !important;
 }
-
+.leftAlignTable{
+  display: block !important;
+}
 .leftAlignTable .jexcel_content .draggable tr td:nth-child(2) {
   text-align: left !important;
 }

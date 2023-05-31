@@ -1755,16 +1755,10 @@ class ModelingValidation extends Component {
 
                                                 </div>
                                             </div>}
-
-
-
-
                                     </div>
 
-
-
                                     {/* {this.state.show && */}
-                                    <div className="row">
+                                    <div className="row displayBlock" >
                                         <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin">
 
                                             {/* // <div className="table-scroll">
