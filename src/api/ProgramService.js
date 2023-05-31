@@ -263,8 +263,8 @@ class ProgramService {
         return axios.post(`${API_URL}/api/dataset/versions/`, json, {});
     }
 
-    getProgramForDropDown(programTypeId) {
-        return axios.get(`${API_URL}/api/programForDropDown/programType/${programTypeId}`, {});
+    getProgramForDropDown(realmId, programTypeId) {
+        return axios.get(`${API_URL}/api/dropdown/program/realm/${realmId}/programType/${programTypeId}`, {});
     }
 }
 export default new ProgramService()
