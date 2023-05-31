@@ -54,7 +54,7 @@ const pickerLang = {
 const validationSchema = function (values, t) {
   return Yup.object().shape({
     consumptionNotes: Yup.string()
-      .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.label.validData"))
+      .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.commit.consumptionnotesvalid"))
   })
 }
 
