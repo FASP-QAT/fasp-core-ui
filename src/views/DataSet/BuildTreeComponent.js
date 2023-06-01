@@ -8505,7 +8505,7 @@ export default class BuildTree extends Component {
                         var parentNode = items.filter(e => e.id == parentId);
                         
                         var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
-                        if(parentNode.templateName ? parentNode.templateName == "contactTemplateMin" ? false : true : true){
+                        if(parentNode[0].templateName ? parentNode[0].templateName == "contactTemplateMin" ? false : true : true){
                             tempToggleArray = tempToggleArray.filter((e) => e != parentId)
                         }
                         updatedItems = updatedItems.map(item => {
@@ -11820,8 +11820,15 @@ export default class BuildTree extends Component {
                                         });
                                         this.setState({toggleArray: tempToggleArray})
                                     }else{
+                                        var parentId = itemConfig.payload.parentNodeId;
+                                        var parentNode = items.filter(e => e.id == parentId);
                                         var tempToggleArray = this.state.toggleArray;
                                         tempToggleArray.push(itemConfig.id);
+                                        if(parentId){
+                                            if(parentNode[0].payload.parentNodeId == null){
+                                                tempToggleArray.push(itemConfig.payload.parentNodeId);
+                                            }
+                                        }
                                         updatedItems = updatedItems.map(item => {
                                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.parent != null) {
                                                 tempToggleArray.push(item.id);
@@ -11830,6 +11837,7 @@ export default class BuildTree extends Component {
                                             }
                                             return item;
                                         });
+                                        console.log("Hello ",tempToggleArray)
                                         this.setState({toggleArray: tempToggleArray})
                                     }
                                     
