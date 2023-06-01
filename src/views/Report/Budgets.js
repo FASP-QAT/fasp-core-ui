@@ -279,7 +279,11 @@ class Budgets extends Component {
                             console.log('already exist')
                         }
                     }
-                    var programData = myResult[i];
+                    var programData = {
+                        id: myResult[i].fundingSourceId,
+                        code: myResult[i].fundingSourceCode,
+                        label: myResult[i].label
+                    };
                     if (f == 0) {
                         proList.push(programData)
                     }
