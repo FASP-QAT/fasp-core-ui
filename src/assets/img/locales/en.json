@@ -3045,8 +3045,13 @@
     "static.inventoryTurns.actual":"Actual Inventory Turns",
     "static.inventoryTurns.planned":"Planned Inventory Turns",
     "static.inventoryTurns.display":"Display report by",
-    "static.inventoryTurns.noofplanningunits":"Number of planning units",
+    "static.inventoryTurns.noofplanningunits":"No. of PUs",
     "static.forecastValidation.noConsumptionExtrapolationNotesFound":"No consumption extrapolation notes found",
     "static.forecastValidation.consumptionExtrapolationNotes":"Consumption Extrapolation Notes",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.tree.collapseTree": "Collapse Tree",
+    "static.inventoryTurns.noofmonths":"No. of months in calculation",
+    "static.inventoryTurns.months12":"Months less than 12 and greater than 6",
+    "static.inventoryTurns.months6":"Months less than 6 (Insufficient data to generate reliable turns)"
+
 }
