@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { Formik } from 'formik';
-import jexcel from 'jspreadsheet';
-import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
+// import jexcel from 'jspreadsheet';
+// import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+// import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
   FormGroup, Label, InputGroup, Input, Button,
@@ -4610,7 +4613,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflicts}
-          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={`modal-lg ${this.props.className} modalWidth`} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -4634,7 +4637,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflictsInventory}
-          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={`modal-lg ${this.props.className} modalWidth`} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeInventory()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -4657,7 +4660,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflictsShipment}
-          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={`modal-lg ${this.props.className} modalWidth`} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeShipment()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -4680,7 +4683,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflictsProblem}
-          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={`modal-lg ${this.props.className} modalWidth`} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeProblem()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
