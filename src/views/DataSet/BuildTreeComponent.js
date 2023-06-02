@@ -8505,7 +8505,7 @@ export default class BuildTree extends Component {
                         var parentNode = items.filter(e => e.id == parentId);
                         
                         var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
-                        if(parentNode.templateName ? parentNode.templateName == "contactTemplateMin" ? false : true : true){
+                        if(parentNode[0].templateName ? parentNode[0].templateName == "contactTemplateMin" ? false : true : true){
                             tempToggleArray = tempToggleArray.filter((e) => e != parentId)
                         }
                         updatedItems = updatedItems.map(item => {
@@ -11277,7 +11277,7 @@ export default class BuildTree extends Component {
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 <b style={{ color: '#212721', float: 'right' }}>
-                                    {itemConfig.payload.nodeType.id == 4 ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}
+                                    {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeType.id == 4) ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}
                                     {itemConfig.payload.nodeType.id == 2 ?
                                         <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
                                         (itemConfig.payload.nodeType.id == 3 ?
@@ -11820,8 +11820,15 @@ export default class BuildTree extends Component {
                                         });
                                         this.setState({toggleArray: tempToggleArray})
                                     }else{
+                                        var parentId = itemConfig.payload.parentNodeId;
+                                        var parentNode = items.filter(e => e.id == parentId);
                                         var tempToggleArray = this.state.toggleArray;
                                         tempToggleArray.push(itemConfig.id);
+                                        if(parentId){
+                                            if(parentNode[0].payload.parentNodeId == null){
+                                                tempToggleArray.push(itemConfig.payload.parentNodeId);
+                                            }
+                                        }
                                         updatedItems = updatedItems.map(item => {
                                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.parent != null) {
                                                 tempToggleArray.push(item.id);
@@ -11830,6 +11837,7 @@ export default class BuildTree extends Component {
                                             }
                                             return item;
                                         });
+                                        console.log("Hello ",tempToggleArray)
                                         this.setState({toggleArray: tempToggleArray})
                                     }
                                     
