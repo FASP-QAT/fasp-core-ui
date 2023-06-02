@@ -314,16 +314,20 @@ class warehouseCapacity extends Component {
         // RealmCountryService.getRealmCountryForProgram(realmId)
         DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
-                var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState({
-                    // countries: response.data.map(ele => ele.realmCountry), loading: false
-                    countries: listArray, loading: false
-                })
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        // countries: response.data.map(ele => ele.realmCountry), loading: false
+                        countries: listArray, loading: false
+                    })
+                } else {
+                    this.setState({ message: response.data.messageCode, loading: false })
+                }
             }).catch(
                 error => {
                     this.setState({
@@ -467,8 +471,8 @@ class warehouseCapacity extends Component {
             let countryIds = this.state.countryValues.map(ele => ele.value);
 
             // let newTracerCategoryIdList = tracerCategoryIdList.concat(tracerCategoryListOfMappingData);
-            let newCountryList = [... new Set(countryIds)];
             if (countryIds != "") {
+                let newCountryList = [... new Set(countryIds)];
                 DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
                     .then(response => {
                         var listArray = response.data;
