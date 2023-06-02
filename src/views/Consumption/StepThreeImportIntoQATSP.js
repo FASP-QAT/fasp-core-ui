@@ -950,7 +950,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </li>
                         <li><span class="legendcolor" style={{ backgroundColor: "#a5a3a3", border: "1px solid #000" }}></span>
                             {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
-                            <span class="legendcommitversionText red">Data exists in Supply Plan Program and is past {FORECASTED_CONSUMPTION_MONTHS_IN_PAST} months, so it cannot imported.</span>
+                            <span class="legendcommitversionText red">Data exists in Supply Plan Program and is past {FORECASTED_CONSUMPTION_MONTHS_IN_PAST} months, so it cannot be imported.</span>
                         </li>
                     </ul>
                 </div>
