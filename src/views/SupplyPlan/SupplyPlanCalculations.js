@@ -625,11 +625,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     // Again sorting the batch details
 
                                     myArray = myArray.sort(function (a, b) { return ((new Date(a.expiryDate) - new Date(b.expiryDate)) || (a.batchId - b.batchId)) })
-                                    var unallocatedFEFO = Number(consumptionQty) - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                                    var unallocatedLEFO = 0 - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                                    var unallocatedFEFO = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                                    var unallocatedLEFO = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
 
-                                    var unallocatedFEFOWps = Number(consumptionQty) - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                                    var unallocatedLEFOWps = 0 - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                                    var unallocatedFEFOWps = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                                    var unallocatedLEFOWps = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
 
                                     for (var a = 0; a < myArray.length; a++) {
                                         var bd = myArray[a];
@@ -640,15 +640,15 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         var adjustment = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
                                         if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
                                             if ((Number(tempOB) + Number(adjustment)) >= 0) {
-                                                unallocatedFEFO += Number(adjustment);
-                                            } else {
-                                                unallocatedFEFO -= Number(tempOB);
-                                            }
-                                        } else {
-                                            if ((Number(tempOB) + Number(adjustment)) >= 0) {
                                                 unallocatedLEFO += Number(adjustment);
                                             } else {
                                                 unallocatedLEFO -= Number(tempOB);
+                                            }
+                                        } else {
+                                            if ((Number(tempOB) + Number(adjustment)) >= 0) {
+                                                unallocatedFEFO += Number(adjustment);
+                                            } else {
+                                                unallocatedFEFO -= Number(tempOB);
                                             }
                                         }
 
@@ -672,15 +672,15 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         var adjustmentWps = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
                                         if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
                                             if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
-                                                unallocatedFEFOWps += Number(adjustmentWps);
-                                            } else {
-                                                unallocatedFEFOWps -= Number(tempOBWps);
-                                            }
-                                        } else {
-                                            if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
                                                 unallocatedLEFOWps += Number(adjustmentWps);
                                             } else {
                                                 unallocatedLEFOWps -= Number(tempOBWps);
+                                            }
+                                        } else {
+                                            if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
+                                                unallocatedFEFOWps += Number(adjustmentWps);
+                                            } else {
+                                                unallocatedFEFOWps -= Number(tempOBWps);
                                             }
                                         }
 
@@ -716,7 +716,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (Number(unallocatedLEFO) != 0) {
                                                 var tempCB = Number(myArray[a].closingBalance);
                                                 myArray[a].unallocatedLEFO = Number(unallocatedLEFO);
-                                                if (Number(tempCB) >= Number(unallocatedLEFO)) {
+                                                if (Number(tempCB) >= Number(unallocatedLEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
                                                     myArray[a].closingBalance = Number(tempCB) - Number(unallocatedLEFO);
                                                     myArray[a].calculatedLEFO = Number(unallocatedLEFO);
                                                     unallocatedLEFO = 0;
@@ -750,7 +750,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (Number(unallocatedLEFOWps) != 0) {
                                                 var tempCB = Number(myArray[a].closingBalanceWps);
                                                 myArray[a].unallocatedLEFOWps = Number(unallocatedLEFOWps);
-                                                if (Number(tempCB) >= Number(unallocatedLEFOWps)) {
+                                                if (Number(tempCB) >= Number(unallocatedLEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
                                                     myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedLEFOWps);
                                                     myArray[a].calculatedLEFOWps = Number(unallocatedLEFOWps);
                                                     unallocatedLEFOWps = 0;
@@ -764,7 +764,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         }
                                     }
 
-                                    if (Number(unallocatedFEFO) < 0 || Number(unallocatedFEFOWps) < 0) {
+                                    if (Number(unallocatedLEFO) < 0 || Number(unallocatedLEFOWps) < 0) {
                                         var batchNo = (BATCH_PREFIX).concat(generalProgramJson.programId).concat(programPlanningUnitList[ppL].planningUnit.id).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                                         var json = {
                                             batchId: 0,
@@ -784,14 +784,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             createdDate: moment(startDate).format("YYYY-MM-DD"),
                                             openingBalance: 0,
                                             openingBalanceWps: 0,
-                                            unallocatedFEFO: Number(unallocatedFEFO) < 0 ? Number(unallocatedFEFO) : 0,
-                                            calculatedFEFO: Number(unallocatedFEFO) < 0 ? Number(unallocatedFEFO) : 0,
-                                            unallocatedFEFOWps: Number(unallocatedFEFOWps) < 0 ? Number(unallocatedFEFOWps) : 0,
-                                            calculatedFEFOWps: Number(unallocatedFEFOWps) < 0 ? Number(unallocatedFEFOWps) : 0,
-                                            closingBalance: Number(unallocatedFEFO) < 0 ? 0 - Number(unallocatedFEFO) : 0,
-                                            closingBalanceWps: Number(unallocatedFEFOWps) < 0 ? 0 - Number(unallocatedFEFOWps) : 0,
-                                            qty: Number(unallocatedFEFO) < 0 ? 0 - Number(unallocatedFEFO) : 0,
-                                            qtyWps: Number(unallocatedFEFOWps) < 0 ? 0 - Number(unallocatedFEFOWps) : 0,
+                                            unallocatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
+                                            calculatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
+                                            unallocatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
+                                            calculatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
+                                            closingBalance: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
+                                            closingBalanceWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
+                                            qty: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
+                                            qtyWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
                                         }
                                         myArray.push(json);
                                         var coreBatch = {
