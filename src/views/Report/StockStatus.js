@@ -2292,7 +2292,11 @@ class StockStatus extends Component {
       ReportService.getStockStatusData(inputjson)
         .then(response => {
           console.log('response+++=>', response.data);
-          var sortedPlanningUnitData = this.state.planningUnitIdsExport;
+          var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
+            a = a.label.toLowerCase();
+            b = b.label.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+          });
           // if (this.state.planningUnitIdsExport.filter(c => c.value == document.getElementById("planningUnitId").value).length > 0) {
           //   sortedPlanningUnitData.push(this.state.planningUnitIdsExport.filter(c => c.value == document.getElementById("planningUnitId").value)[0])
           // }
