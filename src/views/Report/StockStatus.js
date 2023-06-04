@@ -294,16 +294,20 @@ class StockStatus extends Component {
           csvRow.push("")
         }
         csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"')
+        var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
+        csvRow.push('"' + (i18n.t('static.supplyPlan.amcPastOrFuture').replaceAll(' ', '%20') + ' : ' + (ppu.monthsInPastForAmc)+"/"+(ppu.monthsInFutureForAmc) + '"'))
         if (item.data.length > 0 && item.data[0].planBasedOn == 1) {
           csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))
+          } else {
+          csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + ' : ' + item.data[0].minStock + '"'))
+          }
+        csvRow.push('"' + (i18n.t('static.report.shelfLife').replaceAll(' ', '%20') + ' : ' + ppu.shelfLife + '"'))
+        if (item.data.length > 0 && item.data[0].planBasedOn == 1) {
           csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].maxMos + '"'))
         } else {
-          csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + ' : ' + item.data[0].minStock + '"'))
           csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + ' : ' + item.data[0].distributionLeadTime + '"'))
         }
-        var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
-        csvRow.push('"' + (i18n.t('static.supplyPlan.amcPast').replaceAll(' ', '%20') + ' : ' + ppu.monthsInPastForAmc + '"'))
-        csvRow.push('"' + (i18n.t('static.supplyPlan.amcFuture').replaceAll(' ', '%20') + ' : ' + ppu.monthsInFutureForAmc + '"'))
+        csvRow.push('"' + (i18n.t('static.supplyPlan.reorderInterval').replaceAll(' ', '%20') + ' : ' + ppu.reorderFrequencyInMonths + '"'))
         csvRow.push("")
         const headers = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
@@ -749,38 +753,35 @@ class StockStatus extends Component {
         var ppu1 = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
         doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
           align: 'left'
-        })
-        doc.text(i18n.t('static.supplyPlan.amcPast') + ' : ' + ppu1.monthsInPastForAmc, doc.internal.pageSize.width / 10, 100, {
+      })
+      doc.text(i18n.t('static.supplyPlan.amcPastOrFuture') + ' : ' + (ppu1.monthsInPastForAmc)+"/"+(ppu1.monthsInFutureForAmc), doc.internal.pageSize.width / 10, 100, {
           align: 'left'
-        })
-        doc.text(i18n.t('static.supplyPlan.amcFuture') + ' : ' + ppu1.monthsInFutureForAmc, doc.internal.pageSize.width / 10, 110, {
+      })
+      doc.text(i18n.t('static.report.shelfLife') + ' : ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, 110, {
           align: 'left'
-        })
-        doc.text(i18n.t('static.report.shelfLife') + ' : ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, 120, {
+      })
+      if (ppu1.planBasedOn == 1) {
+          doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + item.data[0].minMos, doc.internal.pageSize.width / 10, 120, {
+              align: 'left'
+          })
+      } else {
+          doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(ppu1.minQty), doc.internal.pageSize.width / 10, 120, {
+              align: 'left'
+          })
+      }
+      doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, 130, {
           align: 'left'
-        })
-        if (ppu1.planBasedOn == 1) {
-          doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + item.data[0].minMos, doc.internal.pageSize.width / 10, 130, {
-            align: 'left'
+      })
+      if (ppu1.planBasedOn == 1) {
+          doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, 140, {
+              align: 'left'
           })
-        } else {
-          doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(ppu1.minQty), doc.internal.pageSize.width / 10, 130, {
-            align: 'left'
+      } else {
+          doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(ppu1.distributionLeadTime), doc.internal.pageSize.width / 10, 140, {
+              align: 'left'
           })
-        }
-        doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, 140, {
-          align: 'left'
-        })
-        if (ppu1.planBasedOn == 1) {
-          doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, 150, {
-            align: 'left'
-          })
-        } else {
-          doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(ppu1.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
-            align: 'left'
-          })
-        }
-        // doc.setTextColor("#000");
+      }         
+      // doc.setTextColor("#000");
         // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
         //   align: 'left'
         // })
@@ -3870,6 +3871,7 @@ class StockStatus extends Component {
 
     const { rangeValue } = this.state
 
+    var ppu = (this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0])
 
 
     return (
@@ -4018,14 +4020,37 @@ class StockStatus extends Component {
 
 
                   </div>
-
-
                   {this.state.show && this.state.stockStatusList.length > 0 &&
                     <>
                       <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
                         <ul className="legendcommitversion list-group">
-                          {this.state.stockStatusList[0].planBasedOn == 1 ? <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.formatter(this.state.stockStatusList[0].minMos)}</span></li>
-                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}</span></li></> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.stockStatusList[0].minStock)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.stockStatusList[0].distributionLeadTime)}</span></li>
+                          {this.state.stockStatusList[0].planBasedOn == 1 ? <>
+                          <li><span className="redlegend "></span> 
+                            <span className="legendcommitversionText">
+                              {i18n.t("static.supplyPlan.amcPastOrFuture")} : {ppu.monthsInPastForAmc}/{ppu.monthsInFutureForAmc}
+                            </span>
+                          </li>
+                          <li><span className="redlegend "></span> 
+                            <span className="legendcommitversionText">
+                              {i18n.t("static.report.shelfLife")} : {ppu.shelfLife}
+                            </span>
+                          </li>
+                          <li><span className="redlegend "></span> 
+                            <span className="legendcommitversionText">
+                              {i18n.t("static.supplyPlan.minStockMos")} : {this.formatter(this.state.stockStatusList[0].minMos)}
+                            </span>
+                          </li>
+                          <li><span className="redlegend "></span> 
+                            <span className="legendcommitversionText">
+                              {i18n.t("static.supplyPlan.reorderInterval")} : {ppu.reorderFrequencyInMonths}
+                            </span>
+                          </li>
+                          <li><span className="redlegend "></span> 
+                            <span className="legendcommitversionText">
+                              {i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}
+                            </span>
+                          </li>
+                          </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.stockStatusList[0].minStock)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.stockStatusList[0].distributionLeadTime)}</span></li>
                           </>}
                         </ul>
                       </FormGroup>
