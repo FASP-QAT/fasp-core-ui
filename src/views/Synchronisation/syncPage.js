@@ -297,6 +297,7 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflicts = function (instance) {
+    console.log("loadedResolveConflicts");
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -478,6 +479,8 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsInventory = function (instance) {
+    console.log("loadedResolveConflictsInventory");
+
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -791,6 +794,7 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsShipment = function (instance) {
+    console.log("loadedResolveConflictsShipment");
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -912,6 +916,7 @@ export default class syncPage extends Component {
 
 
   loadedResolveConflictsProblem = function (instance) {
+    console.log("loadedResolveConflictsProblem");
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -3384,6 +3389,8 @@ export default class syncPage extends Component {
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 3, true);
               (jsonData[c])[18] = 3;
+              console.log("mergedVersionConsumption12", LOCAL_VERSION_COLOUR)
+
             } else if ((jsonData[c])[17] != "" && latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               console.log("mergedVersionConsumption12", LOCAL_VERSION_COLOUR)
