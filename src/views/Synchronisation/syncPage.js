@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Formik } from 'formik';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
-import "../../../node_modules/jsuites/dist/jsuites.css";
-// import jexcel from 'jspreadsheet';
-// import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+// import jexcel from 'jexcel-pro';
+// import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 // import "../../../node_modules/jsuites/dist/jsuites.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import {
   Col, Row, Card, CardBody, Form,
   FormGroup, Label, InputGroup, Input, Button,
@@ -4591,9 +4591,9 @@ export default class syncPage extends Component {
                   </div>
                   <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                      <div class="align-items-center">
+                      <div className="align-items-center">
                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                        <div class="spinner-border blue ml-4" role="status">
+                        <div className="spinner-border blue ml-4" role="status">
                         </div>
                       </div>
                     </div>
