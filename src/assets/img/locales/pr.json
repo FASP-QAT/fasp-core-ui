@@ -3034,5 +3034,6 @@
     "static.QATForecastImport.currentForecastConsumption": "Consumo Atual Previsto (Módulo Plano de Suprimentos)",
     "static.forecastValidation.noConsumptionExtrapolationNotesFound":"Nenhuma nota de extrapolação de consumo encontrada",
     "static.forecastValidation.consumptionExtrapolationNotes":"Notas de Extrapolação de Consumo",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
+    "static.commit.consumptionnotesvalid": "Somente letras, números e caracteres especiais são permitidos. Verifique se há caracteres inválidos."
 }

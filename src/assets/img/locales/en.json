@@ -3052,6 +3052,7 @@
     "static.tree.collapseTree": "Collapse Tree",
     "static.inventoryTurns.noofmonths":"No. of months in calculation",
     "static.inventoryTurns.months12":"Months less than 12 and greater than 6",
-    "static.inventoryTurns.months6":"Months less than 6 (Insufficient data to generate reliable turns)"
+    "static.inventoryTurns.months6":"Months less than 6 (Insufficient data to generate reliable turns)",
+    "static.commit.consumptionnotesvalid": "Only letters, numbers and special characters are allowed. Please check for invalid characters."
 
 }

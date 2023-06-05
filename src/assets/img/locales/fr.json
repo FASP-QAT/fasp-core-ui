@@ -3038,5 +3038,6 @@
     "static.QATForecastImport.currentForecastConsumption": "Consommation actuelle prévue (module Plan d`approvisionnement)",
     "static.forecastValidation.noConsumptionExtrapolationNotesFound":"Aucune note d`extrapolation de consommation trouvée",
     "static.forecastValidation.consumptionExtrapolationNotes":"Remarques sur l`extrapolation de la consommation",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.commit.consumptionnotesvalid": "Seuls les lettres, chiffres et caractères spéciaux sont autorisés. Veuillez vérifier les caractères non valides."
 }
