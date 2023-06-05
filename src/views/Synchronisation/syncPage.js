@@ -297,7 +297,6 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflicts = function (instance) {
-    console.log("loadedResolveConflicts");
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -3344,16 +3343,17 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMerge = function (instance) {
-    console.log("Worked");
     jExcelLoadedFunction(instance, 0);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     elInstance.options.editable = true;
+    console.log("worked", "workkkeedd" , instance.worksheets[0]);
     for (var c = 0; c < jsonData.length; c++) {
       if ((jsonData[c])[16] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
+          console.log("worked fine", "fine fine");
           elInstance.setStyle(col, "background-color", "transparent");
           elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
           elInstance.setValueFromCoords(18, c, 2, true);
