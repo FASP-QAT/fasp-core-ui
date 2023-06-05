@@ -20,7 +20,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         super(props);
         this.state = {
             budgetListAll: [],
-            shipmentQtyChangedFlag: 0
+            shipmentQtyChangedFlag: 0,
+            originalShipmentIdForPopup:""
         }
         this.loadedShipments = this.loadedShipments.bind(this)
         this.loadedQtyCalculator = this.loadedQtyCalculator.bind(this)
@@ -461,7 +462,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 procurementAgentList: procurementAgentList,
                                                 procurementAgentListAll: procurementAgentListAll,
                                                 budgetList: budgetList,
-                                                shipmentStatusList: shipmentStatusList
+                                                shipmentStatusList: shipmentStatusList,
+                                                originalShipmentIdForPopup:""
                                             }, () => {
                                                 this.props.updateState("currencyList", currencyList);
                                                 this.props.updateState("dataSourceList", dataSourceList);
@@ -476,6 +478,28 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 jexcel.destroy(document.getElementById("shipmentsDetailsTable"), true);
 
                                             }
+                                            if (this.state.shipmentBatchInfoTableEl != undefined && this.state.shipmentBatchInfoTableEl != "") {
+                                              // elInstance.destroy();
+                                              document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
+                                              jexcel.destroy(document.getElementById("shipmentBatchInfoTable"), true);
+
+                                            }
+
+                                            if (this.state.shipmentDatesTableEl != undefined && this.state.shipmentDatesTableEl != "") {
+                                              document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
+                                              jexcel.destroy(document.getElementById("shipmentDatesTable"), true);
+                                            }
+
+                                            if (this.state.qtyCalculatorTableEl != undefined && this.state.qtyCalculatorTableEl != "") {
+                                              document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
+                                              jexcel.destroy(document.getElementById("qtyCalculatorTable"), true);
+                                            }
+
+                                            if (this.state.qtyCalculatorTableEl1 != undefined && this.state.qtyCalculatorTableEl1 != "") {
+                                              document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
+                                              jexcel.destroy(document.getElementById("qtyCalculatorTable1"), true);
+                                            }
+
                                             var data = [];
                                             var shipmentsArr = [];
                                             var shipmentEditable = true;
@@ -546,9 +570,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 //     erpVisible = true
                                                 // }
 
-                                                if (this.props.shipmentPage != "shipmentDataEntry" && shipmentList[i].erpFlag.toString() == "true") {
-                                                    shipmentEditable = false;
-                                                }
+                                                // if (this.props.shipmentPage != "shipmentDataEntry" && shipmentList[i].erpFlag.toString() == "true") {
+                                                //     shipmentEditable = false;
+                                                // }
                                                 this.setState({
                                                     shipmentEditable: shipmentEditable
                                                 })
@@ -627,7 +651,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data[38] = shipmentList[i].receivedDate != "" && shipmentList[i].receivedDate != null && shipmentList[i].receivedDate != undefined && shipmentList[i].receivedDate != "Invalid date" ? shipmentList[i].receivedDate : shipmentList[i].expectedDeliveryDate;//F
                                                 shipmentsArr.push(data);
                                             }
-                                            if (shipmentList.length == 0 && this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) {
+                                            if (shipmentList.length == 0 && ((this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) || this.props.shipmentPage == "supplyPlan"|| this.props.shipmentPage == "whatIf")) {
                                                 var data = [];
                                                 data[0] = true;
                                                 data[1] = false;
@@ -674,7 +698,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data: shipmentsArr,
                                                 columns: [
                                                     { type: 'checkbox', title: i18n.t('static.common.active'), width: 80, readOnly: !shipmentEditable },
-                                                    { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'text', visible: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? true : false, readOnly: true, title: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? i18n.t('static.supplyPlan.erpFlag') : "", width: 80, autoCasting: false },
+                                                    { type: ((this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2)) || this.props.shipmentPage != 'shipmentDataEntry') ? 'checkbox' : 'text', visible: ((this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2)) || this.props.shipmentPage != 'shipmentDataEntry') ? true : false, readOnly: true, title: ((this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2)) || this.props.shipmentPage != 'shipmentDataEntry') ? i18n.t('static.supplyPlan.erpFlag') : "", width: 80, autoCasting: false },
                                                     { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
                                                     {
                                                         type: 'text',
@@ -1316,7 +1340,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                             };
                                                                             var elVar = jexcel(document.getElementById("shipmentDatesTable"), options);
                                                                             this.el = elVar;
-                                                                            this.setState({ shipmentDatesTableEl: elVar });
+                                                                            this.setState({ shipmentDatesTableEl: elVar,originalShipmentIdForPopup:rowData[2] });
                                                                             this.props.updateState("loading", false);
                                                                         }.bind(this)
                                                                     }.bind(this)
@@ -1734,7 +1758,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var expiryDate = moment(expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
         var batchInfoListAll = this.props.items.programJson.batchInfoList;
         this.setState({
-            batchInfoListAll: batchInfoListAll
+            batchInfoListAll: batchInfoListAll,
+            originalShipmentIdForPopup:rowData[2]
         })
         if (document.getElementById("showShipmentBatchInfoButtonsDiv") != null) {
             document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'block';
@@ -1761,7 +1786,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var batchQtyTotalForPopup = 0;
         if (batchInfo != "") {
             batchInfo.map(item => {
-                batchQtyTotalForPopup += item.shipmentQty
+                batchQtyTotalForPopup += Number(item.shipmentQty)
             })
         }
         this.props.updateState("shipmentQtyTotalForPopup", rowData[12]);
@@ -2643,7 +2668,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.props.updateState("qtyCalculatorTableEl", "");
             this.setState({
                 qtyCalculatorTableEl: "",
-                qtyCalculatorTableEl1: ""
+                qtyCalculatorTableEl1: "",
+                originalShipmentIdForPopup:""
             })
             if (document.getElementById("showSaveQtyButtonDiv") != null) {
                 document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
@@ -2918,7 +2944,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.props.updateState("shipmentBatchInfoChangedFlag", 0);
             this.props.updateState("shipmentBatchInfoTableEl", "");
             this.setState({
-                shipmentBatchInfoTableEl: ""
+                shipmentBatchInfoTableEl: "",
+                originalShipmentIdForPopup:""
             })
             if (document.getElementById("showShipmentBatchInfoButtonsDiv") != null) {
                 document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
@@ -3328,7 +3355,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("shipmentDatesChangedFlag", 0);
             this.setState({
-                shipmentDatesTableEl: ""
+                shipmentDatesTableEl: "",
+                originalShipmentIdForPopup:""
             })
             if (document.getElementById("showSaveShipmentsDatesButtonsDiv") != null) {
                 document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
@@ -4388,7 +4416,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
             var elVar = jexcel(document.getElementById("qtyCalculatorTable"), options);
             this.el = elVar;
-            this.setState({ qtyCalculatorTableEl: elVar });
+            this.setState({ qtyCalculatorTableEl: elVar,originalShipmentIdForPopup:rowData[2] });
             if (unitsPerPalletEuro1 != 0 && unitsPerPalletEuro1 != null || unitsPerPalletEuro2 != 0 && unitsPerPalletEuro2 != null || moq != 0 && moq != null || unitsPerContainer != 0 && unitsPerContainer != null) {
                 var data1 = [];
                 var json1 = []
