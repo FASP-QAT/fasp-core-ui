@@ -3344,6 +3344,7 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMerge = function (instance) {
+    console.log("Worked");
     jExcelLoadedFunction(instance, 0);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
