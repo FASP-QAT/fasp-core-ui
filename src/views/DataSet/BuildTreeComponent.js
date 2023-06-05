@@ -7694,6 +7694,9 @@ export default class BuildTree extends Component {
                 this.setState({
                     treeId,
                     items: [],
+                    selectedScenario: '',
+                    selectedScenarioLabel: '',
+                    currentScenario: []
                 });
             }
             this.getTreeByTreeId(treeId);
