@@ -198,11 +198,11 @@ export default class InventoryTurns extends Component {
                 A.push(this.addDoubleQuoteToRowContent([(r.programName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => sortOrderList.includes(arr.productCategory.id) && arr.program.id == r.programId ).length, "", "", "", "", "", this.roundN1(r.inventoryTurns), this.roundN1(r.plannedInventoryTurns), this.roundN1(r.mape), this.roundN1(r.mse)]))
                         
                 {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 12 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN1(arr1.mse)]))          
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 12 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN1(arr1.mape), this.roundN1(arr1.mse)]))          
                 })}
 
                 {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => sortOrderList.includes(item.id) && arr.program.id == r.programId ).map(arr1 => {
-                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 12 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN(arr1.mape), this.roundN1(arr1.mse)]))  
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 12 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN(arr1.inventoryTurns), this.roundN(arr1.plannedInventoryTurns), this.roundN1(arr1.mape), this.roundN1(arr1.mse)]))  
                 })}
                 
             })}
@@ -286,10 +286,15 @@ export default class InventoryTurns extends Component {
 
                     doc.setDrawColor(0);
                     doc.setFillColor(0, 0, 0);
-                    doc.rect(doc.internal.pageSize.width / 8 + 180, this.state.CostOfInventoryInput.displayId == 1 ? 200 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 200 + this.state.puId.length*2 + this.state.programId.length*2, 15, 12, 'F');
+                    // doc.rect(doc.internal.pageSize.width / 8 + 180, this.state.CostOfInventoryInput.displayId == 1 ? 200 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 200 + this.state.puId.length*2 + this.state.programId.length*2, 15, 12, 'F');
+                    doc.setTextColor("#BA0C2F");
+                    doc.text("!", doc.internal.pageSize.width / 8 + 180, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
+                        align: 'left',
+                    });
 
+                    doc.setTextColor("#002f6c");
                     doc.text(i18n.t('static.inventoryTurns.months6'), doc.internal.pageSize.width / 8 + 200, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
-                        align: 'left'
+                        align: 'left',
                     })
                 }
 
@@ -356,7 +361,7 @@ export default class InventoryTurns extends Component {
                 0: { cellWidth: 170, halign: 'left'},
             },
             didParseCell: function (data) {
-                console.log("Hello ",data.cell.styles)
+                
                 if(data.section=="body" && data.column.index == 0){
                     if(data.cell.raw[0]!=" "){
                         data.cell.styles.cellPadding = {left: 30,right: 5, top: 5, bottom: 5};
@@ -376,8 +381,7 @@ export default class InventoryTurns extends Component {
                     if(data.cell.raw[0] == " "){
                         data.cell.styles.textColor = [186, 12, 47];
                         if(data.cell.raw[1] == undefined){
-                            data.cell.styles.font = "FontAwesome";
-                            data.cell.text = '';
+                            data.cell.text = "!";
                         }
                     }
                 }
