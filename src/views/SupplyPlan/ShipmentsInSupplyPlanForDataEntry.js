@@ -1828,7 +1828,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         var batchQtyTotalForPopup=0;
         if(batchInfo!=""){
         batchInfo.map(item=>{
-            batchQtyTotalForPopup+=item.shipmentQty
+            batchQtyTotalForPopup+=Number(item.shipmentQty)
         })
     }
         this.props.updateState("shipmentQtyTotalForPopup", rowData[12]);
