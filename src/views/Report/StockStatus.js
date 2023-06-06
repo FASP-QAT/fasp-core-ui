@@ -255,7 +255,7 @@ class StockStatus extends Component {
     i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
     i18n.t('static.report.actual').replaceAll(' ', '%20'),
     i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
-    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')),
+    (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')),
     i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
     i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
     i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
@@ -269,7 +269,7 @@ class StockStatus extends Component {
     this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
     (ele.shipmentInfo.map(item => {
       return (
-        item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code + " | " + (item.orderNo == null ? 'N/A' : item.orderNo) + " | " + (item.primeLineNo == null ? 'N/A' : item.primeLineNo)
+        item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code + " | " + (item.orderNo == null ? 'N/A' : item.orderNo) + "-" + (item.primeLineNo == null ? 'N/A' : item.primeLineNo) + " | " + (item.roNo == null ? 'N/A' : item.roNo) + "-" + (item.roPrimeLineNo == null ? 'N/A' : item.roPrimeLineNo)
       )
     }).join(' \n')).replaceAll(' ', '%20')
       , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na") : ele.maxStock != null ? this.roundN(ele.maxStock) : "", ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
@@ -302,7 +302,7 @@ class StockStatus extends Component {
         i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
         i18n.t('static.report.actual').replaceAll(' ', '%20'),
         i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
-        (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus').replaceAll(' ', '%20') + " | " + i18n.t('static.report.procurementAgentName') + " | " + i18n.t('static.mt.orderNoAndPrimeLineNo')),
+        (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus').replaceAll(' ', '%20') + " | " + i18n.t('static.report.procurementAgentName') + " | " + i18n.t('static.mt.orderNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')),
         i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
         i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
@@ -316,7 +316,7 @@ class StockStatus extends Component {
         item.data.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
         (ele.shipmentInfo.map(item1 => {
           return (
-            item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + " | " + (item1.orderNo == null ? 'N/A' : item1.orderNo) + " | " + (item1.primeLineNo == null ? 'N/A' : item1.primeLineNo)
+            item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + " | " + (item1.orderNo == null ? 'N/A' : item1.orderNo) + "-" + (item1.primeLineNo == null ? 'N/A' : item1.primeLineNo) + " | " + (item1.roNo == null ? 'N/A' : item1.roNo) + "-" + (item1.roPrimeLineNo == null ? 'N/A' : item1.roPrimeLineNo)
           )
         }).join(' \n')).replaceAll(' ', '%20')
           , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundN(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
@@ -539,7 +539,7 @@ class StockStatus extends Component {
       i18n.t('static.report.forecasted'),
       i18n.t('static.report.actual'),
       i18n.t('static.supplyPlan.qty'),
-      (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo'))),
+      (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo'))),
       i18n.t('static.supplyPlan.adj'),
       i18n.t('static.supplyplan.exipredStock'),
       i18n.t('static.supplyPlan.endingBalance'),
@@ -553,7 +553,7 @@ class StockStatus extends Component {
       this.state.stockStatusList.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty), this.formatter(ele.actualConsumptionQty), this.formatter(ele.shipmentQty),
       ele.shipmentInfo.map(item => {
         return (
-          item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code + " | " + (item.orderNo == null ? 'N/A' : item.orderNo) + " | " + (item.primeLineNo == null ? 'N/A' : item.primeLineNo))
+          item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code + " | " + (item.orderNo == null ? 'N/A' : item.orderNo) + "-" + (item.primeLineNo == null ? 'N/A' : item.primeLineNo)) + " | " + ((item.roNo == null ? 'N/A' : item.roNo) + "-" + (item.roPrimeLineNo == null ? 'N/A' : item.roPrimeLineNo))
       }).join(' \n')
         , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.planBasedOn == 1 ? ele.mos != null ? this.formatter(this.roundN(ele.mos)) : i18n.t("static.supplyPlanFormula.na") : (ele.maxStock != null ? this.formatter(this.roundN(ele.maxStock)) : ""), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
 
@@ -791,7 +791,7 @@ class StockStatus extends Component {
           item.data.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty), this.formatter(ele.actualConsumptionQty), this.formatter(ele.shipmentQty),
           ele.shipmentInfo.map(item1 => {
             return (
-              item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + " | " + (item1.orderNo == null ? 'N/A' : item1.orderNo) + " | " + (item1.primeLineNo == null ? 'N/A' : item1.primeLineNo))
+              item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + " | " + (item1.orderNo == null ? 'N/A' : item1.orderNo) + "-" + (item1.primeLineNo == null ? 'N/A' : item1.primeLineNo) + " | " + (item1.roNo == null ? 'N/A' : item1.roNo) + "-" + (item1.roPrimeLineNo == null ? 'N/A' : item1.roPrimeLineNo))
           }).join(' \n')
             , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.planBasedOn == 1 ? this.formatter(this.roundN(ele.mos)) : this.formatter(this.roundN(ele.maxStock)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
 
@@ -806,7 +806,7 @@ class StockStatus extends Component {
           i18n.t('static.report.forecasted'),
           i18n.t('static.report.actual'),
           i18n.t('static.supplyPlan.qty'),
-          (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo'))),
+          (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo'))),
           i18n.t('static.supplyPlan.adj'),
           i18n.t('static.supplyplan.exipredStock'),
           i18n.t('static.supplyPlan.endingBalance'),
@@ -1353,7 +1353,7 @@ class StockStatus extends Component {
                           }
                         }
                         data.push(json)
-                        console.log(json)
+                        console.log("jsjsjs", json)
                         if (month == this.state.rangeValue.to.month && from == to) {
                           this.setState({
                             stockStatusList: data,
@@ -3968,7 +3968,7 @@ class StockStatus extends Component {
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
                         <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
-                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')))}</th>
+                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')))}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
@@ -4002,7 +4002,7 @@ class StockStatus extends Component {
                             </td>
                             <td align="center"><table >
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code}   |    ${item.orderNo == null ? 'N/A' : item.orderNo}  |    ${item.primeLineNo == null ? 'N/A' : item.primeLineNo}`}</td></tr>)
+                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code}   |    ${item.orderNo == null ? 'N/A' : item.orderNo}   -   ${item.primeLineNo == null ? 'N/A' : item.primeLineNo}   |    ${item.roNo == null ? 'N/A' : item.roNo}   -   ${item.roPrimeLineNo == null ? 'N/A' : item.roPrimeLineNo}`}</td></tr>)
                                 //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
                               })}</table>
                             </td>
