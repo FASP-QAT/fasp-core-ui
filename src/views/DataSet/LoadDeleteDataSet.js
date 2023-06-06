@@ -165,12 +165,12 @@ class LoadDeleteDataSet extends Component {
     }
     checkNewerVersions(programs) {
         if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors()
-            // ProgramService.checkNewerVersions(programs)
-            //     .then(response => {
-            //         localStorage.removeItem("sesLatestProgram");
-            //         localStorage.setItem("sesLatestProgram", response.data);
-            //     })
+            AuthenticationService.setupAxiosInterceptors()
+            ProgramService.checkNewerVersions(programs)
+                .then(response => {
+                    localStorage.removeItem("sesLatestDataset");
+                    localStorage.setItem("sesLatestDataset", response.data);
+                })
         }
     }
     hideSecondComponent() {
@@ -822,209 +822,209 @@ class LoadDeleteDataSet extends Component {
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.loadDelDataset.loadDeleteDatasetSctionCancell'));
     }
 
-    deleteClicked() {
-        this.setState({ loading: true })
-        var programCheckboxes = document.getElementsByName("programCheckBox");
-        var versionCheckBox = document.getElementsByClassName("versionCheckBox");
-        var checkboxesChecked = [];
-        var programCheckedCount = 0;
-        var programInvalidCheckedCount = 0;
-        var count = 0;
+    // deleteClicked() {
+    //     this.setState({ loading: true })
+    //     var programCheckboxes = document.getElementsByName("programCheckBox");
+    //     var versionCheckBox = document.getElementsByClassName("versionCheckBox");
+    //     var checkboxesChecked = [];
+    //     var programCheckedCount = 0;
+    //     var programInvalidCheckedCount = 0;
+    //     var count = 0;
 
-        for (var i = 0; i < versionCheckBox.length; i++) {
-            if (versionCheckBox[i].checked) {
-                programCheckedCount = programCheckedCount + 1;
-                count = count + 1;
-                var json = {
-                    programId: versionCheckBox[i].dataset.programId,
-                    versionId: parseInt(versionCheckBox[i].value)
-                }
-                checkboxesChecked = checkboxesChecked.concat([json]);
-            }
-        }
-        // loop over them all
-        for (var i = 0; i < programCheckboxes.length; i++) {
-            // And stick the checked ones onto an array...
-            if (programCheckboxes[i].checked) {
-                programCheckedCount = programCheckedCount + 1;
-                var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
-                // loop over them all
-                if (versionCheckboxes.length > 0) {
-                    var count1 = 0;
-                    for (var j = 0; j < versionCheckboxes.length; j++) {
-                        // And stick the checked ones onto an array...
-                        if (versionCheckboxes[j].checked) {
-                            count = count + 1;
-                            count1 = count1 + 1;
-                            var json = {
-                                programId: programCheckboxes[i].value,
-                                versionId: parseInt(versionCheckboxes[j].value)
-                            }
-                            // checkboxesChecked = checkboxesChecked.concat([json]);
-                        }
+    //     for (var i = 0; i < versionCheckBox.length; i++) {
+    //         if (versionCheckBox[i].checked) {
+    //             programCheckedCount = programCheckedCount + 1;
+    //             count = count + 1;
+    //             var json = {
+    //                 programId: versionCheckBox[i].dataset.programId,
+    //                 versionId: parseInt(versionCheckBox[i].value)
+    //             }
+    //             checkboxesChecked = checkboxesChecked.concat([json]);
+    //         }
+    //     }
+    //     // loop over them all
+    //     for (var i = 0; i < programCheckboxes.length; i++) {
+    //         // And stick the checked ones onto an array...
+    //         if (programCheckboxes[i].checked) {
+    //             programCheckedCount = programCheckedCount + 1;
+    //             var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
+    //             // loop over them all
+    //             if (versionCheckboxes.length > 0) {
+    //                 var count1 = 0;
+    //                 for (var j = 0; j < versionCheckboxes.length; j++) {
+    //                     // And stick the checked ones onto an array...
+    //                     if (versionCheckboxes[j].checked) {
+    //                         count = count + 1;
+    //                         count1 = count1 + 1;
+    //                         var json = {
+    //                             programId: programCheckboxes[i].value,
+    //                             versionId: parseInt(versionCheckboxes[j].value)
+    //                         }
+    //                         // checkboxesChecked = checkboxesChecked.concat([json]);
+    //                     }
 
-                    }
-                    if (count1 == 0) {
-                        var programList = this.state.programList.filter(c => c.programId == programCheckboxes[i].value);
-                        for (var p = 0; p < programList.length; p++) {
-                            var json = {
-                                programId: programCheckboxes[i].value,
-                                versionId: programList[p].versionId
-                            }
-                            checkboxesChecked = checkboxesChecked.concat([json]);
-                        }
-                    }
+    //                 }
+    //                 if (count1 == 0) {
+    //                     var programList = this.state.programList.filter(c => c.programId == programCheckboxes[i].value);
+    //                     for (var p = 0; p < programList.length; p++) {
+    //                         var json = {
+    //                             programId: programCheckboxes[i].value,
+    //                             versionId: programList[p].versionId
+    //                         }
+    //                         checkboxesChecked = checkboxesChecked.concat([json]);
+    //                     }
+    //                 }
 
-                }
-            } else {
-                var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
-                // loop over them all
-                if (versionCheckboxes.length > 0) {
-                    // var count = 0;
-                    for (var j = 0; j < versionCheckboxes.length; j++) {
-                        // And stick the checked ones onto an array...
-                        if (versionCheckboxes[j].checked) {
-                            count = count + 1;
-                        }
-                    }
-                    if (count > 0) {
-                        programInvalidCheckedCount = programInvalidCheckedCount + 1;
-                    }
-                }
-            }
-        }
-        if (programCheckedCount == 0) {
-            this.setState({
-                message: i18n.t('static.program.errorSelectAtleastOneProgram'),
-                loading: false, color: "#BA0C2F"
-            },
-                () => {
-                    this.hideFirstComponent();
-                })
-        } else {
-            console.log("Checkbox checked+++", checkboxesChecked);
-            var listOfProgramVersion = checkboxesChecked;
-            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-            var userId = userBytes.toString(CryptoJS.enc.Utf8);
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['datasetData'], 'readwrite');
-                var programTransaction = transaction.objectStore('datasetData');
-                for (var i = 0; i < listOfProgramVersion.length; i++) {
-                    var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                    programTransaction.delete(id);
-                }
-                transaction.oncomplete = function (event) {
-                    var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                    var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
-                    for (var i = 0; i < listOfProgramVersion.length; i++) {
-                        var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                        programTransaction1.delete(id);
-                    }
-                    transaction1.oncomplete = function (event) {
-                        var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
-                        var programTransaction2 = transaction2.objectStore('datasetDetails');
-                        for (var i = 0; i < listOfProgramVersion.length; i++) {
-                            var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                            programTransaction2.delete(id);
-                        }
-                        transaction2.oncomplete = function (event) {
-                            // this.setState({
-                            //     loading: false,
-                            //     message: i18n.t("static.program.deleteLocalProgramSuccess"),
-                            //     color: 'green'
-                            // }, () => {
-                            //     this.hideFirstComponent()
-                            // })
-                            this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.deleteLocalProgramSuccess'))
-                            window.location.reload();
-                        }.bind(this)
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        }
-    }
+    //             }
+    //         } else {
+    //             var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
+    //             // loop over them all
+    //             if (versionCheckboxes.length > 0) {
+    //                 // var count = 0;
+    //                 for (var j = 0; j < versionCheckboxes.length; j++) {
+    //                     // And stick the checked ones onto an array...
+    //                     if (versionCheckboxes[j].checked) {
+    //                         count = count + 1;
+    //                     }
+    //                 }
+    //                 if (count > 0) {
+    //                     programInvalidCheckedCount = programInvalidCheckedCount + 1;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     if (programCheckedCount == 0) {
+    //         this.setState({
+    //             message: i18n.t('static.program.errorSelectAtleastOneProgram'),
+    //             loading: false, color: "#BA0C2F"
+    //         },
+    //             () => {
+    //                 this.hideFirstComponent();
+    //             })
+    //     } else {
+    //         console.log("Checkbox checked+++", checkboxesChecked);
+    //         var listOfProgramVersion = checkboxesChecked;
+    //         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+    //         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+    //         var db1;
+    //         getDatabase();
+    //         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    //         openRequest.onerror = function (event) {
+    //         }.bind(this);
+    //         openRequest.onsuccess = function (e) {
+    //             db1 = e.target.result;
+    //             var transaction = db1.transaction(['datasetData'], 'readwrite');
+    //             var programTransaction = transaction.objectStore('datasetData');
+    //             for (var i = 0; i < listOfProgramVersion.length; i++) {
+    //                 var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+    //                 programTransaction.delete(id);
+    //             }
+    //             transaction.oncomplete = function (event) {
+    //                 // var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+    //                 // var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
+    //                 // for (var i = 0; i < listOfProgramVersion.length; i++) {
+    //                 //     var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+    //                 //     programTransaction1.delete(id);
+    //                 // }
+    //                 // transaction1.oncomplete = function (event) {
+    //                     var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
+    //                     var programTransaction2 = transaction2.objectStore('datasetDetails');
+    //                     for (var i = 0; i < listOfProgramVersion.length; i++) {
+    //                         var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+    //                         programTransaction2.delete(id);
+    //                     }
+    //                     transaction2.oncomplete = function (event) {
+    //                         // this.setState({
+    //                         //     loading: false,
+    //                         //     message: i18n.t("static.program.deleteLocalProgramSuccess"),
+    //                         //     color: 'green'
+    //                         // }, () => {
+    //                         //     this.hideFirstComponent()
+    //                         // })
+    //                         this.props.history.push(`/dataset/loadDeleteDataSet/` + i18n.t('static.program.deleteLocalProgramSuccess'))
+    //                         window.location.reload();
+    //                     }.bind(this)
+    //                 }.bind(this)
+    //             }.bind(this)
+    //         // }.bind(this)
+    //     }
+    // }
 
-    deleteLocalVersionUsingProgramId(programId) {
-        confirmAlert({
-            title: i18n.t('static.program.confirm'),
-            message: i18n.t('static.loadDelDataset.deleteAllOlderVersion'),
-            buttons: [
-                {
-                    label: i18n.t('static.program.yes'),
-                    onClick: () => {
-                        this.setState({
-                            loading: true
-                        })
-                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                        var versionId = Math.max.apply(Math, this.state.prgList.filter(c => c.program.id == programId)[0].versionList.map(function (o) { return o.versionId; }))
-                        var listOfProgramVersion = this.state.programList.filter(c => c.programId == programId && c.versionId != versionId);
-                        var db1;
-                        getDatabase();
-                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        openRequest.onerror = function (event) {
-                        }.bind(this);
-                        openRequest.onsuccess = function (e) {
-                            db1 = e.target.result;
-                            var transaction = db1.transaction(['datasetData'], 'readwrite');
-                            var programTransaction = transaction.objectStore('datasetData');
-                            for (var i = 0; i < listOfProgramVersion.length; i++) {
-                                var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                                programTransaction.delete(id);
-                            }
-                            transaction.oncomplete = function (event) {
-                                var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
-                                for (var i = 0; i < listOfProgramVersion.length; i++) {
-                                    var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                                    programTransaction1.delete(id);
-                                }
-                                transaction1.oncomplete = function (event) {
-                                    var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
-                                    var programTransaction2 = transaction2.objectStore('datasetDetails');
-                                    for (var i = 0; i < listOfProgramVersion.length; i++) {
-                                        var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
-                                        programTransaction2.delete(id);
-                                    }
-                                    transaction2.oncomplete = function (event) {
-                                        this.setState({
-                                            loading: false,
-                                            message: i18n.t('static.loadDelDataset.datasetDeleteSuccessfully'),
-                                            color: 'green'
-                                        }, () => {
-                                            this.hideFirstComponent()
-                                        })
-                                        this.getPrograms();
-                                        this.getLocalPrograms();
-                                    }.bind(this)
-                                }.bind(this)
-                            }.bind(this)
-                        }.bind(this)
-                    }
-                }, {
-                    label: i18n.t('static.program.no'),
-                    onClick: () => {
-                        this.setState({
-                            message: i18n.t('static.actionCancelled'), loading: false, color: "#BA0C2F"
-                        })
-                        this.setState({ loading: false, color: "#BA0C2F" }, () => {
-                            this.hideFirstComponent()
-                        })
-                        this.props.history.push(`/dataSet/loadDeleteDataSet`)
-                    }
-                }
-            ]
-        })
+    // deleteLocalVersionUsingProgramId(programId) {
+    //     confirmAlert({
+    //         title: i18n.t('static.program.confirm'),
+    //         message: i18n.t('static.loadDelDataset.deleteAllOlderVersion'),
+    //         buttons: [
+    //             {
+    //                 label: i18n.t('static.program.yes'),
+    //                 onClick: () => {
+    //                     this.setState({
+    //                         loading: true
+    //                     })
+    //                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+    //                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
+    //                     var versionId = Math.max.apply(Math, this.state.prgList.filter(c => c.program.id == programId)[0].versionList.map(function (o) { return o.versionId; }))
+    //                     var listOfProgramVersion = this.state.programList.filter(c => c.programId == programId && c.versionId != versionId);
+    //                     var db1;
+    //                     getDatabase();
+    //                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    //                     openRequest.onerror = function (event) {
+    //                     }.bind(this);
+    //                     openRequest.onsuccess = function (e) {
+    //                         db1 = e.target.result;
+    //                         var transaction = db1.transaction(['datasetData'], 'readwrite');
+    //                         var programTransaction = transaction.objectStore('datasetData');
+    //                         for (var i = 0; i < listOfProgramVersion.length; i++) {
+    //                             var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+    //                             programTransaction.delete(id);
+    //                         }
+    //                         transaction.oncomplete = function (event) {
+    //                             // var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+    //                             // var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
+    //                             // for (var i = 0; i < listOfProgramVersion.length; i++) {
+    //                             //     var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+    //                             //     programTransaction1.delete(id);
+    //                             // }
+    //                             // transaction1.oncomplete = function (event) {
+    //                                 var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
+    //                                 var programTransaction2 = transaction2.objectStore('datasetDetails');
+    //                                 for (var i = 0; i < listOfProgramVersion.length; i++) {
+    //                                     var id = listOfProgramVersion[i].programId + "_v" + listOfProgramVersion[i].versionId + "_uId_" + userId;
+    //                                     programTransaction2.delete(id);
+    //                                 }
+    //                                 transaction2.oncomplete = function (event) {
+    //                                     this.setState({
+    //                                         loading: false,
+    //                                         message: i18n.t('static.loadDelDataset.datasetDeleteSuccessfully'),
+    //                                         color: 'green'
+    //                                     }, () => {
+    //                                         this.hideFirstComponent()
+    //                                     })
+    //                                     this.getPrograms();
+    //                                     this.getLocalPrograms();
+    //                                 }.bind(this)
+    //                             }.bind(this)
+    //                         }.bind(this)
+    //                     // }.bind(this)
+    //                 }
+    //             }, {
+    //                 label: i18n.t('static.program.no'),
+    //                 onClick: () => {
+    //                     this.setState({
+    //                         message: i18n.t('static.actionCancelled'), loading: false, color: "#BA0C2F"
+    //                     })
+    //                     this.setState({ loading: false, color: "#BA0C2F" }, () => {
+    //                         this.hideFirstComponent()
+    //                     })
+    //                     this.props.history.push(`/dataSet/loadDeleteDataSet`)
+    //                 }
+    //             }
+    //         ]
+    //     })
 
 
 
-    }
+    // }
 
     deleteProgramById(id, i, length) {
         console.log("deleteC---------->4 ", id);
@@ -1039,10 +1039,10 @@ class LoadDeleteDataSet extends Component {
             var programTransaction = transaction.objectStore('datasetData');
             var deleteRequest = programTransaction.delete(id);
             deleteRequest.onsuccess = function (event) {
-                var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
-                var deleteRequest1 = programTransaction1.delete(id);
-                deleteRequest1.onsuccess = function (event) {
+                // var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                // var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
+                // var deleteRequest1 = programTransaction1.delete(id);
+                // deleteRequest1.onsuccess = function (event) {
                     var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                     var programTransaction2 = transaction2.objectStore('datasetDetails');
                     var deleteRequest2 = programTransaction2.delete(id);
@@ -1064,7 +1064,7 @@ class LoadDeleteDataSet extends Component {
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
-        }.bind(this)
+        // }.bind(this)
     }
 
     deleteCleanUpIcon(programId) {
@@ -1155,10 +1155,10 @@ class LoadDeleteDataSet extends Component {
                             var programTransaction = transaction.objectStore('datasetData');
                             var deleteRequest = programTransaction.delete(id);
                             deleteRequest.onsuccess = function (event) {
-                                var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
-                                var deleteRequest1 = programTransaction1.delete(id);
-                                deleteRequest1.onsuccess = function (event) {
+                                // var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                // var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
+                                // var deleteRequest1 = programTransaction1.delete(id);
+                                // deleteRequest1.onsuccess = function (event) {
                                     var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                                     var programTransaction2 = transaction2.objectStore('datasetDetails');
                                     var deleteRequest2 = programTransaction2.delete(id);
@@ -1176,7 +1176,7 @@ class LoadDeleteDataSet extends Component {
                                     }.bind(this)
                                 }.bind(this)
                             }.bind(this)
-                        }.bind(this)
+                        // }.bind(this)
                     }
                 }, {
                     label: i18n.t('static.program.no'),
@@ -1365,13 +1365,13 @@ class LoadDeleteDataSet extends Component {
                                         deleteDatasetOs.delete(id);
                                     }
                                     deleteDatasetTransaction.oncomplete = function (event) {
-                                        var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                        var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
-                                        for (var i = 0; i < versionsThatNeedsToBeDeleted.length; i++) {
-                                            var id = versionsThatNeedsToBeDeleted[i];
-                                            programTransaction1.delete(id);
-                                        }
-                                        transaction1.oncomplete = function (event) {
+                                        // var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                        // var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
+                                        // for (var i = 0; i < versionsThatNeedsToBeDeleted.length; i++) {
+                                        //     var id = versionsThatNeedsToBeDeleted[i];
+                                        //     programTransaction1.delete(id);
+                                        // }
+                                        // transaction1.oncomplete = function (event) {
                                             var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                                             var programTransaction2 = transaction2.objectStore('datasetDetails');
                                             for (var i = 0; i < versionsThatNeedsToBeDeleted.length; i++) {
@@ -1408,32 +1408,32 @@ class LoadDeleteDataSet extends Component {
 
                                                 }
                                                 transactionForSavingData.oncomplete = function (event) {
-                                                    var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                                    var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
-                                                    var programIds = []
-                                                    for (var r = 0; r < json.length; r++) {
-                                                        var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
-                                                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                                        var version = json[r].currentVersion.versionId;
-                                                        if (version == -1) {
-                                                            version = json[r].currentVersion.versionId
-                                                        }
-                                                        var item = {
-                                                            id: json[r].programId + "_v" + version + "_uId_" + userId,
-                                                            programId: json[r].programId,
-                                                            version: version,
-                                                            programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                                            programData: encryptedText.toString(),
-                                                            userId: userId
-                                                        };
-                                                        programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                        var putRequest = downloadedProgramSaveData.put(item);
+                                                    // var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                                    // var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
+                                                    // var programIds = []
+                                                    // for (var r = 0; r < json.length; r++) {
+                                                    //     var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                                    //     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                    //     var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                                    //     var version = json[r].currentVersion.versionId;
+                                                    //     if (version == -1) {
+                                                    //         version = json[r].currentVersion.versionId
+                                                    //     }
+                                                    //     var item = {
+                                                    //         id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                                    //         programId: json[r].programId,
+                                                    //         version: version,
+                                                    //         programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                                    //         programData: encryptedText.toString(),
+                                                    //         userId: userId
+                                                    //     };
+                                                    //     programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                    //     var putRequest = downloadedProgramSaveData.put(item);
 
 
 
-                                                    }
-                                                    transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                                    // }
+                                                    // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                                         var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                                         var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
                                                         var programIds = []
@@ -1471,8 +1471,8 @@ class LoadDeleteDataSet extends Component {
                                                     }.bind(this)
                                                 }.bind(this)
                                             }.bind(this)
-                                        }.bind(this)
-                                    }.bind(this)
+                                        // }.bind(this)
+                                    // }.bind(this)
 
                                 }).catch(error => {
                                     this.setState({

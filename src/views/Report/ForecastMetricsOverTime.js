@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
 import moment, { version } from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -168,7 +168,7 @@ class ForcastMatrixOverTime extends Component {
   }
 
   dateFormatterCSV = value => {
-    return moment(value).format(DATE_FORMAT_CAP)
+    return moment(value).format(DATE_FORMAT_CAP_FOUR_DIGITS)
   }
   makeText = m => {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)

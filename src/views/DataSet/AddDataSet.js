@@ -249,8 +249,8 @@ export default class AddForecastProgram extends Component {
     }
 
     calculateForecastEndDate() {
-        let d1 = new Date(this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01');
-        let d2 = new Date(this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01');
+        let d1 = new Date(moment(new Date(this.state.singleValue1.year + '/' + this.state.singleValue1.month + '/01')).utc().format("YYYY-MM-DD"));
+        let d2 = new Date(moment(new Date(this.state.singleValue2.year + '/' + this.state.singleValue2.month + '/01')).utc().format("YYYY-MM-DD"));
         var months;
         months = (d2.getFullYear() - d1.getFullYear()) * 12;
         months += d2.getMonth() - d1.getMonth();
@@ -1260,7 +1260,7 @@ export default class AddForecastProgram extends Component {
 
                                                 <FormGroup>
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.forecastEnd')}<span class="red Reqasterisk">*</span></Label>
-                                                    <div className="controls edit">
+                                                    <div className="controls edit MonthPickerUpdateInfo">
                                                         <Picker
                                                             // ref="pickAMonth2"
                                                             ref={this.pickRange}

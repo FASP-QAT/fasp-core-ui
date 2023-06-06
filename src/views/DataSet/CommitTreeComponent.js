@@ -233,62 +233,71 @@ export default class CommitTreeComponent extends React.Component {
                     programId: programId
                 })
 
-                var db1;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                openRequest.onerror = function (event) {
-                    this.setState({
-                        message: i18n.t('static.program.errortext'),
-                        color: '#BA0C2F'
-                    })
-                    // this.hideFirstComponent()
-                }.bind(this);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-                    var programDataTransaction = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                    var programDataOs = programDataTransaction.objectStore('downloadedDatasetData');
-                    var programRequest = programDataOs.get(programId);
-                    programRequest.onsuccess = function (e) {
-                        var myResult1 = programRequest.result;
-                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult1.programData, SECRET_KEY);
-                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                        var datasetJson = JSON.parse(datasetData);
+                // var db1;
+                // getDatabase();
+                // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                // openRequest.onerror = function (event) {
+                //     this.setState({
+                //         message: i18n.t('static.program.errortext'),
+                //         color: '#BA0C2F'
+                //     })
+                //     // this.hideFirstComponent()
+                // }.bind(this);
+                // openRequest.onsuccess = function (e) {
+                //     db1 = e.target.result;
+                //     var programDataTransaction = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                //     var programDataOs = programDataTransaction.objectStore('downloadedDatasetData');
+                //     var programRequest = programDataOs.get(programId);
+                //     programRequest.onsuccess = function (e) {
+                //         var myResult1 = programRequest.result;
+                //         var datasetDataBytes = CryptoJS.AES.decrypt(myResult1.programData, SECRET_KEY);
+                //         var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                //         var datasetJson = JSON.parse(datasetData);
 
-                        let programData = myResult.filter(c => (c.id == programId));
-                        this.setState({
-                            programDataLocal: programData[0].datasetJson,
-                            programCode: programData[0].datasetJson.programCode,
-                            version: programData[0].version,
-                            pageName: i18n.t('static.button.commit'),
-                            programDataDownloaded: datasetJson,
-                            programName: programData[0].datasetJson.programCode + '~v' + programData[0].version + ' (local)',
-                            programNameOriginal: getLabelText(datasetJson.label, this.state.lang),
-                            forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
-                            forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
-                            notes: programData[0].datasetJson.currentVersion.notes
-                        })
-
-                        var programVersionJson = [];
-                        var json = {
-                            programId: programData[0].datasetJson.programId,
-                            versionId: '-1'
-                        }
-                        programVersionJson = programVersionJson.concat([json]);
-                        DatasetService.getAllDatasetData(programVersionJson)
-                            .then(response => {
-                                console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
-                                this.setState({
-                                    programDataServer: response.data[0],
-                                    showCompare: true,
-                                    comparedLatestVersion: response.data[0].currentVersion.versionId
-                                }, () => {
-                                    dataCheck(this, programData[0].datasetJson)
-                                })
+                let programData = myResult.filter(c => (c.id == programId));
+                this.setState({
+                    programDataLocal: programData[0].datasetJson,
+                    programCode: programData[0].datasetJson.programCode,
+                    version: programData[0].version,
+                    pageName: i18n.t('static.button.commit'),
+                    // programDataDownloaded: datasetJson,
+                    programName: programData[0].datasetJson.programCode + '~v' + programData[0].version + ' (local)',
+                    programNameOriginal: getLabelText(programData[0].datasetJson.label, this.state.lang),
+                    forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
+                    forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
+                    notes: programData[0].datasetJson.currentVersion.notes
+                })
+                AuthenticationService.setupAxiosInterceptors();
+                ProgramService.getLatestVersionForProgram((programData[0].datasetJson.programId)).then(response1 => {
+                    //   if (response1.status == 200) {
+                    var latestVersion = response1.data;
+                    var programVersionJson = [];
+                    var json = {
+                        programId: programData[0].datasetJson.programId,
+                        versionId: '-1'
+                    }
+                    programVersionJson = programVersionJson.concat([json]);
+                    if (latestVersion == programData[0].version) {
+                    } else {
+                        programVersionJson.push({ programId: programData[0].datasetJson.programId, versionId: programData[0].version });
+                    }
+                    DatasetService.getAllDatasetData(programVersionJson)
+                        .then(response => {
+                            console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
+                            this.setState({
+                                programDataServer: response.data[0],
+                                programDataDownloaded: response.data.length > 1 ? response.data[1] : response.data[0],
+                                showCompare: true,
+                                comparedLatestVersion: response.data[0].currentVersion.versionId
+                            }, () => {
+                                dataCheck(this, programData[0].datasetJson)
                             })
+                        })
+                })
 
 
-                    }.bind(this)
-                }.bind(this)
+                // }.bind(this)
+                // }.bind(this)
             } else {
                 this.setState({
                     loading: false,
@@ -437,11 +446,11 @@ export default class CommitTreeComponent extends React.Component {
                     var datasetRequest = datasetDataOs.delete(this.state.programId);
 
                     datasetDataTransaction.oncomplete = function (event) {
-                        var datasetDataTransaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                        var datasetDataOs1 = datasetDataTransaction1.objectStore('downloadedDatasetData');
-                        var datasetRequest1 = datasetDataOs1.delete(this.state.programId);
+                        // var datasetDataTransaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                        // var datasetDataOs1 = datasetDataTransaction1.objectStore('downloadedDatasetData');
+                        // var datasetRequest1 = datasetDataOs1.delete(this.state.programId);
 
-                        datasetDataTransaction1.oncomplete = function (event) {
+                        // datasetDataTransaction1.oncomplete = function (event) {
 
                             var datasetDataTransaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                             var datasetDataOs2 = datasetDataTransaction2.objectStore('datasetDetails');
@@ -474,28 +483,28 @@ export default class CommitTreeComponent extends React.Component {
 
                                 }
                                 transactionForSavingData.oncomplete = function (event) {
-                                    var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                    var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
-                                    for (var r = 0; r < json.length; r++) {
-                                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                        // var version = json[r].requestedProgramVersion;
-                                        // if (version == -1) {
-                                        //     version = json[r].currentVersion.versionId
-                                        // }
-                                        var version = json[r].currentVersion.versionId
-                                        var item = {
-                                            id: json[r].programId + "_v" + version + "_uId_" + userId,
-                                            programId: json[r].programId,
-                                            version: version,
-                                            programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                            programData: (CryptoJS.AES.encrypt(JSON.stringify((json[r])), SECRET_KEY)).toString(),
-                                            userId: userId
-                                        };
-                                        var putRequest = downloadedProgramSaveData.put(item);
+                                    // var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                    // var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
+                                    // for (var r = 0; r < json.length; r++) {
+                                    //     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                    //     var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                    //     // var version = json[r].requestedProgramVersion;
+                                    //     // if (version == -1) {
+                                    //     //     version = json[r].currentVersion.versionId
+                                    //     // }
+                                    //     var version = json[r].currentVersion.versionId
+                                    //     var item = {
+                                    //         id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                    //         programId: json[r].programId,
+                                    //         version: version,
+                                    //         programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                    //         programData: (CryptoJS.AES.encrypt(JSON.stringify((json[r])), SECRET_KEY)).toString(),
+                                    //         userId: userId
+                                    //     };
+                                    //     var putRequest = downloadedProgramSaveData.put(item);
 
-                                    }
-                                    transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                    // }
+                                    // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                         var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                         var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
                                         var programIds = []
@@ -521,8 +530,8 @@ export default class CommitTreeComponent extends React.Component {
                                 }.bind(this);
                             }.bind(this);
                         }.bind(this);
-                    }.bind(this);
-                }.bind(this);
+                    // }.bind(this);
+                // }.bind(this);
                 // }.bind(this);
             })
 
@@ -1201,7 +1210,7 @@ export default class CommitTreeComponent extends React.Component {
                             <ul>{consumption}</ul>
 
                             <span><b>3. {i18n.t('static.commitTree.treeForecast')}: </b>(<a href={"/#/dataSet/buildTree/tree/0/" + this.state.programId} target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
-                            <span>a. {i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
+                            <span>a. {this.state.includeOnlySelectedForecasts ? i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree') : i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
                             <ul>{pu}</ul>
 
                             <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}:</span><br />

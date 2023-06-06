@@ -57,7 +57,6 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from 'react-bootstrap-table-next';
 import imageHelp from '../../assets/img/help-icon.png';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -250,6 +249,7 @@ class ApplicationDashboard extends Component {
     this.previousProgramSlide = this.previousProgramSlide.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
+    this.checkNewerVersionsDataset = this.checkNewerVersionsDataset.bind(this);
     this.updateState = this.updateState.bind(this);
     this.getDataSetList = this.getDataSetList.bind(this);
     this.deleteProgram = this.deleteProgram.bind(this);
@@ -365,10 +365,10 @@ class ApplicationDashboard extends Component {
               var programTransaction = transaction.objectStore('datasetData');
               var deleteRequest = programTransaction.delete(id);
               deleteRequest.onsuccess = function (event) {
-                var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
-                var deleteRequest1 = programTransaction1.delete(id);
-                deleteRequest1.onsuccess = function (event) {
+                // var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                // var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
+                // var deleteRequest1 = programTransaction1.delete(id);
+                // deleteRequest1.onsuccess = function (event) {
                   var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                   var programTransaction2 = transaction2.objectStore('datasetDetails');
                   var deleteRequest2 = programTransaction2.delete(id);
@@ -386,7 +386,7 @@ class ApplicationDashboard extends Component {
                   }.bind(this)
                 }.bind(this)
               }.bind(this)
-            }.bind(this)
+            // }.bind(this)
           }
         }, {
           label: i18n.t('static.program.no'),
@@ -460,13 +460,26 @@ class ApplicationDashboard extends Component {
   }
   checkNewerVersions(programs) {
     console.log("T***going to call check newer versions dashboard---", programs)
-    if (isSiteOnline()) {
+    if (localStorage.getItem('sessionType') === 'Online') {
       // AuthenticationService.setupAxiosInterceptors()
       ProgramService.checkNewerVersions(programs)
         .then(response => {
           console.log("T***dashboard program response.data---", response.data);
           localStorage.removeItem("sesLatestProgram");
           localStorage.setItem("sesLatestProgram", response.data);
+        })
+    }
+  }
+
+  checkNewerVersionsDataset(programs) {
+    console.log("T***going to call check newer versions dashboard---", programs)
+    if (localStorage.getItem('sessionType') === 'Online') {
+      // AuthenticationService.setupAxiosInterceptors()
+      ProgramService.checkNewerVersions(programs)
+        .then(response => {
+          console.log("T***dashboard program response.data---", response.data);
+          localStorage.removeItem("sesLatestDataset");
+          localStorage.setItem("sesLatestDataset", response.data);
         })
     }
   }
@@ -581,9 +594,9 @@ class ApplicationDashboard extends Component {
         var filteredGetRequestList = myResult.filter(c => c.userId == userId);
         for (var i = 0; i < filteredGetRequestList.length; i++) {
 
-          var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+          var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
           var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-          var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+          var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
           var programJson1 = JSON.parse(programData);
 
@@ -606,7 +619,7 @@ class ApplicationDashboard extends Component {
         // this.setState({
         //     programs: proList
         // })
-        // this.checkNewerVersions(programList);
+        this.checkNewerVersionsDataset(datasetList);
         // if (this.props.updateState != undefined) {
         //     this.props.updateState(false);
         //     this.props.fetchData();
@@ -616,7 +629,7 @@ class ApplicationDashboard extends Component {
 
   }
   componentDidMount() {
-    if (isSiteOnline()) {
+    if (localStorage.getItem('sessionType') === 'Online') {
       if (this.state.id == 1) {
         DashboardService.applicationLevelDashboard()
           .then(response => {
