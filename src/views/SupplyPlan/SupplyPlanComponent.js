@@ -4780,7 +4780,8 @@ export default class SupplyPlanComponent extends React.Component {
             shipmentListUnFiltered: shipmentListUnFiltered
         })
         var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
-        shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate
+        shipmentList = shipmentList.filter(c => 
+            (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
             // && c.erpFlag == false 
             && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value
             // && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)
