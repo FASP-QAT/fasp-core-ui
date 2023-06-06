@@ -1072,7 +1072,8 @@ class EditSupplyPlanStatus extends Component {
                                             } else if (supplyPlanType == 'plannedErpShipments') {
                                                 shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                                             } else if (supplyPlanType == 'allShipments') {
-                                                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate
+                                                shipmentList = shipmentList.filter(c => 
+                                                    (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
                                                     // && c.erpFlag == false 
                                                     && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value
                                                     // && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)
@@ -2165,7 +2166,7 @@ class EditSupplyPlanStatus extends Component {
                             } else {
                                 openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: lastClosingBalance });
                                 consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
-                                shipmentsTotalData.push(0);
+                                shipmentsTotalData.push("");
                                 suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
                                 // manualShipmentsTotalData.push(0);
                                 deliveredShipmentsTotalData.push("");
