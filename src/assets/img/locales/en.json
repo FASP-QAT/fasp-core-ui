@@ -2267,7 +2267,7 @@
     "static.mt.linkColumn": "Link?",
     "static.commitVersion.sendLocalToServer": "Send local version to server",
     "static.importFromQATSupplyPlan.currentQATConsumption": "Current QAT Consumption",
-    "static.mt.orderNoAndPrimeLineNo": "Order No | Prime line No",
+    "static.mt.orderNoAndPrimeLineNo": "Order No - Prime line No",
     "static.monthlyForecast.GraphView": "For the graph view, there are 3 ways you can hide which products are being displayed:",
     "static.loadDelDataset.forForecastPeriod": "for forecast period",
     "static.supplyPlan.maxStockMos": "Max MOS",
@@ -3048,7 +3048,6 @@
     "static.inventoryTurns.noofplanningunits":"No. of PUs",
     "static.forecastValidation.noConsumptionExtrapolationNotesFound":"No consumption extrapolation notes found",
     "static.forecastValidation.consumptionExtrapolationNotes":"Consumption Extrapolation Notes",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.supplyPlanFormula.inventoryTurns1": "Inventory turns at lowest level (PU)",
     "static.supplyPlanFormula.inventoryTurns1L1": "Actual IT = Total Consumption for the last 12 months / Average Stock on hand over last 12 months",
     "static.supplyPlanFormula.inventoryTurns1L2": "Planned IT = Total Consumption over last 12 months / Average Stock during that period",
@@ -3077,6 +3076,7 @@
     "static.inventoryTurns.noofmonths":"No. of months in calculation",
     "static.inventoryTurns.months12":"Months less than 12 and greater than 6",
     "static.inventoryTurns.months6":"Months less than 6 (Insufficient data to generate reliable turns)",
-    "static.commit.consumptionnotesvalid": "Only letters, numbers and special characters are allowed. Please check for invalid characters."
-
+    "static.commit.consumptionnotesvalid": "Only letters, numbers and special characters are allowed. Please check for invalid characters.",
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.mt.roNoAndPrimeLineNo": "RO - Prime line No"
 }
