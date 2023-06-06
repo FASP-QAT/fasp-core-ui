@@ -3037,5 +3037,6 @@
     "static.forecastValidation.noConsumptionExtrapolationNotesFound":"No se han encontrado notas de extrapolación de consumo",
     "static.forecastValidation.consumptionExtrapolationNotes":"Notas de extrapolación de consumo",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.commit.consumptionnotesvalid": "Solo se permiten letras, números y caracteres especiales. Compruebe si hay caracteres no válidos."
+    "static.commit.consumptionnotesvalid": "Solo se permiten letras, números y caracteres especiales. Compruebe si hay caracteres no válidos.",
+    "static.mt.roNoAndPrimeLineNo": "RO - Línea principal No"
 }
