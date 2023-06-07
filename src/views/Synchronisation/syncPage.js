@@ -1,8 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 import { Formik } from 'formik';
-// import jexcel from 'jexcel-pro';
-// import "../../../node_modules/jexcel-pro/dist/jexcel.css";
-// import "../../../node_modules/jsuites/dist/jsuites.css";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -283,7 +280,7 @@ export default class syncPage extends Component {
       allowManualInsertColumn: false,
       allowDeleteRow: false,
       // tableOverflow: false,
-      editable: false,
+      // editable: false,
       onload: this.loadedResolveConflicts
     };
     var resolveConflict = jexcel(document.getElementById("resolveConflictsTable"), options);
@@ -478,8 +475,6 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsInventory = function (instance) {
-    console.log("loadedResolveConflictsInventory");
-
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -793,7 +788,6 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsShipment = function (instance) {
-    console.log("loadedResolveConflictsShipment");
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -915,7 +909,6 @@ export default class syncPage extends Component {
 
 
   loadedResolveConflictsProblem = function (instance) {
-    console.log("loadedResolveConflictsProblem");
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -2305,7 +2298,7 @@ export default class syncPage extends Component {
                                               allowInsertColumn: false,
                                               allowManualInsertColumn: false,
                                               allowDeleteRow: false,
-                                              editable: false,
+                                              // editable: false,
                                               onload: this.loadedFunctionForMerge,
                                               // text: {
                                               //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -3348,12 +3341,10 @@ export default class syncPage extends Component {
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     elInstance.options.editable = true;
-    console.log("worked", "workkkeedd" , instance.worksheets[0]);
     for (var c = 0; c < jsonData.length; c++) {
       if ((jsonData[c])[16] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
-          console.log("worked fine", "fine fine");
           elInstance.setStyle(col, "background-color", "transparent");
           elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
           elInstance.setValueFromCoords(18, c, 2, true);
@@ -3390,8 +3381,6 @@ export default class syncPage extends Component {
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 3, true);
               (jsonData[c])[18] = 3;
-              console.log("mergedVersionConsumption12", LOCAL_VERSION_COLOUR)
-
             } else if ((jsonData[c])[17] != "" && latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               console.log("mergedVersionConsumption12", LOCAL_VERSION_COLOUR)
@@ -4276,6 +4265,9 @@ export default class syncPage extends Component {
     }
   }
 
+
+  
+
   tabPane() {
     return (
       <>
@@ -4284,7 +4276,7 @@ export default class syncPage extends Component {
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0 pr-lg-0" id="realmDiv">
                 <div className="table-responsive consumptionDataEntryTable">
-                  <div id="mergedVersionConsumption" />
+                  <div style={{width: '100%'}} id="mergedVersionConsumption" />
                 </div>
               </Col>
             </Col>
@@ -4295,7 +4287,7 @@ export default class syncPage extends Component {
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0 pr-lg-0" id="realmDiv">
                 <div className="table-responsive RemoveStriped consumptionDataEntryTable">
-                  <div id="mergedVersionInventory" />
+                  <div style={{width: '100%'}} id="mergedVersionInventory" />
                 </div>
               </Col>
             </Col>
@@ -4306,7 +4298,7 @@ export default class syncPage extends Component {
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0 pr-lg-0" id="realmDiv">
                 <div className="table-responsive RemoveStriped consumptionDataEntryTable">
-                  <div id="mergedVersionShipment" />
+                  <div style={{width: '100%'}} id="mergedVersionShipment" />
                 </div>
               </Col>
             </Col>
@@ -4318,7 +4310,7 @@ export default class syncPage extends Component {
               <Col md="12" id="realmDiv">
                 <div><h5 style={{ color: "red" }}>{this.state.shipmentAlreadyLinkedToOtherProgCount > 0 ? i18n.t("static.commitVersion.shipmentAlreadyLinkedToOtherProgram") : ""}</h5></div>
                 <div className="table-responsive RemoveStriped consumptionDataEntryTable rightClickColors ERPLinkTable" style={{ marginTop: "-30px" }}>
-                  <div id="mergedVersionShipmentLinked" />
+                  <div style={{width: '100%'}} id="mergedVersionShipmentLinked" />
                 </div>
               </Col>
             </Col>
@@ -4329,7 +4321,7 @@ export default class syncPage extends Component {
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Col md="12 pl-0" id="realmDiv">
                 <div className="table-responsive RemoveStriped consumptionDataEntryTable">
-                  <div id="mergedVersionProblemList" />
+                  <div style={{width: '100%'}} id="mergedVersionProblemList" />
                 </div>
               </Col>
             </Col>
@@ -4338,6 +4330,7 @@ export default class syncPage extends Component {
       </>
     );
   }
+  
 
   render = () => {
     jexcel.setDictionary({
@@ -4352,6 +4345,10 @@ export default class syncPage extends Component {
           <option key={i} value={item.id}>{getLabelText(item.label, this.state.lang)}</option>
         )
       }, this);
+
+      
+
+      
 
     return (
       <div className="animated fadeIn">
@@ -4599,9 +4596,9 @@ export default class syncPage extends Component {
                   </div>
                   <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                      <div className="align-items-center">
+                      <div class="align-items-center">
                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                        <div className="spinner-border blue ml-4" role="status">
+                        <div class="spinner-border blue ml-4" role="status">
                         </div>
                       </div>
                     </div>
@@ -4621,7 +4618,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflicts}
-          className={`modal-lg ${this.props.className} modalWidth`} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -4645,7 +4642,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflictsInventory}
-          className={`modal-lg ${this.props.className} modalWidth`} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeInventory()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -4668,7 +4665,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflictsShipment}
-          className={`modal-lg ${this.props.className} modalWidth`} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeShipment()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
@@ -4691,7 +4688,7 @@ export default class syncPage extends Component {
 
         {/* Resolve conflicts modal */}
         <Modal isOpen={this.state.conflictsProblem}
-          className={`modal-lg ${this.props.className} modalWidth`} style={{ display: this.state.loading ? "none" : "block" }}>
+          className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
           <ModalHeader toggle={() => this.toggleLargeProblem()} className="modalHeaderSupplyPlan">
             <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
             <ul className="legendcommitversion">
