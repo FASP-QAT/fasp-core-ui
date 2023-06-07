@@ -1221,24 +1221,20 @@ export default class InventoryTurns extends Component {
             <thead>
               <tr>
                 {/* <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th> */}
-                {this.state.costOfCountry.map(item => {
-                    return(
-                        <>
-                            <th className="FirstcolumInventry sticky-col first-col clone1" style={{zIndex:'4'}} ></th>
-                            <th className="supplyplanTdWidthInventry sticky-col first-col clone" align="left" style={{whiteSpace:'inherit', zIndex:'5'}} ></th>
-                            <th>{i18n.t('static.inventoryTurns.noofplanningunits')}</th>
-                            <th>{i18n.t('static.report.totconsumption')}</th>
-                            <th>{i18n.t('static.report.avergeStock')}</th>
-                            <th>{i18n.t('static.inventoryTurns.noofmonths')}</th>
-                            <th>{i18n.t('static.supplyPlan.reorderInterval')}</th>
-                            <th>{i18n.t('static.product.minMonthOfStock')}</th>
-                            <th>{i18n.t('static.inventoryTurns.actual')}</th>
-                            <th>{i18n.t('static.inventoryTurns.planned')}</th>
-                            <th>{i18n.t('static.extrapolation.mape')}</th>
-                            <th>{i18n.t('static.extrapolation.mse')}</th>
-                        </>
-                    )
-                })}
+                    <>
+                        <th className="FirstcolumInventry sticky-col first-col clone1" style={{zIndex:'4'}} ></th>
+                        <th className="supplyplanTdWidthInventry sticky-col first-col clone" align="left" style={{whiteSpace:'inherit', zIndex:'5'}} ></th>
+                        <th>{i18n.t('static.inventoryTurns.noofplanningunits')}</th>
+                        <th>{i18n.t('static.report.totconsumption')}</th>
+                        <th>{i18n.t('static.report.avergeStock')}</th>
+                        <th>{i18n.t('static.inventoryTurns.noofmonths')}</th>
+                        <th>{i18n.t('static.supplyPlan.reorderInterval')}</th>
+                        <th>{i18n.t('static.product.minMonthOfStock')}</th>
+                        <th>{i18n.t('static.inventoryTurns.actual')}</th>
+                        <th>{i18n.t('static.inventoryTurns.planned')}</th>
+                        <th>{i18n.t('static.extrapolation.mape')}</th>
+                        <th>{i18n.t('static.extrapolation.mse')}</th>
+                    </>
               </tr>
             </thead>
             <tbody>
