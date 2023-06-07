@@ -593,7 +593,11 @@ class Budgets extends Component {
                                     console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
                                     OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
                                 });
-                                console.log("B** order shipment budget ---", OrderedShipmentbudget);
+
+                                var remainingbudget = Math.floor(budgetList[l].budgetAmt - (OrderedShipmentbudget + plannedShipmentbudget))
+
+
+                                console.log("B** order shipment budget ---", remainingbudget);
                                 console.log("B** budget list l ==>", budgetList[l]);
                                 var json = {
                                     budget: { id: budgetList[l].budgetId, label: budgetList[l].label, code: budgetList[l].budgetCode },
@@ -1199,23 +1203,27 @@ class Budgets extends Component {
         let data1 = []
         let data2 = []
         let data3 = []
+        let data4 = []
+
         for (var i = 0; i < budgets.length; i++) {
-            console.log(this.state.selBudget.filter(c => c.budget.id = budgets[i].id))
+            console.log("data3===", this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
             // data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.orderedBudgetAmt)))
             // data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.plannedBudgetAmt)))
             // data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
 
             data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.orderedBudgetAmt)))
             data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.plannedBudgetAmt)))
-            data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
+            data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt)) > 0 ? (Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))) : 0))
+            data4 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt)) < 0 ? (Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))) : 0))
         }
+        console.log("data3==", data3, "===", data4)
 
         const bar = {
 
             labels: budgets.map(ele => getLabelText(ele.label, this.state.lang)),
             datasets: [
                 {
-                    label: i18n.t('static.budget.allocatedShipmentOrdered'),
+                    label: i18n.t('static.budget.allocatedShipmentPlanned'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#118b70',
@@ -1224,23 +1232,34 @@ class Budgets extends Component {
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: data1
+                    data: data2
                 },
                 {
-                    label: i18n.t('static.budget.allocatedShipmentPlanned'),
+                    label: i18n.t('static.budget.allocatedShipmentOrdered'),
                     type: 'horizontalBar',
                     stack: 1,
-                    backgroundColor: '#EDB944',
+                    backgroundColor: '#002f6c',
                     borderColor: 'rgba(179,181,198,1)',
                     pointBackgroundColor: 'rgba(179,181,198,1)',
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: data2
+                    data: data1
                 },
-
                 {
-                    label: i18n.t('static.report.remainingBudgetAmt'),
+                    label: i18n.t('static.report.overspentBudget'),
+                    type: 'horizontalBar',
+                    stack: 1,
+                    backgroundColor: '#BA0C2F',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: data4
+                },
+                {
+                    label: i18n.t('static.report.budgetRemaining'),
                     type: 'horizontalBar',
                     stack: 1,
                     backgroundColor: '#cfcdc9',
@@ -1629,7 +1648,6 @@ class Budgets extends Component {
 
             for (var j = 0; j < data.length; j++) {
                 var data1 = [];
-
                 data1[0] = getLabelText(data[j].budget.label, this.state.lang)
                 data1[1] = data[j].budget.code
                 data1[2] = data[j].fundingSource.code

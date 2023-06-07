@@ -1534,8 +1534,9 @@ export default class BuildTree extends Component {
         programData.treeList = treeData;
         console.log("program data>>> 2", programData);
         // alert("27---")
-
-        curTreeObj.tree.flatList = items;
+        if(this.state.selectedScenario!==""){
+            curTreeObj.tree.flatList = items;
+        }
         curTreeObj.scenarioList = this.state.scenarioList;
         var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
         treeData[findTreeIndex] = curTreeObj;
