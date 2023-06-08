@@ -7,7 +7,7 @@ import RealmService from '../../api/RealmService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { API_URL } from '../../Constants';
+import { ACTUAL_CONSUMPTION_MONTHS_IN_PAST, API_URL, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, INVENTORY_MONTHS_IN_PAST } from '../../Constants';
 
 
 const entityname = i18n.t('static.realm.realm');
@@ -19,7 +19,10 @@ const initialValues = {
     maxMosMaxGaurdrail: '',
     minQplTolerance: '',
     minQplToleranceCutOff: '',
-    maxQplTolerance: ''
+    maxQplTolerance: '',
+    actualConsumptionMonthsInPast: '',
+    forecastConsumptionMonthsInPast: '',
+    inventoryMonthsInPast: ''
 }
 
 const validationSchema = function (values) {
@@ -69,6 +72,24 @@ const validationSchema = function (values) {
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.validated.maxQplTolerance'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        actualConsumptionMonthsInPast: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionActualConsumption'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        forecastConsumptionMonthsInPast: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionForecastConsumption'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        inventoryMonthsInPast: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionInventory'))
             .min(0, i18n.t('static.program.validvaluetext')),
         // .min(0, i18n.t('static.program.validvaluetext')),
         /*monthInPastForAmc: Yup.number()
@@ -125,7 +146,10 @@ export default class AddRealmComponent extends Component {
                 maxMosMaxGaurdrail: '',
                 minQplTolerance: '',
                 minQplToleranceCutOff: '',
-                maxQplTolerance: ''
+                maxQplTolerance: '',
+                actualConsumptionMonthsInPast: ACTUAL_CONSUMPTION_MONTHS_IN_PAST,
+                forecastConsumptionMonthsInPast: FORECASTED_CONSUMPTION_MONTHS_IN_PAST,
+                inventoryMonthsInPast: INVENTORY_MONTHS_IN_PAST
             },
             message: ''
         }
@@ -162,6 +186,15 @@ export default class AddRealmComponent extends Component {
         if (event.target.name === "maxQplTolerance") {
             realm.maxQplTolerance = event.target.value
         }
+        if (event.target.name === "actualConsumptionMonthsInPast") {
+            realm.actualConsumptionMonthsInPast = event.target.value
+        }
+        if (event.target.name === "forecastConsumptionMonthsInPast") {
+            realm.forecastConsumptionMonthsInPast = event.target.value
+        }
+        if (event.target.name === "inventoryMonthsInPast") {
+            realm.inventoryMonthsInPast = event.target.value
+        }
         /*  if (event.target.name === "monthInPastForAmc") {
               realm.monthInPastForAmc = event.target.value
           }
@@ -190,7 +223,10 @@ export default class AddRealmComponent extends Component {
             maxMosMaxGaurdrail: true,
             minQplTolerance: true,
             minQplToleranceCutOff: true,
-            maxQplTolerance: true
+            maxQplTolerance: true,
+            actualConsumptionMonthsInPast: true,
+            forecastConsumptionMonthsInPast: true,
+            inventoryMonthsInPast: true
         }
         )
         this.validateForm(errors)
@@ -435,6 +471,52 @@ export default class AddRealmComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.maxQplTolerance}</FormFeedback>
                                                 </FormGroup>
+                                                <FormGroup>
+                                                    <Label>{i18n.t('static.realm.restrictionActualConsumption')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        // min="0"
+                                                        name="actualConsumptionMonthsInPast"
+                                                        id="actualConsumptionMonthsInPast"
+                                                        bsSize="sm"
+                                                        valid={!errors.actualConsumptionMonthsInPast && this.state.realm.actualConsumptionMonthsInPast != ''}
+                                                        invalid={touched.actualConsumptionMonthsInPast && !!errors.actualConsumptionMonthsInPast}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.actualConsumptionMonthsInPast}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.actualConsumptionMonthsInPast}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label>{i18n.t('static.realm.restrictionForecastConsumption')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        // min="0"
+                                                        name="forecastConsumptionMonthsInPast"
+                                                        id="forecastConsumptionMonthsInPast"
+                                                        bsSize="sm"
+                                                        valid={!errors.forecastConsumptionMonthsInPast && this.state.realm.forecastConsumptionMonthsInPast != ''}
+                                                        invalid={touched.forecastConsumptionMonthsInPast && !!errors.forecastConsumptionMonthsInPast}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.forecastConsumptionMonthsInPast}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.forecastConsumptionMonthsInPast}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label>{i18n.t('static.realm.restrictionInventory')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        // min="0"
+                                                        name="inventoryMonthsInPast"
+                                                        id="inventoryMonthsInPast"
+                                                        bsSize="sm"
+                                                        valid={!errors.inventoryMonthsInPast && this.state.realm.inventoryMonthsInPast != ''}
+                                                        invalid={touched.inventoryMonthsInPast && !!errors.inventoryMonthsInPast}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.inventoryMonthsInPast}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.inventoryMonthsInPast}</FormFeedback>
+                                                </FormGroup>
+
                                                 {/*  <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
                                                         <Input type="number"
@@ -560,6 +642,9 @@ export default class AddRealmComponent extends Component {
         realm.minQplTolerance = ''
         realm.minQplToleranceCutOff = ''
         realm.maxQplTolerance = ''
+        realm.actualConsumptionMonthsInPast = ''
+        realm.forecastConsumptionMonthsInPast = ''
+        realm.inventoryMonthsInPast = ''
         realm.defaultRealm = true
         this.setState(
             {
