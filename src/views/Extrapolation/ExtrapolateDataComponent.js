@@ -3426,7 +3426,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <div className="col-md-12 pl-lg-0">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
                                         </div>
-                                        <div className="col-md-12 pl-lg-1">
+                                        
+                                        <div className="row">
+                                        <div className="col-md-8 pl-lg-1">
                                             <FormGroup className="">
                                                 <div className="check inline  pl-lg-3 pt-lg-3">
                                                     <div>
@@ -3868,6 +3870,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
+                                        </div>
+                                        <div className="col-md-4">
+                                                    <input type="textarea"/>
+                                        </div>
+
                                         </div>
                                         {this.state.showData &&
                                         <div className=" col-md-4 pt-lg-0">
