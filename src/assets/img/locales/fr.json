@@ -3017,7 +3017,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-<<<<<<< HEAD
     "static.treeList.confirmAlert": "La version du serveur prendra un certain temps à se charger. Êtes-vous sûr de vouloir charger la version du serveur ?",
     "static.dataset.BranchTreeTemplate": "Modèle de branche",
     "static.planningUnitSetting.offlineMsg": "Remarque : l`utilisateur doit être en ligne pour ajouter de nouveaux produits",
@@ -3040,9 +3039,6 @@
     "static.forecastValidation.noConsumptionExtrapolationNotesFound":"Aucune note d`extrapolation de consommation trouvée",
     "static.forecastValidation.consumptionExtrapolationNotes":"Remarques sur l`extrapolation de la consommation",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.commit.consumptionnotesvalid": "Seuls les lettres, chiffres et caractères spéciaux sont autorisés. Veuillez vérifier les caractères non valides."
-=======
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.commit.consumptionnotesvalid": "Seuls les lettres, chiffres et caractères spéciaux sont autorisés. Veuillez vérifier les caractères non valides.",
     "static.mt.roNoAndPrimeLineNo": "RO - Ligne principale Non"
->>>>>>> QAT-2803
 }

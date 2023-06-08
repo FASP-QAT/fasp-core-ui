@@ -3078,5 +3078,18 @@
     "static.inventoryTurns.months6":"Months less than 6 (Insufficient data to generate reliable turns)",
     "static.commit.consumptionnotesvalid": "Only letters, spaces, numbers and special characters are allowed. Please check for invalid characters.",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.mt.roNoAndPrimeLineNo": "RO - Prime line No"
+    "static.mt.roNoAndPrimeLineNo": "RO - Prime line No",
+    "static.realm.restrictionActualConsumption":"Data entry restriction for Actual Consumption",
+    "static.realm.restrictionForecastConsumption":"Data entry restriction for Forecast Consumption",
+    "static.realm.restrictionInventory":"Data entry restriction for Inventory",
+    "static.validated.restrictionActualConsumption":"Please enter data entry restriction for Actual Consumption",
+    "static.validated.restrictionForecastConsumption":"Please enter data entry restriction for Forecast Consumption",
+    "static.validated.restrictionInventory":"Please enter data entry restriction for Inventory",
+    "static.sync.importantPleaseRead":"**IMPORTANT: PLEASE READ**",
+    "static.sync.clickOkTo":"Click `OK` to:",
+    "static.sync.deleteLocalVersion":"- DELETE local version {{programCodeLocal}}, and",
+    "static.sync.loseUnsubmittedChanges":"- Lose unsubmitted changes from local version, and",
+    "static.sync.loadLatestVersion":"- Load latest version {{programCodeServer}}",
+    "static.sync.clickCancelTo":"Click `Cancel` to:",
+    "static.sync.keepLocalVersion":"- Keep loaded version {{programCodeLocal}}"
 }
