@@ -5362,7 +5362,11 @@ export default class CreateTreeTemplate extends Component {
                 }
                 this.setState({
                     fullBranchTemplateList,
-                    branchTemplateList,
+                    branchTemplateList:branchTemplateList.sort(function (a, b) {
+                        a = getLabelText(a.label,this.state.lang).toLowerCase();
+                        b = getLabelText(b.label,this.state.lang).toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }.bind(this)),
                     isBranchTemplateModalOpen: true,
                     parentNodeIdForBranch: itemConfig.id,
                     nodeTypeParentNode: getLabelText(nodeType.label, this.state.lang),
