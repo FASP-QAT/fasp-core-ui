@@ -1157,6 +1157,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         return new Date(a.month) - new Date(b.month);
                     });
                 console.log("valList---->", valList)
+                if(valList.length>0){
                 this.setState({
                     minMonth: valList[0].month,
                     maxMonth: valList[valList.length - 1].month
@@ -1299,7 +1300,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                     }
                 });
 
-            } else {
+            }else{
+                console.log("Loader 4 Test123")
+                this.setState({ extrapolationLoader: false });
+            } 
+            }else {
                 console.log("Loader 4 Test123")
                 this.setState({ extrapolationLoader: false });
             }
