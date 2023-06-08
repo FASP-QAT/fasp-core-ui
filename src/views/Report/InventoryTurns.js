@@ -1210,6 +1210,9 @@ export default class InventoryTurns extends Component {
                 mode = num;
             }
         }
+        if(maxCount < 3){
+            mode = numbers.filter(arr => arr != null).length > 0 ? numbers.reduce((prev,curr,index) => prev + curr, 0) / (numbers.filter(arr => arr != null).length) : 0;
+        }
         
         return mode;
     }      
