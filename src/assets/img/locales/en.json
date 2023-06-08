@@ -3091,5 +3091,6 @@
     "static.sync.loseUnsubmittedChanges":"- Lose unsubmitted changes from local version, and",
     "static.sync.loadLatestVersion":"- Load latest version {{programCodeServer}}",
     "static.sync.clickCancelTo":"Click `Cancel` to:",
-    "static.sync.keepLocalVersion":"- Keep loaded version {{programCodeLocal}}"
+    "static.sync.keepLocalVersion":"- Keep loaded version {{programCodeLocal}}",
+    "static.supplyPlanFormula.inventoryTurnsNote2": "If maximum occurrence in calculation of MODE is less than 3 then system uses average for the calculation."
 }
