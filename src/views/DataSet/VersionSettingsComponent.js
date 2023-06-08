@@ -300,11 +300,17 @@ class VersionSettingsComponent extends Component {
 
                 var col = ("E").concat(parseInt(y) + 1);
                 value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var regex=/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/;
                 if (value != "") {
                     if (value.length > 1000) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.invalidStringLength'));
+                        valid = false;
+                    } else if(!regex.test(value)){
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.label.validData'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -507,11 +513,16 @@ class VersionSettingsComponent extends Component {
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
             value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var regex=/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/;
             if (value != "") {
                 if (value.length > 1000) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidStringLength'));
+                } else if(!regex.test(value)){
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.validData'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
