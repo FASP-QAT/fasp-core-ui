@@ -1693,6 +1693,12 @@ export default class syncPage extends Component {
       }.bind(this);
     }.bind(this);
     document.getElementById("detailsDiv").style.display = "none";
+
+    const rows = document.querySelectorAll('#mergedVersionConsumption tbody tr');
+    rows.forEach((row) => {
+      row.classList.add('custom_bg');
+    });
+    
   }
 
   checkLastModifiedDateForProgram(value) {
