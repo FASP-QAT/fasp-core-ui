@@ -127,7 +127,7 @@ class DefaultHeader extends Component {
             </NavItem>
           }
           {/* <Online> */}
-          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') && this.props.activeModule == 2 &&
+          {checkOnline === 'Online'  && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
