@@ -8,6 +8,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { ACTUAL_CONSUMPTION_MONTHS_IN_PAST, API_URL, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, INVENTORY_MONTHS_IN_PAST } from '../../Constants';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 
 const entityname = i18n.t('static.realm.realm');
@@ -147,9 +148,9 @@ export default class AddRealmComponent extends Component {
                 minQplTolerance: '',
                 minQplToleranceCutOff: '',
                 maxQplTolerance: '',
-                actualConsumptionMonthsInPast: ACTUAL_CONSUMPTION_MONTHS_IN_PAST,
-                forecastConsumptionMonthsInPast: FORECASTED_CONSUMPTION_MONTHS_IN_PAST,
-                inventoryMonthsInPast: INVENTORY_MONTHS_IN_PAST
+                actualConsumptionMonthsInPast: Number(ACTUAL_CONSUMPTION_MONTHS_IN_PAST),
+                forecastConsumptionMonthsInPast: Number(FORECASTED_CONSUMPTION_MONTHS_IN_PAST),
+                inventoryMonthsInPast: Number(INVENTORY_MONTHS_IN_PAST)
             },
             message: ''
         }
@@ -274,6 +275,21 @@ export default class AddRealmComponent extends Component {
                             </CardHeader> */}
                             <Formik
                                 initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    realmCode: this.state.realm.realmCode,
+                                    label: getLabelText(this.state.realm.label, this.state.lang),
+                                    minMosMinGaurdrail: this.state.realm.minMosMinGaurdrail,
+                                    minMosMaxGaurdrail: this.state.realm.minMosMaxGaurdrail,
+                                    maxMosMaxGaurdrail: this.state.realm.maxMosMaxGaurdrail,
+                                    defaultRealm: this.state.realm.defaultRealm,
+                                    minQplTolerance: this.state.realm.minQplTolerance,
+                                    minQplToleranceCutOff: this.state.realm.minQplToleranceCutOff,
+                                    maxQplTolerance: this.state.realm.maxQplTolerance,
+                                    actualConsumptionMonthsInPast: this.state.realm.actualConsumptionMonthsInPast,
+                                    forecastConsumptionMonthsInPast: this.state.realm.forecastConsumptionMonthsInPast,
+                                    inventoryMonthsInPast: this.state.realm.inventoryMonthsInPast,
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
