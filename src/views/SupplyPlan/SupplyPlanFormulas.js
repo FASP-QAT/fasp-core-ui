@@ -714,7 +714,8 @@ class SupplyPlanFormulas extends Component {
               </ListGroupItem>
               <div className="mt-2" >
                 <p><i>{i18n.t("static.supplyPlanFormula.inventoryTurnsNote")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurnsNote1")}</i></p>
+                  {i18n.t("static.supplyPlanFormula.inventoryTurnsNote1")}<br></br>
+                  {i18n.t("static.supplyPlanFormula.inventoryTurnsNote2")}</i></p>
               </div>
             </ListGroup>
           </ModalBody>
