@@ -2363,6 +2363,11 @@ export default class CreateTreeTemplate extends Component {
 
 
     getPayloadData(itemConfig, type) {
+        if(this.state.toggleArray.includes(itemConfig.id) && itemConfig.parent != null){
+            itemConfig.expanded = true;
+        }else{
+            itemConfig.expanded = false;
+        }
         var data = [];
         var totalValue = "";
         data = itemConfig.payload.nodeDataMap;
@@ -5283,7 +5288,7 @@ export default class CreateTreeTemplate extends Component {
             updatedItems = updatedItems.map(item => {
                 tempToggleArray.push(item.id);
                 if(item.parent != null){
-                    return { ...item, templateName: "contactTemplateMin", expanded: true };  
+                    return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };  
                 }
                 return item;
             });
@@ -5291,7 +5296,7 @@ export default class CreateTreeTemplate extends Component {
         }else{
             updatedItems = updatedItems.map(item => {
                 tempToggleArray = tempToggleArray.filter((e) => e != item.id)
-                return { ...item, templateName: "contactTemplate", expanded: false };                                        
+                return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
             });
             this.setState({toggleArray: tempToggleArray})
         }
@@ -6049,6 +6054,11 @@ export default class CreateTreeTemplate extends Component {
                 DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
                     console.log("my tree---", response.data);
                     var items = response.data.flatList;
+                    items = items.map(item => {
+                        if(item.payload.collapsed)
+                            return {...item, templateName: "contactTemplateMin", expanded: true} 
+                        return {...item, templateName: "contactTemplate", expanded: false} 
+                    })
                     var arr = [];
                     for (let i = 0; i < items.length; i++) {
 
@@ -6084,11 +6094,21 @@ export default class CreateTreeTemplate extends Component {
                         // arr.push(items[i]);
                     }
                     // this.generateMonthList
-
+                    var tempToggleObject = [];
+                    tempToggleObject = items.filter(item => 
+                        (item.payload.collapsed == true) 
+                    );
+                    let tempToggleList = tempToggleObject.map(item => item.id);
+                    // items = items.map(item => {
+                    //     if(tempToggleList.includes(item.id))
+                    //         return {...item, templateName: "contactTemplateMin", expanded: true} 
+                    //     return {...item, templateName: "contactTemplate", expanded: false} 
+                    // })
                     this.setState({
                         treeTemplate: response.data,
                         items,
                         tempItems: items,
+                        toggleArray: tempToggleList,
                         loading: true,
                     }, () => {
                         // console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
@@ -7341,7 +7361,7 @@ export default class CreateTreeTemplate extends Component {
                         updatedItems = updatedItems.map(item => {
                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString())) {
                                 tempToggleArray = tempToggleArray.filter((e) => e != item.id)
-                                return { ...item, templateName: "contactTemplate", expanded: false };                                        
+                                return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
                             }
                             return item;
                         });
@@ -7352,8 +7372,7 @@ export default class CreateTreeTemplate extends Component {
                         updatedItems = updatedItems.map(item => {
                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString())) {
                                 tempToggleArray.push(item.id);
-                                console.log("Here: "+tempToggleArray)
-                                return { ...item, templateName: "contactTemplateMin", expanded: true };
+                                return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };
                             }
                             return item;
                         });
@@ -10474,7 +10493,7 @@ export default class CreateTreeTemplate extends Component {
                                             updatedItems = updatedItems.map(item => {
                                                 if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
                                                     tempToggleArray = tempToggleArray.filter((e) => e != item.id)
-                                                    return { ...item, templateName: "contactTemplate", expanded: false };                                        
+                                                    return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
                                                 }
                                                 return item;
                                             });
@@ -10493,7 +10512,7 @@ export default class CreateTreeTemplate extends Component {
                                                 if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.parent != null) {
                                                     tempToggleArray.push(item.id);
                                                     console.log("Here: "+tempToggleArray)
-                                                    return { ...item, templateName: "contactTemplateMin", expanded: true };
+                                                    return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };
                                                 }
                                                 return item;
                                             });
@@ -10596,8 +10615,11 @@ export default class CreateTreeTemplate extends Component {
                                             }
                                             var json = {
                                                 id: item.id,
+                                                expanded: item.expanded,
+                                                templateName: item.expanded ? "contactTemplateMin" : "contactTemplate",
                                                 parent: item.parent,
                                                 payload: {
+                                                    collapsed: item.payload.collapsed,
                                                     nodeId: item.payload.nodeId,
                                                     nodeType: {
                                                         id: item.payload.nodeType.id
@@ -10664,6 +10686,11 @@ export default class CreateTreeTemplate extends Component {
                                                         if (response.status == 200) {
                                                             var items = response.data.flatList;
                                                             var arr = [];
+                                                            items = items.map(item => {
+                                                                if(item.payload.collapsed)
+                                                                    return {...item, templateName: "contactTemplateMin", expanded: true} 
+                                                                return {...item, templateName: "contactTemplate", expanded: false} 
+                                                            })
                                                             for (let i = 0; i < items.length; i++) {
 
                                                                 if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
@@ -10763,6 +10790,11 @@ export default class CreateTreeTemplate extends Component {
                                                     if (response.status == 200) {
                                                         console.log("message---", i18n.t(response.data.messageCode, { entityname }));
                                                         var items = response.data.flatList;
+                                                        items = items.map(item => {
+                                                            if(item.payload.collapsed)
+                                                                return {...item, templateName: "contactTemplateMin", expanded: true} 
+                                                            return {...item, templateName: "contactTemplate", expanded: false} 
+                                                        })
                                                         var arr = [];
                                                         for (let i = 0; i < items.length; i++) {
 
