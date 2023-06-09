@@ -4058,7 +4058,7 @@ class StockStatus extends Component {
 
 
                   </div>
-                  {this.state.show && this.state.stockStatusList.length > 0 &&
+                  {this.state.show && this.state.stockStatusList.length > 0 && ppu!=undefined &&
                     <>
                       <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                         <ul className="legendcommitversion list-group">
