@@ -966,8 +966,8 @@ export default class InventoryTurns extends Component {
                                 let level1AverageStock = tempData.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                 level1AverageStock = level1AverageStock / level1NoOfMonths;
                                 // let level1InventoryTurns = tempData.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / tempData.length;
-                                let level1InventoryTurns = this.mode(tempData.filter(arr => arr.inventoryTurns != null).map(arr => parseFloat(arr.inventoryTurns.toFixed(1))));
-                                let level1PlannedInventoryTurns = this.mode(tempData.map(arr => parseFloat(arr.plannedInventoryTurns.toFixed(1))));
+                                let level1InventoryTurns = this.mode(tempData.filter(arr => arr.inventoryTurns != null).map(arr => parseFloat(this.formatterSingle(arr.inventoryTurns))));
+                                let level1PlannedInventoryTurns = this.mode(tempData.map(arr => parseFloat(this.formatterSingle(arr.plannedInventoryTurns))));
                                 let level1Mape = tempData.filter(arr => arr.mape != null).length > 0 ? tempData.reduce((prev,curr,index) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length) : 0;
                                 let level1Mse = tempData.filter(arr => arr.mse != null).length > 0 ? tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / (tempData.filter(arr => arr.mse != null).length) : 0;
                                 level1Data.push({
@@ -989,8 +989,8 @@ export default class InventoryTurns extends Component {
                                     let level2AverageStock = temp.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                     level2AverageStock = level2AverageStock / level2NoOfMonths;
                                     // let level2InventoryTurns = temp.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / temp.length;
-                                    let level2InventoryTurns = this.mode(temp.filter(arr => arr.inventoryTurns != null).map(arr => parseFloat(arr.inventoryTurns.toFixed(1))));
-                                    let level2PlannedInventoryTurns = this.mode(temp.map(arr => parseFloat(arr.plannedInventoryTurns.toFixed(1))));
+                                    let level2InventoryTurns = this.mode(temp.filter(arr => arr.inventoryTurns != null).map(arr => parseFloat(this.formatterSingle(arr.inventoryTurns))));
+                                    let level2PlannedInventoryTurns = this.mode(temp.map(arr => parseFloat(this.formatterSingle(arr.plannedInventoryTurns))));
                                     let level2Mape = temp.filter(arr => arr.mape != null).length > 0 ? temp.reduce((prev,curr,index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length) : 0;
                                     let level2Mse = temp.filter(arr => arr.mse != null).length > 0 ? temp.reduce((prev,curr,index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length) : 0;
                                     level2Data.push({
@@ -1025,8 +1025,8 @@ export default class InventoryTurns extends Component {
                                 let level1AverageStock = tempData.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                 level1AverageStock = level1AverageStock / level1NoOfMonths;
                                 // let level1InventoryTurns = tempData.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / tempData.length;
-                                let level1InventoryTurns = this.mode(tempData.filter(arr => arr.inventoryTurns != null).map(arr => parseFloat(arr.inventoryTurns.toFixed(1))));
-                                let level1PlannedInventoryTurns = this.mode(tempData.map(arr => parseFloat(arr.plannedInventoryTurns.toFixed(1))));
+                                let level1InventoryTurns = this.mode(tempData.filter(arr => arr.inventoryTurns != null).map(arr => parseFloat(this.formatterSingle(arr.inventoryTurns))));
+                                let level1PlannedInventoryTurns = this.mode(tempData.map(arr => parseFloat(this.formatterSingle(arr.plannedInventoryTurns))));
                                 let level1Mape = tempData.filter(arr => arr.mape != null).length > 0 ? tempData.reduce((prev,curr,index) => prev + curr.mape, 0) / (tempData.filter(arr => arr.mape != null).length) : 0;
                                 let level1Mse = tempData.filter(arr => arr.mse != null).length > 0 ? tempData.reduce((prev,curr,index) => prev + curr.mse, 0) / tempData.filter(arr => arr.mse != null).length : 0;
                                 level1Data.push({
@@ -1048,8 +1048,8 @@ export default class InventoryTurns extends Component {
                                     let level2AverageStock = temp.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                     level2AverageStock = level2AverageStock / level2NoOfMonths;
                                     // let level2InventoryTurns = temp.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / temp.length;
-                                    let level2InventoryTurns = this.mode(temp.filter(arr => arr.inventoryTurns != null).map(arr => parseFloat(arr.inventoryTurns.toFixed(1))));
-                                    let level2PlannedInventoryTurns = this.mode(temp.map(arr => parseFloat(arr.plannedInventoryTurns.toFixed(1))));
+                                    let level2InventoryTurns = this.mode(temp.filter(arr => arr.inventoryTurns != null).map(arr => parseFloat(this.formatterSingle(arr.inventoryTurns1))));
+                                    let level2PlannedInventoryTurns = this.mode(temp.map(arr => parseFloat(this.formatterSingle(arr.plannedInventoryTurns))));
                                     let level2Mape = temp.filter(arr => arr.mape != null).length > 0 ? temp.reduce((prev,curr,index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length) : 0;
                                     let level2Mse = temp.filter(arr => arr.mse != null).length > 0 ? temp.reduce((prev,curr,index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length) : 0;
                                     level2Data.push({
