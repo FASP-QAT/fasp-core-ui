@@ -5,7 +5,7 @@ import ProgramService from "../../api/ProgramService";
 import { Formik } from 'formik';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import Setupprogram from '../../assets/img/SetupProgram.png'
-import { MAX_PROGRAM_CODE_LENGTH,PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED } from "../../Constants";
+import { MAX_PROGRAM_CODE_LENGTH,PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED, SHIPPED_TO_ARRIVED_ROAD, ROAD_FREIGHT_PERC } from "../../Constants";
 // import Setupprogram from '../../assets/img/setup-program-img.jpg'
 import step1 from '../../assets/img/1-step.png'
 import step2 from '../../assets/img/2-step.png'
@@ -24,6 +24,7 @@ const initialValuesSix = {
     userId: '',
     airFreightPerc: '',
     seaFreightPerc: '',
+    roadFreightPerc: ROAD_FREIGHT_PERC,
     // deliveredToReceivedLeadTime: '',
     plannedToSubmittedLeadTime: PLANNED_TO_SUBMITTED,
     submittedToApprovedLeadTime: SUBMITTED_TO_APPROVED,
@@ -32,6 +33,7 @@ const initialValuesSix = {
     programNotes: '',
     shippedToArrivedByAirLeadTime: SHIPPED_TO_ARRIVED_AIR,
     shippedToArrivedBySeaLeadTime: SHIPPED_TO_ARRIVED_SEA,
+    shippedToArrivedByRoadLeadTime: SHIPPED_TO_ARRIVED_ROAD,
     arrivedToDeliveredLeadTime: ARRIVED_TO_RECEIVED,
     programCode: '',
     programCode1: ''
@@ -54,6 +56,11 @@ const validationSchemaSix = function (values) {
             // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validseafreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        roadFreightPerc: Yup.string()
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validroadfreighttext'))
             .min(0, i18n.t('static.program.validvaluetext')),
 
         // deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -81,6 +88,10 @@ const validationSchemaSix = function (values) {
         shippedToArrivedBySeaLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.realmcountry.shippedToArrivedSeaLeadTimetext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        shippedToArrivedByRoadLeadTime: Yup.string()
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.realmcountry.shippedToArrivedRoadLeadTimetext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         arrivedToDeliveredLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
@@ -140,6 +151,7 @@ export default class StepSix extends Component {
             userId: true,
             airFreightPerc: true,
             seaFreightPerc: true,
+            roadFreightPerc: true,
             // deliveredToReceivedLeadTime: true,
             plannedToSubmittedLeadTime: true,
             submittedToApprovedLeadTime: true,
@@ -148,6 +160,7 @@ export default class StepSix extends Component {
             // programNotes: true,
             shippedToArrivedByAirLeadTime: true,
             shippedToArrivedBySeaLeadTime: true,
+            shippedToArrivedByRoadLeadTime: true,
             arrivedToDeliveredLeadTime: true,
             programCode1: true,
             // uniqueCode: true,
@@ -343,8 +356,8 @@ export default class StepSix extends Component {
                                     </Input>
                                     <FormFeedback className="red">{errors.userId}</FormFeedback>
                                 </FormGroup>
-
-                                <FormGroup className="col-md-6">
+                                <div className="col-md-6"></div>
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%)<span class="red ">*</span></Label>
                                     <Input
                                         onBlur={handleBlur}
@@ -357,7 +370,7 @@ export default class StepSix extends Component {
                                         name="airFreightPerc" id="airFreightPerc" />
                                     <FormFeedback className="red">{errors.airFreightPerc}</FormFeedback>
                                 </FormGroup>
-                                <FormGroup className="col-md-6">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} (%)<span class="red ">*</span></Label>
                                     <Input
                                         onBlur={handleBlur}
@@ -370,7 +383,21 @@ export default class StepSix extends Component {
                                         name="seaFreightPerc" id="seaFreightPerc" />
                                     <FormFeedback className="red">{errors.seaFreightPerc}</FormFeedback>
                                 </FormGroup>
-                                <FormGroup className="col-md-6">
+                                <FormGroup className="col-md-4">
+                                    <Label htmlFor="company">{i18n.t('static.program.roadfreightperc')} (%)<span class="red ">*</span></Label>
+                                    <Input
+                                        onBlur={handleBlur}
+                                        valid={!errors.roadFreightPerc && this.props.items.program.roadFreightPerc != ''}
+                                        invalid={touched.roadFreightPerc && !!errors.roadFreightPerc}
+                                        bsSize="sm"
+                                        onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                        type="number"
+                                        min="0"
+                                        value={this.props.items.program.roadFreightPerc}
+                                        name="roadFreightPerc" id="roadFreightPerc" />
+                                    <FormFeedback className="red">{errors.roadFreightPerc}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
                                     <Input
                                         onBlur={handleBlur}
@@ -384,7 +411,7 @@ export default class StepSix extends Component {
                                         name="plannedToSubmittedLeadTime" id="plannedToSubmittedLeadTime" />
                                     <FormFeedback className="red">{errors.plannedToSubmittedLeadTime}</FormFeedback>
                                 </FormGroup>
-                                <FormGroup className="col-md-6">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
                                     <Input
                                         onBlur={handleBlur}
@@ -398,7 +425,7 @@ export default class StepSix extends Component {
                                         name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" />
                                     <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                 </FormGroup>
-                                <FormGroup className="col-md-6">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
                                     <Input
                                         onBlur={handleBlur}
@@ -412,7 +439,7 @@ export default class StepSix extends Component {
                                         name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" />
                                     <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                 </FormGroup>
-                                <FormGroup className="col-md-6">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                     <Input
                                         onBlur={handleBlur}
@@ -429,7 +456,7 @@ export default class StepSix extends Component {
 
 
 
-                                <FormGroup className="col-md-6">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}<span class="red Reqasterisk">*</span></Label>
                                     <Input
                                         onBlur={handleBlur}
@@ -442,6 +469,20 @@ export default class StepSix extends Component {
                                         value={this.props.items.program.shippedToArrivedBySeaLeadTime}
                                         name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" />
                                     <FormFeedback className="red">{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup className="col-md-4">
+                                    <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedRoadLeadTime')}<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        onBlur={handleBlur}
+                                        valid={!errors.shippedToArrivedByRoadLeadTime && this.props.items.program.shippedToArrivedByRoadLeadTime != ''}
+                                        invalid={touched.shippedToArrivedByRoadLeadTime && !!errors.shippedToArrivedByRoadLeadTime}
+                                        bsSize="sm"
+                                        onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                        type="number"
+                                        min="0"
+                                        value={this.props.items.program.shippedToArrivedByRoadLeadTime}
+                                        name="shippedToArrivedByRoadLeadTime" id="shippedToArrivedByRoadLeadTime" />
+                                    <FormFeedback className="red">{errors.shippedToArrivedByRoadLeadTime}</FormFeedback>
                                 </FormGroup>
 
 

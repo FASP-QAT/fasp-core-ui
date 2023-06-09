@@ -59,6 +59,7 @@ export default class PipelineProgramSetup extends Component {
                 },
                 airFreightPerc: '',
                 seaFreightPerc: '',
+                roadFreightPerc: '',
                 deliveredToReceivedLeadTime: '',
                 plannedToSubmittedLeadTime: '',
                 submittedToApprovedLeadTime: '',
@@ -75,7 +76,8 @@ export default class PipelineProgramSetup extends Component {
 
                 arrivedToDeliveredLeadTime: '',
                 shippedToArrivedBySeaLeadTime: '',
-                shippedToArrivedByAirLeadTime: ''
+                shippedToArrivedByAirLeadTime: '',
+                shippedToArrivedByRoadLeadTime: ''
 
             },
             lang: localStorage.getItem('lang'),
@@ -776,6 +778,8 @@ export default class PipelineProgramSetup extends Component {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
+        }if (event.target.name == 'roadFreightPerc') {
+            program.roadFreightPerc = event.target.value;
         } if (event.target.name == 'deliveredToReceivedLeadTime') {
             program.deliveredToReceivedLeadTime = event.target.value;
         } if (event.target.name == 'plannedToSubmittedLeadTime') {
@@ -798,6 +802,9 @@ export default class PipelineProgramSetup extends Component {
         }
         if (event.target.name == 'shippedToArrivedBySeaLeadTime') {
             program.shippedToArrivedBySeaLeadTime = event.target.value;
+        }
+        if (event.target.name == 'shippedToArrivedByRoadLeadTime') {
+            program.shippedToArrivedByRoadLeadTime = event.target.value;
         }
         if (event.target.name == 'shippedToArrivedByAirLeadTime') {
             program.shippedToArrivedByAirLeadTime = event.target.value;

@@ -24,7 +24,7 @@ import StepFour from './StepFour.js';
 import StepFive from './StepFive';
 import StepSix from './StepSix.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED, API_URL } from "../../Constants";
+import { PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED, API_URL, SHIPPED_TO_ARRIVED_ROAD, ROAD_FREIGHT_PERC } from "../../Constants";
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramOnboarding extends Component {
     constructor(props) {
@@ -61,6 +61,7 @@ export default class ProgramOnboarding extends Component {
                 },
                 airFreightPerc: '',
                 seaFreightPerc: '',
+                roadFreightPerc: ROAD_FREIGHT_PERC,
                 // deliveredToReceivedLeadTime: '',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
@@ -71,6 +72,7 @@ export default class ProgramOnboarding extends Component {
 
                 shippedToArrivedByAirLeadTime: SHIPPED_TO_ARRIVED_AIR,
                 shippedToArrivedBySeaLeadTime: SHIPPED_TO_ARRIVED_SEA,
+                shippedToArrivedByRoadLeadTime: SHIPPED_TO_ARRIVED_ROAD,
                 arrivedToDeliveredLeadTime: ARRIVED_TO_RECEIVED,
 
                 plannedToSubmittedLeadTime: PLANNED_TO_SUBMITTED,
@@ -483,6 +485,9 @@ export default class ProgramOnboarding extends Component {
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
         }
+        if (event.target.name == 'roadFreightPerc') {
+            program.roadFreightPerc = event.target.value;
+        }
         if (event.target.name == 'uniqueCode') {
             var dname = this.state.program.programCode;
             var email_array = dname.split('-');
@@ -522,6 +527,9 @@ export default class ProgramOnboarding extends Component {
         }
         if (event.target.name == 'shippedToArrivedBySeaLeadTime') {
             program.shippedToArrivedBySeaLeadTime = event.target.value;
+        }
+        if (event.target.name == 'shippedToArrivedByRoadLeadTime') {
+            program.shippedToArrivedByRoadLeadTime = event.target.value;
         }
         if (event.target.name == 'arrivedToDeliveredLeadTime') {
             program.arrivedToDeliveredLeadTime = event.target.value;

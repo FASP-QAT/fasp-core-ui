@@ -29,11 +29,13 @@ const initialValues = {
     programManager: '',
     airFreightPerc: '',
     seaFreightPerc: '',
+    roadFreightPerc: '',
     plannedToSubmittedLeadTime: '',
     submittedToApprovedLeadTime: '',
     approvedToShippedLeadTime: '',
     shippedToArrivedByAirLeadTime: '',
     shippedToArrivedBySeaLeadTime: '',
+    shippedToArrivedByRoadLeadTime: '',
     arrivedToDeliveredLeadTime: '',
     notes: ""
 }
@@ -67,6 +69,11 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext'))
             // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
+        roadFreightPerc: Yup.string()
+            .required(i18n.t('static.program.validroadfreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            // .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.program.validBudgetAmount'))
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         plannedToSubmittedLeadTime: Yup.string()
             .required(i18n.t('static.program.validplantosubmittext'))
             .min(0, i18n.t('static.program.validvaluetext'))
@@ -85,6 +92,10 @@ const validationSchema = function (values) {
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         shippedToArrivedBySeaLeadTime: Yup.string()
             .required(i18n.t('static.program.shippedToArrivedBySeaLeadTime'))
+            .min(0, i18n.t('static.program.validvaluetext'))
+            .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
+        shippedToArrivedByRoadLeadTime: Yup.string()
+            .required(i18n.t('static.program.shippedToArrivedByRoadLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
         arrivedToDeliveredLeadTime: Yup.string()
@@ -135,11 +146,13 @@ export default class ProgramTicketComponent extends Component {
                 programManager: '',
                 airFreightPerc: '',
                 seaFreightPerc: '',
+                roadFreightPerc: '',
                 plannedToSubmittedLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
                 shippedToArrivedByAirLeadTime: '',
                 shippedToArrivedBySeaLeadTime: '',
+                shippedToArrivedByRoadLeadTime: '',
                 arrivedToDeliveredLeadTime: '',
                 notes: ""
             },
@@ -220,6 +233,9 @@ export default class ProgramTicketComponent extends Component {
         if (event.target.name == "seaFreightPerc") {
             program.seaFreightPerc = event.target.value;
         }
+        if (event.target.name == "roadFreightPerc") {
+            program.roadFreightPerc = event.target.value;
+        }
         if (event.target.name == "plannedToSubmittedLeadTime") {
             program.plannedToSubmittedLeadTime = event.target.value;
         }
@@ -234,6 +250,9 @@ export default class ProgramTicketComponent extends Component {
         }
         if (event.target.name == "shippedToArrivedBySeaLeadTime") {
             program.shippedToArrivedBySeaLeadTime = event.target.value;
+        }
+        if (event.target.name == "shippedToArrivedByRoadLeadTime") {
+            program.shippedToArrivedByRoadLeadTime = event.target.value;
         }
         if (event.target.name == "arrivedToDeliveredLeadTime") {
             program.arrivedToDeliveredLeadTime = event.target.value;
@@ -608,11 +627,13 @@ export default class ProgramTicketComponent extends Component {
             programManager: true,
             airFreightPerc: true,
             seaFreightPerc: true,
+            roadFreightPerc: true,
             plannedToSubmittedLeadTime: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
             shippedToArrivedByAirLeadTime: true,
             shippedToArrivedBySeaLeadTime: true,
+            shippedToArrivedByRoadLeadTime: true,
             arrivedToDeliveredLeadTime: true,
             healthAreaId: true,
             notes: true
@@ -736,11 +757,13 @@ export default class ProgramTicketComponent extends Component {
         program.programManager = '';
         program.airFreightPerc = '';
         program.seaFreightPerc = '';
+        program.roadFreightPerc = '';
         program.plannedToSubmittedLeadTime = '';
         program.submittedToApprovedLeadTime = '';
         program.approvedToShippedLeadTime = '';
         program.shippedToArrivedByAirLeadTime = '';
         program.shippedToArrivedBySeaLeadTime = '';
+        program.shippedToArrivedByRoadLeadTime = '';
         program.arrivedToDeliveredLeadTime = '';
         program.notes = '';
         this.setState({
@@ -851,11 +874,13 @@ export default class ProgramTicketComponent extends Component {
                             programManager: '',
                             airFreightPerc: '',
                             seaFreightPerc: '',
+                            roadFreightPerc: '',
                             plannedToSubmittedLeadTime: '',
                             submittedToApprovedLeadTime: '',
                             approvedToShippedLeadTime: '',
                             shippedToArrivedByAirLeadTime: '',
                             shippedToArrivedBySeaLeadTime: '',
+                            shippedToArrivedByRoadLeadTime: '',
                             arrivedToDeliveredLeadTime: '',
                             notes: ""
                         }}
@@ -1125,6 +1150,20 @@ export default class ProgramTicketComponent extends Component {
                                         <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.roadfreightperc')} (%) <span class="red ">*</span></Label>
+                                        <Input
+                                            value={this.state.program.roadFreightPerc}
+                                            bsSize="sm"
+                                            valid={!errors.roadFreightPerc && this.state.program.roadFreightPerc != ''}
+                                            invalid={touched.roadFreightPerc && !!errors.roadFreightPerc}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            type="number"
+                                            min="0"
+                                            name="roadFreightPerc" id="roadFreightPerc" />
+                                        <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
                                         <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             value={this.state.program.plannedToSubmittedLeadTime}
@@ -1193,6 +1232,20 @@ export default class ProgramTicketComponent extends Component {
                                             min="0"
                                             name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" />
                                         <FormFeedback>{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedRoadLeadTime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            value={this.state.program.shippedToArrivedByRoadLeadTime}
+                                            bsSize="sm"
+                                            valid={!errors.shippedToArrivedByRoadLeadTime && this.state.program.shippedToArrivedByRoadLeadTime != ''}
+                                            invalid={touched.shippedToArrivedByRoadLeadTime && !!errors.shippedToArrivedByRoadLeadTime}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            type="number"
+                                            min="0"
+                                            name="shippedToArrivedByRoadLeadTime" id="shippedToArrivedByRoadLeadTime" />
+                                        <FormFeedback>{errors.shippedToArrivedByRoadLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="company">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}<span class="red Reqasterisk">*</span></Label>
