@@ -209,10 +209,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
   findFirstError(formName, hasError) {
     const form = document.forms[formName]
-    for (let i = 0; i < form.length; i++) {
-      if (hasError(form[i].name)) {
-        form[i].focus()
-        break
+    if(form){
+      for (let i = 0; i < form.length; i++) {
+        if (hasError(form[i].name)) {
+          form[i].focus()
+          break
+        }
       }
     }
   }
@@ -264,7 +266,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var consumptionNotes = "";
         if (consumptionUnitId > 0) {
           consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
-          consumptionNotes = consumptionUnit.consumptionNotes;
+          consumptionNotes = consumptionUnit.consumptionNotes != null ? consumptionUnit.consumptionNotes : "";
         } else {
           consumptionUnit = {
             programPlanningUnitId: 0,
