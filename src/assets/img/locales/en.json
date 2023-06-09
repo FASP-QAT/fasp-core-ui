@@ -3099,5 +3099,6 @@
     "static.realmcountry.shippedToArrivedRoadLeadTime": "`Shipped to Arrived` Road Lead Time (months)",
     "static.dataentry.road":"Road",
     "static.report.shippedToArrivedRoadLeadTime": "Shipped to Arrived (Road)",
-    "static.report.totalRoadLeadTime": "Planned to Received (Road)"
+    "static.report.totalRoadLeadTime": "Planned to Received (Road)",
+    "static.dashboard.forecasting":"Forecasting"
 }
