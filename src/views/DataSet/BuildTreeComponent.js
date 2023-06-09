@@ -1422,7 +1422,7 @@ export default class BuildTree extends Component {
             levelModal: false,
             curTreeObj,
         }, () => {
-            this.saveTreeData(false)
+            this.saveTreeData(false, false)
             // console.log("final tab list---", this.state.items);
             // if (type == 1) {
             //     var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
@@ -1965,7 +1965,7 @@ export default class BuildTree extends Component {
                     console.log("node id for update state 3----", items);
                     this.setState({ items }, () => {
                         console.log("node id for update state 4----", this.state.items);
-                        this.saveTreeData(true);
+                        this.saveTreeData(true, false);
                     })
                 }
             }
@@ -2021,7 +2021,7 @@ export default class BuildTree extends Component {
 
             }
             if (parameterName != 'currentItemConfig') {
-                this.saveTreeData(false);
+                this.saveTreeData(false, false);
             }
             console.log("returmed list---", this.state.nodeDataMomList);
 
@@ -2040,9 +2040,9 @@ export default class BuildTree extends Component {
             items,
         })
     }
-    saveTreeData(flag) {
+    saveTreeData(flag, collapseFlag) {
         console.log("saving tree data for calculation>>>");
-        this.setState({ loading: true }, () => {
+        this.setState({ loading: collapseFlag ? false : true }, () => {
             var curTreeObj = this.state.curTreeObj;
             curTreeObj.generateMom = 0;
             let { treeData } = this.state;
@@ -5857,6 +5857,13 @@ export default class BuildTree extends Component {
                     }
                 }
                 console.log("pro list---", proList);
+                var tempToggleObject = [];
+                if (proList.length > 0) {
+                    tempToggleObject = proList[0].tree.flatList.filter(item => 
+                        (item.payload.collapsed == true) 
+                    );
+                }
+                let tempToggleList = tempToggleObject.map(item => item.id);
                 if (proList.length > 0) {
                     proList.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -5864,9 +5871,19 @@ export default class BuildTree extends Component {
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                 }
+                let proList1 = [];
+                if (proList.length > 0) {
+                    proList1 = proList[0].tree.flatList.map(item => {
+                        if(tempToggleList.includes(item.id))
+                            return {...item, templateName: "contactTemplateMin", expanded: true} 
+                        return {...item, templateName: "contactTemplate"} 
+                    })
+                    proList[0].tree.flatList = proList1; 
+                }                
                 this.setState({
                     realmCountryId,
                     treeData: proList,
+                    toggleArray: tempToggleList,
                     programDataListForPuCheck:programDataListForPuCheck
                 }, () => {
                     console.log("tree data --->", this.state.treeData);
@@ -6720,7 +6737,7 @@ export default class BuildTree extends Component {
             updatedItems = updatedItems.map(item => {
                 tempToggleArray.push(item.id);
                 if(item.parent != null){
-                    return { ...item, templateName: "contactTemplateMin", expanded: true };  
+                    return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };  
                 }
                 return item;
             });
@@ -6728,11 +6745,11 @@ export default class BuildTree extends Component {
         }else{
             updatedItems = updatedItems.map(item => {
                 tempToggleArray = tempToggleArray.filter((e) => e != item.id)
-                return { ...item, templateName: "contactTemplate", expanded: false };                                        
+                return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
             });
             this.setState({toggleArray: tempToggleArray})
         }
-        this.setState({ items: updatedItems })
+        this.setState({ items: updatedItems }, () => { this.saveTreeData(false, true) })
     }
 
     touchAllScenario(setTouched, errors) {
@@ -7492,7 +7509,7 @@ export default class BuildTree extends Component {
                     this.callAfterScenarioChange(scenarioId);
                     // this.updateTreeData();
                 }
-                this.saveTreeData(false);
+                this.saveTreeData(false, false);
             });
         } else {
             alert(i18n.t('static.tree.duplicateScenarioName'));
@@ -8521,7 +8538,7 @@ export default class BuildTree extends Component {
                         updatedItems = updatedItems.map(item => {
                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString())) {
                                 tempToggleArray = tempToggleArray.filter((e) => e != item.id)
-                                return { ...item, templateName: "contactTemplate", expanded: false };                                        
+                                return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
                             }
                             return item;
                         });
@@ -8532,14 +8549,13 @@ export default class BuildTree extends Component {
                         updatedItems = updatedItems.map(item => {
                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString())) {
                                 tempToggleArray.push(item.id);
-                                console.log("Here: "+tempToggleArray)
-                                return { ...item, templateName: "contactTemplateMin", expanded: true };
+                                return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };
                             }
                             return item;
                         });
                         this.setState({toggleArray: tempToggleArray})
                     }               
-                    this.setState({ items: updatedItems })
+                    this.setState({ items: updatedItems }, () => { this.saveTreeData(false, true) })
                 }
                 console.log("555>>>", this.state.items);
                 // const ids = this.state.items.map(o => o.id)
@@ -11830,7 +11846,7 @@ export default class BuildTree extends Component {
                                         updatedItems = updatedItems.map(item => {
                                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
                                                 tempToggleArray = tempToggleArray.filter((e) => e != item.id)
-                                                return { ...item, templateName: "contactTemplate", expanded: false };                                        
+                                                return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
                                             }
                                             return item;
                                         });
@@ -11848,16 +11864,14 @@ export default class BuildTree extends Component {
                                         updatedItems = updatedItems.map(item => {
                                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.parent != null) {
                                                 tempToggleArray.push(item.id);
-                                                console.log("Here: "+tempToggleArray)
-                                                return { ...item, templateName: "contactTemplateMin", expanded: true };
+                                                return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };
                                             }
                                             return item;
                                         });
-                                        console.log("Hello ",tempToggleArray)
                                         this.setState({toggleArray: tempToggleArray})
                                     }
                                     
-                                    this.setState({ items: updatedItems })
+                                    this.setState({ items: updatedItems }, () => { this.saveTreeData(false, true) })
         
                                 }}>
                                 {this.state.toggleArray.includes(itemConfig.id) ? <i class="fa fa-caret-square-o-left" aria-hidden="true"></i> : <i class="fa fa-caret-square-o-down" aria-hidden="true"></i> }    
@@ -12175,7 +12189,7 @@ export default class BuildTree extends Component {
                                                 }}
                                                 validate={validate(validationSchema)}
                                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                                    this.saveTreeData(false);
+                                                    this.saveTreeData(false, false);
                                                     // this.createOrUpdateTree();
                                                 }}
                                                 render={
