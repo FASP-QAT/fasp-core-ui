@@ -3076,7 +3076,7 @@
     "static.inventoryTurns.noofmonths":"No. of months in calculation",
     "static.inventoryTurns.months12":"Months less than 12 and greater than 6",
     "static.inventoryTurns.months6":"Months less than 6 (Insufficient data to generate reliable turns)",
-    "static.commit.consumptionnotesvalid": "Only letters, spaces, numbers and special characters are allowed. Please check for invalid characters.",
+    "static.commit.consumptionnotesvalid": "Only letters, spaces, numbers and the characters ` ~ ! @ # $ % ^ & ( ) _ { } : \" < > ? , . ; ' [ ] / \\ * - + = | are allowed. Please check for invalid characters.",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.mt.roNoAndPrimeLineNo": "RO - Prime line No",
     "static.realm.restrictionActualConsumption":"Data entry restriction for Actual Consumption",
