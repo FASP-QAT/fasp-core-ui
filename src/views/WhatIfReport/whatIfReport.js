@@ -955,6 +955,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                    }else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                                     } else {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                     }
@@ -1029,6 +1031,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                    }else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                                     } else {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                     }
@@ -1104,6 +1108,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                    } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                                     } else {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                     }
@@ -1543,6 +1549,8 @@ export default class WhatIfReportComponent extends React.Component {
                             var shippedToArrivedLeadTime = ""
                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                            }else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                             } else {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                             }
@@ -1653,6 +1661,8 @@ export default class WhatIfReportComponent extends React.Component {
                             var shippedToArrivedLeadTime = ""
                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                            }else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                             } else {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                             }
@@ -1764,6 +1774,8 @@ export default class WhatIfReportComponent extends React.Component {
                             var shippedToArrivedLeadTime = ""
                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                            }else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                             } else {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                             }

@@ -635,6 +635,8 @@ export default class QatProblemActionNew extends Component {
                                                                                     var shippedToArrivedLeadTime = ""
                                                                                     if (filteredShipmentList[s].shipmentMode == "Air") {
                                                                                         shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                                                                    }else if (filteredShipmentList[s].shipmentMode == "Road") {
+                                                                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByRoadLeadTime);
                                                                                     } else {
                                                                                         shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                                                                                     }
