@@ -5838,7 +5838,6 @@ export default class BuildTree extends Component {
                     );
                 }
                 let tempToggleList = tempToggleObject.map(item => item.id);
-                console.log("Hello ", tempToggleList)
                 if (proList.length > 0) {
                     proList.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -5846,6 +5845,15 @@ export default class BuildTree extends Component {
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                 }
+                let proList1 = [];
+                if (proList.length > 0) {
+                    proList1 = proList[0].tree.flatList.map(item => {
+                        if(tempToggleList.includes(item.id))
+                            return {...item, templateName: "contactTemplateMin", expanded: true} 
+                        return {...item, templateName: "contactTemplate"} 
+                    })
+                    proList[0].tree.flatList = proList1; 
+                }                
                 this.setState({
                     realmCountryId,
                     treeData: proList,
@@ -8503,7 +8511,6 @@ export default class BuildTree extends Component {
                         updatedItems = updatedItems.map(item => {
                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString())) {
                                 tempToggleArray.push(item.id);
-                                console.log("Here: "+tempToggleArray)
                                 return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };
                             }
                             return item;
@@ -11797,12 +11804,10 @@ export default class BuildTree extends Component {
                                         updatedItems = updatedItems.map(item => {
                                             if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.parent != null) {
                                                 tempToggleArray.push(item.id);
-                                                console.log("Here: "+tempToggleArray)
                                                 return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };
                                             }
                                             return item;
                                         });
-                                        console.log("Hello ",tempToggleArray)
                                         this.setState({toggleArray: tempToggleArray})
                                     }
                                     
