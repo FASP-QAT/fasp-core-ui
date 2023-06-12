@@ -5420,8 +5420,10 @@ class EditSupplyPlanStatus extends Component {
                                     console.log("reviewedProblemList===>", reviewedProblemList);
                                     ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
                                         .then(response => {
-                                            console.log("messageCode", response)
-                                            // this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                            if(this.state.program.currentVersion.versionStatus.id!=1){
+                                                console.log("messageCode", response)
+                                                this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                            }else{
                                             this.setState({
                                                 submitMessage: "static.message.supplyplanversionapprovedsuccess",
                                                 submitColor: "green",
@@ -5433,6 +5435,7 @@ class EditSupplyPlanStatus extends Component {
                                                 document.getElementById("submitButton").disabled = false;
                                                 this.componentDidMount();
                                             })
+                                        }
 
                                         })
                                         .catch(
