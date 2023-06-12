@@ -704,11 +704,7 @@ class SupplyPlanFormulas extends Component {
                   {i18n.t("static.supplyPlanFormula.inventoryTurns6L1")}<br></br>
                   {i18n.t("static.supplyPlanFormula.inventoryTurns6L2")}</p>
 
-                  <p>{"7) "+i18n.t("static.supplyPlanFormula.inventoryTurns7")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns7L1")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns7L2")}</p>
-
-                  <p>{"8) "+i18n.t("static.supplyPlanFormula.inventoryTurns8")}<br></br>
+                  <p>{"7) "+i18n.t("static.supplyPlanFormula.inventoryTurns8")}<br></br>
                   {i18n.t('static.supplyPlanFormula.inventoryTurns8L1')}<a href='/#/programProduct/addProgramProduct' target="_blank">{i18n.t('static.formula.suggestedText3')}</a>{i18n.t('static.formula.suggestedText4')}</p>
                 </ListGroupItemText>
               </ListGroupItem>

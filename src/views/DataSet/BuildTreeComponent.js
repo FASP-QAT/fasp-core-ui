@@ -7518,6 +7518,7 @@ export default class BuildTree extends Component {
     nodeTypeChange(value) {
         var nodeTypeId = value;
         console.log("node type value---", nodeTypeId)
+        var { currentItemConfig } = this.state;
         if (nodeTypeId == 1) {
             this.setState({
                 numberNode: false,
@@ -7541,6 +7542,45 @@ export default class BuildTree extends Component {
         }
         else if (nodeTypeId == 4) {
             // Forecasting unit node
+            if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode == undefined) {
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode = {
+                    oneTimeUsage: "false",
+                    lagInMonths: 0,
+                    forecastingUnit: {
+                        tracerCategory: {
+
+                        },
+                        unit: {
+                            id:""
+                        },
+                        label: {
+                            label_en: ""
+                        }
+                    },
+                    usageType: {
+
+                    },
+                    usagePeriod: {
+                        usagePeriodId: 1
+                    },
+                    repeatCount: '',
+                    repeatUsagePeriod: {
+                        usagePeriodId: 1
+                    }
+                }
+
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode = {
+                    planningUnit: {
+                        id: '',
+                        unit: {
+                            id: ""
+                        },
+                        multiplier: ''
+                    },
+                    refillMonths: '',
+                    sharePlanningUnit: "false"
+                }
+            }
             this.setState({
                 numberNode: true,
                 aggregationNode: true,
@@ -7549,7 +7589,7 @@ export default class BuildTree extends Component {
                 this.getNodeUnitOfPrent();
             });
         }
-        var { currentItemConfig } = this.state;
+
         console.log("inside node type change---", (nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) && this.state.addNodeFlag && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue == "");
         if ((nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) && this.state.addNodeFlag && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue == "") {
             currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = 100;
@@ -8641,6 +8681,7 @@ export default class BuildTree extends Component {
             for (var puN = 0; puN < puNodes.length; puN++) {
                 var refillMonths = "";
                 var puPerVisit = "";
+                if(puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode!=null){
                 var pu = puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit;
                 var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
                 var puNode = nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode;
@@ -8658,6 +8699,7 @@ export default class BuildTree extends Component {
                 }
 
                 nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode = puNode;
+            }
             }
         }
         const { curTreeObj } = this.state;
