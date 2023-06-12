@@ -1071,6 +1071,7 @@ export default class SyncMasterData extends Component {
                     if (this.props.location.state != undefined && this.props.location.state.isFullSync != undefined && this.props.location.state.isFullSync == true) {
                         lastSyncDateRealm = '2020-01-01 00:00:00'
                     }
+                    lastSyncDateRealm=moment(lastSyncDateRealm).subtract('1','days').format("YYYY-MM-DD HH:mm:ss")
                     console.log("Last sync date above", lastSyncDateRealm);
                     var transaction = db1.transaction(['programData'], 'readwrite');
                     var program = transaction.objectStore('programData');
