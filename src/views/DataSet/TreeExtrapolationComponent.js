@@ -727,7 +727,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     jsonProperties: {
                         months: this.state.monthsForMovingAverage
                     },
-                    extrapolationOptionDataList: movingAveragesData
+                    extrapolationOptionDataList: []
                 }
                 // json1 = this.state.extrapolationMethodList.filter(c => c.id == 7)[0];
                 nodeDataExtrapolationOptionList.push(json);
@@ -738,7 +738,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     extrapolationMethod: { id: 6 },
                     jsonProperties: {
                     },
-                    extrapolationOptionDataList: semiAveragesData
+                    extrapolationOptionDataList: []
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
@@ -749,7 +749,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     jsonProperties: {
                         confidenceLevelIdLinearRegression: this.state.confidenceLevelIdLinearRegression
                     },
-                    extrapolationOptionDataList: linearRegressionData
+                    extrapolationOptionDataList: []
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
@@ -765,7 +765,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         confidenceLevelIdArima: this.state.confidenceLevelIdArima,
                         seasonality: this.state.seasonality
                     },
-                    extrapolationOptionDataList: arimaData
+                    extrapolationOptionDataList: []
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
@@ -780,7 +780,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         beta: this.state.beta,
                         gamma: this.state.gamma
                     },
-                    extrapolationOptionDataList: tesData
+                    extrapolationOptionDataList: []
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
@@ -1185,7 +1185,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             console.log("inputDataArima 8--->>>", inputDataArima)
                         }
                     }
-                    if (!dataAvailabel) {
+                    // if (!dataAvailabel) {
                         console.log("inputDataMovingAvg--->>>", inputDataMovingAvg)
                         var data = jexcelDataArr.filter(c => c.amount != "" && c.amount != null)
                             .sort(function (a, b) {
@@ -1262,42 +1262,42 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 offlineArima: false                                
                             })
                         }
-                    } else {
-                        console.log("jexcel build else called")
-                        console.log("this.state.semiAvgData--->>>", this.state.semiAvgData)
-                        if (this.state.semiAvgId) {
-                            calculateError(this.state.semiAvgData, "semiAvgError", this);
-                        }
-                        if (this.state.movingAvgId) {
-                            calculateError(this.state.movingAvgData, "movingAvgError", this);
-                        }
-                        if (this.state.linearRegressionId) {
-                            calculateError(this.state.linearRegressionData, "linearRegressionError", this);
-                        }
-                        if (this.state.smoothingId) {
-                            if (this.state.tesData.length > 0) {
-                                calculateError(this.state.tesData, "tesError", this);
-                            } else {
-                                this.setState({
-                                    tesData: [],
-                                    tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                                });
-                            }
-                        }
-                        if (this.state.arimaId) {
-                            if (this.state.arimaData.length > 0) {
-                                calculateError(this.state.arimaData, "arimaError", this);
-                            }
-                            else {
-                                this.setState({
-                                    arimaData: [],
-                                    arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
-                                    noDataMessage: ""
-                                });
-                            }
-                        }
-                        // this.buildJexcel();
-                    }
+                    // } else {
+                    //     console.log("jexcel build else called")
+                    //     console.log("this.state.semiAvgData--->>>", this.state.semiAvgData)
+                    //     if (this.state.semiAvgId) {
+                    //         calculateError(this.state.semiAvgData, "semiAvgError", this);
+                    //     }
+                    //     if (this.state.movingAvgId) {
+                    //         calculateError(this.state.movingAvgData, "movingAvgError", this);
+                    //     }
+                    //     if (this.state.linearRegressionId) {
+                    //         calculateError(this.state.linearRegressionData, "linearRegressionError", this);
+                    //     }
+                    //     if (this.state.smoothingId) {
+                    //         if (this.state.tesData.length > 0) {
+                    //             calculateError(this.state.tesData, "tesError", this);
+                    //         } else {
+                    //             this.setState({
+                    //                 tesData: [],
+                    //                 tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                    //             });
+                    //         }
+                    //     }
+                    //     if (this.state.arimaId) {
+                    //         if (this.state.arimaData.length > 0) {
+                    //             calculateError(this.state.arimaData, "arimaError", this);
+                    //         }
+                    //         else {
+                    //             this.setState({
+                    //                 arimaData: [],
+                    //                 arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                    //                 noDataMessage: ""
+                    //             });
+                    //         }
+                    //     }
+                    //     // this.buildJexcel();
+                    // }
                 });
 
             }else{
@@ -1615,6 +1615,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                         } else {
                             console.log("### inside did mount else")
                             var filteredExtrapolationMethodList = [];
+                            console.log("Current scenario Test@123",this.props.items.currentScenario)
+                            console.log("Node Data extrapolation Test@123",this.props.items.currentScenario.nodeDataExtrapolation)
                             var nodeDataExtrapolation = this.props.items.currentScenario.nodeDataExtrapolation;
                             var extrapolationDataList = nodeDataExtrapolation.extrapolationDataList;
                             var nodeDataExtrapolationOptionList = this.props.items.currentScenario.nodeDataExtrapolationOptionList;
