@@ -7332,6 +7332,7 @@ export default class CreateTreeTemplate extends Component {
             for (var puN = 0; puN < puNodes.length; puN++) {
                 var refillMonths = "";
                 var puPerVisit = "";
+                if(puNodes[puN].payload.nodeDataMap[0][0].puNode!=null){
                 var pu = puNodes[puN].payload.nodeDataMap[0][0].puNode.planningUnit;
                 var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
                 var puNode = nodes[findNodeIndexPu].payload.nodeDataMap[0][0].puNode;
@@ -7349,6 +7350,7 @@ export default class CreateTreeTemplate extends Component {
                 }
 
                 nodes[findNodeIndexPu].payload.nodeDataMap[0][0].puNode = puNode;
+                }
                 console.log("Pu per visit Test123", puPerVisit)
                 console.log("Refill months Test123", refillMonths)
             }
