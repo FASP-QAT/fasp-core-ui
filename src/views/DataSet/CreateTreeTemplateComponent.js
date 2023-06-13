@@ -10365,6 +10365,16 @@ export default class CreateTreeTemplate extends Component {
                                             console.log("i============", i);
                                             var item = items[i];
                                             console.log("item---", item);
+                                            var nodeDataModelingList = (item.payload.nodeDataMap[0])[0].nodeDataModelingList;
+                                            var nodeDataModelingListUpdated = [];
+                                            for (var nml = 0; nml < nodeDataModelingList.length; nml++) {
+                                                if (nodeDataModelingList[nml].dataValue !== "" && nodeDataModelingList[nml].dataValue !== "NaN" && nodeDataModelingList[nml].dataValue !== undefined && nodeDataModelingList[nml].increaseDecrease !== "") {
+                                                    if (nodeDataModelingList[nml].transferNodeDataId == "null" || nodeDataModelingList[nml].transferNodeDataId === "") {
+                                                        nodeDataModelingList[nml].transferNodeDataId = null;
+                                                    }
+                                                    nodeDataModelingListUpdated.push(nodeDataModelingList[nml]);
+                                                }
+                                            }
                                             var json = {
                                                 id: item.id,
                                                 parent: item.parent,
@@ -10392,7 +10402,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 puNode: item.payload.nodeType.id < 4 || item.payload.nodeType.id == 4 ? null : (item.payload.nodeDataMap[0])[0].puNode,
                                                                 notes: (item.payload.nodeDataMap[0])[0].notes,
                                                                 manualChangesEffectFuture: (item.payload.nodeDataMap[0])[0].manualChangesEffectFuture,
-                                                                nodeDataModelingList: (item.payload.nodeDataMap[0])[0].nodeDataModelingList,
+                                                                nodeDataModelingList: nodeDataModelingListUpdated,
                                                                 nodeDataMomList: (item.payload.nodeDataMap[0])[0].nodeDataMomList,
                                                                 nodeDataOverrideList: (item.payload.nodeDataMap[0])[0].nodeDataOverrideList
                                                             }
