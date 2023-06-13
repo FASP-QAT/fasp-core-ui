@@ -918,6 +918,7 @@ export default class BuildTree extends Component {
             missingPUList: [],
             autoCalculate: localStorage.getItem('sesAutoCalculate') != "" && localStorage.getItem('sesAutoCalculate') != undefined ? (localStorage.getItem('sesAutoCalculate').toString() == "true" ? true : false) : true,
             hideActionButtons: false,
+            programDataListForPuCheck:[]
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -3153,6 +3154,7 @@ export default class BuildTree extends Component {
         })
         console.log("programId>>>", this.state.datasetList);
         var proList = [];
+        var programDataListForPuCheck=[];
         localStorage.setItem("sesDatasetId", programId);
         if (programId != "") {
             var dataSetObj = JSON.parse(JSON.stringify(this.state.datasetList.filter(c => c.id == programId)[0]));;
@@ -3160,6 +3162,7 @@ export default class BuildTree extends Component {
             var datasetEnc = dataSetObj;
             var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            programDataListForPuCheck.push({"programData":programData,"id":dataSetObj.id});
             console.log("programData---?????????", programData);
             dataSetObj.programData = programData;
             var treeList = programData.treeList;
@@ -3178,6 +3181,7 @@ export default class BuildTree extends Component {
                 dataSetObj,
                 realmCountryId: programData.realmCountry.realmCountryId,
                 treeData: proList,
+                programDataListForPuCheck:programDataListForPuCheck,
                 items: [],
                 selectedScenario: '',
                 programId,
@@ -3215,6 +3219,7 @@ export default class BuildTree extends Component {
                 programId,
                 forecastPeriod: '',
                 treeData: proList,
+                programDataListForPuCheck:[],
                 singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 }
             })
         }
@@ -5799,12 +5804,14 @@ export default class BuildTree extends Component {
                 console.log("userId---", userId);
                 console.log("myResult.length---", myResult.length);
                 var realmCountryId = "";
+                var programDataListForPuCheck=[];
                 if (this.state.programId != null && this.state.programId != "") {
                     console.log("inside if condition-------------------->", this.state.programId);
                     var dataSetObj = myResult.filter(c => c.id == this.state.programId)[0];
                     console.log("dataSetObj tree>>>", dataSetObj);
                     var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    programDataListForPuCheck.push({"programData":programData,"id":dataSetObj.id});
                     realmCountryId = programData.realmCountry.realmCountryId;
                     var treeList = programData.treeList;
                     for (var k = 0; k < treeList.length; k++) {
@@ -5821,6 +5828,7 @@ export default class BuildTree extends Component {
                             console.log("inside if---");
                             var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                            programDataListForPuCheck.push({"programData":programData,"id":myResult[i].id});
                             console.log("programData--->>>>>>>>>>>>>>>>>>>>>>", programData);
                             var treeList = programData.treeList;
                             for (var k = 0; k < treeList.length; k++) {
@@ -5839,7 +5847,8 @@ export default class BuildTree extends Component {
                 }
                 this.setState({
                     realmCountryId,
-                    treeData: proList
+                    treeData: proList,
+                    programDataListForPuCheck:programDataListForPuCheck
                 }, () => {
                     console.log("tree data --->", this.state.treeData);
                     if (this.state.treeId != "" && this.state.treeId != 0) {
@@ -8000,11 +8009,13 @@ export default class BuildTree extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.unit.id = pu.unit.id;
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id = event.target.value;
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier = pu.multiplier;
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].isPUMappingCorrect=1;
                 currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(pu.label));
             } else {
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.unit.id = '';
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id = '';
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier = '';
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].isPUMappingCorrect=0;
                 var label = {
                     label_en: '',
                     label_fr: '',
@@ -9613,17 +9624,18 @@ export default class BuildTree extends Component {
                                                             id="planningUnitId"
                                                             name="planningUnitId"
                                                             bsSize="sm"
+                                                            className={this.state.currentScenario.isPUMappingCorrect==0?"redPU":""}
                                                             valid={!errors.planningUnitId && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.id != '' : !errors.planningUnitId}
                                                             invalid={touched.planningUnitId && !!errors.planningUnitId}
                                                             onBlur={handleBlur}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.id : ""}>
 
-                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            <option value="" className="black">{i18n.t('static.common.select')}</option>
                                                             {this.state.planningUnitList.length > 0
                                                                 && this.state.planningUnitList.map((item, i) => {
                                                                     return (
-                                                                        <option key={i} value={item.id}>
+                                                                        <option key={i} value={item.id} className="black">
                                                                             {getLabelText(item.label, this.state.lang) + " | " + item.id}
                                                                         </option>
                                                                     )
@@ -11159,6 +11171,21 @@ export default class BuildTree extends Component {
                 // (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuPerMonth = fuPerMonth;
             }
+            if(items[i].payload.nodeType.id==5){
+                var findNodeIndexFU = items.findIndex(n => n.id == items[i].parent);
+                var forecastingUnitId = (items[findNodeIndexFU].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id;
+                var planningUnitId=(items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id;
+                var planningUnitList=[];
+                if(this.state.programId!=null && this.state.programId!=""){
+                planningUnitList=this.state.programDataListForPuCheck.filter(c=>c.id==this.state.programId)[0].programData.planningUnitList;
+                var planningUnitListFilter=planningUnitList.filter(c=>c.planningUnit.id==planningUnitId);
+                if(planningUnitListFilter.length>0 && planningUnitListFilter[0].planningUnit.forecastingUnit.id==forecastingUnitId){
+                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect=1
+                }else{
+                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect=0
+                }
+                }
+            }
             // else if (items[i].payload.nodeType.id == 5) {
             //     var item = items.filter(x => x.id == items[i].parent)[0];
             //     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(((item.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue * (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue) / 100);
@@ -11205,7 +11232,7 @@ export default class BuildTree extends Component {
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
 
-                <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
+                <div className={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect==0?"ContactTemplate boxContactTemplate contactTemplateBorderRed":"ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
                     <div className={itemConfig.payload.nodeType.id == 5
                         || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                         (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}

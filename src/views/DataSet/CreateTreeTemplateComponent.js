@@ -1076,6 +1076,33 @@ export default class CreateTreeTemplate extends Component {
                 // (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
                 (items[i].payload.nodeDataMap[0])[0].fuPerMonth = fuPerMonth;
             }
+            console.log("This.state Test@123",this.state)
+            if(items[i].payload.nodeType.id==5){
+                var findNodeIndexFU = items.findIndex(n => n.id == items[i].parent);
+                var forecastingUnitId = (items[findNodeIndexFU].payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id;
+                PlanningUnitService.getActivePlanningUnitListByFUId(forecastingUnitId).then(response => {
+                    console.log("response---", response.data)
+                    var listArray = response.data;
+                var planningUnitId=(items[i].payload.nodeDataMap[0])[0].puNode.planningUnit.id;
+                var planningUnitList=listArray;
+                var planningUnitListFilter=planningUnitList.filter(c=>c.planningUnitId==planningUnitId);
+                if(planningUnitListFilter.length>0){
+                    (items[i].payload.nodeDataMap[0])[0].isPUMappingCorrect=1
+                }else{
+                    (items[i].payload.nodeDataMap[0])[0].isPUMappingCorrect=0
+                }
+                if((items.length-1)==i){
+                    this.setState({
+                        items
+                    }, () => {
+                        console.log("final updated items---", this.state.items);
+                        // this.calculateValuesForAggregateNode(this.state.items);
+                    })
+                }
+            }).catch(error=>{
+
+            })
+            }
             // else if (items[i].payload.nodeType.id == 5) {
             //     var item = items.filter(x => x.id == items[i].parent)[0];
             //     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(((item.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue * (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue) / 100);
@@ -6819,11 +6846,13 @@ export default class CreateTreeTemplate extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = pu.unit.id;
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = event.target.value;
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier = pu.multiplier;
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].isPUMappingCorrect=1;
                 currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(pu.label));
             } else {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = '';
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = '';
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier = '';
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].isPUMappingCorrect=0;
                 var label = {
                     label_en: '',
                     label_fr: '',
@@ -8307,17 +8336,18 @@ export default class CreateTreeTemplate extends Component {
                                                             id="planningUnitId"
                                                             name="planningUnitId"
                                                             bsSize="sm"
+                                                            className={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].isPUMappingCorrect==0?"redPU":""}
                                                             valid={!errors.planningUnitId && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != '' : !errors.planningUnitId}
                                                             invalid={touched.planningUnitId && !!errors.planningUnitId}
                                                             onBlur={handleBlur}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id : ""}>
 
-                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            <option value=""  className="black">{i18n.t('static.common.select')}</option>
                                                             {this.state.planningUnitList.length > 0
                                                                 && this.state.planningUnitList.map((item, i) => {
                                                                     return (
-                                                                        <option key={i} value={item.planningUnitId}>
+                                                                        <option key={i} value={item.planningUnitId}  className="black">
                                                                             {getLabelText(item.label, this.state.lang) + " | " + item.planningUnitId}
                                                                         </option>
                                                                     )
@@ -9908,7 +9938,7 @@ export default class CreateTreeTemplate extends Component {
 
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-                <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[0][0].notes}>
+                <div className={itemConfig.payload.nodeDataMap[0] != undefined && itemConfig.payload.nodeDataMap[0][0].isPUMappingCorrect==0?"ContactTemplate boxContactTemplate contactTemplateBorderRed":"ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[0][0].notes}>
                     <div className={itemConfig.payload.nodeType.id == 5
                         || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                         (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
