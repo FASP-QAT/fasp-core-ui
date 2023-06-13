@@ -9890,6 +9890,10 @@ legend.scheduler-border {
   background-color: yellow !important;
 }
 
+.jss > tbody > tr > td.readonly.commitConflict {
+  background-color: #a5a3a3 !important;
+}
+
 .jexcel > tbody > tr > td.commitConflict {
   background-color: yellow !important;
 }

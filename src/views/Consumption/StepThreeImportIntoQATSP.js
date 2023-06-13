@@ -142,12 +142,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                 }
             }
-            console.log("isOldDate", isOldDate)
-            if (!isOldDate) {
+
+            if (!isOldDate && currentForecastedValue !== "") {
                 for (var i = 0; i < colArr.length; i++) {
-                    var cell1 = elInstance.getCell(`${colArr[i]}${parseInt(j) + 1}`)
+                    var cell1 = elInstance.getCell(`J${parseInt(j) + 1}`)
                     cell1.classList.add('readonly');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    cell1.classList.add('commitConflict');
                 }
             }
         }
@@ -557,7 +557,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v15: regionFilter[0].forecastPercentage,// % of forecast
                                         v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
                                         v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId,
-                                        v18: isOldDate
+                                        v18: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
 
                                     });
                                 }
@@ -954,6 +954,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
                             {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
                             <span class="legendcommitversionText red">Data already exists in Supply Plan Program</span>
+                        </li>
+                        <li><span class="legendcolor" style={{ backgroundColor: "#a5a3a3", border: "1px solid #000" }}></span>
+                            {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
+                            <span class="legendcommitversionText red">Data exists in Supply Plan Program and is past {FORECASTED_CONSUMPTION_MONTHS_IN_PAST} months, so it cannot be imported.</span>
                         </li>
                     </ul>
                 </div>
