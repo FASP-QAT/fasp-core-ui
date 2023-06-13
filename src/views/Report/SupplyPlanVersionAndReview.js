@@ -94,10 +94,13 @@ class SupplyPlanVersionAndReview extends Component {
             message: '',
             programLst: [],
             // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
-            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            rangeValue: localStorage.getItem("sesReportRangeSPVR") != "" && localStorage.getItem("sesReportRangeSPVR") != null && localStorage.getItem("sesReportRangeSPVR") != undefined ? JSON.parse(localStorage.getItem("sesReportRangeSPVR")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
-            programId: -1,
+            programId: localStorage.getItem("sesProgramIdSPVR") != "" && localStorage.getItem("sesProgramIdSPVR") != null && localStorage.getItem("sesProgramIdSPVR") != undefined ? localStorage.getItem("sesProgramIdSPVR") : -1,
+            realmCountryId:localStorage.getItem("sesCountryIdSPVR") != "" && localStorage.getItem("sesCountryIdSPVR") != null && localStorage.getItem("sesCountryIdSPVR") != undefined ? localStorage.getItem("sesCountryIdSPVR") : -1,
+            versionStatusId:localStorage.getItem("sesVersionStatusSPVR") != "" && localStorage.getItem("sesVersionStatusSPVR") != null && localStorage.getItem("sesVersionStatusSPVR") != undefined ? localStorage.getItem("sesVersionStatusSPVR") : -1,
+            versionTypeId:localStorage.getItem("sesVersionTypeSPVR") != "" && localStorage.getItem("sesVersionTypeSPVR") != null && localStorage.getItem("sesVersionTypeSPVR") != undefined ? localStorage.getItem("sesVersionTypeSPVR") : -1,
             lang: localStorage.getItem('lang')
 
         };
@@ -118,10 +121,39 @@ class SupplyPlanVersionAndReview extends Component {
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
+        this.dataChange=this.dataChange.bind(this);
 
     }
 
+    dataChange(event){
+        if(event.target.name=="countryId"){
+            localStorage.setItem("sesCountryIdSPVR", event.target.value);
+            this.setState({
+                realmCountryId: event.target.value
+            }, () => {
+                this.fetchData();
+            })
+        }
+        if(event.target.name=="versionTypeId"){
+            localStorage.setItem("sesVersionTypeSPVR", event.target.value);
+            this.setState({
+                versionTypeId: event.target.value
+            }, () => {
+                this.fetchData();
+            })
+        }
+        if(event.target.name=="versionStatusId"){
+            localStorage.setItem("sesVersionStatusSPVR", event.target.value);
+            this.setState({
+                versionStatusId: event.target.value
+            }, () => {
+                this.fetchData();
+            })
+        }
+    }
+
     setProgramId(event) {
+        localStorage.setItem("sesProgramIdSPVR", event.target.value);
         this.setState({
             programId: event.target.value
         }, () => {
@@ -370,7 +402,7 @@ class SupplyPlanVersionAndReview extends Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value }, () => { this.fetchData(); })
+        this.setState({ rangeValue: value }, () => { localStorage.setItem("sesReportRangeSPVR", JSON.stringify(value));this.fetchData(); })
 
     }
 
@@ -1278,7 +1310,8 @@ class SupplyPlanVersionAndReview extends Component {
                                                     bsSize="sm"
                                                     name="countryId"
                                                     id="countryId"
-                                                    onChange={(e) => { this.filterProgram(); this.fetchData() }}
+                                                    value={this.state.realmCountryId}
+                                                    onChange={(e) => { this.filterProgram(); this.dataChange(e) }}
                                                 >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                     {countryList}</Input>
                                                 {!!this.props.error &&
@@ -1316,7 +1349,8 @@ class SupplyPlanVersionAndReview extends Component {
                                                         name="versionTypeId"
                                                         id="versionTypeId"
                                                         bsSize="sm"
-                                                        onChange={(e) => { this.fetchData(e) }}
+                                                        onChange={(e) => { this.dataChange(e) }}
+                                                        value={this.state.versionTypeId}
                                                     >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                         {versionTypes}</Input>
                                                 </InputGroup>    </div></FormGroup>
@@ -1329,7 +1363,8 @@ class SupplyPlanVersionAndReview extends Component {
                                                         name="versionStatusId"
                                                         id="versionStatusId"
                                                         bsSize="sm"
-                                                        onChange={(e) => { this.fetchData(e) }}
+                                                        value={this.state.versionStatusId}
+                                                        onChange={(e) => { this.dataChange(e) }}
                                                     >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                         {statusList}</Input>
                                                 </InputGroup>    </div></FormGroup>

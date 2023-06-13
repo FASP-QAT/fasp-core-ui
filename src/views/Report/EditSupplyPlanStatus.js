@@ -255,6 +255,7 @@ class EditSupplyPlanStatus extends Component {
             problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             problemCategoryList: [],
             problemReportChanged: 0,
+            remainingDataChanged:0,
             problemReviewedList: [{ name: i18n.t("static.program.yes"), id: 1 }, { name: i18n.t("static.program.no"), id: 0 }],
             problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }],
             isModalOpen: false,
@@ -2277,7 +2278,8 @@ class EditSupplyPlanStatus extends Component {
 
         this.setState(
             {
-                program
+                program,
+                remainingDataChanged:1
             }
         )
 
@@ -4570,6 +4572,7 @@ class EditSupplyPlanStatus extends Component {
                     this.setState({
                         message: response.data.message,
                         problemReportChanged: 0,
+                        remainingDataChanged:0,
 
                         // isModalOpen: !this.state.isModalOpen,
                     })
@@ -5666,15 +5669,16 @@ class EditSupplyPlanStatus extends Component {
                                                 console.log("messageCode", response)
                                                 this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
                                             }else{
+                                                document.getElementById("submitButton").disabled = false;
                                             this.setState({
                                                 submitMessage: "static.message.supplyplanversionapprovedsuccess",
                                                 submitColor: "green",
                                                 problemReportChanged: 0,
+                                                remainingDataChanged:0
 
                                                 // isModalOpen: !this.state.isModalOpen,
                                             }, () => {
                                                 this.hideMessageComponent()
-                                                document.getElementById("submitButton").disabled = false;
                                                 this.componentDidMount();
                                             })
                                         }
@@ -5824,7 +5828,7 @@ class EditSupplyPlanStatus extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                {this.state.editable && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                 {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
@@ -5889,7 +5893,20 @@ class EditSupplyPlanStatus extends Component {
     }
 
     cancelClicked = () => {
-        this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        var cont = false;
+        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged==1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        }
     }
     resetClicked = () => {
         // AuthenticationService.setupAxiosInterceptors();
