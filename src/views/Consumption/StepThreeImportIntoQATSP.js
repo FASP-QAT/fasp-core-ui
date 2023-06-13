@@ -437,6 +437,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     filterData() {
+        var realmId = AuthenticationService.getRealmId();
         var db1;
         var storeOS;
         var supplyPlanRegionList = [];
@@ -451,6 +452,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
+            var realmTransaction = db1.transaction(['realm'], 'readwrite');
+            var realmOS = realmTransaction.objectStore('realm');
+            var realmRequest = realmOS.get(realmId);
+            realmRequest.onsuccess = function (event) {
+                var realm=realmRequest.result;
             var programDataTransaction = db1.transaction(['programData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('programData');
             var programRequest = programDataOs.get(this.props.items.programId);
@@ -531,7 +537,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 var regionFilter = supplyPlanRegionList.filter(c => c.forecastRegionId == primaryConsumptionData[i].region.id);
                                 if (primaryConsumptionData[i].monthlyForecastData[j].month != null && regionFilter.length > 0) {
                                     var diff = this.monthDiff(new Date(primaryConsumptionData[i].monthlyForecastData[j].month), new Date());
-                                    var isOldDate = diff < FORECASTED_CONSUMPTION_MONTHS_IN_PAST;
+                                    var isOldDate = diff < (realm.forecastConsumptionMonthsInPast+1);
                                     var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId && c.multiplier == 1);
                                     tempList.push({
                                         v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
@@ -624,6 +630,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 // console.log("step 3-tempList--->", tempList)
             }.bind(this)
         }.bind(this)
+    }.bind(this)
     }
 
     buildJexcel() {
