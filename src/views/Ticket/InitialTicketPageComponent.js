@@ -907,11 +907,11 @@ export default class InitialTicketPageComponent extends Component {
 
 
   render() {
-
+    const checkOnline = localStorage.getItem('sessionType');
     return (
       <Dropdown nav  >
 
-        <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.help')} onClick={this.togglehelp} style={{ width: '31px', height: '31px' }} />
+        {checkOnline==='Online' && <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.help')} onClick={this.togglehelp} style={{ width: '31px', height: '31px' }} />}
 
 
 

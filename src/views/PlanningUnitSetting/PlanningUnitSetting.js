@@ -2651,7 +2651,7 @@ export default class PlanningUnitSetting extends Component {
                     }
                     planningUnitList.push(tempJson);
                 } else {
-
+                    indexVar=originalPlanningUnitList.findIndex(c=>c.planningUnit.id==map1.get("1"));
                     let planningUnitobj1 = originalPlanningUnitList[indexVar];
                     let tempJson = {
                         "programPlanningUnitId": parseInt(map1.get("9")),

@@ -142,12 +142,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                 }
             }
-            console.log("isOldDate", isOldDate)
-            if (!isOldDate) {
+
+            if (!isOldDate && currentForecastedValue !== "") {
                 for (var i = 0; i < colArr.length; i++) {
-                    var cell1 = elInstance.getCell(`${colArr[i]}${parseInt(j) + 1}`)
+                    var cell1 = elInstance.getCell(`J${parseInt(j) + 1}`)
                     cell1.classList.add('readonly');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    cell1.classList.add('commitConflict');
                 }
             }
         }
@@ -437,6 +437,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     filterData() {
+        var realmId = AuthenticationService.getRealmId();
         var db1;
         var storeOS;
         var supplyPlanRegionList = [];
@@ -451,6 +452,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
+            var realmTransaction = db1.transaction(['realm'], 'readwrite');
+            var realmOS = realmTransaction.objectStore('realm');
+            var realmRequest = realmOS.get(realmId);
+            realmRequest.onsuccess = function (event) {
+                var realm=realmRequest.result;
             var programDataTransaction = db1.transaction(['programData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('programData');
             var programRequest = programDataOs.get(this.props.items.programId);
@@ -531,7 +537,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 var regionFilter = supplyPlanRegionList.filter(c => c.forecastRegionId == primaryConsumptionData[i].region.id);
                                 if (primaryConsumptionData[i].monthlyForecastData[j].month != null && regionFilter.length > 0) {
                                     var diff = this.monthDiff(new Date(primaryConsumptionData[i].monthlyForecastData[j].month), new Date());
-                                    var isOldDate = diff < FORECASTED_CONSUMPTION_MONTHS_IN_PAST;
+                                    var isOldDate = diff < (realm.forecastConsumptionMonthsInPast+1);
                                     var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId && c.multiplier == 1);
                                     tempList.push({
                                         v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
@@ -551,7 +557,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v15: regionFilter[0].forecastPercentage,// % of forecast
                                         v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
                                         v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId,
-                                        v18: isOldDate
+                                        v18: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
 
                                     });
                                 }
@@ -624,6 +630,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 // console.log("step 3-tempList--->", tempList)
             }.bind(this)
         }.bind(this)
+    }.bind(this)
     }
 
     buildJexcel() {
@@ -947,6 +954,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
                             {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
                             <span class="legendcommitversionText red">Data already exists in Supply Plan Program</span>
+                        </li>
+                        <li><span class="legendcolor" style={{ backgroundColor: "#a5a3a3", border: "1px solid #000" }}></span>
+                            {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
+                            <span class="legendcommitversionText red">Data exists in Supply Plan Program and is past {FORECASTED_CONSUMPTION_MONTHS_IN_PAST} months, so it cannot be imported.</span>
                         </li>
                     </ul>
                 </div>

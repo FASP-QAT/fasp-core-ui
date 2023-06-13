@@ -191,7 +191,9 @@ export default class SyncProgram extends Component {
                         } else {
                             if (programList[i].changed) {
                                 var programCode = programList[i].programCode + "~v" + programList[i].version;
-                                var cf = window.confirm(i18n.t('static.module.forecastingModule') + "\r\n\r\n" + i18n.t('static.syncProgram.loadAndDeleteWithUncommittedChanges', { programCode }) + "\r\n\r\n" + i18n.t('static.sync.clickOkMsg') + "\r\n" + i18n.t("static.sync.clickCancelMsg"));
+                                var programCodeLocal = programList[i].programCode + "~v" + programList[i].version+" (local)";
+                                var programCodeServer = programList[i].programCode + "~v" + latestVersion;
+                                var cf = window.confirm(i18n.t('static.dashboard.forecasting')+" - "+i18n.t('static.sync.importantPleaseRead')+"\n\r" + i18n.t('static.sync.clickOkTo')+"\n"+i18n.t('static.sync.deleteLocalVersion',{programCodeLocal})+"\n"+i18n.t('static.sync.loseUnsubmittedChanges')+"\n"+i18n.t('static.sync.loadLatestVersion',{programCodeServer})+"\n\r"+i18n.t('static.sync.clickCancelTo')+"\n"+i18n.t('static.sync.keepLocalVersion',{programCodeLocal}));
                                 if (cf == true) {
                                     var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                                     if (index == -1) {
@@ -216,7 +218,9 @@ export default class SyncProgram extends Component {
                                 }
                             } else {
                                 var programCode = programList[i].programCode + "~v" + programList[i].version;
-                                var cf = window.confirm(i18n.t('static.module.forecastingModule') + "\r\n\r\n" + i18n.t('static.syncProgram.loadAndDeleteWithoutUncommittedChanges', { programCode }) + "\r\n\r\n" + i18n.t('static.sync.clickOkMsg') + "\r\n" + i18n.t("static.sync.clickCancelMsg"));
+                                var programCodeLocal = programList[i].programCode + "~v" + programList[i].version+" (local)";
+                                var programCodeServer = programList[i].programCode + "~v" + latestVersion;
+                                var cf = window.confirm(i18n.t('static.dashboard.forecasting')+" - "+i18n.t('static.sync.importantPleaseRead')+"\n\r" + i18n.t('static.sync.clickOkTo')+"\n"+i18n.t('static.sync.deleteLocalVersion',{programCodeLocal})+"\n"+i18n.t('static.sync.loadLatestVersion',{programCodeServer})+"\n\r"+i18n.t('static.sync.clickCancelTo')+"\n"+i18n.t('static.sync.keepLocalVersion',{programCodeLocal}));
                                 if (cf == true) {
                                     var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                                     if (index == -1) {
@@ -319,7 +323,9 @@ export default class SyncProgram extends Component {
                         } else {
                             if (programList[i].programModified) {
                                 var programCode = programList[i].programCode + "~v" + programList[i].version;
-                                var cf = window.confirm(i18n.t('static.module.supplyPlanningModule') + "\r\n\r\n" + i18n.t('static.syncProgram.loadAndDeleteWithUncommittedChanges', { programCode }) + "\r\n\r\n" + i18n.t('static.sync.clickOkMsg') + "\r\n" + i18n.t("static.sync.clickCancelMsg"));
+                                var programCodeLocal = programList[i].programCode + "~v" + programList[i].version+" (local)";
+                                var programCodeServer = programList[i].programCode + "~v" + latestVersion;
+                                var cf = window.confirm(i18n.t('static.dashboard.supplyPlan')+" - "+i18n.t('static.sync.importantPleaseRead')+"\n\r" + i18n.t('static.sync.clickOkTo')+"\n"+i18n.t('static.sync.deleteLocalVersion',{programCodeLocal})+"\n"+i18n.t('static.sync.loseUnsubmittedChanges')+"\n"+i18n.t('static.sync.loadLatestVersion',{programCodeServer})+"\n\r"+i18n.t('static.sync.clickCancelTo')+"\n"+i18n.t('static.sync.keepLocalVersion',{programCodeLocal}));
                                 if (cf == true) {
                                     var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                                     if (index == -1) {
@@ -344,7 +350,9 @@ export default class SyncProgram extends Component {
                                 }
                             } else {
                                 var programCode = programList[i].programCode + "~v" + programList[i].version;
-                                var cf = window.confirm(i18n.t('static.module.supplyPlanningModule') + "\r\n\r\n" + i18n.t('static.syncProgram.loadAndDeleteWithoutUncommittedChanges', { programCode }) + "\r\n\r\n" + i18n.t('static.sync.clickOkMsg') + "\r\n" + i18n.t("static.sync.clickCancelMsg"));
+                                var programCodeLocal = programList[i].programCode + "~v" + programList[i].version+" (local)";
+                                var programCodeServer = programList[i].programCode + "~v" + latestVersion;
+                                var cf = window.confirm(i18n.t('static.dashboard.supplyPlan')+" - "+i18n.t('static.sync.importantPleaseRead')+"\n\r" + i18n.t('static.sync.clickOkTo')+"\n"+i18n.t('static.sync.deleteLocalVersion',{programCodeLocal})+"\n"+i18n.t('static.sync.loadLatestVersion',{programCodeServer})+"\n\r"+i18n.t('static.sync.clickCancelTo')+"\n"+i18n.t('static.sync.keepLocalVersion',{programCodeLocal}));
                                 if (cf == true) {
                                     var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                                     if (index == -1) {
@@ -501,13 +509,13 @@ export default class SyncProgram extends Component {
                                     var programRequest3 = programDataOs3.delete(readonlyProgramToBeDeleted[dpd].id);
                                 }
                                 programDataTransaction3.oncomplete = function (event) {
-                                    var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                    var programDataOs2 = programDataTransaction2.objectStore('downloadedDatasetData');
+                                    // var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                    // var programDataOs2 = programDataTransaction2.objectStore('downloadedDatasetData');
 
-                                    for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
-                                        var programRequest2 = programDataOs2.delete(readonlyProgramToBeDeleted[dpd].id);
-                                    }
-                                    programDataTransaction2.oncomplete = function (event) {
+                                    // for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
+                                    //     var programRequest2 = programDataOs2.delete(readonlyProgramToBeDeleted[dpd].id);
+                                    // }
+                                    // programDataTransaction2.oncomplete = function (event) {
 
                                         var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
                                         var programSaveData = transactionForSavingData.objectStore('datasetData');
@@ -538,29 +546,29 @@ export default class SyncProgram extends Component {
 
                                         }
                                         transactionForSavingData.oncomplete = function (event) {
-                                            var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                                            var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
-                                            for (var r = 0; r < json.length; r++) {
-                                                var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
-                                                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                                // var version = json[r].requestedProgramVersion;
-                                                // if (version == -1) {
-                                                var version = json[r].currentVersion.versionId
-                                                // }
-                                                var item = {
-                                                    id: json[r].programId + "_v" + version + "_uId_" + userId,
-                                                    programId: json[r].programId,
-                                                    version: version,
-                                                    programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                                    programData: encryptedText.toString(),
-                                                    userId: userId
-                                                };
-                                                // console.log("Item------------>", item);
-                                                var putRequest = downloadedProgramSaveData.put(item);
+                                            // var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                            // var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedDatasetData');
+                                            // for (var r = 0; r < json.length; r++) {
+                                            //     var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                            //     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                            //     var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                            //     // var version = json[r].requestedProgramVersion;
+                                            //     // if (version == -1) {
+                                            //     var version = json[r].currentVersion.versionId
+                                            //     // }
+                                            //     var item = {
+                                            //         id: json[r].programId + "_v" + version + "_uId_" + userId,
+                                            //         programId: json[r].programId,
+                                            //         version: version,
+                                            //         programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
+                                            //         programData: encryptedText.toString(),
+                                            //         userId: userId
+                                            //     };
+                                            //     // console.log("Item------------>", item);
+                                            //     var putRequest = downloadedProgramSaveData.put(item);
 
-                                            }
-                                            transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                            // }
+                                            // transactionForSavingDownloadedProgramData.oncomplete = function (event) {
                                                 var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
                                                 var programIds = []
@@ -595,8 +603,8 @@ export default class SyncProgram extends Component {
                                     }.bind(this)
                                 }.bind(this)
                             }.bind(this)
-                        }.bind(this)
-                    }.bind(this)
+                        // }.bind(this)
+                    // }.bind(this)
 
                 })
         } else {
@@ -653,19 +661,19 @@ export default class SyncProgram extends Component {
                             var programRequest3 = programDataOs3.delete(checkIfProgramExists[0].id);
                         }
                         programDataTransaction3.oncomplete = function (event) {
-                            var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                            var programDataOs2 = programDataTransaction2.objectStore('downloadedDatasetData');
+                            // var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                            // var programDataOs2 = programDataTransaction2.objectStore('downloadedDatasetData');
 
-                            for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
-                                var checkIfProgramExists = myResult.filter(c => c.programId == readonlyProgramToBeDeleted[dpd].programId && c.version == readonlyProgramToBeDeleted[dpd].version && c.readonly == 1 && c.userId == userId);
-                                console.log("checkIfProgramExists+++", checkIfProgramExists);
-                                var programIdToDelete = 0;
-                                if (checkIfProgramExists.length > 0) {
-                                    programIdToDelete = checkIfProgramExists[0].id;
-                                }
-                                var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
-                            }
-                            programDataTransaction2.oncomplete = function (event) {
+                            // for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
+                            //     var checkIfProgramExists = myResult.filter(c => c.programId == readonlyProgramToBeDeleted[dpd].programId && c.version == readonlyProgramToBeDeleted[dpd].version && c.readonly == 1 && c.userId == userId);
+                            //     console.log("checkIfProgramExists+++", checkIfProgramExists);
+                            //     var programIdToDelete = 0;
+                            //     if (checkIfProgramExists.length > 0) {
+                            //         programIdToDelete = checkIfProgramExists[0].id;
+                            //     }
+                            //     var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
+                            // }
+                            // programDataTransaction2.oncomplete = function (event) {
                                 console.log(")))) Data saved successfully")
                                 var syncedMasters = this.state.syncedMasters;
                                 this.setState({
@@ -681,7 +689,7 @@ export default class SyncProgram extends Component {
                         }.bind(this)
                     }.bind(this)
                 }.bind(this)
-            }.bind(this)
+            // }.bind(this)
         }
     }
 
