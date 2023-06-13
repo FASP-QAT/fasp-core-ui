@@ -8129,7 +8129,7 @@ export default class BuildTree extends Component {
         }
 
 
-        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = false;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = true;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier = pu.multiplier;
         // if (itemConfig.context.payload.nodeType.id == 4) {
         //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
@@ -9800,7 +9800,7 @@ export default class BuildTree extends Component {
                                                                         id="sharePlanningUnitTrue"
                                                                         name="sharePlanningUnit"
                                                                         value={true}
-                                                                        checked={this.state.currentScenario.puNode.sharePlanningUnit === true}
+                                                                        checked={this.state.currentScenario.puNode.sharePlanningUnit == true || this.state.currentScenario.puNode.sharePlanningUnit == "true"}
                                                                         onChange={(e) => {
                                                                             this.dataChange(e)
                                                                         }}
@@ -9819,7 +9819,7 @@ export default class BuildTree extends Component {
                                                                         id="sharePlanningUnitFalse"
                                                                         name="sharePlanningUnit"
                                                                         value={false}
-                                                                        checked={this.state.currentScenario.puNode.sharePlanningUnit === false}
+                                                                        checked={this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.currentScenario.puNode.sharePlanningUnit == "false"}
                                                                         onChange={(e) => {
                                                                             this.dataChange(e)
                                                                         }}
@@ -11579,7 +11579,7 @@ export default class BuildTree extends Component {
                                                 multiplier: ''
                                             },
                                             refillMonths: '',
-                                            sharePlanningUnit: "false"
+                                            sharePlanningUnit: "true"
                                         }
                                     };
                                     tempArray.push(tempJson);
