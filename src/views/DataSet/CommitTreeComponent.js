@@ -614,15 +614,15 @@ export default class CommitTreeComponent extends React.Component {
                                 for (var tl = 0; tl < treeList.length; tl++) {
                                     var tree = treeList[tl];
                                     var scenarioList = tree.scenarioList;
-                                    var scenarioIdsSet=[...new Set(scenarioList.map(ele => Number(ele.id)))];
-                                    console.log("Scenario Ids Set Test@123",scenarioIdsSet);
+                                    var scenarioIdsSet = [...new Set(scenarioList.map(ele => Number(ele.id)))];
+                                    console.log("Scenario Ids Set Test@123", scenarioIdsSet);
                                     var completeFlatList = (tree.tree).flatList;
                                     for (let i = 0; i < completeFlatList.length; i++) {
                                         var node = completeFlatList[i];
-                                        var scenarioKeys=Object.keys(node.payload.nodeDataMap);
-                                        for(var sk=0;sk<scenarioKeys.length;sk++){
-                                            console.log("scenarioKeys[sk] Test@123",scenarioKeys[sk])
-                                            if(!(scenarioIdsSet.includes(Number(scenarioKeys[sk])))){
+                                        var scenarioKeys = Object.keys(node.payload.nodeDataMap);
+                                        for (var sk = 0; sk < scenarioKeys.length; sk++) {
+                                            console.log("scenarioKeys[sk] Test@123", scenarioKeys[sk])
+                                            if (!(scenarioIdsSet.includes(Number(scenarioKeys[sk])))) {
                                                 delete node.payload.nodeDataMap[scenarioKeys[sk]];
                                             }
                                         }
@@ -1057,7 +1057,7 @@ export default class CommitTreeComponent extends React.Component {
                                     </div>
                                 </div>
                             </Form>
-                            <b><div className="mb-2"> <span>{i18n.t('static.commitTree.note')}</span></div></b>
+                            <div style={{ display: (this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined !== "") ? 'block' : 'none' }}><b><div className="mb-2"> <span>{i18n.t('static.commitTree.note')}</span></div></b></div>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 {(this.state.showCompare) &&
                                     <>
@@ -1082,7 +1082,7 @@ export default class CommitTreeComponent extends React.Component {
                                 <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Next</Button>
                             </div> */}
 
-                                <div>
+                                <div style={{ display: (this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined) ? 'block' : 'none' }}>
                                     <Formik
                                         initialValues={initialValues}
                                         validate={validate(validationSchema)}
@@ -1213,7 +1213,7 @@ export default class CommitTreeComponent extends React.Component {
                             <ul>{consumption}</ul>
 
                             <span><b>3. {i18n.t('static.commitTree.treeForecast')}: </b>(<a href={"/#/dataSet/buildTree/tree/0/" + this.state.programId} target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
-                            <span>a. {this.state.includeOnlySelectedForecasts?i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree'):i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
+                            <span>a. {this.state.includeOnlySelectedForecasts ? i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree') : i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
                             <ul>{pu}</ul>
 
                             <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}:</span><br />
