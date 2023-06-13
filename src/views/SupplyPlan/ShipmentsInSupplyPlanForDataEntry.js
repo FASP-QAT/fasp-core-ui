@@ -185,6 +185,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
 
         if (x == 12 && !isNaN(rowData[12]) && rowData[12].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(12, y, parseFloat(rowData[12]), true);
+            elInstance.setValueFromCoords(21, y, "", true);
         } else if (x == 19 && !isNaN(rowData[19]) && rowData[19].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(19, y, parseFloat(rowData[19]), true);
         } else if (x == 20 && !isNaN(rowData[20]) && rowData[20].toString().indexOf('.') != -1) {
@@ -649,9 +650,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[17] = "";
                                                 data[18] = USD_CURRENCY_ID;
                                                 data[19] = "";
-                                                data[20] = `=ROUND(T${parseInt(0) + 1}*M${parseInt(0) + 1},2)`;
+                                                data[20] = `=ROUND(T${parseInt(0) + 1}*O${parseInt(0) + 1},2)`;
                                                 data[21] = "";
-                                                data[22] = `=ROUND(ROUND(M${parseInt(0) + 1}*T${parseInt(0) + 1},2)+V${parseInt(0) + 1},2)`;
+                                                data[22] = `=ROUND(ROUND(O${parseInt(0) + 1}*T${parseInt(0) + 1},2)+V${parseInt(0) + 1},2)`;
                                                 data[23] = NONE_SELECTED_DATA_SOURCE_ID;
                                                 data[24] = "";
                                                 data[25] = moment(Date.now()).format("YYYY-MM-DD");
@@ -942,6 +943,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                                         var cf = window.confirm(i18n.t('static.shipmentDataEntry.suggestedShipmentQtyConfirm1') + " " + this.formatter(suggestedQty) + " " + i18n.t("static.shipmentDataEntry.suggestedShipmentQtyConfirm2") + " " + this.formatter(newSuggestedShipmentQty));
                                                                         if (cf == true) {
                                                                             obj.setValueFromCoords(12, y, newSuggestedShipmentQty, true);
+                                                                            obj.setValueFromCoords(21, y, "", true);
                                                                         } else {
 
                                                                         }
@@ -1392,9 +1394,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         data[17] = "";
         data[18] = USD_CURRENCY_ID;
         data[19] = "";
-        data[20] = `=ROUND(T${parseInt(json.length) + 1}*M${parseInt(json.length) + 1},2)`;
+        data[20] = `=ROUND(T${parseInt(json.length) + 1}*O${parseInt(json.length) + 1},2)`;
         data[21] = "";
-        data[22] = `=ROUND(ROUND(M${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},2)+V${parseInt(json.length) + 1},2)`;
+        data[22] = `=ROUND(ROUND(O${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},2)+V${parseInt(json.length) + 1},2)`;
         data[23] = NONE_SELECTED_DATA_SOURCE_ID;
         data[24] = "";
         data[25] = moment(Date.now()).format("YYYY-MM-DD");
@@ -1823,7 +1825,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         var batchQtyTotalForPopup=0;
         if(batchInfo!=""){
         batchInfo.map(item=>{
-            batchQtyTotalForPopup+=item.shipmentQty
+            batchQtyTotalForPopup+=Number(item.shipmentQty)
         })
     }
         this.props.updateState("shipmentQtyTotalForPopup", rowData[12]);
@@ -2148,6 +2150,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             if (valid == true) {
                 var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[11].toString().split(";")[0])[0]).multiplier;
                 elInstance.setValueFromCoords(13, y, multiplier, true);
+            }
+            if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+            } else {
+                elInstance.setValueFromCoords(21, y, "", true);
             }
         }
 
@@ -2502,6 +2509,8 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
                         elInstance.setValueFromCoords(21, y, freightCost.toFixed(2), true);
                     }
+                }else{
+                    elInstance.setValueFromCoords(21, y, "", true);
                 }
                 if ((rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) && (rowData[30].expectedDeliveryDate == "" || rowData[30].expectedDeliveryDate == null || rowData[30].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
@@ -2566,12 +2575,18 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     this.batchDetailsClicked(elInstance, x, y, true, !(rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) ? true : false);
                 }
             }
+            elInstance.setValueFromCoords(21, y, "", true);
         }
 
         if (x == 19) {
             var valid = checkValidtion("number", "T", y, elInstance.getValue(`T${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
             if (valid == false) {
                 elInstance.setValueFromCoords(34, y, 1, true);
+            }
+            if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+            } else {
+                elInstance.setValueFromCoords(21, y, "", true);
             }
         }
 
@@ -2764,6 +2779,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             var rowNumber = rowData[6];
             var shipmentInstance = this.state.shipmentsEl;
             shipmentInstance.setValueFromCoords(12, rowNumber, shipmentQty, true);
+            shipmentInstance.setValueFromCoords(21, rowNumber, "", true);
             this.props.updateState("shipmentQtyChangedFlag", 0);
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("qtyCalculatorTableEl", "");

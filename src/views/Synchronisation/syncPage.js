@@ -4175,7 +4175,7 @@ export default class syncPage extends Component {
             if (oldData[12] != PROBLEM_STATUS_IN_COMPLIANCE && latestData[12] != PROBLEM_STATUS_IN_COMPLIANCE) {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1,
-                conflictsCountQPL: this.state.conflictsCountQPL
+                conflictsCountQPL: this.state.conflictsCountQPL+1
               })
               elInstance.setValueFromCoords(20, c, 1, true);
               (jsonData[c])[20] = 1;
