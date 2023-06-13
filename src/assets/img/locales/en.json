@@ -3100,5 +3100,6 @@
     "static.dataentry.road":"Road",
     "static.report.shippedToArrivedRoadLeadTime": "Shipped to Arrived (Road)",
     "static.report.totalRoadLeadTime": "Planned to Received (Road)",
-    "static.dashboard.forecasting":"Forecasting"
+    "static.dashboard.forecasting":"Forecasting",
+    "static.common.duplicateToDifferentProgram":"Duplicate tree to different program"
 }
