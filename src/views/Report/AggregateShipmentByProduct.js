@@ -1227,7 +1227,7 @@ class AggregateShipmentByProduct extends Component {
                         data: this.state.consumptions.map((item, index) => (item.forcast))
                     }, {
                         label: i18n.t('static.report.actualConsumption'),
-                        backgroundColor: '#86CD99',
+                        backgroundColor: '#86cd99 !important',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -1248,7 +1248,7 @@ class AggregateShipmentByProduct extends Component {
                 datasets: [
                     {
                         label: i18n.t('static.report.actualConsumption'),
-                        backgroundColor: '#86CD99',
+                        backgroundColor: '#86cd99 !important',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
