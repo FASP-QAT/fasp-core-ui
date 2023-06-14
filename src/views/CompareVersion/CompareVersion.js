@@ -136,7 +136,7 @@ class CompareVersion extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push({ id: newVList[v].versionId, name: newVList[v].versionId.toString().includes("Local") ? newVList[v].versionId : (newVList[v].versionId + (newVList[v].versionType.id == 2 ? "*" : "") + " (" + moment(newVList[v].createdDate).format(`DD-MMM-YYYY`) + ")") })
+                versionList.push({ id: newVList[v].versionId, name: (newVList[v].versionId + (newVList[v].versionType.id == 2 ? "*" : "") + " (" + moment(newVList[v].createdDate).format(`DD-MMM-YYYY`) + ")") })
             }
             var versionId = "";
             var event = {
@@ -220,7 +220,7 @@ class CompareVersion extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push({ id: newVList[v].versionId, name: newVList[v].versionId.toString().includes("Local") ? newVList[v].versionId : (newVList[v].versionId + (newVList[v].versionType.id == 2 ? "*" : "") + " (" + moment(newVList[v].createdDate).format(`DD-MMM-YYYY`) + ")") })
+                versionList.push({ id: newVList[v].versionId, name: (newVList[v].versionId + (newVList[v].versionType.id == 2 ? "*" : "") + " (" + moment(newVList[v].createdDate).format(`DD-MMM-YYYY`) + ")") })
             }
             versionList = versionList.filter(c => c.id != this.state.versionId);
 
@@ -339,6 +339,8 @@ class CompareVersion extends Component {
                 for (var mr = 0; mr < myResult.length; mr++) {
                     if (myResult[mr].userId == userId) {
                         var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                        var databytes = CryptoJS.AES.decrypt(myResult[mr].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                         if (index == -1) {
                             var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
                             var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
@@ -348,13 +350,13 @@ class CompareVersion extends Component {
                                 id: myResult[mr].programId,
                                 name: getLabelText(programNameJson, this.state.lang),
                                 code: myResult[mr].programCode,
-                                versionList: [{ versionId: myResult[mr].version + " (Local)" }]
+                                versionList: [{ versionId: myResult[mr].version + " (Local)",createdDate:programData.currentVersion.createdDate,versionType:programData.currentVersion.versionType }]
                             }
                             datasetList.push(json)
                         } else {
                             var existingVersionList = datasetList[index].versionList;
                             console.log("existingVersionList+++", datasetList[index].versionList)
-                            existingVersionList.push({ versionId: myResult[mr].version + " (Local)" })
+                            existingVersionList.push({ versionId: myResult[mr].version + " (Local)",createdDate:programData.currentVersion.createdDate,versionType:programData.currentVersion.versionType })
                             datasetList[index].versionList = existingVersionList
                         }
                     }
