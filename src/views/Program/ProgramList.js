@@ -604,6 +604,16 @@ export default class ProgramList extends Component {
                   })
 
                 }.bind(this)
+              },
+              {
+                title: i18n.t('static.program.mapPlanningUnit'),
+                onclick: function () {
+                  // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                  this.props.history.push({
+                    pathname: `/program/mapProcurementAgent/${this.el.getValueFromCoords(0, y)}`,
+                  })
+
+                }.bind(this)
               });
             }
           }

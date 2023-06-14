@@ -966,6 +966,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/program/mapProcurementAgent/:programId":
+                        if (bfunction.includes("ROLE_BF_ADD_INTEGRATION_PROGRAM")) {
+                            return true;
+                        }
+                        break;
                     case "/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId":
                         if (bfunction.includes("ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES")) {
                             return true;

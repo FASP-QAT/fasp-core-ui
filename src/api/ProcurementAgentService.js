@@ -76,6 +76,14 @@ class ProcurementAgentService {
         return axios.put(`${API_URL}/api/procurementAgentType/`, json, {
         });
     }
+    getProcurementAgentForProgram(json) {
+        return axios.get(`${API_URL}/api/program/${json}/updateProcurementAgents`, {}
+        );
+    }
+    updateProcurementAgentsForProgram(json) {
+        return axios.post(`${API_URL}/api/program/${json}/updateProcurementAgents`, json, {
+        });
+    }
 }
 
 export default new ProcurementAgentService();
