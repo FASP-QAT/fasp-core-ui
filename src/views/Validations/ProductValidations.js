@@ -770,7 +770,7 @@ class ProductValidation extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push(newVList[v].versionId)
+                versionList.push({"versionId":newVList[v].versionId,"createdDate":newVList[v].createdDate})
             }
             var versionId = "";
             var event = {
@@ -778,10 +778,11 @@ class ProductValidation extends Component {
                     value: ""
                 }
             };
+            console.log("Version List Test@123",versionList)
             if (versionList.length == 1) {
-                versionId = versionList[0];
-                event.target.value = versionList[0];
-            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetVersionId")).length > 0) {
+                versionId = versionList[0].versionId;
+                event.target.value = versionList[0].versionId;
+            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c.versionId == localStorage.getItem("sesDatasetVersionId")).length > 0) {
                 versionId = localStorage.getItem("sesDatasetVersionId");
                 event.target.value = localStorage.getItem("sesDatasetVersionId");
             }
@@ -914,22 +915,24 @@ class ProductValidation extends Component {
                                     for (var mr = 0; mr < myResult.length; mr++) {
                                         if (myResult[mr].userId == userId) {
                                             var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                                            var databytes = CryptoJS.AES.decrypt(myResult[mr].programData, SECRET_KEY);
+                                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                                             if (index == -1) {
                                                 var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
                                                 var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
                                                 console.log("programNamelabel+++", programNameLabel);
-                                                var programNameJson = JSON.parse(programNameLabel)
+                                                var programNameJson = JSON.parse(programNameLabel);
                                                 var json = {
                                                     id: myResult[mr].programId,
                                                     name: getLabelText(programNameJson, this.state.lang),
                                                     code: myResult[mr].programCode,
-                                                    versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                                                    versionList: [{ versionId: myResult[mr].version + "  (Local)",createdDate:programData.currentVersion.createdDate }]
                                                 }
                                                 datasetList.push(json)
                                             } else {
                                                 var existingVersionList = datasetList[index].versionList;
                                                 console.log("existingVersionList+++", datasetList[index].versionList)
-                                                existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                                                existingVersionList.push({ versionId: myResult[mr].version + "  (Local)",createdDate:programData.currentVersion.createdDate })
                                                 datasetList[index].versionList = existingVersionList
                                             }
                                         }
@@ -1272,8 +1275,8 @@ class ProductValidation extends Component {
         let versions = versionList.length > 0
             && versionList.map((item, i) => {
                 return (
-                    <option key={i} value={item}>
-                        {item} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+                    <option key={i} value={item.versionId}>
+                        {item.versionId} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
