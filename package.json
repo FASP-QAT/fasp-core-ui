@@ -160,8 +160,8 @@
   "scripts": {
     "dev": "webpack-dev-server --mode=development",
     "prod": "webpack --mode=production",
-    "start": "PORT=4202 react-scripts start",
-    "build": "react-scripts build",
+    "start": "PORT=4202 react-scripts --openssl-legacy-provider start",
+    "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
     "test:cov": "npm test -- --coverage --watchAll=false",
     "test:debug": "react-scripts --inspect-brk test --runInBand",

@@ -876,6 +876,9 @@ class VersionSettingsComponent extends Component {
             stopDate: stopDate
         }
         console.log("Input Json", inputjson)
+        this.setState({
+            loading: true
+        })
         ProgramService.getDatasetVersions(inputjson).then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
@@ -915,7 +918,8 @@ class VersionSettingsComponent extends Component {
                 }
                 console.log("dataList1---------->", dataList1)
                 this.setState({
-                    dataList: dataList1
+                    dataList: dataList1,
+                    loading: false
                 },
                     () => {
                         this.buildJExcel();
@@ -924,7 +928,8 @@ class VersionSettingsComponent extends Component {
         }).catch(
             error => {
                 this.setState({
-                    dataList: []
+                    dataList: [],
+                    loading: false
                 },
                     () => {
                         this.buildJExcel();
@@ -1892,7 +1897,7 @@ class VersionSettingsComponent extends Component {
                             <ul>{consumption}</ul>
 
                             <span><b>3. {i18n.t('static.commitTree.treeForecast')}: </b>(<a href={"/#/dataSet/buildTree/tree/0/" + this.state.programId} target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
-                            <span>a. {this.state.includeOnlySelectedForecasts?i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree'):i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
+                            <span>a. {this.state.includeOnlySelectedForecasts ? i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree') : i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
                             <ul>{pu}</ul>
 
                             <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}:</span><br />

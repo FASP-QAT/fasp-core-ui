@@ -5600,7 +5600,7 @@ class EditSupplyPlanStatus extends Component {
 
                                                         <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClickedModal}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                             &nbsp;
                                                         </FormGroup>
@@ -5829,7 +5829,7 @@ class EditSupplyPlanStatus extends Component {
                                         <CardFooter>
                                             <FormGroup>
                                                 {this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                {this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
                                                 &nbsp;
@@ -5909,57 +5909,28 @@ class EditSupplyPlanStatus extends Component {
         }
     }
     resetClicked = () => {
-        // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
-            .then(response => {
-                console.log(response.data)
-                let { program } = this.state
-                program.label = response.data.label
-                this.setState({
-                    program
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            // message: 'static.unkownError',
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+        var cont = false;
+        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged==1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                problemReportChanged:0,
+                remainingDataChanged:0
+            },()=>{
+                this.componentDidMount();
+            })
+        }
+    }
 
+    resetClickedModal=()=>{
 
     }
 
