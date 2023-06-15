@@ -967,7 +967,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/program/mapProcurementAgent/:programId":
-                        if (bfunction.includes("ROLE_BF_ADD_INTEGRATION_PROGRAM")) {
+                        if (bfunction.includes("ROLE_BF_MAP_PROCUREMENT_AGENT")) {
                             return true;
                         }
                         break;

@@ -606,7 +606,7 @@ export default class ProgramList extends Component {
                 }.bind(this)
               },
               {
-                title: i18n.t('static.program.mapPlanningUnit'),
+                title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementAgent'),
                 onclick: function () {
                   // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                   this.props.history.push({

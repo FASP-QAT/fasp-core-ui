@@ -80,8 +80,8 @@ class ProcurementAgentService {
         return axios.get(`${API_URL}/api/program/${json}/updateProcurementAgents`, {}
         );
     }
-    updateProcurementAgentsForProgram(json) {
-        return axios.post(`${API_URL}/api/program/${json}/updateProcurementAgents`, json, {
+    updateProcurementAgentsForProgram(json, json1) {
+        return axios.post(`${API_URL}/api/program/${json}/updateProcurementAgents`, json1, {
         });
     }
 }

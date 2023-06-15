@@ -4,29 +4,24 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n';
-import jexcel from 'jspreadsheet';
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import IntegrationService from '../../api/IntegrationService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import RealmService from "../../api/RealmService";
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, SPACE_REGEX } from '../../Constants.js';
+import { API_URL } from '../../Constants.js';
 import classNames from 'classnames';
-import { responsiveFontSizes } from '@material-ui/core';
 
 const initialValues = {
     label: ""
 }
-const entityname = i18n.t('static.integration.integration');
+const entityname = i18n.t('static.report.procurementAgentName');
 const validationSchema = function (values) {
     return Yup.object().shape({
-        realmId: Yup.string()
-            .required(i18n.t('static.common.realmtext')),
+        // programId: Yup.string()
+        //     .required(i18n.t('static.common.realmtext')),
     })
 }
 
@@ -60,31 +55,19 @@ export default class AddDimensionComponent extends Component {
         this.state = {
             program: {
                 id: this.props.match.params.programId,
-                label_en: '',
-                procurementAgent: [],
+                code: '',
+                procurementAgents: []
             },
             message: '',
             loading: true,
             isHide: true,
             bodyParameter: '',
-            procurementAgents: []
+            selectedProcurementAgentList: [],
+            procurementAgentList: []
         }
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.buildJexcel = this.buildJexcel.bind(this);
-    }
-
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance, 1);
-        jExcelLoadedFunctionOnlyHideRow(instance);
-        // var asterisk = document.getElementsByClassName("resizable")[0];
-        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
-        var tr = asterisk.firstChild;
-        // tr.children[1].classList.add('AsteriskTheadtrTd');
-        tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[3].classList.add('AsteriskTheadtrTd');
-
     }
 
     hideSecondComponent() {
@@ -101,7 +84,7 @@ export default class AddDimensionComponent extends Component {
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('simpleForm', (fieldName) => {
+        this.findFirstError('procurementAgentForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -114,235 +97,60 @@ export default class AddDimensionComponent extends Component {
             }
         }
     }
-    dataChange(roleId) {
-
-    }
-
-    buildJexcel() {
-        var procurementAgentList = this.state.selectedProcurementAgentList;
-
-        var data = [];
-        var procurementAgentArr = [];
-
-        var count = 0;
-        if (procurementAgentList.length != 0) {
-            for (var j = 0; j < procurementAgentList.length; j++) {
-                data = [];
-                data[0] = procurementAgentList[j].id
-                data[1] = procurementAgentList[j].code
-                count++;
-            }
-        }
-
-       
-
-        if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
-            // this.state.table1Instance.destroy();
-            jexcel.destroy(document.getElementById("paputableDiv"), true);
-        }
-
-        // if (this.state.table2Instance != "" && this.state.table2Instance != undefined) {
-        //     // this.state.table2Instance.destroy();
-        //     jexcel.destroy(document.getElementById("eqUnitInfoTable"), true);
-        // }
-        var json = [];
-        var data = procurementAgentArr;
-
-        var options = {
-            data: data,
-            columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100, 50],
-            columns: [
-
-                {
-                    title: 'procurementAgentId',
-                    type: 'hidden',
-                    // readOnly: true
-                },
-                {
-                    title: i18n.t('static.equivalancyUnit.equivalancyUnitName'),
-                    type: 'autocomplete',
-                    source: this.state.equivalancyUnitList,
-                    filter: this.filterEquivalancyUnit
-                }
-
-            ],
-            updateTable: function (el, cell, x, y, source, value, id) {
-                if (y != null) {
-                    var elInstance = el;
-                    var rowData = elInstance.getRowData(y);
-
-                    //left align
-                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
-
-                    var typeId = rowData[14];
-                    // console.log("updateTable------>", rowData[11]);                    
-
-                    let checkReadOnly = 0;
-                    if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && typeId == -1 && typeId != 0)) {
-                        checkReadOnly = checkReadOnly + 1;
-
-                        // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        // cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    }
-
-                    var addRowId = rowData[15];
-                    // console.log("addRowId------>", addRowId);
-                    if (addRowId == 1) {//active grade out
-                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    } else if (checkReadOnly == 0) {
-                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
-                    }
-
-                    if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')
-                        && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN')) {
-                        // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        // cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-                    }
-
-
-                }
-            }.bind(this),
-
-            pagination: localStorage.getItem("sesRecordCount"),
-            filters: true,
-            search: true,
-            columnSorting: true,
-            // tableOverflow: true,
-            wordWrap: true,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: true,
-            onchange: this.changed,
-            // oneditionend: this.onedit,
-            copyCompatibility: true,
-            allowManualInsertRow: false,
-            parseFormulas: true,
-            // onpaste: this.onPaste,
-            oneditionend: this.oneditionend,
-            // text: {
-            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
-            onload: this.loaded,
-            editable: true,
-            // editable: (( AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE') ) ? true : false),
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                var items = [];
-                //Add consumption batch info
-
-
-                if (y == null) {
-
-                } else {
-
-                    // Insert new row before
-                    if (obj.options.allowInsertRow == true) {
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_EQUIVALENCY_UNIT')) {
-                            items.push({
-                                title: i18n.t('static.common.addRow'),
-                                onclick: function () {
-                                    this.addRow();
-                                }.bind(this)
-                            });
-                        }
-                    }
-
-                    // Delete a row
-                    if (obj.options.allowDeleteRow == true) {
-                        // region id
-                        if (obj.getRowData(y)[0] == 0) {
-                            items.push({
-                                title: i18n.t("static.common.deleterow"),
-                                onclick: function () {
-                                    obj.deleteRow(parseInt(y));
-                                    this.setState({ countVar: this.state.countVar - 1 })
-                                }
-                            });
-                            // Line
-                            // items.push({ type: 'line' });
-                        }
-                    }
-                }
-
-                return items;
-            }.bind(this)
-        };
-
-        var table1Instance = jexcel(document.getElementById("paputableDiv"), options);
-        this.el = table1Instance;
-        this.setState({
-            table1Instance: table1Instance,
-            loading: false,
-            countVar: count
-        })
-    }
-
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         this.setState({ loading: false })
             ProcurementAgentService.getProcurementAgentForProgram(this.state.program.id)
             .then(response => {
-                console.log("Hello",response.data)
                 this.setState({
                     program: {
                         id: response.data.program.id,
-                        name: response.data.program.code
+                        code: response.data.program.code
                     },
-                    selectedProcurementAgentList: response.data.selectedProcurementAgentList,
-                    procurementAgentList: response.data.procurementAgentList,
                     loading: false
                 })
+
+                var procurementAgentListArray = [];
+                for (var i = 0; i < response.data.procurementAgentList.length; i++) {
+                    if (this.state.procurementAgentList.id != 0) {
+                        procurementAgentListArray[i] = { value: response.data.procurementAgentList[i].id, label: response.data.procurementAgentList[i].code }
+                    }
+                }
+                var listArray = procurementAgentListArray;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
+                var paJson = {
+                    value: -1,
+                    label: "All",
+                }
+                listArray.unshift(paJson);
+
+                this.setState({ 
+                    procurementAgentList: listArray 
+                })
+
+                var selectedProcurementAgentListArray = [];
+                for (var i = 0; i < response.data.selectedProcurementAgentList.length; i++) {
+                    selectedProcurementAgentListArray[i] = { value: response.data.selectedProcurementAgentList[i].id, label: response.data.selectedProcurementAgentList[i].code }
+                }
+                var listArray = selectedProcurementAgentListArray;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                this.setState({
+                    program: {
+                        ...this.state.program, 
+                        procurementAgents: listArray
+                    },
+                    selectedProcurementAgentList: listArray
+                })                
 
             })
             .catch(
@@ -389,9 +197,21 @@ export default class AddDimensionComponent extends Component {
 
     }
 
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
+    procurementAgentChange(selectedProcurementAgentList) {
+        var selectedArray = [];
+        for (var p = 0; p < selectedProcurementAgentList.length; p++) {
+            selectedArray.push(selectedProcurementAgentList[p].value);
+        }
+        if (selectedArray.includes(-1)) {
+            console.log("hello")
+            this.setState({ selectedProcurementAgentList: [] });
+            var list = this.state.procurementAgentList.filter(c => c.value != -1)
+            this.setState({ selectedProcurementAgentList: list });
+            var selectedProcurementAgentList = list;
+        } else {
+            this.setState({ selectedProcurementAgentList: selectedProcurementAgentList });
+            var selectedProcurementAgentList = selectedProcurementAgentList;
+        }
     }
 
     render() {
@@ -407,8 +227,154 @@ export default class AddDimensionComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
 
-                            <div id="paputableDiv" className="AddListbatchtrHeight RemoveStriped consumptionDataEntryTable">
-                            </div>
+                            <Formik
+                                enableReinitialize={true}
+                                initialValues={
+                                    {
+                                        procurementAgentId: this.state.selectedProcurementAgentList
+                                    }}
+                                validate={validate(validationSchema)}
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    this.setState({
+                                        loading: true
+                                    })
+                                    
+                                    let selectedProcurementAgentListArray = [];
+                                    selectedProcurementAgentListArray = this.state.selectedProcurementAgentList.map(e => e.value);
+
+                                    AuthenticationService.setupAxiosInterceptors();
+                                    ProcurementAgentService.updateProcurementAgentsForProgram(this.state.program.id, selectedProcurementAgentListArray)
+                                        .then(response => {
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t("static.mt.dataUpdateSuccess", { entityname }))
+                                            } else {
+                                                this.setState({
+                                                    message: response.data.messageCode, loading: false
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
+                                            }
+                                        }).catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        );
+                                }}
+                                render={
+                                    ({
+                                        values,
+                                        errors,
+                                        touched,
+                                        handleChange,
+                                        handleBlur,
+                                        handleSubmit,
+                                        isSubmitting,
+                                        isValid,
+                                        setTouched,
+                                        handleReset,
+                                        setFieldTouched,
+                                        setFieldValue
+                                    }) => (
+                                        <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm' autocomplete="off">
+                                            <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label htmlFor="programId">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                    <Input
+                                                        type="text"
+                                                        name="programId"
+                                                        id="programId"
+                                                        bsSize="sm"
+                                                        readOnly={true}
+                                                        value={this.state.program.code}
+                                                    >
+                                                    </Input>
+                                                    {/* </InputGroupAddon> */}
+                                                </FormGroup>
+                                                <FormGroup className="Selectcontrol-bdrNone">
+                                                    <Label htmlFor="procurementAgentId">{i18n.t('static.report.procurementAgentName')}</Label>
+                                                    <Select
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.procurementAgentId && this.state.procurementAgentList.length != 0 },
+                                                            { 'is-invalid': (touched.procurementAgentId && !!errors.procurementAgentId) }
+                                                        )}
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("procurementAgentId", e);
+                                                            this.procurementAgentChange(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("procurementAgentId", true)}
+                                                        name="procurementAgentId"
+                                                        id="procurementAgentId"
+                                                        multi
+                                                        options={this.state.procurementAgentList}
+                                                        value={this.state.selectedProcurementAgentList}
+
+                                                    />
+                                                    <FormFeedback className="red">{errors.procurementAgentId}</FormFeedback>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                        <div class="spinner-border blue ml-4" role="status">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
+
+                                    )} />
 
                         </Card>
                     </Col>
@@ -418,22 +384,16 @@ export default class AddDimensionComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/integration/listIntegration/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/program/listProgram/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
-        this.state.integrationName = ''
-        this.state.integrationView.integrationViewId = ''
-        this.state.realm.id = ''
-        this.state.folderLocation = ''
-        this.state.fileName = ''
-        this.state.isHide = true
-        this.state.bodyParameter = ''
+        this.state.selectedProcurementAgentList = this.state.program.procurementAgents
 
-        let { integration } = this.state
+        let { selectedProcurementAgentList } = this.state
         this.setState(
             {
-                integration
+                selectedProcurementAgentList
             }
         )
     }
