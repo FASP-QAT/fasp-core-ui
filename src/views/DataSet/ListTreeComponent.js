@@ -910,7 +910,6 @@ export default class ListTreeComponent extends Component {
     }
 
     getPrograms() {
-        this.setState({ loading: true })
         if (isSiteOnline()) {
             ProgramService.getDataSetListAll().then(response => {
                 if (response.status == 200) {
@@ -947,7 +946,6 @@ export default class ListTreeComponent extends Component {
     }
 
     consolidatedProgramList = () => {
-        this.setState({ loading: true })
         const lan = 'en';
         const { datasetList } = this.state
         var proList = datasetList;
@@ -1092,7 +1090,6 @@ export default class ListTreeComponent extends Component {
 
     filterVersion() {
         // let programId = document.getElementById("programId").value;
-        this.setState({ loading: true })
         let programId = this.state.datasetId;
         if (programId != 0) {
 
@@ -1112,8 +1109,7 @@ export default class ListTreeComponent extends Component {
                             this.setState({
                                 versions: program[0].versionList.filter(function (x, i, a) {
                                     return a.indexOf(x) === i;
-                                }),
-                                loading: false
+                                })
                             }, () => { this.consolidatedVersionList(programId) });
                         }
 
@@ -1123,7 +1119,7 @@ export default class ListTreeComponent extends Component {
                 } else {
                     this.setState({
                         versions: [],
-                        loading: false
+
                     }, () => {
                         this.consolidatedVersionList(programId)
                     })
@@ -1132,7 +1128,7 @@ export default class ListTreeComponent extends Component {
 
                 this.setState({
                     versions: [],
-                    loading: false
+
                 }, () => { })
 
             }
@@ -1146,14 +1142,11 @@ export default class ListTreeComponent extends Component {
                 // this.el.destroy();
                 jexcel.destroy(document.getElementById("tableDiv"), true);
             })
-                // this.el.destroy();
-                jexcel.destroy(document.getElementById("tableDiv"), true);
-            })
         }
     }
 
     consolidatedVersionList = (programId) => {
-        this.setState({ loading: true })
+
         const lan = 'en';
         const { versions } = this.state
         var verList = versions;
@@ -1201,7 +1194,6 @@ export default class ListTreeComponent extends Component {
                     this.setState({
                         versions: versionList,
                         versionId: this.props.match.params.versionId + " (Local)",
-                        loading: false
                     }, () => {
                         // this.setVersionId();
                         this.consolidatedDataSetList(programId, this.state.versionId)
@@ -1213,7 +1205,6 @@ export default class ListTreeComponent extends Component {
                     this.setState({
                         versions: versionList,
                         versionId: (versionVar != '' && versionVar != undefined ? localStorage.getItem("sesVersionIdReport") : versionList[0].versionId),
-                        loading: false
                     }, () => {
                         // this.setVersionId();
                         this.consolidatedDataSetList(programId, this.state.versionId)
@@ -1223,7 +1214,6 @@ export default class ListTreeComponent extends Component {
                     this.setState({
                         versions: versionList,
                         versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
-                        loading: false
                     }, () => {
                         this.consolidatedDataSetList(programId, this.state.versionId)
 
@@ -1245,8 +1235,7 @@ export default class ListTreeComponent extends Component {
                         if (response.status == 200) {
                             var responseData = response.data;
                             this.setState({
-                                datasetListJexcel: responseData,
-                                loading: false
+                                datasetListJexcel: responseData
                             }, () => {
                                 this.getTreeList();
                             })
@@ -1256,8 +1245,7 @@ export default class ListTreeComponent extends Component {
                 let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == versionId.toString().split(" ")[0])[0];
                 console.log("selectedForecastProgram===2", this.state.downloadedProgramData, "===", versionId)
                 this.setState({
-                    datasetListJexcel: selectedForecastProgram,
-                    loading: false
+                    datasetListJexcel: selectedForecastProgram
                 }, () => {
                     this.getTreeList();
 
@@ -1580,8 +1568,6 @@ export default class ListTreeComponent extends Component {
                                         ]
                                     });
 
-                                }.bind(this)
-                            });
                                 }.bind(this)
                             });
 
