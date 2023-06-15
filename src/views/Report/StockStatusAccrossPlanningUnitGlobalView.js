@@ -43,7 +43,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { API_URL, SECRET_KEY } from '../../Constants.js'
+import { API_URL, PROGRAM_TYPE_SUPPLY_PLAN, SECRET_KEY } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -58,6 +58,7 @@ import 'chartjs-plugin-annotation';
 import TracerCategoryService from '../../api/TracerCategoryService';
 import { MultiSelect } from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import DropdownService from '../../api/DropdownService';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -521,8 +522,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       programIdsValue.push(programIds[i].value);
     }
     // console.log("programids=====>", programIdsValue);
-    let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
-    TracerCategoryService.getTracerCategoryByProgramIds(realmId,programIdsValue)
+    DropdownService.getTracerCategoryForMultipleProgramsDropdownList(programIdsValue)
       .then(response => {
         console.log("tc respons==>", response.data);
         var listArray = response.data;
@@ -615,39 +615,80 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   filterProgram = () => {
     let countryIds = this.state.countryValues.map(ele => ele.value);
     let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());
-    console.log('countryIds', countryIds, 'programs', this.state.programs)
+    console.log('countryIds', countryIds, 'programs', this.state.programLstFiltered)
     this.setState({
       programLstFiltered: [],
       programValues: [],
       programLabels: []
     }, () => {
       if (countryIds.length != 0) {
-        let programLstFiltered = [];
-        for (var i = 0; i < countryIds.length; i++) {
-          programLstFiltered = [...programLstFiltered, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-        }
+        let newCountryList = [... new Set(countryIds)];
+        DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+          .then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            console.log('programLstFiltered', listArray)
+            if (listArray.length > 0) {
+              this.setState({
+                programLstFiltered: listArray
+              }, () => {
+                this.filterData()
+              });
+            } else {
+              this.setState({
+                programLstFiltered: []
+              }, () => {
+                this.filterData()
+              });
+            }
+          }).catch(
+            error => {
+              this.setState({
+                programLstFiltered: [], loading: false
+              })
+              if (error.message === "Network Error") {
+                this.setState({
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
 
-        console.log('programLstFiltered', programLstFiltered)
-        if (programLstFiltered.length > 0) {
-
-          programLstFiltered.sort((a, b) => {
-            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-            return itemLabelA > itemLabelB ? 1 : -1;
-          });
-
-          this.setState({
-            programLstFiltered: programLstFiltered
-          }, () => {
-            this.filterData()
-          });
-        } else {
-          this.setState({
-            programLstFiltered: []
-          }, () => {
-            this.filterData()
-          });
-        }
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
       } else {
         this.setState({
           programLstFiltered: []
@@ -677,7 +718,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     let realmId = AuthenticationService.getRealmId()
     let date = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0)).startOf('month').format('YYYY-MM-DD')
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
-    let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+    let programIds = this.state.programValues.length == this.state.programLstFiltered.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
 
     console.log(realmId)
     if (realmId > 0 && this.state.countryValues.length > 0 && this.state.tracerCategoryValues.length > 0 && this.state.programValues.length > 0) {
@@ -873,10 +914,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
   getCountrys = () => {
     // AuthenticationService.setupAxiosInterceptors();
-    let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
-    RealmCountryService.getRealmCountryForProgram(realmId)
+    let realmId = AuthenticationService.getRealmId();
+    DropdownService.getRealmCountryDropdownList(realmId)
       .then(response => {
-        var listArray = response.data.map(ele => ele.realmCountry);
+        var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
           var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -884,7 +925,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         });
         this.setState({
           // countrys: response.data.map(ele => ele.realmCountry)
-          countrys: listArray
+          countrys: listArray, loading: false
         })
       }).catch(
         error => {
@@ -1038,9 +1079,9 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   }
 
   componentDidMount() {
-    this.getPrograms()
+    // this.getPrograms()
     this.getCountrys();
-    this.getTracerCategoryList();
+    // this.getTracerCategoryList();
     // AuthenticationService.setupAxiosInterceptors();
     //  this.getRelamList();
 
@@ -1167,7 +1208,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         return (
 
           // { label: getLabelText(item.label, this.state.lang), value: item.programId }
-          { label: item.programCode, value: item.programId }
+          { label: item.code, value: item.id }
 
         )
       }, this);
@@ -1287,7 +1328,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                           options=
                           {tracerCategories.length > 0 ?
                             tracerCategories.map((item, i) => {
-                              return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
+                              return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
                             }, this) : []} />
 

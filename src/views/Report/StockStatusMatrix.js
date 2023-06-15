@@ -10,7 +10,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
@@ -32,6 +32,7 @@ import { MultiSelect } from "react-multi-select-component";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import TracerCategoryService from '../../api/TracerCategoryService';
+import DropdownService from "../../api/DropdownService";
 const { RangePicker } = DatePicker;
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -121,7 +122,7 @@ export default class StockStatusMatrix extends React.Component {
             };
             planningunitRequest.onsuccess = function (e) {
               var myResult = [];
-              myResult = planningunitRequest.result.filter(c=>c.active==true);
+              myResult = planningunitRequest.result.filter(c => c.active == true);
               var programId = (document.getElementById("programId").value).split("_")[0];
               var proList = []
 
@@ -191,8 +192,7 @@ export default class StockStatusMatrix extends React.Component {
         else {
 
 
-          let realmId = AuthenticationService.getRealmId();
-          TracerCategoryService.getTracerCategoryByProgramId(realmId,programId).then(response => {
+          DropdownService.getTracerCategoryForMultipleProgramsDropdownList([programId]).then(response => {
 
             if (response.status == 200) {
               var listArray = response.data;
@@ -849,12 +849,21 @@ export default class StockStatusMatrix extends React.Component {
 
   getPrograms = () => {
     if (isSiteOnline()) {
-      // AuthenticationService.setupAxiosInterceptors();
-      ProgramService.getProgramList()
+      let realmId = AuthenticationService.getRealmId();
+
+      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then(response => {
-          console.log(JSON.stringify(response.data))
+          var proList = []
+          for (var i = 0; i < response.data.length; i++) {
+            var programJson = {
+              programId: response.data[i].id,
+              label: response.data[i].label,
+              programCode: response.data[i].code
+            }
+            proList[i] = programJson
+          }
           this.setState({
-            programs: response.data, loading: false
+            programs: proList, loading: false
           }, () => { this.consolidatedProgramList() })
         }).catch(
           error => {
@@ -1020,11 +1029,62 @@ export default class StockStatusMatrix extends React.Component {
           this.setState({
             versions: []
           }, () => {
-            this.setState({
-              versions: program[0].versionList.filter(function (x, i, a) {
-                return a.indexOf(x) === i;
-              })
-            }, () => { this.consolidatedVersionList(programId) });
+            DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+              .then(response => {
+                console.log("response===>", response.data)
+                this.setState({
+                  versions: []
+                }, () => {
+                  this.setState({
+                    versions: response.data
+                  }, () => {
+                    this.consolidatedVersionList(programId)
+                  });
+                });
+              }).catch(
+                error => {
+                  this.setState({
+                    programs: [], loading: false
+                  })
+                  if (error.message === "Network Error") {
+                    this.setState({
+                      // message: 'static.unkownError',
+                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                      loading: false
+                    });
+                  } else {
+                    switch (error.response ? error.response.status : "") {
+
+                      case 401:
+                        this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                      case 403:
+                        this.props.history.push(`/accessDenied`)
+                        break;
+                      case 500:
+                      case 404:
+                      case 406:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                          loading: false
+                        });
+                        break;
+                      case 412:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                          loading: false
+                        });
+                        break;
+                      default:
+                        this.setState({
+                          message: 'static.unkownError',
+                          loading: false
+                        });
+                        break;
+                    }
+                  }
+                }
+              );
           });
 
 
@@ -1244,22 +1304,26 @@ export default class StockStatusMatrix extends React.Component {
             // AuthenticationService.setupAxiosInterceptors();
 
             //let productCategoryId = document.getElementById("productCategoryId").value;
-            ProgramService.getPlanningUnitByProgramTracerCategory(programId, tracercategory).then(response => {
+            var json = {
+              tracerCategoryIds: tracercategory,
+              programIds: [programId]
+            }
+            DropdownService.getProgramPlanningUnitDropdownList(json).then(response => {
               console.log('**' + JSON.stringify(response.data))
               var listArray = response.data;
               listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                 return itemLabelA > itemLabelB ? 1 : -1;
               });
               this.setState({
                 planningUnits: listArray,
                 planningUnitValues: response.data.map((item, i) => {
-                  return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                  return ({ label: getLabelText(item.label, this.state.lang), value: item.planningUnit.id })
 
                 }, this),
                 planningUnitLabels: response.data.map((item, i) => {
-                  return (getLabelText(item.planningUnit.label, this.state.lang))
+                  return (getLabelText(item.label, this.state.lang))
                 }, this),
                 message: ''
               }, () => {
@@ -1525,43 +1589,43 @@ export default class StockStatusMatrix extends React.Component {
           doc.text(doc.internal.pageSize.width / 8, 170, planningText)
 
           var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-          doc.text(doc.internal.pageSize.width / 8, 180 + (this.state.tracerCategoryValues.length * 1.2 ), planningText)
+          doc.text(doc.internal.pageSize.width / 8, 180 + (this.state.tracerCategoryValues.length * 1.2), planningText)
 
           //Legends start
 
           doc.setDrawColor(0);
           doc.setFillColor(186, 12, 47);
-          doc.rect(doc.internal.pageSize.width / 8, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), 15, 12, 'F');
+          doc.rect(doc.internal.pageSize.width / 8, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2), 15, 12, 'F');
 
           doc.setFillColor(244, 133, 33);
-          doc.rect(doc.internal.pageSize.width / 8+100, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), 15, 12, 'F');
+          doc.rect(doc.internal.pageSize.width / 8 + 100, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2), 15, 12, 'F');
 
           doc.setFillColor(17, 139, 112);
-          doc.rect(doc.internal.pageSize.width / 8+200, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), 15, 12, 'F');
+          doc.rect(doc.internal.pageSize.width / 8 + 200, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2), 15, 12, 'F');
 
           doc.setFillColor(237, 185, 68);
-          doc.rect(doc.internal.pageSize.width / 8+300, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), 15, 12, 'F');
+          doc.rect(doc.internal.pageSize.width / 8 + 300, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2), 15, 12, 'F');
 
           doc.setFillColor(207, 205, 201);
-          doc.rect(doc.internal.pageSize.width / 8+400, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), 15, 12, 'F');
+          doc.rect(doc.internal.pageSize.width / 8 + 400, 200 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2), 15, 12, 'F');
 
-          doc.text(i18n.t(legendcolor[0].text), doc.internal.pageSize.width / 8+20, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), {
+          doc.text(i18n.t(legendcolor[0].text), doc.internal.pageSize.width / 8 + 20, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2), {
             align: 'left'
           })
 
-          doc.text(i18n.t(legendcolor[1].text), doc.internal.pageSize.width / 8+120, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), {
+          doc.text(i18n.t(legendcolor[1].text), doc.internal.pageSize.width / 8 + 120, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2), {
             align: 'left'
           })
 
-          doc.text(i18n.t(legendcolor[2].text), doc.internal.pageSize.width / 8+220, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), {
+          doc.text(i18n.t(legendcolor[2].text), doc.internal.pageSize.width / 8 + 220, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2), {
             align: 'left'
           })
 
-          doc.text(i18n.t(legendcolor[3].text), doc.internal.pageSize.width / 8+320, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), {
+          doc.text(i18n.t(legendcolor[3].text), doc.internal.pageSize.width / 8 + 320, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2), {
             align: 'left'
           })
 
-          doc.text(i18n.t(legendcolor[4].text), doc.internal.pageSize.width / 8+420, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 ), {
+          doc.text(i18n.t(legendcolor[4].text), doc.internal.pageSize.width / 8 + 420, 210 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2), {
             align: 'left'
           })
 
@@ -1635,38 +1699,38 @@ export default class StockStatusMatrix extends React.Component {
       if (actualValue != null) {
         actualValue = this.roundN(actualValue)
         if (actualValue == 0) {
-          return legendcolor[0].color 
+          return legendcolor[0].color
         } else if (min > actualValue) {
-          return  legendcolor[1].color 
+          return legendcolor[1].color
         } else if ((maxValue) < actualValue) {
-  
-          return legendcolor[3].color 
+
+          return legendcolor[3].color
         } else {
-          return  legendcolor[2].color 
-  
+          return legendcolor[2].color
+
         }
       }
       else {
-        return  legendcolor[4].color 
+        return legendcolor[4].color
       }
     }
 
     let dataColor;
     dataColor = this.state.data.map(ele => [
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.jan, ele.janStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.feb, ele.febStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.mar, ele.marStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.apr, ele.aprStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.may, ele.mayStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.jun, ele.junStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.jul, ele.julStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.aug, ele.augStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.sep, ele.sepStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.oct, ele.octStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.nov, ele.novStock),
-      cellStyle(ele.planBasedOn, ele.minMonthsOfStock,ele.reorderFrequency, ele.dec, ele.decStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.jan, ele.janStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.feb, ele.febStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.mar, ele.marStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.apr, ele.aprStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.may, ele.mayStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.jun, ele.junStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.jul, ele.julStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.aug, ele.augStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.sep, ele.sepStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.oct, ele.octStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.nov, ele.novStock),
+      cellStyle(ele.planBasedOn, ele.minMonthsOfStock, ele.reorderFrequency, ele.dec, ele.decStock),
     ]);
-    var startY = 230 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2 )
+    var startY = 230 + (this.state.planningUnitValues.length * 3) + (this.state.tracerCategoryValues.length * 1.2)
     let content = {
       margin: { top: 80, bottom: 90 },
       startY: startY,
@@ -1678,8 +1742,8 @@ export default class StockStatusMatrix extends React.Component {
         2: { cellWidth: 54 },
       },
       didParseCell: function (data) {
-          if(data.section=="body" && data.column.index > 5)
-            data.cell.styles.fillColor=dataColor[data.row.index][data.column.index-6];
+        if (data.section == "body" && data.column.index > 5)
+          data.cell.styles.fillColor = dataColor[data.row.index][data.column.index - 6];
       }
     };
 
@@ -1729,7 +1793,7 @@ export default class StockStatusMatrix extends React.Component {
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
-        return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+        return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
       }, this);
     const { productCategories } = this.state;
@@ -2059,7 +2123,7 @@ export default class StockStatusMatrix extends React.Component {
                       options=
                       {tracerCategories.length > 0 ?
                         tracerCategories.map((item, i) => {
-                          return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
+                          return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
                         }, this) : []} />
                   </div>

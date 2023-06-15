@@ -28,7 +28,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ReportService from '../../api/ReportService';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -38,6 +38,7 @@ import "jspdf-autotable";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 const ref = React.createRef();
 const entityname = i18n.t('static.dashboard.budget');
 const pickerLang = {
@@ -205,9 +206,9 @@ class Budgets extends Component {
     getFundingSource = () => {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            FundingSourceService.getFundingSourceListAll()
+            DropdownService.getFundingSourceDropdownList()
                 .then(response => {
-                    // console.log(JSON.stringify(response.data))
+                    console.log("json===>", JSON.stringify(response.data))
                     this.setState({
                         fundingSources: response.data, loading: false
                     }, () => { this.consolidatedFundingSourceList() })
@@ -273,12 +274,16 @@ class Budgets extends Component {
 
                     var f = 0
                     for (var k = 0; k < this.state.fundingSources.length; k++) {
-                        if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
+                        if (this.state.fundingSources[k].id == myResult[i].fundingSourceId) {
                             f = 1;
                             console.log('already exist')
                         }
                     }
-                    var programData = myResult[i];
+                    var programData = {
+                        id: myResult[i].fundingSourceId,
+                        code: myResult[i].fundingSourceCode,
+                        label: myResult[i].label
+                    };
                     if (f == 0) {
                         proList.push(programData)
                     }
@@ -287,8 +292,8 @@ class Budgets extends Component {
 
                 this.setState({
                     fundingSources: proList.sort(function (a, b) {
-                        a = a.fundingSourceCode.toLowerCase();
-                        b = b.fundingSourceCode.toLowerCase();
+                        a = a.code.toLowerCase();
+                        b = b.code.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     })
                 })
@@ -769,11 +774,21 @@ class Budgets extends Component {
     getPrograms = () => {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
+            let realmId = AuthenticationService.getRealmId();
+
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    var proList = []
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            programId: response.data[i].id,
+                            label: response.data[i].label,
+                            programCode: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: proList, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -951,15 +966,62 @@ class Budgets extends Component {
             console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
-                    this.setState({
-                        versions: []
-                    }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
-                    });
+                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                        .then(response => {
+                            console.log("response===>", response.data)
+                            this.setState({
+                                versions: []
+                            }, () => {
+                                this.setState({
+                                    versions: response.data
+                                }, () => {
+                                    this.consolidatedVersionList(programId)
+                                });
+                            });
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    programs: [], loading: false
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
 
 
                 } else {
@@ -1523,7 +1585,7 @@ class Budgets extends Component {
                                             options={fundingSources.length > 0
                                                 && fundingSources.map((item, i) => {
                                                     return (
-                                                        { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                        { label: item.code, value: item.id }
                                                     )
                                                 }, this)}
                                             disabled={this.state.loading}

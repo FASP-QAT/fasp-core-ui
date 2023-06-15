@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -37,6 +37,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -96,11 +97,21 @@ class ProcurementAgentExport extends Component {
         this.setState({ loading: true })
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
+            let realmId = AuthenticationService.getRealmId();
+
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    // console.log(JSON.stringify(response.data))
+                    var proList = []
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            programId: response.data[i].id,
+                            label: response.data[i].label,
+                            programCode: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: proList, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -258,17 +269,19 @@ class ProcurementAgentExport extends Component {
 
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProcurementAgentService.getProcurementAgentListAll()
+            var programJson = [programId]
+            DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programJson)
                 .then(response => {
-                    // console.log(JSON.stringify(response.data))
+                    console.log("getProcurementAgent", JSON.stringify(response.data))
                     var listArray = response.data;
                     var listArrays = [];
                     for (var i = 0; i < listArray.length; i++) {
-                        for (var j = 0; j < listArray[i].programList.length; j++) {
-                            if (listArray[i].programList[j].id == programId) {
-                                listArrays.push(listArray[i]);
-                            }
+                        var arr = {
+                            procurementAgentId: listArray[i].id,
+                            procurementAgentCode: listArray[i].code,
+                            label: listArray[i].label
                         }
+                        listArray[i] = arr;
                     }
                     listArrays.sort((a, b) => {
                         var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
@@ -374,8 +387,8 @@ class ProcurementAgentExport extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                // var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 // console.log("ProcurementAgentMyResult------>>>>", myResult);
                 for (var i = 0; i < myResult.length; i++) {
 
@@ -394,25 +407,19 @@ class ProcurementAgentExport extends Component {
                             console.log('already exist')
                         }
                     }
-                    var programData = myResult[i];
                     if (f == 0) {
-                        proList.push(programData)
-                    }
-
-                }
-                var listArray = proList;
-                var listArrays = [];
-                for (var i = 0; i < listArray.length; i++) {
-                    for (var j = 0; j < listArray[i].programList.length; j++) {
-                        if (listArray[i].programList[j].id == programId) {
-                            listArrays.push(listArray[i]);
+                        for (var j = 0; j < myResult[i].programList.length; j++) {
+                            if (myResult[i].programList[j].id == programId) {
+                                var programData = myResult[i];
+                                proList.push(programData)
+                            }
                         }
                     }
+                    var listArray = proList;
                 }
-                console.log("listArrays", listArrays, "==programId", programId)
-                var lang = this.state.lang;
+                console.log("listArrays", listArray, "==programId", programId)
                 this.setState({
-                    procurementAgents: listArrays.sort(function (a, b) {
+                    procurementAgents: listArray.sort(function (a, b) {
                         a = a.procurementAgentCode.toLowerCase();
                         b = b.procurementAgentCode.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
@@ -420,15 +427,15 @@ class ProcurementAgentExport extends Component {
                 })
                 let viewby = document.getElementById("viewById").value;
                 if (viewby == 1) {
-                    console.log("viewby", this.state.procurementAgents)
+                    // console.log("viewby", this.state.procurementAgents)
 
-                    if (listArrays.length > 0) {
+                    if (listArray.length > 0) {
                         document.getElementById("procurementAgentDiv").style.display = "block";
                         // document.getElementById("fundingSourceDiv").style.display = "block";
                     } else {
-                        console.log("viewby", viewby)
+                        // console.log("viewby", viewby)
                         this.setState({
-                            viewby: 2,
+                            viewby: 2
                         })
                         document.getElementById("procurementAgentDiv").style.display = "none";
                         document.getElementById("fundingSourceDiv").style.display = "block";
@@ -455,11 +462,62 @@ class ProcurementAgentExport extends Component {
                     this.setState({
                         versions: []
                     }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
+                        DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                            .then(response => {
+                                console.log("response===>", response.data)
+                                this.setState({
+                                    versions: []
+                                }, () => {
+                                    this.setState({
+                                        versions: response.data
+                                    }, () => {
+                                        this.consolidatedVersionList(programId)
+                                    });
+                                });
+                            }).catch(
+                                error => {
+                                    this.setState({
+                                        programs: [], loading: false
+                                    })
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
                     });
 
 
@@ -523,7 +581,7 @@ class ProcurementAgentExport extends Component {
                     return a.indexOf(x) === i;
                 });
                 versionList.reverse();
-
+                console.log("versionList", versionList)
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
 
                     let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
@@ -595,14 +653,14 @@ class ProcurementAgentExport extends Component {
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
-                                    proList[i] = myResult[i]
+                                    proList[i] = myResult[i].planningUnit
                                 }
                             }
                             var lang = this.state.lang;
                             this.setState({
                                 planningUnits: proList.sort(function (a, b) {
-                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }), message: ''
                             }, () => {
@@ -618,12 +676,19 @@ class ProcurementAgentExport extends Component {
 
                     this.setState({ loading: true })
                     //let productCategoryId = document.getElementById("productCategoryId").value;
-                    ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                        // console.log('**' + JSON.stringify(response.data))
+                    var programJson = {
+                        tracerCategoryIds: [],
+                        programIds: [programId]
+                    }
+                    console.log('**', programJson)
+
+                    //let productCategoryId = document.getElementById("productCategoryId").value;
+                    DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+                        console.log('**getProgramPlanningUnitDropdownList', response.data)
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -637,6 +702,8 @@ class ProcurementAgentExport extends Component {
                                 planningUnits: [],
                                 loading: false
                             })
+                            console.log('**getProgramPlanningUnitDropdownList' + error.response)
+
                             if (error.message === "Network Error") {
                                 this.setState({
                                     // message: 'static.unkownError',
@@ -1292,7 +1359,7 @@ class ProcurementAgentExport extends Component {
                                         } else {
                                             freight = seaFreight;
                                         }
-                                        var planningUnit = this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitFilter[j].planningUnit.id);
+                                        var planningUnit = this.state.planningUnits.filter(c => c.id == planningUnitFilter[j].planningUnit.id);
                                         var procurementAgent = this.state.procurementAgents.filter(c => c.procurementAgentId == planningUnitFilter[j].procurementAgent.id);
                                         if (procurementAgent.length > 0) {
                                             var simplePAObject = {
@@ -1635,7 +1702,7 @@ class ProcurementAgentExport extends Component {
                                         } else {
                                             freight = seaFreight;
                                         }
-                                        var planningUnit = this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitFilter[j].planningUnit.id);
+                                        var planningUnit = this.state.planningUnits.filter(c => c.id == planningUnitFilter[j].planningUnit.id);
                                         var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == planningUnitFilter[j].fundingSource.id);
                                         if (fundingSource.length > 0) {
                                             var simpleFSObject = {
@@ -1961,7 +2028,7 @@ class ProcurementAgentExport extends Component {
                                     } else {
                                         freight = seaFreight;
                                     }
-                                    var planningUnit = this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitFilter[j].planningUnit.id);
+                                    var planningUnit = this.state.planningUnits.filter(c => c.id == planningUnitFilter[j].planningUnit.id);
                                     let json = {
                                         "active": true,
                                         "shipmentId": planningUnitFilter[j].shipmentId,
@@ -2458,7 +2525,7 @@ class ProcurementAgentExport extends Component {
         const { planningUnits } = this.state
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 
