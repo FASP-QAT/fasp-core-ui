@@ -22,7 +22,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { Link } from "react-router-dom";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, API_URL, MIN_MODE_REQ } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, API_URL, MIN_MODE_PER_REQ, MIN_MODE_COUNT_REQ } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -1212,7 +1212,7 @@ export default class InventoryTurns extends Component {
             }
         }
         var mode_per = (maxCount / numbers.length) * 100;
-        if( mode_per < MIN_MODE_REQ){
+        if( mode_per < MIN_MODE_PER_REQ || maxCount < MIN_MODE_COUNT_REQ){
             mode = numbers.filter(arr => arr != null).length > 0 ? numbers.reduce((prev,curr,index) => prev + curr, 0) / (numbers.filter(arr => arr != null).length) : 0;
         }
         
