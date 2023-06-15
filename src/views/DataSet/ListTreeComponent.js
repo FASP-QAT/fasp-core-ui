@@ -9,7 +9,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutSearch } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY,PROGRAM_TYPE_DATASET,API_URL } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -29,6 +29,8 @@ import ListTreeEn from '../../../src/ShowGuidanceFiles/ManageTreeListTreeEn.html
 import ListTreeFr from '../../../src/ShowGuidanceFiles/ManageTreeListTreeFr.html'
 import ListTreeSp from '../../../src/ShowGuidanceFiles/ManageTreeListTreeSp.html'
 import ListTreePr from '../../../src/ShowGuidanceFiles/ManageTreeListTreePr.html'
+import DropdownService from '../../api/DropdownService';
+
 const entityname = i18n.t('static.common.listtree');
 
 const validationSchema = function (values) {
@@ -871,18 +873,20 @@ export default class ListTreeComponent extends Component {
 
     getPrograms() {
         if (isSiteOnline()) {
-            ProgramService.getDataSetListAll().then(response => {
+            console.log("getDataSetListAll")
+            let realmId = AuthenticationService.getRealmId();
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+            // ProgramService.getDataSetListAll()
+            .then(response => {
                 if (response.status == 200) {
-                    var responseData = response.data;
-                    var datasetList = [];
-                    datasetList = responseData.filter(c => c.active == true);
-                    console.log("datasetList--->", responseData)
-
+                    // var responseData = response.data;
+                    // var datasetList = [];
+                    // datasetList = responseData.filter(c => c.active == true);
+                    // console.log("datasetList--->", responseData)
                     this.setState({
-                        datasetList: datasetList,
+                        datasetList: response.data,
                         loading: false,
-                        allProgramList: responseData
-
+                        allProgramList: response.data
                     }, () => {
                         this.consolidatedProgramList();
                     })
@@ -938,7 +942,7 @@ export default class ListTreeComponent extends Component {
 
                         var f = 0
                         for (var k = 0; k < this.state.datasetList.length; k++) {
-                            if (this.state.datasetList[k].programId == programData.programId) {
+                            if (this.state.datasetList[k].id == programData.programId) {
                                 f = 1;
                                 console.log('already exist')
                             }
@@ -955,8 +959,8 @@ export default class ListTreeComponent extends Component {
                 if (proList.length == 1) {
                     this.setState({
                         datasetList: proList.sort(function (a, b) {
-                            a = (a.programCode).toLowerCase();
-                            b = (b.programCode).toLowerCase();
+                            a = (a.code).toLowerCase();
+                            b = (b.code).toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         datasetId: proList[0].programId,
@@ -977,8 +981,8 @@ export default class ListTreeComponent extends Component {
                     if (this.props.match.params.programId != "" && this.props.match.params.programId != undefined) {
                         this.setState({
                             datasetList: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             datasetId: this.props.match.params.programId,
@@ -1001,8 +1005,8 @@ export default class ListTreeComponent extends Component {
                         var datasetId=datasetarr[0];
                         this.setState({
                             datasetList: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             datasetId: datasetId,
@@ -1021,8 +1025,8 @@ export default class ListTreeComponent extends Component {
                     } else {
                         this.setState({
                             datasetList: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             loading: false,
@@ -1053,27 +1057,80 @@ export default class ListTreeComponent extends Component {
         let programId = this.state.datasetId;
         if (programId != 0) {
 
-            const program = this.state.datasetList.filter(c => c.programId == programId)
+            const program = this.state.datasetList.filter(c => c.id == programId)
             // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
-                    this.setState({
-                        versions: [],
-                    }, () => {
-                        let inactiveProgram = this.state.allProgramList.filter(c => c.active == false);
-                        inactiveProgram = inactiveProgram.filter(c => c.programId == programId);
+                    // this.setState({
+                    //     versions: [],
+                    // }, () => {
+                        DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                            .then(response => {
+                                this.setState({
+                                    versions: []
+                                }, () => {
+                                    this.setState({
+                                        versions: response.data
+                                    }, () => { this.consolidatedVersionList(programId) });
+                                });
+                            }).catch(
+                                error => {
+                                    this.setState({
+                                        programs: [], loading: false
+                                    })
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
 
-                        if (inactiveProgram.length > 0) {//Inactive
-                            this.consolidatedVersionList(programId)
-                        } else {
-                            this.setState({
-                                versions: program[0].versionList.filter(function (x, i, a) {
-                                    return a.indexOf(x) === i;
-                                })
-                            }, () => { this.consolidatedVersionList(programId) });
-                        }
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
+                        // let inactiveProgram = this.state.allProgramList.filter(c => c.active == false);
+                        // inactiveProgram = inactiveProgram.filter(c => c.programId == programId);
 
-                    });
+                        // if (inactiveProgram.length > 0) {//Inactive
+                        //     this.consolidatedVersionList(programId)
+                        // } else {
+                    //         this.setState({
+                    //             versions: program[0].versionList.filter(function (x, i, a) {
+                    //                 return a.indexOf(x) === i;
+                    //             })
+                    //         }, () => { this.consolidatedVersionList(programId) });
+                    //     // }
+
+                    // });
 
 
                 } else {
@@ -1830,8 +1887,8 @@ export default class ListTreeComponent extends Component {
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
-                        {item.programCode}
+                    <option key={i} value={item.id}>
+                        {item.code}
                     </option>
                 )
             }, this);
