@@ -1695,28 +1695,6 @@ export default class syncPage extends Component {
     }.bind(this);
     document.getElementById("detailsDiv").style.display = "none";
 
-
-      // const rows = document.getElementById('mergedVersionConsumption');
-      // console.log("workedTable", rows);
-      
-
-
-      const targetDiv = document.getElementById('mergedVersionConsumption');
-if (targetDiv) {
-  console.log("wokrds", targetDiv);
-  const table = targetDiv.getElementsByTagName('tbody');
-
-  
-  console.log("wokrdr", table);
-  // if (table) {
-
-  //   const tdElements = table.querySelectorAll('tbody td');
-  //   tdElements.forEach((td) => {
-  //     td.style.backgroundColor = 'red';
-  //   });
-  // }
-}
-
     
   }
 
