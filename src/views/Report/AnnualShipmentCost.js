@@ -265,12 +265,12 @@ class AnnualShipmentCost extends Component {
                                                     var fundingSource = this.state.fundingSources.filter(c => c.id == f)[0]
                                                     var procurementAgent = this.state.procurementAgents.filter(c => c.id == p)[0]
                                                     console.log("fundingSource", fundingSource)
-                                                    console.log(procurementAgent)
+                                                    console.log("procurementAgent===>",procurementAgent)
                                                     var json = {
                                                         'FUNDING_SOURCE_ID': fundingSource.fundingSourceId,
                                                         'PROCUREMENT_AGENT_ID': procurementAgent.procurementAgentId,
-                                                        'fundingsource': fundingSource.fundingSourceCode,
-                                                        'procurementAgent': procurementAgent.procurementAgentCode,
+                                                        'fundingsource': fundingSource.code,
+                                                        'procurementAgent': procurementAgent.code,
                                                         'PLANNING_UNIT_ID': planningUnitId,
                                                         'planningUnit': planningUnitLabel
 
@@ -320,7 +320,7 @@ class AnnualShipmentCost extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
                     ReportService.getAnnualShipmentCost(json)
                         .then(response => {
-                            console.log("-----response", JSON.stringify(response.data));
+                            console.log("response====))))",response.data);
                             var outPutList = [];
                             var responseData = response.data;
                             for (var i = 0; i < responseData.length; i++) {

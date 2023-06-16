@@ -517,7 +517,7 @@ class Budgets extends Component {
                             console.log("B** funding source ---", this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId));
                             console.log("B** moment ---", moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)'))
                             // if (budgetResult[k].program.id == programId && moment().range(startDate, endDate)  moment(budgetResult[k].startDate).isBetween(startDate, endDate) && (this.state.fundingSourceValues.filter(c=>c.value==budgetResult[k].fundingSource.fundingSourceId)).length>0 )
-                            if (budgetResult[k].program.id == programId && ((budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) || (budgetResult[k].stopDate >= startDate && budgetResult[k].stopDate <= endDate) || (startDate >= budgetResult[k].startDate && startDate <= budgetResult[k].stopDate)) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
+                            if (budgetResult[k].programs[0].id == programId && ((budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) || (budgetResult[k].stopDate >= startDate && budgetResult[k].stopDate <= endDate) || (startDate >= budgetResult[k].startDate && startDate <= budgetResult[k].stopDate)) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
                                 budgetList[j++] = budgetResult[k]
                         }
                         console.log("budgetList---", budgetList);
@@ -583,7 +583,7 @@ class Budgets extends Component {
                             }
                             console.log("B** program json ---", programJson);
                             for (var l = 0; l < budgetList.length; l++) {
-                                shipmentList = programJson.shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+                                shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                 shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
                                 console.log("B** shipment list ---", shipmentList);
                                 var plannedShipmentbudget = 0;
@@ -602,7 +602,7 @@ class Budgets extends Component {
                                 console.log("B** budget list l ==>", budgetList[l]);
                                 var json = {
                                     budget: { id: budgetList[l].budgetId, label: budgetList[l].label, code: budgetList[l].budgetCode },
-                                    program: { id: budgetList[l].program.id, label: budgetList[l].program.label, code: programJson.programCode },
+                                    program: { id: budgetList[l].programs.id, label: budgetList[l].programs.label, code: programJson.programCode },
                                     fundingSource: { id: budgetList[l].fundingSource.fundingSourceId, label: budgetList[l].fundingSource.label, code: budgetList[l].fundingSource.fundingSourceCode },
                                     currency: budgetList[l].currency,
                                     // plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,

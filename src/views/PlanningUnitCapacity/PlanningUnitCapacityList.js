@@ -268,6 +268,7 @@ import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import DropdownService from '../../api/DropdownService';
 
 
 const entityname = i18n.t('static.dashboad.planningunitcapacity');
@@ -441,7 +442,7 @@ export default class PlanningUnitCapacityList extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        PlanningUnitService.getAllPlanningUnitList().then(response => {
+        DropdownService.getPlanningUnitDropDownList().then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -560,7 +561,7 @@ export default class PlanningUnitCapacityList extends Component {
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
                 return (
-                    <option key={i} value={item.planningUnitId}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang) + ' | ' + item.planningUnitId}
                     </option>
                 )

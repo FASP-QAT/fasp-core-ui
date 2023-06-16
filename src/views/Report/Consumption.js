@@ -1753,8 +1753,8 @@ class Consumption extends Component {
                                 {offlinePlanningUnitList.length > 0
                                   && offlinePlanningUnitList.map((item, i) => {
                                     return (
-                                      <option key={i} value={item.planningUnit.id}>
-                                        {getLabelText(item.planningUnit.label, this.state.lang)}
+                                      <option key={i} value={item.id}>
+                                        {getLabelText(item.label, this.state.lang)}
                                       </option>
                                     )
                                   }, this)}

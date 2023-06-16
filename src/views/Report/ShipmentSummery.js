@@ -680,7 +680,7 @@ class ShipmentSummery extends Component {
         console.log("programId=========>", programId)
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            BudgetService.getBudgetList()
+            DropdownService.getBudgetDropdownBasedOnProgram(programId)
                 .then(response => {
                     var listArray = response.data.filter(b => b.program.id == programId);
                     listArray.sort((a, b) => {
@@ -704,7 +704,7 @@ class ShipmentSummery extends Component {
                         budgets: listArray,
                         filteredBudgetList: listArray
                     }, () => {
-                        this.getPrograms();
+                        // this.getPrograms();
                     })
                 }).catch(
                     error => {
@@ -756,9 +756,9 @@ class ShipmentSummery extends Component {
                         });
                         budgetLabelsFromProps.push(this.props.match.params.budgetCode);
                     }
-                    console.log("budgetValuesFromProps offline===>", budgetValuesFromProps);
+                    console.log("budgetValuesFromProps offline===>", fSourceRequest.result);
 
-                    fSourceResult = fSourceRequest.result.filter(b => b.program.id == programId);
+                    fSourceResult = fSourceRequest.result.filter(b => b.programs.id == programId);
                     console.log("budget list offline--->", fSourceResult);
                     this.setState({
                         budgetValues: budgetValuesFromProps,
@@ -774,7 +774,7 @@ class ShipmentSummery extends Component {
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     }, () => {
-                        this.getPrograms();
+                        // this.getPrograms();
                     });
 
                 }.bind(this)
@@ -1188,7 +1188,7 @@ class ShipmentSummery extends Component {
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
                         this.filterVersion();
-                        // this.getBudgetList();
+                        this.getBudgetList();
                     })
                 } else {
                     this.setState({
@@ -1554,7 +1554,7 @@ class ShipmentSummery extends Component {
 
 
     componentDidMount() {
-        // this.getPrograms();
+        this.getPrograms();
         this.getFundingSourceList();
         // this.getBudgetList();
     }

@@ -12,10 +12,11 @@ import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import ProgramService from "../../api/ProgramService";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
+import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, PROGRAM_TYPE_SUPPLY_PLAN } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import DropdownService from '../../api/DropdownService';
 
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
@@ -120,7 +121,9 @@ class AddprogramPlanningUnit extends Component {
 
     componentDidMount() {
         this.hideFirstComponent();
-        ProgramService.getProgramForDropDown(1)//supply plan programs
+        let realmId = AuthenticationService.getRealmId();
+
+        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
                     console.log("response.data", response.data)
