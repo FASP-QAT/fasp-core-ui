@@ -3102,5 +3102,6 @@
     "static.report.shippedToArrivedRoadLeadTime": "Shipped to Arrived (Road)",
     "static.report.totalRoadLeadTime": "Planned to Received (Road)",
     "static.common.duplicateToDifferentProgram":"Duplicate tree to different program",
-    "static.procurementAgentProcurementUnit.mapProcurementAgent":"Map Procurement Agent"
+    "static.procurementAgentProcurementUnit.mapProcurementAgent":"Map Procurement Agent",
+    "static.tree.pleaseSelectNodeType":"Please select node type before proceeding."
 }
