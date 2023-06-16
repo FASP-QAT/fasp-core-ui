@@ -10,7 +10,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_INTEGER_REGEX, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX } from "../../Constants";
+import { JEXCEL_INTEGER_REGEX, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX,PROGRAM_TYPE_DATASET } from "../../Constants";
 import { MultiSelect } from 'react-multi-select-component';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
@@ -26,6 +26,7 @@ import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettings
 import showguidanceFr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsFr.html'
 import showguidanceSp from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsSp.html'
 import showguidancePr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsPr.html'
+import DropdownService from '../../api/DropdownService';
 import { resolve } from "path";
 const ref = React.createRef();
 const pickerLang = {
@@ -1376,16 +1377,19 @@ class VersionSettingsComponent extends Component {
     }
 
     componentDidMount() {
-        ProgramService.getDataSetList().then(response => {
+        // ProgramService.getDataSetList()
+        let realmId = AuthenticationService.getRealmId();
+        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+        .then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
                 console.log("getDataSetList**********responseData------->", responseData);
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
                     var json = {
-                        programId: responseData[rd].programId,
+                        programId: responseData[rd].id,
                         name: getLabelText(responseData[rd].label, this.state.lang),
-                        programCode: responseData[rd].programCode,
+                        programCode: responseData[rd].code,
                         isOnline: 1
                     }
                     datasetList.push(json);

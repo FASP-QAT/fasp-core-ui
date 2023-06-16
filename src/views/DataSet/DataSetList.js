@@ -19,6 +19,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, API_URL } from "../../Constants";
+import DropdownService from '../../api/DropdownService';
 
 const entityname = i18n.t('static.dataSet.dataSet');
 export default class ProgramList extends Component {
@@ -561,14 +562,15 @@ export default class ProgramList extends Component {
 
 
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryrealmIdById(realmId)
+        // RealmCountryService.getRealmCountryrealmIdById(realmId)
+        DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
                 console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -656,8 +658,8 @@ export default class ProgramList extends Component {
         let countries = countryList.length > 0
             && countryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
+                    <option key={i} value={item.id}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
