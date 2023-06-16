@@ -21,6 +21,8 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import moment from 'moment';
 import { API_URL } from "../../Constants";
+import DropdownService from '../../api/DropdownService';
+
 // const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
@@ -468,14 +470,17 @@ export default class AddForecastProgram extends Component {
 
     getRealmCountryList() {
         console.log("in get realmCOuntry list----->", this.state.program.realm.realmId);
-        ProgramService.getRealmCountryList(this.state.program.realm.realmId)
-            .then(response => {
+        // ProgramService.getRealmCountryList(this.state.program.realm.realmId)
+        DropdownService.getRealmCountryDropdownList(this.state.program.realm.realmId)
+        .then(response => {
+                console.log("response.data getRealmCountryList",response.data)
                 if (response.status == 200) {
                     // var realmCountries = response.data.filter(c => c.active == true );
-                    var listArray = response.data.filter(c => c.active == true);
+                    // var listArray = response.data.filter(c => c.active == true);
+                    var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -746,7 +751,7 @@ export default class AddForecastProgram extends Component {
     }
 
     generateCountryCode(event) {
-        let realmCountryCode = this.state.realmCountryList.filter(c => (c.realmCountryId == event.target.value))[0].country.countryCode;
+        let realmCountryCode = this.state.realmCountryList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({ realmCountryCode: realmCountryCode })
     }
 
@@ -878,8 +883,8 @@ export default class AddForecastProgram extends Component {
         let realmCountries = realmCountryList.length > 0
             && realmCountryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
+                    <option key={i} value={item.id}>
+                        {getLabelText(item.label, this.state.lang)}
                         {/* {item.country.countryCode} */}
                     </option>
                 )

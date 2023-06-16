@@ -58,7 +58,7 @@ import 'react-select/dist/react-select.min.css';
 import { Prompt } from 'react-router';
 import AuthenticationService from '../Common/AuthenticationService';
 import RotatedText from 'basicprimitivesreact/dist/umd/Templates/RotatedText';
-
+import DropdownService from '../../api/DropdownService';
 
 const entityname = 'Tree Template';
 const pickerLang = {
@@ -5067,7 +5067,12 @@ export default class CreateTreeTemplate extends Component {
         var tracerCategoryId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id;
         console.log("tracerCategoryId new---", tracerCategoryId)
         if (tracerCategoryId != "" && tracerCategoryId != undefined && tracerCategoryId != 'undefined') {
-            ForecastingUnitService.getForcastingUnitListByTracerCategoryId(tracerCategoryId).then(response => {
+            ForecastingUnitService.getForcastingUnitListByTracerCategoryId(tracerCategoryId)
+            // let inputJson = {
+            // "tracerCategoryId": tracerCategoryId,
+            // }
+            // DropdownService.getForecastingUnitDropdownListWithFilterForPcAndTc(inputJson)
+            .then(response => {
                 console.log("fu list---", response.data)
 
 
@@ -5813,9 +5818,11 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             );
-        TracerCategoryService.getTracerCategoryListAll()
+        DropdownService.getTracerCategoryDropdownList()    
+        // TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 var listArray = response.data;
+           console.log("listArray---->",listArray)
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -8573,7 +8580,7 @@ export default class CreateTreeTemplate extends Component {
                                                     {this.state.tracerCategoryList.length > 0
                                                         && this.state.tracerCategoryList.map((item, i) => {
                                                             return (
-                                                                <option key={i} value={item.tracerCategoryId}>
+                                                                <option key={i} value={item.id}>
                                                                     {getLabelText(item.label, this.state.lang)}
                                                                 </option>
                                                             )
