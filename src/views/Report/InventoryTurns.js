@@ -1048,7 +1048,7 @@ export default class InventoryTurns extends Component {
                                     let level2AverageStock = temp.reduce((prev,curr,index) => prev + curr.avergeStock * curr.noOfMonths, 0);
                                     level2AverageStock = level2AverageStock / level2NoOfMonths;
                                     // let level2InventoryTurns = temp.reduce((prev,curr,index) => prev + curr.inventoryTurns, 0) / temp.length;
-                                    let level2InventoryTurns = this.mode(temp.filter(arr => arr.inventoryTurns != null).map(arr => parseFloat(this.formatterSingle(arr.inventoryTurns1))));
+                                    let level2InventoryTurns = this.mode(temp.filter(arr => arr.inventoryTurns != null).map(arr => parseFloat(this.formatterSingle(arr.inventoryTurns))));
                                     let level2PlannedInventoryTurns = this.mode(temp.map(arr => parseFloat(this.formatterSingle(arr.plannedInventoryTurns))));
                                     let level2Mape = temp.filter(arr => arr.mape != null).length > 0 ? temp.reduce((prev,curr,index) => prev + curr.mape, 0) / (temp.filter(arr => arr.mape != null).length) : 0;
                                     let level2Mse = temp.filter(arr => arr.mse != null).length > 0 ? temp.reduce((prev,curr,index) => prev + curr.mse, 0) / (temp.filter(arr => arr.mse != null).length) : 0;
