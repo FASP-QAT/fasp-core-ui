@@ -1059,7 +1059,7 @@ export default class CommitTreeComponent extends React.Component {
                                         <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
                                         <div className='ForecastSummaryTable'>
                                             <div className="RemoveStriped commitversionTable CommitTableMarginTop consumptionDataEntryTable">
-                                                <div id="tableDiv" />
+                                                <div  id="tableDiv" />
                                             </div>
                                         </div>
                                     </>
