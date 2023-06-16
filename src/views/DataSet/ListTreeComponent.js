@@ -1398,7 +1398,7 @@ export default class ListTreeComponent extends Component {
                     data[9] = programList.version
                     data[10] = treeList[k].active
                     data[11] = this.state.versionId.toString().includes("(Local)") ? 1 : 2
-                    data[12] = treeList[k].forecastMethod.id;
+                    data[12] = JSON.stringify(treeList[k].forecastMethod);
                     console.log("selStatus---", this.state.versionId.toString().includes("(Local)"))
                     if (selStatus != "") {
                         if (tempSelStatus == treeList[k].active) {
@@ -1599,15 +1599,7 @@ export default class ListTreeComponent extends Component {
                                         isModalOpen: !this.state.isModalOpen,
                                         treeName: this.state.treeEl.getValueFromCoords(2, y) + " (copy)",
                                         active: true,
-                                        forecastMethod: {
-                                            id: this.state.treeEl.getValueFromCoords(12, y),
-                                            label: {
-                                                label_en: '',
-                                                label_fr: '',
-                                                label_sp: '',
-                                                label_pr: ''
-                                            }
-                                        },
+                                        forecastMethod: JSON.parse(this.state.treeEl.getValueFromCoords(12, y)),
                                         regionId: '',
                                         regionList: [],
                                         regionValues: [],

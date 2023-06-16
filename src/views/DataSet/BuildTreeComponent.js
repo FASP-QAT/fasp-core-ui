@@ -5742,6 +5742,21 @@ export default class BuildTree extends Component {
 
             }, this);
             console.log("regionValues--->>>>", regionValues);
+            var tempToggleObject = [];
+            if (curTreeObj.tree.flatList.length > 0) {
+                tempToggleObject = curTreeObj.tree.flatList.filter(item => 
+                    (item.payload.collapsed == true) 
+                );
+            }
+            let tempToggleList = tempToggleObject.map(item => item.id);
+            this.setState({toggleArray: tempToggleList});
+            var curTreeObj1 = curTreeObj.tree.flatList.map(item => {
+                if(tempToggleList.includes(item.id))
+                    return {...item, templateName: "contactTemplateMin", expanded: true} 
+                return {...item, templateName: "contactTemplate", expanded: false} 
+            })
+            curTreeObj.tree.flatList = curTreeObj1; 
+                
             this.setState({
                 curTreeObj,
                 scenarioList: curTreeObj.scenarioList.filter(x => x.active == true),
