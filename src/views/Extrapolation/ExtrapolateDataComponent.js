@@ -3436,7 +3436,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.MovingAverages')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <div>
+                                                    <div className="col-md-12">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -3476,7 +3476,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.SemiAverages')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <div className="pt-lg-2">
+                                                    <div className="pt-lg-2 col-md-12">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -3497,7 +3497,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.LinearRegression')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <div className="pt-lg-2">
+                                                    <div className="pt-lg-2 col-md-12">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -3550,7 +3550,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.Tes')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <div className="pt-lg-2">
+                                                    <div className="pt-lg-2 col-md-12">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -3735,7 +3735,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.arima')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <div className="pt-lg-2">
+                                                    <div className="pt-lg-2 col-md-12">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -3872,7 +3872,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </FormGroup>
                                         </div>
                                         <div className="col-md-4">
-                                                    <input type="textarea"/>
+                                            <textarea placeholder="Notes..." style={{width: '100%', height: '80%', padding: '1rem'}}>
+
+                                            </textarea>
                                         </div>
 
                                         </div>
