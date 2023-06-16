@@ -4040,7 +4040,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     </ul>}
                                                 </div>
                                                 <div className="row  mt-lg-3 mb-lg-3">
-                                                    <div className="pl-lg-4 pr-lg-4 ModelingValidationTable consumptionDataEntryTable">
+                                                    <div style={{width: '100%'}} className="pl-lg-4 pr-lg-4 ModelingValidationTable consumptionDataEntryTable">
                                                         <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                                         </div>
                                                     </div>
