@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
+import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP, API_URL, } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -509,8 +509,8 @@ function addCommasThreeDecimal(cell1, row) {
 }
 
 export default class CreateTreeTemplate extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.pickAMonth5 = React.createRef()
         this.pickAMonth4 = React.createRef()
         this.pickAMonth2 = React.createRef()
@@ -747,7 +747,10 @@ export default class CreateTreeTemplate extends Component {
             lastRowDeleted: false,
             modelingChanged: false,
             levelModal: false,
-            nodeTransferDataList: []
+            nodeTransferDataList: [],
+            editable:AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE')?true:false,
+            treeTemplateList:[],
+            treeTemplateId:this.props.match.params.templateId!=undefined && this.props.match.params.templateId!=-1?this.props.match.params.templateId:""
 
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -853,6 +856,7 @@ export default class CreateTreeTemplate extends Component {
         this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this);
         this.filterUsageTemplateList = this.filterUsageTemplateList.bind(this);
         this.generateBranchFromTemplate = this.generateBranchFromTemplate.bind(this);
+        this.createTree=this.createTree.bind(this)
     }
     filterUsageTemplateList(forecastingUnitId) {
         var usageTemplateList;
@@ -3092,7 +3096,7 @@ export default class CreateTreeTemplate extends Component {
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.0000%', decimal: '.',
-                    readOnly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') ? false : true,
+                    readOnly: this.state.editable ? false : true,
 
                 },
                 {
@@ -3212,6 +3216,7 @@ export default class CreateTreeTemplate extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            editable:this.state.editable,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -3363,6 +3368,7 @@ export default class CreateTreeTemplate extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
+            editable:this.state.editable,
             onchange: this.changed1,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el;
@@ -3667,6 +3673,7 @@ export default class CreateTreeTemplate extends Component {
             //     entries: '',
             // },
             onload: this.loaded,
+            editable:this.state.editable,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -3871,7 +3878,7 @@ export default class CreateTreeTemplate extends Component {
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
 
-            if (y == 8 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES')) {
+            if (y == 8 && this.state.editable) {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
                 if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
@@ -4306,7 +4313,7 @@ export default class CreateTreeTemplate extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable: true,
+            editable: this.state.editable,
             onload: this.loadedPer,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -4524,6 +4531,13 @@ export default class CreateTreeTemplate extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/dataset/listTreeTemplate/`)
+    }
+
+    createTree(){
+        this.props.history.push({
+            pathname: `/dataSet/listTreeTemplate/`,
+            state: { "treeTemplateId":this.state.treeTemplateId }
+        });
     }
 
 
@@ -5950,6 +5964,58 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             );
+            DatasetService.getTreeTemplateList().then(response => {
+                console.log("tree template list---", response.data)
+                var treeTemplateList = response.data.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                this.setState({
+                    treeTemplateList,
+                })
+            })
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+    
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
         // DatasetService.getNodeTypeList().then(response => {
         //     console.log("node type list---", response.data);
         //     var listArray = response.data;
@@ -6004,8 +6070,8 @@ export default class CreateTreeTemplate extends Component {
         //         }
         //     );
         setTimeout(() => {
-            if (this.props.match.params.templateId != -1 || this.state.treeTemplate.treeTemplateId > 0) {
-                var treeTemplateId = this.props.match.params.templateId != -1 ? this.props.match.params.templateId : this.state.treeTemplate.treeTemplateId;
+            if (this.state.treeTemplateId != "" || this.state.treeTemplate.treeTemplateId > 0) {
+                var treeTemplateId = this.state.treeTemplateId != "" ? this.state.treeTemplateId : this.state.treeTemplate.treeTemplateId;
                 DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
                     console.log("my tree---", response.data);
                     var items = response.data.flatList;
@@ -6528,6 +6594,15 @@ export default class CreateTreeTemplate extends Component {
             this.setState({ branchTemplateId: event.target.value }, () => {
 
             });
+        }
+        if (event.target.name === "treeTemplateId") {
+            if(event.target.value!=""){
+                this.setState({
+                    treeTemplateId:event.target.value
+                },()=>{
+                    this.componentDidMount()
+                })
+            }
         }
 
         if (event.target.name == "calculatorStartDate") {
@@ -7849,6 +7924,7 @@ export default class CreateTreeTemplate extends Component {
                                                         invalid={touched.nodeTitle && !!errors.nodeTitle}
                                                         onBlur={handleBlur}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        readOnly={!this.state.editable}
                                                         value={this.state.currentItemConfig.context.payload.label.label_en}>
                                                     </Input>
                                                     <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
@@ -7871,6 +7947,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="nodeTypeId"
                                                         name="nodeTypeId"
                                                         bsSize="sm"
+                                                        disabled={!this.state.editable}
                                                         valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
                                                         invalid={touched.nodeTypeId && !!errors.nodeTypeId}
                                                         onBlur={handleBlur}
@@ -7905,7 +7982,7 @@ export default class CreateTreeTemplate extends Component {
                                                         onBlur={handleBlur}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         required
-                                                        disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 && this.state.currentItemConfig.context.parent != null ? true : false}
+                                                        disabled={!this.state.editable?true:this.state.currentItemConfig.context.payload.nodeType.id > 3 && this.state.currentItemConfig.context.parent != null ? true : false}
                                                         value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.parent != null ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
@@ -7954,6 +8031,7 @@ export default class CreateTreeTemplate extends Component {
                                                         onBlur={handleBlur}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         required
+                                                        disabled={!this.state.editable}
                                                         value={this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
@@ -7985,6 +8063,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="percentageOfParent"
                                                             name="percentageOfParent"
                                                             bsSize="sm"
+                                                            readOnly={!this.state.editable}
                                                             valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
                                                             invalid={touched.percentageOfParent && !!errors.percentageOfParent}
                                                             onBlur={handleBlur}
@@ -8007,6 +8086,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <Input type="text"
                                                         id="parentValue"
                                                         name="parentValue"
+                                                        readOnly={!this.state.editable}
                                                         bsSize="sm"
                                                         readOnly={true}
                                                         onChange={(e) => { this.dataChange(e) }}
@@ -8030,7 +8110,7 @@ export default class CreateTreeTemplate extends Component {
                                                         valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue) : addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue) != ''}
                                                         invalid={touched.nodeValue && !!errors.nodeValue}
                                                         onBlur={handleBlur}
-                                                        readOnly={this.state.numberNode ? true : false}
+                                                        readOnly={!this.state.editable?true:this.state.numberNode ? true : false}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         // step={.01}
                                                         // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
@@ -8047,6 +8127,7 @@ export default class CreateTreeTemplate extends Component {
                                                         name="notes"
                                                         onChange={(e) => { this.dataChange(e) }}
                                                         // value={this.getNotes}
+                                                        readOnly={!this.state.editable}
                                                         value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].notes}
                                                     ></Input>
                                                 </FormGroup>
@@ -8090,6 +8171,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="nodeTitle"
                                                             name="nodeTitle"
                                                             bsSize="sm"
+                                                            readOnly={!this.state.editable}
                                                             valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
                                                             invalid={touched.nodeTitle && !!errors.nodeTitle}
                                                             onBlur={handleBlur}
@@ -8115,6 +8197,7 @@ export default class CreateTreeTemplate extends Component {
                                                             type="select"
                                                             id="nodeTypeId"
                                                             name="nodeTypeId"
+                                                            disabled={!this.state.editable}
                                                             bsSize="sm"
                                                             valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
                                                             invalid={touched.nodeTypeId && !!errors.nodeTypeId}
@@ -8142,6 +8225,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="monthNo"
                                                             name="monthNo"
                                                             bsSize="sm"
+                                                            disabled={!this.state.editable}
                                                             valid={!errors.monthNo && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo != ''}
                                                             invalid={touched.monthNo && !!errors.monthNo}
                                                             onBlur={handleBlur}
@@ -8182,6 +8266,7 @@ export default class CreateTreeTemplate extends Component {
                                                         <Input type="textarea"
                                                             id="notes"
                                                             name="notes"
+                                                            readOnly={!this.state.editable}
                                                             style={{ height: "100px" }}
                                                             onChange={(e) => { this.dataChange(e) }}
                                                             // value={this.getNotes}
@@ -8200,6 +8285,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 id="percentageOfParent"
                                                                 name="percentageOfParent"
                                                                 bsSize="sm"
+                                                                readOnly={!this.state.editable}
                                                                 valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
                                                                 invalid={touched.percentageOfParent && !!errors.percentageOfParent}
                                                                 onBlur={handleBlur}
@@ -8226,7 +8312,7 @@ export default class CreateTreeTemplate extends Component {
                                                             valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue) : addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue) != ''}
                                                             invalid={touched.nodeValue && !!errors.nodeValue}
                                                             onBlur={handleBlur}
-                                                            readOnly={this.state.numberNode ? true : false}
+                                                            readOnly={!this.state.editable?true:this.state.numberNode ? true : false}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             // step={.01}
                                                             // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
@@ -8336,6 +8422,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="planningUnitId"
                                                             name="planningUnitId"
                                                             bsSize="sm"
+                                                            disabled={!this.state.editable}
                                                             className={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].isPUMappingCorrect==0?"redPU":""}
                                                             valid={!errors.planningUnitId && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != '' : !errors.planningUnitId}
                                                             invalid={touched.planningUnitId && !!errors.planningUnitId}
@@ -8451,6 +8538,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         handleChange(e);
                                                                         this.dataChange(e)
                                                                     }}
+                                                                    readOnly={!this.state.editable}
                                                                     bsSize="sm"
                                                                     value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 5 && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths : "")}>
                                                                 </Input>
@@ -8463,7 +8551,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 <Input type="number"
                                                                     id="puPerVisit"
                                                                     name="puPerVisit"
-                                                                    readOnly={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
+                                                                    readOnly={!this.state.editable?true:this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
                                                                     bsSize="sm"
                                                                     valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit != '' : !errors.puPerVisit}
                                                                     invalid={touched.puPerVisit && !!errors.puPerVisit}
@@ -8515,6 +8603,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         id="sharePlanningUnitTrue"
                                                                         name="sharePlanningUnit"
                                                                         value={true}
+                                                                        disabled={!this.state.editable}
                                                                         checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true" || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == true}
                                                                         onChange={(e) => {
                                                                             this.dataChange(e)
@@ -8533,6 +8622,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         type="radio"
                                                                         id="sharePlanningUnitFalse"
                                                                         name="sharePlanningUnit"
+                                                                        disabled={!this.state.editable}
                                                                         value={false}
                                                                         checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == false || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == false}
                                                                         onChange={(e) => {
@@ -8570,7 +8660,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 <Input type="number"
                                                                     id="puPerVisit"
                                                                     name="puPerVisit"
-                                                                    readOnly={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
+                                                                    readOnly={!this.state.editable?true:this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
                                                                     bsSize="sm"
                                                                     valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit != '' : !errors.puPerVisit}
                                                                     invalid={touched.puPerVisit && !!errors.puPerVisit}
@@ -8611,6 +8701,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id="tracerCategoryId"
                                                     name="tracerCategoryId"
                                                     bsSize="sm"
+                                                    disabled={!this.state.editable}
                                                     // valid={!errors.tracerCategoryId && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory.id != '' : !errors.tracerCategoryId}
                                                     // invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
                                                     onBlur={handleBlur}
@@ -8644,6 +8735,7 @@ export default class CreateTreeTemplate extends Component {
                                                     name="usageTemplateId"
                                                     id="usageTemplateId"
                                                     bsSize="sm"
+                                                    disabled={!this.state.editable}
                                                     // valid={!errors.usageTemplateId && this.state.usageTemplateId != ''}
                                                     // invalid={touched.usageTemplateId && !!errors.usageTemplateId}
                                                     onBlur={handleBlur}
@@ -8691,6 +8783,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="forecastingUnitId"
                                                         name="forecastingUnitId"
                                                         bsSize="sm"
+                                                        disabled={!this.state.editable}
                                                         onChange={(e) => {
                                                             handleChange(e);
                                                             setFieldValue("forecastingUnitId", e);
@@ -8746,6 +8839,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="planningUnitIdFU"
                                                         name="planningUnitIdFU"
                                                         bsSize="sm"
+                                                        disabled={!this.state.editable}
                                                         valid={!errors.planningUnitIdFU}
                                                         invalid={touched.planningUnitIdFU && !!errors.planningUnitIdFU}
                                                         onBlur={handleBlur}
@@ -8778,6 +8872,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id="usageTypeIdFU"
                                                     name="usageTypeIdFU"
                                                     bsSize="sm"
+                                                    disabled={!this.state.editable}
                                                     valid={!errors.usageTypeIdFU && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id != '' : !errors.usageTypeIdFU}
                                                     invalid={touched.usageTypeIdFU && !!errors.usageTypeIdFU}
                                                     onBlur={handleBlur}
@@ -8811,6 +8906,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id="lagInMonths"
                                                     name="lagInMonths"
                                                     bsSize="sm"
+                                                    readOnly={!this.state.editable}
                                                     valid={!errors.lagInMonths && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.lagInMonths != '' : !errors.lagInMonths}
                                                     invalid={touched.lagInMonths && !!errors.lagInMonths}
                                                     onBlur={handleBlur}
@@ -8837,7 +8933,7 @@ export default class CreateTreeTemplate extends Component {
                                                     valid={!errors.noOfPersons && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfPersons != '' : !errors.noOfPersons}
                                                     invalid={touched.noOfPersons && !!errors.noOfPersons}
                                                     onBlur={handleBlur}
-                                                    readOnly={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? true : false}
+                                                    readOnly={!this.state.editable?true:this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? true : false}
                                                     onChange={(e) => {
                                                         handleChange(e);
                                                         this.dataChange(e)
@@ -8874,6 +8970,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id="forecastingUnitPerPersonsFC"
                                                     name="forecastingUnitPerPersonsFC"
                                                     bsSize="sm"
+                                                    readOnly={!this.state.editable}
                                                     valid={!errors.forecastingUnitPerPersonsFC && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson != '' : !errors.forecastingUnitPerPersonsFC}
                                                     invalid={touched.forecastingUnitPerPersonsFC && !!errors.forecastingUnitPerPersonsFC}
                                                     onBlur={handleBlur}
@@ -8919,6 +9016,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 ? 'block' : 'none' }}>
                                                     <Input type="select"
                                                         id="oneTimeUsage"
+                                                        disabled={!this.state.editable}
                                                         name="oneTimeUsage"
                                                         bsSize="sm"
                                                         valid={!errors.oneTimeUsage && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != '' : !errors.oneTimeUsage}
@@ -8945,6 +9043,7 @@ export default class CreateTreeTemplate extends Component {
                                                         <Input type="text"
                                                             id="usageFrequencyDis"
                                                             name="usageFrequencyDis"
+                                                            readOnly={!this.state.editable}
                                                             bsSize="sm"
                                                             valid={!errors.usageFrequencyDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency != "" : false)}
                                                             invalid={touched.usageFrequencyDis && !!errors.usageFrequencyDis}
@@ -8969,6 +9068,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="usagePeriodIdDis"
                                                             name="usagePeriodIdDis"
                                                             bsSize="sm"
+                                                            disabled={!this.state.editable}
                                                             valid={!errors.usagePeriodIdDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" : false)}
                                                             invalid={touched.usagePeriodIdDis && !!errors.usagePeriodIdDis}
                                                             onBlur={handleBlur}
@@ -8999,6 +9099,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="repeatCount"
                                                             name="repeatCount"
                                                             bsSize="sm"
+                                                            readOnly={!this.state.editable}
                                                             valid={!errors.repeatCount && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatCount != '' : !errors.repeatCount}
                                                             invalid={touched.repeatCount && !!errors.repeatCount}
                                                             onBlur={handleBlur}
@@ -9015,6 +9116,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="repeatUsagePeriodId"
                                                             name="repeatUsagePeriodId"
                                                             bsSize="sm"
+                                                            disabled={!this.state.editable}
                                                             valid={!errors.repeatUsagePeriodId && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage == false) ? (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod != '' && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId != '') : !errors.repeatUsagePeriodId}
                                                             invalid={touched.repeatUsagePeriodId && !!errors.repeatUsagePeriodId}
                                                             onBlur={handleBlur}
@@ -9061,6 +9163,7 @@ export default class CreateTreeTemplate extends Component {
                                                             handleChange(e);
                                                             this.dataChange(e)
                                                         }}
+                                                        readOnly={!this.state.editable}
                                                         value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency : ""}></Input>
                                                     <FormFeedback className="red">{errors.usageFrequencyCon}</FormFeedback>
                                                     {/* <FormFeedback className="red">{errors.usageFrequency}</FormFeedback> */}
@@ -9071,6 +9174,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="usagePeriodIdCon"
                                                         name="usagePeriodIdCon"
                                                         bsSize="sm"
+                                                        disabled={!this.state.editable}
                                                         valid={!errors.usagePeriodIdCon && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" : false)}
                                                         invalid={touched.usagePeriodIdCon && !!errors.usagePeriodIdCon}
                                                         onBlur={handleBlur}
@@ -9149,7 +9253,7 @@ export default class CreateTreeTemplate extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1') })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        {this.state.editable && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
@@ -9241,7 +9345,7 @@ export default class CreateTreeTemplate extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.aggregationNode && this.state.editable && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>
@@ -9531,6 +9635,7 @@ export default class CreateTreeTemplate extends Component {
                                                         type="checkbox"
                                                         id="manualChange"
                                                         name="manualChange"
+                                                        readOnly={!this.state.editable}
                                                         // checked={true}
                                                         checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture}
                                                         onClick={(e) => { this.momCheckbox(e, 1); }}
@@ -9581,7 +9686,7 @@ export default class CreateTreeTemplate extends Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                                    {this.state.editable && this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
                                 {/* </div> */}
@@ -9616,6 +9721,7 @@ export default class CreateTreeTemplate extends Component {
                                                         type="checkbox"
                                                         id="manualChange"
                                                         name="manualChange"
+                                                        readOnly={!this.state.editable}
                                                         // checked={true}
                                                         checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture}
                                                         onClick={(e) => { this.momCheckbox(e, 2); }}
@@ -9661,7 +9767,7 @@ export default class CreateTreeTemplate extends Component {
                                         });
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.}><i className="fa fa-check"></i> {'Update'}</Button> */}
-                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                                    {this.state.editable && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
                                 {/* </div> */}
@@ -10009,6 +10115,16 @@ export default class CreateTreeTemplate extends Component {
                 )
             }, this);
 
+            const { treeTemplateList } = this.state;
+        let treeTemplates = treeTemplateList.length > 0
+            && treeTemplateList.map((item, i) => {
+                return (
+                    <option key={i} value={item.treeTemplateId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
 
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
@@ -10127,7 +10243,7 @@ export default class CreateTreeTemplate extends Component {
                 return <>
                     {itemConfig.parent != null &&
                         <>
-                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                            {this.state.editable &&
                                 <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                     onClick={(event) => {
                                         event.stopPropagation();
@@ -10136,7 +10252,7 @@ export default class CreateTreeTemplate extends Component {
                                     <i class="fa fa-clone" aria-hidden="true"></i>
                                 </button>
                             }
-                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                            {this.state.editable &&
                                 <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                     onClick={(event) => {
                                         event.stopPropagation();
@@ -10159,7 +10275,7 @@ export default class CreateTreeTemplate extends Component {
                                     <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                 </button>}
                         </>}
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 && this.state.editable &&
 
                         <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -10171,7 +10287,7 @@ export default class CreateTreeTemplate extends Component {
                         </button>
                     }
 
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 && this.state.editable &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
@@ -10372,6 +10488,7 @@ export default class CreateTreeTemplate extends Component {
                                         onClick={() => this.exportPDF()}
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
+                                    <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{'Create tree'}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span>
                                 </a>
                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
@@ -10513,6 +10630,7 @@ export default class CreateTreeTemplate extends Component {
                                                             }
                                                             this.setState({
                                                                 treeTemplate: response.data,
+                                                                treeTemplateId:response.data.treeTemplateId,
                                                                 items,
                                                                 message: i18n.t('static.message.addTreeTemplate'),
                                                                 color: 'green',
@@ -10690,6 +10808,23 @@ export default class CreateTreeTemplate extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
+                                                            <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{i18n.t('static.dataset.TreeTemplate')}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="treeTemplateId"
+                                                                        id="treeTemplateId"
+                                                                        bsSize="sm"
+                                                                        required
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        value={this.state.treeTemplateId}
+                                                                    >
+                                                                        {this.state.treeTemplate.treeTemplateId==0 && <option value="">{i18n.t('static.common.select')}</option>}
+                                                                        {treeTemplates}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.forecastMethodId}</FormFeedback>
+                                                                </FormGroup>
+                                                                <div className="col-md-9"></div>
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
                                                                     <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
@@ -10697,6 +10832,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         name="forecastMethodId"
                                                                         id="forecastMethodId"
                                                                         bsSize="sm"
+                                                                        disabled={!this.state.editable}
                                                                         valid={!errors.forecastMethodId && this.state.treeTemplate.forecastMethod.id != ''}
                                                                         invalid={touched.forecastMethodId && !!errors.forecastMethodId}
                                                                         onBlur={handleBlur}
@@ -10717,6 +10853,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         name="treeName"
                                                                         id="treeName"
                                                                         bsSize="sm"
+                                                                        readOnly={!this.state.editable}
                                                                         valid={!errors.treeName && this.state.treeTemplate.label.label_en != ''}
                                                                         invalid={touched.treeName && !!errors.treeName}
                                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -10735,6 +10872,7 @@ export default class CreateTreeTemplate extends Component {
                                                                             type="radio"
                                                                             id="active1"
                                                                             name="active"
+                                                                            disabled={!this.state.editable}
                                                                             value={true}
                                                                             checked={this.state.treeTemplate.active === true}
                                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -10751,6 +10889,7 @@ export default class CreateTreeTemplate extends Component {
                                                                             type="radio"
                                                                             id="active2"
                                                                             name="active"
+                                                                            disabled={!this.state.editable}
                                                                             value={false}
                                                                             checked={this.state.treeTemplate.active === false}
                                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -10811,6 +10950,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         bsSize="sm"
                                                                         min={0}
                                                                         step={1}
+                                                                        readOnly={!this.state.editable}
                                                                         valid={!errors.monthsInPast && this.state.treeTemplate.monthsInPast != ''}
                                                                         invalid={touched.monthsInPast && !!errors.monthsInPast}
                                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -10833,6 +10973,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         name="monthsInFuture"
                                                                         id="monthsInFuture"
                                                                         bsSize="sm"
+                                                                        readOnly={!this.state.editable}
                                                                         min={0}
                                                                         step={1}
                                                                         valid={!errors.monthsInFuture && this.state.treeTemplate.monthsInFuture != ''}
@@ -10853,6 +10994,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         name="templateNotes"
                                                                         id="templateNotes"
                                                                         bsSize="sm"
+                                                                        readOnly={!this.state.editable}
                                                                         onChange={(e) => { this.dataChange(e) }}
                                                                         value={this.state.treeTemplate.notes}
                                                                     >
@@ -11146,6 +11288,7 @@ export default class CreateTreeTemplate extends Component {
                                             id="levelName"
                                             name="levelName"
                                             required
+                                            readOnly={!this.state.editable}
                                             valid={!errors.levelName && this.state.levelName != null ? this.state.levelName : '' != ''}
                                             invalid={touched.levelName && !!errors.levelName}
                                             onBlur={handleBlur}
@@ -11162,6 +11305,7 @@ export default class CreateTreeTemplate extends Component {
                                             id="levelUnit"
                                             name="levelUnit"
                                             bsSize="sm"
+                                            disabled={!this.state.editable}
                                             onChange={(e) => { this.levelUnitChange(e) }}
                                             value={this.state.levelUnit}
                                         >
