@@ -3372,7 +3372,7 @@ export default class PlanningUnitSetting extends Component {
                         </Col>}
 
                         <div className="UpdatePlanningSettingTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv">
+                            <div style={{width: '100%'}} id="tableDiv">
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

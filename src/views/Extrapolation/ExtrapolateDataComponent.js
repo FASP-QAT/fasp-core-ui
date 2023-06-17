@@ -3912,7 +3912,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             {this.state.showData &&
                                                 <div className="">
                                                     <div className="">
-                                                        <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: 'unset' }}>
+                                                        <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: '100%' }}>
                                                             <thead>
                                                                 <tr>
                                                                     <td width="160px" title={i18n.t('static.tooltip.errors')}><b>{i18n.t('static.common.errors')}</b>
