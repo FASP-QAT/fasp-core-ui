@@ -355,6 +355,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.toggleMa = this.toggleMa.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.getExtrapolationMethodList = this.getExtrapolationMethodList.bind(this);
+        this.resetExtrapolation = this.resetExtrapolation.bind(this);
         this.manualChangeExtrapolation = this.manualChangeExtrapolation.bind(this);
         this.interpolate = this.interpolate.bind(this);
         this.extrapolationMethodChange = this.extrapolationMethodChange.bind(this);
@@ -566,6 +567,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         return new Date(a.month) - new Date(b.month);
                     });
                 console.log("gap2---", dataList)
+                if (dataList.length > 0) {
                 var result = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(dataList[0].month).format("YYYY-MM") && moment(c.month).format("YYYY-MM") < moment(dataList[dataList.length - 1].month).format("YYYY-MM") && (c.amount == ''))
                 console.log("dataList[0]---", dataList[0]);
                 console.log("dataList[dataList.length - 1]---", dataList[dataList.length - 1]);
@@ -598,6 +600,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                         this.buildExtrapolationMom();
                     }
                 }
+            }else{
+                console.log("Loader 2 Test123")
+                this.setState({ extrapolationLoader: false }, () => {
+                    setTimeout(() => {
+                        alert("Please fill in the blank actual values or interpolate.")
+                    }, 0);
+                });
+            }
             }, 0);
         });
     }
@@ -717,7 +727,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     jsonProperties: {
                         months: this.state.monthsForMovingAverage
                     },
-                    extrapolationOptionDataList: movingAveragesData
+                    extrapolationOptionDataList: []
                 }
                 // json1 = this.state.extrapolationMethodList.filter(c => c.id == 7)[0];
                 nodeDataExtrapolationOptionList.push(json);
@@ -728,7 +738,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     extrapolationMethod: { id: 6 },
                     jsonProperties: {
                     },
-                    extrapolationOptionDataList: semiAveragesData
+                    extrapolationOptionDataList: []
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
@@ -739,7 +749,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     jsonProperties: {
                         confidenceLevelIdLinearRegression: this.state.confidenceLevelIdLinearRegression
                     },
-                    extrapolationOptionDataList: linearRegressionData
+                    extrapolationOptionDataList: []
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
@@ -755,7 +765,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         confidenceLevelIdArima: this.state.confidenceLevelIdArima,
                         seasonality: this.state.seasonality
                     },
-                    extrapolationOptionDataList: arimaData
+                    extrapolationOptionDataList: []
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
@@ -770,7 +780,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         beta: this.state.beta,
                         gamma: this.state.gamma
                     },
-                    extrapolationOptionDataList: tesData
+                    extrapolationOptionDataList: []
                 }
                 nodeDataExtrapolationOptionList.push(json);
             }
@@ -1147,6 +1157,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         return new Date(a.month) - new Date(b.month);
                     });
                 console.log("valList---->", valList)
+                if(valList.length>0){
                 this.setState({
                     minMonth: valList[0].month,
                     maxMonth: valList[valList.length - 1].month
@@ -1174,7 +1185,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             console.log("inputDataArima 8--->>>", inputDataArima)
                         }
                     }
-                    if (!dataAvailabel) {
+                    // if (!dataAvailabel) {
                         console.log("inputDataMovingAvg--->>>", inputDataMovingAvg)
                         var data = jexcelDataArr.filter(c => c.amount != "" && c.amount != null)
                             .sort(function (a, b) {
@@ -1251,45 +1262,49 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 offlineArima: false                                
                             })
                         }
-                    } else {
-                        console.log("jexcel build else called")
-                        console.log("this.state.semiAvgData--->>>", this.state.semiAvgData)
-                        if (this.state.semiAvgId) {
-                            calculateError(this.state.semiAvgData, "semiAvgError", this);
-                        }
-                        if (this.state.movingAvgId) {
-                            calculateError(this.state.movingAvgData, "movingAvgError", this);
-                        }
-                        if (this.state.linearRegressionId) {
-                            calculateError(this.state.linearRegressionData, "linearRegressionError", this);
-                        }
-                        if (this.state.smoothingId) {
-                            if (this.state.tesData.length > 0) {
-                                calculateError(this.state.tesData, "tesError", this);
-                            } else {
-                                this.setState({
-                                    tesData: [],
-                                    tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                                });
-                            }
-                        }
-                        if (this.state.arimaId) {
-                            if (this.state.arimaData.length > 0) {
-                                calculateError(this.state.arimaData, "arimaError", this);
-                            }
-                            else {
-                                this.setState({
-                                    arimaData: [],
-                                    arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
-                                    noDataMessage: ""
-                                });
-                            }
-                        }
-                        // this.buildJexcel();
-                    }
+                    // } else {
+                    //     console.log("jexcel build else called")
+                    //     console.log("this.state.semiAvgData--->>>", this.state.semiAvgData)
+                    //     if (this.state.semiAvgId) {
+                    //         calculateError(this.state.semiAvgData, "semiAvgError", this);
+                    //     }
+                    //     if (this.state.movingAvgId) {
+                    //         calculateError(this.state.movingAvgData, "movingAvgError", this);
+                    //     }
+                    //     if (this.state.linearRegressionId) {
+                    //         calculateError(this.state.linearRegressionData, "linearRegressionError", this);
+                    //     }
+                    //     if (this.state.smoothingId) {
+                    //         if (this.state.tesData.length > 0) {
+                    //             calculateError(this.state.tesData, "tesError", this);
+                    //         } else {
+                    //             this.setState({
+                    //                 tesData: [],
+                    //                 tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                    //             });
+                    //         }
+                    //     }
+                    //     if (this.state.arimaId) {
+                    //         if (this.state.arimaData.length > 0) {
+                    //             calculateError(this.state.arimaData, "arimaError", this);
+                    //         }
+                    //         else {
+                    //             this.setState({
+                    //                 arimaData: [],
+                    //                 arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+                    //                 noDataMessage: ""
+                    //             });
+                    //         }
+                    //     }
+                    //     // this.buildJexcel();
+                    // }
                 });
 
-            } else {
+            }else{
+                console.log("Loader 4 Test123")
+                this.setState({ extrapolationLoader: false });
+            } 
+            }else {
                 console.log("Loader 4 Test123")
                 this.setState({ extrapolationLoader: false });
             }
@@ -1316,11 +1331,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                 for (var i = 0; i < tableJson.length; i++) {
                     var map1 = new Map(Object.entries(tableJson[i]));
                     console.log("10 map---" + map1.get("10"));
-                    var result = jexcelDataArr.filter(x => x.amount != "");
-                    resultCount = (map1.get("1") != "" && map1.get("1") != 0) || result.length > 0 ? resultCount + 1 : resultCount;
+                    var result = jexcelDataArr.filter(x => x.amount !== "");
+                    resultCount = (map1.get("1") !== "" || result.length > 0) ? resultCount + 1 : resultCount;
                     var json = {
                         month: map1.get("0"),
-                        amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
+                        amount: map1.get("1") !== "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
                         reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                         monthNo: resultCount,
                         manualChange: map1.get("10").toString().replaceAll(",", ""),
@@ -1329,6 +1344,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     jexcelDataArr.push(json);
                 }
                 this.setState({ jexcelDataArr }, () => {
+                var interpolatedMonths = [];
                     for (var j = 0; j < monthArray.length; j++) {
                         var dataArr = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))[0];
                         console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "dataArr---", dataArr);
@@ -1352,6 +1368,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endVal---", endVal);
                                 var endMonthVal = endValList[0].month;
                                 console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endMonthVal---", endMonthVal);
+                                interpolatedMonths.push({ month: moment(monthArray[j]).format("YYYY-MM") });
                                 const monthDifference = Math.round(Number(moment(new Date(monthArray[j])).diff(new Date(startMonthVal), 'months', true)));
                                 const monthDiff = Math.round(Number(moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true)));
                                 var missingActualData = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
@@ -1382,8 +1399,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                         .sort(function (a, b) {
                             return new Date(a.month) - new Date(b.month);
                         });
+                        if (interpolatedMonths.length == 0) {
+                            window.alert(i18n.t('static.consumptionDataEntryAndAdjustment.nothingToInterpolate'));
+                          }
                     this.setState({
-                        minMonth: valList[0].month,
+                        minMonth: valList.length!=0?valList[0].month:'',
                         nodeDataExtrapolation,
                         dataChanged: true
                     }, () => { this.buildJexcel() });
@@ -1420,6 +1440,54 @@ export default class TreeExtrapolationComponent extends React.Component {
     componentDidMount() {
         //     this.getExtrapolationMethodList();
     }
+    resetExtrapolation(){
+        var startDate1 = moment(this.props.items.forecastStartDate).startOf('month').subtract(23, 'months').startOf('month').utc().format("YYYY-MM-DD");
+        var endDate1 = moment(this.props.items.forecastStartDate).startOf('month').utc().format("YYYY-MM-DD");
+        this.setState({
+            extrapolationLoader: true,
+            rangeValue1: { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 } },
+            seasonality: 0,
+            dataChanged: false,
+            buttonFalg: 1,
+            showJexcelData: false,
+            maxMonth: '',
+            extrapolationLoader: true,
+            forecastNestedHeader: '5',
+            filteredExtrapolationMethodList: [],
+            minMonth: '',
+            monthsForMovingAverage: 5,
+            confidenceLevelId: 0.95,
+            confidenceLevelIdLinearRegression: 0.95,
+            confidenceLevelIdArima: 0.95,
+            alpha: 0.2,
+            beta: 0.2,
+            gamma: 0.2,
+            p: 0,
+            d: 1,
+            q: 1,
+            movingAvgId: true,
+            semiAvgId: true,
+            linearRegressionId: true,
+            smoothingId: true,
+            arimaId: true,
+            jexcelDataArr: [],
+            nodeDataExtrapolationOptionList: [],
+            movingAvgData: [],
+            semiAvgData: [],
+            linearRegressionData: [],
+            tesData: [],
+            arimaData: [],
+            movingAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            semiAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            noDataMessage: "",
+        }, () => {
+    this.getExtrapolationMethodList();        
+    })
+}
+
     getExtrapolationMethodList() {
         console.log("### inside did mount")
         console.log("Loader 6 Test123")
@@ -1547,6 +1615,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                         } else {
                             console.log("### inside did mount else")
                             var filteredExtrapolationMethodList = [];
+                            console.log("Current scenario Test@123",this.props.items.currentScenario)
+                            console.log("Node Data extrapolation Test@123",this.props.items.currentScenario.nodeDataExtrapolation)
                             var nodeDataExtrapolation = this.props.items.currentScenario.nodeDataExtrapolation;
                             var extrapolationDataList = nodeDataExtrapolation.extrapolationDataList;
                             var nodeDataExtrapolationOptionList = this.props.items.currentScenario.nodeDataExtrapolationOptionList;
@@ -3721,13 +3791,15 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         {/* <Form name='simpleForm'> */}
                                         <div className=" pl-0">
                                             <div className="row">
-                                                <div>
+                                                {/* <div>
                                                     <Popover placement="top" isOpen={this.state.popoverOpenStartMonth} target="Popover28" trigger="hover" toggle={this.toggleStartMonth}>
                                                         <PopoverBody>{i18n.t('static.tooltip.startMonthForHistoricData')}</PopoverBody>
                                                     </Popover>
-                                                </div>
+                                                </div> */}
                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData')}
+                                                    {/* <i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> */}
+                                                    </Label>
                                                     <div className="controls edit">
                                                         {/* <Picker
 
@@ -4216,8 +4288,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 <div className="col-md-6 pl-lg-0">
                                                     {(this.state.offlineTES || this.state.offlineArima)  && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
                                                     <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
-                                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <><Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>{i18n.t('static.tree.interpolate')}</Button>
-                                                        <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.extrapolate')}</Button></>}
+                                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && <>
+                                                        <Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>{i18n.t('static.tree.interpolate')}</Button>
+                                                        <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.extrapolate')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-left mr-1" onClick={() => { this.resetExtrapolation()}} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>    
+                                                        </>}
                                                 </div>
                                                 <div className="col-md-6 pr-lg-0">
                                                     <Button className="btn btn-info btn-md float-right" onClick={this.toggleJexcelData}>

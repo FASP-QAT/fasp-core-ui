@@ -101,16 +101,16 @@ export default class SupplyPlanComponent extends React.Component {
             regionList: [],
             consumptionTotalData: [],
             shipmentsTotalData: [],
-            manualShipmentsTotalData: [],
+            // manualShipmentsTotalData: [],
             deliveredShipmentsTotalData: [],
             shippedShipmentsTotalData: [],
             orderedShipmentsTotalData: [],
             plannedShipmentsTotalData: [],
-            erpShipmentsTotalData: [],
-            deliveredErpShipmentsTotalData: [],
-            shippedErpShipmentsTotalData: [],
-            orderedErpShipmentsTotalData: [],
-            plannedErpShipmentsTotalData: [],
+            // erpShipmentsTotalData: [],
+            // deliveredErpShipmentsTotalData: [],
+            // shippedErpShipmentsTotalData: [],
+            // orderedErpShipmentsTotalData: [],
+            // plannedErpShipmentsTotalData: [],
             consumptionDataForAllMonths: [],
             amcTotalData: [],
             consumptionFilteredArray: [],
@@ -129,6 +129,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             monthCountConsumption: 0,
             monthCountAdjustments: 0,
+            monthCountShipments: 0,
             minStockArray: [],
             maxStockArray: [],
             minStockMoS: [],
@@ -163,6 +164,7 @@ export default class SupplyPlanComponent extends React.Component {
             showConsumption: 0,
             consumptionStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
+            shipmentStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -171,10 +173,13 @@ export default class SupplyPlanComponent extends React.Component {
             showBatchSaveButton: false,
             programQPLDetails: [],
             replanModal: false,
+            exportModal: false,
             singleValue: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             minDateSingle: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             maxDateSingle: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             planningUnitIdsPlan: [],
+            planningUnitIdsExport: [],
+            type: 0,
             procurementAgentListPlan: [],
             procurementAgentId: TBD_PROCUREMENT_AGENT_ID,
             fundingSourceListPlan: [],
@@ -184,7 +189,9 @@ export default class SupplyPlanComponent extends React.Component {
             budgetListPlanAll: [],
             programResult: "",
             showPlanningUnitAndQty: 0,
-            showPlanningUnitAndQtyList: []
+            showPlanningUnitAndQtyList: [],
+            shipmentQtyTotalForPopup: 0,
+            batchQtyTotalForPopup: 0
             // startDateFormat:curDate
         }
 
@@ -209,6 +216,9 @@ export default class SupplyPlanComponent extends React.Component {
         this.leftClickedAdjustments = this.leftClickedAdjustments.bind(this);
         this.rightClickedAdjustments = this.rightClickedAdjustments.bind(this);
 
+        this.leftClickedShipments = this.leftClickedShipments.bind(this);
+        this.rightClickedShipments = this.rightClickedShipments.bind(this);
+
         this.actionCanceled = this.actionCanceled.bind(this);
 
         this.suggestedShipmentsDetailsClicked = this.suggestedShipmentsDetailsClicked.bind(this);
@@ -225,11 +235,24 @@ export default class SupplyPlanComponent extends React.Component {
         this.hideFourthComponent = this.hideFourthComponent.bind(this);
         this.hideFifthComponent = this.hideFifthComponent.bind(this);
         this.toggleReplan = this.toggleReplan.bind(this);
+        this.toggleExport = this.toggleExport.bind(this);
         this.setProcurementAgentId = this.setProcurementAgentId.bind(this);
         this.setFundingSourceId = this.setFundingSourceId.bind(this);
         this.setBudgetId = this.setBudgetId.bind(this);
         this.planShipment = this.planShipment.bind(this)
         this.pickAMonthSingle = React.createRef();
+    }
+
+    addCommas(cell, row) {
+        cell += '';
+        var x = cell.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
     }
 
     _handleClickRangeBox(e) {
@@ -466,112 +489,112 @@ export default class SupplyPlanComponent extends React.Component {
         csvRow.push('')
         csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
 
-        csvRow.push('')
-        csvRow.push("\"" + (i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' : ' + ((this.state.planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20') + "\"")
-        csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
-        csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
-        csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
-        if (this.state.planBasedOn == 1) {
-            csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
-        } else {
-            csvRow.push("\"" + i18n.t("static.product.minQuantity").replaceAll(' ', '%20') + ' : ' + this.state.minQtyPpu + "\"")
-        }
-        csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
-        if (this.state.planBasedOn == 1) {
-            csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
-        } else {
-            csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
-        }
+        // csvRow.push('')
+        // csvRow.push("\"" + (i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' : ' + ((this.state.planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20') + "\"")
+        // csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + this.state.monthsInPastForAMC + "\"")
+        // csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.monthsInFutureForAMC + "\"")
+        // csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.shelfLife + "\"")
+        // if (this.state.planBasedOn == 1) {
+        //     csvRow.push("\"" + i18n.t("static.supplyPlan.minStockMos").replaceAll(' ', '%20') + ' : ' + this.state.minStockMoSQty + "\"")
+        // } else {
+        //     csvRow.push("\"" + i18n.t("static.product.minQuantity").replaceAll(' ', '%20') + ' : ' + this.state.minQtyPpu + "\"")
+        // }
+        // csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.reorderFrequency + "\"")
+        // if (this.state.planBasedOn == 1) {
+        //     csvRow.push("\"" + i18n.t("static.supplyPlan.maxStockMos").replaceAll(' ', '%20') + ' : ' + this.state.maxStockMoSQty + "\"")
+        // } else {
+        //     csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
+        // }
 
-        csvRow.push('')
+        // csvRow.push('')
 
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             ("\'").concat(item.monthName).concat('%20').concat(item.monthYear)
         ))
         )]
-        var A = [header]
-
-        var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ...this.state.openingBalanceArray.map(item => item.balance)]
-        var consumptionArr = [...["\'" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\'"], ...this.state.consumptionTotalData]
-        var shipmentArr = [...["\'" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\'"], ...this.state.shipmentsTotalData]
-        var suggestedArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20') + "\""], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
-        var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...this.state.manualShipmentsTotalData]
-
-        var deliveredShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...this.state.deliveredShipmentsTotalData.map(item => item.qty)]
-        var shippedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...this.state.shippedShipmentsTotalData.map(item => item.qty)]
-        var orderedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
-        var plannedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
-
-        var erpShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.erpShipments')).replaceAll(' ', '%20') + "\""], ...this.state.erpShipmentsTotalData]
-        var deliveredErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...this.state.deliveredErpShipmentsTotalData.map(item => item.qty)]
-        var shippedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...this.state.shippedErpShipmentsTotalData.map(item => item.qty)]
-        var orderedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...this.state.orderedErpShipmentsTotalData.map(item => item.qty)]
-        var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
-
-        var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...this.state.inventoryTotalData]
-        var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...this.state.expiredStockArr.map(item => item.qty)]
-        var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...this.state.closingBalanceArray.map(item => item.balance)]
-        var monthsOfStockArr = [...["\"" + (i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20') + "\""], ... this.state.monthsOfStockArray]
-        var maxQtyArr = [...["\"" + (i18n.t('static.supplyPlan.maxQty')).replaceAll(' ', '%20') + "\""], ... this.state.maxQtyArray]
-        var amcgArr = [...["\"" + (i18n.t('static.supplyPlan.amc')).replaceAll(' ', '%20') + "\""], ...this.state.amcTotalData]
-
-        // var minStocArr = [...["\"" + (i18n.t('static.supplyPlan.minStockMos')).replaceAll(' ', '%20') + "\""], ...this.state.minStockMoS]
-        // var maxStockArr = [...["\"" + (i18n.t('static.supplyPlan.maxStockMos')).replaceAll(' ', '%20') + "\""], ...this.state.maxStockMoS]
-        var unmetDemandArr = [...["\"" + (i18n.t('static.supplyPlan.unmetDemandStr')).replaceAll(' ', '%20') + "\""], ...this.state.unmetDemand]
+        var A = "";
 
 
-        A.push(openningArr)
-        A.push(consumptionArr.map((c, item) => item != 0 ? c.consumptionQty : c))
-        A.push(shipmentArr)
-        A.push(suggestedArr)
-        A.push(manualEntryShipmentsArr)
-        A.push(deliveredShipmentArr)
-        A.push(shippedShipmentArr)
-        A.push(orderedShipmentArr)
-        A.push(plannedShipmentArr)
-        A.push(erpShipmentsArr)
-        A.push(deliveredErpShipmentArr)
-        A.push(shippedErpShipmentArr)
-        A.push(orderedErpShipmentArr)
-        A.push(plannedErpShipmentArr)
-        A.push(inventoryArr)
-        A.push(expiredStockArr)
-        A.push(closingBalanceArr)
-        A.push(this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? c : i18n.t("static.supplyPlanFormula.na"))) : maxQtyArr.map(c => c != null ? c : ""))
-        A.push(amcgArr)
+        // var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ...this.state.openingBalanceArray.map(item => item.balance)]
+        // var consumptionArr = [...["\'" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\'"], ...this.state.consumptionTotalData]
+        // var shipmentArr = [...["\'" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\'"], ...this.state.shipmentsTotalData]
+        // var suggestedArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20') + "\""], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
+        // var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...this.state.manualShipmentsTotalData]
 
-        // A.push(minStocArr)
-        // A.push(maxStockArr)
-        A.push(unmetDemandArr)
+        // var deliveredShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...this.state.deliveredShipmentsTotalData.map(item => item.qty)]
+        // var shippedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...this.state.shippedShipmentsTotalData.map(item => item.qty)]
+        // var orderedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
+        // var plannedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
 
+        // var erpShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.erpShipments')).replaceAll(' ', '%20') + "\""], ...this.state.erpShipmentsTotalData]
+        // var deliveredErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...this.state.deliveredErpShipmentsTotalData.map(item => item.qty)]
+        // var shippedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...this.state.shippedErpShipmentsTotalData.map(item => item.qty)]
+        // var orderedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...this.state.orderedErpShipmentsTotalData.map(item => item.qty)]
+        // var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
-        for (var i = 0; i < A.length; i++) {
-            csvRow.push(A[i].join(","))
-        }
+        // var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...this.state.inventoryTotalData]
+        // var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...this.state.expiredStockArr.map(item => item.qty)]
+        // var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...this.state.closingBalanceArray.map(item => item.balance)]
+        // var monthsOfStockArr = [...["\"" + (i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20') + "\""], ... this.state.monthsOfStockArray]
+        // var maxQtyArr = [...["\"" + (i18n.t('static.supplyPlan.maxQty')).replaceAll(' ', '%20') + "\""], ... this.state.maxQtyArray]
+        // var amcgArr = [...["\"" + (i18n.t('static.supplyPlan.amc')).replaceAll(' ', '%20') + "\""], ...this.state.amcTotalData]
 
-
-        var planningUnitData = this.state.planningUnitData
+        // // var minStocArr = [...["\"" + (i18n.t('static.supplyPlan.minStockMos')).replaceAll(' ', '%20') + "\""], ...this.state.minStockMoS]
+        // // var maxStockArr = [...["\"" + (i18n.t('static.supplyPlan.maxStockMos')).replaceAll(' ', '%20') + "\""], ...this.state.maxStockMoS]
+        // var unmetDemandArr = [...["\"" + (i18n.t('static.supplyPlan.unmetDemandStr')).replaceAll(' ', '%20') + "\""], ...this.state.unmetDemand]
 
 
-        var list = planningUnitData.filter(c => c.planningUnit.id != this.state.planningUnitId);
-        list.map(ele => {
+        // A.push(openningArr)
+        // A.push(consumptionArr.map((c, item) => item != 0 ? c.consumptionQty : c))
+        // A.push(shipmentArr)
+        // A.push(suggestedArr)
+        // A.push(manualEntryShipmentsArr)
+        // A.push(deliveredShipmentArr)
+        // A.push(shippedShipmentArr)
+        // A.push(orderedShipmentArr)
+        // A.push(plannedShipmentArr)
+        // A.push(erpShipmentsArr)
+        // A.push(deliveredErpShipmentArr)
+        // A.push(shippedErpShipmentArr)
+        // A.push(orderedErpShipmentArr)
+        // A.push(plannedErpShipmentArr)
+        // A.push(inventoryArr)
+        // A.push(expiredStockArr)
+        // A.push(closingBalanceArr)
+        // A.push(this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? c : i18n.t("static.supplyPlanFormula.na"))) : maxQtyArr.map(c => c != null ? c : ""))
+        // A.push(amcgArr)
+
+        // // A.push(minStocArr)
+        // // A.push(maxStockArr)
+        // A.push(unmetDemandArr)
+
+
+        // for (var i = 0; i < A.length; i++) {
+        //     csvRow.push(A[i].join(","))
+        // }
+
+
+        var planningUnitData = this.state.planningUnitData;
+
+        var list = planningUnitData;
+        list.map((ele, index) => {
 
             var openningArr = [...["\"" + i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20') + "\""], ...ele.data.openingBalanceArray.map(item => item.balance)]
             var consumptionArr = [...["\'" + ("-" + i18n.t('static.supplyPlan.consumption')).replaceAll(' ', '%20') + "\'"], ...ele.data.consumptionTotalData]
             var shipmentArr = [...["\'" + ("+" + i18n.t('static.dashboard.shipments')).replaceAll(' ', '%20') + "\'"], ...ele.data.shipmentsTotalData]
             var suggestedArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.suggestedShipments')).replaceAll(' ', '%20') + "\""], ...ele.data.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
-            var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...ele.data.manualShipmentsTotalData]
+            // var manualEntryShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.manualEntryShipments')).replaceAll(' ', '%20') + "\""], ...ele.data.manualShipmentsTotalData]
 
-            var deliveredShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...ele.data.deliveredShipmentsTotalData.map(item => item.qty)]
-            var shippedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...ele.data.shippedShipmentsTotalData.map(item => item.qty)]
-            var orderedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...ele.data.orderedShipmentsTotalData.map(item => item.qty)]
-            var plannedShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...ele.data.plannedShipmentsTotalData.map(item => item.qty)]
+            var deliveredShipmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...ele.data.deliveredShipmentsTotalData.map(item => item.qty)]
+            var shippedShipmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...ele.data.shippedShipmentsTotalData.map(item => item.qty)]
+            var orderedShipmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...ele.data.orderedShipmentsTotalData.map(item => item.qty)]
+            var plannedShipmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...ele.data.plannedShipmentsTotalData.map(item => item.qty)]
 
-            var erpShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.erpShipments')).replaceAll(' ', '%20') + "\""], ...ele.data.erpShipmentsTotalData]
-            var deliveredErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...ele.data.deliveredErpShipmentsTotalData.map(item => item.qty)]
-            var shippedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...ele.data.shippedErpShipmentsTotalData.map(item => item.qty)]
-            var orderedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...ele.data.orderedErpShipmentsTotalData.map(item => item.qty)]
-            var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...ele.data.plannedErpShipmentsTotalData.map(item => item.qty)]
+            // var erpShipmentsArr = [...["\"" + ("  " + i18n.t('static.supplyPlan.erpShipments')).replaceAll(' ', '%20') + "\""], ...ele.data.erpShipmentsTotalData]
+            // var deliveredErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.delivered')).replaceAll(' ', '%20') + "\""], ...ele.data.deliveredErpShipmentsTotalData.map(item => item.qty)]
+            // var shippedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.shipped')).replaceAll(' ', '%20') + "\""], ...ele.data.shippedErpShipmentsTotalData.map(item => item.qty)]
+            // var orderedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...ele.data.orderedErpShipmentsTotalData.map(item => item.qty)]
+            // var plannedErpShipmentArr = [...["\"" + ("     " + i18n.t('static.supplyPlan.planned')).replaceAll(' ', '%20') + "\""], ...ele.data.plannedErpShipmentsTotalData.map(item => item.qty)]
 
             var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...ele.data.inventoryTotalData]
             var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...ele.data.expiredStockArr.map(item => item.qty)]
@@ -585,8 +608,10 @@ export default class SupplyPlanComponent extends React.Component {
             var unmetDemandArr = [...["\"" + (i18n.t('static.supplyPlan.unmetDemandStr')).replaceAll(' ', '%20') + "\""], ...ele.data.unmetDemand]
 
             csvRow.push('')
-            csvRow.push('')
-            csvRow.push('')
+            if (index != 0) {
+                csvRow.push('')
+                csvRow.push('')
+            }
             csvRow.push("\"" + (i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' : ' + (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20') + "\"")
             csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + ele.info.monthsInPastForAMC + "\"")
             csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + ele.info.monthsInFutureForAMC + "\"")
@@ -609,16 +634,16 @@ export default class SupplyPlanComponent extends React.Component {
             A.push(consumptionArr.map((c, item) => item != 0 ? c.consumptionQty : c))
             A.push(shipmentArr)
             A.push(suggestedArr)
-            A.push(manualEntryShipmentsArr)
+            // A.push(manualEntryShipmentsArr)
             A.push(deliveredShipmentArr)
             A.push(shippedShipmentArr)
             A.push(orderedShipmentArr)
             A.push(plannedShipmentArr)
-            A.push(erpShipmentsArr)
-            A.push(deliveredErpShipmentArr)
-            A.push(shippedErpShipmentArr)
-            A.push(orderedErpShipmentArr)
-            A.push(plannedErpShipmentArr)
+            // A.push(erpShipmentsArr)
+            // A.push(deliveredErpShipmentArr)
+            // A.push(shippedErpShipmentArr)
+            // A.push(orderedErpShipmentArr)
+            // A.push(plannedErpShipmentArr)
             A.push(inventoryArr)
             A.push(expiredStockArr)
             A.push(closingBalanceArr)
@@ -706,39 +731,39 @@ export default class SupplyPlanComponent extends React.Component {
                     doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programSelect).label, doc.internal.pageSize.width / 10, 80, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnit).label, doc.internal.pageSize.width / 10, 90, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.supplyPlan.amcPast') + ' : ' + this.state.monthsInPastForAMC, doc.internal.pageSize.width / 10, 100, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.supplyPlan.amcFuture') + ' : ' + this.state.monthsInFutureForAMC, doc.internal.pageSize.width / 10, 110, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.report.shelfLife') + ' : ' + this.state.shelfLife, doc.internal.pageSize.width / 10, 120, {
-                        align: 'left'
-                    })
-                    if (this.state.planBasedOn == 1) {
-                        doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + this.state.minStockMoSQty, doc.internal.pageSize.width / 10, 130, {
-                            align: 'left'
-                        })
-                    } else {
-                        doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(this.state.minQtyPpu), doc.internal.pageSize.width / 10, 130, {
-                            align: 'left'
-                        })
-                    }
-                    doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + this.state.reorderFrequency, doc.internal.pageSize.width / 10, 140, {
-                        align: 'left'
-                    })
-                    if (this.state.planBasedOn == 1) {
-                        doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 150, {
-                            align: 'left'
-                        })
-                    } else {
-                        doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(this.state.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
-                            align: 'left'
-                        })
-                    }
+                    // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + (this.state.planningUnit).label, doc.internal.pageSize.width / 10, 90, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.supplyPlan.amcPast') + ' : ' + this.state.monthsInPastForAMC, doc.internal.pageSize.width / 10, 100, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.supplyPlan.amcFuture') + ' : ' + this.state.monthsInFutureForAMC, doc.internal.pageSize.width / 10, 110, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.report.shelfLife') + ' : ' + this.state.shelfLife, doc.internal.pageSize.width / 10, 120, {
+                    //     align: 'left'
+                    // })
+                    // if (this.state.planBasedOn == 1) {
+                    //     doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + this.state.minStockMoSQty, doc.internal.pageSize.width / 10, 130, {
+                    //         align: 'left'
+                    //     })
+                    // } else {
+                    //     doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(this.state.minQtyPpu), doc.internal.pageSize.width / 10, 130, {
+                    //         align: 'left'
+                    //     })
+                    // }
+                    // doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + this.state.reorderFrequency, doc.internal.pageSize.width / 10, 140, {
+                    //     align: 'left'
+                    // })
+                    // if (this.state.planBasedOn == 1) {
+                    //     doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + this.state.maxStockMoSQty, doc.internal.pageSize.width / 10, 150, {
+                    //         align: 'left'
+                    //     })
+                    // } else {
+                    //     doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(this.state.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
+                    //         align: 'left'
+                    //     })
+                    // }
                 }
 
             }
@@ -752,16 +777,16 @@ export default class SupplyPlanComponent extends React.Component {
 
         doc.setFontSize(15);
 
-        var canvas = document.getElementById("cool-canvas");
-        //creates image
+        // var canvas = document.getElementById("cool-canvas");
+        // //creates image
 
-        var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
+        // var canvasImg = canvas.toDataURL("image/png", 1.0);
+        // var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
-        var h1 = 100;
-        var aspectwidth1 = (width - h1);
+        // var h1 = 100;
+        // var aspectwidth1 = (width - h1);
 
-        doc.addImage(canvasImg, 'png', 50, 160, 750, 290, 'CANVAS');
+        // doc.addImage(canvasImg, 'png', 50, 160, 750, 290, 'CANVAS');
         // doc.addImage(canvasImg, 'png', 50, 110, aspectwidth1, (height - h1) * 3 / 4);
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             item.monthName.concat(" ").concat(item.monthYear)
@@ -769,186 +794,190 @@ export default class SupplyPlanComponent extends React.Component {
         )]
 
         const headers = [header];
-        var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ... this.state.openingBalanceArray.map(item => item.balance)]
-        var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...this.state.consumptionTotalData]
-        var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments'))], ...this.state.shipmentsTotalData]
-        var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments'))], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
-        var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments'))], ...this.state.manualShipmentsTotalData]
+        // var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ... this.state.openingBalanceArray.map(item => item.balance)]
+        // var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...this.state.consumptionTotalData]
+        // var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments'))], ...this.state.shipmentsTotalData]
+        // var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments'))], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
+        // var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments'))], ...this.state.manualShipmentsTotalData]
 
-        var deliveredShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...this.state.deliveredShipmentsTotalData.map(item => item.qty)]
-        var shippedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...this.state.shippedShipmentsTotalData.map(item => item.qty)]
-        var orderedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
-        var plannedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
+        // var deliveredShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...this.state.deliveredShipmentsTotalData.map(item => item.qty)]
+        // var shippedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...this.state.shippedShipmentsTotalData.map(item => item.qty)]
+        // var orderedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
+        // var plannedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
 
-        var erpShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.erpShipments'))], ...this.state.erpShipmentsTotalData]
-        var deliveredErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...this.state.deliveredErpShipmentsTotalData.map(item => item.qty)]
-        var shippedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...this.state.shippedErpShipmentsTotalData.map(item => item.qty)]
-        var orderedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...this.state.orderedErpShipmentsTotalData.map(item => item.qty)]
-        var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
+        // var erpShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.erpShipments'))], ...this.state.erpShipmentsTotalData]
+        // var deliveredErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...this.state.deliveredErpShipmentsTotalData.map(item => item.qty)]
+        // var shippedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...this.state.shippedErpShipmentsTotalData.map(item => item.qty)]
+        // var orderedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...this.state.orderedErpShipmentsTotalData.map(item => item.qty)]
+        // var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...this.state.plannedErpShipmentsTotalData.map(item => item.qty)]
 
-        var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...this.state.inventoryTotalData]
-        var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...this.state.expiredStockArr.map(item => item.qty)]
-        var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...this.state.closingBalanceArray.map(item => item.balance)]
-        var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock'))], ... this.state.monthsOfStockArray]
-        var maxQtyArr = [...[(i18n.t('static.supplyPlan.maxQty'))], ... this.state.maxQtyArray]
-        var amcgArr = [...[(i18n.t('static.supplyPlan.amc'))], ...this.state.amcTotalData]
+        // var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...this.state.inventoryTotalData]
+        // var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...this.state.expiredStockArr.map(item => item.qty)]
+        // var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...this.state.closingBalanceArray.map(item => item.balance)]
+        // var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock'))], ... this.state.monthsOfStockArray]
+        // var maxQtyArr = [...[(i18n.t('static.supplyPlan.maxQty'))], ... this.state.maxQtyArray]
+        // var amcgArr = [...[(i18n.t('static.supplyPlan.amc'))], ...this.state.amcTotalData]
 
-        // var minStocArr = [...[(i18n.t('static.supplyPlan.minStockMos'))], ...this.state.minStockMoS]
-        // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
-        var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
+        // // var minStocArr = [...[(i18n.t('static.supplyPlan.minStockMos'))], ...this.state.minStockMoS]
+        // // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...this.state.maxStockMoS]
+        // var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
 
-        const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na'))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : '')), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+        // const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na'))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : '')), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
 
-        let content = {
-            margin: { top: 80, bottom: 70 },
-            startY: height,
-            head: headers,
-            body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 39, halign: 'center' },
-            columnStyles: {
-                0: { cellWidth: 59.89 }
-            }
-        };
-        doc.autoTable(content);
+        // let content = {
+        //     margin: { top: 80, bottom: 70 },
+        //     startY: height,
+        //     head: headers,
+        //     body: data,
+        //     styles: { lineWidth: 1, fontSize: 8, cellWidth: 39, halign: 'center' },
+        //     columnStyles: {
+        //         0: { cellWidth: 59.89 }
+        //     }
+        // };
+        // doc.autoTable(content);
 
 
-        doc.setFontSize(8)
-        doc.setFont('helvetica', 'bold')
-        var y = doc.lastAutoTable.finalY + 20
-        if (y + 100 > height) {
-            doc.addPage();
-            y = 80
-        }
-        doc.text(i18n.t('static.program.notes'), doc.internal.pageSize.width / 9, y, {
-            align: 'left'
-        })
-        doc.setFont('helvetica', 'normal')
-        var cnt = 0
-        this.state.inList.map(ele => {
+        // doc.setFontSize(8)
+        // doc.setFont('helvetica', 'bold')
+        // var y = doc.lastAutoTable.finalY + 20
+        // if (y + 100 > height) {
+        //     doc.addPage();
+        //     y = 80
+        // }
+        // doc.text(i18n.t('static.program.notes'), doc.internal.pageSize.width / 9, y, {
+        //     align: 'left'
+        // })
+        // doc.setFont('helvetica', 'normal')
+        // var cnt = 0
+        // this.state.inList.map(ele => {
 
-            if (ele.notes != null && ele.notes != '') {
-                cnt = cnt + 1
-                if (cnt == 1) {
-                    y = y + 20
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.inventory.inventory'), doc.internal.pageSize.width / 8, y, {
-                        align: 'left'
-                    })
-                }
-                doc.setFontSize(8)
-                y = y + 20
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
+        //     if (ele.notes != null && ele.notes != '') {
+        //         cnt = cnt + 1
+        //         if (cnt == 1) {
+        //             y = y + 20
+        //             doc.setFontSize(8)
+        //             doc.text(i18n.t('static.inventory.inventory'), doc.internal.pageSize.width / 8, y, {
+        //                 align: 'left'
+        //             })
+        //         }
+        //         doc.setFontSize(8)
+        //         y = y + 20
+        //         if (y > doc.internal.pageSize.height - 100) {
+        //             doc.addPage();
+        //             y = 80;
 
-                }
-                doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
-                    align: 'left'
-                })
-                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                for (var i = 0; i < splitTitle.length; i++) {
-                    if (y > doc.internal.pageSize.height - 100) {
-                        doc.addPage();
-                        y = 80;
-                    } else {
-                        y = y + 3
-                    }
-                }
-                if (splitTitle.length > 1) {
-                    y = y + (5 * (splitTitle.length - 1));
-                }
-            }
-        })
+        //         }
+        //         doc.text(moment(ele.inventoryDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
+        //             align: 'left'
+        //         })
+        //         var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+        //         doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+        //         for (var i = 0; i < splitTitle.length; i++) {
+        //             if (y > doc.internal.pageSize.height - 100) {
+        //                 doc.addPage();
+        //                 y = 80;
+        //             } else {
+        //                 y = y + 3
+        //             }
+        //         }
+        //         if (splitTitle.length > 1) {
+        //             y = y + (5 * (splitTitle.length - 1));
+        //         }
+        //     }
+        // })
 
-        cnt = 0
+        // cnt = 0
 
-        this.state.coList.map(ele => {
-            if (ele.notes != null && ele.notes != '') {
-                cnt = cnt + 1
-                if (cnt == 1) {
-                    y = y + 20
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.supplyPlan.consumption'), doc.internal.pageSize.width / 8, y, {
-                        align: 'left'
-                    })
-                }
-                doc.setFontSize(8)
-                y = y + 20
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
+        // this.state.coList.map(ele => {
+        //     if (ele.notes != null && ele.notes != '') {
+        //         cnt = cnt + 1
+        //         if (cnt == 1) {
+        //             y = y + 20
+        //             doc.setFontSize(8)
+        //             doc.text(i18n.t('static.supplyPlan.consumption'), doc.internal.pageSize.width / 8, y, {
+        //                 align: 'left'
+        //             })
+        //         }
+        //         doc.setFontSize(8)
+        //         y = y + 20
+        //         if (y > doc.internal.pageSize.height - 100) {
+        //             doc.addPage();
+        //             y = 80;
 
-                }
-                doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
-                    align: 'left'
-                })
-                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                for (var i = 0; i < splitTitle.length; i++) {
-                    if (y > doc.internal.pageSize.height - 100) {
-                        doc.addPage();
-                        y = 80;
-                    } else {
-                        y = y + 3
-                    }
-                }
-                if (splitTitle.length > 1) {
-                    y = y + (5 * (splitTitle.length - 1));
-                }
-            }
-        })
+        //         }
+        //         doc.text(moment(ele.consumptionDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
+        //             align: 'left'
+        //         })
+        //         var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+        //         doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+        //         for (var i = 0; i < splitTitle.length; i++) {
+        //             if (y > doc.internal.pageSize.height - 100) {
+        //                 doc.addPage();
+        //                 y = 80;
+        //             } else {
+        //                 y = y + 3
+        //             }
+        //         }
+        //         if (splitTitle.length > 1) {
+        //             y = y + (5 * (splitTitle.length - 1));
+        //         }
+        //     }
+        // })
 
-        cnt = 0
+        // cnt = 0
 
-        this.state.shList.map(ele => {
-            if (ele.notes != null && ele.notes != '') {
-                cnt = cnt + 1
-                if (cnt == 1) {
-                    y = y + 20
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
-                        align: 'left'
-                    })
-                }
-                doc.setFontSize(8)
-                y = y + 20
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
+        // this.state.shList.map(ele => {
+        //     if (ele.notes != null && ele.notes != '') {
+        //         cnt = cnt + 1
+        //         if (cnt == 1) {
+        //             y = y + 20
+        //             doc.setFontSize(8)
+        //             doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8, y, {
+        //                 align: 'left'
+        //             })
+        //         }
+        //         doc.setFontSize(8)
+        //         y = y + 20
+        //         if (y > doc.internal.pageSize.height - 100) {
+        //             doc.addPage();
+        //             y = 80;
 
-                }
-                doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
-                    align: 'left'
-                })
-                var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
-                for (var i = 0; i < splitTitle.length; i++) {
-                    if (y > doc.internal.pageSize.height - 100) {
-                        doc.addPage();
-                        y = 80;
-                    } else {
-                        y = y + 3
-                    }
-                }
-                if (splitTitle.length > 1) {
-                    y = y + (5 * (splitTitle.length - 1));
-                }
+        //         }
+        //         doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
+        //             align: 'left'
+        //         })
+        //         var splitTitle = doc.splitTextToSize(ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
+        //         doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+        //         for (var i = 0; i < splitTitle.length; i++) {
+        //             if (y > doc.internal.pageSize.height - 100) {
+        //                 doc.addPage();
+        //                 y = 80;
+        //             } else {
+        //                 y = y + 3
+        //             }
+        //         }
+        //         if (splitTitle.length > 1) {
+        //             y = y + (5 * (splitTitle.length - 1));
+        //         }
 
-            }
-        }
-        )
+        //     }
+        // }
+        // )
 
 
         var planningUnitData = this.state.planningUnitData
 
 
-        var list = planningUnitData.filter(c => c.planningUnit.id != this.state.planningUnitId);
+        var list = planningUnitData;
         var count = 0;
-        list.map(ele => {
-            doc.addPage();
+        list.map((ele, index) => {
+            // doc.setTextColor("#002f6c");
+            if (index != 0) {
+                doc.addPage();
+            }
             y = 80
             doc.setFontSize(8)
+            doc.setTextColor("#002f6c");
             doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(ele.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
                 align: 'left'
             })
@@ -982,23 +1011,23 @@ export default class SupplyPlanComponent extends React.Component {
                     align: 'left'
                 })
             }
-
+            doc.setTextColor("#000");
             var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ...ele.data.openingBalanceArray.map(item => item.balance)]
             var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...ele.data.consumptionTotalData]
             var shipmentArr = [...[("+" + i18n.t('static.dashboard.shipments'))], ...ele.data.shipmentsTotalData]
             var suggestedArr = [...[("   " + i18n.t('static.supplyPlan.suggestedShipments'))], ...ele.data.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
-            var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments'))], ...ele.data.manualShipmentsTotalData]
+            // var manualEntryShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.manualEntryShipments'))], ...ele.data.manualShipmentsTotalData]
 
-            var deliveredShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...ele.data.deliveredShipmentsTotalData.map(item => item.qty)]
-            var shippedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...ele.data.shippedShipmentsTotalData.map(item => item.qty)]
-            var orderedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...ele.data.orderedShipmentsTotalData.map(item => item.qty)]
-            var plannedShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...ele.data.plannedShipmentsTotalData.map(item => item.qty)]
+            var deliveredShipmentArr = [...[("   " + i18n.t('static.supplyPlan.delivered'))], ...ele.data.deliveredShipmentsTotalData.map(item => item.qty)]
+            var shippedShipmentArr = [...[("   " + i18n.t('static.supplyPlan.shipped'))], ...ele.data.shippedShipmentsTotalData.map(item => item.qty)]
+            var orderedShipmentArr = [...[("   " + i18n.t('static.supplyPlan.submitted'))], ...ele.data.orderedShipmentsTotalData.map(item => item.qty)]
+            var plannedShipmentArr = [...[("   " + i18n.t('static.supplyPlan.planned'))], ...ele.data.plannedShipmentsTotalData.map(item => item.qty)]
 
-            var erpShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.erpShipments'))], ...ele.data.erpShipmentsTotalData]
-            var deliveredErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...ele.data.deliveredErpShipmentsTotalData.map(item => item.qty)]
-            var shippedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...ele.data.shippedErpShipmentsTotalData.map(item => item.qty)]
-            var orderedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...ele.data.orderedErpShipmentsTotalData.map(item => item.qty)]
-            var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...ele.data.plannedErpShipmentsTotalData.map(item => item.qty)]
+            // var erpShipmentsArr = [...[("  " + i18n.t('static.supplyPlan.erpShipments'))], ...ele.data.erpShipmentsTotalData]
+            // var deliveredErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.delivered'))], ...ele.data.deliveredErpShipmentsTotalData.map(item => item.qty)]
+            // var shippedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.shipped'))], ...ele.data.shippedErpShipmentsTotalData.map(item => item.qty)]
+            // var orderedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.submitted'))], ...ele.data.orderedErpShipmentsTotalData.map(item => item.qty)]
+            // var plannedErpShipmentArr = [...[("     " + i18n.t('static.supplyPlan.planned'))], ...ele.data.plannedErpShipmentsTotalData.map(item => item.qty)]
 
             var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...ele.data.inventoryTotalData]
             var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...ele.data.expiredStockArr.map(item => item.qty)]
@@ -1011,7 +1040,11 @@ export default class SupplyPlanComponent extends React.Component {
             // var maxStockArr = [...[(i18n.t('static.supplyPlan.maxStockMos'))], ...ele.data.maxStockMoS]
             var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...ele.data.unmetDemand]
 
-            let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)), manualEntryShipmentsArr.map(c => this.formatter(c)), deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)), erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), ele.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na"))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : "")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+            let data1 = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)),
+            // manualEntryShipmentsArr.map(c => this.formatter(c)), 
+            deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)),
+            // erpShipmentsArr.map(c => this.formatter(c)), deliveredErpShipmentArr.map(c => this.formatter(c)), shippedErpShipmentArr.map(c => this.formatter(c)), orderedErpShipmentArr.map(c => this.formatter(c)), plannedErpShipmentArr.map(c => this.formatter(c)), 
+            inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), ele.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t("static.supplyPlanFormula.na"))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : "")), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
             //  var createCanvas =React.renderComponent( <CreateCanvas/>, document.getElementById('createCanvas') );
 
 
@@ -1386,69 +1419,6 @@ export default class SupplyPlanComponent extends React.Component {
 
                 },
                 {
-                    label: i18n.t('static.supplyPlan.planned'),
-                    stack: 1,
-                    yAxisID: 'A',
-                    backgroundColor: '#A7C6ED',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
-                },
-                {
-                    label: i18n.t('static.supplyPlan.submitted'),
-                    stack: 1,
-                    yAxisID: 'A',
-                    backgroundColor: '#0067B9',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
-                },
-                {
-                    label: i18n.t('static.supplyPlan.shipped'),
-                    stack: 1,
-                    yAxisID: 'A',
-                    backgroundColor: '#49A4A1',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
-                },
-                {
-                    label: i18n.t('static.supplyPlan.delivered'),
-                    stack: 1,
-                    yAxisID: 'A',
-                    backgroundColor: '#002f6c',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
-                }, {
-                    label: i18n.t('static.report.stock'),
-                    stack: 2,
-                    type: 'line',
-                    yAxisID: 'A',
-                    borderColor: '#cfcdc9',
-                    borderStyle: 'dotted',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    lineTension: 0,
-                    pointStyle: 'line',
-                    pointRadius: 0,
-                    showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
-                }, {
                     label: i18n.t('static.supplyPlan.consumption'),
                     type: 'line',
                     stack: 3,
@@ -1465,6 +1435,86 @@ export default class SupplyPlanComponent extends React.Component {
                     pointRadius: 0,
                     showInLegend: true,
                     data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                },
+                {
+                    label: i18n.t('static.report.actualConsumption'),
+                    yAxisID: 'A',
+                    type: 'line',
+                    stack: 7,
+                    data: this.state.consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? item.consumptionQty : null)),
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    showLine: false,
+                    pointStyle: 'point',
+                    pointBackgroundColor: '#ba0c2f',
+                    pointBorderColor: '#ba0c2f',
+                    pointRadius: 3
+                },
+                {
+                    label: i18n.t('static.supplyPlan.delivered'),
+                    stack: 1,
+                    yAxisID: 'A',
+                    backgroundColor: '#002f6c',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
+                },
+                {
+                    label: i18n.t('static.supplyPlan.shipped'),
+                    stack: 1,
+                    yAxisID: 'A',
+                    backgroundColor: '#49A4A1',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
+                },
+                {
+                    label: i18n.t('static.supplyPlan.submitted'),
+                    stack: 1,
+                    yAxisID: 'A',
+                    backgroundColor: '#0067B9',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
+                },
+                {
+                    label: i18n.t('static.supplyPlan.planned'),
+                    stack: 1,
+                    yAxisID: 'A',
+                    backgroundColor: '#A7C6ED',
+                    borderColor: 'rgba(179,181,198,1)',
+                    pointBackgroundColor: 'rgba(179,181,198,1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
+                },
+                {
+                    label: i18n.t('static.report.stock'),
+                    stack: 2,
+                    type: 'line',
+                    yAxisID: 'A',
+                    borderColor: '#cfcdc9',
+                    borderStyle: 'dotted',
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: true,
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
                 },
                 {
                     label: this.state.planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
@@ -1552,8 +1602,8 @@ export default class SupplyPlanComponent extends React.Component {
                     <div id="supplyPlanTableId" style={{ display: this.state.display }}>
                         <Row className="float-right">
                             <div className="col-md-12">
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.getDataforExport(1)} />
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.getDataforExport(2)} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.toggleExport(1)} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.toggleExport(2)} />
 
                             </div>
                         </Row>
@@ -1620,8 +1670,8 @@ export default class SupplyPlanComponent extends React.Component {
                                             </td>
                                             <td align="left" className="sticky-col first-col clone"><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
                                             {
-                                                this.state.shipmentsTotalData.map(item1 => (
-                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                this.state.shipmentsTotalData.map((item1, index) => (
+                                                    <td align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${this.state.monthsArray[index].startDate}`, `${this.state.monthsArray[index].endDate}`, ``, 'allShipments', index)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
                                                 ))
                                             }
                                         </tr>
@@ -1630,12 +1680,12 @@ export default class SupplyPlanComponent extends React.Component {
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.suggestedShipments')}&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void();" onClick={this.toggleReplan} title={i18n.t("static.supplyPlan.planMultiplePusByDate")}><i className="fa fa-lg fa-calendar"></i></a></td>
                                             {
-                                                this.state.suggestedShipmentsTotalData.map(item1 => {
+                                                this.state.suggestedShipmentsTotalData.map((item1, index) => {
                                                     if (item1.suggestedOrderQty.toString() != "") {
                                                         if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" className="emergencyComment hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                            return (<td align="right" className="emergencyComment hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, `${this.state.monthsArray[index].startDate}`, `${this.state.monthsArray[index].endDate}`, `${item1.isEmergencyOrder}`, '', index)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                         } else {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, `${this.state.monthsArray[index].startDate}`, `${this.state.monthsArray[index].endDate}`, `${item1.isEmergencyOrder}`, '', index)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                         }
                                                     } else {
                                                         var compare = item1.month >= moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
@@ -1649,7 +1699,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
 
-                                        <tr className="totalShipments">
+                                        {/* <tr className="totalShipments">
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionManualShipments()}>
                                                 {this.state.showManualShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
@@ -1665,18 +1715,37 @@ export default class SupplyPlanComponent extends React.Component {
                                                     // }
                                                 })
                                             }
-                                        </tr>
-                                        <tr className="manualShipments">
+                                        </tr> */}
+                                        <tr className="totalShipments">
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.delivered')}</td>
 
                                             {
-                                                this.state.deliveredShipmentsTotalData.map(item1 => {
+                                                this.state.deliveredShipmentsTotalData.map((item1, count) => {
                                                     if (item1.toString() != "") {
+                                                        var classNameForShipments = "";
+                                                        if (item1.isLocalProcurementAgent) {
+                                                            if (item1.textColor == "#fff") {
+                                                                classNameForShipments = classNameForShipments.concat("localProcurement1")
+                                                            } else {
+                                                                classNameForShipments = classNameForShipments.concat("localProcurement2")
+                                                            }
+                                                        }
+                                                        if (item1.isErp) {
+                                                            if (item1.textColor == "#fff") {
+                                                                classNameForShipments = classNameForShipments.concat("erpShipment1")
+                                                            } else {
+                                                                classNameForShipments = classNameForShipments.concat("erpShipment2")
+                                                            }
+                                                        }
+                                                        if (item1.isEmergencyOrder) {
+                                                            classNameForShipments = classNameForShipments.concat("emergencyOrder")
+                                                        }
+                                                        classNameForShipments = classNameForShipments.concat(" hoverTd");
                                                         if (item1.textColor == "#fff") {
-                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         } else {
-                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'deliveredShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
@@ -1686,16 +1755,35 @@ export default class SupplyPlanComponent extends React.Component {
 
                                         </tr>
 
-                                        <tr className="manualShipments">
+                                        <tr className="totalShipments">
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.shipped')}</td>
                                             {
-                                                this.state.shippedShipmentsTotalData.map(item1 => {
+                                                this.state.shippedShipmentsTotalData.map((item1, count) => {
                                                     if (item1.toString() != "") {
+                                                        var classNameForShipments = "";
+                                                        if (item1.isLocalProcurementAgent) {
+                                                            if (item1.textColor == "#fff") {
+                                                                classNameForShipments = classNameForShipments.concat("localProcurement1")
+                                                            } else {
+                                                                classNameForShipments = classNameForShipments.concat("localProcurement2")
+                                                            }
+                                                        }
+                                                        if (item1.isErp) {
+                                                            if (item1.textColor == "#fff") {
+                                                                classNameForShipments = classNameForShipments.concat("erpShipment1")
+                                                            } else {
+                                                                classNameForShipments = classNameForShipments.concat("erpShipment2")
+                                                            }
+                                                        }
+                                                        if (item1.isEmergencyOrder) {
+                                                            classNameForShipments = classNameForShipments.concat("emergencyOrder")
+                                                        }
+                                                        classNameForShipments = classNameForShipments.concat(" hoverTd");
                                                         if (item1.textColor == "#fff") {
-                                                            return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         } else {
-                                                            return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td align="right" bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'shippedShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
@@ -1704,33 +1792,35 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
 
-                                        <tr className="manualShipments">
+                                        <tr className="totalShipments">
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.submitted')}</td>
                                             {
-                                                this.state.orderedShipmentsTotalData.map(item1 => {
+                                                this.state.orderedShipmentsTotalData.map((item1, count) => {
                                                     if (item1.toString() != "") {
-                                                        if (item1.textColor == "#fff") {
-                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        var classNameForShipments = "";
+                                                        if (item1.isLocalProcurementAgent) {
+                                                            if (item1.textColor == "#fff") {
+                                                                classNameForShipments = classNameForShipments.concat("localProcurement1")
+                                                            } else {
+                                                                classNameForShipments = classNameForShipments.concat("localProcurement2")
+                                                            }
                                                         }
-                                                    } else {
-                                                        return (<td align="right" >{item1}</td>)
-                                                    }
-                                                })
-                                            }
-                                        </tr>
-                                        <tr className="manualShipments">
-                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
-                                            {
-                                                this.state.plannedShipmentsTotalData.map(item1 => {
-                                                    if (item1.toString() != "") {
+                                                        if (item1.isErp) {
+                                                            if (item1.textColor == "#fff") {
+                                                                classNameForShipments = classNameForShipments.concat("erpShipment1")
+                                                            } else {
+                                                                classNameForShipments = classNameForShipments.concat("erpShipment2")
+                                                            }
+                                                        }
+                                                        if (item1.isEmergencyOrder) {
+                                                            classNameForShipments = classNameForShipments.concat("emergencyOrder")
+                                                        }
+                                                        classNameForShipments = classNameForShipments.concat(" hoverTd");
                                                         if (item1.textColor == "#fff") {
-                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement1EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent1 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         } else {
-                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={item1.isEmergencyOrder == true ? item1.isLocalProcurementAgent == true ? "localProcurement2EmergencyComment hoverTd" : "emergencyComment hoverTd" : item1.isLocalProcurementAgent == true ? "localProcurementAgent2 hoverTd" : "hoverTd"} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments')} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} align="right" className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'orderedShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
@@ -1739,6 +1829,42 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr className="totalShipments">
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.planned')}</td>
+                                            {
+                                                this.state.plannedShipmentsTotalData.map((item1, count) => {
+                                                    if (item1.toString() != "") {
+                                                        var classNameForShipments = "";
+                                                        if (item1.isLocalProcurementAgent) {
+                                                            if (item1.textColor == "#fff") {
+                                                                classNameForShipments = classNameForShipments.concat("localProcurement1")
+                                                            } else {
+                                                                classNameForShipments = classNameForShipments.concat("localProcurement2")
+                                                            }
+                                                        }
+                                                        if (item1.isErp) {
+                                                            if (item1.textColor == "#fff") {
+                                                                classNameForShipments = classNameForShipments.concat("erpShipment1")
+                                                            } else {
+                                                                classNameForShipments = classNameForShipments.concat("erpShipment2")
+                                                            }
+                                                        }
+                                                        if (item1.isEmergencyOrder) {
+                                                            classNameForShipments = classNameForShipments.concat("emergencyOrder")
+                                                        }
+                                                        classNameForShipments = classNameForShipments.concat(" hoverTd");
+                                                        if (item1.textColor == "#fff") {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        } else {
+                                                            return (<td bgcolor={item1.colour} style={{ color: item1.textColor }} align="right" data-toggle="tooltip" data-placement="right" title={item1.shipmentDetail} className={classNameForShipments} onClick={() => this.toggleLarge('shipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`, ``, 'plannedShipments', count)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                        }
+                                                    } else {
+                                                        return (<td align="right" >{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        {/* <tr className="totalShipments">
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionErpShipments()}>
                                                 {this.state.showErpShipment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                             </td>
@@ -1817,7 +1943,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 })
                                             }
-                                        </tr>
+                                        </tr> */}
                                         <tr>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
@@ -1935,7 +2061,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 {/* <CreateCanvas ref="child" chartOptions={chartOptions}/> */}
                                             </div>
                                             <div id="bars_div" style={{ display: "none" }}>
-                                                {this.state.planningUnitData.filter(c => c.planningUnit.id != this.state.planningUnitId).map((ele, index) => {
+                                                {this.state.planningUnitData.map((ele, index) => {
                                                     return (<>{ele.planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
                                                         {ele.planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
                                                     </>)
@@ -1986,14 +2112,14 @@ export default class SupplyPlanComponent extends React.Component {
                     <Modal isOpen={this.state.consumption}
                         className={'modal-lg ' + this.props.className, "modalWidth"} >
                         <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
-                            <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
+                            <strong>{i18n.t('static.dashboard.consumptiondetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
 
-                            <ul className="legendcommitversion" style={{ display: 'inline-flex' }}>
+                            <ul className="legendcommitversion list-group" style={{ display: 'inline-flex' }}>
                                 <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
                                 <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                             </ul>
 
-                            <div className=" card-header-actions" style={{ marginTop: '-5px' }}>
+                            <div className=" card-header-actions" style={{ marginTop: '19px' }}>
                                 <a className="card-header-action">
                                     {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                     <Link to={`/consumptionDetails/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.consumptionDataEntry')}</small></Link>
@@ -2031,12 +2157,12 @@ export default class SupplyPlanComponent extends React.Component {
                                                             if (count < 7) {
                                                                 if (item1.qty.toString() != '') {
                                                                     if (item1.actualFlag.toString() == 'true') {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                                        return (<td align="center" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                                     } else {
-                                                                        return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></i></td>)
+                                                                        return (<td align="center" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, `${item1.actualFlag}`, `${item1.month.month}`)}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></i></td>)
                                                                     }
                                                                 } else {
-                                                                    return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, ``, `${item1.month.month}`)}></td>)
+                                                                    return (<td align="center" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.regionId}`, ``, `${item1.month.month}`)}></td>)
                                                                 }
                                                             }
                                                         })
@@ -2052,7 +2178,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.consumptionFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
                                                     if (count < 7) {
-                                                        return (<th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></th>)
+                                                        return (<th style={{ textAlign: 'center' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></th>)
                                                     }
                                                 })
                                             }
@@ -2099,8 +2225,8 @@ export default class SupplyPlanComponent extends React.Component {
                     <Modal isOpen={this.state.adjustments}
                         className={'modal-lg ' + this.props.className, "modalWidth"}>
                         <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">
-                            {i18n.t('static.supplyPlan.adjustmentsDetails')}
-                            <div className="card-header-actions" style={{ marginTop: '-5px' }}>
+                            <strong>{i18n.t('static.supplyPlan.adjustmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
+                            <div className="card-header-actions" style={{ marginTop: '0px' }}>
                                 <a className="card-header-action">
                                     {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                     <Link to={`/inventory/addInventory/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.adjustmentDataEntry')}</small></Link>
@@ -2155,27 +2281,27 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
                                                                     return (
                                                                         <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                            <td align="right" className={compare ? "hoverTd" : ""} onClick={compare ? () => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
+                                                                            <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
+                                                                            <td align="center" className={compare ? "hoverTd" : ""} onClick={compare ? () => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
                                                                         </>
                                                                     )
                                                                 } else if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() == "" || item1.actualQty.toString() == 0)) {
                                                                     return (
                                                                         <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                            <td align="right" className={compare ? "hoverTd" : ""} onClick={compare ? () => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1) : ""}></td>
+                                                                            <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
+                                                                            <td align="center" className={compare ? "hoverTd" : ""} onClick={compare ? () => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1) : ""}></td>
                                                                         </>
                                                                     )
                                                                 } else if (item1.adjustmentsQty.toString() == '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
                                                                     return (
                                                                         <>
-                                                                            <td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
-                                                                            <td align="right" className={compare ? "hoverTd" : ""} onClick={compare ? () => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
+                                                                            <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
+                                                                            <td align="center" className={compare ? "hoverTd" : ""} onClick={compare ? () => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
                                                                         </>
                                                                     )
                                                                 } else {
-                                                                    return (<><td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
-                                                                        <td align="right" className={compare ? "hoverTd" : ""} onClick={compare ? () => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1) : ""}></td>
+                                                                    return (<><td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}></td>
+                                                                        <td align="center" className={compare ? "hoverTd" : ""} onClick={compare ? () => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1) : ""}></td>
                                                                     </>)
                                                                 }
                                                             }
@@ -2315,11 +2441,13 @@ export default class SupplyPlanComponent extends React.Component {
                         className={'modal-lg ' + this.props.className, "modalWidth"}>
                         <ModalHeader toggle={() => this.toggleLarge('shipments')} className="modalHeaderSupplyPlan">
                             <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
-                            <ul className="legendcommitversion list-group" style={{ display: 'inline-flex' }}>
-                                <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
-                                <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
+                            <ul className="legendcommitversion">
+                                <li className="mt-2"><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
+                                <li className="mt-2"><span className=" mediumGreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.doNotIncludeInProjectedShipment')} </span></li>
+                                <li className="mt-2"><span className=" readonlylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.shipment.erpShipment')} </span></li>
+                                <li className="mt-2"><span className=" readonlylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.common.readonlyData')} </span></li>
                             </ul>
-                            <div className="card-header-actions" style={{ marginTop: '19px' }}>
+                            <div className="card-header-actions" style={{ marginTop: '-21px' }}>
                                 <a className="card-header-action">
                                     {/* <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span> */}
                                     <Link to={`/shipment/shipmentDetails/` + this.state.programId + `/0/` + this.state.planningUnitId} target="_blank"><small className="dataEntryLink">{i18n.t('static.supplyplan.shipmentDataEntry')}</small></Link>
@@ -2328,12 +2456,48 @@ export default class SupplyPlanComponent extends React.Component {
                         </ModalHeader>
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <ModalBody>
-                                <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" useLocalData={1} />
+                                <div>
+                                    <div className="col-md-12">
+                                        <span className="supplyplan-larrow-dataentry" onClick={this.leftClickedShipments}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
+                                        <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedShipments}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
+                                    </div>
+                                    <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                        <thead>
+                                            <tr>
+                                                <th className="regionTdWidthConsumption"></th>
+                                                {
+                                                    this.state.monthsArray.map((item, count) => {
+                                                        if (count < 7) {
+                                                            return (<th onClick={() => this.shipmentsDetailsClicked('allShipments', `${item.startDate}`, `${item.endDate}`)} className={moment(this.state.shipmentStartDateClicked).format("YYYY-MM-DD") == moment(item.startDate).format("YYYY-MM-DD") ? "supplyplan-Thead supplyplanTdWidthForMonths hoverTd" : "supplyplanTdWidthForMonths hoverTd"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
+                                                        }
+                                                    })
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td align="left">{i18n.t('static.dashboard.shipments')}</td>
+                                                {
+                                                    this.state.shipmentsTotalData.map((item1, count) => {
+                                                        if (count < 7) {
+                                                            if (item1.toString() != '') {
+                                                                return (<td align="center" className={this.state.monthsArray.findIndex(c => moment(this.state.shipmentStartDateClicked).format("YYYY-MM-DD") == moment(c.startDate).format("YYYY-MM-DD")) == count ? "supplyplan-Thead hoverTd" : "hoverTd"} onClick={() => this.shipmentsDetailsClicked('allShipments', `${this.state.monthsArray[count].startDate}`, `${this.state.monthsArray[count].endDate}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                            } else {
+                                                                return (<td align="center" className={this.state.monthsArray.findIndex(c => moment(this.state.shipmentStartDateClicked).format("YYYY-MM-DD") == moment(c.startDate).format("YYYY-MM-DD")) == count ? "supplyplan-Thead hoverTd" : "hoverTd"} onClick={() => this.shipmentsDetailsClicked('allShipments', `${this.state.monthsArray[count].startDate}`, `${this.state.monthsArray[count].endDate}`)}></td>)
+                                                            }
+                                                        }
+                                                    })
+                                                }
+                                            </tr>
+                                        </tbody>
+                                    </Table>
+                                </div>
+                                {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="supplyPlan" useLocalData={1} />}
                                 <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                 <div className="">
                                     <div id="shipmentsDetailsTable" />
                                 </div>
-
+                                {this.refs.shipmentChild != undefined && this.refs.shipmentChild.state.originalShipmentIdForPopup !== "" && <><br /><strong>{this.refs.shipmentChild != undefined && this.refs.shipmentChild.state.originalShipmentIdForPopup !== "" ? "For Shipment Id " + this.refs.shipmentChild.state.originalShipmentIdForPopup : ""}</strong></>}
                                 <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
                                 <div className=" RemoveStriped">
                                     <div id="qtyCalculatorTable"></div>
@@ -2364,6 +2528,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     <Button size="md" color="danger" id="shipmentDetailsPopCancelButton" className="float-right mr-1 " onClick={() => this.actionCanceledShipments('shipmentBatch')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.showBatchSaveButton && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.shipmentChild.saveShipmentBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.shipmentChild != undefined && <Button color="info" size="md" id="addRowBatchId" className="float-right mr-1" type="button" onClick={this.refs.shipmentChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                    <b><h3 className="float-right mr-2">{i18n.t("static.supplyPlan.shipmentQty") + " : " + this.addCommas(this.state.shipmentQtyTotalForPopup) + " / " + i18n.t("static.supplyPlan.batchQty") + " : " + this.addCommas(this.state.batchQtyTotalForPopup)}</h3></b>
                                 </div>
                                 <div className="pt-4"></div>
                             </ModalBody>
@@ -2559,6 +2724,37 @@ export default class SupplyPlanComponent extends React.Component {
                                 )} />
                     </Modal>
 
+                    <Modal isOpen={this.state.exportModal}
+                        className={'modal-md'}>
+                        <ModalHeader toggle={() => this.toggleExport(0)} className="modalHeaderSupplyPlan" id="shipmentModalHeader">
+                            <strong>{this.state.type == 1 ? i18n.t("static.supplyPlan.exportAsPDF") : i18n.t("static.supplyPlan.exportAsCsv")}</strong>
+                        </ModalHeader>
+                        <ModalBody>
+                            <>
+                                <FormGroup className="col-md-12">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.product.product')}
+                                        <span className="reportdown-box-icon  fa fa-sort-desc"></span>
+                                    </Label>
+                                    <div className="controls ">
+                                        {/* <InputGroup className="box"> */}
+                                        <MultiSelect
+                                            name="planningUnitIdsExport"
+                                            id="planningUnitIdsExport"
+                                            options={this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
+                                            value={this.state.planningUnitIdsExport}
+                                            onChange={(e) => { this.setPlanningUnitIdsExport(e) }}
+                                            // onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                            labelledBy={i18n.t('static.common.select')}
+                                        />
+                                    </div>
+                                </FormGroup>
+                            </>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.getDataforExport(this.state.type)} ><i className="fa fa-check"></i>{i18n.t("static.common.submit")}</Button>
+                        </ModalFooter>
+                    </Modal>
+
                     {/* Expired Stock modal */}
                     <Modal isOpen={this.state.expiredStockModal}
                         className={'modal-md modalWidthExpiredStock'}>
@@ -2704,28 +2900,13 @@ export default class SupplyPlanComponent extends React.Component {
                 } else {
                     date = moment(sl.expectedDeliveryDate).format("YYYY-MM-DD");
                 }
-                // Open toggleLarge
-                var supplyPlanType = "";
-                if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == false) {
-                    supplyPlanType = 'deliveredShipments'
-                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == false) {
-                    supplyPlanType = 'shippedShipments'
-                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == false) {
-                    supplyPlanType = 'orderedShipments'
-                } else if ((shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == false) {
-                    supplyPlanType = 'plannedShipments'
-                } else if (shipmentStatus == DELIVERED_SHIPMENT_STATUS && sl.erpFlag == true) {
-                    supplyPlanType = 'deliveredErpShipments'
-                } else if ((shipmentStatus == SHIPPED_SHIPMENT_STATUS || shipmentStatus == ARRIVED_SHIPMENT_STATUS) && sl.erpFlag == true) {
-                    supplyPlanType = 'shippedErpShipments'
-                } else if ((shipmentStatus == APPROVED_SHIPMENT_STATUS || shipmentStatus == SUBMITTED_SHIPMENT_STATUS) && sl.erpFlag == true) {
-                    supplyPlanType = 'orderedErpShipments'
-                } else if ((shipmentStatus == PLANNED_SHIPMENT_STATUS || shipmentStatus == ON_HOLD_SHIPMENT_STATUS) && sl.erpFlag == true) {
-                    supplyPlanType = 'plannedErpShipments'
-                }
-                if (supplyPlanType != "") {
-                    this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, supplyPlanType);
-                }
+                var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+                const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN - 2;
+                this.setState({
+                    monthCount: monthDifference
+                }, () => {
+                    this.toggleLarge('shipments', '', '', moment(date).startOf('month').format("YYYY-MM-DD"), moment(date).endOf('month').format("YYYY-MM-DD"), ``, 'allShipments');
+                })
             }
         })
     }
@@ -3133,16 +3314,16 @@ export default class SupplyPlanComponent extends React.Component {
         var regionListFiltered = this.state.regionList;
         var consumptionTotalData = [];
         var shipmentsTotalData = [];
-        var manualShipmentsTotalData = [];
+        // var manualShipmentsTotalData = [];
         var deliveredShipmentsTotalData = [];
         var shippedShipmentsTotalData = [];
         var orderedShipmentsTotalData = [];
         var plannedShipmentsTotalData = [];
-        var erpShipmentsTotalData = [];
-        var deliveredErpShipmentsTotalData = [];
-        var shippedErpShipmentsTotalData = [];
-        var orderedErpShipmentsTotalData = [];
-        var plannedErpShipmentsTotalData = [];
+        // var erpShipmentsTotalData = [];
+        // var deliveredErpShipmentsTotalData = [];
+        // var shippedErpShipmentsTotalData = [];
+        // var orderedErpShipmentsTotalData = [];
+        // var plannedErpShipmentsTotalData = [];
         var totalExpiredStockArr = [];
         var amcTotalData = [];
         var minStockMoS = [];
@@ -3294,11 +3475,13 @@ export default class SupplyPlanComponent extends React.Component {
                             if (jsonList.length > 0) {
                                 openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: jsonList[0].openingBalance });
                                 consumptionTotalData.push({ consumptionQty: jsonList[0].consumptionQty, consumptionType: jsonList[0].actualFlag, textColor: jsonList[0].actualFlag == 1 ? "#000000" : "rgb(170, 85, 161)" });
-                                shipmentsTotalData.push(jsonList[0].shipmentTotalQty);
-                                manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
+                                // manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
 
                                 // Tomorrow begin from here
-                                var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "false");
+                                var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate))
+                                    // && c.erpFlag.toString() == "false"
+                                );
+                                shipmentsTotalData.push(shipmentDetails.length > 0 ? jsonList[0].shipmentTotalQty : "");
                                 var sd1 = [];
                                 var sd2 = [];
                                 var sd3 = [];
@@ -3319,6 +3502,10 @@ export default class SupplyPlanComponent extends React.Component {
                                 var isLocalProcurementAgent2 = 0;
                                 var isLocalProcurementAgent3 = 0;
                                 var isLocalProcurementAgent4 = 0;
+                                var isErp1 = 0;
+                                var isErp2 = 0;
+                                var isErp3 = 0;
+                                var isErp4 = 0;
                                 if (shipmentDetails != "" && shipmentDetails != undefined) {
                                     for (var i = 0; i < shipmentDetails.length; i++) {
                                         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
@@ -3348,6 +3535,9 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                             if (shipmentDetails[i].localProcurement.toString() == "true") {
                                                 isLocalProcurementAgent1 = true;
+                                            }
+                                            if (shipmentDetails[i].erpFlag.toString() == "true") {
+                                                isErp1 = true;
                                             }
                                             sd1.push(shipmentDetail);
                                             if (paColor1Array.indexOf(paColor1) === -1) {
@@ -3385,6 +3575,9 @@ export default class SupplyPlanComponent extends React.Component {
                                             if (shipmentDetails[i].localProcurement.toString() == "true") {
                                                 isLocalProcurementAgent2 = true;
                                             }
+                                            if (shipmentDetails[i].erpFlag.toString() == "true") {
+                                                isErp2 = true;
+                                            }
                                         } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
@@ -3416,6 +3609,9 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                             if (shipmentDetails[i].localProcurement.toString() == "true") {
                                                 isLocalProcurementAgent3 = true;
+                                            }
+                                            if (shipmentDetails[i].erpFlag.toString() == "true") {
+                                                isErp3 = true;
                                             }
                                         } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
@@ -3449,6 +3645,10 @@ export default class SupplyPlanComponent extends React.Component {
                                             if (shipmentDetails[i].localProcurement.toString() == "true") {
                                                 isLocalProcurementAgent4 = true;
                                             }
+                                            if (shipmentDetails[i].erpFlag.toString() == "true") {
+                                                isErp4 = true;
+                                            }
+
                                         }
                                     }
                                 }
@@ -3458,7 +3658,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (paColor1Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
+                                    deliveredShipmentsTotalData.push({ qty: Number(jsonList[0].receivedShipmentsTotalData) + Number(jsonList[0].receivedErpShipmentsTotalData), month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1, isErp: isErp1 });
                                 } else {
                                     deliveredShipmentsTotalData.push("")
                                 }
@@ -3468,7 +3668,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (paColor2Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
+                                    shippedShipmentsTotalData.push({ qty: Number(jsonList[0].shippedShipmentsTotalData) + Number(jsonList[0].shippedErpShipmentsTotalData), month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2, isErp: isErp2 });
                                 } else {
                                     shippedShipmentsTotalData.push("")
                                 }
@@ -3478,7 +3678,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    orderedShipmentsTotalData.push({ qty: Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
+                                    orderedShipmentsTotalData.push({ qty: Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3, isErp: isErp3 });
                                 } else {
                                     orderedShipmentsTotalData.push("")
                                 }
@@ -3488,208 +3688,208 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (paColor4Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    plannedShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
+                                    plannedShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4, isErp: isErp4 });
                                 } else {
                                     plannedShipmentsTotalData.push("")
                                 }
 
-                                erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
+                                // erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
 
 
-                                var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "true");
-                                var sd1 = [];
-                                var sd2 = [];
-                                var sd3 = [];
-                                var sd4 = [];
-                                var paColor1Array = [];
-                                var paColor2Array = [];
-                                var paColor3Array = [];
-                                var paColor4Array = [];
-                                var paColor1 = "";
-                                var paColor2 = "";
-                                var paColor3 = "";
-                                var paColor4 = "";
-                                var isEmergencyOrder1 = 0;
-                                var isEmergencyOrder2 = 0;
-                                var isEmergencyOrder3 = 0;
-                                var isEmergencyOrder4 = 0;
-                                var isLocalProcurementAgent1 = 0;
-                                var isLocalProcurementAgent2 = 0;
-                                var isLocalProcurementAgent3 = 0;
-                                var isLocalProcurementAgent4 = 0;
-                                if (shipmentDetails != "" && shipmentDetails != undefined) {
-                                    for (var i = 0; i < shipmentDetails.length; i++) {
-                                        if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor1 = procurementAgent.colorHtmlCode;
-                                                var index = paColors.findIndex(c => c.color == paColor1);
-                                                if (index == -1) {
-                                                    paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
-                                                }
-                                            } else {
-                                                if (shipmentDetails[i].procurementAgent.id != "") {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor1 = "#efefef"
-                                                } else {
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor1 = "#efefef"
-                                                }
-                                            }
-                                            sd1.push(shipmentDetail);
-                                            if (paColor1Array.indexOf(paColor1) === -1) {
-                                                paColor1Array.push(paColor1);
-                                            }
-                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                isEmergencyOrder1 = true
-                                            }
-                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                isLocalProcurementAgent1 = true;
-                                            }
-                                        } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor2 = procurementAgent.colorHtmlCode;
-                                                var index = paColors.findIndex(c => c.color == paColor2);
-                                                if (index == -1) {
-                                                    paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
-                                                }
-                                            } else {
-                                                if (shipmentDetails[i].procurementAgent.id != "") {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor2 = "#efefef"
-                                                } else {
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor2 = "#efefef"
-                                                }
-                                            }
-                                            sd2.push(shipmentDetail);
-                                            if (paColor2Array.indexOf(paColor2) === -1) {
-                                                paColor2Array.push(paColor2);
-                                            }
-                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                isEmergencyOrder2 = true
-                                            }
-                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                isLocalProcurementAgent2 = true;
-                                            }
-                                        } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor3 = procurementAgent.colorHtmlCode;
-                                                var index = paColors.findIndex(c => c.color == paColor3);
-                                                if (index == -1) {
-                                                    paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
-                                                }
-                                            } else {
-                                                if (shipmentDetails[i].procurementAgent.id != "") {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor3 = "#efefef"
-                                                } else {
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor3 = "#efefef"
-                                                }
-                                            }
-                                            sd3.push(shipmentDetail);
-                                            if (paColor3Array.indexOf(paColor3) === -1) {
-                                                paColor3Array.push(paColor3);
-                                            }
-                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                isEmergencyOrder3 = true
-                                            }
-                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                isLocalProcurementAgent3 = true;
-                                            }
-                                        } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                            if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor4 = procurementAgent.colorHtmlCode;
-                                                var index = paColors.findIndex(c => c.color == paColor4);
-                                                if (index == -1) {
-                                                    paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
-                                                }
-                                            } else {
-                                                if (shipmentDetails[i].procurementAgent.id != "") {
-                                                    var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor4 = "#efefef"
-                                                } else {
-                                                    var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                    var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                    paColor4 = "#efefef"
-                                                }
-                                            }
-                                            sd4.push(shipmentDetail);
-                                            if (paColor4Array.indexOf(paColor4) === -1) {
-                                                paColor4Array.push(paColor4);
-                                            }
-                                            if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                isEmergencyOrder4 = true
-                                            }
-                                            if (shipmentDetails[i].localProcurement.toString() == "true") {
-                                                isLocalProcurementAgent4 = true;
-                                            }
-                                        }
-                                    }
-                                }
+                                // var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "true");
+                                // var sd1 = [];
+                                // var sd2 = [];
+                                // var sd3 = [];
+                                // var sd4 = [];
+                                // var paColor1Array = [];
+                                // var paColor2Array = [];
+                                // var paColor3Array = [];
+                                // var paColor4Array = [];
+                                // var paColor1 = "";
+                                // var paColor2 = "";
+                                // var paColor3 = "";
+                                // var paColor4 = "";
+                                // var isEmergencyOrder1 = 0;
+                                // var isEmergencyOrder2 = 0;
+                                // var isEmergencyOrder3 = 0;
+                                // var isEmergencyOrder4 = 0;
+                                // var isLocalProcurementAgent1 = 0;
+                                // var isLocalProcurementAgent2 = 0;
+                                // var isLocalProcurementAgent3 = 0;
+                                // var isLocalProcurementAgent4 = 0;
+                                // if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                //     for (var i = 0; i < shipmentDetails.length; i++) {
+                                //         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
+                                //             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                //                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                //                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                 paColor1 = procurementAgent.colorHtmlCode;
+                                //                 var index = paColors.findIndex(c => c.color == paColor1);
+                                //                 if (index == -1) {
+                                //                     paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
+                                //                 }
+                                //             } else {
+                                //                 if (shipmentDetails[i].procurementAgent.id != "") {
+                                //                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                     paColor1 = "#efefef"
+                                //                 } else {
+                                //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                     paColor1 = "#efefef"
+                                //                 }
+                                //             }
+                                //             sd1.push(shipmentDetail);
+                                //             if (paColor1Array.indexOf(paColor1) === -1) {
+                                //                 paColor1Array.push(paColor1);
+                                //             }
+                                //             if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                //                 isEmergencyOrder1 = true
+                                //             }
+                                //             if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                //                 isLocalProcurementAgent1 = true;
+                                //             }
+                                //         } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
+                                //             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                //                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                //                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                 paColor2 = procurementAgent.colorHtmlCode;
+                                //                 var index = paColors.findIndex(c => c.color == paColor2);
+                                //                 if (index == -1) {
+                                //                     paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
+                                //                 }
+                                //             } else {
+                                //                 if (shipmentDetails[i].procurementAgent.id != "") {
+                                //                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                     paColor2 = "#efefef"
+                                //                 } else {
+                                //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                     paColor2 = "#efefef"
+                                //                 }
+                                //             }
+                                //             sd2.push(shipmentDetail);
+                                //             if (paColor2Array.indexOf(paColor2) === -1) {
+                                //                 paColor2Array.push(paColor2);
+                                //             }
+                                //             if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                //                 isEmergencyOrder2 = true
+                                //             }
+                                //             if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                //                 isLocalProcurementAgent2 = true;
+                                //             }
+                                //         } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                //             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                //                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                //                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                 paColor3 = procurementAgent.colorHtmlCode;
+                                //                 var index = paColors.findIndex(c => c.color == paColor3);
+                                //                 if (index == -1) {
+                                //                     paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
+                                //                 }
+                                //             } else {
+                                //                 if (shipmentDetails[i].procurementAgent.id != "") {
+                                //                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                     paColor3 = "#efefef"
+                                //                 } else {
+                                //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                     paColor3 = "#efefef"
+                                //                 }
+                                //             }
+                                //             sd3.push(shipmentDetail);
+                                //             if (paColor3Array.indexOf(paColor3) === -1) {
+                                //                 paColor3Array.push(paColor3);
+                                //             }
+                                //             if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                //                 isEmergencyOrder3 = true
+                                //             }
+                                //             if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                //                 isLocalProcurementAgent3 = true;
+                                //             }
+                                //         } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                //             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                //                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                //                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                 paColor4 = procurementAgent.colorHtmlCode;
+                                //                 var index = paColors.findIndex(c => c.color == paColor4);
+                                //                 if (index == -1) {
+                                //                     paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
+                                //                 }
+                                //             } else {
+                                //                 if (shipmentDetails[i].procurementAgent.id != "") {
+                                //                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                     paColor4 = "#efefef"
+                                //                 } else {
+                                //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                //                     paColor4 = "#efefef"
+                                //                 }
+                                //             }
+                                //             sd4.push(shipmentDetail);
+                                //             if (paColor4Array.indexOf(paColor4) === -1) {
+                                //                 paColor4Array.push(paColor4);
+                                //             }
+                                //             if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                //                 isEmergencyOrder4 = true
+                                //             }
+                                //             if (shipmentDetails[i].localProcurement.toString() == "true") {
+                                //                 isLocalProcurementAgent4 = true;
+                                //             }
+                                //         }
+                                //     }
+                                // }
 
-                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
-                                    var colour = paColor1;
-                                    if (paColor1Array.length > 1) {
-                                        colour = "#d9ead3";
-                                    }
-                                    deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
-                                } else {
-                                    deliveredErpShipmentsTotalData.push("")
-                                }
+                                // if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
+                                //     var colour = paColor1;
+                                //     if (paColor1Array.length > 1) {
+                                //         colour = "#d9ead3";
+                                //     }
+                                //     deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1 });
+                                // } else {
+                                //     deliveredErpShipmentsTotalData.push("")
+                                // }
 
-                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
-                                    var colour = paColor2;
-                                    if (paColor2Array.length > 1) {
-                                        colour = "#d9ead3";
-                                    }
-                                    shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
-                                } else {
-                                    shippedErpShipmentsTotalData.push("")
-                                }
+                                // if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
+                                //     var colour = paColor2;
+                                //     if (paColor2Array.length > 1) {
+                                //         colour = "#d9ead3";
+                                //     }
+                                //     shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2 });
+                                // } else {
+                                //     shippedErpShipmentsTotalData.push("")
+                                // }
 
-                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
-                                    var colour = paColor3;
-                                    if (paColor3Array.length > 1) {
-                                        colour = "#d9ead3";
-                                    }
-                                    orderedErpShipmentsTotalData.push({ qty: Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
-                                } else {
-                                    orderedErpShipmentsTotalData.push("")
-                                }
+                                // if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
+                                //     var colour = paColor3;
+                                //     if (paColor3Array.length > 1) {
+                                //         colour = "#d9ead3";
+                                //     }
+                                //     orderedErpShipmentsTotalData.push({ qty: Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3 });
+                                // } else {
+                                //     orderedErpShipmentsTotalData.push("")
+                                // }
 
-                                if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
-                                    var colour = paColor4;
-                                    if (paColor4Array.length > 1) {
-                                        colour = "#d9ead3";
-                                    }
-                                    plannedErpShipmentsTotalData.push({ qty: Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
-                                } else {
-                                    plannedErpShipmentsTotalData.push("")
-                                }
+                                // if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
+                                //     var colour = paColor4;
+                                //     if (paColor4Array.length > 1) {
+                                //         colour = "#d9ead3";
+                                //     }
+                                //     plannedErpShipmentsTotalData.push({ qty: Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4 });
+                                // } else {
+                                //     plannedErpShipmentsTotalData.push("")
+                                // }
 
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
@@ -3916,10 +4116,18 @@ export default class SupplyPlanComponent extends React.Component {
                                     month: m[n].monthName.concat(" ").concat(m[n].monthYear),
                                     consumption: jsonList[0].consumptionQty,
                                     stock: jsonList[0].closingBalance,
-                                    planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + Number(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
-                                    delivered: Number(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + Number(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
-                                    shipped: Number(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + Number(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
-                                    ordered: Number(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + Number(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
+                                    planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0)
+                                    // + Number(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0)
+                                    ,
+                                    delivered: Number(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0)
+                                    // + Number(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0)
+                                    ,
+                                    shipped: Number(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0)
+                                    // + Number(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0)
+                                    ,
+                                    ordered: Number(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0)
+                                    // + Number(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0)
+                                    ,
                                     mos: jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos,
                                     minMos: minStockMoSQty,
                                     maxMos: maxStockMoSQty,
@@ -3931,18 +4139,18 @@ export default class SupplyPlanComponent extends React.Component {
                             } else {
                                 openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: lastClosingBalance });
                                 consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
-                                shipmentsTotalData.push(0);
+                                shipmentsTotalData.push("");
                                 suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
-                                manualShipmentsTotalData.push(0);
+                                // manualShipmentsTotalData.push(0);
                                 deliveredShipmentsTotalData.push("");
                                 shippedShipmentsTotalData.push("");
                                 orderedShipmentsTotalData.push("");
                                 plannedShipmentsTotalData.push("");
-                                erpShipmentsTotalData.push(0);
-                                deliveredErpShipmentsTotalData.push("");
-                                shippedErpShipmentsTotalData.push("");
-                                orderedErpShipmentsTotalData.push("");
-                                plannedErpShipmentsTotalData.push("");
+                                // erpShipmentsTotalData.push(0);
+                                // deliveredErpShipmentsTotalData.push("");
+                                // shippedErpShipmentsTotalData.push("");
+                                // orderedErpShipmentsTotalData.push("");
+                                // plannedErpShipmentsTotalData.push("");
                                 inventoryTotalData.push("");
                                 totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                 monthsOfStockArray.push(null)
@@ -3984,16 +4192,16 @@ export default class SupplyPlanComponent extends React.Component {
                             expiredStockArr: totalExpiredStockArr,
                             shipmentsTotalData: shipmentsTotalData,
                             suggestedShipmentsTotalData: suggestedShipmentsTotalData,
-                            manualShipmentsTotalData: manualShipmentsTotalData,
+                            // manualShipmentsTotalData: manualShipmentsTotalData,
                             deliveredShipmentsTotalData: deliveredShipmentsTotalData,
                             shippedShipmentsTotalData: shippedShipmentsTotalData,
                             orderedShipmentsTotalData: orderedShipmentsTotalData,
                             plannedShipmentsTotalData: plannedShipmentsTotalData,
-                            erpShipmentsTotalData: erpShipmentsTotalData,
-                            deliveredErpShipmentsTotalData: deliveredErpShipmentsTotalData,
-                            shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
-                            orderedErpShipmentsTotalData: orderedErpShipmentsTotalData,
-                            plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
+                            // erpShipmentsTotalData: erpShipmentsTotalData,
+                            // deliveredErpShipmentsTotalData: deliveredErpShipmentsTotalData,
+                            // shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
+                            // orderedErpShipmentsTotalData: orderedErpShipmentsTotalData,
+                            // plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
                             inventoryTotalData: inventoryTotalData,
                             monthsOfStockArray: monthsOfStockArray,
                             maxQtyArray: maxQtyArray,
@@ -4094,20 +4302,33 @@ export default class SupplyPlanComponent extends React.Component {
                 var roleList = AuthenticationService.getLoggedInUserRole();
                 if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 } else {
+                    var monthCountShipments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                     this.setState({
-                        shipments: !this.state.shipments
+                        shipments: !this.state.shipments,
+                        monthCountShipments: monthCountShipments,
+                        shipmentStartDateClicked: count != undefined ? this.state.monthsArray[count].startDate : moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
+                        isSuggested: 1,
                     }, () => {
+                        this.formSubmit(this.state.planningUnit, monthCountShipments)
                         if (this.state.shipments) {
-                            this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
+                            this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder, startDate, endDate);
                         }
                     });
                 }
             } else if (supplyPlanType == 'shipments') {
+                var monthCountShipments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                 this.setState({
-                    shipments: !this.state.shipments
+                    shipments: !this.state.shipments,
+                    monthCountShipments: monthCountShipments,
+                    shipmentStartDateClicked: count != undefined ? this.state.monthsArray[count].startDate : moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
+                    isSuggested: 0,
                 }, () => {
+                    // if (this.state.shipments) {
+                    //     this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+                    // }
+                    this.formSubmit(this.state.planningUnit, monthCountShipments)
                     if (this.state.shipments) {
-                        this.shipmentsDetailsClicked(shipmentType, startDate, endDate);
+                        this.shipmentsDetailsClicked('allShipments', startDate, endDate);
                     }
                 });
             } else if (supplyPlanType == 'Adjustments') {
@@ -4274,6 +4495,24 @@ export default class SupplyPlanComponent extends React.Component {
         })
         console.log("Mohit form submit 31")
         this.formSubmit(this.state.planningUnit, monthCountAdjustments);
+    }
+
+    leftClickedShipments() {
+        var monthCountShipments = (this.state.monthCountShipments) - NO_OF_MONTHS_ON_LEFT_CLICKED_REGION;
+        this.setState({
+            monthCountShipments: monthCountShipments
+        })
+        console.log("Mohit form submit 30")
+        this.formSubmit(this.state.planningUnit, monthCountShipments)
+    }
+
+    rightClickedShipments() {
+        var monthCountShipments = (this.state.monthCountShipments) + NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION;
+        this.setState({
+            monthCountShipments: monthCountShipments
+        })
+        console.log("Mohit form submit 31")
+        this.formSubmit(this.state.planningUnit, monthCountShipments);
     }
 
     // Consumption Functionality
@@ -4491,8 +4730,8 @@ export default class SupplyPlanComponent extends React.Component {
     // Suggested shipments
 
     //Show Suggested shipments details
-    suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder) {
-        this.setState({ loading: true })
+    suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder, startDate, endDate) {
+        this.setState({ loading: true, shipmentStartDateClicked: startDate })
         var programId = document.getElementById("programId").value;
         // var db1;
         // getDatabase();
@@ -4536,7 +4775,20 @@ export default class SupplyPlanComponent extends React.Component {
             }
             suggestedShipmentList.push(json);
         }
-        var shipmentList = [];
+        var shipmentListUnFiltered = programJson.shipmentList;
+        this.setState({
+            shipmentListUnFiltered: shipmentListUnFiltered
+        })
+        var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
+        shipmentList = shipmentList.filter(c => 
+            (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
+            // && c.erpFlag == false 
+            && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value
+            // && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)
+        );
+        if (document.getElementById("addRowId") != null) {
+            document.getElementById("addRowId").style.display = "block"
+        }
         var emergencyOrder = true;
         if (isEmergencyOrder == 0) {
             emergencyOrder = false;
@@ -4593,7 +4845,7 @@ export default class SupplyPlanComponent extends React.Component {
             rate: catalogPrice,
             freightCost: freightCost
         }
-        shipmentList.push(json);
+        shipmentList.unshift(json);
         this.setState({
             shipmentListUnFiltered: programJson.shipmentList,
             programJson: programJson,
@@ -4602,7 +4854,11 @@ export default class SupplyPlanComponent extends React.Component {
             shipmentList: shipmentList,
             showShipments: 1,
             isSuggested: 1,
-            programPlanningUnitForPrice: programPlanningUnit
+            programPlanningUnitForPrice: programPlanningUnit,
+            shipmentChangedFlag: 0,
+            shipmentBatchInfoChangedFlag: 0,
+            shipmentQtyChangedFlag: 0,
+            shipmentDatesChangedFlag: 0
         }, () => {
             if (this.refs.shipmentChild != undefined) {
                 this.refs.shipmentChild.showShipmentData();
@@ -4629,6 +4885,15 @@ export default class SupplyPlanComponent extends React.Component {
             showPlanningUnitAndQty: 0,
             planningUnitIdsPlan: [],
             singleValue: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+        })
+    }
+
+    toggleExport(type) {
+        var list = this.state.planningUnitList;
+        this.setState({
+            exportModal: !this.state.exportModal,
+            planningUnitIdsExport: type != 0 ? list.filter(c => c.value == this.state.planningUnitId) : [],
+            type: type
         })
     }
 
@@ -4764,6 +5029,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <li><span className="lightgreenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.multipleShipments')}</span></li>
                                         <li><span className="legend-localprocurment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.report.localprocurement')}</span></li>
                                         <li><span className="legend-emergencyComment legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
+                                        <li><span className="legend-erp legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.shipment.erpShipment')}</span></li>
                                     </ul>
                                 </FormGroup>
                                 <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
@@ -4824,119 +5090,182 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     shipmentsDetailsClicked(supplyPlanType, startDate, endDate) {
-        this.setState({ loading: true })
-        // var programId = document.getElementById("programId").value;
-        // var db1;
-        // getDatabase();
-        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        // openRequest.onerror = function (event) {
-        //     this.setState({
-        //         supplyPlanError: i18n.t('static.program.errortext'),
-        //         loading: false,
-        //         color: "red"
-        //     })
-        //     this.hideFirstComponent()
-        // }.bind(this);
-        // openRequest.onsuccess = function (e) {
-        //     db1 = e.target.result;
-        //     var transaction = db1.transaction(['programData'], 'readwrite');
-        //     var programTransaction = transaction.objectStore('programData');
-        //     var programRequest = programTransaction.get(programId);
-        //     programRequest.onerror = function (event) {
-        //         this.setState({
-        //             supplyPlanError: i18n.t('static.program.errortext'),
-        //             loading: false,
-        //             color: "red"
-        //         })
-        //         this.hideFirstComponent()
-        //     }.bind(this);
-        //     programRequest.onsuccess = function (event) {
-        //         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-        //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-        var programJson = this.state.programJson;
-        console.log("ProgramJson###", programJson);
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
-        var shipmentListUnFiltered = programJson.shipmentList;
-        this.setState({
-            shipmentListUnFiltered: shipmentListUnFiltered
-        })
-        var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
-        console.log("SupplyPlanType###", supplyPlanType);
-        // var tableEditableBasedOnSupplyPlan = true;
-        if (supplyPlanType == 'deliveredShipments') {
-            shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
-            if (document.getElementById("addRowId") != null) {
-                document.getElementById("addRowId").style.display = "block"
-            }
-        } else if (supplyPlanType == 'shippedShipments') {
-            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
-            if (document.getElementById("addRowId") != null) {
-                document.getElementById("addRowId").style.display = "block"
-            }
-        } else if (supplyPlanType == 'orderedShipments') {
-            console.log("In else if###", shipmentList);
-            console.log("In else if###", startDate);
-            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-            console.log("In else if###", shipmentList);
-            if (document.getElementById("addRowId") != null) {
-                document.getElementById("addRowId").style.display = "block"
-            }
-        } else if (supplyPlanType == 'plannedShipments') {
-            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-            if (document.getElementById("addRowId") != null) {
-                document.getElementById("addRowId").style.display = "block"
-            }
-        } else if (supplyPlanType == 'deliveredErpShipments') {
-            shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
-            if (document.getElementById("addRowId") != null) {
-                document.getElementById("addRowId").style.display = "none"
-            }
-        } else if (supplyPlanType == 'shippedErpShipments') {
-            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
-            if (document.getElementById("addRowId") != null) {
-                document.getElementById("addRowId").style.display = "none"
-            }
-        } else if (supplyPlanType == 'orderedErpShipments') {
-            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-            if (document.getElementById("addRowId") != null) {
-                document.getElementById("addRowId").style.display = "none"
-            }
-        } else if (supplyPlanType == 'plannedErpShipments') {
-            shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-            if (document.getElementById("addRowId") != null) {
-                document.getElementById("addRowId").style.display = "none"
-            }
-        } else {
-            shipmentList = [];
-        }
-
-        var roleList = AuthenticationService.getLoggedInUserRole();
-        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
-            if (document.getElementById("addRowId") != null) {
-                document.getElementById("addRowId").style.display = "none"
-            }
-        } else {
-        }
-        this.setState({
-            showShipments: 1,
-            shipmentList: shipmentList,
-            shipmentListUnFiltered: shipmentListUnFiltered,
-            isSuggested: 0,
-            programJson: programJson,
-            shelfLife: programPlanningUnit.shelfLife,
-            catalogPrice: programPlanningUnit.catalogPrice,
-            programPlanningUnitForPrice: programPlanningUnit
-        }, () => {
-            // console.log("After state set###", this.refs.shipmentChild)
-            if (this.refs.shipmentChild != undefined) {
-                this.refs.shipmentChild.showShipmentData();
+        var cont = false;
+        if (this.state.shipmentChangedFlag == 1 || this.state.shipmentBatchInfoChangedFlag == 1 || this.state.shipmentQtyChangedFlag == 1 || this.state.shipmentDatesChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
             } else {
-                this.setState({
-                    loading: false
-                })
+
             }
-        })
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({ loading: true, shipmentStartDateClicked: startDate });
+            // var elInstance = this.state.shipmentBatchInfoTableEl;
+            // console.log("El Instance Test@123",elInstance)
+            // if (elInstance != undefined && elInstance != "") {
+            //     // elInstance.destroy();
+            //     document.getElementById("showShipmentBatchInfoButtonsDiv").style.display = 'none';
+            //     jexcel.destroy(document.getElementById("shipmentBatchInfoTable"), true);
+
+            // }
+
+            // var elInstance1 = this.state.shipmentDatesTableEl;
+            // if (elInstance1 != undefined && elInstance1 != "") {
+            //     document.getElementById("showSaveShipmentsDatesButtonsDiv").style.display = 'none';
+            //     jexcel.destroy(document.getElementById("shipmentDatesTable"), true);
+            // }
+
+            // var elInstance2 = this.state.qtyCalculatorTableEl;
+            // if (elInstance2 != undefined && elInstance2 != "") {
+            //     document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
+            //     jexcel.destroy(document.getElementById("qtyCalculatorTable"), true);
+            // }
+
+            // var elInstance3 = this.state.qtyCalculatorTableEl1;
+            // if (elInstance3 != undefined && elInstance3 != "") {
+            //     document.getElementById("showSaveQtyButtonDiv").style.display = 'none';
+            //     jexcel.destroy(document.getElementById("qtyCalculatorTable1"), true);
+            // }
+
+            // var programId = document.getElementById("programId").value;
+            // var db1;
+            // getDatabase();
+            // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            // openRequest.onerror = function (event) {
+            //     this.setState({
+            //         supplyPlanError: i18n.t('static.program.errortext'),
+            //         loading: false,
+            //         color: "red"
+            //     })
+            //     this.hideFirstComponent()
+            // }.bind(this);
+            // openRequest.onsuccess = function (e) {
+            //     db1 = e.target.result;
+            //     var transaction = db1.transaction(['programData'], 'readwrite');
+            //     var programTransaction = transaction.objectStore('programData');
+            //     var programRequest = programTransaction.get(programId);
+            //     programRequest.onerror = function (event) {
+            //         this.setState({
+            //             supplyPlanError: i18n.t('static.program.errortext'),
+            //             loading: false,
+            //             color: "red"
+            //         })
+            //         this.hideFirstComponent()
+            //     }.bind(this);
+            //     programRequest.onsuccess = function (event) {
+            //         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = this.state.programJson;
+            console.log("ProgramJson###", programJson);
+            var planningUnitId = document.getElementById("planningUnitId").value;
+            var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
+            var shipmentListUnFiltered = programJson.shipmentList;
+            this.setState({
+                shipmentListUnFiltered: shipmentListUnFiltered
+            })
+            var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
+            console.log("SupplyPlanType###", supplyPlanType);
+            // var tableEditableBasedOnSupplyPlan = true;
+            if (supplyPlanType == 'deliveredShipments') {
+                shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
+                    // && c.erpFlag == false 
+                    && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+                if (document.getElementById("addRowId") != null) {
+                    document.getElementById("addRowId").style.display = "block"
+                }
+            } else if (supplyPlanType == 'shippedShipments') {
+                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate
+                    // && c.erpFlag == false 
+                    && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
+                if (document.getElementById("addRowId") != null) {
+                    document.getElementById("addRowId").style.display = "block"
+                }
+            } else if (supplyPlanType == 'orderedShipments') {
+                console.log("In else if###", shipmentList);
+                console.log("In else if###", startDate);
+                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate
+                    // && c.erpFlag == false 
+                    && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                console.log("In else if###", shipmentList);
+                if (document.getElementById("addRowId") != null) {
+                    document.getElementById("addRowId").style.display = "block"
+                }
+            } else if (supplyPlanType == 'plannedShipments') {
+                shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate
+                    // && c.erpFlag == false 
+                    && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                if (document.getElementById("addRowId") != null) {
+                    document.getElementById("addRowId").style.display = "block"
+                }
+            } else if (supplyPlanType == 'allShipments') {
+                shipmentList = shipmentList.filter(c => 
+                    (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
+                    // && c.erpFlag == false 
+                    && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value
+                    // && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)
+                );
+                if (document.getElementById("addRowId") != null) {
+                    document.getElementById("addRowId").style.display = "block"
+                }
+            }
+            // else if (supplyPlanType == 'deliveredErpShipments') {
+            //     shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
+            //     if (document.getElementById("addRowId") != null) {
+            //         document.getElementById("addRowId").style.display = "none"
+            //     }
+            // } else if (supplyPlanType == 'shippedErpShipments') {
+            //     shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS));
+            //     if (document.getElementById("addRowId") != null) {
+            //         document.getElementById("addRowId").style.display = "none"
+            //     }
+            // } else if (supplyPlanType == 'orderedErpShipments') {
+            //     shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+            //     if (document.getElementById("addRowId") != null) {
+            //         document.getElementById("addRowId").style.display = "none"
+            //     }
+            // } else if (supplyPlanType == 'plannedErpShipments') {
+            //     shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+            //     if (document.getElementById("addRowId") != null) {
+            //         document.getElementById("addRowId").style.display = "none"
+            //     }
+            // } 
+            else {
+                shipmentList = [];
+            }
+
+            var roleList = AuthenticationService.getLoggedInUserRole();
+            if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+                if (document.getElementById("addRowId") != null) {
+                    document.getElementById("addRowId").style.display = "none"
+                }
+            } else {
+            }
+            this.setState({
+                showShipments: 1,
+                shipmentList: shipmentList,
+                shipmentListUnFiltered: shipmentListUnFiltered,
+                programJson: programJson,
+                shelfLife: programPlanningUnit.shelfLife,
+                catalogPrice: programPlanningUnit.catalogPrice,
+                programPlanningUnitForPrice: programPlanningUnit,
+                shipmentChangedFlag: 0,
+                shipmentBatchInfoChangedFlag: 0,
+                shipmentQtyChangedFlag: 0,
+                shipmentDatesChangedFlag: 0
+            }, () => {
+                // console.log("After state set###", this.refs.shipmentChild)
+                if (this.refs.shipmentChild != undefined) {
+                    this.refs.shipmentChild.showShipmentData();
+                } else {
+                    this.setState({
+                        loading: false
+                    })
+                }
+            })
+        }
         // }.bind(this)
         // }.bind(this)
     }
@@ -4968,6 +5297,7 @@ export default class SupplyPlanComponent extends React.Component {
                 jexcel.destroy(document.getElementById("qtyCalculatorTable1"), true);
 
                 this.refs.shipmentChild.state.shipmentQtyChangedFlag = 0;
+                this.refs.shipmentChild.state.originalShipmentIdForPopup = "";
                 this.setState({
                     qtyCalculatorValidationError: "",
                     shipmentQtyChangedFlag: 0
@@ -4991,6 +5321,7 @@ export default class SupplyPlanComponent extends React.Component {
                 jexcel.destroy(document.getElementById("shipmentDatesTable"), true);
 
                 this.refs.shipmentChild.state.shipmentDatesChangedFlag = 0;
+                this.refs.shipmentChild.state.originalShipmentIdForPopup = "";
                 this.setState({
                     shipmentDatesChangedFlag: 0,
                     shipmentDatesError: ""
@@ -5014,6 +5345,7 @@ export default class SupplyPlanComponent extends React.Component {
                 jexcel.destroy(document.getElementById("shipmentBatchInfoTable"), true);
 
                 this.refs.shipmentChild.state.shipmentBatchInfoChangedFlag = 0;
+                this.refs.shipmentChild.state.originalShipmentIdForPopup = "";
                 this.setState({
                     shipmentBatchInfoChangedFlag: 0,
                     shipmentValidationBatchError: "",
@@ -5079,7 +5411,7 @@ export default class SupplyPlanComponent extends React.Component {
     getDataforExport = (report) => {
 
         document.getElementById("bars_div").style.display = 'block';
-        this.setState({ loading: true }, () => {
+        this.setState({ exportModal: false, loading: true }, () => {
             var m = this.state.monthsArray
             var db1;
             var storeOS;
@@ -5114,12 +5446,21 @@ export default class SupplyPlanComponent extends React.Component {
                     var programResult = programRequest.result.programData;
                     var planningUnitData = [];
                     var selectedPlanningUnitdata = {};
-                    var selectedplanningunit = this.state.planningUnitList.filter(c => c.value == this.state.planningUnitId)
-
-                    var planningunitList = this.state.planningUnitList.filter(c => c.value != this.state.planningUnitId)
-                    planningunitList.push(selectedplanningunit[0])
-                    var pcnt = 0
-                    planningunitList.map(planningUnit => {
+                    // var selectedplanningunit = this.state.planningUnitList.filter(c => c.value == this.state.planningUnitId)
+                    // var filteredPlanningUnitList=
+                    // var planningunitList = this.state.planningUnitList.filter(c => c.value != this.state.planningUnitId)
+                    // planningunitList.push(selectedplanningunit[0])
+                    var pcnt = 0;
+                    var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
+                        a = a.label.toLowerCase();
+                        b = b.label.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    });
+                    // if (this.state.planningUnitIdsExport.filter(c => c.value == this.state.planningUnitId).length > 0) {
+                    //     sortedPlanningUnitData.push(this.state.planningUnitIdsExport.filter(c => c.value == this.state.planningUnitId)[0])
+                    // }
+                    // sortedPlanningUnitData = sortedPlanningUnitData.concat(this.state.planningUnitIdsExport.filter(c => c.value != this.state.planningUnitId));
+                    sortedPlanningUnitData.map(planningUnit => {
 
                         var planningUnitId = planningUnit.value
                         var programJson = {}
@@ -5143,16 +5484,16 @@ export default class SupplyPlanComponent extends React.Component {
                         var regionListFiltered = this.state.regionList;
                         var consumptionTotalData = [];
                         var shipmentsTotalData = [];
-                        var manualShipmentsTotalData = [];
+                        // var manualShipmentsTotalData = [];
                         var deliveredShipmentsTotalData = [];
                         var shippedShipmentsTotalData = [];
                         var orderedShipmentsTotalData = [];
                         var plannedShipmentsTotalData = [];
-                        var erpShipmentsTotalData = [];
-                        var deliveredErpShipmentsTotalData = [];
-                        var shippedErpShipmentsTotalData = [];
-                        var orderedErpShipmentsTotalData = [];
-                        var plannedErpShipmentsTotalData = [];
+                        // var erpShipmentsTotalData = [];
+                        // var deliveredErpShipmentsTotalData = [];
+                        // var shippedErpShipmentsTotalData = [];
+                        // var orderedErpShipmentsTotalData = [];
+                        // var plannedErpShipmentsTotalData = [];
                         var totalExpiredStockArr = [];
                         var amcTotalData = [];
                         var minStockMoS = [];
@@ -5268,10 +5609,12 @@ export default class SupplyPlanComponent extends React.Component {
                                         if (jsonList.length > 0) {
                                             openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: jsonList[0].openingBalance });
                                             consumptionTotalData.push({ consumptionQty: jsonList[0].consumptionQty, consumptionType: jsonList[0].actualFlag, textColor: jsonList[0].actualFlag == 1 ? "#000000" : "rgb(170, 85, 161)" });
-                                            shipmentsTotalData.push(jsonList[0].shipmentTotalQty);
-                                            manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
+                                            // manualShipmentsTotalData.push(jsonList[0].manualTotalQty);
 
-                                            var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "false");
+                                            var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate))
+                                                // && c.erpFlag.toString() == "false"
+                                            );
+                                            shipmentsTotalData.push(shipmentDetails.length > 0 ? jsonList[0].shipmentTotalQty : "");
                                             var sd1 = [];
                                             var sd2 = [];
                                             var sd3 = [];
@@ -5280,168 +5623,6 @@ export default class SupplyPlanComponent extends React.Component {
                                             var paColor2 = "";
                                             var paColor3 = "";
                                             var paColor4 = "";
-                                            var isEmergencyOrder1 = 0;
-                                            var isEmergencyOrder2 = 0;
-                                            var isEmergencyOrder3 = 0;
-                                            var isEmergencyOrder14 = 0;
-                                            if (shipmentDetails != "" && shipmentDetails != undefined) {
-                                                for (var i = 0; i < shipmentDetails.length; i++) {
-                                                    if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                                        if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                            paColor1 = procurementAgent.colorHtmlCode;
-                                                            var index = paColors.findIndex(c => c.color == paColor1);
-                                                            if (index == -1) {
-                                                                paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
-                                                            }
-                                                        } else {
-                                                            if (shipmentDetails[i].procurementAgent.id != "") {
-                                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor1 = "#efefef"
-                                                            } else {
-                                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor1 = "#efefef"
-                                                            }
-                                                        }
-                                                        if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                            isEmergencyOrder1 = true
-                                                        }
-                                                        sd1.push(shipmentDetail);
-                                                    } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                                        if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                            paColor2 = procurementAgent.colorHtmlCode;
-                                                            var index = paColors.findIndex(c => c.color == paColor2);
-                                                            if (index == -1) {
-                                                                paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
-                                                            }
-                                                        } else {
-                                                            if (shipmentDetails[i].procurementAgent.id != "") {
-                                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor2 = "#efefef"
-                                                            } else {
-                                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor2 = "#efefef"
-                                                            }
-                                                        }
-                                                        sd2.push(shipmentDetail);
-                                                        if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                            isEmergencyOrder2 = true
-                                                        }
-                                                    } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                                        if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                            paColor3 = procurementAgent.colorHtmlCode;
-                                                            var index = paColors.findIndex(c => c.color == paColor3);
-                                                            if (index == -1) {
-                                                                paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
-                                                            }
-                                                        } else {
-                                                            if (shipmentDetails[i].procurementAgent.id != "") {
-                                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor3 = "#efefef"
-                                                            } else {
-                                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor3 = "#efefef"
-                                                            }
-                                                        }
-                                                        sd3.push(shipmentDetail);
-                                                        if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                            isEmergencyOrder3 = true
-                                                        }
-                                                    } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                                        if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
-                                                            var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                            var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                            var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                            paColor4 = procurementAgent.colorHtmlCode;
-                                                            var index = paColors.findIndex(c => c.color == paColor4);
-                                                            if (index == -1) {
-                                                                paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
-                                                            }
-                                                        } else {
-                                                            if (shipmentDetails[i].procurementAgent.id != "") {
-                                                                var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
-                                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor4 = "#efefef"
-                                                            } else {
-                                                                var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
-                                                                var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor4 = "#efefef"
-                                                            }
-                                                        }
-                                                        sd4.push(shipmentDetail);
-                                                        if (shipmentDetails[i].emergencyOrder.toString() == "true") {
-                                                            isEmergencyOrder4 = true
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
-                                                var colour = paColor1;
-                                                if (sd1.length > 1) {
-                                                    colour = "#d9ead3";
-                                                }
-                                                deliveredShipmentsTotalData.push({ qty: jsonList[0].receivedShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1 });
-                                            } else {
-                                                deliveredShipmentsTotalData.push("")
-                                            }
-
-                                            if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
-                                                var colour = paColor2;
-                                                if (sd2.length > 1) {
-                                                    colour = "#d9ead3";
-                                                }
-                                                shippedShipmentsTotalData.push({ qty: jsonList[0].shippedShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2 });
-                                            } else {
-                                                shippedShipmentsTotalData.push("")
-                                            }
-
-                                            if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
-                                                var colour = paColor3;
-                                                if (sd3.length > 1) {
-                                                    colour = "#d9ead3";
-                                                }
-                                                orderedShipmentsTotalData.push({ qty: Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3 });
-                                            } else {
-                                                orderedShipmentsTotalData.push("")
-                                            }
-
-                                            if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
-                                                var colour = paColor4;
-                                                if (sd4.length > 1) {
-                                                    colour = "#d9ead3";
-                                                }
-                                                plannedShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4 });
-                                            } else {
-                                                plannedShipmentsTotalData.push("")
-                                            }
-
-                                            erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
-
-
-                                            var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "true");
-                                            var sd1 = [];
-                                            var sd2 = [];
-                                            var sd3 = [];
-                                            var sd4 = [];
                                             var isEmergencyOrder1 = 0;
                                             var isEmergencyOrder2 = 0;
                                             var isEmergencyOrder3 = 0;
@@ -5470,10 +5651,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 paColor1 = "#efefef"
                                                             }
                                                         }
-                                                        sd1.push(shipmentDetail);
                                                         if (shipmentDetails[i].emergencyOrder.toString() == "true") {
                                                             isEmergencyOrder1 = true
                                                         }
+                                                        sd1.push(shipmentDetail);
                                                     } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
                                                         if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                             var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
@@ -5561,9 +5742,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (sd1.length > 1) {
                                                     colour = "#d9ead3";
                                                 }
-                                                deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1 });
+                                                deliveredShipmentsTotalData.push({ qty: Number(jsonList[0].receivedShipmentsTotalData) + Number(jsonList[0].receivedErpShipmentsTotalData), month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1 });
                                             } else {
-                                                deliveredErpShipmentsTotalData.push("")
+                                                deliveredShipmentsTotalData.push("")
                                             }
 
                                             if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
@@ -5571,9 +5752,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (sd2.length > 1) {
                                                     colour = "#d9ead3";
                                                 }
-                                                shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2 });
+                                                shippedShipmentsTotalData.push({ qty: Number(jsonList[0].shippedShipmentsTotalData) + Number(jsonList[0].shippedErpShipmentsTotalData), month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2 });
                                             } else {
-                                                shippedErpShipmentsTotalData.push("")
+                                                shippedShipmentsTotalData.push("")
                                             }
 
                                             if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
@@ -5581,9 +5762,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (sd3.length > 1) {
                                                     colour = "#d9ead3";
                                                 }
-                                                orderedErpShipmentsTotalData.push({ qty: Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3 });
+                                                orderedShipmentsTotalData.push({ qty: Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3 });
                                             } else {
-                                                orderedErpShipmentsTotalData.push("")
+                                                orderedShipmentsTotalData.push("")
                                             }
 
                                             if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
@@ -5591,10 +5772,172 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (sd4.length > 1) {
                                                     colour = "#d9ead3";
                                                 }
-                                                plannedErpShipmentsTotalData.push({ qty: Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4 });
+                                                plannedShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4 });
                                             } else {
-                                                plannedErpShipmentsTotalData.push("")
+                                                plannedShipmentsTotalData.push("")
                                             }
+
+                                            // erpShipmentsTotalData.push(jsonList[0].erpTotalQty);
+
+
+                                            // var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate)) && c.erpFlag.toString() == "true");
+                                            // var sd1 = [];
+                                            // var sd2 = [];
+                                            // var sd3 = [];
+                                            // var sd4 = [];
+                                            // var isEmergencyOrder1 = 0;
+                                            // var isEmergencyOrder2 = 0;
+                                            // var isEmergencyOrder3 = 0;
+                                            // var isEmergencyOrder4 = 0;
+                                            // if (shipmentDetails != "" && shipmentDetails != undefined) {
+                                            //     for (var i = 0; i < shipmentDetails.length; i++) {
+                                            //         if (shipmentDetails[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
+                                            //             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                            //                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                            //                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                 paColor1 = procurementAgent.colorHtmlCode;
+                                            //                 var index = paColors.findIndex(c => c.color == paColor1);
+                                            //                 if (index == -1) {
+                                            //                     paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
+                                            //                 }
+                                            //             } else {
+                                            //                 if (shipmentDetails[i].procurementAgent.id != "") {
+                                            //                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                            //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                     paColor1 = "#efefef"
+                                            //                 } else {
+                                            //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                     paColor1 = "#efefef"
+                                            //                 }
+                                            //             }
+                                            //             sd1.push(shipmentDetail);
+                                            //             if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                            //                 isEmergencyOrder1 = true
+                                            //             }
+                                            //         } else if (shipmentDetails[i].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
+                                            //             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                            //                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                            //                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                 paColor2 = procurementAgent.colorHtmlCode;
+                                            //                 var index = paColors.findIndex(c => c.color == paColor2);
+                                            //                 if (index == -1) {
+                                            //                     paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
+                                            //                 }
+                                            //             } else {
+                                            //                 if (shipmentDetails[i].procurementAgent.id != "") {
+                                            //                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                            //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                     paColor2 = "#efefef"
+                                            //                 } else {
+                                            //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                     paColor2 = "#efefef"
+                                            //                 }
+                                            //             }
+                                            //             sd2.push(shipmentDetail);
+                                            //             if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                            //                 isEmergencyOrder2 = true
+                                            //             }
+                                            //         } else if (shipmentDetails[i].shipmentStatus.id == APPROVED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                            //             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                            //                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                            //                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                 paColor3 = procurementAgent.colorHtmlCode;
+                                            //                 var index = paColors.findIndex(c => c.color == paColor3);
+                                            //                 if (index == -1) {
+                                            //                     paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
+                                            //                 }
+                                            //             } else {
+                                            //                 if (shipmentDetails[i].procurementAgent.id != "") {
+                                            //                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                            //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                     paColor3 = "#efefef"
+                                            //                 } else {
+                                            //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                     paColor3 = "#efefef"
+                                            //                 }
+                                            //             }
+                                            //             sd3.push(shipmentDetail);
+                                            //             if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                            //                 isEmergencyOrder3 = true
+                                            //             }
+                                            //         } else if (shipmentDetails[i].shipmentStatus.id == PLANNED_SHIPMENT_STATUS || shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                            //             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
+                                            //                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                            //                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                 paColor4 = procurementAgent.colorHtmlCode;
+                                            //                 var index = paColors.findIndex(c => c.color == paColor4);
+                                            //                 if (index == -1) {
+                                            //                     paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
+                                            //                 }
+                                            //             } else {
+                                            //                 if (shipmentDetails[i].procurementAgent.id != "") {
+                                            //                     var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
+                                            //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                     paColor4 = "#efefef"
+                                            //                 } else {
+                                            //                     var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
+                                            //                     var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
+                                            //                     paColor4 = "#efefef"
+                                            //                 }
+                                            //             }
+                                            //             sd4.push(shipmentDetail);
+                                            //             if (shipmentDetails[i].emergencyOrder.toString() == "true") {
+                                            //                 isEmergencyOrder4 = true
+                                            //             }
+                                            //         }
+                                            //     }
+                                            // }
+
+                                            // if ((shipmentDetails.filter(c => c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS)).length > 0) {
+                                            //     var colour = paColor1;
+                                            //     if (sd1.length > 1) {
+                                            //         colour = "#d9ead3";
+                                            //     }
+                                            //     deliveredErpShipmentsTotalData.push({ qty: jsonList[0].receivedErpShipmentsTotalData, month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1 });
+                                            // } else {
+                                            //     deliveredErpShipmentsTotalData.push("")
+                                            // }
+
+                                            // if ((shipmentDetails.filter(c => c.shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || c.shipmentStatus.id == ARRIVED_SHIPMENT_STATUS)).length > 0) {
+                                            //     var colour = paColor2;
+                                            //     if (sd2.length > 1) {
+                                            //         colour = "#d9ead3";
+                                            //     }
+                                            //     shippedErpShipmentsTotalData.push({ qty: jsonList[0].shippedErpShipmentsTotalData, month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2 });
+                                            // } else {
+                                            //     shippedErpShipmentsTotalData.push("")
+                                            // }
+
+                                            // if ((shipmentDetails.filter(c => c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS)).length > 0) {
+                                            //     var colour = paColor3;
+                                            //     if (sd3.length > 1) {
+                                            //         colour = "#d9ead3";
+                                            //     }
+                                            //     orderedErpShipmentsTotalData.push({ qty: Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3 });
+                                            // } else {
+                                            //     orderedErpShipmentsTotalData.push("")
+                                            // }
+
+                                            // if ((shipmentDetails.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)).length > 0) {
+                                            //     var colour = paColor4;
+                                            //     if (sd4.length > 1) {
+                                            //         colour = "#d9ead3";
+                                            //     }
+                                            //     plannedErpShipmentsTotalData.push({ qty: Number(jsonList[0].onholdErpShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4 });
+                                            // } else {
+                                            //     plannedErpShipmentsTotalData.push("")
+                                            // }
 
                                             inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                             totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
@@ -5817,10 +6160,18 @@ export default class SupplyPlanComponent extends React.Component {
                                                 month: m[n].monthName.concat(" ").concat(m[n].monthYear),
                                                 consumption: jsonList[0].consumptionQty,
                                                 stock: jsonList[0].closingBalance,
-                                                planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0) + Number(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0),
-                                                delivered: Number(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0) + Number(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0),
-                                                shipped: Number(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0) + Number(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0),
-                                                ordered: Number(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0) + Number(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0),
+                                                planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0)
+                                                //  + Number(plannedErpShipmentsTotalData[n] != "" ? plannedErpShipmentsTotalData[n].qty : 0)
+                                                ,
+                                                delivered: Number(deliveredShipmentsTotalData[n] != "" ? deliveredShipmentsTotalData[n].qty : 0)
+                                                // + Number(deliveredErpShipmentsTotalData[n] != "" ? deliveredErpShipmentsTotalData[n].qty : 0)
+                                                ,
+                                                shipped: Number(shippedShipmentsTotalData[n] != "" ? shippedShipmentsTotalData[n].qty : 0)
+                                                // + Number(shippedErpShipmentsTotalData[n] != "" ? shippedErpShipmentsTotalData[n].qty : 0)
+                                                ,
+                                                ordered: Number(orderedShipmentsTotalData[n] != "" ? orderedShipmentsTotalData[n].qty : 0)
+                                                // + Number(orderedErpShipmentsTotalData[n] != "" ? orderedErpShipmentsTotalData[n].qty : 0)
+                                                ,
                                                 mos: jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos,
                                                 minMos: minStockMoSQty,
                                                 maxMos: maxStockMoSQty,
@@ -5832,18 +6183,18 @@ export default class SupplyPlanComponent extends React.Component {
                                         } else {
                                             openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: lastClosingBalance });
                                             consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
-                                            shipmentsTotalData.push(0);
+                                            shipmentsTotalData.push("");
                                             suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
-                                            manualShipmentsTotalData.push(0);
+                                            // manualShipmentsTotalData.push(0);
                                             deliveredShipmentsTotalData.push("");
                                             shippedShipmentsTotalData.push("");
                                             orderedShipmentsTotalData.push("");
                                             plannedShipmentsTotalData.push("");
-                                            erpShipmentsTotalData.push(0);
-                                            deliveredErpShipmentsTotalData.push("");
-                                            shippedErpShipmentsTotalData.push("");
-                                            orderedErpShipmentsTotalData.push("");
-                                            plannedErpShipmentsTotalData.push("");
+                                            // erpShipmentsTotalData.push(0);
+                                            // deliveredErpShipmentsTotalData.push("");
+                                            // shippedErpShipmentsTotalData.push("");
+                                            // orderedErpShipmentsTotalData.push("");
+                                            // plannedErpShipmentsTotalData.push("");
                                             inventoryTotalData.push("");
                                             totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                             monthsOfStockArray.push(null)
@@ -5885,16 +6236,16 @@ export default class SupplyPlanComponent extends React.Component {
                                         expiredStockArr: totalExpiredStockArr,
                                         shipmentsTotalData: shipmentsTotalData,
                                         suggestedShipmentsTotalData: suggestedShipmentsTotalData,
-                                        manualShipmentsTotalData: manualShipmentsTotalData,
+                                        // manualShipmentsTotalData: manualShipmentsTotalData,
                                         deliveredShipmentsTotalData: deliveredShipmentsTotalData,
                                         shippedShipmentsTotalData: shippedShipmentsTotalData,
                                         orderedShipmentsTotalData: orderedShipmentsTotalData,
                                         plannedShipmentsTotalData: plannedShipmentsTotalData,
-                                        erpShipmentsTotalData: erpShipmentsTotalData,
-                                        deliveredErpShipmentsTotalData: deliveredErpShipmentsTotalData,
-                                        shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
-                                        orderedErpShipmentsTotalData: orderedErpShipmentsTotalData,
-                                        plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
+                                        // erpShipmentsTotalData: erpShipmentsTotalData,
+                                        // deliveredErpShipmentsTotalData: deliveredErpShipmentsTotalData,
+                                        // shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
+                                        // orderedErpShipmentsTotalData: orderedErpShipmentsTotalData,
+                                        // plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
                                         inventoryTotalData: inventoryTotalData,
                                         monthsOfStockArray: monthsOfStockArray,
                                         maxQtyArray: maxQtyArray,
@@ -5920,7 +6271,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             yAxisID: 'A',
                                             type: 'line',
                                             stack: 7,
-                                            data: this.state.expiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
+                                            data: totalExpiredStockArr.map((item, index) => (item.qty > 0 ? item.qty : null)),
                                             fill: false,
                                             borderColor: 'rgb(75, 192, 192)',
                                             tension: 0.1,
@@ -5932,69 +6283,6 @@ export default class SupplyPlanComponent extends React.Component {
 
                                         },
                                         {
-                                            label: i18n.t('static.supplyPlan.planned'),
-                                            stack: 1,
-                                            yAxisID: 'A',
-                                            backgroundColor: '#a7c6ed',
-                                            borderColor: 'rgba(179,181,198,1)',
-                                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                                            pointBorderColor: '#fff',
-                                            pointHoverBackgroundColor: '#fff',
-                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                            data: jsonArrForGraph.map((item, index) => (item.planned)),
-                                        },
-                                        {
-                                            label: i18n.t('static.supplyPlan.ordered'),
-                                            stack: 1,
-                                            yAxisID: 'A',
-                                            backgroundColor: '#205493',
-                                            borderColor: 'rgba(179,181,198,1)',
-                                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                                            pointBorderColor: '#fff',
-                                            pointHoverBackgroundColor: '#fff',
-                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                            data: jsonArrForGraph.map((item, index) => (item.ordered)),
-                                        },
-                                        {
-                                            label: i18n.t('static.supplyPlan.shipped'),
-                                            stack: 1,
-                                            yAxisID: 'A',
-                                            backgroundColor: '#006789',
-                                            borderColor: 'rgba(179,181,198,1)',
-                                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                                            pointBorderColor: '#fff',
-                                            pointHoverBackgroundColor: '#fff',
-                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                            data: jsonArrForGraph.map((item, index) => (item.shipped)),
-                                        },
-                                        {
-                                            label: i18n.t('static.supplyPlan.delivered'),
-                                            stack: 1,
-                                            yAxisID: 'A',
-                                            backgroundColor: '#002f6c',
-                                            borderColor: 'rgba(179,181,198,1)',
-                                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                                            pointBorderColor: '#fff',
-                                            pointHoverBackgroundColor: '#fff',
-                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
-                                            data: jsonArrForGraph.map((item, index) => (item.delivered)),
-                                        }, {
-                                            label: i18n.t('static.report.stock'),
-                                            stack: 2,
-                                            type: 'line',
-                                            yAxisID: 'A',
-                                            borderColor: '#cfcdc9',
-                                            borderStyle: 'dotted',
-                                            ticks: {
-                                                fontSize: 2,
-                                                fontColor: 'transparent',
-                                            },
-                                            lineTension: 0,
-                                            pointStyle: 'line',
-                                            pointRadius: 0,
-                                            showInLegend: true,
-                                            data: jsonArrForGraph.map((item, index) => (item.stock))
-                                        }, {
                                             label: i18n.t('static.supplyPlan.consumption'),
                                             type: 'line',
                                             stack: 3,
@@ -6011,6 +6299,86 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointRadius: 0,
                                             showInLegend: true,
                                             data: jsonArrForGraph.map((item, index) => (item.consumption))
+                                        },
+                                        {
+                                            label: i18n.t('static.report.actualConsumption'),
+                                            yAxisID: 'A',
+                                            type: 'line',
+                                            stack: 7,
+                                            data: consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? item.consumptionQty : null)),
+                                            fill: false,
+                                            borderColor: 'rgb(75, 192, 192)',
+                                            tension: 0.1,
+                                            showLine: false,
+                                            pointStyle: 'point',
+                                            pointBackgroundColor: '#ba0c2f',
+                                            pointBorderColor: '#ba0c2f',
+                                            pointRadius: 3
+                                        },
+                                        {
+                                            label: i18n.t('static.supplyPlan.delivered'),
+                                            stack: 1,
+                                            yAxisID: 'A',
+                                            backgroundColor: '#002f6c',
+                                            borderColor: 'rgba(179,181,198,1)',
+                                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                                            pointBorderColor: '#fff',
+                                            pointHoverBackgroundColor: '#fff',
+                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                            data: jsonArrForGraph.map((item, index) => (item.delivered)),
+                                        },
+                                        {
+                                            label: i18n.t('static.supplyPlan.shipped'),
+                                            stack: 1,
+                                            yAxisID: 'A',
+                                            backgroundColor: '#006789',
+                                            borderColor: 'rgba(179,181,198,1)',
+                                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                                            pointBorderColor: '#fff',
+                                            pointHoverBackgroundColor: '#fff',
+                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                            data: jsonArrForGraph.map((item, index) => (item.shipped)),
+                                        },
+                                        {
+                                            label: i18n.t('static.supplyPlan.ordered'),
+                                            stack: 1,
+                                            yAxisID: 'A',
+                                            backgroundColor: '#205493',
+                                            borderColor: 'rgba(179,181,198,1)',
+                                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                                            pointBorderColor: '#fff',
+                                            pointHoverBackgroundColor: '#fff',
+                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                            data: jsonArrForGraph.map((item, index) => (item.ordered)),
+                                        },
+                                        {
+                                            label: i18n.t('static.supplyPlan.planned'),
+                                            stack: 1,
+                                            yAxisID: 'A',
+                                            backgroundColor: '#a7c6ed',
+                                            borderColor: 'rgba(179,181,198,1)',
+                                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                                            pointBorderColor: '#fff',
+                                            pointHoverBackgroundColor: '#fff',
+                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                            data: jsonArrForGraph.map((item, index) => (item.planned)),
+                                        },
+                                        {
+                                            label: i18n.t('static.report.stock'),
+                                            stack: 2,
+                                            type: 'line',
+                                            yAxisID: 'A',
+                                            borderColor: '#cfcdc9',
+                                            borderStyle: 'dotted',
+                                            ticks: {
+                                                fontSize: 2,
+                                                fontColor: 'transparent',
+                                            },
+                                            lineTension: 0,
+                                            pointStyle: 'line',
+                                            pointRadius: 0,
+                                            showInLegend: true,
+                                            data: jsonArrForGraph.map((item, index) => (item.stock))
                                         },
                                         {
                                             label: jsonArrForGraph[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'),
@@ -6185,24 +6553,24 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     }
                                     console.log("PlanningUnitDataForExport@@@@@@@@@@", planningUnitDataforExport)
-                                    if (this.state.planningUnitId != programPlanningUnit.planningUnit.id) {
-                                        planningUnitData.push(planningUnitDataforExport)
-                                        // this.setState({
-                                        //     planningUnitData: planningUnitData,
-                                        //         loading: false
-                                        // })
-                                    }
-                                    else {
-                                        selectedPlanningUnitdata = planningUnitDataforExport
-                                        this.setState({
-                                            inList: invList,
-                                            coList: conList,
-                                            shList: shiList,
-                                        })
-                                    }
+                                    // if (this.state.planningUnitId != programPlanningUnit.planningUnit.id) {
+                                    planningUnitData.push(planningUnitDataforExport)
+                                    // this.setState({
+                                    //     planningUnitData: planningUnitData,
+                                    //         loading: false
+                                    // })
+                                    // }
+                                    // else {
+                                    //     selectedPlanningUnitdata = planningUnitDataforExport
+                                    //     this.setState({
+                                    //         inList: invList,
+                                    //         coList: conList,
+                                    //         shList: shiList,
+                                    //     })
+                                    // }
                                     pcnt = pcnt + 1
-                                    if (pcnt == this.state.planningUnitList.length) {
-                                        planningUnitData.push(selectedPlanningUnitdata)
+                                    if (pcnt == this.state.planningUnitIdsExport.length) {
+                                        // planningUnitData.push(selectedPlanningUnitdata)
                                         this.setState({
                                             planningUnitData: planningUnitData,
                                             loading: false
@@ -6249,6 +6617,12 @@ export default class SupplyPlanComponent extends React.Component {
     setPlanningUnitIdsPlan(e) {
         this.setState({
             planningUnitIdsPlan: e,
+        })
+    }
+
+    setPlanningUnitIdsExport(e) {
+        this.setState({
+            planningUnitIdsExport: e,
         })
     }
 

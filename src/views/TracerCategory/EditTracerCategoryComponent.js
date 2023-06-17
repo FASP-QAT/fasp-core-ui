@@ -485,16 +485,93 @@ class EditTracerCategoryComponent extends Component {
     }
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        TracerCategoryService.getTracerCategoryById(this.props.match.params.tracerCategoryId).then(response => {
-            if (response.status == 200) {
+        TracerCategoryService.getTracerCategoryById(this.props.match.params.tracerCategoryId).then(response1 => {
+            if (response1.status == 200) {
                 this.setState({
-                    tracerCategory: response.data, loading: false
+                    tracerCategory: response1.data, loading: false
+                }, 
+                () => {
+                    HealthAreaService.getHealthAreaList()
+                    .then(response => {
+                        if (response.status == 200) {
+                            var listArray = response.data;
+                            var haArray = response.data;
+                            haArray = haArray.filter( (item) => {
+                                return item.healthAreaId === this.state.tracerCategory.healthArea.id;
+                            });
+                            if(haArray.length > 0){
+                                if(haArray[0].active==false){
+                                    this.setState(prevState => ({
+                                        ...prevState,
+                                        tracerCategory:{
+                                            ...prevState.tracerCategory,
+                                            healthArea:{
+                                                id:''
+                                            }
+                                        }
+                                    }))
+                                }
+                            }
+                            listArray.sort((a, b) => {
+                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
+                            this.setState({
+                                healthAreas: listArray, loading: false
+                            })
+                        } else {
+                            this.setState({
+                                message: response.data.messageCode, loading: false
+                            })
+                        }
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
                 });
             }
             else {
 
                 this.setState({
-                    message: response.data.messageCode, loading: false
+                    message: response1.data.messageCode, loading: false
                 },
                     () => {
                         this.hideSecondComponent();
@@ -543,79 +620,7 @@ class EditTracerCategoryComponent extends Component {
             }
         );
 
-        HealthAreaService.getHealthAreaList()
-            .then(response => {
-                if (response.status == 200) {
-                    var listArray = response.data;
-                    var haArray = response.data;
-                    haArray = haArray.filter( (item) => {
-                        return item.healthAreaId === this.state.tracerCategory.healthArea.id;
-                    });
-                    if(haArray[0].active==false){
-                        this.setState(prevState => ({
-                            ...prevState,
-                            tracerCategory:{
-                                ...prevState.tracerCategory,
-                                healthArea:{
-                                    id:''
-                                }
-                            }
-                        }))
-                    }
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        healthAreas: listArray, loading: false
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            // message: 'static.unkownError',
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+        
 
     }
     render() {

@@ -46,7 +46,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 // import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { FORECAST_DATEPICKER_START_MONTH, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, FORECASTED_CONSUMPTION_MODIFIED, QAT_DATASOURCE_ID, API_URL } from '../../Constants.js';
+import { FORECAST_DATEPICKER_START_MONTH, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, FORECASTED_CONSUMPTION_MODIFIED, QAT_DATASOURCE_ID, API_URL, FORECASTED_CONSUMPTION_MONTHS_IN_PAST } from '../../Constants.js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
@@ -103,6 +103,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     redirectToDashbaord() {
         this.props.redirectToDashboard();
     }
+
+    monthDiff(dateFrom, dateTo) {
+        return dateTo.getMonth() - dateFrom.getMonth() +
+            (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
+    }
+
     changeColor() {
 
         var elInstance = this.state.languageEl;
@@ -115,6 +121,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             var id = rowData[9];
             var currentForecastedValue = rowData[8];
             var forecastConsumption = rowData[4];
+            var isOldDate = rowData[13];
+
             if (forecastConsumption === "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var cell1 = elInstance.getCell(`${colArr[i]}${parseInt(j) + 1}`)
@@ -132,6 +140,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             } else {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                }
+            }
+
+            if (!isOldDate && currentForecastedValue !== "") {
+                for (var i = 0; i < colArr.length; i++) {
+                    var cell1 = elInstance.getCell(`J${parseInt(j) + 1}`)
+                    cell1.classList.add('readonly');
+                    cell1.classList.add('commitConflict');
                 }
             }
         }
@@ -245,9 +261,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     var finalImportQATDataSelSource = this.state.selSource;
                                     var finalImportQATDataSelSourceFilter = finalImportQATDataSelSource.filter((c, indexFilter) => json[indexFilter][9] == true);
 
-                                    var finalImportQATData = Object.values(finalImportQATDataSelSourceFilter.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17 }) => {
+                                    var finalImportQATData = Object.values(finalImportQATDataSelSourceFilter.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 }) => {
                                         if (!a[v16]) {
-                                            a[v16] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17 });
+                                            a[v16] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 });
                                         } else {
                                             a[v16].v7 += v7;
                                         }
@@ -291,7 +307,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                                         var consumptionDataList = (programJson.consumptionList);
 
-                                        var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && json[indexFilter][9] == true);
+                                        var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && c.v18);
 
                                         for (var i = 0; i < finalImportQATDataFilter.length; i++) {
                                             var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
@@ -379,8 +395,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         var finalQATPlanningList = [];
                                         for (var i = 0; i < finalImportQATData.length; i++) {
 
-                                            var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].v10)
-                                            // console.log("inside success", index)
+                                            var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].v10 && finalImportQATData[i].v18)
+                                            // console.log("inside success", finalImportQATData)
 
                                             if (index == -1) {
                                                 finalQATPlanningList.push(parseInt(finalImportQATData[i].v10))
@@ -421,6 +437,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     filterData() {
+        var realmId = AuthenticationService.getRealmId();
         var db1;
         var storeOS;
         var supplyPlanRegionList = [];
@@ -435,6 +452,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
+            var realmTransaction = db1.transaction(['realm'], 'readwrite');
+            var realmOS = realmTransaction.objectStore('realm');
+            var realmRequest = realmOS.get(realmId);
+            realmRequest.onsuccess = function (event) {
+                var realm=realmRequest.result;
             var programDataTransaction = db1.transaction(['programData'], 'readwrite');
             var programDataOs = programDataTransaction.objectStore('programData');
             var programRequest = programDataOs.get(this.props.items.programId);
@@ -514,6 +536,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 var selectedSupplyPlanPlanningUnit = selectedSupplyPlan.filter(c => c.forecastPlanningUnitId == primaryConsumptionData[i].planningUnit.id);
                                 var regionFilter = supplyPlanRegionList.filter(c => c.forecastRegionId == primaryConsumptionData[i].region.id);
                                 if (primaryConsumptionData[i].monthlyForecastData[j].month != null && regionFilter.length > 0) {
+                                    var diff = this.monthDiff(new Date(primaryConsumptionData[i].monthlyForecastData[j].month), new Date());
+                                    var isOldDate = diff < (realm.forecastConsumptionMonthsInPast+1);
                                     var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId && c.multiplier == 1);
                                     tempList.push({
                                         v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
@@ -532,7 +556,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v14: primaryConsumptionData[i].monthlyForecastData[j].month, // Month without format
                                         v15: regionFilter[0].forecastPercentage,// % of forecast
                                         v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
-                                        v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId
+                                        v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId,
+                                        v18: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
 
                                     });
                                 }
@@ -542,9 +567,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             }
                         }
 
-                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17 }) => {
+                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 }) => {
                             if (!a[v13]) {
-                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17 });
+                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 });
                             } else {
                                 a[v13].v7 += v7;
                                 a[v13].v5 += v5;
@@ -605,6 +630,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 // console.log("step 3-tempList--->", tempList)
             }.bind(this)
         }.bind(this)
+    }.bind(this)
     }
 
     buildJexcel() {
@@ -628,11 +654,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[6] = papuList[j].v6
                 data[7] = papuList[j].v7
                 data[8] = papuList[j].v8
-                data[9] = papuList[j].v5 !== "" ? true : false;
+                data[9] = papuList[j].v5 !== "" && papuList[j].v18 ? true : false;
                 data[10] = papuList[j].v9;
                 data[11] = papuList[j].v10;
                 data[12] = papuList[j].v11;
-                // data[9] = papuList[j].id
+                data[13] = papuList[j].v18;
 
                 papuDataArr[count] = data;
                 count++;
@@ -763,10 +789,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     title: "Supply Planning Region Id"
                 },
 
-                // {
-                //     title: 'Id',
-                //     type: 'hidden'
-                // },
+                {
+                    title: 'Is Old Data?',
+                    type: 'hidden'
+                },
 
 
             ],
@@ -928,6 +954,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         <li><span class="legendcolor" style={{ backgroundColor: "yellow", border: "1px solid #000" }}></span>
                             {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
                             <span class="legendcommitversionText red">Data already exists in Supply Plan Program</span>
+                        </li>
+                        <li><span class="legendcolor" style={{ backgroundColor: "#a5a3a3", border: "1px solid #000" }}></span>
+                            {/* <span class="legendcommitversionText red">{i18n.t('static.importFromQATSupplyPlan.dataAlreadyExistsInForecastProgram')}</span> */}
+                            <span class="legendcommitversionText red">Data exists in Supply Plan Program and is past {FORECASTED_CONSUMPTION_MONTHS_IN_PAST} months, so it cannot be imported.</span>
                         </li>
                     </ul>
                 </div>
