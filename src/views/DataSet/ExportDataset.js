@@ -158,21 +158,21 @@ export default class ExportDataset extends Component {
                     var myResult = [];
                     myResult = getRequest.result;
                     console.log("MyResult+++", myResult);
-                    var dTransaction = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                    var dProgram = dTransaction.objectStore('downloadedDatasetData');
-                    var dGetRequest = dProgram.getAll();
-                    dGetRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    dGetRequest.onsuccess = function (event) {
+                    // var dTransaction = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                    // var dProgram = dTransaction.objectStore('downloadedDatasetData');
+                    // var dGetRequest = dProgram.getAll();
+                    // dGetRequest.onerror = function (event) {
+                    //     // Handle errors!
+                    // };
+                    // dGetRequest.onsuccess = function (event) {
                         var programQPLDetailsTransaction1 = db1.transaction(['datasetDetails'], 'readwrite');
                         var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('datasetDetails');
                         var programQPLDetailsGetRequest = programQPLDetailsOs1.getAll();
                         programQPLDetailsGetRequest.onsuccess = function (event) {
                             var programQPLResult = [];
                             programQPLResult = programQPLDetailsGetRequest.result;
-                            var dMyResult = [];
-                            dMyResult = dGetRequest.result;
+                            // var dMyResult = [];
+                            // dMyResult = dGetRequest.result;
                             var countryTransaction = db1.transaction(['country'], 'readwrite');
                             var countryOs = countryTransaction.objectStore('country');
                             var countryRequest = countryOs.getAll();
@@ -302,8 +302,8 @@ export default class ExportDataset extends Component {
                                                                                                 if (isUnEncrepted) {//encrept data
 
                                                                                                     var txt = JSON.stringify(myResult[i]);
-                                                                                                    var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
-                                                                                                    var txt1 = JSON.stringify(dArray)
+                                                                                                    // var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+                                                                                                    var txt1 = "";
                                                                                                     // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                                                                                                     // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                                                                     var labelName = (programId[j].label).replaceAll("/", "-")
@@ -330,20 +330,20 @@ export default class ExportDataset extends Component {
                                                                                                     var txt = JSON.stringify(myResult[i]);
 
 
-                                                                                                    var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+                                                                                                    // var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
 
-                                                                                                    var bytes1 = CryptoJS.AES.decrypt(dArray.programName, SECRET_KEY);
-                                                                                                    var programNameLabel11 = bytes1.toString(CryptoJS.enc.Utf8);
-                                                                                                    var programNameLabel111 = JSON.parse(programNameLabel11);
+                                                                                                    // var bytes1 = CryptoJS.AES.decrypt(dArray.programName, SECRET_KEY);
+                                                                                                    // var programNameLabel11 = bytes1.toString(CryptoJS.enc.Utf8);
+                                                                                                    // var programNameLabel111 = JSON.parse(programNameLabel11);
 
-                                                                                                    var programDataBytes1 = CryptoJS.AES.decrypt(dArray.programData, SECRET_KEY);
-                                                                                                    var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
-                                                                                                    var programJson111 = JSON.parse(programData1);
+                                                                                                    // var programDataBytes1 = CryptoJS.AES.decrypt(dArray.programData, SECRET_KEY);
+                                                                                                    // var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                                                                    // var programJson111 = JSON.parse(programData1);
 
-                                                                                                    dArray.programName = programNameLabel111;
-                                                                                                    dArray.programData = programJson111;
+                                                                                                    // dArray.programName = programNameLabel111;
+                                                                                                    // dArray.programData = programJson111;
 
-                                                                                                    var txt1 = JSON.stringify(dArray)
+                                                                                                    var txt1 = ""
                                                                                                     // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                                                                                                     // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                                                                     var labelName = (programId[j].label).replaceAll("/", "-")
@@ -408,7 +408,7 @@ export default class ExportDataset extends Component {
                         }.bind(this)
                     }.bind(this)
                 }.bind(this)
-            }.bind(this)
+            // }.bind(this)
         } else {
             console.log("in ekse")
             this.setState({

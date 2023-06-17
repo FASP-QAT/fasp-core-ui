@@ -597,8 +597,17 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         if (flatList[fl].level != 1) {
                                             filter2 = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
                                         }
-                                        if (filter1.length > 0 && filter2.length > 0) {
-                                            deltaPatients = filter1[0].calculatedValue - filter2[0].calculatedValue;
+                                        if (filter1.length > 0 || filter2.length > 0) {
+                                            var val1 = 0;
+                                            var val2 = 0;
+                                            if (filter1.length > 0) {
+                                                val1 = filter1[0].calculatedValue;
+                                            }
+                                            if (filter2.length > 0) {
+                                                val2 = filter2[0].calculatedValue;
+                                            }
+                                            deltaPatients = val1 - val2;
+                                            // deltaPatients = filter1[0].calculatedValue - filter2[0].calculatedValue;
                                         }
                                     }
                                     console.log("deltaPatients$$$%%%", deltaPatients);

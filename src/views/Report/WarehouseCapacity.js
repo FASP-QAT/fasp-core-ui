@@ -782,6 +782,7 @@ class warehouseCapacity extends Component {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
+                        console.log("Program Json Test@123",programJson)
                         var regionList = (programJson.regionList);
                         var realmCountry = (programJson.realmCountry);
                         var programName = (document.getElementById("programIdOffline").selectedOptions[0].text);
@@ -792,16 +793,9 @@ class warehouseCapacity extends Component {
                                 "realmCountry": realmCountry.country,
                                 "programList": [
                                     {
-                                        "id": 3,
-                                        "label": {
-                                            "active": false,
-                                            "labelId": 136,
-                                            "label_en": programName,
-                                            "label_sp": programName,
-                                            "label_fr": programName,
-                                            "label_pr": programName,
-                                        },
-                                        "code": "MWI-FRH-MOH"
+                                        "id": programJson.programId,
+                                        "label": programJson.label,
+                                        "code": programJson.programCode
                                     },
                                 ],
                                 "region": regionList[i],

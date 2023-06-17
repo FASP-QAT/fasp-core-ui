@@ -408,7 +408,7 @@ export default class QunatimedImportStepFive extends Component {
         var planningUnitFilter = json.filter(c => c.product.programPlanningUnitId != "-1");
         var dateFilter = planningUnitFilter.filter(c => moment(c.dtmPeriod).isBetween(startDate, endDate, null, '[)'))
 
-
+        var realmId = AuthenticationService.getRealmId();
         var db1;
         var storeOS;
         getDatabase();
@@ -421,6 +421,11 @@ export default class QunatimedImportStepFive extends Component {
         openRequest.onsuccess = function (e) {
 
             db1 = e.target.result;
+            var realmTransaction = db1.transaction(['realm'], 'readwrite');
+            var realmOS = realmTransaction.objectStore('realm');
+            var realmRequest = realmOS.get(realmId);
+            realmRequest.onsuccess = function (event) {
+                var realm=realmRequest.result;
             var transaction;
             var programTransaction;
 
@@ -497,7 +502,7 @@ export default class QunatimedImportStepFive extends Component {
 
                 for (var i = 0; i < finalList.length; i++) {
                     var diff = this.monthDiff(new Date(finalList[i].dtmPeriod), new Date());
-                    var isOldDate = diff < FORECASTED_CONSUMPTION_MONTHS_IN_PAST;
+                    var isOldDate = diff < (realm.forecastConsumptionMonthsInPast+1);
 
                     data_1 = [];
                     data_1[0] = finalList[i].productId;// A
@@ -567,6 +572,7 @@ export default class QunatimedImportStepFive extends Component {
 
             }.bind(this);
         }.bind(this);
+    }.bind(this);
     }
 
     render() {
