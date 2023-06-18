@@ -360,7 +360,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                     bResult = bRequest.result;
                                     budgetList.push({ id: '', name: i18n.t('static.common.select') });
                                     for (var k = 0; k < bResult.length; k++) {
-                                        if (bResult[k].program.id == generalProgramJson.programId) {
+                                        if ([...new Set(bResult[k].programs.map(ele => ele.id))].includes(parseInt(generalProgramJson.programId))) {
                                             var bJson = {
                                                 name: bResult[k].budgetCode,
                                                 id: bResult[k].budgetId,
@@ -376,7 +376,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                             currency: bResult[k].currency,
                                             budgetAmt: bResult[k].budgetAmt,
                                             active: bResult[k].active,
-                                            programId: bResult[k].program.id,
+                                            programs: bResult[k].programs,
                                             label: bResult[k].label,
                                             startDate: bResult[k].startDate,
                                             stopDate: bResult[k].stopDate
@@ -1775,7 +1775,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         var value = (this.state.shipmentsEl.getJson(null, false)[r])[16];
         if (value != "") {
             var budgetList = this.state.budgetListAll;
-            mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && b.programId == this.state.programIdForBudget && b.active.toString() == "true");
+            mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && [...new Set(b.programs.map(ele => ele.id))].includes(parseInt(this.state.programIdForBudget)) && b.active.toString() == "true");
             mylist.push({ id: '', name: i18n.t('static.common.select') })
         }
         return mylist.sort(function (a, b) {
@@ -2425,7 +2425,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             if (valid == true) {
                 var budgetList = this.state.budgetListAll;
                 var receiveDate = rowData[5]
-                var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && b.programId == this.state.programIdForBudget && b.active.toString() == "true");
+                var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value && [...new Set(b.programs.map(ele => ele.id))].includes(parseInt(this.state.programIdForBudget)) && b.active.toString() == "true");
                 if (mylist.length == 1) {
                     elInstance.setValueFromCoords(17, y, mylist[0].id, true);
                 } else if (mylist.length == 0) {

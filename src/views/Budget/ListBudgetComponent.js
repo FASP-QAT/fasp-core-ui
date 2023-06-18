@@ -595,19 +595,19 @@ class ListBudgetComponent extends Component {
 
   filterData() {
     let fundingSourceId = this.state.fundingSourceId;
-    let programId = this.state.programId;
+    let programId = parseInt(this.state.programId);
     var selStatus = this.state.statusId;
     let tempSelStatus = (selStatus == "true" ? true : false)
 
     if (fundingSourceId != 0 && programId != 0 && selStatus != "") {
-      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && c.program.id == programId && c.active == tempSelStatus)
+      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && [...new Set(c.programs.map(ele => ele.id))].includes(programId) && c.active == tempSelStatus)
       this.setState({
         selBudget: selBudget
       }, () => {
         this.buildJExcel();
       });
     } else if (fundingSourceId != 0 && programId != 0) {
-      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && c.program.id == programId)
+      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && [...new Set(c.programs.map(ele => ele.id))].includes(programId))
       this.setState({
         selBudget: selBudget
       }, () => {
@@ -621,7 +621,7 @@ class ListBudgetComponent extends Component {
         this.buildJExcel();
       });
     } else if (programId != 0 && selStatus != "") {
-      const selBudget = this.state.budgetList.filter(c => c.program.id == programId && c.active == tempSelStatus)
+      const selBudget = this.state.budgetList.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(programId) && c.active == tempSelStatus)
       this.setState({
         selBudget: selBudget
       }, () => {
@@ -635,7 +635,7 @@ class ListBudgetComponent extends Component {
         this.buildJExcel();
       });
     } else if (programId != 0) {
-      const selBudget = this.state.budgetList.filter(c => c.program.id == programId)
+      const selBudget = this.state.budgetList.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(programId))
       this.setState({
         selBudget: selBudget
       }, () => {
@@ -725,7 +725,7 @@ class ListBudgetComponent extends Component {
       data = [];
       data[0] = budgetList[j].budgetId
       // data[1] = getLabelText(budgetList[j].program.label, this.state.lang)
-      data[1] = budgetList[j].program.code
+      data[1] = ""
       data[2] = getLabelText(budgetList[j].label, this.state.lang)
       data[3] = budgetList[j].budgetCode;
       data[4] = getLabelText(budgetList[j].fundingSource.label, this.state.lang)
@@ -782,7 +782,7 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.budget.program'),
-          type: 'text',
+          type: 'hidden',
           // readOnly: true
         },
         {
