@@ -47,7 +47,7 @@ import docicon from '../../assets/img/doc.png';
 import AggregationNode from '../../assets/img/Aggregation-icon.png';
 import { saveAs } from "file-saver";
 import { convertInchesToTwip, Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
-import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculationForTreeTemplate';
+import { calculateModelingDataForTreeTemplate } from '../../views/DataSet/ModelingDataCalculationForTreeTemplate';
 import PDFDocument from 'pdfkit-nodejs-webpack';
 import blobStream from 'blob-stream';
 import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit';
@@ -58,7 +58,8 @@ import 'react-select/dist/react-select.min.css';
 import { Prompt } from 'react-router';
 import AuthenticationService from '../Common/AuthenticationService';
 import RotatedText from 'basicprimitivesreact/dist/umd/Templates/RotatedText';
-
+import CryptoJS from 'crypto-js'
+import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 
 const entityname = 'Tree Template';
 const pickerLang = {
@@ -83,6 +84,57 @@ let initialValuesNodeData = {
     nodeUnitId: "",
     percentageOfParent: ""
     // nodeValue: ""
+}
+
+const validationSchemaCreateTree = function (values) {
+    return Yup.object().shape({
+        datasetIdModalForCreateTree: Yup.string()
+            .test('datasetIdModalForCreateTree', 'Please select program',
+                function (value) {
+                    if (document.getElementById("datasetIdModalForCreateTree").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        treeNameForCreateTree: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.validation.selectTreeName')),
+        forecastMethodIdForCreateTree: Yup.string()
+            .test('forecastMethodIdForCreateTree', i18n.t('static.validation.selectForecastMethod'),
+                function (value) {
+                    if (document.getElementById("forecastMethodIdForCreateTree").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        regionIdForCreateTree: Yup.string()
+                    .required(i18n.t('static.common.regiontext'))
+                    .typeError(i18n.t('static.common.regiontext')),
+    })
+}
+
+const validateCreateTree = (getValidationSchema) => {
+    return (values) => {
+        const validationSchemaCreateTree = getValidationSchema(values)
+        try {
+            validationSchemaCreateTree.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorCreateTree(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorCreateTree = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
 }
 
 const validationSchemaNodeData = function (values) {
@@ -768,7 +820,26 @@ export default class CreateTreeTemplate extends Component {
             toggleArray: [],
             editable:AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE')?true:false,
             treeTemplateList:[],
-            treeTemplateId:this.props.match.params.templateId!=undefined && this.props.match.params.templateId!=-1?this.props.match.params.templateId:""
+            treeTemplateId:this.props.match.params.templateId!=undefined && this.props.match.params.templateId!=-1?this.props.match.params.templateId:"",
+            isModalForCreateTree:false,
+            treeNameForCreateTree:"",
+            forecastMethodForCreateTree:{
+                id:"",
+                label:{
+                    label_en:""
+                }
+            },
+            datasetIdModalForCreateTree:"",
+            regionIdForCreateTree: '',
+            regionListForCreateTree: [],
+            regionValuesForCreateTree: [],
+            missingPUListForCreateTree:[],
+            forecastMethodListForCreateTree:[],
+            datasetListForCreateTree:[],
+            programListForCreateTree:[],
+            activeForCreateTree: true,
+            datasetListJexcelForCreateTree:{},
+            treeTemplateForCreateTree:{}
 
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -875,7 +946,217 @@ export default class CreateTreeTemplate extends Component {
         this.filterUsageTemplateList = this.filterUsageTemplateList.bind(this);
         this.generateBranchFromTemplate = this.generateBranchFromTemplate.bind(this);
         this.createTree=this.createTree.bind(this)
+        this.modelOpenCloseForCreateTree=this.modelOpenCloseForCreateTree.bind(this)
     }
+
+    modelOpenCloseForCreateTree() {
+        this.setState({
+            isModalForCreateTree: !this.state.isModalForCreateTree,
+            treeNameForCreateTree:"",
+            forecastMethodForCreateTree:{
+                id:"",
+                label:{
+                    label_en:""
+                }
+            },
+            datasetIdModalForCreateTree:"",
+            regionIdForCreateTree: '',
+            regionListForCreateTree: [],
+            regionValuesForCreateTree: [],
+            missingPUListForCreateTree:[],
+            activeForCreateTree: true,
+            datasetListJexcelForCreateTree:{},
+            treeTemplateForCreateTree:{}
+        })
+    }
+
+    touchAllCreateTree(setTouched, errors) {
+        setTouched({
+            treeNameForCreateTree: true,
+            forecastMethodIdForCreateTree: true,
+            regionIdForCreateTree: true,
+            datasetIdModalForCreateTree: true
+        }
+        )
+        this.validateFormCreateTree(errors)
+    }
+
+    validateFormCreateTree(errors) {
+        this.findFirstErrorCreateTree('userForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorCreateTree(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
+    getRegionListForCreateTree(datasetId) {
+        console.log("datasetId details---", datasetId);
+
+        var regionListForCreateTree = [];
+        var regionMultiListForCreateTree = [];
+        if (datasetId != 0 && datasetId != "" && datasetId != null) {
+            var programForCreateTree = this.state.datasetListForCreateTree.filter(c=>c.id==datasetId);
+            if(programForCreateTree.length>0){
+                var databytes = CryptoJS.AES.decrypt(programForCreateTree[0].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+            regionListForCreateTree = programData.regionList;
+            regionListForCreateTree.map(c => {
+                regionMultiListForCreateTree.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
+            })
+        }
+        this.setState({
+            regionListForCreateTree,
+            regionMultiListForCreateTree,
+            missingPUListForCreateTree: [],
+            datasetListJexcelForCreateTree:programData
+        }, () => {
+                this.findMissingPUsForCreateTree();
+        });
+    }
+    }
+
+    findMissingPUsForCreateTree() {
+        var missingPUListForCreateTree = [];
+        var json;
+        var treeTemplateForCreateTree = this.state.treeTemplateForCreateTree;
+        if (this.state.datasetIdModalForCreateTree != "" && this.state.datasetIdModalForCreateTree != null) {
+            var dataset = this.state.datasetListJexcelForCreateTree;
+            var puNodeList = treeTemplateForCreateTree.flatList.filter(x => x.payload.nodeType.id == 5);
+            var planningUnitList = dataset.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
+            for (let i = 0; i < puNodeList.length; i++) {
+                if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
+                    var parentNodeData = treeTemplateForCreateTree.flatList.filter(x => x.id == puNodeList[i].parent)[0];
+                    json = {
+                        productCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory,
+                        planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
+                    };
+                    missingPUListForCreateTree.push(json);
+                }
+            }
+        }
+        if (missingPUListForCreateTree.length > 0) {
+            missingPUListForCreateTree = missingPUListForCreateTree.filter((v, i, a) => a.findIndex(v2 => (v2.planningUnit.id === v.planningUnit.id)) === i)
+        }
+        this.setState({
+            missingPUListForCreateTree
+        }, () => {
+            this.buildMissingPUJexcelForCreateTree();
+        });
+    }
+
+    buildMissingPUJexcelForCreateTree() {
+        var missingPUListForCreateTree = this.state.missingPUListForCreateTree;
+        var dataArray = [];
+        let count = 0;
+        if (missingPUListForCreateTree.length > 0) {
+            for (var j = 0; j < missingPUListForCreateTree.length; j++) {
+                data = [];
+                // data[0] = missingPUList[j].month
+                // data[1] = missingPUList[j].startValue
+                data[0] = getLabelText(missingPUListForCreateTree[j].productCategory.label, this.state.lang)
+                data[1] = getLabelText(missingPUListForCreateTree[j].planningUnit.label, this.state.lang) + " | " + missingPUListForCreateTree[j].planningUnit.id
+                dataArray[count] = data;
+                count++;
+            }
+        }
+        this.el = jexcel(document.getElementById("missingPUJexcelForCreateTree"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("missingPUJexcelForCreateTree"), true);
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [20, 80],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    // 0
+                    title: i18n.t('static.productCategory.productCategory'),
+                    type: 'test',
+                    // readOnly: true
+                },
+                {
+                    // 1
+                    title: i18n.t('static.product.product'),
+                    type: 'text',
+                    // readOnly: true
+
+                }
+
+            ],
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
+            onload: this.loadedMissingPUForCreateTree,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: false,
+            columnSorting: true,
+            // tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+
+        };
+        var missingPUJexcelForCreateTree = jexcel(document.getElementById("missingPUJexcelForCreateTree"), options);
+        this.el = missingPUJexcelForCreateTree;
+        this.setState({
+            missingPUJexcelForCreateTree
+        }
+        );
+    }
+
+    loadedMissingPUForCreateTree = function (instance, cell, x, y, value) {
+        jExcelLoadedFunctionOnlyHideRow(instance, 1);
+    }
+
+    handleRegionChangeForCreateTree = (regionIds) => {
+        console.log("regionIds---", regionIds);
+
+        this.setState({
+            regionValuesForCreateTree: regionIds.map(ele => ele),
+            // regionLabels: regionIds.map(ele => ele.label)
+        }, () => {
+            // console.log("regionLabels---", this.state.regionLabels);
+            // if ((this.state.regionValues).length > 0) {
+            var regionListForCreateTree = [];
+            var regions = this.state.regionValuesForCreateTree;
+            for (let i = 0; i < regions.length; i++) {
+                var json = {
+                    id: regions[i].value,
+                    label: {
+                        label_en: regions[i].label
+                    }
+                }
+                regionListForCreateTree.push(json);
+            }
+            this.setState({ regionListForCreateTree });
+            // }
+        })
+    }
+
     filterUsageTemplateList(forecastingUnitId) {
         var usageTemplateList;
         if (forecastingUnitId > 0) {
@@ -1102,8 +1383,8 @@ export default class CreateTreeTemplate extends Component {
                 // (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
                 (items[i].payload.nodeDataMap[0])[0].fuPerMonth = fuPerMonth;
             }
-            console.log("This.state Test@123", this.state)
-            if (items[i].payload.nodeType.id == 5) {
+            // console.log("This.state Test@123",this.state)
+            if(items[i].payload.nodeType.id==5){
                 var findNodeIndexFU = items.findIndex(n => n.id == items[i].parent);
                 var forecastingUnitId = (items[findNodeIndexFU].payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id;
                 PlanningUnitService.getActivePlanningUnitListByFUId(forecastingUnitId).then(response => {
@@ -1617,7 +1898,7 @@ export default class CreateTreeTemplate extends Component {
 
         treeTemplate.flatList = items;
         console.log("after---*", treeTemplate)
-        calculateModelingData(treeTemplate, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), 0, type, -1, true);
+        calculateModelingDataForTreeTemplate(treeTemplate, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), 0, type, -1, true);
     }
 
     updateState(parameterName, value) {
@@ -1685,12 +1966,162 @@ export default class CreateTreeTemplate extends Component {
 
 
             }
+            if (parameterName == 'programId' && value != "") {
+                try{
+                    console.log("In else if Test@123")
+                console.log("tempTreeId---", this.state.tempTreeId)
+                var programId = this.state.programId;
+                var program = this.state.datasetListJexcelForCreateTree;
+                console.log("my program---", program);
+                let tempProgram = JSON.parse(JSON.stringify(program))
+                let treeList = tempProgram.treeList;
+                var tree = treeList.filter(x => x.treeId == this.state.tempTreeId)[0];
+                console.log("my tree---", tree);
+                var items = tree.tree.flatList;
+                console.log("my items---", items);
+                var nodeDataMomList = this.state.nodeDataMomList;
+                console.log("nodeDataMomList---", nodeDataMomList);
+                if (nodeDataMomList.length > 0) {
+                    for (let i = 0; i < nodeDataMomList.length; i++) {
+                        // console.log("nodeDataMomList[i]---", nodeDataMomList[i])
+                        var nodeId = nodeDataMomList[i].nodeId;
+                        var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
+                        // console.log("this.state.nodeDataMomList---", this.state.nodeDataMomList);
+                        // console.log("my items---", items);
+                        // console.log("my nodeId---", nodeId);
+                        var node = items.filter(n => n.id == nodeId)[0];
+                        // console.log("node---", node);
+                        (node.payload.nodeDataMap[1])[0].nodeDataMomList = nodeDataMomListForNode;
+                        var findNodeIndex = items.findIndex(n => n.id == nodeId);
+                        // console.log("findNodeIndex---", findNodeIndex);
+                        items[findNodeIndex] = node;
+                    }
+                }
+                tree.flatList = items;
+                console.log("TempTreeId Test@123",this.state.tempTreeId)
+                var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);
+                console.log("Tree Test@123",tree)
+                console.log("findTreeIndex---", findTreeIndex);
+                treeList[findTreeIndex] = tree;
+                tempProgram.treeList = treeList;
+                var programCopy = JSON.parse(JSON.stringify(tempProgram));
+                var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
+                tempProgram.programData = programData;
+                // var treeTemplateId = document.getElementById('templateId').value;
+                this.saveTreeData(3, tempProgram, this.state.treeTemplate.treeTemplateId, programId, this.state.tempTreeId, programCopy);
+            }catch(error){
+                console.log("Error Test@123",error)
+            }
+            }
             this.updateTreeData(this.state.monthId);
             if (parameterName == 'type' && value == 0) {
                 this.calculateValuesForAggregateNode(this.state.items);
             }
             console.log("returmed list---", this.state.nodeDataMomList);
         })
+    }
+
+    saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy) {
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var version = tempProgram.currentVersion.versionId;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+            var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
+            var id = tempProgram.programId + "_v" + version + "_uId_" + userId;
+            var json = {
+                id: id,
+                programCode: tempProgram.programCode,
+                versionList: tempProgram.versionList,
+                programData: programData,
+                programId: tempProgram.programId,
+                version: version,
+                programName: (CryptoJS.AES.encrypt(JSON.stringify((tempProgram.label)), SECRET_KEY)).toString(),
+                userId: userId
+            }
+            var programRequest = programTransaction.put(json);
+
+            transaction.oncomplete = function (event) {
+                console.log("in side datasetDetails")
+                db1 = e.target.result;
+                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetIdModalForCreateTree);
+                datasetDetailsRequest.onsuccess = function (e) {         
+                  var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                  datasetDetailsRequestJson.changed = 1;
+                  var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                  datasetDetailsRequest1.onsuccess = function (event) {
+
+                      }}
+                this.setState({
+                    loading: false,
+                    message: i18n.t('static.mt.dataUpdateSuccess'),
+                    color: "green",
+                }, () => {
+
+                    if (operationId == 3) {
+                        // if (treeTemplateId != "" && treeTemplateId != null) {
+                        //     console.log("programId 1---", programId);
+                        //     calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false);
+                        // } else {
+                        confirmAlert({
+                            message: i18n.t('static.listTree.manageTreePage'),
+                            buttons: [
+                                {
+                                    label: i18n.t('static.program.yes'),
+                                    onClick: () => {
+                                        this.props.history.push({
+                                            pathname: `/dataSet/buildTree/tree/${treeId}/${id}`,
+                                            // state: { role }
+                                        });
+
+                                    }
+                                },
+                                {
+                                    label: i18n.t('static.program.no'),
+                                    onClick: () => {
+                                        // this.getDatasetList();
+                                        this.componentDidMount();
+                                    }
+                                }
+                            ]
+                        });
+                        // }
+                    } else {
+                        // this.getDatasetList();
+                        // this.getPrograms();
+                    }
+
+                });
+                console.log("Data update success1");
+                // alert("success");
+
+
+            }.bind(this);
+            transaction.onerror = function (event) {
+                this.setState({
+                    loading: false,
+                    color: "red",
+                }, () => {
+                    this.hideSecondComponent();
+                });
+                console.log("Data update errr");
+            }.bind(this);
+        }.bind(this);
+
     }
 
     updateMomDataInDataSet() {
@@ -1743,7 +2174,7 @@ export default class CreateTreeTemplate extends Component {
                         treeTemplate
                     }, () => {
                         console.log("treeTemplate mom---", treeTemplate);
-                        calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
+                        calculateModelingDataForTreeTemplate(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
                     });
                 });
 
@@ -4565,10 +4996,160 @@ export default class CreateTreeTemplate extends Component {
     }
 
     createTree(){
-        this.props.history.push({
-            pathname: `/dataSet/listTreeTemplate/`,
-            state: { "treeTemplateId":this.state.treeTemplateId }
-        });
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+            var planningunitTransaction = db1.transaction(['forecastMethod'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('forecastMethod');
+            var planningunitRequest = planningunitOs.getAll();
+            planningunitRequest.onsuccess = function (e) {
+
+                var programTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+            var programOs = programTransaction.objectStore('datasetDetails');
+            var programRequest = programOs.getAll();
+            programRequest.onsuccess = function (e) {
+
+                var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
+            var datasetOs = datasetTransaction.objectStore('datasetData');
+            var datasetRequest = datasetOs.getAll();
+            datasetRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                console.log("myResult===============2", myResult)
+                this.setState({
+                    forecastMethodListForCreateTree: myResult.filter(x => x.forecastMethodTypeId == 1),
+                    programListForCreateTree:programRequest.result.filter(c=>c.userId==userId),
+                    datasetListForCreateTree:datasetRequest.result.filter(c=>c.userId==userId)
+                }, () => {
+
+                    this.setState({
+                        isModalForCreateTree:!this.state.isModalForCreateTree,
+                        treeTemplateForCreateTree:this.state.treeTemplate,
+                        treeNameForCreateTree: this.state.treeTemplate.label.label_en,
+                        activeForCreateTree: this.state.treeTemplate.active,
+                        forecastMethodForCreateTree: this.state.treeTemplate.forecastMethod,
+                        regionIdForCreateTree: '',
+                        regionListForCreateTree: [],
+                        regionValuesForCreateTree: [],
+                        notesForCreateTree: this.state.treeTemplate.notes,
+                        missingPUListForCreateTree: [],
+                        datasetIdModalForCreateTree:""
+                    },()=>{
+                        if(this.state.programListForCreateTree.length==1){
+                            var event={
+                                target:{
+                                    name:"datasetIdModalForCreateTree",
+                                    value:this.state.programListForCreateTree[0].id,
+                                }
+                            }
+                            this.dataChange(event)
+                        }
+                    })
+                })
+            }.bind(this);
+        }.bind(this);
+        }.bind(this);
+        }.bind(this)
+    }
+
+    createTreeForCreateTree(){
+        // var program = this.state.treeFlag ? (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]) : (this.state.datasetList.filter(x => x.id == programId)[0]);
+        var program = this.state.datasetListJexcelForCreateTree;
+        let tempProgram = JSON.parse(JSON.stringify(program))
+        let treeList = program.treeList;
+        console.log("delete treeList---", treeList);
+        var treeTemplateId = '';
+        var treeId=""
+        var maxTreeId = treeList.length > 0 ? Math.max(...treeList.map(o => o.treeId)) : 0;
+            treeId = parseInt(maxTreeId) + 1;
+            var nodeDataMap = {};
+            var tempArray = [];
+            var tempJson = {};
+            var tempTree = {};
+            // var curMonth = moment(new Date()).format('YYYY-MM-DD');
+            // console
+            var curMonth = moment(program.currentVersion.forecastStartDate).format('YYYY-MM-DD');
+            // treeTemplateId = document.getElementById('templateId').value;
+            // console.log("treeTemplateId===", treeTemplateId);
+            // if (treeTemplateId != "" && treeTemplateId != 0) {
+                var treeTemplate = this.state.treeTemplateForCreateTree;
+                // console.log("treeTemplate 123----", treeTemplate);
+                var flatList = JSON.parse(JSON.stringify(treeTemplate.flatList));
+                for (let i = 0; i < flatList.length; i++) {
+                    nodeDataMap = {};
+                    tempArray = [];
+                    if (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
+                        for (let j = 0; j < flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length; j++) {
+                            var modeling = (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j];
+                            // var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
+                            // var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
+                            var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
+                            console.log("startMonthNoModeling---", startMonthNoModeling);
+                            modeling.startDate = moment(curMonth).startOf('month').add(startMonthNoModeling, 'months').format("YYYY-MM-DD");
+                            var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
+                            console.log("stopMonthNoModeling---", stopMonthNoModeling);
+                            modeling.stopDate = moment(curMonth).startOf('month').add(stopMonthNoModeling, 'months').format("YYYY-MM-DD");
+
+
+                            console.log("modeling---", modeling);
+                            (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j] = modeling;
+                        }
+                    }
+                    // console.log("flatList[i]---", flatList[i]);
+                    tempJson = flatList[i].payload.nodeDataMap[0][0];
+                    if (flatList[i].payload.nodeType.id != 1) {
+                        // console.log("month from tree template---", flatList[i].payload.nodeDataMap[0][0].monthNo + " cur month---", curMonth + " final result---", moment(curMonth).startOf('month').add(flatList[i].payload.nodeDataMap[0][0].monthNo, 'months').format("YYYY-MM-DD"))
+                        var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo - 1)
+                        tempJson.month = moment(curMonth).startOf('month').add(monthNo, 'months').format("YYYY-MM-DD");
+                    }
+                    tempArray.push(tempJson);
+                    nodeDataMap[1] = tempArray;
+                    flatList[i].payload.nodeDataMap = nodeDataMap;
+                }
+                // console.log("treeTemplate@@@@@@@@@@@@@@",treeTemplate)
+                tempTree = {
+                    treeId: treeId,
+                    active: this.state.activeForCreateTree,
+                    forecastMethod: this.state.forecastMethodForCreateTree,
+                    label: {
+                        label_en: this.state.treeNameForCreateTree,
+                        label_fr: '',
+                        label_sp: '',
+                        label_pr: ''
+                    },
+                    notes: this.state.notesForCreateTree,
+                    regionList: this.state.regionListForCreateTree,
+                    levelList: treeTemplate.levelList,
+                    scenarioList: [{
+                        id: 1,
+                        label: {
+                            label_en: i18n.t('static.realm.default'),
+                            label_fr: '',
+                            label_sp: '',
+                            label_pr: ''
+                        },
+                        active: true,
+                        notes: ''
+                    }],
+                    tree: {
+                        flatList: flatList
+                    }
+                }
+                treeList.push(tempTree);
+        // }
+        console.log("TreeList@@@@@@@@@@@@@@", treeList)
+        tempProgram.treeList = treeList;
+        var programCopy = JSON.parse(JSON.stringify(tempProgram));
+        // var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
+        // tempProgram = programData;
+        // if (operationId == 3) {
+            programCopy.programData = tempProgram;
+            calculateModelingData(programCopy, this, this.state.datasetIdModalForCreateTree, 0, 1, 1, treeId, false, true,true);
     }
 
 
@@ -6657,6 +7238,59 @@ export default class CreateTreeTemplate extends Component {
         console.log("event---", event);
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
+        if (event.target.name == "treeNameForCreateTree") {
+            this.setState({
+                treeNameForCreateTree: event.target.value,
+            });
+        }
+
+        if (event.target.name == "forecastMethodIdForCreateTree") {
+            var forecastMethodForCreateTree = document.getElementById("forecastMethodIdForCreateTree");
+            var selectedTextForCreateTree = forecastMethodForCreateTree.options[forecastMethodForCreateTree.selectedIndex].text;
+            let label = {
+                label_en: selectedTextForCreateTree,
+                label_fr: '',
+                label_sp: '',
+                label_pr: ''
+            }
+            this.setState({
+                forecastMethodForCreateTree: {
+                    id: event.target.value,
+                    label: label
+                },
+            });
+        }
+
+        if (event.target.name == "notesForCreateTree") {
+            this.setState({
+                notesForCreateTree: event.target.value,
+            });
+        }
+        if (event.target.name == "activeForCreateTree") {
+            this.setState({
+                activeForCreateTree: event.target.id === "active11ForCreateTree" ? false : true
+            });
+
+        }
+
+        if (event.target.name == "datasetIdModalForCreateTree") {
+            // var realmCountryId = "";
+            if (event.target.value != "") {
+                // var program = (this.state.datasetList.filter(x => x.id == event.target.value)[0]);
+                // console.log("program for display---",program);
+                // realmCountryId = program.programData.realmCountry.realmCountryId;
+            }
+            this.setState({
+                // realmCountryId,
+                datasetIdModalForCreateTree: event.target.value,
+            }, () => {
+                localStorage.setItem("sesDatasetId", event.target.value);
+                this.getRegionListForCreateTree(event.target.value);
+                // if (document.getElementById('templateId').value != "") {
+                //     this.findMissingPUs();
+                // }
+            });
+        }
 
         if (event.target.name === "branchTemplateId") {
             this.setState({ branchTemplateId: event.target.value }, () => {
@@ -10137,6 +10771,26 @@ export default class CreateTreeTemplate extends Component {
             entries: " ",
         });
 
+        const { programListForCreateTree } = this.state;    
+            let downloadedDatasetsForCreateTree = programListForCreateTree.length > 0
+            && programListForCreateTree.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>
+                        {item.programCode+"~v"+item.version}
+                    </option>
+                )
+            }, this);
+        const { forecastMethodListForCreateTree } = this.state;
+        let forecastMethodsForCreateTree = forecastMethodListForCreateTree.length > 0
+            && forecastMethodListForCreateTree.map((item, i) => {
+                return (
+                    <option key={i} value={item.forecastMethodId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+
         const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
             const opacity = isDragging ? 0.4 : 1
             let itemTitleColor = Colors.RoyalBlue;
@@ -11030,7 +11684,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
-                                                            <FormGroup className="col-md-3 pl-lg-0">
+                                                            {treeTemplateList.length>0 && <FormGroup className="col-md-3 pl-lg-0">
                                                                     <Label htmlFor="languageId">{i18n.t('static.dataset.TreeTemplate')}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
@@ -11045,8 +11699,8 @@ export default class CreateTreeTemplate extends Component {
                                                                         {treeTemplates}
                                                                     </Input>
                                                                     <FormFeedback>{errors.forecastMethodId}</FormFeedback>
-                                                                </FormGroup>
-                                                                <div className="col-md-9"></div>
+                                                                </FormGroup>}
+                                                                {treeTemplateList.length>0 && <div className="col-md-9"></div>}
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
                                                                     <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
@@ -11574,6 +12228,243 @@ export default class CreateTreeTemplate extends Component {
                             </Form>
                         )} />
             </Modal>
+            <Modal isOpen={this.state.isModalForCreateTree}
+                        className={'modal-lg ' + this.props.className}>
+                        <ModalHeader>
+                            <strong>{i18n.t('static.listTree.treeDetails')}</strong>
+                            <Button size="md" onClick={this.modelOpenCloseForCreateTree} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                        </ModalHeader>
+                        <ModalBody className='pb-lg-0'>
+                            {/* <h6 className="red" id="div3"></h6> */}
+                            <Col sm={12} style={{ flexBasis: 'auto' }}>
+                                {/* <Card> */}
+                                <Formik
+                                    initialValues={{
+                                        treeNameForCreateTree: this.state.treeNameForCreateTree,
+                                        forecastMethodIdForCreateTree: this.state.forecastMethodForCreateTree.id,
+                                        datasetIdModalForCreateTree: this.state.datasetIdModalForCreateTree,
+                                        regionIdForCreateTree: this.state.regionValuesForCreateTree
+                                    }}
+                                    validate={validate(validationSchemaCreateTree)}
+                                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                                            this.setState({ loading: true }, () => {
+                                                this.createTreeForCreateTree();
+                                                this.setState({
+                                                    isModalForCreateTree: !this.state.isModalForCreateTree,
+                                                    // treeName:"",
+                                                    // forecastMethod:{
+                                                    //     id:"",
+                                                    //     label:{
+                                                    //         label_en:""
+                                                    //     }
+                                                    // },
+                                                    // datasetIdModal:"",
+                                                    // regionId: '',
+                                                    // regionList: [], 
+                                                    // regionValues: [],
+                                                    // missingPUList:[],
+                                                    // active: true,
+                                                    // datasetListJexcel:{},
+                                                    // treeTemplate:{}
+                                                })
+                                            })
+
+                                    }}
+
+
+                                    render={
+                                        ({
+                                            values,
+                                            errors,
+                                            touched,
+                                            handleChange,
+                                            handleBlur,
+                                            handleSubmit,
+                                            isSubmitting,
+                                            isValid,
+                                            setTouched,
+                                            handleReset,
+                                            setFieldValue,
+                                            setFieldTouched
+                                        }) => (
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                                {/* <CardBody> */}
+                                                <div className="col-md-12">
+                                                    <div className="">
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
+
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="datasetIdModalForCreateTree"
+                                                                        id="datasetIdModalForCreateTree"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.datasetIdModalForCreateTree && this.state.datasetIdModalForCreateTree != null ? this.state.datasetIdModalForCreateTree : '' != ''}
+                                                                        invalid={touched.datasetIdModalForCreateTree && !!errors.datasetIdModalForCreateTree}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        value={this.state.datasetIdModalForCreateTree}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.mt.selectProgram')}</option>
+                                                                        {downloadedDatasetsForCreateTree}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.datasetIdModalForCreateTree}</FormFeedback>
+                                                                </div>
+
+                                                            </FormGroup>
+
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
+
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="forecastMethodIdForCreateTree"
+                                                                        id="forecastMethodIdForCreateTree"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.forecastMethodIdForCreateTree && this.state.forecastMethodForCreateTree.id != null ? this.state.forecastMethodForCreateTree.id : '' != ''}
+                                                                        invalid={touched.forecastMethodIdForCreateTree && !!errors.forecastMethodIdForCreateTree}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        required
+                                                                        value={this.state.forecastMethodForCreateTree.id}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.forecastmethod')}</option>
+                                                                        {forecastMethodsForCreateTree}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.forecastMethodIdForCreateTree}</FormFeedback>
+                                                                </div>
+
+                                                            </FormGroup>
+                                                        </div>
+                                                    </div>
+                                                    <div className="row">
+                                                        <FormGroup className={"col-md-6"}>
+                                                            <Label for="number1">{i18n.t('static.common.treeName')}<span className="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
+                                                                <Input type="text"
+                                                                    bsSize="sm"
+                                                                    name="treeNameForCreateTree"
+                                                                    id="treeNameForCreateTree"
+                                                                    valid={!errors.treeNameForCreateTree && this.state.treeNameForCreateTree != ''}
+                                                                    invalid={touched.treeNameForCreateTree && !!errors.treeNameForCreateTree}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                    value={this.state.treeNameForCreateTree}
+                                                                />
+                                                                <FormFeedback className="red">{errors.treeNameForCreateTree}</FormFeedback>
+                                                            </div>
+
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6" >
+                                                            <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
+                                                                <Select
+                                                                    className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                        { 'is-valid': !errors.regionIdForCreateTree },
+                                                                        { 'is-invalid': (touched.regionIdForCreateTree && !!errors.regionIdForCreateTree || this.state.regionValuesForCreateTree.length == 0) }
+                                                                    )}
+                                                                    bsSize="sm"
+                                                                    onChange={(e) => {
+                                                                        handleChange(e);
+                                                                        setFieldValue("regionIdForCreateTree", e);
+                                                                        this.handleRegionChangeForCreateTree(e);
+                                                                    }}
+                                                                    onBlur={() => setFieldTouched("regionIdForCreateTree", true)}
+                                                                    multi
+                                                                    options={this.state.regionMultiListForCreateTree}
+                                                                    value={this.state.regionValuesForCreateTree}
+                                                                />
+                                                                <FormFeedback>{errors.regionIdForCreateTree}</FormFeedback>
+                                                            </div>
+
+                                                        </FormGroup>
+                                                    </div>
+                                                    <div >
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                                <div className="controls">
+                                                                    <Input type="textarea"
+                                                                        id="notesForCreateTree"
+                                                                        name="notesForCreateTree"
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        value={this.state.notesForCreateTree}
+                                                                    ></Input>
+                                                                </div>
+
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-6 mt-lg-4">
+                                                                <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active10ForCreateTree"
+                                                                        name="activeForCreateTree"
+                                                                        value={true}
+                                                                        checked={this.state.activeForCreateTree === true}
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio1">
+                                                                        {i18n.t('static.common.active')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active11ForCreateTree"
+                                                                        name="activeForCreateTree"
+                                                                        value={false}
+                                                                        checked={this.state.activeForCreateTree === false}
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        {i18n.t('static.common.disabled')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                            </FormGroup>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                        <div style={{ display: this.state.missingPUListForCreateTree.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
+                                                            <div id="missingPUJexcelForCreateTree" className="RowClickable">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseForCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        &nbsp;
+
+                                                    </FormGroup>
+                                                </div>
+
+                                                {/* <CardFooter>
+                                                        <FormGroup>
+                                                            <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+                                                        </FormGroup>
+                                                    </CardFooter> */}
+                                            </Form>
+
+                                        )} />
+
+                                {/* </Card> */}
+                            </Col>
+                            <br />
+                        </ModalBody>
+                    </Modal>
         </div>
     }
 }
