@@ -3025,7 +3025,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var bRequest = bOs.getAll();
                                     bRequest.onsuccess = function (event) {
                                         var bResult = [];
-                                        bResult = bRequest.result.filter(c => c.program.id == generalProgramJson.programId);
+                                        bResult = bRequest.result.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(parseInt(generalProgramJson.programId)));
                                         this.setState({
                                             budgetListForWhatIf: bResult
                                         })
