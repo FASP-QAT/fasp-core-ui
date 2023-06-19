@@ -156,7 +156,7 @@ class Budgets extends Component {
             programValues: [],
             programLabels: [],
             programs: [],
-            versions: [],
+            // versions: [],
             show: false,
             loading: true,
             // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
@@ -167,6 +167,7 @@ class Budgets extends Component {
             fundingSourceLabels: [],
             fundingSources: [],
             programId: '',
+            programValues: [],
             jexcelDataEl: ""
         }
 
@@ -181,8 +182,8 @@ class Budgets extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
-        this.setProgramId = this.setProgramId.bind(this);
-        this.setVersionId = this.setVersionId.bind(this);
+        // this.setProgramId = this.setProgramId.bind(this);
+        // this.setVersionId = this.setVersionId.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
 
     }
@@ -211,12 +212,16 @@ class Budgets extends Component {
                     console.log("json===>", JSON.stringify(response.data))
                     this.setState({
                         fundingSources: response.data, loading: false
-                    }, () => { this.consolidatedFundingSourceList() })
+                    }, () => {
+                        // this.consolidatedFundingSourceList()
+                    })
                 }).catch(
                     error => {
                         this.setState({
                             fundingSources: [], loading: false
-                        }, () => { this.consolidatedFundingSourceList() })
+                        }, () => {
+                            // this.consolidatedFundingSourceList()
+                        })
                         if (error.message === "Network Error") {
                             this.setState({
                                 // message: error.message, 
@@ -242,66 +247,66 @@ class Budgets extends Component {
 
         } else {
             console.log('offline')
-            this.consolidatedFundingSourceList()
+            // this.consolidatedFundingSourceList()
             this.setState({ loading: false })
         }
 
     }
 
-    consolidatedFundingSourceList = () => {
-        const lan = 'en';
-        const { fundingSources } = this.state
-        var proList = fundingSources;
+    // consolidatedFundingSourceList = () => {
+    //     const lan = 'en';
+    //     const { fundingSources } = this.state
+    //     var proList = fundingSources;
 
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['fundingSource'], 'readwrite');
-            var fundingSource = transaction.objectStore('fundingSource');
-            var getRequest = fundingSource.getAll();
+    //     var db1;
+    //     getDatabase();
+    //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    //     openRequest.onsuccess = function (e) {
+    //         db1 = e.target.result;
+    //         var transaction = db1.transaction(['fundingSource'], 'readwrite');
+    //         var fundingSource = transaction.objectStore('fundingSource');
+    //         var getRequest = fundingSource.getAll();
 
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
+    //         getRequest.onerror = function (event) {
+    //             // Handle errors!
+    //         };
+    //         getRequest.onsuccess = function (event) {
+    //             var myResult = [];
+    //             myResult = getRequest.result;
+    //             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+    //             var userId = userBytes.toString(CryptoJS.enc.Utf8);
+    //             for (var i = 0; i < myResult.length; i++) {
 
-                    var f = 0
-                    for (var k = 0; k < this.state.fundingSources.length; k++) {
-                        if (this.state.fundingSources[k].id == myResult[i].fundingSourceId) {
-                            f = 1;
-                            console.log('already exist')
-                        }
-                    }
-                    var programData = {
-                        id: myResult[i].fundingSourceId,
-                        code: myResult[i].fundingSourceCode,
-                        label: myResult[i].label
-                    };
-                    if (f == 0) {
-                        proList.push(programData)
-                    }
+    //                 var f = 0
+    //                 for (var k = 0; k < this.state.fundingSources.length; k++) {
+    //                     if (this.state.fundingSources[k].id == myResult[i].fundingSourceId) {
+    //                         f = 1;
+    //                         console.log('already exist')
+    //                     }
+    //                 }
+    //                 var programData = {
+    //                     id: myResult[i].fundingSourceId,
+    //                     code: myResult[i].fundingSourceCode,
+    //                     label: myResult[i].label
+    //                 };
+    //                 if (f == 0) {
+    //                     proList.push(programData)
+    //                 }
 
-                }
+    //             }
 
-                this.setState({
-                    fundingSources: proList.sort(function (a, b) {
-                        a = a.code.toLowerCase();
-                        b = b.code.toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    })
-                })
+    //             this.setState({
+    //                 fundingSources: proList.sort(function (a, b) {
+    //                     a = a.code.toLowerCase();
+    //                     b = b.code.toLowerCase();
+    //                     return a < b ? -1 : a > b ? 1 : 0;
+    //                 })
+    //             })
 
-            }.bind(this);
+    //         }.bind(this);
 
-        }.bind(this);
-    }
+    //     }.bind(this);
+    // }
 
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -339,8 +344,9 @@ class Budgets extends Component {
 
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('ststatic.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        this.state.programLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+        // csvRow.push('"' + (i18n.t('ststatic.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         this.state.fundingSourceLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
 
@@ -409,12 +415,14 @@ class Budgets extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                        align: 'left'
-                    })
+                    // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    //     align: 'left'
+                    // })
+                    var programText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 150, programText)
+                    // doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    //     align: 'left'
+                    // })
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 150, fundingSourceText)
 
@@ -474,284 +482,282 @@ class Budgets extends Component {
     filterData() {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-        let programId = document.getElementById('programId').value
-        let versionId = document.getElementById('versionId').value
+        let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString())
+        // let versionId = document.getElementById('versionId').value
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
 
         // console.log('programIds.length', programIds.length)
-        if (programId.length != 0 && versionId != 0 && this.state.fundingSourceValues.length > 0) {
-            localStorage.setItem("sesVersionIdReport", versionId);
-            if (versionId.includes('Local')) {
-                this.setState({ loading: true })
+        if (this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0) {
+            // localStorage.setItem("sesVersionIdReport", versionId);
+            // if (versionId.includes('Local')) {
+            //     this.setState({ loading: true })
 
-                var db1;
-                getDatabase();
-                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            //     var db1;
+            //     getDatabase();
+            //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
 
-                var procurementAgentList = [];
-                var fundingSourceList = [];
-                var budgetList = [];
+            //     var procurementAgentList = [];
+            //     var fundingSourceList = [];
+            //     var budgetList = [];
 
-                openRequest.onerror = function (event) {
+            //     openRequest.onerror = function (event) {
+            //         this.setState({
+            //             loading: false
+            //         })
+            //     }.bind(this);
+            //     openRequest.onsuccess = function (e) {
+            //         db1 = e.target.result;
+
+            //         var budgetTransaction = db1.transaction(['budget'], 'readwrite');
+            //         var budgetOs = budgetTransaction.objectStore('budget');
+            //         var budgetRequest = budgetOs.getAll();
+
+            //         budgetRequest.onerror = function (event) {
+            //             this.setState({
+            //                 loading: false
+            //             })
+            //         }.bind(this);
+            //         budgetRequest.onsuccess = function (event) {
+            //             var budgetResult = [];
+            //             budgetResult = budgetRequest.result;
+            //             console.log('B*******', budgetResult)
+            //             for (var k = 0, j = 0; k < budgetResult.length; k++) {
+            //                 console.log("B** funding source ---", this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId));
+            //                 console.log("B** moment ---", moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)'))
+            //                 // if (budgetResult[k].program.id == programId && moment().range(startDate, endDate)  moment(budgetResult[k].startDate).isBetween(startDate, endDate) && (this.state.fundingSourceValues.filter(c=>c.value==budgetResult[k].fundingSource.fundingSourceId)).length>0 )
+            //                 if (budgetResult[k].programs[0].id == programId && ((budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) || (budgetResult[k].stopDate >= startDate && budgetResult[k].stopDate <= endDate) || (startDate >= budgetResult[k].startDate && startDate <= budgetResult[k].stopDate)) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
+            //                     budgetList[j++] = budgetResult[k]
+            //             }
+            //             console.log("budgetList---", budgetList);
+            //             console.log("B** budget 1 ---", budgetList);
+            //             var transaction = db1.transaction(['programData'], 'readwrite');
+            //             var programTransaction = transaction.objectStore('programData');
+            //             var version = (versionId.split('(')[0]).trim()
+            //             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+            //             var userId = userBytes.toString(CryptoJS.enc.Utf8);
+            //             var program = `${programId}_v${version}_uId_${userId}`
+            //             var data = [];
+            //             var programRequest = programTransaction.get(program);
+
+            //             programRequest.onerror = function (event) {
+            //                 this.setState({
+            //                     loading: false
+            //                 })
+            //             }.bind(this);
+            //             programRequest.onsuccess = function (event) {
+            //                 // var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+            //                 // var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
+            //                 // var programDataRequest = programDataOs.get(program);
+            //                 // programDataRequest.onsuccess = function (event) {
+
+            //                 //     var planningUnitProgramDataList = programDataRequest.result.programData.planningUnitDataList;
+            //                 //     var programDataShipmentList = [];
+            //                 //     for (var pu = 0; pu < planningUnitProgramDataList.length; pu++) {
+            //                 //         var planningUnitData = planningUnitProgramDataList[pu];
+            //                 //         var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+            //                 //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            //                 //         var programJson = JSON.parse(programData);
+            //                 //         var sList = programJson.shipmentList;
+            //                 //         programDataShipmentList = programDataShipmentList.concat(sList);
+            //                 //     }
+            //                 //     for (var l = 0; l < budgetList.length; l++) {
+            //                 //         shipmentList = programDataShipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+            //                 //         shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
+            //                 //         var plannedShipmentbudget = 0;
+            //                 //         (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
+            //                 //             console.log(ele)
+            //                 //             plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
+            //                 //         });
+            //                 //         var OrderedShipmentbudget = 0;
+            //                 //         var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
+            //                 //         shiplist.map(ele => {
+            //                 //             console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
+            //                 //             OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
+            //                 //         });
+            //                 //         oldShipmentbudget = ((plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) + (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd))
+            //                 //     }
+            //                 // }.bind(this);
+
+
+            //                 var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+            //                 var shipmentList = [];
+            //                 for (var pu = 0; pu < planningUnitDataList.length; pu++) {
+            //                     var planningUnitData = planningUnitDataList[pu];
+            //                     var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+            //                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            //                     var programJson = JSON.parse(programData);
+            //                     var sList = programJson.shipmentList;
+            //                     shipmentList = shipmentList.concat(sList);
+            //                 }
+            //                 console.log("B** program json ---", programJson);
+            //                 for (var l = 0; l < budgetList.length; l++) {
+            //                     shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+            //                     shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
+            //                     console.log("B** shipment list ---", shipmentList);
+            //                     var plannedShipmentbudget = 0;
+            //                     (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
+            //                         plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
+            //                     });
+            //                     console.log("B** planned shipment budget ---", plannedShipmentbudget);
+            //                     var OrderedShipmentbudget = 0;
+            //                     var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
+            //                     console.log("B** shiplist ---", shiplist);
+            //                     shiplist.map(ele => {
+            //                         console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
+            //                         OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
+            //                     });
+
+            //                     var remainingbudget = Math.floor(budgetList[l].budgetAmt - (OrderedShipmentbudget + plannedShipmentbudget))
+
+
+            //                     console.log("B** order shipment budget ---", remainingbudget);
+            //                     console.log("B** budget list l ==>", budgetList[l]);
+            //                     var json = {
+            //                         budget: { id: budgetList[l].budgetId, label: budgetList[l].label, code: budgetList[l].budgetCode },
+            //                         program: { id: budgetList[l].programs.id, label: budgetList[l].programs.label, code: programJson.programCode },
+            //                         fundingSource: { id: budgetList[l].fundingSource.fundingSourceId, label: budgetList[l].fundingSource.label, code: budgetList[l].fundingSource.fundingSourceCode },
+            //                         currency: budgetList[l].currency,
+            //                         // plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+            //                         // orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
+            //                         plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
+            //                         orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
+            //                         startDate: budgetList[l].startDate,
+            //                         stopDate: budgetList[l].stopDate,
+            //                         budgetAmt: budgetList[l].budgetAmt,
+            //                         remainingBudgetAmtUsd: (budgetList[l].budgetUsdAmt - budgetList[l].usedUsdAmt)
+
+            //                     }
+
+            //                     data.push(json)
+            //                     console.log("B** json ---", json);
+            //                 }
+            //                 console.log("B** data ---", data);
+
+            //                 data.sort(function (a, b) {
+            //                     var keyA = new Date(a.startDate),
+            //                         keyB = new Date(b.startDate);
+            //                     // Compare the 2 dates
+            //                     if (keyA < keyB) return -1;
+            //                     if (keyA > keyB) return 1;
+            //                     return 0;
+            //                 });
+            //                 data.sort(function (a, b) {
+            //                     var keyA1 = new Date(a.startDate),
+            //                         keyA11 = new Date(a.stopDate),
+            //                         keyB1 = new Date(b.startDate),
+            //                         keyB11 = new Date(b.stopDate);
+            //                     // Compare the 2 dates
+            //                     if (keyA1.getTime() === keyB1.getTime()) {
+            //                         if (keyA11 < keyB11) return -1;
+            //                         if (keyA11 > keyB11) return 1;
+            //                     }
+            //                     return 0;
+            //                 });
+
+            //                 console.log("data---->", data);
+            //                 this.setState({
+            //                     selBudget: data,
+            //                     message: '',
+            //                     loading: false
+            //                 }, () => {
+            //                     this.buildJexcel()
+            //                 })
+
+
+
+            //             }.bind(this)
+
+
+            //         }.bind(this)
+            //     }.bind(this)
+
+            // } else {
+            this.setState({ loading: true })
+            // var inputjson = { "programId": programId, "versionId": versionId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
+            var inputjson = { "programIds": programId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
+            console.log("Input Json Test@123", inputjson)
+            // AuthenticationService.setupAxiosInterceptors();
+            ReportService.budgetReport(inputjson)
+                .then(response => {
+                    console.log("BudgetData--------", response.data);
                     this.setState({
-                        loading: false
+                        selBudget: response.data, message: '', loading: false
+                    }, () => {
+                        this.buildJexcel();
                     })
-                }.bind(this);
-                openRequest.onsuccess = function (e) {
-                    db1 = e.target.result;
-
-                    var budgetTransaction = db1.transaction(['budget'], 'readwrite');
-                    var budgetOs = budgetTransaction.objectStore('budget');
-                    var budgetRequest = budgetOs.getAll();
-
-                    budgetRequest.onerror = function (event) {
+                }).catch(
+                    error => {
                         this.setState({
-                            loading: false
+                            selBudget: [], loading: false
                         })
-                    }.bind(this);
-                    budgetRequest.onsuccess = function (event) {
-                        var budgetResult = [];
-                        budgetResult = budgetRequest.result;
-                        console.log('B*******', budgetResult)
-                        for (var k = 0, j = 0; k < budgetResult.length; k++) {
-                            console.log("B** funding source ---", this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId));
-                            console.log("B** moment ---", moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)'))
-                            // if (budgetResult[k].program.id == programId && moment().range(startDate, endDate)  moment(budgetResult[k].startDate).isBetween(startDate, endDate) && (this.state.fundingSourceValues.filter(c=>c.value==budgetResult[k].fundingSource.fundingSourceId)).length>0 )
-                            if (budgetResult[k].programs[0].id == programId && ((budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) || (budgetResult[k].stopDate >= startDate && budgetResult[k].stopDate <= endDate) || (startDate >= budgetResult[k].startDate && startDate <= budgetResult[k].stopDate)) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
-                                budgetList[j++] = budgetResult[k]
-                        }
-                        console.log("budgetList---", budgetList);
-                        console.log("B** budget 1 ---", budgetList);
-                        var transaction = db1.transaction(['programData'], 'readwrite');
-                        var programTransaction = transaction.objectStore('programData');
-                        var version = (versionId.split('(')[0]).trim()
-                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                        var program = `${programId}_v${version}_uId_${userId}`
-                        var data = [];
-                        var programRequest = programTransaction.get(program);
-
-                        programRequest.onerror = function (event) {
+                        if (error.message === "Network Error") {
                             this.setState({
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
-                            })
-                        }.bind(this);
-                        programRequest.onsuccess = function (event) {
-                            // var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
-                            // var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
-                            // var programDataRequest = programDataOs.get(program);
-                            // programDataRequest.onsuccess = function (event) {
-
-                            //     var planningUnitProgramDataList = programDataRequest.result.programData.planningUnitDataList;
-                            //     var programDataShipmentList = [];
-                            //     for (var pu = 0; pu < planningUnitProgramDataList.length; pu++) {
-                            //         var planningUnitData = planningUnitProgramDataList[pu];
-                            //         var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            //         var programJson = JSON.parse(programData);
-                            //         var sList = programJson.shipmentList;
-                            //         programDataShipmentList = programDataShipmentList.concat(sList);
-                            //     }
-                            //     for (var l = 0; l < budgetList.length; l++) {
-                            //         shipmentList = programDataShipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
-                            //         shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
-                            //         var plannedShipmentbudget = 0;
-                            //         (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
-                            //             console.log(ele)
-                            //             plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
-                            //         });
-                            //         var OrderedShipmentbudget = 0;
-                            //         var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
-                            //         shiplist.map(ele => {
-                            //             console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
-                            //             OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
-                            //         });
-                            //         oldShipmentbudget = ((plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) + (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd))
-                            //     }
-                            // }.bind(this);
-
-
-                            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                            var shipmentList = [];
-                            for (var pu = 0; pu < planningUnitDataList.length; pu++) {
-                                var planningUnitData = planningUnitDataList[pu];
-                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                var programJson = JSON.parse(programData);
-                                var sList = programJson.shipmentList;
-                                shipmentList = shipmentList.concat(sList);
-                            }
-                            console.log("B** program json ---", programJson);
-                            for (var l = 0; l < budgetList.length; l++) {
-                                shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
-                                shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
-                                console.log("B** shipment list ---", shipmentList);
-                                var plannedShipmentbudget = 0;
-                                (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
-                                    plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
-                                });
-                                console.log("B** planned shipment budget ---", plannedShipmentbudget);
-                                var OrderedShipmentbudget = 0;
-                                var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
-                                console.log("B** shiplist ---", shiplist);
-                                shiplist.map(ele => {
-                                    console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
-                                    OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
-                                });
-
-                                var remainingbudget = Math.floor(budgetList[l].budgetAmt - (OrderedShipmentbudget + plannedShipmentbudget))
-
-
-                                console.log("B** order shipment budget ---", remainingbudget);
-                                console.log("B** budget list l ==>", budgetList[l]);
-                                var json = {
-                                    budget: { id: budgetList[l].budgetId, label: budgetList[l].label, code: budgetList[l].budgetCode },
-                                    program: { id: budgetList[l].programs.id, label: budgetList[l].programs.label, code: programJson.programCode },
-                                    fundingSource: { id: budgetList[l].fundingSource.fundingSourceId, label: budgetList[l].fundingSource.label, code: budgetList[l].fundingSource.fundingSourceCode },
-                                    currency: budgetList[l].currency,
-                                    // plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
-                                    // orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd) / 1000000,
-                                    plannedBudgetAmt: (plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
-                                    orderedBudgetAmt: (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd),
-                                    startDate: budgetList[l].startDate,
-                                    stopDate: budgetList[l].stopDate,
-                                    budgetAmt: budgetList[l].budgetAmt,
-                                    remainingBudgetAmtUsd: (budgetList[l].budgetUsdAmt - budgetList[l].usedUsdAmt)
-
-                                }
-
-                                data.push(json)
-                                console.log("B** json ---", json);
-                            }
-                            console.log("B** data ---", data);
-
-                            data.sort(function (a, b) {
-                                var keyA = new Date(a.startDate),
-                                    keyB = new Date(b.startDate);
-                                // Compare the 2 dates
-                                if (keyA < keyB) return -1;
-                                if (keyA > keyB) return 1;
-                                return 0;
                             });
-                            data.sort(function (a, b) {
-                                var keyA1 = new Date(a.startDate),
-                                    keyA11 = new Date(a.stopDate),
-                                    keyB1 = new Date(b.startDate),
-                                    keyB11 = new Date(b.stopDate);
-                                // Compare the 2 dates
-                                if (keyA1.getTime() === keyB1.getTime()) {
-                                    if (keyA11 < keyB11) return -1;
-                                    if (keyA11 > keyB11) return 1;
-                                }
-                                return 0;
-                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
 
-                            console.log("data---->", data);
-                            this.setState({
-                                selBudget: data,
-                                message: '',
-                                loading: false
-                            }, () => {
-                                this.buildJexcel()
-                            })
-
-
-
-                        }.bind(this)
-
-
-                    }.bind(this)
-                }.bind(this)
-
-            } else {
-                this.setState({ loading: true })
-                // var inputjson = { "programId": programId, "versionId": versionId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
-                var inputjson = { "programIds": [programId], "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
-                // AuthenticationService.setupAxiosInterceptors();
-                ReportService.budgetReport(inputjson)
-                    .then(response => {
-                        console.log("BudgetData--------", response.data);
-                        this.setState({
-                            selBudget: response.data, message: '', loading: false
-                        }, () => {
-                            this.buildJexcel();
-                        })
-                    }).catch(
-                        error => {
-                            this.setState({
-                                selBudget: [], loading: false
-                            })
-                            if (error.message === "Network Error") {
-                                this.setState({
-                                    // message: 'static.unkownError',
-                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                    loading: false
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false
-                                        });
-                                        break;
-                                }
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
                             }
                         }
-                    );
-                // .catch(
-                //     error => {
-                //         this.setState({
-                //             selBudget: [], loading: false
-                //         })
+                    }
+                );
+            // .catch(
+            //     error => {
+            //         this.setState({
+            //             selBudget: [], loading: false
+            //         })
 
-                //         if (error.message === "Network Error") {
-                //             this.setState({ message: error.message });
-                //         } else {
-                //             switch (error.response ? error.response.status : "") {
-                //                 case 500:
-                //                 case 401:
-                //                 case 404:
-                //                 case 406:
-                //                 case 412:
-                //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                //                     break;
-                //                 default:
-                //                     this.setState({ loading: false, message: 'static.unkownError' });
-                //                     break;
-                //             }
-                //         }
-                //     }
-                // );
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+            //                     break;
+            //                 default:
+            //                     this.setState({ loading: false, message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
-            }
-        } else if (programId == 0) {
+            // }
+        } else if (this.state.programValues.length == 0) {
             jexcel.destroy(document.getElementById("budgetTable"), true);
             this.setState({ selBudget: [], message: i18n.t('static.common.selectProgram') });
-        } else if (versionId == 0) {
-            jexcel.destroy(document.getElementById("budgetTable"), true);
-            this.setState({ selBudget: [], message: i18n.t('static.program.validversion') });
         } else {
             jexcel.destroy(document.getElementById("budgetTable"), true);
             this.setState({ selBudget: [], message: i18n.t('static.fundingSource.selectFundingSource') });
@@ -794,12 +800,14 @@ class Budgets extends Component {
                     }
                     this.setState({
                         programs: proList, loading: false
-                    }, () => { this.consolidatedProgramList() })
+                    }, () => { this.filterData() })
                 }).catch(
                     error => {
                         this.setState({
                             programs: [], loading: false
-                        }, () => { this.consolidatedProgramList() })
+                        }, () => {
+                            // this.consolidatedProgramList()
+                        })
                         if (error.message === "Network Error") {
                             this.setState({
                                 // message: 'static.unkownError',
@@ -865,86 +873,86 @@ class Budgets extends Component {
 
         } else {
             console.log('offline')
-            this.consolidatedProgramList()
+            // this.consolidatedProgramList()
             this.setState({ loading: false })
         }
 
     }
-    consolidatedProgramList = () => {
-        const lan = 'en';
-        const { programs } = this.state
-        var proList = programs;
+    // consolidatedProgramList = () => {
+    //     const lan = 'en';
+    //     const { programs } = this.state
+    //     var proList = programs;
 
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
+    //     var db1;
+    //     getDatabase();
+    //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    //     openRequest.onsuccess = function (e) {
+    //         db1 = e.target.result;
+    //         var transaction = db1.transaction(['programData'], 'readwrite');
+    //         var program = transaction.objectStore('programData');
+    //         var getRequest = program.getAll();
 
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+    //         getRequest.onerror = function (event) {
+    //             // Handle errors!
+    //         };
+    //         getRequest.onsuccess = function (event) {
+    //             var myResult = [];
+    //             myResult = getRequest.result;
+    //             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+    //             var userId = userBytes.toString(CryptoJS.enc.Utf8);
+    //             for (var i = 0; i < myResult.length; i++) {
+    //                 if (myResult[i].userId == userId) {
+    //                     var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+    //                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+    //                     var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
+    //                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+    //                     console.log(programNameLabel)
 
-                        var f = 0
-                        for (var k = 0; k < this.state.programs.length; k++) {
-                            if (this.state.programs[k].programId == programData.programId) {
-                                f = 1;
-                                console.log('already exist')
-                            }
-                        }
-                        if (f == 0) {
-                            proList.push(programData)
-                        }
-                    }
-
-
-                }
-                var lang = this.state.lang;
-
-                if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
-                    this.setState({
-                        programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        }),
-                        programId: localStorage.getItem("sesProgramIdReport")
-                    }, () => {
-                        this.filterVersion();
-                        this.filterData()
-                    })
-                } else {
-                    this.setState({
-                        programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        })
-                    })
-
-                }
-
-            }.bind(this);
-
-        }.bind(this);
+    //                     var f = 0
+    //                     for (var k = 0; k < this.state.programs.length; k++) {
+    //                         if (this.state.programs[k].programId == programData.programId) {
+    //                             f = 1;
+    //                             console.log('already exist')
+    //                         }
+    //                     }
+    //                     if (f == 0) {
+    //                         proList.push(programData)
+    //                     }
+    //                 }
 
 
-    }
+    //             }
+    //             var lang = this.state.lang;
+
+    //             if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
+    //                 this.setState({
+    //                     programs: proList.sort(function (a, b) {
+    //                         a = getLabelText(a.label, lang).toLowerCase();
+    //                         b = getLabelText(b.label, lang).toLowerCase();
+    //                         return a < b ? -1 : a > b ? 1 : 0;
+    //                     }),
+    //                     programId: localStorage.getItem("sesProgramIdReport")
+    //                 }, () => {
+    //                     this.filterVersion();
+    //                     this.filterData()
+    //                 })
+    //             } else {
+    //                 this.setState({
+    //                     programs: proList.sort(function (a, b) {
+    //                         a = getLabelText(a.label, lang).toLowerCase();
+    //                         b = getLabelText(b.label, lang).toLowerCase();
+    //                         return a < b ? -1 : a > b ? 1 : 0;
+    //                     })
+    //                 })
+
+    //             }
+
+    //         }.bind(this);
+
+    //     }.bind(this);
+
+
+    // }
 
 
     roundNStr = num => {
@@ -960,173 +968,173 @@ class Budgets extends Component {
         return Number(Math.round((num / 1000000) * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
 
     }
-    filterVersion = () => {
-        // let programId = document.getElementById("programId").value;
-        let programId = this.state.programId;
-        document.getElementById("versionId").value = 0
-        if (programId != 0) {
+    // filterVersion = () => {
+    //     // let programId = document.getElementById("programId").value;
+    //     let programId = this.state.programId;
+    //     document.getElementById("versionId").value = 0
+    //     if (programId != 0) {
 
-            localStorage.setItem("sesProgramIdReport", programId);
-            const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
-            if (program.length == 1) {
-                if (isSiteOnline()) {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
-                        .then(response => {
-                            console.log("response===>", response.data)
-                            this.setState({
-                                versions: []
-                            }, () => {
-                                this.setState({
-                                    versions: response.data
-                                }, () => {
-                                    this.consolidatedVersionList(programId)
-                                });
-                            });
-                        }).catch(
-                            error => {
-                                this.setState({
-                                    programs: [], loading: false
-                                })
-                                if (error.message === "Network Error") {
-                                    this.setState({
-                                        // message: 'static.unkownError',
-                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                        loading: false
-                                    });
-                                } else {
-                                    switch (error.response ? error.response.status : "") {
+    //         // localStorage.setItem("sesProgramIdReport", programId);
+    //         const program = this.state.programs.filter(c => c.programId == programId)
+    //         console.log(program)
+    //         if (program.length == 1) {
+    //             if (isSiteOnline()) {
+    //                 DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+    //                     .then(response => {
+    //                         console.log("response===>", response.data)
+    //                         this.setState({
+    //                             versions: []
+    //                         }, () => {
+    //                             this.setState({
+    //                                 versions: response.data
+    //                             }, () => {
+    //                                 this.consolidatedVersionList(programId)
+    //                             });
+    //                         });
+    //                     }).catch(
+    //                         error => {
+    //                             this.setState({
+    //                                 programs: [], loading: false
+    //                             })
+    //                             if (error.message === "Network Error") {
+    //                                 this.setState({
+    //                                     // message: 'static.unkownError',
+    //                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+    //                                     loading: false
+    //                                 });
+    //                             } else {
+    //                                 switch (error.response ? error.response.status : "") {
 
-                                        case 401:
-                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                            break;
-                                        case 403:
-                                            this.props.history.push(`/accessDenied`)
-                                            break;
-                                        case 500:
-                                        case 404:
-                                        case 406:
-                                            this.setState({
-                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                                loading: false
-                                            });
-                                            break;
-                                        case 412:
-                                            this.setState({
-                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                                loading: false
-                                            });
-                                            break;
-                                        default:
-                                            this.setState({
-                                                message: 'static.unkownError',
-                                                loading: false
-                                            });
-                                            break;
-                                    }
-                                }
-                            }
-                        );
-
-
-                } else {
-                    this.setState({
-                        versions: []
-                    }, () => { this.consolidatedVersionList(programId) })
-                }
-            } else {
-
-                this.setState({
-                    versions: []
-                })
-
-            }
-        } else {
-            this.setState({
-                versions: []
-            })
-        }
-    }
-    consolidatedVersionList = (programId) => {
-        const lan = 'en';
-        const { versions } = this.state
-        var verList = versions;
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
-                        var programData = databytes.toString(CryptoJS.enc.Utf8)
-                        var version = JSON.parse(programData).currentVersion
-
-                        version.versionId = `${version.versionId} (Local)`
-                        verList.push(version)
-
-                    }
+    //                                     case 401:
+    //                                         this.props.history.push(`/login/static.message.sessionExpired`)
+    //                                         break;
+    //                                     case 403:
+    //                                         this.props.history.push(`/accessDenied`)
+    //                                         break;
+    //                                     case 500:
+    //                                     case 404:
+    //                                     case 406:
+    //                                         this.setState({
+    //                                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+    //                                             loading: false
+    //                                         });
+    //                                         break;
+    //                                     case 412:
+    //                                         this.setState({
+    //                                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+    //                                             loading: false
+    //                                         });
+    //                                         break;
+    //                                     default:
+    //                                         this.setState({
+    //                                             message: 'static.unkownError',
+    //                                             loading: false
+    //                                         });
+    //                                         break;
+    //                                 }
+    //                             }
+    //                         }
+    //                     );
 
 
-                }
+    //             } else {
+    //                 this.setState({
+    //                     versions: []
+    //                 }, () => { this.consolidatedVersionList(programId) })
+    //             }
+    //         } else {
 
-                console.log(verList)
-                let versionList = verList.filter(function (x, i, a) {
-                    return a.indexOf(x) === i;
-                });
-                versionList.reverse();
+    //             this.setState({
+    //                 versions: []
+    //             })
 
-                if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+    //         }
+    //     } else {
+    //         this.setState({
+    //             versions: []
+    //         })
+    //     }
+    // }
+    // consolidatedVersionList = (programId) => {
+    //     const lan = 'en';
+    //     const { versions } = this.state
+    //     var verList = versions;
 
-                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
-                    if (versionVar != '' && versionVar != undefined) {
-                        this.setState({
-                            versions: versionList,
-                            versionId: localStorage.getItem("sesVersionIdReport")
-                        }, () => {
-                            this.filterData();
-                        })
-                    } else {
-                        this.setState({
-                            versions: versionList,
-                            versionId: versionList[0].versionId
-                        }, () => {
-                            this.filterData();
-                        })
-                    }
-                } else {
-                    this.setState({
-                        versions: versionList,
-                        versionId: versionList[0].versionId
-                    }, () => {
-                        this.filterData();
-                    })
-                }
+    //     var db1;
+    //     getDatabase();
+    //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    //     openRequest.onsuccess = function (e) {
+    //         db1 = e.target.result;
+    //         var transaction = db1.transaction(['programData'], 'readwrite');
+    //         var program = transaction.objectStore('programData');
+    //         var getRequest = program.getAll();
+
+    //         getRequest.onerror = function (event) {
+    //             // Handle errors!
+    //         };
+    //         getRequest.onsuccess = function (event) {
+    //             var myResult = [];
+    //             myResult = getRequest.result;
+    //             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+    //             var userId = userBytes.toString(CryptoJS.enc.Utf8);
+    //             for (var i = 0; i < myResult.length; i++) {
+    //                 if (myResult[i].userId == userId && myResult[i].programId == programId) {
+    //                     var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+    //                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+    //                     var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
+    //                     var programData = databytes.toString(CryptoJS.enc.Utf8)
+    //                     var version = JSON.parse(programData).currentVersion
+
+    //                     version.versionId = `${version.versionId} (Local)`
+    //                     verList.push(version)
+
+    //                 }
 
 
-            }.bind(this);
+    //             }
+
+    //             console.log(verList)
+    //             let versionList = verList.filter(function (x, i, a) {
+    //                 return a.indexOf(x) === i;
+    //             });
+    //             versionList.reverse();
+
+    //             if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
+
+    //                 let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
+    //                 if (versionVar != '' && versionVar != undefined) {
+    //                     this.setState({
+    //                         versions: versionList,
+    //                         versionId: localStorage.getItem("sesVersionIdReport")
+    //                     }, () => {
+    //                         this.filterData();
+    //                     })
+    //                 } else {
+    //                     this.setState({
+    //                         versions: versionList,
+    //                         versionId: versionList[0].versionId
+    //                     }, () => {
+    //                         this.filterData();
+    //                     })
+    //                 }
+    //             } else {
+    //                 this.setState({
+    //                     versions: versionList,
+    //                     versionId: versionList[0].versionId
+    //                 }, () => {
+    //                     this.filterData();
+    //                 })
+    //             }
+
+
+    //         }.bind(this);
 
 
 
-        }.bind(this)
+    //     }.bind(this)
 
 
-    }
+    // }
 
 
     componentDidMount() {
@@ -1134,26 +1142,26 @@ class Budgets extends Component {
         this.getFundingSource();
     }
 
-    setProgramId(event) {
-        this.setState({
-            programId: event.target.value,
-            versionId: ''
-        }, () => {
-            localStorage.setItem("sesVersionIdReport", '');
-            this.filterVersion();
-            this.filterData()
-        })
+    // setProgramId(event) {
+    //     this.setState({
+    //         programId: event.target.value,
+    //         versionId: ''
+    //     }, () => {
+    //         // localStorage.setItem("sesVersionIdReport", '');
+    //         this.filterVersion();
+    //         this.filterData()
+    //     })
 
-    }
+    // }
 
-    setVersionId(event) {
-        this.setState({
-            versionId: event.target.value
-        }, () => {
-            this.filterData();
-        })
+    // setVersionId(event) {
+    //     this.setState({
+    //         versionId: event.target.value
+    //     }, () => {
+    //         this.filterData();
+    //     })
 
-    }
+    // }
     // showSubFundingSourceLabel(cell, row) {
     //   return getLabelText(cell.label, this.state.lang);
     // }
@@ -1224,8 +1232,11 @@ class Budgets extends Component {
 
     handleChangeProgram = (programIds) => {
 
+        programIds = programIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
         this.setState({
-            programValues: programIds.map(ele => ele.value),
+            programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
 
@@ -1241,21 +1252,18 @@ class Budgets extends Component {
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
-                        {/* {getLabelText(item.label, this.state.lang)} */}
-                        {(item.programCode)}
-                    </option>
+                    { label: (item.programCode), value: item.programId }
                 )
             }, this);
-        const { versions } = this.state;
-        let versionList = versions.length > 0
-            && versions.map((item, i) => {
-                return (
-                    <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
-                    </option>
-                )
-            }, this);
+        // const { versions } = this.state;
+        // let versionList = versions.length > 0
+        //     && versions.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.versionId}>
+        //                 {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+        //             </option>
+        //         )
+        //     }, this);
         console.log('budget list', this.state.selBudget)
         var budgets = this.state.selBudget.map((item, index) => (item.budget))
         const { fundingSources } = this.state;
@@ -1553,26 +1561,22 @@ class Budgets extends Component {
                                 </FormGroup>
 
                                 <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                    <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls ">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="programId"
-                                                id="programId"
-                                                bsSize="sm"
-                                                // onChange={(e) => { this.filterVersion(); this.filterData() }}
-                                                onChange={(e) => { this.setProgramId(e) }}
-                                                value={this.state.programId}
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {programList}
-                                            </Input>
+                                        <MultiSelect
 
-                                        </InputGroup>
+                                            bsSize="sm"
+                                            name="programIds"
+                                            id="programIds"
+                                            value={this.state.programValues}
+                                            onChange={(e) => { this.handleChangeProgram(e) }}
+                                            options={programList && programList.length > 0 ? programList : []}
+                                            disabled={this.state.loading}
+                                        />
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
+                                {/* <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                     <div className="controls ">
                                         <InputGroup>
@@ -1591,7 +1595,7 @@ class Budgets extends Component {
 
                                         </InputGroup>
                                     </div>
-                                </FormGroup>
+                                </FormGroup> */}
                                 <FormGroup className="col-md-3" >
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1702,7 +1706,7 @@ class Budgets extends Component {
     buildJexcel() {
         // this.el = jexcel(document.getElementById("budgetTable"), '');
         // this.el.destroy();
-        if (this.state.programId != 0 && this.state.programId != "" && this.state.versionId != "" && this.state.versionId != 0 && this.state.fundingSourceValues.length > 0) {
+        if (this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0) {
             jexcel.destroy(document.getElementById("budgetTable"), true);
 
             var data = this.state.selBudget;
@@ -1772,12 +1776,12 @@ class Budgets extends Component {
                     var items = [];
                     if (y != null) {
                         if (obj.options.allowInsertRow == true) {
-                            items.push({
-                                title: i18n.t('static.supplyPlan.shipmentsDetails'),
-                                onclick: function () {
-                                    window.open(window.location.origin + `/#/report/shipmentSummery/${this.el.getValueFromCoords(10, y)}/${this.el.getValueFromCoords(1, y)}`);
-                                }.bind(this)
-                            });
+                            // items.push({
+                            //     title: i18n.t('static.supplyPlan.shipmentsDetails'),
+                            //     onclick: function () {
+                            //         window.open(window.location.origin + `/#/report/shipmentSummery/${this.el.getValueFromCoords(10, y)}/${this.el.getValueFromCoords(1, y)}`);
+                            //     }.bind(this)
+                            // });
                         }
                     }
                     return items;
