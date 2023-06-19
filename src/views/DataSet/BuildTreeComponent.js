@@ -2816,7 +2816,7 @@ export default class BuildTree extends Component {
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.0000%', decimal: '.',
-                    readOnly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') ? false : true,
+                    readOnly: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') ? false : true,
 
                 },
                 {
@@ -4456,7 +4456,7 @@ export default class BuildTree extends Component {
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
 
-            if (y == 8 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2) {
+            if (y == 8 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
                 if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
@@ -10397,7 +10397,7 @@ export default class BuildTree extends Component {
                                     <FormGroup className="pb-lg-3">
                                         {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, isChanged: false, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {(!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
@@ -10514,7 +10514,7 @@ export default class BuildTree extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.aggregationNode && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>
@@ -10838,7 +10838,7 @@ export default class BuildTree extends Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
@@ -10918,7 +10918,7 @@ export default class BuildTree extends Component {
                                             showMomDataPercent: false
                                         });
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
@@ -11478,7 +11478,7 @@ export default class BuildTree extends Component {
                     {itemConfig.parent != null &&
 
                         <>
-                            {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                            {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
 
                                 <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                     onClick={(event) => {
@@ -11488,7 +11488,7 @@ export default class BuildTree extends Component {
                                     <i class="fa fa-clone" aria-hidden="true"></i>
                                 </button>
                             }
-                            {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                            {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                 <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                     onClick={(event) => {
                                         event.stopPropagation();
@@ -11513,7 +11513,7 @@ export default class BuildTree extends Component {
                                 </button>}
 
                         </>}
-                    {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                    {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
 
                         <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -11524,7 +11524,7 @@ export default class BuildTree extends Component {
                             <i class="fa fa-sitemap" aria-hidden="true"></i>
                         </button>
                     }
-                    {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                    {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
@@ -11913,7 +11913,7 @@ export default class BuildTree extends Component {
                                                                 {scenarios}
                                                             </Input>
 
-                                                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                                                 <InputGroupAddon addonType="append" onClick={this.toggleDropdown}>
                                                                     {/* <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.openScenarioModal} title=""></i></InputGroupText> */}
                                                                     <InputGroupText className='SettingIcon'>
@@ -12196,7 +12196,7 @@ export default class BuildTree extends Component {
                                                                 <FormGroup className="col-md-3 pt-lg-4">
 
                                                                     {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                                 </FormGroup>
                                                             </Row>
                                                         </Form>
