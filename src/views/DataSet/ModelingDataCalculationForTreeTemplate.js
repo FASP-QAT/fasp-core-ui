@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
+export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
     console.log("modelling dataset---", dataset);
     // console.log("modeling nodeId---", nodeId);
     // console.log("modelling scenarioId---", scenarioId);
