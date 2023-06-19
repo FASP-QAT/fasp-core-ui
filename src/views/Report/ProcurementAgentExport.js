@@ -1899,7 +1899,7 @@ class ProcurementAgentExport extends Component {
                       freight = seaFreight;
                     }
                     var planningUnit = this.state.planningUnits.filter(
-                      (c) => c.id == planningUnitFilter[j].planningUnit.id
+                      (c) => c.id == planningUnitFilter[j].id
                     );
                     var procurementAgent = this.state.procurementAgents.filter(
                       (c) =>
@@ -1958,11 +1958,13 @@ class ProcurementAgentExport extends Component {
                   }
                 });
                 console.log("data----->", data);
-                var planningUnitsinData = data.map((q) => parseInt(q.id));
+                var planningUnitsinData = data.map((q) =>
+                  parseInt(q.planningUnit.id)
+                );
                 var useFilter = planningUnitsinData.filter(
                   (q, idx) => planningUnitsinData.indexOf(q) === idx
                 );
-                // console.log("userFilter===>###", useFilter);
+                console.log("userFilter===>###", useFilter);
                 var filteredData = [];
                 var myJson = [];
                 for (var uf = 0; uf < useFilter.length; uf++) {
@@ -2028,6 +2030,7 @@ class ProcurementAgentExport extends Component {
                     filteredData.push(myJson);
                   }
                 }
+                console.log("filteredData===>", filteredData);
                 this.setState(
                   {
                     data: filteredData,
@@ -2366,7 +2369,7 @@ class ProcurementAgentExport extends Component {
                       freight = seaFreight;
                     }
                     var planningUnit = this.state.planningUnits.filter(
-                      (c) => c.id == planningUnitFilter[j].planningUnit.id
+                      (c) => c.id == planningUnitFilter[j].id
                     );
                     var fundingSource = this.state.fundingSources.filter(
                       (c) =>
@@ -2408,7 +2411,7 @@ class ProcurementAgentExport extends Component {
                     data.push(json);
                   }
                 });
-                var planningUnitsinData = data.map((q) => parseInt(q.id));
+                var planningUnitsinData = data.map((q) => parseInt(q.planningUnit.id));
                 var useFilter = planningUnitsinData.filter(
                   (q, idx) => planningUnitsinData.indexOf(q) === idx
                 );
@@ -2805,7 +2808,7 @@ class ProcurementAgentExport extends Component {
                     freight = seaFreight;
                   }
                   var planningUnit = this.state.planningUnits.filter(
-                    (c) => c.id == planningUnitFilter[j].planningUnit.id
+                    (c) => c.id == planningUnitFilter[j].id
                   );
                   let json = {
                     active: true,
@@ -2831,7 +2834,7 @@ class ProcurementAgentExport extends Component {
                   data.push(json);
                 }
 
-                var planningUnitsinData = data.map((q) => parseInt(q.id));
+                var planningUnitsinData = data.map((q) => parseInt(q.planningUnit.id));
                 var useFilter = planningUnitsinData.filter(
                   (q, idx) => planningUnitsinData.indexOf(q) === idx
                 );

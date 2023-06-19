@@ -665,7 +665,8 @@ class Budgets extends Component {
 
             } else {
                 this.setState({ loading: true })
-                var inputjson = { "programId": programId, "versionId": versionId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
+                // var inputjson = { "programId": programId, "versionId": versionId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
+                var inputjson = { "programIds": [programId], "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.budgetReport(inputjson)
                     .then(response => {
