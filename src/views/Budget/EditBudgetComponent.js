@@ -123,6 +123,7 @@ class EditBudgetComponent extends Component {
                 budgetAmt: '',
                 notes: '',
                 budgetCode: '',
+                programs:[]
 
             },
             message: '',
@@ -568,7 +569,7 @@ class EditBudgetComponent extends Component {
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
 
                                                 <FormGroup>
-                                                    <Label htmlFor="programId">{i18n.t('static.budget.program')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
 
                                                     <Input
                                                         type="text"
@@ -580,8 +581,7 @@ class EditBudgetComponent extends Component {
                                                         invalid={touched.programId && !!errors.programId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-
-                                                        value={this.state.budget.program.code}
+                                                        value={[...new Set(this.state.budget.programs.map(ele => ele.code))].toString()}
                                                     >
                                                     </Input>
 

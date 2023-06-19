@@ -90,7 +90,7 @@ export default class EditBudgetTicketComponent extends Component {
             var outText = "";
             if (event.target.value !== "") {
                 var budgetT = this.state.budgets.filter(c => c.budgetId == event.target.value)[0];
-                outText = budgetT.program.label.label_en + " | " + budgetT.label.label_en;
+                outText = budgetT.label.label_en;
             }
             budget.budgetName = outText;
             this.setState({
@@ -227,7 +227,7 @@ export default class EditBudgetTicketComponent extends Component {
         let programList = budgets.length > 0 && budgets.map((item, i) => {
             return (
                 <option key={i} value={item.budgetId}>
-                    {getLabelText(item.label, this.state.lang) + " | " + getLabelText(item.program.label, this.state.lang)}
+                    {getLabelText(item.label, this.state.lang)}
                 </option>
             )
         }, this);

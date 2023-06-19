@@ -3105,7 +3105,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                     var fundingSourceListPlan = fsRequest.result;
                                     // .filter(c => c.realm.id == generalProgramJson.realmCountry.realm.realmId);
-                                    var budgetListPlan = bRequest.result.filter(c => c.program.id == programId);
+                                    var budgetListPlan = bRequest.result.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(parseInt(programId)));
                                     console.log("budgetListPlan", budgetListPlan)
                                     var myResult = [];
                                     myResult = planningunitRequest.result.filter(c => c.program.id == programId);
