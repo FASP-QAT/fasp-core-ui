@@ -1015,8 +1015,9 @@ export default class CreateTreeTemplate extends Component {
             for (let i = 0; i < puNodeList.length; i++) {
                 if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
                     var parentNodeData = treeTemplateForCreateTree.flatList.filter(x => x.id == puNodeList[i].parent)[0];
+                    var productCategory=parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory;
                     json = {
-                        productCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory,
+                        productCategory: productCategory!=undefined?productCategory:{id:"",label:{label_en:""}},
                         planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
                     };
                     missingPUListForCreateTree.push(json);
@@ -11284,7 +11285,7 @@ export default class CreateTreeTemplate extends Component {
                                                             }
                                                             this.setState({
                                                                 treeTemplate: response.data,
-                                                                treeTemplateId:response.data.treeTemplateId,
+                                                                treeTemplateId:0,
                                                                 items,
                                                                 message: i18n.t('static.message.addTreeTemplate'),
                                                                 color: 'green',
@@ -11473,7 +11474,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         onChange={(e) => { this.dataChange(e) }}
                                                                         value={this.state.treeTemplateId}
                                                                     >
-                                                                        {this.state.treeTemplate.treeTemplateId==0 && <option value="">{i18n.t('static.common.select')}</option>}
+                                                                        {this.state.treeTemplateId==0 && <option value="">{i18n.t('static.common.select')}</option>}
                                                                         {treeTemplates}
                                                                     </Input>
                                                                     <FormFeedback>{errors.forecastMethodId}</FormFeedback>
