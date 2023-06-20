@@ -568,7 +568,7 @@ export default class QunatimedImportStepFive extends Component {
 
                         <Col xs="12" sm="12">
                             <div className='consumptionDataEntryTable'>
-                            <div id="recordsDiv" >
+                            <div style={{width: '100%'}} id="recordsDiv" >
                             </div>
                             </div>
 

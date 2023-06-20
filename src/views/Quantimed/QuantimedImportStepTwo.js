@@ -612,7 +612,7 @@ export default class QunatimedImportStepTwo extends Component {
                     <CardBody className="pl-0 pr-0 pt-lg-0">
                         {/* <Col xs="12" sm="12"> */}
                         <div className="consumptionDataEntryTable">
-                            <div id="paputableDiv" >
+                            <div style={{width: '100%'}} id="paputableDiv" >
                             </div>
                         </div>
                         {/* </Col> */}
