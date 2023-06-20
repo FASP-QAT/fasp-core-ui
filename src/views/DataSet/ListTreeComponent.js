@@ -160,6 +160,7 @@ export default class ListTreeComponent extends Component {
             downloadedProgramListAcrossProgram: [],
             downloadAcrossProgram: 0,
             treeIdAcrossProgram: 0,
+            forecastingUnitList:[]
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -445,8 +446,14 @@ export default class ListTreeComponent extends Component {
                     if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[scenarioList[s].id][0].puNode.planningUnit.id).length == 0) {
                         var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
                         console.log("parentNodeData---", parentNodeData);
+                        var productCategory="";
+                        productCategory=parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit.productCategory;
+                        if(productCategory==undefined){
+                            var forecastingUnit=this.state.forecastingUnitList.filter(c=>c.forecastingUnitId==parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit.id);
+                            productCategory=forecastingUnit[0].productCategory;
+                        }
                         json = {
-                            productCategory: parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit.productCategory,
+                            productCategory: productCategory,
                             planningUnit: puNodeList[i].payload.nodeDataMap[scenarioList[s].id][0].puNode.planningUnit
                         };
                         missingPUList.push(json);
@@ -964,7 +971,16 @@ export default class ListTreeComponent extends Component {
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
+
+                var pcTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
+            var pcProgram = pcTransaction.objectStore('forecastingUnit');
+            var pcGetRequest = pcProgram.getAll();
+            pcGetRequest.onsuccess = function (event) {
                 myResult = getRequest.result;
+                var pcList=pcGetRequest.result;
+                this.setState({
+                    forecastingUnitList:pcList
+                })
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 let downloadedProgramData = [];
@@ -1084,6 +1100,7 @@ export default class ListTreeComponent extends Component {
             }.bind(this);
 
         }.bind(this);
+    }.bind(this);
 
 
     }
@@ -1557,7 +1574,7 @@ export default class ListTreeComponent extends Component {
                                                 label: i18n.t('static.program.yes'),
                                                 onClick: () => {
                                                     this.setState({ treeFlag: true }, () => {
-                                                        this.copyDeleteTree(this.el.getValueFromCoords(0, y), this.el.getValueFromCoords(7, y), this.el.getValueFromCoords(9, y), 1);
+                                                        this.copyDeleteTree(this.state.treeEl.getValueFromCoords(0, y), this.state.treeEl.getValueFromCoords(7, y), this.state.treeEl.getValueFromCoords(9, y), 1);
                                                     })
 
                                                 }
@@ -1615,7 +1632,7 @@ export default class ListTreeComponent extends Component {
                                             this.setState({
                                                 datasetListJexcel: selectedForecastProgram
                                             }, () => {
-                                                localStorage.setItem("sesDatasetId", this.state.datasetIdModal.split("~v")[0]);
+                                                // localStorage.setItem("sesDatasetId", this.state.datasetIdModal.split("~v")[0]);
                                                 this.getRegionList(this.state.datasetIdModal);
                                             })
                                         }
@@ -1694,7 +1711,7 @@ export default class ListTreeComponent extends Component {
                     this.setState({
                         datasetListJexcel: selectedForecastProgram
                     }, () => {
-                        localStorage.setItem("sesDatasetId", event.target.value.split("~v")[0]);
+                        // localStorage.setItem("sesDatasetId", event.target.value.split("~v")[0]);
                         this.getRegionList(event.target.value);
                     })
                 }
@@ -1743,9 +1760,9 @@ export default class ListTreeComponent extends Component {
                 // console.log("HEADER SELECTION--------------------------");
             } else {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')) {
-                    var treeId = this.el.getValueFromCoords(0, x);
-                    var programId = this.el.getValueFromCoords(8, x);
-                    var isLocal = this.el.getValueFromCoords(11, x);
+                    var treeId = this.state.treeEl.getValueFromCoords(0, x);
+                    var programId = this.state.treeEl.getValueFromCoords(8, x);
+                    var isLocal = this.state.treeEl.getValueFromCoords(11, x);
                     if (isLocal == 1) {
                         this.props.history.push({
                             pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
