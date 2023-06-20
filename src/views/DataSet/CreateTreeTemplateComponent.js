@@ -7605,9 +7605,10 @@ export default class CreateTreeTemplate extends Component {
                 currentTargetChangeNumberEdit: false
             });
         }
-
-
-        this.setState({ currentItemConfig, isChanged: true }, () => {
+        if (event.target.name != "treeNameForCreateTree" && event.target.name != "forecastMethodIdForCreateTree" && event.target.name != "notesForCreateTree" && event.target.name != "activeForCreateTree" && event.target.name != "datasetIdModalForCreateTree") {
+            this.setState({isChanged: true})
+        }
+        this.setState({ currentItemConfig }, () => {
             console.log("after state update---", this.state.currentItemConfig);
             if (flag) {
                 if (event.target.name === "planningUnitId") {
@@ -11143,7 +11144,7 @@ export default class CreateTreeTemplate extends Component {
                                         onClick={() => this.exportPDF()}
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
-                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{'Create tree'}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span>}
+                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{'Create tree'}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span>}
                                 </a>
                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
