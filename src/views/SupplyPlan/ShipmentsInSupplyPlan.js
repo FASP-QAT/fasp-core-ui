@@ -2771,7 +2771,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
 
         if (rowData[0] != "") {
-            if (rowData[0].length > 29) {
+            if (rowData[0].length > 26) {
                 inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
             } else if (!BATCH_NO_REGEX.test(rowData[0])) {
                 inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
@@ -2848,7 +2848,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var rowData = elInstance.getRowData(y);
                 var value = rowData[0];
                 if (value != "") {
-                    if (value.length > 29) {
+                    if (value.length > 26) {
                         inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
                         valid = false;
                     } else if (!BATCH_NO_REGEX.test(value)) {
