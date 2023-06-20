@@ -625,9 +625,11 @@ export default class AddForecastProgram extends Component {
     }
 
     getOrganisationList() {
-        ProgramService.getOrganisationListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
-            .then(response => {
-                if (response.status == 200) {
+        // ProgramService.getOrganisationListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
+        DropdownService.getOrganisationListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
+        .then(response => {   
+            if (response.status == 200) {
+                console.log("response.data----",response.data) 
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -915,7 +917,7 @@ export default class AddForecastProgram extends Component {
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
-                    <option key={i} value={item.organisationId}>
+                    <option key={i} value={item.id}>
                         {/* {item.organisationCode} */}
                         {getLabelText(item.label, this.state.lang)}
                     </option>

@@ -562,7 +562,7 @@ export default class PlanningUnitCapacityList extends Component {
             && planningUnits.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {getLabelText(item.label, this.state.lang) + ' | ' + item.planningUnitId}
+                        {getLabelText(item.label, this.state.lang) + ' | ' + item.id}
                     </option>
                 )
             }, this);

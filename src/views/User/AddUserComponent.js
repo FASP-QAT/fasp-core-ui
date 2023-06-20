@@ -17,7 +17,7 @@ import RealmCountryService from "../../api/RealmCountryService"
 import getLabelText from '../../CommonComponent/getLabelText';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE, API_URL } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, LABEL_REGEX, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE, API_URL,PROGRAM_TYPE_DATASET } from '../../Constants.js';
 import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
@@ -26,6 +26,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import DropdownService from '../../api/DropdownService';
 
 let initialValues = {
     username: "",
@@ -347,6 +348,7 @@ class AddUserComponent extends Component {
         let realmId = this.state.user.realm.realmId;
         if (realmId != 0 && realmId != null) {
             const selProgram = this.state.programs.filter(c => c.realmCountry.realm.realmId == realmId && c.active.toString() == "true")
+            // const selProgram = this.state.programs
             this.setState({
                 selProgram
             });
@@ -367,7 +369,8 @@ class AddUserComponent extends Component {
         let realmId = this.state.user.realm.realmId;
         let selHealthArea;
         if (realmId != 0 && realmId != null) {
-            selHealthArea = this.state.healthAreas.filter(c => c.realm.realmId == realmId)
+            // selHealthArea = this.state.healthAreas.filter(c => c.realm.realmId == realmId)
+            selHealthArea = this.state.healthAreas
         } else {
             selHealthArea = this.state.healthAreas
         }
@@ -380,7 +383,8 @@ class AddUserComponent extends Component {
     filterOrganisation() {
         let realmId = this.state.user.realm.realmId;
         if (realmId != 0 && realmId != null) {
-            const selOrganisation = this.state.organisations.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
+            // const selOrganisation = this.state.organisations.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
+            const selOrganisation = this.state.organisations
             this.setState({
                 selOrganisation
             });
@@ -397,7 +401,8 @@ class AddUserComponent extends Component {
     filterData() {
         let realmId = this.state.user.realm.realmId;
         if (realmId != 0 && realmId != null) {
-            const selRealmCountry = this.state.realmCountryList.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
+            // const selRealmCountry = this.state.realmCountryList.filter(c => c.realm.realmId == realmId && c.active.toString() == "true")
+            const selRealmCountry = this.state.realmCountryList
             this.setState({
                 selRealmCountry
             });
@@ -414,20 +419,24 @@ class AddUserComponent extends Component {
     }
 
     getAccessControlData() {
-        RealmCountryService.getRealmCountryListAll()
+        // RealmCountryService.getRealmCountryListAll()
+        let realmId = AuthenticationService.getRealmId();
+        console.log("getAccessControlData-->",realmId)   
+        DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
                         realmCountryList: listArray,
-                        selRealmCountry: listArray.filter(c => c.active.toString() == "true")
+                        selRealmCountry: listArray
                     })
-                    OrganisationService.getOrganisationList()
+                    // OrganisationService.getOrganisationList()
+                    DropdownService.getOrganisationDropdownList(realmId)
                         .then(response => {
                             if (response.status == "200") {
                                 var listArray = response.data;
@@ -440,7 +449,8 @@ class AddUserComponent extends Component {
                                     organisations: listArray,
                                     selOrganisation: listArray
                                 });
-                                HealthAreaService.getHealthAreaList()
+                                // HealthAreaService.getHealthAreaList()
+                                DropdownService.getHealthAreaDropdownList(realmId)
                                     .then(response => {
                                         if (response.status == "200") {
                                             var listArray = response.data;
@@ -450,10 +460,11 @@ class AddUserComponent extends Component {
                                                 return itemLabelA > itemLabelB ? 1 : -1;
                                             });
                                             this.setState({
-                                                healthAreas: listArray.filter(c => c.active == true),
-                                                selHealthArea: listArray.filter(c => c.active == true)
+                                                healthAreas: listArray,
+                                                selHealthArea: listArray
                                             });
                                             ProgramService.getProgramList()
+                                            // DropdownService.getProgramForDropdown(realmId,PROGRAM_TYPE_DATASET)
                                                 .then(response => {
                                                     if (response.status == "200") {
                                                         console.log("CountryList------->1", response.data);
@@ -861,9 +872,9 @@ class AddUserComponent extends Component {
         if (selRealmCountry.length > 0) {
             for (var i = 0; i < selRealmCountry.length; i++) {
                 var paJson = {
-                    name: getLabelText(selRealmCountry[i].country.label, this.state.lang),
-                    id: parseInt(selRealmCountry[i].realmCountryId),
-                    active: selRealmCountry[i].active
+                    name: getLabelText(selRealmCountry[i].label, this.state.lang),
+                    id: parseInt(selRealmCountry[i].id),
+                    //active: selRealmCountry[i].active
                 }
                 countryList[i] = paJson
             }
@@ -879,8 +890,8 @@ class AddUserComponent extends Component {
             for (var i = 0; i < selOrganisation.length; i++) {
                 var paJson = {
                     name: getLabelText(selOrganisation[i].label, this.state.lang),
-                    id: parseInt(selOrganisation[i].organisationId),
-                    active: selOrganisation[i].active
+                    id: parseInt(selOrganisation[i].id),
+                    //active: selOrganisation[i].active
                 }
                 organisationList[i] = paJson
             }
@@ -896,8 +907,8 @@ class AddUserComponent extends Component {
             for (var i = 0; i < selHealthArea.length; i++) {
                 var paJson = {
                     name: getLabelText(selHealthArea[i].label, this.state.lang),
-                    id: parseInt(selHealthArea[i].healthAreaId),
-                    active: selHealthArea[i].active
+                    id: parseInt(selHealthArea[i].id)
+                    //active: selHealthArea[i].active
                 }
                 healthAreaList[i] = paJson
             }
