@@ -532,7 +532,6 @@ import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCE
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import DropdownService from '../../api/DropdownService';
 
-
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
 export default class ForecastingUnitListComponent extends Component {
 
@@ -1069,9 +1068,10 @@ export default class ForecastingUnitListComponent extends Component {
                     }
                 }
             );
-
         DropdownService.getTracerCategoryDropdownList()
+        // TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
+                console.log("response.data--->",response.data)
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {

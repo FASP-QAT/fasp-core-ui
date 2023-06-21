@@ -34,7 +34,7 @@ import showguidanceforEquivalencyUnitEn from '../../../src/ShowGuidanceFiles/Equ
 import showguidanceforEquivalencyUnitFr from '../../../src/ShowGuidanceFiles/EquivalencyUnitFr.html'
 import showguidanceforEquivalencyUnitPr from '../../../src/ShowGuidanceFiles/EquivalencyUnitPr.html'
 import showguidanceforEquivalencyUnitSp from '../../../src/ShowGuidanceFiles/EquivalencyUnitSp.html'
-
+import DropdownService from '../../api/DropdownService';
 const entityname = i18n.t('static.equivalancyUnit.equivalancyUnits')
 
 
@@ -532,7 +532,7 @@ class EquivalancyUnit extends Component {
         console.log("myList--------->0", this.state.technicalAreaList);
 
         var mylist = this.state.technicalAreaList.filter(c => c.id != '' && c.id != null);
-        mylist = mylist.filter(c => c.active.toString() == "true");
+        // mylist = mylist.filter(c => c.active.toString() == "true");
 
         console.log("myList--------->1", this.state.technicalAreaList);
         // console.log("myList--------->2", mylist);
@@ -1898,7 +1898,9 @@ class EquivalancyUnit extends Component {
     }
 
     getHealthArea() {
-        HealthAreaService.getHealthAreaList()
+        // HealthAreaService.getHealthAreaList()
+        let realmId = AuthenticationService.getRealmId();
+        DropdownService.getHealthAreaDropdownList(realmId)
             .then(response => {
                 if (response.status == 200) {
                     console.log("response---", response.data);
@@ -1914,7 +1916,7 @@ class EquivalancyUnit extends Component {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
                                 name: getLabelText(listArray[i].label, this.state.lang),
-                                id: parseInt(listArray[i].healthAreaId),
+                                id: parseInt(listArray[i].id),
                                 active: listArray[i].active,
                             }
                             tempList[i] = paJson

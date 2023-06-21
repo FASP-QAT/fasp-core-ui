@@ -274,8 +274,10 @@ export default class AddForecastingUnitComponent extends Component {
                 }
             );
 
+        // TracerCategoryService.getTracerCategoryListAll()
         DropdownService.getTracerCategoryDropdownList()
             .then(response => {
+                console.log("getTracerCategoryDropdownList",response.data)
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
