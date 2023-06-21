@@ -600,14 +600,14 @@ class ListBudgetComponent extends Component {
     let tempSelStatus = (selStatus == "true" ? true : false)
 
     if (fundingSourceId != 0 && programId != 0 && selStatus != "") {
-      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && c.program.id == programId && c.active == tempSelStatus)
+      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && [...new Set(c.programs.map(ele => ele.id))].includes(programId) && c.active == tempSelStatus)
       this.setState({
         selBudget: selBudget
       }, () => {
         this.buildJExcel();
       });
     } else if (fundingSourceId != 0 && programId != 0) {
-      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && c.program.id == programId)
+      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId && [...new Set(c.programs.map(ele => ele.id))].includes(programId))
       this.setState({
         selBudget: selBudget
       }, () => {
@@ -621,7 +621,7 @@ class ListBudgetComponent extends Component {
         this.buildJExcel();
       });
     } else if (programId != 0 && selStatus != "") {
-      const selBudget = this.state.budgetList.filter(c => c.program.id == programId && c.active == tempSelStatus)
+      const selBudget = this.state.budgetList.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(programId) && c.active == tempSelStatus)
       this.setState({
         selBudget: selBudget
       }, () => {
@@ -635,7 +635,7 @@ class ListBudgetComponent extends Component {
         this.buildJExcel();
       });
     } else if (programId != 0) {
-      const selBudget = this.state.budgetList.filter(c => c.program.id == programId)
+      const selBudget = this.state.budgetList.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(programId))
       this.setState({
         selBudget: selBudget
       }, () => {
@@ -725,7 +725,7 @@ class ListBudgetComponent extends Component {
       data = [];
       data[0] = budgetList[j].budgetId
       // data[1] = getLabelText(budgetList[j].program.label, this.state.lang)
-      data[1] = budgetList[j].program.code
+      data[1] = ""
       data[2] = getLabelText(budgetList[j].label, this.state.lang)
       data[3] = budgetList[j].budgetCode;
       data[4] = getLabelText(budgetList[j].fundingSource.label, this.state.lang)
@@ -779,10 +779,13 @@ class ListBudgetComponent extends Component {
         {
           title: 'budgetId',
           type: 'hidden',
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         },
         {
           title: i18n.t('static.budget.program'),
-          type: 'text',
+          type: 'hidden',
           // readOnly: true
         },
         {
@@ -858,14 +861,23 @@ class ListBudgetComponent extends Component {
         {
           title: i18n.t('static.budget.budgetamount'),
           type: 'hidden',
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         },
         {
           title: i18n.t('static.budget.availableAmt'),
           type: 'hidden',
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         },
         {
           title: 'Date',
           type: 'hidden',
+          // title: 'A',
+          // type: 'text',
+          // visible: false
         },
 
       ],
@@ -1123,7 +1135,7 @@ class ListBudgetComponent extends Component {
     FundingSourceService.getFundingSourceListAll()
       .then(response => {
         if (response.status == 200) {
-          console.log("funding source after status 200--->" + response.data)
+          console.log("funding source after status 200--->" , response.data)
           // this.setState({
           //   fundingSourceList: response.data
           // })
@@ -1237,9 +1249,9 @@ class ListBudgetComponent extends Component {
     let programList = programs.length > 0
       && programs.map((item, i) => {
         return (
-          <option key={i} value={item.programId}>
+          <option key={i} value={item.id}>
             {/* {getLabelText(item.label, this.state.lang)} */}
-            {item.programCode}
+            {item.code}
           </option>
         )
       }, this);

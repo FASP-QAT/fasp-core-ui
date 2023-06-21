@@ -1619,7 +1619,7 @@ export default class ManualTagging extends Component {
         var versionList = [];
         var filteredProgramList = this.state.programs.filter(c => c.programId == selectedProgramId)[0];
 
-        versionList.push({ versionId: filteredProgramList.currentVersion.versionId })
+        versionList.push({ versionId: filteredProgramList.currentVersionId })
         var programQPLDetailsList = this.state.programQPLDetailsList
         for (var v = 0; v < filterList.length; v++) {
             var programQPLDetailsFilter = programQPLDetailsList.filter(c => c.id == filterList[v].id);
@@ -3318,20 +3318,32 @@ export default class ManualTagging extends Component {
     }
 
     getProgramList() {
-        ProgramService.getProgramList()
+        let realmId=AuthenticationService.getRealmId()
+        DropdownService.getProgramForDropdown(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
-                    listArray.sort((a, b) => {
+                    console.log("listArray",listArray)
+                    var proList = [];
+          for (var i = 0; i < listArray.length; i++) {
+            var programJson = {
+              programId: listArray[i].id,
+              label: listArray[i].label,
+              programCode: listArray[i].code,
+              currentVersionId:listArray[i].currentVersionId
+            };
+            proList[i] = programJson;
+          }
+          proList.sort((a, b) => {
                         var itemLabelA = a.programCode.toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = b.programCode.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
-                    if (response.data.length == 1) {
+                    if (proList.length == 1) {
                         this.setState({
-                            programs: response.data,
+                            programs: proList,
                             loading: false,
-                            programId: response.data[0].programId
+                            programId: proList[0].programId
                         }, () => {
                             if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined && this.state.programs.filter(c => c.programId == localStorage.getItem("sesProgramIdReport")).length > 0) {
                                 this.setState({
@@ -3345,7 +3357,7 @@ export default class ManualTagging extends Component {
                         })
                     } else {
                         this.setState({
-                            programs: listArray,
+                            programs: proList,
                             loading: false
                         }, () => {
                             if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined && this.state.programs.filter(c => c.programId == localStorage.getItem("sesProgramIdReport")).length > 0) {

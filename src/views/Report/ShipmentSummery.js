@@ -1195,7 +1195,7 @@ class ShipmentSummery extends Component {
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
                         this.filterVersion();
-                        this.getBudgetList();
+                        // this.getBudgetList();
                     })
                 } else {
                     this.setState({
