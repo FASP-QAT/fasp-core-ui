@@ -7673,9 +7673,10 @@ export default class CreateTreeTemplate extends Component {
                 currentTargetChangeNumberEdit: false
             });
         }
-
-
-        this.setState({ currentItemConfig, isChanged: true }, () => {
+        if (event.target.name != "treeNameForCreateTree" && event.target.name != "forecastMethodIdForCreateTree" && event.target.name != "notesForCreateTree" && event.target.name != "activeForCreateTree" && event.target.name != "datasetIdModalForCreateTree") {
+            this.setState({isChanged: true})
+        }
+        this.setState({ currentItemConfig }, () => {
             console.log("after state update---", this.state.currentItemConfig);
             if (flag) {
                 if (event.target.name === "planningUnitId") {
@@ -11096,7 +11097,7 @@ export default class CreateTreeTemplate extends Component {
                                         <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                     </button>}
                             </>}
-                        {this.state.editable &&
+                        {parseInt(itemConfig.payload.nodeType.id) != 5 && this.state.editable &&
     
                             <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
@@ -11259,7 +11260,7 @@ export default class CreateTreeTemplate extends Component {
                                 {/* <FontAwesomeIcon icon={faPlus} /> */}
                                 <i class="fa fa-plus" aria-hidden="true"></i>
                             </button>}
-                            {
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') && 
                                 <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                     onClick={(event) => {
             
@@ -11352,7 +11353,7 @@ export default class CreateTreeTemplate extends Component {
                                         onClick={() => this.exportPDF()}
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
-                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{'Create tree'}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span>}
+                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{'Create tree'}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span>}
                                 </a>
                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
@@ -11811,6 +11812,21 @@ export default class CreateTreeTemplate extends Component {
                                                                                 <b>{i18n.t('static.tree.hideFUAndPU')}</b>
                                                                             </Label>
                                                                         </div>
+                                                                        <div>
+                                                                            <Input
+                                                                                className="form-check-input checkboxMargin"
+                                                                                type="checkbox"
+                                                                                id="active9"
+                                                                                name="active9"
+                                                                                checked={this.state.toggleArray.length != 0 }
+                                                                                onClick={(e) => { this.expandCollapse(e); }}
+                                                                            />
+                                                                            <Label
+                                                                                className="form-check-label"
+                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                                <b>{i18n.t('static.tree.collapseTree')}</b>
+                                                                            </Label>
+                                                                        </div>
                                                                     </div>
                                                                 </FormGroup>
                                                                 <div>
@@ -11929,28 +11945,6 @@ export default class CreateTreeTemplate extends Component {
                                                             </CardFooter>}
 
                                                     </CardBody>
-
-                                                    <div className="row ml-lg-1 pb-lg-2">
-                                                        <FormGroup className="col-md-2" >
-                                                            <div className="check inline  pl-lg-0 pt-lg-0">
-                                                                <div>
-                                                                    <Input
-                                                                        className="form-check-input checkboxMargin"
-                                                                        type="checkbox"
-                                                                        id="active9"
-                                                                        name="active9"
-                                                                        checked={this.state.toggleArray.length != 0 }
-                                                                        onClick={(e) => { this.expandCollapse(e); }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                        <b>{i18n.t('static.tree.collapseTree')}</b>
-                                                                    </Label>
-                                                                </div>
-                                                            </div>
-                                                        </FormGroup>    
-                                                    </div>
 
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                                         <Provider>
