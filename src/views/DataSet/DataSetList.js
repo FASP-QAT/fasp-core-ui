@@ -65,13 +65,12 @@ export default class ProgramList extends Component {
         localStorage.setItem("FMSelStatus", document.getElementById("active").value)
     }
     filterData() {
-        let countryId = localStorage.getItem("FMCountryId") ? localStorage.getItem("FMCountryId") : 0;
-        var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : "true";
+        let countryId = localStorage.getItem("FMCountryId") ? localStorage.getItem("FMCountryId") : -1;
+        // var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : "true";
+        var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : -1;
         
         console.log("countryId--------->", countryId);
         console.log("selStatus--------->", selStatus);
-        countryId= countryId==0 ?   -1  :   countryId;
-        selStatus=selStatus=="true"?1:selStatus=="false"?0:-1;
         // if (countryId != 0 && selStatus != "") {
         //     console.log("1------------");
         //     let tempSelStatus = (selStatus == "true" ? true : false)
@@ -795,7 +794,7 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                                                 onChange={() => {this.dataChange(); this.filterData() } }
                                                 value={ localStorage.getItem("FMCountryId") }
                                             >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
                                                 {countries}
                                             </Input>
                                         </InputGroup>
@@ -820,8 +819,8 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
                                                 value={localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : true}
                                             >
                                                 <option value="-1">{i18n.t('static.common.all')}</option>
-                                                <option value="true">{i18n.t('static.common.active')}</option>
-                                                <option value="false">{i18n.t('static.common.disabled')}</option>
+                                                <option value="1">{i18n.t('static.common.active')}</option>
+                                                <option value="0">{i18n.t('static.common.disabled')}</option>
 
                                             </Input>
                                         </InputGroup>
