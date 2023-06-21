@@ -595,7 +595,7 @@ class ListBudgetComponent extends Component {
 
   filterData() {
     let fundingSourceId = this.state.fundingSourceId;
-    let programId = this.state.programId;
+    let programId = parseInt(this.state.programId);
     var selStatus = this.state.statusId;
     let tempSelStatus = (selStatus == "true" ? true : false)
 

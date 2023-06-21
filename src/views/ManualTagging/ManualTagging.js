@@ -1400,7 +1400,7 @@ export default class ManualTagging extends Component {
         console.log("this.state.budgetList@@@@@@@@@@", programId1)
         if (programId1 != "") {
             console.log("this.state.budgetList@@@@@@@@@@", this.state.budgetList)
-            const filteredBudgetList = this.state.budgetList.filter(c => c.program.id == programId1)
+            const filteredBudgetList = this.state.budgetList.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(parseInt(programId1)))
             console.log("this.state.filteredBudgetList@@@@@@@@@@", filteredBudgetList)
             this.setState({
                 filteredBudgetList,
