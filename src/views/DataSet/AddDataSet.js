@@ -796,7 +796,7 @@ export default class AddForecastProgram extends Component {
     }
 
     generateOrganisationCode(event) {
-        let organisationCode = this.state.organisationList.filter(c => (c.organisationId == event.target.value))[0].organisationCode;
+        let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({
             organisationCode: organisationCode
         })
