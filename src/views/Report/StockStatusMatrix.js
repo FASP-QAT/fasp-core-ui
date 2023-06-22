@@ -218,7 +218,7 @@ export default class StockStatusMatrix extends React.Component {
                       }
                     }
                   }
-                  console.log("planningList", planningList);
+                  console.log("flList", flList);
 
                   var tcList = [];
                   flList.filter(function (item) {
@@ -1523,7 +1523,7 @@ export default class StockStatusMatrix extends React.Component {
     }.bind(this);
   };
 
-  handleTracerCategoryChange(tracerCategoryIds) {
+  handleTracerCategoryChange = (tracerCategoryIds) => {
     tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
     });
@@ -1533,15 +1533,11 @@ export default class StockStatusMatrix extends React.Component {
         tracerCategoryLabels: tracerCategoryIds.map((ele) => ele.label),
       },
       () => {
-        console.log(
-          "tracerCategoryIdstracerCategoryIds",
-          this.state
-        );
         this.getPlanningUnit();
         this.filterData();
       }
     );
-  }
+  };
 
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
@@ -1598,7 +1594,7 @@ export default class StockStatusMatrix extends React.Component {
                     .getElementById("programId")
                     .value.split("_")[0];
                   var proList = [];
-                  console.log("myResult123", myResult);
+                  console.log(myResult);
                   let incrmental = 0;
                   for (var i = 0; i < myResult.length; i++) {
                     if (
@@ -1624,24 +1620,15 @@ export default class StockStatusMatrix extends React.Component {
                       return { tracerCategoryId: item.value };
                     }, this);
 
-                  console.log(
-                    "Log--------> ********123",
-                    this.state.tracerCategoryValues
-                  );
-                  console.log(
-                    "Log--------> ******** 00",
-                    this.state.planningUnitList
-                  );
-                  console.log("Log--------> ********00", tracercategory);
+                  // console.log("Log--------> ******** ", tracerCategoryValues);
+                  console.log("Log--------> ******** 00", proList);
+                  console.log("Log--------> ******** -00", proList.length);
 
                   let data1 = [];
                   for (let i = 0; i < proList.length; i++) {
                     for (let j = 0; j < tracerCategoryValues.length; j++) {
                       console.log("Log--------> ******** 11", proList[i]);
-                      console.log(
-                        "Log--------> ******** 22",
-                        tracerCategoryValues[j]
-                      );
+                      console.log("Log--------> ******** 22", i);
                       if (
                         tracerCategoryValues[j].tracerCategoryId ==
                         proList[i].tracerCategoryId
@@ -1650,7 +1637,6 @@ export default class StockStatusMatrix extends React.Component {
                       }
                     }
                   }
-                  console.log("Log--------> ******** 33", data1);
 
                   var lang = this.state.lang;
                   this.setState(
@@ -1701,13 +1687,22 @@ export default class StockStatusMatrix extends React.Component {
                 .then((response) => {
                   console.log("**" + JSON.stringify(response.data));
                   var listArray = response.data;
+
+                  for (var i = 0; i < listArray.length; i++) {
+                    var programJson = {
+                      id: listArray[i].id,
+                      label: listArray[i].label,
+                    };
+                    listArray[i].planningUnit = programJson;
+                  }
+
                   listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(
-                      a.label,
+                      a.planningUnit.label,
                       this.state.lang
                     ).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(
-                      b.label,
+                      b.planningUnit.label,
                       this.state.lang
                     ).toUpperCase(); // ignore upper and lowercase
                     return itemLabelA > itemLabelB ? 1 : -1;
@@ -1717,12 +1712,18 @@ export default class StockStatusMatrix extends React.Component {
                       planningUnits: listArray,
                       planningUnitValues: response.data.map((item, i) => {
                         return {
-                          label: getLabelText(item.label, this.state.lang),
-                          value: item.id,
+                          label: getLabelText(
+                            item.planningUnit.label,
+                            this.state.lang
+                          ),
+                          value: item.planningUnit.id,
                         };
                       }, this),
                       planningUnitLabels: response.data.map((item, i) => {
-                        return getLabelText(item.label, this.state.lang);
+                        return getLabelText(
+                          item.planningUnit.label,
+                          this.state.lang
+                        );
                       }, this),
                       message: "",
                     },
@@ -1746,8 +1747,6 @@ export default class StockStatusMatrix extends React.Component {
                       loading: false,
                     });
                   } else {
-                    console.log("*error*", error);
-
                     switch (error.response ? error.response.status : "") {
                       case 401:
                         this.props.history.push(
@@ -2767,8 +2766,8 @@ export default class StockStatusMatrix extends React.Component {
       planningUnits.length > 0 &&
       planningUnits.map((item, i) => {
         return {
-          label: getLabelText(item.label, this.state.lang),
-          value: item.id,
+          label: getLabelText(item.planningUnit.label, this.state.lang),
+          value: item.planningUnit.id,
         };
       }, this);
     const { productCategories } = this.state;
@@ -3179,7 +3178,6 @@ export default class StockStatusMatrix extends React.Component {
                       bsSize="sm"
                       value={this.state.tracerCategoryValues}
                       onChange={(e) => {
-                        alert(e);
                         this.handleTracerCategoryChange(e);
                       }}
                       disabled={this.state.loading}
@@ -3191,7 +3189,7 @@ export default class StockStatusMatrix extends React.Component {
                                   item.label,
                                   this.state.lang
                                 ),
-                                value: item.id,
+                                value: item.tracerCategoryId,
                               };
                             }, this)
                           : []

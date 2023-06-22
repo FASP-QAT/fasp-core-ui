@@ -179,8 +179,29 @@ class DropdownService {
     );
   }
 
-getOrganisationListByRealmCountryId(realmCountryId) {
-      return axios.get(`${API_URL}/api/dropdown/organisation/realmCountryId/${realmCountryId}`, {});
+  getUpdateProgramInfoDetailsBasedRealmCountryId(
+    programTypeId,
+    realmCountryId,
+    statusId
+  ) {
+    return axios.get(
+      `${API_URL}/api/report/updateProgramInfo/programTypeId/${programTypeId}/realmCountryId/${realmCountryId}/active/${statusId}`,
+      {}
+    );
+  }
+
+  getVersionListForPrograms(programTypeId, json) {
+    return axios.post(
+      `${API_URL}/api/dropdown/version/filter/programTypeId/${programTypeId}/programs`,
+      json,
+      {}
+    );
+  }
+  getOrganisationListByRealmCountryId(realmCountryId) {
+    return axios.get(
+      `${API_URL}/api/dropdown/organisation/realmCountryId/${realmCountryId}`,
+      {}
+    );
   }
 }
 
