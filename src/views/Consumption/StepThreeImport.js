@@ -1343,7 +1343,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
                 <div className="table-responsive consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
-                    <div id="mapImport">
+                    <div style={{width: '100%'}} id="mapImport">
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>

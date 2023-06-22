@@ -428,7 +428,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
                 <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
 
-                    <div id="mapRegion">
+                    <div style={{width: '100%'}} id="mapRegion">
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>

@@ -3982,7 +3982,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             {this.state.showData &&
                                                 <div className="">
                                                     <div className="">
-                                                        <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: 'unset' }}>
+                                                        <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: '100%' }}>
                                                             <thead>
                                                                 <tr>
                                                                     <td width="160px" title={i18n.t('static.tooltip.errors')}><b>{i18n.t('static.common.errors')}</b>
@@ -4110,7 +4110,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     </ul>}
                                                 </div>
                                                 <div className="row  mt-lg-3 mb-lg-3">
-                                                    <div className="pl-lg-4 pr-lg-4 ModelingValidationTable consumptionDataEntryTable">
+                                                    <div style={{width: '100%'}} className="pl-lg-4 pr-lg-4 ModelingValidationTable consumptionDataEntryTable">
                                                         <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                                         </div>
                                                     </div>
