@@ -19,7 +19,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Online, Offline } from 'react-detect-offline';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling, API_URL } from '../../Constants.js';
+import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -38,6 +38,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { act } from 'react-test-renderer';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 
 
 // const { getToggledOptions } = utils;
@@ -245,10 +246,9 @@ class ProductCatalog extends Component {
 
 
             // AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
             if (isSiteOnline()) {
-                TracerCategoryService.getTracerCategoryByProgramId(realmId,programId).then(response => {
-
+                // console.log("programids=====>", programIdsValue);
+                DropdownService.getTracerCategoryForMultipleProgramsDropdownList([programId]).then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -418,19 +418,27 @@ class ProductCatalog extends Component {
         let realmId = AuthenticationService.getRealmId();
         // ProgramService.getProgramByRealmId(realmId)
         if (isSiteOnline()) {
-            ProgramService.getProgramList()
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
                     console.log("sesProgramIdReport----->", localStorage.getItem("sesProgramIdReport"));
                     var listArray = response.data;
-                    listArray.sort((a, b) => {
+                    var proList = []
+                    for (var i = 0; i < listArray.length; i++) {
+                        var programJson = {
+                            programId: listArray[i].id,
+                            label: listArray[i].label,
+                            programCode: listArray[i].code
+                        }
+                        proList[i] = programJson
+                    }
+                    proList.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                         this.setState({
-                            programs: listArray, loading: false,
+                            programs: proList, loading: false,
                             programId: localStorage.getItem("sesProgramIdReport")
                         }, () => {
                             this.fetchData();
@@ -1477,7 +1485,7 @@ class ProductCatalog extends Component {
                                                 {tracerCategories.length > 0
                                                     && tracerCategories.map((item, i) => {
                                                         return (
-                                                            <option key={i} value={item.tracerCategoryId}>
+                                                            <option key={i} value={item.id}>
                                                                 {getLabelText(item.label, this.state.lang)}
                                                             </option>
                                                         )

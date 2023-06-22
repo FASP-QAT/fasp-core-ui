@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -57,6 +57,7 @@ import 'chartjs-plugin-annotation';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { MultiSelect } from "react-multi-select-component";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -487,33 +488,80 @@ class GlobalConsumption extends Component {
   }
   filterProgram = () => {
     let countryIds = this.state.countryValues.map(ele => ele.value);
-    console.log('countryIds', countryIds, 'programs', this.state.programs)
+    // console.log('countryIds', countryIds, 'programs', this.state.programs)
     this.setState({
       programLst: [],
       programValues: [],
       programLabels: []
     }, () => {
       if (countryIds.length != 0) {
-        let programLst = [];
-        for (var i = 0; i < countryIds.length; i++) {
-          programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-        }
+        let newCountryList = [... new Set(countryIds)];
+        DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+          .then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            console.log('programLst', listArray)
+            if (listArray.length > 0) {
+              this.setState({
+                programLst: listArray
+              }, () => {
+                this.filterData(this.state.rangeValue)
+              });
+            } else {
+              this.setState({
+                programLst: []
+              }, () => {
+                this.filterData(this.state.rangeValue)
+              });
+            }
+          }).catch(
+            error => {
+              this.setState({
+                programLst: [], loading: false
+              })
+              if (error.message === "Network Error") {
+                this.setState({
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
 
-        console.log('programLst', programLst)
-        if (programLst.length > 0) {
-
-          this.setState({
-            programLst: programLst
-          }, () => {
-            this.filterData(this.state.rangeValue)
-          });
-        } else {
-          this.setState({
-            programLst: []
-          }, () => {
-            this.filterData(this.state.rangeValue)
-          });
-        }
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
       } else {
         this.setState({
           programLst: []
@@ -573,7 +621,7 @@ class GlobalConsumption extends Component {
     // let productCategoryId = document.getElementById("productCategoryId").value;
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
     let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-    let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+    let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     let viewById = document.getElementById("viewById").value;
     let realmId = AuthenticationService.getRealmId()
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
@@ -688,21 +736,28 @@ class GlobalConsumption extends Component {
     if (isSiteOnline()) {
 
       let realmId = AuthenticationService.getRealmId();
-      // let realmId = document.getElementById('realmId').value
-      RealmCountryService.getRealmCountryForProgram(realmId)
+      // RealmCountryService.getRealmCountryForProgram(realmId)
+      DropdownService.getRealmCountryDropdownList(realmId)
         .then(response => {
-          var listArray = response.data.map(ele => ele.realmCountry);
-          listArray.sort((a, b) => {
-            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-            return itemLabelA > itemLabelB ? 1 : -1;
-          });
-          this.setState({
-            // countrys: response.data.map(ele => ele.realmCountry)
-            countrys: listArray,
-            loading: false
-          })
-        }).catch(
+          console.log("RealmCountryService---->", response.data)
+          if (response.status == 200) {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+              // realmCountryList: response.data.map(ele => ele.realmCountry)
+              countrys: listArray,
+              loading: false
+            }, () => { })
+          } else {
+            this.setState({ message: response.data.messageCode, loading: false },
+              () => { this.hideSecondComponent(); })
+          }
+        })
+        .catch(
           error => {
             this.setState({
               countrys: []
@@ -821,69 +876,74 @@ class GlobalConsumption extends Component {
 
   getPlanningUnit() {
     this.setState({ loading: true })
-    let programValues = this.state.programValues;
-    // console.log("programValues----->", programValues);
+    let programValues = this.state.programValues.map(c => c.value);
+    console.log("programValues----->", programValues);
     this.setState({
       planningUnits: [],
       planningUnitValues: [],
       planningUnitLabels: []
     }, () => {
       if (programValues.length > 0) {
-        PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
-          .then(response => {
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-              return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            this.setState({
-              planningUnits: listArray, loading: false
-            }, () => {
-              this.filterData(this.state.rangeValue)
+        var programJson = {
+          tracerCategoryIds: [],
+          programIds: programValues
+        }
+        console.log('**' + programJson);
+        DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+          console.log('**' + JSON.stringify(response.data));
+          var listArray = response.data;
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
+          this.setState({
+            planningUnits: listArray, loading: false
+          }, () => {
+            this.filterData(this.state.rangeValue)
 
-            })
-          }).catch(
-            error => {
-              if (error.message === "Network Error") {
-                this.setState({
-                  // message: 'static.unkownError',
-                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                  loading: false
-                });
-              } else {
-                switch (error.response ? error.response.status : "") {
+          })
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
 
-                  case 401:
-                    this.props.history.push(`/login/static.message.sessionExpired`)
-                    break;
-                  case 403:
-                    this.props.history.push(`/accessDenied`)
-                    break;
-                  case 500:
-                  case 404:
-                  case 406:
-                    this.setState({
-                      message: error.response.data.messageCode,
-                      loading: false
-                    });
-                    break;
-                  case 412:
-                    this.setState({
-                      message: error.response.data.messageCode,
-                      loading: false
-                    });
-                    break;
-                  default:
-                    this.setState({
-                      message: 'static.unkownError',
-                      loading: false
-                    });
-                    break;
-                }
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
               }
             }
-          );
+          }
+        );
       }
     })
 
@@ -978,8 +1038,8 @@ class GlobalConsumption extends Component {
   componentDidMount() {
 
     // this.getPrograms()
-    // this.getCountrys();
-    this.getRelamList();
+    this.getCountrys();
+    // this.getRelamList();
     // this.getProductCategories()
   }
 
@@ -1125,13 +1185,13 @@ class GlobalConsumption extends Component {
 
   filterOptions = async (options, filter) => {
     if (filter) {
-        return options.filter((i) =>
-            i.label.toLowerCase().includes(filter.toLowerCase())
-        );
+      return options.filter((i) =>
+        i.label.toLowerCase().includes(filter.toLowerCase())
+      );
     } else {
-        return options;
+      return options;
     }
-};
+  };
 
   render() {
     const { planningUnits } = this.state;
@@ -1151,7 +1211,7 @@ class GlobalConsumption extends Component {
         return (
 
           // { label: getLabelText(item.label, this.state.lang), value: item.programId }
-          { label: item.programCode, value: item.programId }
+          { label: item.code, value: item.id }
 
         )
       }, this);

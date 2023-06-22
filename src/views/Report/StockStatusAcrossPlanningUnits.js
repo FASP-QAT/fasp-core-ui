@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, API_URL } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -36,6 +36,7 @@ import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import TracerCategoryService from '../../api/TracerCategoryService';
 
 import { MultiSelect } from 'react-multi-select-component';
+import DropdownService from '../../api/DropdownService';
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
@@ -108,7 +109,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                     };
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
-                        myResult = planningunitRequest.result.filter(c=>c.active==true);
+                        myResult = planningunitRequest.result.filter(c => c.active == true);
                         var programId = (document.getElementById("programId").value).split("_")[0];
                         var proList = []
 
@@ -148,7 +149,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                             flList.filter(function (item) {
                                 var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
                                 if (i <= -1 && item.tracerCategory.id != 0) {
-                                    tcList.push({ tracerCategoryId: item.tracerCategory.id, label: item.tracerCategory.label });
+                                    tcList.push({ id: item.tracerCategory.id, label: item.tracerCategory.label });
                                 }
                                 return null;
                             });
@@ -174,10 +175,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
             }
             else {
-
-
-                let realmId = AuthenticationService.getRealmId();
-                TracerCategoryService.getTracerCategoryByProgramId(realmId,programId).then(response => {
+                DropdownService.getTracerCategoryForMultipleProgramsDropdownList([programId]).then(response => {
 
                     if (response.status == 200) {
                         var listArray = response.data;
@@ -377,11 +375,21 @@ class StockStatusAcrossPlanningUnits extends Component {
     getPrograms = () => {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
+            let realmId = AuthenticationService.getRealmId();
+
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    var proList = []
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            programId: response.data[i].id,
+                            label: response.data[i].label,
+                            programCode: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: proList, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -545,15 +553,62 @@ class StockStatusAcrossPlanningUnits extends Component {
             console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
-                    this.setState({
-                        versions: []
-                    }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
-                    });
+                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                        .then(response => {
+                            console.log("response===>", response.data)
+                            this.setState({
+                                versions: []
+                            }, () => {
+                                this.setState({
+                                    versions: response.data
+                                }, () => {
+                                    this.consolidatedVersionList(programId)
+                                });
+                            });
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    programs: [], loading: false
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
 
 
                 } else {
@@ -1722,7 +1777,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                         options=
                                                         {tracerCategories.length > 0 ?
                                                             tracerCategories.map((item, i) => {
-                                                                return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
+                                                                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
                                                             }, this) : []} />
 

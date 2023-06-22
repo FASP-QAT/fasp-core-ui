@@ -1135,7 +1135,7 @@ class ListBudgetComponent extends Component {
     FundingSourceService.getFundingSourceListAll()
       .then(response => {
         if (response.status == 200) {
-          console.log("funding source after status 200--->" + response.data)
+          console.log("funding source after status 200--->" , response.data)
           // this.setState({
           //   fundingSourceList: response.data
           // })
@@ -1249,9 +1249,9 @@ class ListBudgetComponent extends Component {
     let programList = programs.length > 0
       && programs.map((item, i) => {
         return (
-          <option key={i} value={item.programId}>
+          <option key={i} value={item.id}>
             {/* {getLabelText(item.label, this.state.lang)} */}
-            {item.programCode}
+            {item.code}
           </option>
         )
       }, this);

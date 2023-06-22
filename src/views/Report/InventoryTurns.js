@@ -37,6 +37,7 @@ import ProductCategoryService from "../../api/PoroductCategoryService";
 import RealmCountryService from '../../api/RealmCountryService';
 import { json } from 'mathjs';
 import { de } from 'date-fns/locale';
+import DropdownService from '../../api/DropdownService';
 
 
 export const PSM_PROCUREMENT_AGENT_ID = 1
@@ -677,15 +678,15 @@ export default class InventoryTurns extends Component {
                 this.filterData();
                 this.formSubmit();
             })    
-        
-        RealmCountryService.getRealmCountryListAll()
+        let realmId=AuthenticationService.getRealmId();
+        DropdownService.getRealmCountryDropdownList(realmId)
                 .then(response => {
                     console.log("Realm Country List list---", response.data);
                     if (response.status == 200) {
-                        var json = (response.data).filter(c => c.active == true);
+                        var json = (response.data);
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                            regList[i] = { value: json[i].id, label: json[i].label.label_en }
                         }
                         var listArray = regList;
                         listArray.sort((a, b) => {
@@ -697,7 +698,7 @@ export default class InventoryTurns extends Component {
                         
                         var countryArray = [];
                         for (var i = 0; i < response.data.length; i++) {
-                            countryArray[i] = response.data[i].realmCountryId;
+                            countryArray[i] = response.data[i].id;
                         }
                         this.setState({
                             countryList: listArray,

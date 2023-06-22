@@ -310,7 +310,7 @@
 
 import React, { Component } from "react";
 import { NavLink } from 'react-router-dom';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
+import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col, Dropdown } from 'reactstrap';
 // import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProcurementUnitService from "../../api/ProcurementUnitService";
@@ -328,6 +328,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, API_URL } from "../../Constants";
+import DropdownService from "../../api/DropdownService";
 
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
 export default class ListProcurementUnit extends Component {
@@ -615,7 +616,7 @@ export default class ListProcurementUnit extends Component {
       }
     );
 
-    PlanningUnitService.getActivePlanningUnitList().then(response => {
+    DropdownService.getPlanningUnitDropDownList().then(response => {
       if (response.status == 200) {
         console.log("response--->", response.data);
         var listArray = response.data;
@@ -700,7 +701,7 @@ export default class ListProcurementUnit extends Component {
     let planningUnits = planningUnitList.length > 0
       && planningUnitList.map((item, i) => {
         return (
-          <option key={i} value={item.planningUnitId}>
+          <option key={i} value={item.id}>
             {getLabelText(item.label, this.state.lang)}
           </option>
         )

@@ -4,7 +4,7 @@ import i18n from '../../i18n';
 import {
     Card, CardBody,
     Label, Input, FormGroup,
-    CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody
+    CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody, Dropdown
 } from 'reactstrap';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jspreadsheet';
@@ -12,7 +12,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from "../../api/ProgramService";
 import IntegrationService from "../../api/IntegrationService";
-import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SPV_REPORT_DATEPICKER_START_MONTH } from "../../Constants";
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SPV_REPORT_DATEPICKER_START_MONTH } from "../../Constants";
 import { checkValidtion, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionOnlyHideRowOld } from "../../CommonComponent/JExcelCommonFunctions";
 import moment from "moment";
 import AuthenticationService from "../Common/AuthenticationService";
@@ -22,6 +22,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import { MultiSelect } from "react-multi-select-component";
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
+import DropdownService from "../../api/DropdownService";
 
 const entityname = i18n.t('static.integration.manualProgramIntegration')
 export default class ConsumptionDetails extends Component {
@@ -62,6 +63,7 @@ export default class ConsumptionDetails extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
         this.filterProgram = this.filterProgram.bind(this)
+        this.getVersions=this.getVersions.bind(this)
     }
 
     modelOpenClose() {
@@ -243,24 +245,7 @@ export default class ConsumptionDetails extends Component {
         this.setState({
             loading: true
         })
-        ProgramService.getProgramList()
-            .then(programResponse => {
-                if (programResponse.status == 200) {
-                    var programList = programResponse.data;
-                    console.log("programList", programList)
-                    var plList = [];
-                    programList.map(item => {
-                        plList.push({ id: item.programId, name: item.programCode, versionList: item.versionList, realmCountry: item.realmCountry })
-                    })
-                    plList.sort((a, b) => {
-                        var itemLabelA = (a.name).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = (b.name).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        programList: plList,
-                        loading: false
-                    })
+        
                     IntegrationService.getIntegrationListAll().then(response => {
                         if (response.status == 200) {
                             var listArray = response.data;
@@ -291,7 +276,7 @@ export default class ConsumptionDetails extends Component {
                                         // countrys: response.data.map(ele => ele.realmCountry)
                                         countrys: listArray,
                                         countryValues: countryValues,
-                                        programList: plList,
+                                        // programList: plList,
                                         integrationList: integrationList,
                                         loading: false
                                     }, () => {
@@ -516,64 +501,6 @@ export default class ConsumptionDetails extends Component {
                             }
                         }
                     );
-                } else {
-                    this.setState({
-                        message: programResponse.data.messageCode,
-                        color: 'red',
-                        programList: []
-                    },
-                        () => {
-                            this.hideFirstComponent();
-                        })
-                }
-            }).catch(
-                error => {
-                    this.setState({
-                        programList: []
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            // message: 'static.unkownError',
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            color: 'red',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    color: 'red',
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    color: 'red',
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    color: 'red',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -816,35 +743,112 @@ export default class ConsumptionDetails extends Component {
             programValues: [],
         }, () => {
             if (countryIds.length != 0) {
-                let programLst = [];
                 var programValues = [];
-                for (var i = 0; i < countryIds.length; i++) {
-                    programLst = [...programLst, ...this.state.programList.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
+                let newCountryList = [...new Set(countryIds)];
+                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN,newCountryList)
+                    .then(programResponse => {
+                        if (programResponse.status == 200) {
+                            var programList = programResponse.data;
+                            console.log("programList", programList)
+                            var plList = [];
+                            programList.map(item => {
+                                plList.push({ id: item.id, name: item.code, versionList: [] })
+                            })
+                            plList.sort((a, b) => {
+                                var itemLabelA = (a.name).toUpperCase(); // ignore upper and lowercase
+                                var itemLabelB = (b.name).toUpperCase(); // ignore upper and lowercase                   
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
+                            plList.map(item => {
+                              programValues.push({ value: item.id })
+                          })
 
-                }
-                programLst.map(item => {
-                    programValues.push({ label: item.name, value: item.id })
-                })
-                console.log('programLst', programLst)
-                if (programLst.length > 0) {
+                          if (plList.length > 0) {
 
-                    this.setState({
-                        programListBasedOnCountry: programLst.sort((a, b) => {
-                            var itemLabelA = (a.name).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = (b.name).toUpperCase(); // ignore upper and lowercase                   
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        }),
-                        programValues: programValues
-                    }, () => {
-                        this.showReport()
-                    });
-                } else {
-                    this.setState({
-                        programListBasedOnCountry: []
-                    }, () => {
-                        this.showReport()
-                    });
-                }
+                            this.setState({
+                                programListBasedOnCountry: plList.sort((a, b) => {
+                                    var itemLabelA = (a.name).toUpperCase(); // ignore upper and lowercase
+                                    var itemLabelB = (b.name).toUpperCase(); // ignore upper and lowercase                   
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                }),
+                                programValues: programValues
+                            }, () => {
+                          console.log('programValues', programValues)
+
+                                this.getVersions()
+                            });
+                        } else {
+                            this.setState({
+                                programListBasedOnCountry: []
+                            }, () => {
+                                this.showReport()
+                            });
+                        }
+
+
+                            this.setState({
+                                programList: plList,
+                                loading: false
+                            })
+                          } else {
+                            this.setState({
+                                message: programResponse.data.messageCode,
+                                color: 'red',
+                                programList: []
+                            },
+                                () => {
+                                    this.hideFirstComponent();
+                                })
+                        }
+                    }).catch(
+                        error => {
+                            this.setState({
+                                programList: []
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    color: 'red',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+        
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            color: 'red',
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            color: 'red',
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            color: 'red',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+                
             } else {
                 this.setState({
                     programListBasedOnCountry: []
@@ -854,6 +858,107 @@ export default class ConsumptionDetails extends Component {
             }
 
         })
+    }
+
+    getVersions(){
+      let progList = this.state.programListBasedOnCountry;
+      let programValues=this.state.programValues.map(ele => ele.value);;
+          if (progList.length != 0) {
+              let verLst = [];
+              var keys = [];
+              var values = [];
+              let newProgramList = [...new Set(programValues)];
+
+              DropdownService.getVersionListForPrograms(PROGRAM_TYPE_SUPPLY_PLAN,newProgramList)
+                  .then(versionResponse => {
+                      if (versionResponse.status == 200) {
+//to get values
+                        for (let value of Object.values(versionResponse.data)) {
+                            values.push(value)
+                        }
+                        //to get keys
+                        for (let key of Object.keys(versionResponse.data)) {
+                            keys.push(key)
+                        }
+                        for (var i = 0; i < keys.length; i++) {
+                            // verLst[keys[i]] = values[i];
+                            progList.filter(c=>c.id==keys[i])[0].versionList=values[i]
+                        } 
+
+                          this.setState({
+                              programListBasedOnCountry: progList
+                          }, () => {
+                              this.showReport()
+                          });
+                        } else {
+                          this.setState({
+                              message: versionResponse.data.messageCode,
+                              color: 'red',
+                              programList: []
+                          },
+                              () => {
+                                  this.hideFirstComponent();
+                              })
+                      }
+                  }).catch(
+                      error => {
+                          this.setState({
+                              programList: []
+                          })
+
+                          if (error.message === "Network Error") {
+                              this.setState({
+                                  // message: 'static.unkownError',
+                                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                  color: 'red',
+                                  loading: false
+                              });
+                          } else {
+                              switch (error.response ? error.response.status : "") {
+      
+                                  case 401:
+                                      this.props.history.push(`/login/static.message.sessionExpired`)
+                                      break;
+                                  case 403:
+                                      this.props.history.push(`/accessDenied`)
+                                      break;
+                                  case 500:
+                                  case 404:
+                                  case 406:
+                                      this.setState({
+                                          message: error.response.data.messageCode,
+                                          color: 'red',
+                                          loading: false
+                                      });
+                                      break;
+                                  case 412:
+                                      this.setState({
+                                          message: error.response.data.messageCode,
+                                          color: 'red',
+                                          loading: false
+                                      });
+                                      break;
+                                  default:
+                                      this.setState({
+                                          message: 'static.unkownError',
+                                          color: 'red',
+                                          loading: false
+                                      });
+                                      break;
+                              }
+                          }
+                      }
+                  );
+              
+          } else {
+              this.setState({
+                  programListBasedOnCountry: []
+              }, () => {
+                  this.showReport()
+              });
+          }
+
+     
     }
 
     handleChangeProgram(programIds) {
