@@ -3289,7 +3289,7 @@ class EquivalancyUnit extends Component {
                             <span><h5 style={{ color: this.state.color, display: "none" }} id="div3">{this.state.message}</h5></span>
                             {/* <h6 className="red" id="div3"></h6> */}
                             <div>
-                                <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped consumptionDataEntryTable">
+                                <div id="eqUnitInfoTable" style={{width: '100%'}} className="AddListbatchtrHeight RemoveStriped consumptionDataEntryTable">
                                 </div>
                             </div>
                             <br />
