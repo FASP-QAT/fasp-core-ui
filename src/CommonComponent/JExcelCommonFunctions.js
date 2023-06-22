@@ -387,10 +387,10 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
     jexcel_pagination.firstChild.classList.add('pl-0');
     // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
     // document.getElementsByClassName('jexcel_pagination')[number].value = 25
-    var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[number];
+    var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[0];
     pageSelect.options[3].innerHTML = "All";
 
-    pageSelect.addEventListener("change", () => paginationChange(number));
+    pageSelect.addEventListener("change", () => paginationChange(0));
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
