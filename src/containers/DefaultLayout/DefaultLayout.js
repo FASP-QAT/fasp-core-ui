@@ -4182,17 +4182,17 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
-                              {
-                                name: i18n.t('static.budgetHead.budget'),
-                                url: '/report/budgets',
-                                icon: 'fa fa-exchange',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
+                              // {
+                              //   name: i18n.t('static.budgetHead.budget'),
+                              //   url: '/report/budgets',
+                              //   icon: 'fa fa-exchange',
+                              //   attributes: {
+                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT') && this.state.activeTab == 2 ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
                                 name: i18n.t('static.dashboard.supplierLeadTimes'),
                                 url: '/report/supplierLeadTimes',

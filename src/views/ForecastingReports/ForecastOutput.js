@@ -19,7 +19,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, TITLE_FONT, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, TITLE_FONT, DATE_FORMAT_CAP, API_URL,PROGRAM_TYPE_DATASET } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -36,6 +36,7 @@ import showguidanceforecastOutputEn from '../../../src/ShowGuidanceFiles/Forecas
 import showguidanceforecastOutputFr from '../../../src/ShowGuidanceFiles/ForecastOutputFr.html'
 import showguidanceforecastOutputSp from '../../../src/ShowGuidanceFiles/ForecastOutputSp.html'
 import showguidanceforecastOutputPr from '../../../src/ShowGuidanceFiles/ForecastOutputPr.html'
+import DropdownService from '../../api/DropdownService';
 
 const ref = React.createRef();
 const pickerLang = {
@@ -491,7 +492,7 @@ class ForecastOutput extends Component {
         // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (this.state.programs.filter(c => c.id == this.state.programId)[0].code + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
         // csvRow.push('"' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
@@ -614,7 +615,7 @@ class ForecastOutput extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.monthlyForecast') + ".csv"
+        a.download = this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.monthlyForecast') + ".csv"
         document.body.appendChild(a)
         a.click();
 
@@ -663,7 +664,7 @@ class ForecastOutput extends Component {
                 doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runDate') + "</b> " + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + "</font></span>", doc.internal.pageSize.width - 150, 20)
                 doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runTime') + "</b> " + moment(new Date()).format('hh:mm A') + "</font></span>", doc.internal.pageSize.width - 150, 30)
                 doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.user.user') + ":</b> " + AuthenticationService.getLoggedInUsername() + "</font></span>", doc.internal.pageSize.width - 150, 40)
-                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font></span>", doc.internal.pageSize.width - 150, 50)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.id == this.state.programId)[0].code + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font></span>", doc.internal.pageSize.width - 150, 50)
 
 
                 // doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
@@ -869,7 +870,7 @@ class ForecastOutput extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.monthlyForecast') + ".pdf")
+        doc.save(this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.monthlyForecast') + ".pdf")
 
     }
     addGraphId() {
@@ -2021,15 +2022,16 @@ class ForecastOutput extends Component {
 
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getDataSetListAll()
+            let realmId = AuthenticationService.getRealmId();
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
                 .then(response => {
                     let datasetList = response.data;
                     console.log("datasetList-------------->1", datasetList);
-                    datasetList = datasetList.filter(c => c.active == true);
+                    // datasetList = datasetList.filter(c => c.active == true);
                     console.log("datasetList-------------->2", datasetList);
                     this.setState({
                         programs: datasetList,
-                        allProgramList: response.data
+                        // allProgramList: response.data
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -2118,7 +2120,7 @@ class ForecastOutput extends Component {
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
-                            if (this.state.programs[k].programId == programData.programId) {
+                            if (this.state.programs[k].id == programData.programId) {
                                 f = 1;
                                 console.log('already exist')
                                 console.log("programJson1-------->1", programData);
@@ -2137,8 +2139,8 @@ class ForecastOutput extends Component {
                 if (proList.length == 1) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = (a.programCode).toLowerCase();
-                            b = (b.programCode).toLowerCase();
+                            a = (a.code).toLowerCase();
+                            b = (b.code).toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         downloadedProgramData: downloadedProgramData,
@@ -2151,8 +2153,8 @@ class ForecastOutput extends Component {
                     if (this.props.match.params.programId != "" && this.props.match.params.programId != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             programId: this.props.match.params.programId,
@@ -2166,8 +2168,8 @@ class ForecastOutput extends Component {
                     else if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             downloadedProgramData: downloadedProgramData,
@@ -2179,8 +2181,8 @@ class ForecastOutput extends Component {
                     } else {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             downloadedProgramData: downloadedProgramData
@@ -2245,7 +2247,7 @@ class ForecastOutput extends Component {
 
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
-
+console.log("programId",programId,"   versionId",versionId)
         // let programId = this.state.programId;
         // let versionId = this.state.versionId;
 
@@ -2269,6 +2271,7 @@ class ForecastOutput extends Component {
                 } else {
                     // localStorage.setItem("sesVersionIdReport", versionId);
                     if (versionId.includes('Local')) {
+                        console.log("IN local programId",programId,"   versionId",versionId)
                         let programData = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == (versionId.split('(')[0]).trim())[0];
                         console.log("programData---------->", programData);
                         let forecastingUnitListTemp = [];
@@ -2436,7 +2439,8 @@ class ForecastOutput extends Component {
 
                     }
                     else {
-
+                        console.log("IN Live programId",programId,"   versionId",versionId)
+                        
                         PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(programId, versionId).then(response => {
                             console.log('**' + JSON.stringify(response.data))
                             var listArray = response.data;
@@ -2723,11 +2727,11 @@ class ForecastOutput extends Component {
                 }, () => { })
 
             } else {//server version
-                let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId)[0];
+                let selectedForecastProgram = this.state.programs.filter(c => c.id == programId)[0];
 
-                let currentProgramVersion = selectedForecastProgram.versionList.filter(c => c.versionId == versionId)[0];
+                let currentProgramVersion = this.state.versions.filter(c => c.versionId == versionId)[0];
 
-                console.log("selectedForecastProgram---------->", selectedForecastProgram);
+                console.log("currentProgramVersion---------->", currentProgramVersion);
 
                 let d1 = new Date(currentProgramVersion.forecastStartDate);
                 let d2 = new Date(currentProgramVersion.forecastStopDate);
@@ -2914,26 +2918,76 @@ class ForecastOutput extends Component {
         let programId = this.state.programId;
         if (programId != 0) {
 
-            const program = this.state.programs.filter(c => c.programId == programId)
+            const program = this.state.programs.filter(c => c.id == programId)
             console.log("program-------------->", program);
             if (program.length == 1) {
                 if (isSiteOnline()) {
-                    this.setState({
-                        versions: [],
-                    }, () => {
-                        let inactiveProgram = this.state.allProgramList.filter(c => c.active == false);
-                        inactiveProgram = inactiveProgram.filter(c => c.programId == programId);
-                        if (inactiveProgram.length > 0) {//Inactive
-                            this.consolidatedVersionList(programId)
-                        } else {//Active
+                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                    .then(response => {
+                        console.log("response===>1", response.data)
+                        this.setState({
+                            versions: []
+                        }, () => {
                             this.setState({
-                                versions: program[0].versionList.filter(function (x, i, a) {
-                                    return a.indexOf(x) === i;
-                                })
+                                versions: response.data
                             }, () => { this.consolidatedVersionList(programId) });
-                        }
+                        });
+                    }).catch(
+                        error => {
+                            this.setState({
+                                programs: [], loading: false
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
 
-                    });
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+                    // this.setState({
+                    //     versions: [],
+                    // }, () => {
+                    //         this.setState({
+                    //             versions: program[0].versionList.filter(function (x, i, a) {
+                    //                 return a.indexOf(x) === i;
+                    //             })
+                    //         }, () => { this.consolidatedVersionList(programId) });
+                    //     // }
+
+                    // });
 
 
                 } else {
@@ -3200,7 +3254,7 @@ class ForecastOutput extends Component {
             title: {
                 display: true,
                 // text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(' + i18n.t('static.product.product') + ')' : '(' + i18n.t('static.forecastingunit.forecastingunit') + ')'))
-                text: i18n.t('static.dashboard.monthlyForecast') + ' - ' + (this.state.programs.filter(c => c.programId == this.state.programId).length > 0 ? this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : '')
+                text: i18n.t('static.dashboard.monthlyForecast') + ' - ' + (this.state.programs.filter(c => c.id == this.state.programId).length > 0 ? this.state.programs.filter(c => c.id == this.state.programId)[0].code : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : '')
             },
             scales: {
                 yAxes: [
@@ -3424,9 +3478,9 @@ class ForecastOutput extends Component {
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
+                    <option key={i} value={item.id}>
                         {/* {item.label.label_en} */}
-                        {item.programCode}
+                        {item.code}
                     </option>
                 )
             }, this);

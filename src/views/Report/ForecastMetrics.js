@@ -46,7 +46,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, API_URL } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -66,6 +66,7 @@ import { contrast, isSiteOnline } from "../../CommonComponent/JavascriptCommonFu
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import DropdownService from '../../api/DropdownService';
 
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
@@ -482,33 +483,82 @@ class ForecastMetrics extends Component {
 
   filterProgram = () => {
     let countryIds = this.state.countryValues.map(ele => ele.value);
-    console.log('countryIds', countryIds, 'programs', this.state.programs)
+    // console.log('countryIds', countryIds, 'programs', this.state.programs)
     this.setState({
       programLst: [],
       programValues: [],
       programLabels: []
     }, () => {
       if (countryIds.length != 0) {
-        let programLst = [];
-        for (var i = 0; i < countryIds.length; i++) {
-          programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-        }
+        let newCountryList = [... new Set(countryIds)];
+        DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+          .then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            console.log('programLst', listArray)
+            if (listArray.length > 0) {
+              this.setState({
+                programLst: listArray
+              }, () => {
+                this.filterData()
+              });
+            } else {
+              this.setState({
+                programLst: []
+              }, () => {
+                this.filterData()
+              });
+            }
+          }).catch(
+            error => {
+              this.setState({
+                programLst: [], loading: false
+              })
+              if (error.message === "Network Error") {
+                this.setState({
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
 
-        console.log('programLst', programLst)
-        if (programLst.length > 0) {
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
 
-          this.setState({
-            programLst: programLst
-          }, () => {
-            this.filterData()
-          });
-        } else {
-          this.setState({
-            programLst: []
-          }, () => {
-            this.filterData()
-          });
-        }
+
       } else {
         this.setState({
           programLst: []
@@ -554,7 +604,7 @@ class ForecastMetrics extends Component {
         }
         // console.log("programids=====>", programIdsValue);
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
-        TracerCategoryService.getTracerCategoryByProgramIds(realmId,programIdsValue)
+        TracerCategoryService.getTracerCategoryByProgramIds(realmId, programIdsValue)
           .then(response => {
             console.log("tc respons==>", response.data);
             var listArray = response.data;
@@ -809,7 +859,7 @@ class ForecastMetrics extends Component {
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
     let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
     let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
-    let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+    let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
     let monthInCalc = document.getElementById("viewById").value;
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
@@ -967,9 +1017,9 @@ class ForecastMetrics extends Component {
     if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
       let realmId = AuthenticationService.getRealmId();
-      RealmCountryService.getRealmCountryForProgram(realmId)
+      DropdownService.getRealmCountryDropdownList(realmId)
         .then(response => {
-          var listArray = response.data.map(ele => ele.realmCountry);
+          var listArray = response.data;
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -1110,69 +1160,68 @@ class ForecastMetrics extends Component {
             tracerCategoryIds: this.state.tracerCategoryValues.map(ele => (ele.value).toString()),
             programIds: programValues.map(ele => (ele.value))
           }
-          PlanningUnitService.getPlanningUnitByProgramIdsAndTracerCategorieIds(inputjson)
-            .then(response => {
-              var listArray = response.data;
-              listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                return itemLabelA > itemLabelB ? 1 : -1;
-              });
-              console.log("resp---->", listArray);
-              this.setState({
-                planningUnits: listArray,
-                planningUnitValues: listArray.map((item, i) => {
-                  return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+          DropdownService.getProgramPlanningUnitDropdownList(inputjson).then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            console.log("resp---->", listArray);
+            this.setState({
+              planningUnits: listArray,
+              planningUnitValues: listArray.map((item, i) => {
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
-                }, this),
-                planningUnitLabels: listArray.map((item, i) => {
-                  return (getLabelText(item.label, this.state.lang))
-                }, this),
-                message: ''
-              }, () => {
-                this.filterData();
-              })
-            }).catch(
-              error => {
-                if (error.message === "Network Error") {
-                  this.setState({
-                    // message: 'static.unkownError',
-                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                    loading: false
-                  });
-                } else {
-                  switch (error.response ? error.response.status : "") {
+              }, this),
+              planningUnitLabels: listArray.map((item, i) => {
+                return (getLabelText(item.label, this.state.lang))
+              }, this),
+              message: ''
+            }, () => {
+              this.filterData();
+            })
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
 
-                    case 401:
-                      this.props.history.push(`/login/static.message.sessionExpired`)
-                      break;
-                    case 403:
-                      this.props.history.push(`/accessDenied`)
-                      break;
-                    case 500:
-                    case 404:
-                    case 406:
-                      this.setState({
-                        message: error.response.data.messageCode,
-                        loading: false
-                      });
-                      break;
-                    case 412:
-                      this.setState({
-                        message: error.response.data.messageCode,
-                        loading: false
-                      });
-                      break;
-                    default:
-                      this.setState({
-                        message: 'static.unkownError',
-                        loading: false
-                      });
-                      break;
-                  }
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
                 }
               }
-            );
+            }
+          );
         }
       })
     } else {
@@ -1351,7 +1400,7 @@ class ForecastMetrics extends Component {
   }
   componentDidMount() {
     // AuthenticationService.setupAxiosInterceptors();
-    this.getPrograms()
+    // this.getPrograms()
     this.getCountrys();
 
   }
@@ -1429,14 +1478,14 @@ class ForecastMetrics extends Component {
         return (
 
           // { label: getLabelText(item.label, this.state.lang), value: item.programId }
-          { label: item.programCode, value: item.programId }
+          { label: item.code, value: item.id }
 
         )
       }, this);
     const { countrys } = this.state;
     // console.log(JSON.stringify(countrys))
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
-      console.log(JSON.stringify(item))
+      // console.log(JSON.stringify(item))
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
     const { productCategories } = this.state;

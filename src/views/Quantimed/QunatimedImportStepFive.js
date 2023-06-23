@@ -101,7 +101,7 @@ export default class QunatimedImportStepFive extends Component {
 
     loaded_four = function (instance, cell, x, y, value) {
 
-        jExcelLoadedFunctionQuantimed(instance);
+        jExcelLoadedFunctionQuantimed(instance,1);
 
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -599,8 +599,8 @@ export default class QunatimedImportStepFive extends Component {
 
                         <Col xs="12" sm="12">
                             <div className='consumptionDataEntryTable'>
-                                <div id="recordsDiv" >
-                                </div>
+                            <div style={{width: '100%'}} id="recordsDiv" >
+                            </div>
                             </div>
 
                         </Col>

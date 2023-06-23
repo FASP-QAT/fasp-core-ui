@@ -11879,9 +11879,6 @@ and (max-width: 1366px)
   background: #fff;
 }
 
-.custom-display {
-  display: block !important;
-}
 .legend-erp {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAo0lEQVR4nOXQPU5CQRTF8Z8dFS7GGGEPsgoIDY8OsKaT0IAdLgtch/Yk8MyYQ2JeZgfcZDKZ8z937gf3Gz2MMMUEgw4fRp/GV/x/8YgvtJ2zD/+osBP6Bb5FmOEJa/zgim3ub7yHN/EvS/InLnhIO+dKpTZ6L77iP5TkVWCTnzedym3e6/B5tIX0Xpt5l5n3FXa8zVzb9ktn288Yh7/+3/a9xS+NaThrC/0ZnwAAAABJRU5ErkJggg==');
   background-repeat: no-repeat;
@@ -12065,4 +12062,9 @@ and (max-width: 1366px)
 
 .redPU{
   color:#BA0C2F !important;
+}
+
+
+.was-validated .form-control:valid, .form-control.is-valid, .form-control.is-invalid {
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem !important;
 }

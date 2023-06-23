@@ -16,7 +16,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import CryptoJS from 'crypto-js';
 import {
     Card,
@@ -31,6 +31,7 @@ import ReportService from '../../api/ReportService';
 
 import { MultiSelect } from 'react-multi-select-component';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -261,15 +262,15 @@ class AnnualShipmentCost extends Component {
                                                 list = list1.filter(c => c.procurementAgent.id == p && c.fundingSource.id == f)
                                                 console.log(list)
                                                 if (list.length > 0) {
-                                                    var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == f)[0]
-                                                    var procurementAgent = this.state.procurementAgents.filter(c => c.procurementAgentId == p)[0]
-                                                    console.log(fundingSource)
-                                                    console.log(procurementAgent)
+                                                    var fundingSource = this.state.fundingSources.filter(c => c.id == f)[0]
+                                                    var procurementAgent = this.state.procurementAgents.filter(c => c.id == p)[0]
+                                                    console.log("fundingSource", fundingSource)
+                                                    console.log("procurementAgent===>",procurementAgent)
                                                     var json = {
                                                         'FUNDING_SOURCE_ID': fundingSource.fundingSourceId,
                                                         'PROCUREMENT_AGENT_ID': procurementAgent.procurementAgentId,
-                                                        'fundingsource': fundingSource.fundingSourceCode,
-                                                        'procurementAgent': procurementAgent.procurementAgentCode,
+                                                        'fundingsource': fundingSource.code,
+                                                        'procurementAgent': procurementAgent.code,
                                                         'PLANNING_UNIT_ID': planningUnitId,
                                                         'planningUnit': planningUnitLabel
 
@@ -319,7 +320,7 @@ class AnnualShipmentCost extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
                     ReportService.getAnnualShipmentCost(json)
                         .then(response => {
-                            console.log("-----response", JSON.stringify(response.data));
+                            console.log("response====))))",response.data);
                             var outPutList = [];
                             var responseData = response.data;
                             for (var i = 0; i < responseData.length; i++) {
@@ -398,11 +399,21 @@ class AnnualShipmentCost extends Component {
     getPrograms() {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
+            let realmId = AuthenticationService.getRealmId();
+
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    var proList = []
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            programId: response.data[i].id,
+                            label: response.data[i].label,
+                            programCode: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
                     this.setState({
-                        programs: response.data
+                        programs: proList, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -917,11 +928,62 @@ class AnnualShipmentCost extends Component {
                         planningUnitValues: []
 
                     }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
+                        DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                            .then(response => {
+                                console.log("response===>", response.data)
+                                this.setState({
+                                    versions: []
+                                }, () => {
+                                    this.setState({
+                                        versions: response.data
+                                    }, () => {
+                                        this.consolidatedVersionList(programId)
+                                    });
+                                });
+                            }).catch(
+                                error => {
+                                    this.setState({
+                                        programs: [], loading: false
+                                    })
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
                     });
 
 
@@ -1058,14 +1120,14 @@ class AnnualShipmentCost extends Component {
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
-                                    proList[i] = myResult[i]
+                                    proList[i] = myResult[i].planningUnit
                                 }
                             }
                             var lang = this.state.lang;
                             this.setState({
                                 planningUnits: proList.sort(function (a, b) {
-                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }), message: ''
                             }, () => {
@@ -1080,12 +1142,19 @@ class AnnualShipmentCost extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
 
                     //let productCategoryId = document.getElementById("productCategoryId").value;
-                    ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                        console.log('**' + JSON.stringify(response.data))
+                    var programJson = {
+                        tracerCategoryIds: [],
+                        programIds: [programId]
+                    }
+                    console.log('**' + programJson);
+
+                    DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+
+                        console.log('**' + JSON.stringify(response.data));
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -1168,12 +1237,14 @@ class AnnualShipmentCost extends Component {
         const { fundingSources } = this.state
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            FundingSourceService.getFundingSourceListAll()
+            // FundingSourceService.getFundingSourceListAll()
+            DropdownService.getFundingSourceDropdownList()
+
                 .then(response => {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -1220,12 +1291,18 @@ class AnnualShipmentCost extends Component {
                 }.bind(this);
                 fSourceRequest.onsuccess = function (event) {
 
-                    fSourceResult = fSourceRequest.result;
-                    console.log("funding source list offline--->", fSourceResult);
+                    for (var i = 0; i < fSourceRequest.result.length; i++) {
+                        var arr = {
+                            id: fSourceRequest.result[i].fundingSourceId,
+                            label: fSourceRequest.result[i].label,
+                            code: fSourceRequest.result[i].fundingSourceCode
+                        }
+                        fSourceResult[i] = arr
+                    }
                     this.setState({
                         fundingSources: fSourceResult.sort(function (a, b) {
-                            a = a.fundingSourceCode.toLowerCase();
-                            b = b.fundingSourceCode.toLowerCase();
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     });
@@ -1244,20 +1321,15 @@ class AnnualShipmentCost extends Component {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
 
-            ProcurementAgentService.getProcurementAgentListAll()
+            var programJson = [programId]
+            DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programJson)
                 .then(response => {
-                    var listArray = response.data;
-                    var listArrays = [];
-                    for (var i = 0; i < listArray.length; i++) {
-                        for (var j = 0; j < listArray[i].programList.length; j++) {
-                            if (listArray[i].programList[j].id == programId) {
-                                listArrays.push(listArray[i]);
-                            }
-                        }
-                    }
+                    console.log("=====>", JSON.stringify(response.data))
+                    // var procurementAgent = response.data
+                    var listArrays = response.data;
                     listArrays.sort((a, b) => {
-                        var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -1306,10 +1378,21 @@ class AnnualShipmentCost extends Component {
 
                     papuResult = papuRequest.result;
                     console.log("procurement agent list offline--->", papuResult);
+                    var listArrays = []
+                    for (var i = 0; i < papuResult.length; i++) {
+                        var arr = {
+                            id: papuResult[i].procurementAgentId,
+                            label: papuResult[i].label,
+                            code: papuResult[i].procurementAgentCode
+                        }
+                        listArrays.push(arr);
+                    }
+                    console.log("procurement agent list offline--->", listArrays);
+
                     this.setState({
-                        procurementAgents: papuResult.sort(function (a, b) {
-                            a = a.procurementAgentCode.toLowerCase();
-                            b = b.procurementAgentCode.toLowerCase();
+                        procurementAgents: listArrays.sort(function (a, b) {
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     });
@@ -1510,7 +1593,7 @@ class AnnualShipmentCost extends Component {
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 
@@ -1525,7 +1608,7 @@ class AnnualShipmentCost extends Component {
         // console.log(JSON.stringify(countrys))
         let procurementAgentList = procurementAgents.length > 0 && procurementAgents.map((item, i) => {
             return (
-                <option key={i} value={item.procurementAgentId}>
+                <option key={i} value={item.id}>
                     {getLabelText(item.label, this.state.lang)}
                 </option>
 
@@ -1742,7 +1825,7 @@ class AnnualShipmentCost extends Component {
                                                         onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                                         options={procurementAgents.length > 0
                                                             && procurementAgents.map((item, i) => {
-                                                                return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
+                                                                return ({ label: item.code, value: item.id })
                                                             }, this)}
                                                         disabled={this.state.loading}
                                                     />
@@ -1762,7 +1845,7 @@ class AnnualShipmentCost extends Component {
                                                         options={fundingSources.length > 0
                                                             && fundingSources.map((item, i) => {
                                                                 return (
-                                                                    { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                                    { label: item.code, value: item.id }
                                                                 )
                                                             }, this)}
                                                         disabled={this.state.loading}

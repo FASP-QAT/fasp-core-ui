@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, API_URL, } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, API_URL,PROGRAM_TYPE_DATASET } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -34,6 +34,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { Prompt } from 'react-router';
 import ReportService from '../../api/ReportService';
+import DropdownService from '../../api/DropdownService';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import DesiredStockatForecasend from '../../assets/img/DesiredStockatForecasend.png';
 import FreightCost from '../../assets/img/FreightCost.png';
@@ -280,7 +281,7 @@ class ForecastSummary extends Component {
         // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (this.state.programs.filter(c => c.id == this.state.programId)[0].code + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
         // csvRow.push('"' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
@@ -446,7 +447,7 @@ class ForecastSummary extends Component {
             var a = document.createElement("a")
             a.href = 'data:attachment/csv,' + csvString
             a.target = "_Blank"
-            a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
+            a.download = this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
             document.body.appendChild(a)
             a.click();
 
@@ -529,7 +530,7 @@ class ForecastSummary extends Component {
                 var a = document.createElement("a")
                 a.href = 'data:attachment/csv,' + csvString
                 a.target = "_Blank"
-                a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
+                a.download = this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
                 document.body.appendChild(a)
                 a.click();
 
@@ -629,7 +630,7 @@ class ForecastSummary extends Component {
                 var a = document.createElement("a")
                 a.href = 'data:attachment/csv,' + csvString
                 a.target = "_Blank"
-                a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
+                a.download = this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
                 document.body.appendChild(a)
                 a.click();
 
@@ -686,7 +687,7 @@ class ForecastSummary extends Component {
                 doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runDate') + "</b> " + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + "</font></span>", doc.internal.pageSize.width - 150, 20)
                 doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runTime') + "</b> " + moment(new Date()).format('hh:mm A') + "</font></span>", doc.internal.pageSize.width - 150, 30)
                 doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.user.user') + ":</b> " + AuthenticationService.getLoggedInUsername() + "</font></span>", doc.internal.pageSize.width - 150, 40)
-                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font></span>", doc.internal.pageSize.width - 150, 50)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.id == this.state.programId)[0].code + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font></span>", doc.internal.pageSize.width - 150, 50)
                 // doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
                 //     align: 'right'
                 // })
@@ -843,7 +844,7 @@ class ForecastSummary extends Component {
                 doc.autoTable(content);
                 addHeaders(doc)
                 addFooters(doc)
-                doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
+                doc.save(this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
 
             } else {//server version
 
@@ -906,7 +907,7 @@ class ForecastSummary extends Component {
                 doc.autoTable(content);
                 addHeaders(doc)
                 addFooters(doc)
-                doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
+                doc.save(this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
 
 
 
@@ -1054,7 +1055,7 @@ class ForecastSummary extends Component {
             doc.autoTable(content);
             addHeaders(doc)
             addFooters(doc)
-            doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
+            doc.save(this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
 
         }
     }
@@ -2246,18 +2247,21 @@ class ForecastSummary extends Component {
         // this.setState({ programs: [{ label: "Benin PRH,Condoms Forecast Dataset", programId: 1 }, { label: "Benin ARV Forecast Dataset", programId: 2 }, { label: "Benin Malaria Forecast Dataset", programId: 3 }], loading: false });
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getDataSetListAll()
+            let realmId = AuthenticationService.getRealmId();
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+            // ProgramService.getDataSetListAll()
                 .then(response => {
                     let datasetList = response.data;
                     console.log("datasetList-------------->1", datasetList);
-                    datasetList = datasetList.filter(c => c.active == true);
+                    // datasetList = datasetList.filter(c => c.active == true);
                     console.log("datasetList-------------->2", datasetList);
                     this.setState({
                         programs: datasetList,
-                        allProgramList: response.data
+                        // allProgramList: response.data
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
+                        console.log("datasetList in catch-------------->2");
                         this.setState({
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
@@ -2341,7 +2345,7 @@ class ForecastSummary extends Component {
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
-                            if (this.state.programs[k].programId == programData.programId) {
+                            if (this.state.programs[k].id == programData.programId) {
                                 f = 1;
                                 console.log('already exist')
                             }
@@ -2358,8 +2362,8 @@ class ForecastSummary extends Component {
                 if (proList.length == 1) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = (a.programCode).toLowerCase();
-                            b = (b.programCode).toLowerCase();
+                            a = (a.code).toLowerCase();
+                            b = (b.code).toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         programId: proList[0].programId,
@@ -2374,8 +2378,8 @@ class ForecastSummary extends Component {
                     if (this.props.match.params.programId != "" && this.props.match.params.programId != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             programId: this.props.match.params.programId,
@@ -2389,8 +2393,8 @@ class ForecastSummary extends Component {
                     else if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             programId: localStorage.getItem("sesForecastProgramIdReport"),
@@ -2403,8 +2407,8 @@ class ForecastSummary extends Component {
                     } else {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             loading: false,
@@ -2545,10 +2549,9 @@ class ForecastSummary extends Component {
 
 
             } else {//server version
-                let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId)[0];
+                let selectedForecastProgram = this.state.programs.filter(c => c.id == programId)[0];
 
-                let selectedVersion = selectedForecastProgram.versionList.filter(c => c.versionId == versionId)[0];
-                console.log("Test-----------------111Online", selectedForecastProgram);
+                let selectedVersion = this.state.versions.filter(c => c.versionId == versionId)[0];
 
                 let tempObj = {
                     forecastStartDate: (selectedVersion.forecastStartDate ? moment(selectedVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
@@ -2751,50 +2754,77 @@ class ForecastSummary extends Component {
 
         let programId = this.state.programId;
         if (programId != 0) {
-
-            const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            const program = this.state.programs.filter(c => c.id == programId)
             if (program.length == 1) {
                 if (isSiteOnline()) {
-                    this.setState({
-                        versions: [],
-                    }, () => {
-                        let inactiveProgram = this.state.allProgramList.filter(c => c.active == false);
-                        inactiveProgram = inactiveProgram.filter(c => c.programId == programId);
+                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                            .then(response => {
+                                this.setState({
+                                    versions: []
+                                }, () => {
+                                    this.setState({
+                                        versions: response.data
+                                    }, () => { this.consolidatedVersionList(programId) });
+                                });
+                            }).catch(
+                                error => {
+                                    this.setState({
+                                        programs: [], loading: false
+                                    })
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
 
-                        if (inactiveProgram.length > 0) {//Inactive
-                            this.consolidatedVersionList(programId)
-                        } else {
-                            this.setState({
-                                versions: program[0].versionList.filter(function (x, i, a) {
-                                    return a.indexOf(x) === i;
-                                })
-                            }, () => { this.consolidatedVersionList(programId) });
-                        }
-
-                    });
-
-
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
                 } else {
                     this.setState({
                         versions: [],
-
                     }, () => {
                         this.consolidatedVersionList(programId)
                     })
                 }
             } else {
-
                 this.setState({
                     versions: [],
-
                 }, () => { })
-
             }
         } else {
             this.setState({
                 versions: [],
-
             }, () => { })
         }
     }
@@ -3097,9 +3127,9 @@ class ForecastSummary extends Component {
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
+                    <option key={i} value={item.id}>
                         {/* {item.label.label_en} */}
-                        {item.programCode}
+                        {item.code}
                     </option>
                 )
             }, this);

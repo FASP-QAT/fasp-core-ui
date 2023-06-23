@@ -1546,6 +1546,7 @@ export default class syncPage extends Component {
   }
 
   componentDidMount() {
+
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1695,10 +1696,6 @@ export default class syncPage extends Component {
     }.bind(this);
     document.getElementById("detailsDiv").style.display = "none";
 
-    const rows = document.querySelectorAll('#mergedVersionConsumption tbody tr');
-    rows.forEach((row) => {
-      row.classList.add('custom_bg');
-    });
     
   }
 
@@ -3389,7 +3386,7 @@ export default class syncPage extends Component {
         for (var j = 1; j < 13; j++) {
           if ((oldData[j] == latestData[j]) || (oldData[j] == "" && latestData[j] == null) || (oldData[j] == null && latestData[j] == "")) {
             var col = (colArr[j]).concat(parseInt(c) + 1);
-            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "#fff");
           } else {
             this.setState({
               isChanged: true
@@ -3429,7 +3426,7 @@ export default class syncPage extends Component {
         if ((jsonData[c])[16] != "" && (jsonData[c])[15] != "" && (jsonData[c])[18] != 1) {
           if ((oldData[13] == latestData[13]) || (oldData[13] == "" && latestData[13] == null) || (oldData[13] == null && latestData[13] == "")) {
             var col = (colArr[14]).concat(parseInt(c) + 1);
-            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setStyle(col, "background-color", "#fff");
           } else {
             this.setState({
               isChanged: true
@@ -4616,9 +4613,9 @@ export default class syncPage extends Component {
                   </div>
                   <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                      <div class="align-items-center">
+                      <div className="align-items-center">
                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                        <div class="spinner-border blue ml-4" role="status">
+                        <div className="spinner-border blue ml-4" role="status">
                         </div>
                       </div>
                     </div>

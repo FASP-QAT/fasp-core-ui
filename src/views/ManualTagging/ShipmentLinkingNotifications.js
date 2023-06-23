@@ -23,6 +23,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
 import CryptoJS from 'crypto-js'
+import DropdownService from '../../api/DropdownService.js';
 
 
 const entityname = i18n.t('static.mt.shipmentLinkingNotification');
@@ -97,7 +98,7 @@ export default class ShipmentLinkingNotifications extends Component {
         let planningUnits = this.state.planningUnits;
         let planningUnitArray = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 
@@ -1539,111 +1540,116 @@ export default class ShipmentLinkingNotifications extends Component {
         console.log("this.state.programId.split@@@@", this.state.programId);
         var programId = this.state.programId != -1 && this.state.programId != undefined ? this.state.programId.toString().split("_")[0] : -1;
         if (programId != -1) {
-            ProgramService.getProgramPlaningUnitListByProgramId(programId)
-                .then(response => {
-                    if (response.status == 200) {
-                        var listArray = response.data;
-                        listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
-                        var db1;
-                        var storeOS;
-                        getDatabase();
-                        var thisAsParameter = this;
-                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        openRequest.onerror = function (event) {
-                            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                            this.props.updateState("color", "#BA0C2F");
-                            this.props.hideFirstComponent();
-                        }.bind(this);
-                        openRequest.onsuccess = function (e) {
-                            db1 = e.target.result;
-                            var transaction;
-                            var programTransaction;
-                            transaction = db1.transaction(['programData'], 'readwrite');
-                            programTransaction = transaction.objectStore('programData');
-                            // Yaha program Id dalna hai actual wala
-                            var curUser = AuthenticationService.getLoggedInUserId();
-                            var programId = (this.state.programId);
-                            console.log("ProgramId@@@@@@@@@@@@", programId)
-                            var programRequest = programTransaction.get(programId);
-                            programRequest.onsuccess = function (event) {
-                                var programDataJson = programRequest.result;
-                                this.setState({
-                                    planningUnits: listArray,
-                                    programDataJson: programDataJson
-                                }, () => {
-                                    this.getPlanningUnitArray();
-                                })
-                            }.bind(this)
-                        }.bind(this)
-                    }
-                    else {
-
-                        this.setState({
-                            message: response.data.messageCode,
-                            color: '#BA0C2F'
-                        },
-                            () => {
-                                this.hideSecondComponent();
-                            })
-                    }
-                }).catch(
-                    error => {
-                        console.log("Error@@@@@@@@@@", error)
-                        if (error.message === "Network Error") {
+            var programJson = {
+                tracerCategoryIds: [],
+                programIds: [programId]
+            }
+            console.log('**' + programJson);
+            DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+                if (response.status == 200) {
+                    console.log('**' + JSON.stringify(response.data));
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var thisAsParameter = this;
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onerror = function (event) {
+                        this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                        this.props.updateState("color", "#BA0C2F");
+                        this.props.hideFirstComponent();
+                    }.bind(this);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var transaction;
+                        var programTransaction;
+                        transaction = db1.transaction(['programData'], 'readwrite');
+                        programTransaction = transaction.objectStore('programData');
+                        // Yaha program Id dalna hai actual wala
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        var programId = (this.state.programId);
+                        console.log("ProgramId@@@@@@@@@@@@", programId)
+                        var programRequest = programTransaction.get(programId);
+                        programRequest.onsuccess = function (event) {
+                            var programDataJson = programRequest.result;
                             this.setState({
-                                // message: 'static.unkownError',
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                color: '#BA0C2F',
-                                loading: false
+                                planningUnits: listArray,
+                                programDataJson: programDataJson
                             }, () => {
-                                this.hideSecondComponent();
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
+                                this.getPlanningUnitArray();
+                            })
+                        }.bind(this)
+                    }.bind(this)
+                }
+                else {
 
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        color: '#BA0C2F',
-                                        loading: false
-                                    }, () => {
-                                        this.hideSecondComponent();
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        color: '#BA0C2F',
-                                        loading: false
-                                    }, () => {
-                                        this.hideSecondComponent();
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        color: '#BA0C2F',
-                                        loading: false
-                                    }, () => {
-                                        this.hideSecondComponent();
-                                    });
-                                    break;
-                            }
+                    this.setState({
+                        message: response.data.messageCode,
+                        color: '#BA0C2F'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    console.log("Error@@@@@@@@@@", error)
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            color: '#BA0C2F',
+                            loading: false
+                        }, () => {
+                            this.hideSecondComponent();
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    color: '#BA0C2F',
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    color: '#BA0C2F',
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    color: '#BA0C2F',
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                break;
                         }
                     }
-                );
+                }
+            );
         } else {
             this.setState({
                 outputList: [],
@@ -1885,7 +1891,7 @@ export default class ShipmentLinkingNotifications extends Component {
         const { planningUnits } = this.state;
         let planningUnitMultiList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 

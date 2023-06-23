@@ -46,7 +46,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -66,6 +66,7 @@ import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { red } from '@material-ui/core/colors';
+import DropdownService from '../../api/DropdownService';
 
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
@@ -595,12 +596,12 @@ class ShipmentSummery extends Component {
         const { fundingSources } = this.state
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            FundingSourceService.getFundingSourceListAll()
+            DropdownService.getFundingSourceDropdownList()
                 .then(response => {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -651,10 +652,19 @@ class ShipmentSummery extends Component {
 
                     fSourceResult = fSourceRequest.result;
                     console.log("funding source list offline--->", fSourceResult);
+                    var fundingSource = [];
+                    for (var i = 0; i < fSourceResult.length; i++) {
+                        var arr = {
+                            id: fSourceResult[i].fundingSourceId,
+                            code: fSourceResult[i].fundingSourceCode,
+                            label: fSourceResult[i].label
+                        }
+                        fundingSource[i] = arr
+                    }
                     this.setState({
-                        fundingSources: fSourceResult.sort(function (a, b) {
-                            a = a.fundingSourceCode.toLowerCase();
-                            b = b.fundingSourceCode.toLowerCase();
+                        fundingSources: fundingSource.sort(function (a, b) {
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     }, () => {
@@ -1043,11 +1053,21 @@ class ShipmentSummery extends Component {
     getPrograms = () => {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
+            let realmId = AuthenticationService.getRealmId();
+
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    // console.log(JSON.stringify(response.data))
+                    var proList = []
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            programId: response.data[i].id,
+                            label: response.data[i].label,
+                            programCode: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: proList, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -1216,11 +1236,62 @@ class ShipmentSummery extends Component {
                         planningUnitValues: []
 
                     }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
+                        DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                            .then(response => {
+                                console.log("response===>", response.data)
+                                this.setState({
+                                    versions: []
+                                }, () => {
+                                    this.setState({
+                                        versions: response.data
+                                    }, () => {
+                                        this.consolidatedVersionList(programId)
+                                    });
+                                });
+                            }).catch(
+                                error => {
+                                    this.setState({
+                                        programs: [], loading: false
+                                    })
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
                     });
 
 
@@ -1367,14 +1438,14 @@ class ShipmentSummery extends Component {
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
-                                    proList[i] = myResult[i]
+                                    proList[i] = myResult[i].planningUnit
                                 }
                             }
                             var lang = this.state.lang;
                             this.setState({
                                 planningUnits: proList.sort(function (a, b) {
-                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }), message: ''
                             }, () => {
@@ -1388,13 +1459,19 @@ class ShipmentSummery extends Component {
                 else {
                     // AuthenticationService.setupAxiosInterceptors();
 
+                    var programJson = {
+                        tracerCategoryIds: [],
+                        programIds: [programId]
+                    }
+                    console.log('**', programJson)
+
                     //let productCategoryId = document.getElementById("productCategoryId").value;
-                    ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
+                    DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
                         // console.log('**' + JSON.stringify(response.data))
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -1490,7 +1567,7 @@ class ShipmentSummery extends Component {
 
 
     componentDidMount() {
-        // this.getPrograms();
+        this.getPrograms();
         this.getFundingSourceList();
         // this.getBudgetList();
     }
@@ -1719,12 +1796,12 @@ class ShipmentSummery extends Component {
                                                 code: procurementAgent[0].procurementAgentCode
                                             }
                                         }
-                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == planningUnitFilter[i].fundingSource.id);
+                                        var fundingSource = this.state.fundingSources.filter(c => c.id == planningUnitFilter[i].fundingSource.id);
                                         if (fundingSource.length > 0) {
                                             var simpleFSObject = {
-                                                id: fundingSource[0].fundingSourceId,
+                                                id: fundingSource[0].id,
                                                 label: fundingSource[0].label,
-                                                code: fundingSource[0].fundingSourceCode
+                                                code: fundingSource[0].code
                                             }
                                         }
                                         var budget = [];
@@ -1776,12 +1853,12 @@ class ShipmentSummery extends Component {
                                     const fundingSourceIds = [...new Set(data.map(q => parseInt(q.fundingSource.id)))];
                                     console.log('fundingSourceIds', fundingSourceIds)
                                     fundingSourceIds.map(ele => {
-                                        var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == ele);
+                                        var fundingSource = this.state.fundingSources.filter(c => c.id == ele);
                                         if (fundingSource.length > 0) {
                                             var simpleFSObject = {
-                                                id: fundingSource[0].fundingSourceId,
+                                                id: fundingSource[0].id,
                                                 label: fundingSource[0].label,
-                                                code: fundingSource[0].fundingSourceCode
+                                                code: fundingSource[0].code
                                             }
                                         }
                                         var fundingSourceList = data.filter(c => c.fundingSource.id == ele)
@@ -2085,7 +2162,7 @@ class ShipmentSummery extends Component {
         const { planningUnits } = this.state
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 
@@ -2529,7 +2606,7 @@ class ShipmentSummery extends Component {
                                                         options={fundingSources.length > 0
                                                             && fundingSources.map((item, i) => {
                                                                 return (
-                                                                    { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                                    { label: item.code, value: item.id }
                                                                 )
                                                             }, this)}
                                                         disabled={this.state.loading}
