@@ -61,21 +61,21 @@ export default class ProgramOnboarding extends Component {
                 },
                 airFreightPerc: '',
                 seaFreightPerc: '',
-                roadFreightPerc: ROAD_FREIGHT_PERC,
+                roadFreightPerc: '',
                 // deliveredToReceivedLeadTime: '',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
-                submittedToApprovedLeadTime: SUBMITTED_TO_APPROVED,
-                approvedToShippedLeadTime: APPROVED_TO_SHIPPED,
+                submittedToApprovedLeadTime: '',
+                approvedToShippedLeadTime: '',
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
 
-                shippedToArrivedByAirLeadTime: SHIPPED_TO_ARRIVED_AIR,
-                shippedToArrivedBySeaLeadTime: SHIPPED_TO_ARRIVED_SEA,
-                shippedToArrivedByRoadLeadTime: SHIPPED_TO_ARRIVED_ROAD,
-                arrivedToDeliveredLeadTime: ARRIVED_TO_RECEIVED,
+                shippedToArrivedByAirLeadTime: '',
+                shippedToArrivedBySeaLeadTime: '',
+                shippedToArrivedByRoadLeadTime: '',
+                arrivedToDeliveredLeadTime: '',
 
-                plannedToSubmittedLeadTime: PLANNED_TO_SUBMITTED,
+                plannedToSubmittedLeadTime: '',
 
                 // healthArea: {
                 //     id: ''
