@@ -1773,18 +1773,19 @@ class Budgets extends Component {
                 editable: false,
                 license: JEXCEL_PRO_KEY,
                 contextMenu: function (obj, x, y, e) {
-                    var items = [];
-                    if (y != null) {
-                        if (obj.options.allowInsertRow == true) {
+                    // var items = [];
+                    // if (y != null) {
+                        // if (obj.options.allowInsertRow == true) {
                             // items.push({
                             //     title: i18n.t('static.supplyPlan.shipmentsDetails'),
                             //     onclick: function () {
                             //         window.open(window.location.origin + `/#/report/shipmentSummery/${this.el.getValueFromCoords(10, y)}/${this.el.getValueFromCoords(1, y)}`);
                             //     }.bind(this)
                             // });
-                        }
-                    }
-                    return items;
+                        // }
+                    // }
+                    // return items;
+                    return false;
                 }.bind(this),
             };
             var jexcelDataEl = jexcel(document.getElementById("budgetTable"), options);

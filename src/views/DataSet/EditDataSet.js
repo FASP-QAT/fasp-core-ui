@@ -561,7 +561,8 @@ export default class EditProgram extends Component {
     }
 
     generateOrganisationCode(event) {
-        let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].organisationCode;
+        console.log("generateOrganisationCode===",this.state.organisationList)
+        let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({
             organisationCode: organisationCode
         })
