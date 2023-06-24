@@ -203,6 +203,13 @@ class DropdownService {
       {}
     );
   }
+
+  getProgramBasedOnRealmIdAndProgramTypeId(realmId, programTypeId) {
+    return axios.get(
+      `${API_URL}/api/dropdown/program/realm/${realmId}/programType/${programTypeId}/expanded`,
+      {}
+    );
+  }
 }
 
 export default new DropdownService();
