@@ -9674,7 +9674,7 @@ export default class BuildTree extends Component {
                                                                 bsSize="sm"
                                                                 className="mr-2"
                                                                 readOnly={true}
-                                                                value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? parseFloat((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor).toFixed(4) : (this.state.noFURequired / this.state.conversionFactor))}>
+                                                                value={addCommasWith8Decimals(this.state.parentScenario.fuNode.usageType.id == 2 ? parseFloat((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor).toFixed(8) : (this.state.noFURequired / this.state.conversionFactor))}>
 
                                                             </Input>
                                                             {/* </FormGroup>
