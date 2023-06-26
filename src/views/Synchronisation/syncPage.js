@@ -2141,6 +2141,14 @@ export default class syncPage extends Component {
                                         .then(responseLinking => {
                                           if (responseLinking.status == 200) {
                                             var oldProgramData = programJson;
+                                            var checkIfThereIsUnMappedBudget=0;
+                                            oldProgramData.shipmentList.filter(c=>c.budget!=null && c.budget.id>0 && c.active.toString()=="true").map(item=>{
+                                                var budgetFilter=bResult.filter(c=>c.budgetId==item.budget.id);
+                                                if(budgetFilter.length==0 || (budgetFilter.length>0 && ![...new Set(budgetFilter[0].programs.map(ele => ele.id))].includes(parseInt(programJson.programId)))){
+                                                  checkIfThereIsUnMappedBudget=1;
+                                                }
+                                            })
+                                            if(checkIfThereIsUnMappedBudget==0){
                                             var downloadedProgramData = response.data.length > 1 ? response.data[1] : response.data[0];
                                             var regionList = [];
                                             for (var i = 0; i < latestProgramData.regionList.length; i++) {
@@ -3187,6 +3195,12 @@ export default class syncPage extends Component {
                                                 this.generateDataAfterResolveConflictsForQPL();
                                               }
                                             })
+                                          }else{
+                                            alert("There are shipments with unmaped budget");
+                                            this.setState({
+                                              loading: false,
+                                            })
+                                          }
                                           }
                                         })
                                     }.bind(this)
