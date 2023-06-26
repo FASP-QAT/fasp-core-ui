@@ -2014,7 +2014,7 @@ export default class PlanningUnitSetting extends Component {
             data[12] = outPutList[j].selectedForecastMap;
             data[13] = indexVar;
             data[14] = outPutList[j].treeForecast;
-            data[15] = outPutList[j].consumptionNotes;
+            data[15] = outPutList[j].planningUnitNotes;
             data[16] = outPutList[j].active;
             data[17] = outPutList[j].active;
 
@@ -2641,7 +2641,7 @@ export default class PlanningUnitSetting extends Component {
                         "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         "higherThenConsumptionThreshold": null,
                         "lowerThenConsumptionThreshold": null,
-                        "consumptionNotes": map1.get("15"),
+                        "planningUnitNotes": map1.get("15"),
                         "consumptionDataType": 2,
                         "otherUnit": null,
                         "selectedForecastMap": map1.get("12"),
@@ -2677,7 +2677,7 @@ export default class PlanningUnitSetting extends Component {
                         "higherThenConsumptionThreshold": planningUnitobj1.higherThenConsumptionThreshold,
                         "lowerThenConsumptionThreshold": planningUnitobj1.lowerThenConsumptionThreshold,
                         // "consumptionNotes": planningUnitobj1.consumptionNotes,
-                        "consumptionNotes": map1.get("15"),
+                        "planningUnitNotes": map1.get("15"),
                         "consumptionDataType": planningUnitobj1.consumptionDataType,
                         "otherUnit": planningUnitobj1.otherUnit,
                         "selectedForecastMap": map1.get("12"),
