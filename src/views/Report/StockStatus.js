@@ -270,28 +270,28 @@ class StockStatus extends Component {
     //   // i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]
     // ])];
 
-    var A = headers
-    this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
-    (ele.shipmentInfo.map(item => {
-      return (
-        item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code + 
-        (item.orderNo == null &&
-          item.primeLineNo == null &&
-          item.roNo == null &&
-          item.roPrimeLineNo == null
-            ? " | N/A"
-            : (item.roNo == null && item.roPrimeLineNo == null
-                ? ""
-                : " | " + item.roNo + "-" + item.roPrimeLineNo) +
-              (item.orderNo == null && item.primeLineNo == null
-                ? ""
-                : item.orderNo == null
-                ? ""
-                : " | " + item.orderNo) +
-              (item.primeLineNo == null ? "" : "-" + item.primeLineNo))
-        );
-    }).join(' \n')).replaceAll(' ', '%20')
-      , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na") : ele.maxStock != null ? this.roundN(ele.maxStock) : "", ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+    var A = ""
+    // this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
+    // (ele.shipmentInfo.map(item => {
+    //   return (
+    //     item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code + 
+    //     (item.orderNo == null &&
+    //       item.primeLineNo == null &&
+    //       item.roNo == null &&
+    //       item.roPrimeLineNo == null
+    //         ? " | N/A"
+    //         : (item.roNo == null && item.roPrimeLineNo == null
+    //             ? ""
+    //             : " | " + item.roNo + "-" + item.roPrimeLineNo) +
+    //           (item.orderNo == null && item.primeLineNo == null
+    //             ? ""
+    //             : item.orderNo == null
+    //             ? ""
+    //             : " | " + item.orderNo) +
+    //           (item.primeLineNo == null ? "" : "-" + item.primeLineNo))
+    //     );
+    // }).join(' \n')).replaceAll(' ', '%20')
+    //   , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na") : ele.maxStock != null ? this.roundN(ele.maxStock) : "", ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
 
 
     for (var i = 0; i < A.length; i++) {
