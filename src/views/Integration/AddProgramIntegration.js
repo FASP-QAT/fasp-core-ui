@@ -17,7 +17,7 @@ import ProgramService from "../../api/ProgramService.js";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { inValid, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 
 const entityname = i18n.t('static.integration.programIntegration')
@@ -886,6 +886,20 @@ class ProgramIntegration extends Component {
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
+        if(x==1 || x==2 || x==3 || x==4){
+            var col = ("B").concat(parseInt(y) + 1);
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+            var col = ("C").concat(parseInt(y) + 1);
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+            var col = ("D").concat(parseInt(y) + 1);
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+            var col = ("E").concat(parseInt(y) + 1);
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+        }
 
         //Integration
         if (x == 1) {
@@ -949,6 +963,20 @@ class ProgramIntegration extends Component {
         var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
+            var checkDuplicate=json.filter(c=>c[1]==json[y][1] && c[2]==json[y][2] && c[3]==json[y][3] && c[4].toString()==json[y][4].toString());
+            console.log("check duplicate Test@123",checkDuplicate)
+            if(checkDuplicate.length>1){
+                this.setState({
+                    message:'static.programIntegration.duplicateIntegration',
+                },()=>{
+                    this.hideSecondComponent();
+                })
+                // var colArr = ['B','C','D','E'];
+                // for (var c = 0; c < colArr.length; c++) {
+                //     inValid(colArr[c], y, i18n.t('static.programIntegration.duplicateIntegration'), this.el);
+                // }
+                valid = false;
+            }else{
             var value = this.el.getValueFromCoords(6, y);
             if (parseInt(value) == 1) {
 
@@ -993,6 +1021,7 @@ class ProgramIntegration extends Component {
                 }
             }
         }
+    }
         return valid;
     }
     render() {
