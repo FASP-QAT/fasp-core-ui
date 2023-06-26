@@ -919,7 +919,8 @@ export default class BuildTree extends Component {
             missingPUList: [],
             autoCalculate: localStorage.getItem('sesAutoCalculate') != "" && localStorage.getItem('sesAutoCalculate') != undefined ? (localStorage.getItem('sesAutoCalculate').toString() == "true" ? true : false) : true,
             hideActionButtons: false,
-            toggleArray: []
+            toggleArray: [],
+            collapseState: false
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -6718,10 +6719,11 @@ export default class BuildTree extends Component {
         });
     }
 
-    expandCollapse(){
+    expandCollapse(e){
         var updatedItems = this.state.items;
         var tempToggleArray = this.state.toggleArray;
-        if(this.state.toggleArray.length == 0){
+        if(e.target.checked){
+            this.setState({collapseState: true})
             updatedItems = updatedItems.map(item => {
                 tempToggleArray.push(item.id);
                 if(item.parent != null){
@@ -6731,6 +6733,7 @@ export default class BuildTree extends Component {
             });
             this.setState({toggleArray: tempToggleArray})
         }else{
+            this.setState({collapseState: false})
             updatedItems = updatedItems.map(item => {
                 tempToggleArray = tempToggleArray.filter((e) => e != item.id)
                 return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
@@ -12380,7 +12383,7 @@ export default class BuildTree extends Component {
                                                             type="checkbox"
                                                             id="active9"
                                                             name="active9"
-                                                            checked={this.state.toggleArray.length != 0 }
+                                                            checked={ this.state.collapseState }
                                                             onClick={(e) => { this.expandCollapse(e); }}
                                                         />
                                                         <Label
