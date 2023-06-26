@@ -255,6 +255,7 @@ class EditSupplyPlanStatus extends Component {
             problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             problemCategoryList: [],
             problemReportChanged: 0,
+            remainingDataChanged:0,
             problemReviewedList: [{ name: i18n.t("static.program.yes"), id: 1 }, { name: i18n.t("static.program.no"), id: 0 }],
             problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }],
             isModalOpen: false,
@@ -263,6 +264,8 @@ class EditSupplyPlanStatus extends Component {
             isSubmitClicked: false,
             criticalities: [],
             criticalitiesList: [],
+            submitMessage: "",
+            submitColor: ""
 
         }
         this.formSubmit = this.formSubmit.bind(this);
@@ -398,6 +401,13 @@ class EditSupplyPlanStatus extends Component {
 
     hideFifthComponent() {
 
+    }
+
+    hideMessageComponent() {
+        document.getElementById('div3').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
+        }, 30000);
     }
 
     getMonthArray(currentDate) {
@@ -2268,7 +2278,8 @@ class EditSupplyPlanStatus extends Component {
 
         this.setState(
             {
-                program
+                program,
+                remainingDataChanged:1
             }
         )
 
@@ -4558,6 +4569,7 @@ class EditSupplyPlanStatus extends Component {
                     this.setState({
                         message: response.data.message,
                         problemReportChanged: 0,
+                        remainingDataChanged:0,
 
                         // isModalOpen: !this.state.isModalOpen,
                     })
@@ -4732,6 +4744,7 @@ class EditSupplyPlanStatus extends Component {
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.submitColor} id="div3">{i18n.t(this.state.submitMessage)}</h5>
 
                 <Col sm={12} sm={12} style={{ flexBasis: 'auto' }}>
                     <Card>
@@ -5584,7 +5597,7 @@ class EditSupplyPlanStatus extends Component {
 
                                                         <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                            <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClickedModal}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                             &nbsp;
                                                         </FormGroup>
@@ -5649,16 +5662,35 @@ class EditSupplyPlanStatus extends Component {
                                     console.log("reviewedProblemList===>", reviewedProblemList);
                                     ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
                                         .then(response => {
-                                            console.log("messageCode", response)
-                                            this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                            if(this.state.program.currentVersion.versionStatus.id!=1){
+                                                console.log("messageCode", response)
+                                                this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                            }else{
+                                                document.getElementById("submitButton").disabled = false;
+                                            this.setState({
+                                                submitMessage: "static.message.supplyplanversionapprovedsuccess",
+                                                submitColor: "green",
+                                                problemReportChanged: 0,
+                                                remainingDataChanged:0
+
+                                                // isModalOpen: !this.state.isModalOpen,
+                                            }, () => {
+                                                this.hideMessageComponent()
+                                                this.componentDidMount();
+                                            })
+                                        }
+
                                         })
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
                                                         // message: 'static.unkownError',
-                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                        submitMessage: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                        submitColor: "red",
                                                         loading: false
+                                                    }, () => {
+                                                        this.hideMessageComponent()
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
@@ -5673,20 +5705,29 @@ class EditSupplyPlanStatus extends Component {
                                                         case 404:
                                                         case 406:
                                                             this.setState({
-                                                                message: error.response.data.messageCode,
+                                                                submitMessage: error.response.data.messageCode,
+                                                                submitColor: "red",
                                                                 loading: false
+                                                            }, () => {
+                                                                this.hideMessageComponent()
                                                             });
                                                             break;
                                                         case 412:
                                                             this.setState({
-                                                                message: error.response.data.messageCode,
+                                                                submitMessage: error.response.data.messageCode,
+                                                                submitColor: "red",
                                                                 loading: false
+                                                            }, () => {
+                                                                this.hideMessageComponent()
                                                             });
                                                             break;
                                                         default:
                                                             this.setState({
-                                                                message: 'static.unkownError',
+                                                                submitMessage: 'static.unkownError',
+                                                                submitColor: "red",
                                                                 loading: false
+                                                            }, () => {
+                                                                this.hideMessageComponent()
                                                             });
                                                             break;
                                                     }
@@ -5784,8 +5825,8 @@ class EditSupplyPlanStatus extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                {this.state.editable && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                {this.state.editable && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                {this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
                                                 &nbsp;
@@ -5849,60 +5890,44 @@ class EditSupplyPlanStatus extends Component {
     }
 
     cancelClicked = () => {
-        this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        var cont = false;
+        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged==1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        }
     }
     resetClicked = () => {
-        // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
-            .then(response => {
-                console.log(response.data)
-                let { program } = this.state
-                program.label = response.data.label
-                this.setState({
-                    program
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            // message: 'static.unkownError',
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+        var cont = false;
+        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged==1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                problemReportChanged:0,
+                remainingDataChanged:0
+            },()=>{
+                this.componentDidMount();
+            })
+        }
+    }
 
+    resetClickedModal=()=>{
 
     }
 
