@@ -114,7 +114,7 @@ export default class AddDimensionComponent extends Component {
                 var procurementAgentListArray = [];
                 for (var i = 0; i < response.data.procurementAgentList.length; i++) {
                     if (this.state.procurementAgentList.id != 0) {
-                        procurementAgentListArray[i] = { value: response.data.procurementAgentList[i].id, label: response.data.procurementAgentList[i].code }
+                        procurementAgentListArray[i] = { value: response.data.procurementAgentList[i].id, label: response.data.procurementAgentList[i].label.label_en }
                     }
                 }
                 var listArray = procurementAgentListArray;
@@ -136,7 +136,7 @@ export default class AddDimensionComponent extends Component {
 
                 var selectedProcurementAgentListArray = [];
                 for (var i = 0; i < response.data.selectedProcurementAgentList.length; i++) {
-                    selectedProcurementAgentListArray[i] = { value: response.data.selectedProcurementAgentList[i].id, label: response.data.selectedProcurementAgentList[i].code }
+                    selectedProcurementAgentListArray[i] = { value: response.data.selectedProcurementAgentList[i].id, label: response.data.selectedProcurementAgentList[i].label.label_en }
                 }
                 var listArray = selectedProcurementAgentListArray;
                 listArray.sort((a, b) => {
@@ -203,7 +203,6 @@ export default class AddDimensionComponent extends Component {
             selectedArray.push(selectedProcurementAgentList[p].value);
         }
         if (selectedArray.includes(-1)) {
-            console.log("hello")
             this.setState({ selectedProcurementAgentList: [] });
             var list = this.state.procurementAgentList.filter(c => c.value != -1)
             this.setState({ selectedProcurementAgentList: list });
