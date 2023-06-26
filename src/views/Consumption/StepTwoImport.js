@@ -215,7 +215,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         let datasetList = this.props.items.datasetList
         let forecastProgramVersionId = this.props.items.forecastProgramVersionId
 
-        let selectedProgramObj = programs.filter(c => c.programId == programId)[0];
+        let selectedProgramObj = programs.filter(c => c.id == programId)[0];
         let selectedForecastProgramObj = datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0];
 
         this.setState({
@@ -239,12 +239,13 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         var count = 0;
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
-
+                console.log("region--------->papuList", papuList);
+        
                 data = [];
-                data[0] = papuList[j].regionId
+                data[0] = papuList[j].id
                 data[1] = getLabelText(papuList[j].label, this.state.lang)
 
-                let match = this.state.forecastProgramRegionList.filter(c => c.regionId == papuList[j].regionId);
+                let match = this.state.forecastProgramRegionList.filter(c => c.regionId == papuList[j].id);
 
                 if (match.length > 0) {
                     data[2] = 1
@@ -258,6 +259,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 count++;
             }
         }
+        console.log("region--------->papuDataArr", papuDataArr);
+        
 
         // if (papuDataArr.length == 0) {
         //     data = [];
@@ -293,7 +296,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             data = papuDataArr
         }
         // var data = papuDataArr;
-
+        console.log("region--------->data", data);
+        
         var options = {
             data: data,
             columnDrag: true,
