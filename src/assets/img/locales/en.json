@@ -763,6 +763,7 @@
     "static.country.countryMaster": "Country",
     "static.message.user.forgotPasswordSuccess": "An email has been sent to you with a password reset link",
     "static.loadDelDataset.deleteAllOlderVersion": "Do you want to delete all the older version and keep latest version only.",
+    "static.tree.pleaseSelectNodeType": "Please select node type before proceeding.",
     "static.procurementAgentPlanningUnit.validUnitsPerContainer": "Enter Units per Container",
     "static.supplyPlan.rowNumber": "Row Number",
     "static.report.exportWordDoc": "Export to word doc",
