@@ -11789,7 +11789,7 @@ export default class BuildTree extends Component {
                                 {/* <FontAwesomeIcon icon={faPlus} /> */}
                                 <i class="fa fa-plus" aria-hidden="true"></i>
                             </button>}
-                        {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && 
+                        {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && 
                             <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
         
