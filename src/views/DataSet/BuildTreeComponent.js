@@ -7961,7 +7961,7 @@ export default class BuildTree extends Component {
             this.calculateParentValueFromMOM((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month);
         }
         if (event.target.name === "nodeValue") {
-            console.log("$$$$-----", (event.target.value).replaceAll(",", ""));
+            console.log("$$$$-----==>", (event.target.value).replaceAll(",", ""));
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = (event.target.value).replaceAll(",", "");
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value).replaceAll(",", "");
         }
@@ -9399,7 +9399,7 @@ export default class BuildTree extends Component {
                                                         id="nodeValue"
                                                         name="nodeValue"
                                                         bsSize="sm"
-                                                        valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
+                                                        valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.displayCalculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
                                                         invalid={touched.nodeValue && !!errors.nodeValue}
                                                         onBlur={handleBlur}
                                                         readOnly={this.state.numberNode || this.state.currentScenario.extrapolation ? true : false}
@@ -9409,7 +9409,7 @@ export default class BuildTree extends Component {
                                                         }}
                                                         // step={.01}
                                                         // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
-                                                        value={this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(this.state.currentScenario.calculatedDataValue) : addCommasNodeValue(this.state.currentScenario.dataValue)}
+                                                        value={this.state.numberNode ? this.state.currentScenario.displayCalculatedDataValue == 0 ? "0" : addCommasNodeValue(this.state.currentScenario.displayCalculatedDataValue) : addCommasNodeValue(this.state.currentScenario.dataValue)}
                                                     ></Input>
                                                     <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                 </FormGroup>
@@ -9602,7 +9602,7 @@ export default class BuildTree extends Component {
                                                                 id="nodeValue"
                                                                 name="nodeValue"
                                                                 bsSize="sm"
-                                                                valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
+                                                                valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.displayCalculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
                                                                 invalid={touched.nodeValue && !!errors.nodeValue}
                                                                 onBlur={handleBlur}
                                                                 readOnly={this.state.numberNode || this.state.currentScenario.extrapolation ? true : false}
@@ -9610,7 +9610,7 @@ export default class BuildTree extends Component {
                                                                     handleChange(e);
                                                                     this.dataChange(e)
                                                                 }}
-                                                                value={(this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(this.state.currentScenario.calculatedDataValue) : addCommasNodeValue(this.state.currentScenario.dataValue)) + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
+                                                                value={(this.state.numberNode ? this.state.currentScenario.displayCalculatedDataValue == 0 ? "0" : addCommasNodeValue(this.state.currentScenario.displayCalculatedDataValue) : addCommasNodeValue(this.state.currentScenario.dataValue)) + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
                                                             ></Input>
                                                             <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                         </FormGroup>
