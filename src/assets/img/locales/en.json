@@ -578,7 +578,6 @@
     "static.equivalancyUnit.DisplayTheirForecast": "could elect to display their forecast in the EU of “Treatments for QATitis” and display their forecast as 5,000 “Treatments for QATitis” per month instead.",
     "static.report.lastmodifieddate": "Last modified date",
     "static.report.selectProgram": "Select Program and Version",
-    "static.commit.consumptionnotesvalid": "Only letters, spaces, numbers and the characters ` ~ ! @ # $ % ^ & ( ) _ { } : \" < > ? , . ; ' [ ] / \\ * - + = | are allowed. Please check for invalid characters.",
     "static.supplyPlan.multipleProcurementAgent": "Multiple Procurement Agents",
     "static.programPU.stockStatusMatrixMaxTooltip": "If planning by quantity, the max value is calculated every month by min + reorder interval* AMC. The value displayed here is the average for the year.",
     "static.common.apr": "Apr",
