@@ -1469,6 +1469,7 @@ class ForecastSummary extends Component {
                                 if (displayId == 2) {
                                     // console.log("langaugeList---->", langaugeList);
                                     let dataArray = [];
+                                    console.log("Test@123 datasetJson",this.state.regDatasetJson)
                                     var treeList = this.state.regDatasetJson.treeList.filter(c => c.active == true);;
                                     console.log("TreeList+++", treeList)
                                     var consumptionExtrapolation = this.state.regDatasetJson.consumptionExtrapolation;
@@ -1539,12 +1540,36 @@ class ForecastSummary extends Component {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
                                                 console.log("filterForecastSelected+++", filterForecastSelected);
                                                 console.log("filterForecastSelected != undefined ? filterForecastSelected.notes : +++", filterForecastSelected != undefined ? filterForecastSelected.notes : "");
-                                                data[(k + 1) * 3] = (filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
-                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "";
-                                                total += Number(filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : 0);
+                                                var selectedForecast=(filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
+                                                data[(k + 1) * 3] = selectedForecast;
+                                                var totalForecast = 0;
+                                                if(selectedForecast!=""){
+                                                    var tsListFilter = tsList.filter(c => c.id == selectedForecast)[0]
+                                                    if(tsListFilter!=undefined){
+                                                        console.log("totalForecast---------->0", tsListFilter);
+                                                        totalForecast = 0;
+                                                        if (tsListFilter.type == "C") {
+                                                            totalForecast = tsListFilter.totalForecast;
+                                                        } else {
+                                                            var flatList = tsListFilter.flatList;
+                                                            console.log("Flat List @@@@@@@ Test", flatList)
+                                                            var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == puListFiltered[j].planningUnit.id);
+                                                            console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
+                                                            var nodeDataMomList = [];
+                                                            for (var fl = 0; fl < flatListFilter.length; fl++) {
+                                                                nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM")));
+                                                            }
+                                                            nodeDataMomList.map(ele => {
+                                                                totalForecast += Number(ele.calculatedMmdValue);
+                                                            });
+                                                        }
+                                                    }
+                                                }
+                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? Math.round(totalForecast) : "";
+                                                total += Number(filterForecastSelected != undefined ? Math.round(totalForecast) : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
 
-                                                if ((filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "") != "") {
+                                                if ((filterForecastSelected != undefined ? Math.round(totalForecast) : "") != "") {
                                                     selectedForecastQty = selectedForecastQty + 1;
                                                 }
                                             }
