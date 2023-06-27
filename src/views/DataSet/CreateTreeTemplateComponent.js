@@ -995,6 +995,7 @@ export default class CreateTreeTemplate extends Component {
         var startValue = 0;
         var items = this.state.items;
         var item = items.filter(x => x.id == this.state.currentItemConfig.context.id);
+        if(item.length>0){
         console.log("***MOM item---", item);
         var momList = item[0].payload.nodeDataMap[0][0].nodeDataMomList;
         console.log("***MOM momList---", momList);
@@ -1009,6 +1010,9 @@ export default class CreateTreeTemplate extends Component {
             }
         }
         console.log("***MOM startValue---", startValue);
+        }else{
+            startValue=this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue
+        }
         return startValue;
 
     }
@@ -3903,6 +3907,7 @@ export default class CreateTreeTemplate extends Component {
                         });
                     })
                 } else if (rowData[4] == "" || rowData[4] == null) {
+                    if(this.state.aggregationNode){
                     this.setState({
                         currentRowIndex: '',
                         currentTransferData: '',
@@ -3930,6 +3935,9 @@ export default class CreateTreeTemplate extends Component {
                             currentEndValueEdit: false
                         });
                     })
+                    }else{
+                        alert(i18n.t('static.tree.pleaseSelectNodeType'));
+                    }
                 }
                 else if (rowData[1] == "" || rowData[1] == null) {
                     alert("Please select start date before proceeding.");

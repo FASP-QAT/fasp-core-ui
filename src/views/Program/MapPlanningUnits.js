@@ -654,7 +654,7 @@ export default class MapPlanningUnits extends Component {
 
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
-                name: puList[k].label.label_en,
+                name: puList[k].label.label_en + ' | ' + puList[k].planningUnitId,
                 id: puList[k].planningUnitId
             }
             mylist.push(planningUnitJson);
@@ -736,7 +736,7 @@ export default class MapPlanningUnits extends Component {
                                 });
                                 for (var k = 0; k < (response.data).length; k++) {
                                     var planningUnitJson = {
-                                        name: response.data[k].label.label_en,
+                                        name: response.data[k].label.label_en + ' | ' + response.data[k].planningUnitId,
                                         id: response.data[k].planningUnitId
                                     }
                                     list.push(planningUnitJson);
