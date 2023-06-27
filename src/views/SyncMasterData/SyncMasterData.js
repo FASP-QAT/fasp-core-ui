@@ -302,7 +302,9 @@ export default class SyncMasterData extends Component {
                                             // console.log("Shipment data list", shipmentDataList);
                                             // console.log("Batch Info list", batchInfoList);
                                             var shipArray = shipmentSyncResponse.data[response.data.programId].filter(c => c.shipmentActive == true && c.orderActive == true);
-                                            var pplModified = programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") >= moment(date).format("YYYY-MM-DD HH:mm:ss") && c.program.id == response.data.programId);
+                                            var minDateForPPLModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? generalJson.currentVersion.createdDate : date;
+                                            console.log("Min Date for PPL Modify Test@123",minDateForPPLModify)
+                                            var pplModified = programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") >= moment(minDateForPPLModify).format("YYYY-MM-DD HH:mm:ss") && c.program.id == response.data.programId);
 
                                             var rebuild = false;
                                             if (shipArray.length > 0 || pplModified.length > 0) {

@@ -1194,7 +1194,7 @@ export default class BuildTree extends Component {
         var startValue = 0;
         var items = this.state.items;
         var item = items.filter(x => x.id == this.state.currentItemConfig.context.id);
-        console.log("***MOM item---", item);
+        if(item.length>0){
         var momList = item[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList;
         console.log("***MOM momList---", momList);
         if (momList.length > 0) {
@@ -1208,6 +1208,9 @@ export default class BuildTree extends Component {
             }
         }
         console.log("***MOM startValue---", startValue);
+        }else{
+            startValue=this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue
+        }
         return startValue;
 
     }
@@ -4492,6 +4495,7 @@ export default class BuildTree extends Component {
                     })
 
                 } else if (rowData[4] == "" || rowData[4] == null) {
+                    if(this.state.aggregationNode){
                     this.setState({
                         currentRowIndex: '',
                         currentTransferData: '',
@@ -4522,6 +4526,9 @@ export default class BuildTree extends Component {
                             // this.calculateMOMData(0, 3);
                         });
                     })
+                }else{
+                    alert(i18n.t('static.tree.pleaseSelectNodeType'));
+                }
                 }
                 else if (rowData[1] == "" || rowData[1] == null) {
                     alert("Please select start date before proceeding.");

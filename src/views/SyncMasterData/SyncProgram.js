@@ -220,7 +220,7 @@ export default class SyncProgram extends Component {
                                 var programCode = programList[i].programCode + "~v" + programList[i].version;
                                 var programCodeLocal = programList[i].programCode + "~v" + programList[i].version+" (local)";
                                 var programCodeServer = programList[i].programCode + "~v" + latestVersion;
-                                var cf = window.confirm(i18n.t('static.dashboard.forecasting')+" - "+i18n.t('static.sync.importantPleaseRead')+"\n\r" + i18n.t('static.sync.clickOkTo')+"\n"+i18n.t('static.sync.deleteLocalVersion',{programCodeLocal})+"\n"+i18n.t('static.sync.loadLatestVersion',{programCodeServer})+"\n\r"+i18n.t('static.sync.clickCancelTo')+"\n"+i18n.t('static.sync.keepLocalVersion',{programCodeLocal}));
+                                var cf = window.confirm(i18n.t('static.dashboard.forecasting')+" - "+i18n.t('static.sync.importantPleaseRead')+"\n\r" + i18n.t('static.sync.clickOkTo')+"\n"+i18n.t('static.sync.deleteLocalVersion',{programCodeLocal})+", "+i18n.t("static.common.and")+"\n"+i18n.t('static.sync.loadLatestVersion',{programCodeServer})+"\n\r"+i18n.t('static.sync.clickCancelTo')+"\n"+i18n.t('static.sync.keepLocalVersion',{programCodeLocal}));
                                 if (cf == true) {
                                     var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                                     if (index == -1) {
@@ -352,7 +352,7 @@ export default class SyncProgram extends Component {
                                 var programCode = programList[i].programCode + "~v" + programList[i].version;
                                 var programCodeLocal = programList[i].programCode + "~v" + programList[i].version+" (local)";
                                 var programCodeServer = programList[i].programCode + "~v" + latestVersion;
-                                var cf = window.confirm(i18n.t('static.dashboard.supplyPlan')+" - "+i18n.t('static.sync.importantPleaseRead')+"\n\r" + i18n.t('static.sync.clickOkTo')+"\n"+i18n.t('static.sync.deleteLocalVersion',{programCodeLocal})+"\n"+i18n.t('static.sync.loadLatestVersion',{programCodeServer})+"\n\r"+i18n.t('static.sync.clickCancelTo')+"\n"+i18n.t('static.sync.keepLocalVersion',{programCodeLocal}));
+                                var cf = window.confirm(i18n.t('static.dashboard.supplyPlan')+" - "+i18n.t('static.sync.importantPleaseRead')+"\n\r" + i18n.t('static.sync.clickOkTo')+"\n"+i18n.t('static.sync.deleteLocalVersion',{programCodeLocal})+", "+i18n.t("static.common.and")+"\n"+i18n.t('static.sync.loadLatestVersion',{programCodeServer})+"\n\r"+i18n.t('static.sync.clickCancelTo')+"\n"+i18n.t('static.sync.keepLocalVersion',{programCodeLocal}));
                                 if (cf == true) {
                                     var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                                     if (index == -1) {
