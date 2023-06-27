@@ -316,29 +316,29 @@ export default class PlanningUnitSetting extends Component {
             }
 
             //procurement agent
-            var col = ("H").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(7, y);
-            console.log("value-----", value);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+            // var col = ("H").concat(parseInt(y) + 1);
+            // var value = this.el.getValueFromCoords(7, y);
+            // console.log("value-----", value);
+            // if (value == "") {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            //     valid = false;
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+            // }
 
             var col = ("I").concat(parseInt(y) + 1);
             var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             console.log("Anchal--------->1", value);
             if (value == "") {
-                console.log("Anchal--------->2", value);
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
+                // console.log("Anchal--------->2", value);
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                // valid = false;
             } else {
                 console.log("Anchal--------->3", value);
                 // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
@@ -742,8 +742,8 @@ export default class PlanningUnitSetting extends Component {
             } else {
                 console.log("Value--------------->ELSE");
                 // this.el.setValueFromCoords(8, y, '', true);
-                let q = '';
-                q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                // let q = '';
+                // q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
             }
 
         }
@@ -929,16 +929,20 @@ export default class PlanningUnitSetting extends Component {
 
         //procurement Agent
         if (x == 7) {
-            var col = ("H").concat(parseInt(y) + 1);
-            this.el.setValueFromCoords(10, y, 1, true);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+            // var col = ("H").concat(parseInt(y) + 1);
+            // this.el.setValueFromCoords(10, y, 1, true);
+            // if (value == "") {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+            // }
+        }
+
+        if(this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",","")>0 && this.el.getValue(`H${parseInt(y) + 1}`, true)==""){
+            this.el.setValueFromCoords(7,y,-1,true);
         }
 
 
@@ -954,9 +958,9 @@ export default class PlanningUnitSetting extends Component {
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
 
                 if (isNaN(parseInt(value))) {//string value check
@@ -2006,7 +2010,7 @@ export default class PlanningUnitSetting extends Component {
             data[4] = outPutList[j].stock;
             data[5] = outPutList[j].existingShipments;
             data[6] = outPutList[j].monthsOfStock;
-            data[7] = (outPutList[j].procurementAgent == null || outPutList[j].procurementAgent == undefined ? -1 : outPutList[j].procurementAgent.id);
+            data[7] = (outPutList[j].price==="" || outPutList[j].price==null || outPutList[j].price==undefined)?"":(outPutList[j].procurementAgent == null || outPutList[j].procurementAgent == undefined ? -1 : outPutList[j].procurementAgent.id);
             data[8] = outPutList[j].price;
             data[9] = outPutList[j].programPlanningUnitId;
             data[10] = 0;
@@ -2502,12 +2506,13 @@ export default class PlanningUnitSetting extends Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
-        tr.children[9].classList.add('AsteriskTheadtrTd');
+        // tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
+        // tr.children[9].classList.add('AsteriskTheadtrTd');
 
         tr.children[5].classList.add('InfoTr');
         tr.children[6].classList.add('InfoTr');
         tr.children[7].classList.add('InfoTr');
+        tr.children[8].classList.add('InfoTr');
 
 
         tr.children[5].title = i18n.t('static.tooltip.Stock');

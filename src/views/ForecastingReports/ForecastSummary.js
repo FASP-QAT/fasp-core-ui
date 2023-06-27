@@ -347,7 +347,7 @@ class ForecastSummary extends Component {
                 }
                 let propertyName1 = [];
                 if (!this.state.hideColumn) {
-                    propertyName1.push((ele.priceType == null ? '' : ele.priceType));
+                    propertyName1.push((ele.priceType == null ? '' : ele.priceType.replaceAll(' ', '%20')));
                     propertyName1.push((ele.unitPrice == null ? '' : ele.unitPrice));
                 }
                 return (ele.id != 0 &&
@@ -357,7 +357,7 @@ class ForecastSummary extends Component {
                         ((ele.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                         ((ele.planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                         (ele.totalForecastedQuantity == null ? '' : ele.totalForecastedQuantity)
-                    ].concat(propertyName).concat([(ele.procurementGap == null ? '' : ele.procurementGap)].concat(propertyName1).concat([(ele.procurementNeeded == null ? '' : ele.procurementNeeded), (ele.notes == null ? '' : (ele.notes).replaceAll(' ', '%20'))]))))
+                    ].concat(propertyName).concat([(ele.procurementGap == null ? '' : ele.procurementGap)].concat(propertyName1).concat([(ele.procurementNeeded == null || ele.unitPrice==null ? '' : ele.procurementNeeded), (ele.notes == null ? '' : (ele.notes).replaceAll(' ', '%20'))]))))
                 )
             }
             );
@@ -954,7 +954,7 @@ class ForecastSummary extends Component {
                         ((ele.planningUnit.label.label_en)),
                         (ele.totalForecastedQuantity == null ? '' : (ele.totalForecastedQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                     )
-                    A = A.concat(propertyName).concat([(ele.procurementGap == null ? '' : (ele.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))].concat(propertyName1).concat([(ele.procurementNeeded == null ? '' : (ele.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")), (ele.notes == null ? '' : ele.notes)]));
+                    A = A.concat(propertyName).concat([(ele.procurementGap == null ? '' : (ele.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))].concat(propertyName1).concat([(ele.procurementNeeded == null || ele.unitPrice==null ? '' : (ele.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")), (ele.notes == null ? '' : ele.notes)]));
                 }
 
                 return (ele.id != 0 &&
@@ -1436,6 +1436,39 @@ class ForecastSummary extends Component {
                                         console.log("totalProductCost----------->4", totalProductCost);
                                     }
 
+                                }else{
+                                    //obj parameter decleration
+                                    let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
+                                    let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
+                                    let planningUnit = planningUnitList[j].planningUnit;
+                                    var totalForecastedQuantity0ri=null;
+                                    let totalForecastedQuantity = totalForecastedQuantity0ri;
+                                    let stock1 = planningUnitList[j].stock;
+                                    let existingShipments = planningUnitList[j].existingShipments;
+                                    let stock2 = (Math.round(planningUnitList[j].stock) + Math.round(planningUnitList[j].existingShipments)) - Math.round(totalForecastedQuantity0ri);
+                                    let isStock2Red = (stock2 < 0 ? true : false);
+                                    let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
+                                    let desiredMonthOfStock2 = Math.round(Math.round(planningUnitList[j].monthsOfStock) * Math.round(totalForecastedQuantity0ri) / Math.round(total_months));
+                                    let tempProcurementGap = ((Math.round(planningUnitList[j].stock) + Math.round(planningUnitList[j].existingShipments)) - Math.round(totalForecastedQuantity0ri)) - (Math.round(planningUnitList[j].monthsOfStock) * Math.round(totalForecastedQuantity0ri) / Math.round(total_months));
+                                    let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
+                                    procurementGap = Math.round(procurementGap)
+                                    let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
+                                    let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
+                                    let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
+                                    let unitPrice = planningUnitList[j].price;
+                                    // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
+                                    let procurementNeeded = (isProcurementGapRed == true ? '$ ' + Math.round(Math.abs(tempProcurementGap) * unitPrice) : '');
+                                    let notes = planningUnitList[j].consumptionNotes;
+
+                                    let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: true, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes1 }
+                                    tempData.push(obj);
+
+
+
+                                    if (isProcurementGapRed == true) {
+                                        totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * unitPrice);
+                                        console.log("totalProductCost----------->4", totalProductCost);
+                                    }
                                 }
 
 
@@ -3449,13 +3482,19 @@ class ForecastSummary extends Component {
                                                                                                     </>
                                                                                                 }
                                                                                                 {item1.isProcurementGapRed == true ? <td className="red" style={{ fontSize: '12px' }}>{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td> : <td>{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>}
-                                                                                                {!this.state.hideColumn &&
+                                                                                                {!this.state.hideColumn && item1.unitPrice != null && item1.unitPrice !== "" && item1.unitPrice != undefined &&
                                                                                                     <>
                                                                                                         {item1.isPriceTypeRed == true ? <td className="red" style={{ fontSize: '12px' }}>{item1.priceType}</td> : <td>{item1.priceType}</td>}
                                                                                                         <td>{(item1.unitPrice != null ? (item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                                     </>
                                                                                                 }
-                                                                                                <td>{(item1.procurementNeeded != null ? (item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                {!this.state.hideColumn && (item1.unitPrice == null || item1.unitPrice === "" || item1.unitPrice == undefined) &&
+                                                                                                    <>
+                                                                                                        {!item1.isProcurementGapRed ?<td></td> : <td title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-warning fa-2x" style={{"color":"yellow","margin-top":"7px"}}></i></td>}
+                                                                                                        {!item1.isProcurementGapRed ?<td></td> : <td title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-warning fa-2x" style={{"color":"yellow","margin-top":"7px"}}></i></td>}
+                                                                                                    </>
+                                                                                                }
+                                                                                                {(item1.unitPrice != null && item1.unitPrice !== "" && item1.unitPrice != undefined) ? <td>{(item1.procurementNeeded != null ? (item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>:(!item1.isProcurementGapRed ?<td></td> : <td title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-warning fa-2x" style={{"color":"yellow","margin-top":"7px"}}></i></td>)}
                                                                                                 <td>{item1.notes}</td>
                                                                                             </>
                                                                                         }
