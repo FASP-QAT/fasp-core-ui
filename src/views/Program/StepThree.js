@@ -14,6 +14,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import classNames from 'classnames';
 import { API_URL } from '../../Constants';
+import DropdownService from '../../api/DropdownService';
 
 const initialValuesThree = {
     healthAreaId: []
@@ -93,13 +94,13 @@ export default class StepThree extends Component {
     getHealthAreaList() {
         // AuthenticationService.setupAxiosInterceptors();
         // ProgramService.getHealthAreaList(this.props.items.program.realm.realmId)
-        ProgramService.getHealthAreaListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
+        DropdownService.getHealthAreaDropdownList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
                     var json = response.data;
                     var haList = [];
                     for (var i = 0; i < json.length; i++) {
-                        haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                        haList[i] = { healthAreaCode: json[i].code, value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
                     }
 
                     var listArray = haList;

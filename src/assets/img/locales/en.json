@@ -3103,6 +3103,7 @@
     "static.report.totalRoadLeadTime": "Planned to Received (Road)",
     "static.common.duplicateToDifferentProgram":"Duplicate tree to different program",
     "static.procurementAgentProcurementUnit.mapProcurementAgent":"Map Procurement Agent",
-    "static.tree.pleaseSelectNodeType":"Please select node type before proceeding.",
-    "static.programIntegration.duplicateIntegration":"Duplicate Integration"
+    "static.programIntegration.duplicateIntegration":"Duplicate Integration",
+    "static.commit.untaggedShipments":"This program contains shipments tagged to a budget that is no longer associated with this program. To proceed with committing, please re-assign those shipments to a different budget or re-assign the budget to this program.",
+    "static.forecastSummary.priceNotAvaiable":"Price is missing - please add in Update Planning Unit screen"
 }

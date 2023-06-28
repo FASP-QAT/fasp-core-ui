@@ -3223,7 +3223,7 @@ export default class syncPage extends Component {
                                               }
                                             })
                                           }else{
-                                            alert("There are shipments with unmaped budget");
+                                            alert(i18n.t('static.commit.untaggedShipments'));
                                             this.setState({
                                               loading: false,
                                             })
