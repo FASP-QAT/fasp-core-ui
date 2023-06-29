@@ -18,8 +18,9 @@ import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, API_URL } from "../../Constants";
-
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, API_URL,PROGRAM_TYPE_DATASET } from "../../Constants";
+import DropdownService from '../../api/DropdownService';
+import ReportService from "../../api/ReportService";
 const entityname = i18n.t('static.dataSet.dataSet');
 export default class ProgramList extends Component {
 
@@ -64,43 +65,115 @@ export default class ProgramList extends Component {
         localStorage.setItem("FMSelStatus", document.getElementById("active").value)
     }
     filterData() {
-        let countryId = localStorage.getItem("FMCountryId") ? localStorage.getItem("FMCountryId") : 0;
-        var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : "true";
+        let countryId = localStorage.getItem("FMCountryId") ? localStorage.getItem("FMCountryId") : -1;
+        // var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : "true";
+        var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : -1;
         
         console.log("countryId--------->", countryId);
         console.log("selStatus--------->", selStatus);
-        if (countryId != 0 && selStatus != "") {
-            console.log("1------------");
-            let tempSelStatus = (selStatus == "true" ? true : false)
-            // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
-            const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId && c.active == tempSelStatus)
-            this.setState({
-                selProgram: selProgram
-            }, () => {
-                this.buildJExcel();
-            });
-        } else if (countryId != 0) {
-            console.log("2------------");
-            // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
-            const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId)
-            this.setState({
-                selProgram: selProgram
-            }, () => {
-                this.buildJExcel();
-            });
-        } else if (selStatus != "") {
-            console.log("3------------");
-            let tempSelStatus = (selStatus == "true" ? true : false)
-            const selProgram = this.state.programList.filter(c => c.active == tempSelStatus)
-            this.setState({
-                selProgram: selProgram
-            }, () => {
-                this.buildJExcel();
-            });
-        } else {
+        // if (countryId != 0 && selStatus != "") {
+        //     console.log("1------------");
+        //     let tempSelStatus = (selStatus == "true" ? true : false)
+        //     // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
+        //     // const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId && c.active == tempSelStatus)
+        //     // this.setState({
+        //         // selProgram: selProgram
+        //     // }, () => {
+        //         this.buildJExcel();
+        //     // });
+        // } else if (countryId != 0) {
+        //     console.log("2------------");
+        //     // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
+        //     const selProgram = this.state.programList.filter(c => c.realmCountry.realmCountryId == countryId)
+        //     this.setState({
+        //         selProgram: selProgram
+        //     }, () => {
+        //         this.buildJExcel();
+        //     });
+        // } else if (selStatus != "") {
+        //     console.log("3------------");
+        //     let tempSelStatus = (selStatus == "true" ? true : false)
+        //     const selProgram = this.state.programList.filter(c => c.active == tempSelStatus)
+        //     this.setState({
+        //         selProgram: selProgram
+        //     }, () => {
+        //         this.buildJExcel();
+        //     });
+        // } else {
+        //     console.log("4------------");
+        //     this.setState({
+        //         selProgram: this.state.programList
+        //     }, () => {
+        //         this.buildJExcel();
+        //     });
+        // }
+        if (countryId != 0 && selStatus != "") {        
+// changes
+ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASET,countryId,selStatus)    
+        .then(response => {
+            if (response.status == 200) {
+                console.log("resp--------------------", response.data);
+                this.setState({
+                    programList: response.data,
+                    selProgram: response.data,
+                },
+                    () => {
+                        this.buildJExcel();
+                    })
+            } else {
+                this.setState({
+                    message: response.data.messageCode, loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+    }
+    else {
             console.log("4------------");
             this.setState({
-                selProgram: this.state.programList
+                selProgram: this.state.programlist
             }, () => {
                 this.buildJExcel();
             });
@@ -117,48 +190,50 @@ export default class ProgramList extends Component {
     }
 
     buildJExcel() {
-        let programList = this.state.selProgram;
-
+        let programList = this.state.selProgram;        
         programList.sort((a, b) => {
-            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            var itemLabelA = getLabelText(a.program.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.program.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
             return itemLabelA > itemLabelB ? 1 : -1;
         });
-        console.log("programList---->", programList);
+        console.log("programList---->after", programList);
         let programArray = [];
         let count = 0;
 
         for (var j = 0; j < programList.length; j++) {
-            let healthAreaLabels = programList[j].healthAreaList;
+            let healthAreaLabels = programList[j].healthAreas;
             let haValues = [];
-            healthAreaLabels.map(c => {
-                haValues.push(' ' + getLabelText(c.label, this.state.lang));
-            })
-
-            let regionLabels = programList[j].regionList;
-            let reValues = [];
-            regionLabels.map(c => {
-                reValues.push(' ' + getLabelText(c.label, this.state.lang));
-            })
-
+            let regionLabels = programList[j].regions;
+            let reValues = []; 
+            haValues.push(' ' + getLabelText(healthAreaLabels.label, this.state.lang));
+            reValues.push(' ' + getLabelText(regionLabels.label, this.state.lang));
+            // healthAreaLabels.map(c => {
+            //     haValues.push(' ' + getLabelText(c.label, this.state.lang));
+            // })
+            // regionLabels.map(c => {
+            //     reValues.push(' ' + getLabelText(c.label, this.state.lang));
+            // })
+            console.log("programList---->reValues", reValues);
+            
             data = [];
-            data[0] = programList[j].programId
-            data[1] = getLabelText(programList[j].realmCountry.realm.label, this.state.lang)
-            data[2] = getLabelText(programList[j].label, this.state.lang)
-            data[3] = programList[j].programCode;
-            data[4] = getLabelText(programList[j].realmCountry.country.label, this.state.lang)
+            data[0] = programList[j].program.id
+            data[1] = getLabelText(programList[j].realm.label, this.state.lang)
+            data[2] = getLabelText(programList[j].program.label, this.state.lang)
+            data[3] = programList[j].program.code;
+            data[4] = getLabelText(programList[j].realmCountry.label, this.state.lang)
             data[5] = getLabelText(programList[j].organisation.label, this.state.lang)
             data[6] = haValues.toString();
             data[7] = reValues.toString();
-            data[8] = programList[j].programManager.username
+            data[8] = programList[j].programManager
             data[9] = programList[j].programNotes
-            data[10] = programList[j].lastModifiedBy.username;
-            data[11] = (programList[j].lastModifiedDate ? moment(programList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[10] = programList[j].lastUpdatedBy.username;
+            data[11] = (programList[j].lastUpdatedDate ? moment(programList[j].lastUpdatedDate).format(`YYYY-MM-DD`) : null)
 
 
             programArray[count] = data;
             count++;
         }
+        console.log("programArray---->",programArray)
         // if (programList.length == 0) {
         //   data = [];
         //   programArray[0] = data;
@@ -302,7 +377,9 @@ export default class ProgramList extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
 
-        ProgramService.getDataSetListAll().then(response => {
+        // ProgramService.getDataSetListAll()
+        ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASET,-1,-1)    
+        .then(response => {
             if (response.status == 200) {
                 console.log("resp--------------------", response.data);
                 this.setState({
@@ -561,14 +638,14 @@ export default class ProgramList extends Component {
 
 
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryrealmIdById(realmId)
+        // RealmCountryService.getRealmCountryrealmIdById(realmId)
+        DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
-                console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -656,8 +733,8 @@ export default class ProgramList extends Component {
         let countries = countryList.length > 0
             && countryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
+                    <option key={i} value={item.id}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -717,7 +794,7 @@ export default class ProgramList extends Component {
                                                 onChange={() => {this.dataChange(); this.filterData() } }
                                                 value={ localStorage.getItem("FMCountryId") }
                                             >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
                                                 {countries}
                                             </Input>
                                         </InputGroup>
@@ -741,9 +818,9 @@ export default class ProgramList extends Component {
                                                 onChange={() => {this.dataChange(); this.filterData() } }
                                                 value={localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : true}
                                             >
-                                                <option value="">{i18n.t('static.common.all')}</option>
-                                                <option value="true">{i18n.t('static.common.active')}</option>
-                                                <option value="false">{i18n.t('static.common.disabled')}</option>
+                                                <option value="-1">{i18n.t('static.common.all')}</option>
+                                                <option value="1">{i18n.t('static.common.active')}</option>
+                                                <option value="0">{i18n.t('static.common.disabled')}</option>
 
                                             </Input>
                                         </InputGroup>

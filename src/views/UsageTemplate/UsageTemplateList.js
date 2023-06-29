@@ -36,6 +36,7 @@ import CryptoJS from 'crypto-js';
 import { Prompt } from 'react-router';
 import { SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, INTEGER_NO_REGEX, DECIMAL_NO_REGEX, API_URL } from "../../Constants";
 import { number } from "mathjs";
+import DropdownService from '../../api/DropdownService';
 
 let initialValues = {
     number1: "",
@@ -356,7 +357,8 @@ class usageTemplate extends Component {
     }
 
     getTracerCategory() {
-        TracerCategoryService.getTracerCategoryListAll()
+        // TracerCategoryService.getTracerCategoryListAll()
+        DropdownService.getTracerCategoryDropdownList()
             .then(response => {
                 if (response.status == 200) {
                     console.log("TracerCategory------->123", response.data);
@@ -372,9 +374,9 @@ class usageTemplate extends Component {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
                                 name: getLabelText(listArray[i].label, this.state.lang),
-                                id: parseInt(listArray[i].tracerCategoryId),
-                                active: listArray[i].active,
-                                healthAreaId: listArray[i].healthArea.id
+                                id: parseInt(listArray[i].id)
+                                // active: listArray[i].active,
+                                // healthAreaId: listArray[i].healthArea.id
                             }
                             tempList[i] = paJson
                         }

@@ -347,6 +347,7 @@ import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import { MultiSelect } from 'react-multi-select-component';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
+import DropdownService from '../../api/DropdownService';
 
 
 const entityname = i18n.t('static.region.region');
@@ -863,11 +864,12 @@ class RegionListComponent extends Component {
         //     })
 
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryForProgram(realmId)
+        // RealmCountryService.getRealmCountryForProgram(realmId)
+        DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
                 console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
-                    var listArray = response.data.map(ele => ele.realmCountry);
+                    var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
