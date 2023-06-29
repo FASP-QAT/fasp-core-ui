@@ -404,7 +404,8 @@ export default class ListTreeTemplate extends Component {
             regionList,
             regionMultiList,
             missingPUList: [],
-            datasetListJexcel:programData
+            datasetListJexcel:programData,
+            regionValues:regionMultiList.length==1?regionMultiList:[]
         }, () => {
                 this.findMissingPUs();
         });
@@ -1138,35 +1139,35 @@ export default class ListTreeTemplate extends Component {
                         //     console.log("programId 1---", programId);
                         //     calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false);
                         // } else {
-                        confirmAlert({
-                            message: i18n.t('static.listTree.manageTreePage'),
-                            buttons: [
-                                {
-                                    label: i18n.t('static.program.yes'),
-                                    onClick: () => {
+                        // confirmAlert({
+                        //     message: i18n.t('static.listTree.manageTreePage'),
+                        //     buttons: [
+                        //         {
+                        //             label: i18n.t('static.program.yes'),
+                        //             onClick: () => {
                                         this.props.history.push({
                                             pathname: `/dataSet/buildTree/tree/${treeId}/${id}`,
                                             // state: { role }
                                         });
 
-                                    }
-                                },
-                                {
-                                    label: i18n.t('static.program.no'),
-                                    onClick: () => {
-                                        // this.getDatasetList();
-                                        if(this.props.location.state != undefined && this.props.location.state.treeTemplateId!=undefined){
-                                            this.props.history.push({
-                                                pathname: `/dataset/createTreeTemplate/${treeTemplateId}`,
-                                                // state: { role }
-                                            });
-                                        }else{
-                                        this.componentDidMount();
-                                        }
-                                    }
-                                }
-                            ]
-                        });
+                        //             }
+                        //         },
+                        //         {
+                        //             label: i18n.t('static.program.no'),
+                        //             onClick: () => {
+                        //                 // this.getDatasetList();
+                        //                 if(this.props.location.state != undefined && this.props.location.state.treeTemplateId!=undefined){
+                        //                     this.props.history.push({
+                        //                         pathname: `/dataset/createTreeTemplate/${treeTemplateId}`,
+                        //                         // state: { role }
+                        //                     });
+                        //                 }else{
+                        //                 this.componentDidMount();
+                        //                 }
+                        //             }
+                        //         }
+                        //     ]
+                        // });
                         // }
                     } else {
                         // this.getDatasetList();
@@ -1384,6 +1385,7 @@ export default class ListTreeTemplate extends Component {
                                         datasetIdModal: this.state.datasetIdModal,
                                         regionId: this.state.regionValues
                                     }}
+                                    enableReinitialize={true}
                                     validate={validate(validationSchemaCreateTree)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                             this.setState({ loading: true }, () => {
