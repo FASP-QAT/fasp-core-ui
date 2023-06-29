@@ -12064,7 +12064,9 @@ and (max-width: 1366px)
   color:#BA0C2F !important;
 }
 
-
+.removeOddColor .jss_content .jss tbody tr:nth-of-type(odd) {
+  background-color: transparent;
+}
 .was-validated .form-control:valid, .form-control.is-valid, .form-control.is-invalid {
   padding: 0.25rem 0.25rem 0.25rem 0.5rem !important;
 }
