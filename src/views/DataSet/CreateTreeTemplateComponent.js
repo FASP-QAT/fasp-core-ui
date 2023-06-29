@@ -1017,7 +1017,8 @@ export default class CreateTreeTemplate extends Component {
             regionListForCreateTree,
             regionMultiListForCreateTree,
             missingPUListForCreateTree: [],
-            datasetListJexcelForCreateTree:programData
+            datasetListJexcelForCreateTree:programData,
+            regionValuesForCreateTree:regionMultiListForCreateTree.length==1?regionMultiListForCreateTree:[],
         }, () => {
                 this.findMissingPUsForCreateTree();
         });
@@ -2097,28 +2098,28 @@ export default class CreateTreeTemplate extends Component {
                         //     console.log("programId 1---", programId);
                         //     calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false);
                         // } else {
-                        confirmAlert({
-                            message: i18n.t('static.listTree.manageTreePage'),
-                            buttons: [
-                                {
-                                    label: i18n.t('static.program.yes'),
-                                    onClick: () => {
+                        // confirmAlert({
+                        //     message: i18n.t('static.listTree.manageTreePage'),
+                        //     buttons: [
+                        //         {
+                        //             label: i18n.t('static.program.yes'),
+                        //             onClick: () => {
                                         this.props.history.push({
                                             pathname: `/dataSet/buildTree/tree/${treeId}/${id}`,
                                             // state: { role }
                                         });
 
-                                    }
-                                },
-                                {
-                                    label: i18n.t('static.program.no'),
-                                    onClick: () => {
-                                        // this.getDatasetList();
-                                        this.componentDidMount();
-                                    }
-                                }
-                            ]
-                        });
+                        //             }
+                        //         },
+                        //         {
+                        //             label: i18n.t('static.program.no'),
+                        //             onClick: () => {
+                        //                 // this.getDatasetList();
+                        //                 this.componentDidMount();
+                        //             }
+                        //         }
+                        //     ]
+                        // });
                         // }
                     } else {
                         // this.getDatasetList();
@@ -6625,7 +6626,7 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             );
-            DatasetService.getTreeTemplateList().then(response => {
+            DropdownService.getTreeTemplateListForDropdown().then(response => {
                 console.log("tree template list---", response.data)
                 var treeTemplateList = response.data.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -7325,13 +7326,27 @@ export default class CreateTreeTemplate extends Component {
             });
         }
         if (event.target.name === "treeTemplateId") {
+            var cont = false;
+        if (this.state.isChanged == true || this.state.isTemplateChanged == true) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
             if(event.target.value!=""){
                 this.setState({
+                    loading:true,
                     treeTemplateId:event.target.value
                 },()=>{
                     this.componentDidMount()
                 })
             }
+        }
         }
 
         if (event.target.name == "calculatorStartDate") {
@@ -7934,7 +7949,7 @@ export default class CreateTreeTemplate extends Component {
         console.log("end>>>", Date.now());
     }
     onRemoveButtonClick(itemConfig) {
-        this.setState({ loading: true }, () => {
+        this.setState({ loading: true,isTemplateChanged:true }, () => {
             var { items } = this.state;
             const ids = items.map(o => o.id)
             const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
@@ -11379,7 +11394,7 @@ export default class CreateTreeTemplate extends Component {
                                         onClick={() => this.exportPDF()}
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
-                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{'Create tree'}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span>}
+                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.createTreeFromTemplate')}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span>}
                                 </a>
                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
@@ -11712,8 +11727,8 @@ export default class CreateTreeTemplate extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
-                                                            {treeTemplateList.length>0 && <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{i18n.t('static.dataset.TreeTemplate')}<span class="red Reqasterisk">*</span></Label>
+                                                            <FormGroup className="col-md-3 pl-lg-0">
+                                                            {treeTemplateList.length>0 && <><Label htmlFor="languageId">{i18n.t('static.dataset.TreeTemplate')}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
                                                                         name="treeTemplateId"
@@ -11726,9 +11741,26 @@ export default class CreateTreeTemplate extends Component {
                                                                         {this.state.treeTemplateId==0 && <option value="">{i18n.t('static.common.select')}</option>}
                                                                         {treeTemplates}
                                                                     </Input>
-                                                                    <FormFeedback>{errors.forecastMethodId}</FormFeedback>
-                                                                </FormGroup>}
-                                                                {treeTemplateList.length>0 && <div className="col-md-9"></div>}
+                                                                    <FormFeedback>{errors.forecastMethodId}</FormFeedback></>}
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Template Name'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name="treeName"
+                                                                        id="treeName"
+                                                                        bsSize="sm"
+                                                                        readOnly={!this.state.editable}
+                                                                        valid={!errors.treeName && this.state.treeTemplate.label.label_en != ''}
+                                                                        invalid={touched.treeName && !!errors.treeName}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                        value={this.state.treeTemplate.label.label_en}
+                                                                    >
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.treeName}</FormFeedback>
+                                                                </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
                                                                     <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
@@ -11748,62 +11780,6 @@ export default class CreateTreeTemplate extends Component {
                                                                         {forecastMethods}
                                                                     </Input>
                                                                     <FormFeedback>{errors.forecastMethodId}</FormFeedback>
-                                                                </FormGroup>
-
-                                                                <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Template Name'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        name="treeName"
-                                                                        id="treeName"
-                                                                        bsSize="sm"
-                                                                        readOnly={!this.state.editable}
-                                                                        valid={!errors.treeName && this.state.treeTemplate.label.label_en != ''}
-                                                                        invalid={touched.treeName && !!errors.treeName}
-                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                        value={this.state.treeTemplate.label.label_en}
-                                                                    >
-                                                                    </Input>
-                                                                    <FormFeedback>{errors.treeName}</FormFeedback>
-                                                                </FormGroup>
-                                                                <FormGroup className="col-md-3 pl-lg-0" style={{ marginTop: '28px' }}>
-                                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
-                                                                    <FormGroup check inline>
-                                                                        <Input
-                                                                            className="form-check-input"
-                                                                            type="radio"
-                                                                            id="active1"
-                                                                            name="active"
-                                                                            disabled={!this.state.editable}
-                                                                            value={true}
-                                                                            checked={this.state.treeTemplate.active === true}
-                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        />
-                                                                        <Label
-                                                                            className="form-check-label"
-                                                                            check htmlFor="inline-radio1">
-                                                                            {i18n.t('static.common.active')}
-                                                                        </Label>
-                                                                    </FormGroup>
-                                                                    <FormGroup check inline>
-                                                                        <Input
-                                                                            className="form-check-input"
-                                                                            type="radio"
-                                                                            id="active2"
-                                                                            name="active"
-                                                                            disabled={!this.state.editable}
-                                                                            value={false}
-                                                                            checked={this.state.treeTemplate.active === false}
-                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        />
-                                                                        <Label
-                                                                            className="form-check-label"
-                                                                            check htmlFor="inline-radio2">
-                                                                            {i18n.t('static.common.disabled')}
-                                                                        </Label>
-                                                                    </FormGroup>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3" >
                                                                     <div className="check inline  pl-lg-1 pt-lg-3">
@@ -11939,8 +11915,7 @@ export default class CreateTreeTemplate extends Component {
                                                                             }, this)}
                                                                     </Input>
                                                                 </FormGroup> */}
-                                                            </Row>
-                                                            <FormGroup className="row col-md-3 pl-lg-0 MarginTopMonthSelector">
+                                                            <FormGroup className="col-md-3 pl-lg-0 MarginTopMonthSelector">
                                                                 <Label htmlFor="languageId">{'Month Selector'}</Label>
                                                                 <Input
                                                                     type="select"
@@ -11960,6 +11935,44 @@ export default class CreateTreeTemplate extends Component {
                                                                         }, this)}
                                                                 </Input>
                                                             </FormGroup>
+                                                            <FormGroup className="col-md-3 pl-lg-0" style={{ marginTop: '12px',marginLeft:'30px' }}>
+                                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                                                    <FormGroup check inline>
+                                                                        <Input
+                                                                            className="form-check-input"
+                                                                            type="radio"
+                                                                            id="active1"
+                                                                            name="active"
+                                                                            disabled={!this.state.editable}
+                                                                            value={true}
+                                                                            checked={this.state.treeTemplate.active === true}
+                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        />
+                                                                        <Label
+                                                                            className="form-check-label"
+                                                                            check htmlFor="inline-radio1">
+                                                                            {i18n.t('static.common.active')}
+                                                                        </Label>
+                                                                    </FormGroup>
+                                                                    <FormGroup check inline>
+                                                                        <Input
+                                                                            className="form-check-input"
+                                                                            type="radio"
+                                                                            id="active2"
+                                                                            name="active"
+                                                                            disabled={!this.state.editable}
+                                                                            value={false}
+                                                                            checked={this.state.treeTemplate.active === false}
+                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        />
+                                                                        <Label
+                                                                            className="form-check-label"
+                                                                            check htmlFor="inline-radio2">
+                                                                            {i18n.t('static.common.disabled')}
+                                                                        </Label>
+                                                                    </FormGroup>
+                                                                </FormGroup>
+                                                                </Row>
                                                         </div>
 
                                                         {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')) &&
@@ -12272,6 +12285,7 @@ export default class CreateTreeTemplate extends Component {
                                         datasetIdModalForCreateTree: this.state.datasetIdModalForCreateTree,
                                         regionIdForCreateTree: this.state.regionValuesForCreateTree
                                     }}
+                                    enableReinitialize={true}
                                     validate={validate(validationSchemaCreateTree)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                             this.setState({ loading: true }, () => {
