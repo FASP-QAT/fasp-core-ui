@@ -314,6 +314,10 @@ export default class CompareVersion extends Component {
     }
 
     componentDidMount() {
+
+        let target = document.getElementById('tableDiv');
+        target.classList.add("removeOddColor")
+        console.log("target", target);
         console.log("DatasetData+++", this.props.datasetData);
         console.log("DatasetData1+++", this.props.datasetData1);
         this.props.updateState("loading", true);
@@ -648,7 +652,7 @@ export default class CompareVersion extends Component {
             filters: true,
             editable: false,
             license: JEXCEL_PRO_KEY,
-            editable: false,
+            // editable: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 // //Resolve conflicts
