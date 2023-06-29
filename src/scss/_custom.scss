@@ -10384,3 +10384,6 @@ and (max-width: 1605px)
   color:#BA0C2F !important;
 }
 
+.removeOddColor .jss_content .jss tbody tr:nth-of-type(odd) {
+  background-color: transparent !important;
+}

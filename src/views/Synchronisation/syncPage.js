@@ -2301,7 +2301,7 @@ export default class syncPage extends Component {
                                               allowInsertColumn: false,
                                               allowManualInsertColumn: false,
                                               allowDeleteRow: false,
-                                              // editable: false,
+                                              editable: false,
                                               onload: this.loadedFunctionForMerge,
                                               // text: {
                                               //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
