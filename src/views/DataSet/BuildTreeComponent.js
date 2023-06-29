@@ -10530,8 +10530,49 @@ export default class BuildTree extends Component {
                                 <fieldset className="scheduler-border">
                                     <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool')}</legend>
                                     <div className="row">
+                                    <FormGroup className="col-md-6" >
+                                            <div className="check inline  pl-lg-1 pt-lg-2">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
+                                                <Label htmlFor="select">{i18n.t('static.modelingType.modelingType')}</Label>
+                                    <Input
+                                        valid={!errors.modelingType}
+                                        invalid={touched.modelingType && !!errors.modelingType}
+                                         onChange={(e) => { this.dataChange(e); }}
+                                        bsSize="sm"
+                                        className="col-md-4"
+                                        onBlur={handleBlur}
+                                        type="select" name="modelingType" id="modelingType">
+                                        {this.state.currentItemConfig.context.payload.nodeType.id == 2 &&<option value="active1" selected={this.state.currentModelingType == 4 ? true : false}>{"Exponential (%)"}</option>}
+                                        {this.state.currentItemConfig.context.payload.nodeType.id == 2 &&<option value="active2" selected={(this.state.currentItemConfig.context.payload.nodeType.id > 2 || this.state.currentModelingType == 3) ? true : false}>{'Linear (%)'}</option>}
+                                        {this.state.currentItemConfig.context.payload.nodeType.id == 2 &&<option value="active3" selected={this.state.currentModelingType == 2 ? true : false}>{'Linear (#)'}</option>}
+                                        {this.state.currentItemConfig.context.payload.nodeType.id > 2&&<option value="active4" selected={this.state.currentModelingType == 5 ? true : false}>{'Linear (% point)'}</option>}
+                                    </Input>
+                                    <FormFeedback className="red">{errors.modelingType}</FormFeedback>
+                                                    
+                                                </div>}
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6" >
+                                            <div className="check inline  pl-lg-1 pt-lg-2">
+                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
+                                    <Input
+                                        valid={!errors.targetSelect}
+                                        invalid={touched.targetSelect && !!errors.targetSelect}
+                                         onChange={(e) => { this.dataChange(e); }}
+                                        bsSize="sm"
+                                        className="col-md-4"
+                                        onBlur={handleBlur}
+                                        type="select" name="targetSelect" id="targetSelect">
+                                        <option value="target1"selected={true}>{'Annual Target'}</option>
+                                        <option value="target2">{'Ending Value Target / Change'}</option>
+                                    </Input>
+                                    <FormFeedback className="red">{errors.targetSelect}</FormFeedback>
+                                                    
+                                                </div>}
+                                            </div>
+                                        </FormGroup>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.common.startdate')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.firstMonthOfTarget')}<span class="red Reqasterisk">*</span></Label>
                                             <Picker
                                                 ref={this.pickAMonth4}
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
@@ -10543,7 +10584,7 @@ export default class BuildTree extends Component {
                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
                                             </Picker>
                                         </FormGroup>
-                                        <FormGroup className="col-md-6">
+                                        {/* <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.targetDate')}<span class="red Reqasterisk">*</span></Label>
                                             <Picker
                                                 ref={this.pickAMonth5}
@@ -10555,7 +10596,7 @@ export default class BuildTree extends Component {
                                             >
                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                             </Picker>
-                                        </FormGroup>
+                                        </FormGroup> */}
                                         {this.state.currentItemConfig.context.payload.nodeType.id <= 2 &&
                                             <>
                                                 <div>
@@ -10564,7 +10605,7 @@ export default class BuildTree extends Component {
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-6">
-                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover53" onClick={this.toggleStartValueModelingTool} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.firstMonthOfTarget')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover53" onClick={this.toggleStartValueModelingTool} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <Input type="text"
                                                         id="startValue"
                                                         name="startValue"
@@ -10676,75 +10717,6 @@ export default class BuildTree extends Component {
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
                                         <FormGroup className="col-md-6"></FormGroup>
-                                        <FormGroup className="col-md-6" >
-                                            <div className="check inline  pl-lg-1 pt-lg-2">
-                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="radio"
-                                                        id="active1"
-                                                        name="modelingType"
-                                                        checked={this.state.currentModelingType == 4 ? true : false}
-                                                        onChange={(e) => { this.dataChange(e) }}
-                                                    // onClick={(e) => { this.filterPlanningUnitNode(e); }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Exponential (%)'}</b>
-                                                    </Label>
-                                                </div>}
-                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
-                                                    <Input
-                                                        className="form-check-input Radioactive checkboxMargin"
-                                                        type="radio"
-                                                        id="active2"
-                                                        name="modelingType"
-                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id > 2 || this.state.currentModelingType == 3) ? true : false}
-                                                        onChange={(e) => { this.dataChange(e) }}
-                                                    // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Linear (%)'}</b>
-                                                    </Label>
-                                                </div>
-                                                }
-                                                {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="radio"
-                                                        id="active3"
-                                                        name="modelingType"
-                                                        checked={this.state.currentModelingType == 2 ? true : false}
-                                                        onChange={(e) => { this.dataChange(e) }}
-                                                    // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Linear (#)'}</b>
-                                                    </Label>
-                                                </div>}
-                                                {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <div className="col-md-12 form-group">
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="radio"
-                                                        id="active4"
-                                                        name="modelingType"
-                                                        checked={this.state.currentModelingType == 5 ? true : false}
-                                                        onChange={(e) => { this.dataChange(e) }}
-                                                    // onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Linear (% point)'}</b>
-                                                    </Label>
-                                                </div>}
-                                            </div>
-                                        </FormGroup>
                                         <FormGroup className="col-md-6">
                                         </FormGroup>
                                     </div>
