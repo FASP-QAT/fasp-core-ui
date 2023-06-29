@@ -5727,12 +5727,22 @@ export default class BuildTree extends Component {
                 );
             }
             let tempToggleList = tempToggleObject.map(item => item.id);
-            this.setState({toggleArray: tempToggleList});
+                  
             var curTreeObj1 = curTreeObj.tree.flatList.map(item => {
                 if(tempToggleList.includes(item.id))
                     return {...item, templateName: "contactTemplateMin", expanded: true} 
                 return {...item, templateName: "contactTemplate", expanded: false} 
             })
+            if(Array.from(new Set(tempToggleList)).length + 1 >= curTreeObj.tree.flatList.length){
+                var parentNode = curTreeObj.tree.flatList.filter(item => 
+                    (item.parent == null) 
+                );
+                tempToggleList.push(parentNode[0].id)
+                this.setState({ collapseState: true })
+            }else{
+                this.setState({ collapseState: false })
+            }
+            this.setState({toggleArray: tempToggleList});
             curTreeObj.tree.flatList = curTreeObj1; 
                 
             this.setState({
@@ -8534,7 +8544,8 @@ export default class BuildTree extends Component {
                             return item;
                         });
                         this.setState({toggleArray: tempToggleArray})
-                    }               
+                    }
+                    this.setState({ collapseState: false })               
                     this.setState({ items: updatedItems }, () => { this.saveTreeData(false, true) })
                 }
                 console.log("555>>>", this.state.items);
@@ -11808,6 +11819,11 @@ export default class BuildTree extends Component {
                                             }
                                             return item;
                                         });
+                                        if(Array.from(new Set(tempToggleArray)).length >= items.length){
+                                            this.setState({ collapseState: true })
+                                        }else{
+                                            this.setState({ collapseState: false })
+                                        }
                                         this.setState({toggleArray: tempToggleArray})
                                     }else{
                                         var parentId = itemConfig.payload.parentNodeId;
@@ -11826,6 +11842,11 @@ export default class BuildTree extends Component {
                                             }
                                             return item;
                                         });
+                                        if(Array.from(new Set(tempToggleArray)).length >= items.length){
+                                            this.setState({ collapseState: true })
+                                        }else{
+                                            this.setState({ collapseState: false })
+                                        }
                                         this.setState({toggleArray: tempToggleArray})
                                     }
                                     
