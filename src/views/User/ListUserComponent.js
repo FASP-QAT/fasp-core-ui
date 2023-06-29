@@ -1369,7 +1369,7 @@ class ListUserComponent extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            editable: true,
+            // editable: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
