@@ -88,7 +88,7 @@ export default class IntegrationListComponent extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable: true,
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
