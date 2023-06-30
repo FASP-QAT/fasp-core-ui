@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form, Button, ModalHeader, ModalBody, Modal, CardFooter
+    Table, FormGroup, Input, InputGroup, Label, Form, Button, ModalHeader, ModalBody, Modal, CardFooter, Row
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -1068,6 +1068,7 @@ class ForecastSummary extends Component {
         console.log("versionId----------->", versionId);
         let displayId = this.state.displayId;
         (displayId == 1 ? document.getElementById("hideCalculationDiv").style.display = "block" : document.getElementById("hideCalculationDiv").style.display = "none");
+        (displayId == 1 ? document.getElementById("hideLegendDiv").style.display = "block" : document.getElementById("hideLegendDiv").style.display = "none");
         // (displayId == 1 ? document.getElementById("hideCurrencyDiv").style.display = "block" : document.getElementById("hideCurrencyDiv").style.display = "none");
         // this.setState({
         //     displayId: displayId
@@ -2502,6 +2503,7 @@ class ForecastSummary extends Component {
 
     componentDidMount() {
         document.getElementById("hideCalculationDiv").style.display = "none";
+        document.getElementById("hideLegendDiv").style.display = "none";
         // document.getElementById("hideCurrencyDiv").style.display = "none";
         this.getPrograms();
         this.setState({
@@ -3175,6 +3177,11 @@ class ForecastSummary extends Component {
         })
     }
 
+    redirectToForecastSummary(){
+        const win = window.open(`/#/planningUnitSetting/listPlanningUnitSetting`, "_blank");
+        win.focus();
+    }
+
     render() {
         jexcel.setDictionary({
             Show: " ",
@@ -3417,7 +3424,8 @@ class ForecastSummary extends Component {
                                                     </FormGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3" id="hideCalculationDiv">
+                                            {/* <div> */}
+                                            <FormGroup className="col-md-2" id="hideCalculationDiv">
                                                 {/* <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.hideCalculations')}</Label> */}
                                                 <div className="controls pl-lg-4 pt-lg-0">
                                                     {/* <InputGroup>
@@ -3449,6 +3457,12 @@ class ForecastSummary extends Component {
                                                     </Label>
                                                 </div>
                                             </FormGroup>
+                                            <FormGroup className="col-md-6" id="hideLegendDiv">
+                                                {/* <ul className="legendcommitversion list-group"> */}
+                                                    <i class="fa fa-exclamation-triangle" style={{color: "#BA0C2F"}}></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{i18n.t('static.forecastSummary.priceIsMissing')}
+                                                {/* </ul> */}
+                                            </FormGroup>
+                                            {/* </div> */}
                                             <FormGroup className="col-md-3" id="hideCurrencyDiv" style={{ display: 'none' }}>
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.country.currency')}</Label>
                                                 <div className="controls ">
@@ -3582,16 +3596,16 @@ class ForecastSummary extends Component {
                                                                                                 {!this.state.hideColumn && item1.unitPrice != null && item1.unitPrice !== "" && item1.unitPrice != undefined &&
                                                                                                     <>
                                                                                                         {item1.isPriceTypeRed == true ? <td className="red" style={{ fontSize: '12px' }}>{item1.priceType}</td> : <td>{item1.priceType}</td>}
-                                                                                                        <td>{(item1.unitPrice != null ? (item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                        <td onClick={()=>this.state.versionId.toString().includes('Local')?this.redirectToForecastSummary():""} className={this.state.versionId.toString().includes('Local')?"hoverTd":""}>{(item1.unitPrice != null ? (item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                                     </>
                                                                                                 }
                                                                                                 {!this.state.hideColumn && (item1.unitPrice == null || item1.unitPrice === "" || item1.unitPrice == undefined) &&
                                                                                                     <>
-                                                                                                        {!item1.isProcurementGapRed ?<td></td> : <td title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-warning fa-2x" style={{"color":"yellow","margin-top":"7px"}}></i></td>}
-                                                                                                        {!item1.isProcurementGapRed ?<td></td> : <td title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-warning fa-2x" style={{"color":"yellow","margin-top":"7px"}}></i></td>}
+                                                                                                        {!item1.isProcurementGapRed ?<td></td> : <td title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-exclamation-triangle" style={{"color":"#BA0C2F","margin-top":"7px"}}></i></td>}
+                                                                                                        {!item1.isProcurementGapRed ?<td  onClick={()=>this.state.versionId.toString().includes('Local')?this.redirectToForecastSummary():""} className={this.state.versionId.toString().includes('Local')?"hoverTd":""}></td> : <td  onClick={()=>this.state.versionId.toString().includes('Local')?this.redirectToForecastSummary():""} className={this.state.versionId.toString().includes('Local')?"hoverTd":""} title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-exclamation-triangle" style={{"color":"#BA0C2F","margin-top":"7px"}}></i></td>}
                                                                                                     </>
                                                                                                 }
-                                                                                                {(item1.unitPrice != null && item1.unitPrice !== "" && item1.unitPrice != undefined) ? <td>{(item1.procurementNeeded != null ? (item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>:(!item1.isProcurementGapRed ?<td></td> : <td title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-warning fa-2x" style={{"color":"yellow","margin-top":"7px"}}></i></td>)}
+                                                                                                {(item1.unitPrice != null && item1.unitPrice !== "" && item1.unitPrice != undefined) ? <td>{(item1.procurementNeeded != null ? (item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>:(!item1.isProcurementGapRed ?<td></td> : <td title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-exclamation-triangle" style={{"color":"#BA0C2F","margin-top":"7px"}}></i></td>)}
                                                                                                 <td>{item1.notes}</td>
                                                                                             </>
                                                                                         }

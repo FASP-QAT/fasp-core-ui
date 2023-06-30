@@ -3105,5 +3105,6 @@
     "static.procurementAgentProcurementUnit.mapProcurementAgent":"Map Procurement Agent",
     "static.programIntegration.duplicateIntegration":"Duplicate Integration",
     "static.commit.untaggedShipments":"This program contains shipments tagged to a budget that is no longer associated with this program. To proceed with committing, please re-assign those shipments to a different budget or re-assign the budget to this program.",
-    "static.forecastSummary.priceNotAvaiable":"Price is missing - please add in Update Planning Unit screen"
+    "static.forecastSummary.priceNotAvaiable":"Price is missing - please add in Update Planning Unit screen",
+    "static.forecastSummary.priceIsMissing":"Price is missing"
 }
