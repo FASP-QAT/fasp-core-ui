@@ -664,39 +664,62 @@ class SupplyPlanFormulas extends Component {
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.dashboard.inventoryTurns")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
-                  <p>{"1) "+i18n.t("static.supplyPlanFormula.inventoryTurns1")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns1L1")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns1L2")}</p>
+                  <p><b>{i18n.t("static.supplyPlanFormula.inventoryTurns1")}</b><br></br>
+                    <p className="ml-3">
+                      <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L1")}</b>{i18n.t("static.supplyPlanFormula.inventoryTurns1L1")}<br></br><br></br>
+                      <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L3")}</b>{i18n.t("static.supplyPlanFormula.inventoryTurns1L2")}<br></br><br></br>
+                      <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L9")}</b>{i18n.t("static.supplyPlanFormula.inventoryTurns1L3")}
+                    </p>
+                  </p>
 
-                  <p>{"2) "+i18n.t("static.supplyPlanFormula.inventoryTurns2")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns2L1")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns2L2")}</p>
+                  <p><b>{i18n.t("static.supplyPlanFormula.inventoryTurns2")}</b><br></br>
+                    <p className="ml-3">
+                      <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L1")}</b><br></br>
+                      <ol>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L2")}</li>
+                      </ol>
+                      <br></br>
+                      <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L3")}</b><br></br>
+                      <ol>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L4")}</li>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L5")}</li>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L6")}</li>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L7")}</li>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L8")}</li>
+                      </ol>
+                      <br></br>
+                      <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L9")}</b><br></br>
+                      <ol>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L10")}</li>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L11")}</li>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L12")}</li>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L13")}</li>
+                        <li>{i18n.t("static.supplyPlanFormula.inventoryTurns2L14")}</li>
+                      </ol>
+                    </p>
+                  </p>
 
-                  <p>{"3) "+i18n.t("static.supplyPlanFormula.inventoryTurns3")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns3L1")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns3L2")}</p>
+                  <p><b>{i18n.t("static.supplyPlanFormula.inventoryTurns3")}</b><br></br>
+                    <ol>
+                      <li>{i18n.t("static.supplyPlanFormula.inventoryTurns3L1")}</li>
+                      <li>{i18n.t("static.supplyPlanFormula.inventoryTurns3L2")}</li>    
+                    </ol>
+                  </p>
 
-                  <p>{"4) "+i18n.t("static.supplyPlanFormula.inventoryTurns4")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns4L1")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns4L2")}</p>
+                  <p><b>{i18n.t("static.supplyPlanFormula.inventoryTurns4")}</b><br></br>
+                    <ol>
+                      <li>{i18n.t("static.supplyPlanFormula.inventoryTurns4L1")}</li>
+                      <li>{i18n.t("static.supplyPlanFormula.inventoryTurns4L2")}</li>
+                    </ol>
+                  </p>
 
-                  <p>{"5) "+i18n.t("static.supplyPlanFormula.inventoryTurns5")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns5L1")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns5L2")}</p>
-
-                  <p>{"6) "+i18n.t("static.supplyPlanFormula.inventoryTurns6")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns6L1")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurns6L2")}</p>
-
-                  <p>{"7) "+i18n.t("static.supplyPlanFormula.inventoryTurns8")}<br></br>
-                  {i18n.t('static.supplyPlanFormula.inventoryTurns8L1')}<a href='/#/programProduct/addProgramProduct' target="_blank">{i18n.t('static.formula.suggestedText3')}</a>{i18n.t('static.formula.suggestedText4')}</p>
+                  <p><b>{i18n.t("static.supplyPlanFormula.inventoryTurns5")}</b><br></br>
+                    <ol>
+                      <li>{i18n.t('static.supplyPlanFormula.inventoryTurns5L1')}<a href='/#/programProduct/addProgramProduct' target="_blank">{i18n.t('static.formula.suggestedText3')}</a>{i18n.t('static.formula.suggestedText4')}</li>
+                    </ol>
+                  </p>
                 </ListGroupItemText>
               </ListGroupItem>
-              <div className="mt-2" >
-                <p><i>{i18n.t("static.supplyPlanFormula.inventoryTurnsNote")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurnsNote1")}<br></br>
-                  {i18n.t("static.supplyPlanFormula.inventoryTurnsNote2")}</i></p>
-              </div>
             </ListGroup>
           </ModalBody>
         </Modal>

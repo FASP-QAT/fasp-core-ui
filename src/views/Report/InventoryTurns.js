@@ -198,11 +198,11 @@ export default class InventoryTurns extends Component {
                 A.push(this.addDoubleQuoteToRowContent([(r.programName).replaceAll(',', ' '), this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => sortOrderList.includes(arr.productCategory.id) && arr.program.id == r.programId ).length, "", "", "", "", "", this.roundN1(r.inventoryTurns), this.roundN1(r.plannedInventoryTurns), this.roundN1(r.mape), this.roundN1(r.mse)]))
                         
                 {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 12 ? arr1.noOfMonths : arr1.noOfMonths >= 6 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN1(arr1.inventoryTurns), this.roundN1(arr1.plannedInventoryTurns), this.roundN1(arr1.mape), this.roundN1(arr1.mse)]))          
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 12 ? arr1.noOfMonths : arr1.noOfMonths >= 6 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, arr1.noOfMonths >= 6 ? this.roundN1(arr1.inventoryTurns) : "", this.roundN1(arr1.plannedInventoryTurns), this.roundN1(arr1.mape), this.roundN1(arr1.mse)]))          
                 })}
 
                 {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => sortOrderList.includes(item.id) && arr.program.id == r.programId ).map(arr1 => {
-                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 12 ? arr1.noOfMonths : arr1.noOfMonths >= 6 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, this.roundN1(arr1.inventoryTurns), this.roundN1(arr1.plannedInventoryTurns), this.roundN1(arr1.mape), this.roundN1(arr1.mse)]))  
+                    A.push(this.addDoubleQuoteToRowContent([getLabelText(arr1.planningUnit.label).replaceAll(',', ' '), " ", this.formatter(arr1.totalConsumption), this.round(arr1.avergeStock), arr1.noOfMonths >= 12 ? arr1.noOfMonths : arr1.noOfMonths >= 6 ? arr1.noOfMonths : "", arr1.reorderFrequencyInMonths, arr1.minMonthsOfStock, arr1.noOfMonths >= 6 ? this.roundN1(arr1.inventoryTurns) : "", this.roundN1(arr1.plannedInventoryTurns), this.roundN1(arr1.mape), this.roundN1(arr1.mse)]))  
                 })}
                 
             })}
@@ -278,9 +278,17 @@ export default class InventoryTurns extends Component {
                     
                     doc.setDrawColor(0);
                     doc.setFillColor(186, 12, 47);
-                    doc.rect(doc.internal.pageSize.width / 8, this.state.CostOfInventoryInput.displayId == 1 ? 200 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 200 + this.state.puId.length*2 + this.state.programId.length*2, 15, 12, 'F');
+                    doc.rect(doc.internal.pageSize.width / 8 + 300, this.state.CostOfInventoryInput.displayId == 1 ? 200 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 200 + this.state.puId.length*2 + this.state.programId.length*2, 15, 12, 'F');
 
-                    doc.text(i18n.t('static.inventoryTurns.months12'), doc.internal.pageSize.width / 8 + 20, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
+                    doc.text(i18n.t('static.inventoryTurns.months12'), doc.internal.pageSize.width / 8 + 320, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
+                        align: 'left'
+                    })
+
+                    doc.setDrawColor(0);
+                    doc.setFillColor(0, 0, 0);
+                    doc.rect(doc.internal.pageSize.width / 8 + 450, this.state.CostOfInventoryInput.displayId == 1 ? 200 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 200 + this.state.puId.length*2 + this.state.programId.length*2, 15, 12, 'F');
+
+                    doc.text(i18n.t('static.inventoryTurns.months13'), doc.internal.pageSize.width / 8 + 470, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
                         align: 'left'
                     })
 
@@ -288,12 +296,12 @@ export default class InventoryTurns extends Component {
                     doc.setFillColor(0, 0, 0);
                     // doc.rect(doc.internal.pageSize.width / 8 + 180, this.state.CostOfInventoryInput.displayId == 1 ? 200 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 200 + this.state.puId.length*2 + this.state.programId.length*2, 15, 12, 'F');
                     doc.setTextColor("#BA0C2F");
-                    doc.text("!", doc.internal.pageSize.width / 8 + 180, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
+                    doc.text("!", doc.internal.pageSize.width / 8, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
                         align: 'left',
                     });
 
                     doc.setTextColor("#002f6c");
-                    doc.text(i18n.t('static.inventoryTurns.months6'), doc.internal.pageSize.width / 8 + 200, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
+                    doc.text(i18n.t('static.inventoryTurns.months6'), doc.internal.pageSize.width / 8 + 10, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
                         align: 'left',
                     })
                 }
@@ -340,11 +348,11 @@ export default class InventoryTurns extends Component {
                 data.push(["      "+r.programName, this.state.CostOfInventoryInput.displayId==1 ? this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).length : this.state.costOfInventory.filter(arr => sortOrderList.includes(arr.productCategory.id) && arr.program.id == r.programId ).length, "", "", "",  "", "", this.formatterSingle(r.inventoryTurns), this.formatterSingle(r.plannedInventoryTurns), this.formatterSingle(r.mape), this.formatterSingle(r.mse)])
                 
                 {this.state.CostOfInventoryInput.displayId==1 && this.state.costOfInventory.filter(arr => arr.realmCountry.id == item.id && arr.program.id == r.programId ).map(arr1 => {
-                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), arr1.noOfMonths >= 12 ? this.formatter(arr1.noOfMonths) : arr1.noOfMonths >= 6 ? " "+arr1.noOfMonths : " ", this.formatter(arr1.reorderFrequencyInMonths), this.formatter(arr1.minMonthsOfStock), this.formatterSingle(arr1.inventoryTurns), this.formatterSingle(arr1.plannedInventoryTurns), this.formatterSingle(arr1.mape), this.formatterSingle(arr1.mse)])          
+                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), arr1.noOfMonths >= 12 ? this.formatter(arr1.noOfMonths) : arr1.noOfMonths >= 6 ? " "+arr1.noOfMonths : " ", this.formatter(arr1.reorderFrequencyInMonths), this.formatter(arr1.minMonthsOfStock), arr1.noOfMonths >= 6 ? this.formatterSingle(arr1.inventoryTurns) : "", this.formatterSingle(arr1.plannedInventoryTurns), this.formatterSingle(arr1.mape), this.formatterSingle(arr1.mse)])          
                 })}
 
                 {this.state.CostOfInventoryInput.displayId==2 && this.state.costOfInventory.filter(arr => sortOrderList.includes(item.id) && arr.program.id == r.programId ).map(arr1 => {
-                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), arr1.noOfMonths >= 12 ? this.formatter(arr1.noOfMonths) : arr1.noOfMonths >= 6 ? " "+arr1.noOfMonths : " ", this.formatter(arr1.reorderFrequencyInMonths), this.formatter(arr1.minMonthsOfStock), this.formatterSingle(arr1.inventoryTurns), this.formatterSingle(arr1.plannedInventoryTurns), this.formatterSingle(arr1.mape), this.formatterSingle(arr1.mse)])  
+                    data.push([getLabelText(arr1.planningUnit.label), "", this.formatter(arr1.totalConsumption), this.formatter(arr1.avergeStock), arr1.noOfMonths >= 12 ? this.formatter(arr1.noOfMonths) : arr1.noOfMonths >= 6 ? " "+arr1.noOfMonths : " ", this.formatter(arr1.reorderFrequencyInMonths), this.formatter(arr1.minMonthsOfStock), arr1.noOfMonths >= 6 ? this.formatterSingle(arr1.inventoryTurns) : "", this.formatterSingle(arr1.plannedInventoryTurns), this.formatterSingle(arr1.mape), this.formatterSingle(arr1.mse)])  
                 })}
                 
             })}
@@ -1307,7 +1315,7 @@ export default class InventoryTurns extends Component {
                         <td style={{ color: arr1.noOfMonths >= 12 ? "" : "#BA0C2F"}} className='borderNoneInventry1'>{arr1.noOfMonths >= 6 ? arr1.noOfMonths : <i class='fa fa-exclamation-triangle'></i>}</td>
                         <td>{arr1.reorderFrequencyInMonths}</td>
                         <td>{arr1.minMonthsOfStock}</td>
-                        <td>{this.formatterSingle(arr1.inventoryTurns)}</td>
+                        <td>{arr1.noOfMonths >= 6 ? this.formatterSingle(arr1.inventoryTurns) : ""}</td>
                         <td>{this.formatterSingle(arr1.plannedInventoryTurns)}</td>
                         <td>{this.formatterSingle(arr1.mape)}</td>
                         <td>{this.formatterSingle(arr1.mse)}</td>
@@ -1324,7 +1332,7 @@ export default class InventoryTurns extends Component {
                         <td style={{ color: arr1.noOfMonths >= 12 ? "" : "#BA0C2F"}} className='borderNoneInventry1'>{arr1.noOfMonths >= 6 ? arr1.noOfMonths : <i class='fa fa-exclamation-triangle'></i>}</td>
                         <td>{arr1.reorderFrequencyInMonths}</td>
                         <td>{arr1.minMonthsOfStock}</td>
-                        <td>{this.formatterSingle(arr1.inventoryTurns)}</td>
+                        <td>{arr1.noOfMonths >= 6 ? this.formatterSingle(arr1.inventoryTurns) : ""}</td>
                         <td>{this.formatterSingle(arr1.plannedInventoryTurns)}</td>
                         <td>{this.formatterSingle(arr1.mape)}</td>
                         <td>{this.formatterSingle(arr1.mse)}</td>
@@ -1673,8 +1681,9 @@ export default class InventoryTurns extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
                                                 <ul className="legendcommitversion list-group">
+                                                    <li><span className="legendcolorIcon"><i class="fa fa-exclamation-triangle" style={{color: "#BA0C2F"}}></i></span><span className="legendcommitversionText">{i18n.t('static.inventoryTurns.months6')}</span></li>
                                                     <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.inventoryTurns.months12')}</span></li>
-                                                    <li><span className="legendcolor"><i class="fa fa-exclamation-triangle" style={{color: "#BA0C2F"}}></i></span><span className="legendcommitversionText">{i18n.t('static.inventoryTurns.months6')}</span></li>
+                                                    <li><span className="legendcolor" style={{ backgroundColor: "#000000" }}></span> <span className="legendcommitversionText">{i18n.t('static.inventoryTurns.months13')}</span></li>
                                                 </ul>
                                             </FormGroup>
                                         </div>
