@@ -12,7 +12,8 @@ import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import ProgramService from "../../api/ProgramService";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
+import CryptoJS from 'crypto-js'
+import { API_URL, SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -380,13 +381,18 @@ class AddprogramPlanningUnit extends Component {
                                                                         autocomplete: true,
                                                                         remoteSearch: true,
                                                                         onbeforesearch: function(instance, request) {
-                                                                            console.log("Hello");
+                                                                            console.log("Hello Test@123",instance);
+                                                                            console.log("Requset Test@123",request);
                                                                             request.method = 'POST';
-                                                                            request.data = { searchText: "be", language: "en"  };
-                                                                            let jwtToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb2xseS5jQGFsdGl1cy5jYyIsImV4cCI6MTY4NTYzOTMyNiwidXNlcklkIjo2LCJ1c2VyIjp7InVzZXJJZCI6NiwidXNlcm5hbWUiOiJEb2xseSBDIiwicGFzc3dvcmQiOiIkMmEkMTAkcjluLnpldndHRU5LNkZWUkh4QkhCZXhmRTdsaFRHemZhbm5tVGZmWDk3ekxoRkc3TzlrblMiLCJhY3RpdmUiOnRydWUsImZhaWxlZEF0dGVtcHRzIjowLCJleHBpcmVzT24iOjE2OTI5MTI5MTQwMDAsImxhc3RMb2dpbkRhdGUiOjE2ODU1ODM1MjYwMDAsInJlYWxtIjp7ImNyZWF0ZWRCeSI6bnVsbCwiY3JlYXRlZERhdGUiOm51bGwsImxhc3RNb2RpZmllZEJ5IjpudWxsLCJsYXN0TW9kaWZpZWREYXRlIjpudWxsLCJhY3RpdmUiOmZhbHNlLCJyZWFsbUlkIjoxLCJsYWJlbCI6eyJjcmVhdGVkQnkiOm51bGwsImNyZWF0ZWREYXRlIjpudWxsLCJsYXN0TW9kaWZpZWRCeSI6bnVsbCwibGFzdE1vZGlmaWVkRGF0ZSI6bnVsbCwiYWN0aXZlIjp0cnVlLCJsYWJlbElkIjo0LCJsYWJlbF9lbiI6Ikdsb2JhbCBIZWFsdGgiLCJsYWJlbF9zcCI6IlNhbHVkIEdsb2JhbCIsImxhYmVsX2ZyIjoiU2FudMOpIEdsb2JhbGUiLCJsYWJlbF9wciI6IlNhw7pkZSBHbG9iYWwifSwicmVhbG1Db2RlIjoiR0hSIiwiZGVmYXVsdFJlYWxtIjpmYWxzZSwibWluTW9zTWluR2F1cmRyYWlsIjowLCJtaW5Nb3NNYXhHYXVyZHJhaWwiOjAsIm1heE1vc01heEdhdXJkcmFpbCI6MCwibWluUXBsVG9sZXJhbmNlIjowLCJtaW5RcGxUb2xlcmFuY2VDdXRPZmYiOjAsIm1heFFwbFRvbGVyYW5jZSI6MH0sInJvbGVzIjpbXSwiYWNsTGlzdCI6W10sImJ1c2luZXNzRnVuY3Rpb24iOltdLCJlbWFpbElkIjoiZG9sbHkuY0BhbHRpdXMuY2MiLCJzZXNzaW9uRXhwaXJlc09uIjoxODAwLCJsYW5ndWFnZSI6eyJjcmVhdGVkQnkiOm51bGwsImNyZWF0ZWREYXRlIjpudWxsLCJsYXN0TW9kaWZpZWRCeSI6bnVsbCwibGFzdE1vZGlmaWVkRGF0ZSI6bnVsbCwiYWN0aXZlIjpmYWxzZSwibGFuZ3VhZ2VJZCI6MSwibGFiZWwiOnsiY3JlYXRlZEJ5IjpudWxsLCJjcmVhdGVkRGF0ZSI6bnVsbCwibGFzdE1vZGlmaWVkQnkiOm51bGwsImxhc3RNb2RpZmllZERhdGUiOm51bGwsImFjdGl2ZSI6dHJ1ZSwibGFiZWxJZCI6MjkyMDcsImxhYmVsX2VuIjoiRW5nbGlzaCIsImxhYmVsX3NwIjoiSW5nbMOpcyIsImxhYmVsX2ZyIjoiQW5nbGFpcyIsImxhYmVsX3ByIjoiSW5nbMOqcyJ9LCJsYW5ndWFnZUNvZGUiOiJlbiIsImNvdW50cnlDb2RlIjoidXMifSwic3luY0V4cGlyZXNPbiI6MTY4NTU4MzUyNjAwMCwiYWdyZWVtZW50QWNjZXB0ZWQiOnRydWUsImVuYWJsZWQiOnRydWUsImF1dGhvcml0aWVzIjpbXSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImFjY291bnROb25Mb2NrZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwicHJlc2VudCI6dHJ1ZX0sImlhdCI6MTY4NTYxNzcyNn0.MNC4XIqhHdjjxANLuWBIfiUP42XJv1kviXBEoickwEDj14NPrCHZZTLGLbPyqXLpn032_Gt_Y167o05ky3afqQ";
+                                                                            // request.data=""
+                                                                            // request.data = { searchText: "be", language: "en"  };
+                                                                            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                                                            let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                                                            // request.headers={"Authorization":'Bearer ' + jwtToken}
                                                                             // request.setRequestHeader('Authorization', 'Bearer ' + jwtToken);
                                                                             request.beforeSend = (httpRequest) => {
-                                                                                httpRequest.setRequestHeader('Authorization', 'Bearer ' + jwtToken);
+                                                                                console.log("Http Request Test@123",httpRequest);
+                                                                                httpRequest.setRequestHeader('Authorization', 'Bearer '+jwtToken);
                                                                             }
                                                                             return request;
                                                                         }
