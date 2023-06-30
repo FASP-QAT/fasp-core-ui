@@ -519,7 +519,8 @@ export default class ListTreeComponent extends Component {
         this.setState({
             regionList,
             regionMultiList,
-            missingPUList: []
+            missingPUList: [],
+            regionValues:regionMultiList.length==1?regionMultiList:[]
         }, () => {
             if (this.state.treeTemplate != "" || this.state.downloadAcrossProgram == 1)
                 this.findMissingPUs();
@@ -1588,28 +1589,28 @@ export default class ListTreeComponent extends Component {
                                 }.bind(this)
                             });
 
+                            // items.push({
+                            //     title: i18n.t('static.common.duplicateTree'),
+                            //     onclick: function () {
+                            //         console.log("tree name---", this.el.getValueFromCoords(2, y))
+                            //         this.setState({
+                            //             programId: this.state.treeEl.getValueFromCoords(7, y),
+                            //             versionId: this.state.treeEl.getValueFromCoords(9, y),
+                            //             treeId: this.state.treeEl.getValueFromCoords(0, y),
+                            //             isModalOpen: !this.state.isModalOpen,
+                            //             downloadAcrossProgram: 0,
+                            //             treeIdAcrossProgram: 0,
+                            //             treeName: this.state.treeEl.getValueFromCoords(2, y) + " (copy)",
+                            //             treeFlag: true,
+                            //             treeTemplate: ''
+                            //         })
+                            //     }.bind(this)
+                            // });
+
                             items.push({
                                 title: i18n.t('static.common.duplicateTree'),
                                 onclick: function () {
-                                    console.log("tree name---", this.el.getValueFromCoords(2, y))
-                                    this.setState({
-                                        programId: this.state.treeEl.getValueFromCoords(7, y),
-                                        versionId: this.state.treeEl.getValueFromCoords(9, y),
-                                        treeId: this.state.treeEl.getValueFromCoords(0, y),
-                                        isModalOpen: !this.state.isModalOpen,
-                                        downloadAcrossProgram: 0,
-                                        treeIdAcrossProgram: 0,
-                                        treeName: this.state.treeEl.getValueFromCoords(2, y) + " (copy)",
-                                        treeFlag: true,
-                                        treeTemplate: ''
-                                    })
-                                }.bind(this)
-                            });
-
-                            items.push({
-                                title: i18n.t('static.common.duplicateToDifferentProgram'),
-                                onclick: function () {
-                                    var downloadedProgramListAcrossProgram = this.state.downloadedProgramList.filter(c => c.programId != this.state.treeEl.getValueFromCoords(7, y))
+                                    var downloadedProgramListAcrossProgram = this.state.downloadedProgramList;
                                     this.setState({
                                         treeTemplate: '',
                                         treeFlag: false,
@@ -1621,7 +1622,7 @@ export default class ListTreeComponent extends Component {
                                         regionList: [],
                                         regionValues: [],
                                         notes: this.state.treeEl.getValueFromCoords(6, y),
-                                        datasetIdModal: downloadedProgramListAcrossProgram.length == 1 ? downloadedProgramListAcrossProgram[0].programId + "~v" + downloadedProgramListAcrossProgram[0].currentVersion.versionId : "",
+                                        // datasetIdModal: downloadedProgramListAcrossProgram.length == 1 ? downloadedProgramListAcrossProgram[0].programId + "~v" + downloadedProgramListAcrossProgram[0].currentVersion.versionId : "",
                                         downloadedProgramListAcrossProgram: downloadedProgramListAcrossProgram,
                                         downloadAcrossProgram: 1,
                                         treeIdAcrossProgram: this.state.treeEl.getValueFromCoords(0, y)
@@ -2203,6 +2204,7 @@ export default class ListTreeComponent extends Component {
                                         datasetIdModal: this.state.datasetIdModal,
                                         regionId: this.state.regionValues
                                     }}
+                                    enableReinitialize={true}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         if (!this.state.isSubmitClicked) {
