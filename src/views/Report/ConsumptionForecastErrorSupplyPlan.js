@@ -1267,8 +1267,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             daysOfStockOut+=consumptionActualQty[con].dayOfStockOut;
                                                         }
                                                     }
-                                                    totalOfActualForLast6months+= Number(actualQty);
-                                                    totalDiffForLast6months+=Math.abs(Number(actualQty) - Number(forecastQty));
+                                                    totalOfActualForLast6months+= consumptionAdjForStockOutId ? Number(adjustedActualConsumption) :Number(actualQty);
+                                                    totalDiffForLast6months+=consumptionAdjForStockOutId ? Math.abs(Number(adjustedActualConsumption) - Number(forecastQty)):Math.abs(Number(actualQty) - Number(forecastQty));
+                                       
                                                 }
                                                     console.log("@@@@NewDevelopement@@@ totalOfActualForLast6months--->",totalOfActualForLast6months);
                                                     console.log("@@@@NewDevelopement@@@ totalDiffForLast6months--->",totalDiffForLast6months);
@@ -1312,9 +1313,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             dataList.push({
                                                 month: moment(curDate).format("YYYY-MM-DD"),
                                                 regionData: regionData,
-                                                actualQty: consumptionAdjForStockOutId ? isNaN(regionTotalAdjustedActualQty) ? 0:regionTotalAdjustedActualQty :isNaN(regionTotalActualQty)?0:regionTotalActualQty,
-                                                forecastQty: isNaN(regionTotalForecastQty)?0:regionTotalForecastQty,
-                                                errorPerc: regionTotalActualQty>0?isNaN(regionTotalError)?0:regionTotalError:""
+                                                actualQty: consumptionAdjForStockOutId ? isNaN(PUadjustedActualConsumption) ? 0:PUadjustedActualConsumption :isNaN(PUActualConsumption)?0:PUActualConsumption,
+                                                forecastQty: isNaN(PUforecastedConsumption)?0:PUforecastedConsumption,
+                                                errorPerc: PUActualConsumption>0?isNaN(PUError)?0:PUError:""
                                             });
                                         }
                                     }
@@ -1469,8 +1470,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                     daysOfStockOut+=consumptionActualQty[con].dayOfStockOut;
                                                 }
                                             }
-                                            totalOfActualForLast6months+= Number(actualQty);
-                                            totalDiffForLast6months+=Math.abs(Number(actualQty) - Number(forecastQty));
+                                            totalOfActualForLast6months+= consumptionAdjForStockOutId ? Number(adjustedActualConsumption) :Number(actualQty);
+                                            totalDiffForLast6months+=consumptionAdjForStockOutId ? Math.abs(Number(adjustedActualConsumption) - Number(forecastQty)):Math.abs(Number(actualQty) - Number(forecastQty));
+                               
                                         }
                                             console.log("@@@@NewDevelopement@@@ totalOfActualForLast6months--->",totalOfActualForLast6months);
                                             console.log("@@@@NewDevelopement@@@ totalDiffForLast6months--->",totalDiffForLast6months);
