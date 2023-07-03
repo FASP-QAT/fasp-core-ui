@@ -185,6 +185,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
 
         if (x == 12 && !isNaN(rowData[12]) && rowData[12].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(12, y, parseFloat(rowData[12]), true);
+            elInstance.setValueFromCoords(21, y, "", true);
         } else if (x == 19 && !isNaN(rowData[19]) && rowData[19].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(19, y, parseFloat(rowData[19]), true);
         } else if (x == 20 && !isNaN(rowData[20]) && rowData[20].toString().indexOf('.') != -1) {
@@ -200,6 +201,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
     showShipmentData() {
         // var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
+        console.log("General program Json Test@@@123",generalProgramJson)
         this.setState({
             actualProgramId: generalProgramJson.programId
         })
@@ -510,6 +512,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                             }
                                             console.log("ShipmentListMohit@@@@@", shipmentList)
                                             for (var i = 0; i < shipmentList.length; i++) {
+                                                var shipmentLinkingList=(generalProgramJson.shipmentLinkingList == null || generalProgramJson.shipmentLinkingList == undefined) ? [] : generalProgramJson.shipmentLinkingList;
+                                                var orderNo=shipmentList[i].orderNo;
+                                                if(shipmentList[i].erpFlag.toString()=="true"){
+                                                    var shipmentLinkingListFilter=shipmentLinkingList.filter(c=>shipmentList[i].shipmentId>0?c.childShipmentId==shipmentList[i].shipmentId:c.tempChildShipmentId==shipmentList[i].tempShipmentId);
+                                                    if(shipmentLinkingListFilter.length>0){
+                                                        orderNo=shipmentLinkingListFilter[0].roNo + " - " + shipmentLinkingListFilter[0].roPrimeLineNo+ " | " + (shipmentLinkingListFilter[0].orderNo + " - " + shipmentLinkingListFilter[0].primeLineNo)
+                                                    }
+                                                }
                                                 var shipmentListUnFiltered = this.props.items.puData.filter(c => c.id == shipmentList[i].planningUnit.id)[0].shipmentListUnFiltered;
                                                 var index;
                                                 if (shipmentList[i].shipmentId != 0) {
@@ -527,15 +537,15 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 if (shipmentList[i].shipmentMode == "Air") {
                                                     shipmentMode = 2;
                                                 }
-                                                if (shipmentList[i].erpFlag.toString() == "true" && this.props.shipmentPage != "shipmentDataEntry") {
-                                                    erpType = "text";
-                                                    erpVisible = true
+                                                // if (shipmentList[i].erpFlag.toString() == "true" && this.props.shipmentPage != "shipmentDataEntry") {
+                                                //     erpType = "text";
+                                                //     erpVisible = true
 
-                                                }
-                                                if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentTypeIds).includes(2)) {
-                                                    erpType = "text";
-                                                    erpVisible = true
-                                                }
+                                                // }
+                                                // if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentTypeIds).includes(2)) {
+                                                //     erpType = "text";
+                                                //     erpVisible = true
+                                                // }
 
                                                 if (this.props.shipmentPage != "shipmentDataEntry" && shipmentList[i].erpFlag.toString() == "true") {
                                                     shipmentEditable = false;
@@ -582,7 +592,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[6] = shipmentMode;//G
                                                 data[7] = shipmentList[i].procurementAgent.id;//H
                                                 data[8] = shipmentList[i].localProcurement;//I
-                                                data[9] = shipmentList[i].orderNo;//J
+                                                data[9] = orderNo;
                                                 data[10] = shipmentList[i].primeLineNo;//K
                                                 data[11] = shipmentList[i].realmCountryPlanningUnit.id//L
                                                 data[12] = Math.round(shipmentList[i].shipmentRcpuQty);//M
@@ -594,7 +604,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[17] = shipmentList[i].budget.id;//R
                                                 data[18] = shipmentList[i].currency.currencyId;//S
                                                 data[19] = shipmentList[i].rate != undefined ? Number(shipmentList[i].rate).toFixed(2) : "";//T
-                                                data[20] = shipmentList[i].erpFlag.toString()=="true"?Number(shipmentList[i].productCost).toFixed(2):`=ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)`;//U
+                                                data[20] = shipmentList[i].erpFlag.toString() == "true" ? Number(shipmentList[i].productCost).toFixed(2) : `=ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)`;//U
                                                 data[21] = shipmentList[i].freightCost != undefined ? Number(shipmentList[i].freightCost).toFixed(2) : "";//V
 
                                                 data[22] = `=ROUND(ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)+V${parseInt(i) + 1},2)`;
@@ -640,9 +650,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[17] = "";
                                                 data[18] = USD_CURRENCY_ID;
                                                 data[19] = "";
-                                                data[20] = `=ROUND(T${parseInt(0) + 1}*M${parseInt(0) + 1},2)`;
+                                                data[20] = `=ROUND(T${parseInt(0) + 1}*O${parseInt(0) + 1},2)`;
                                                 data[21] = "";
-                                                data[22] = `=ROUND(ROUND(M${parseInt(0) + 1}*T${parseInt(0) + 1},2)+V${parseInt(0) + 1},2)`;
+                                                data[22] = `=ROUND(ROUND(O${parseInt(0) + 1}*T${parseInt(0) + 1},2)+V${parseInt(0) + 1},2)`;
                                                 data[23] = NONE_SELECTED_DATA_SOURCE_ID;
                                                 data[24] = "";
                                                 data[25] = moment(Date.now()).format("YYYY-MM-DD");
@@ -667,28 +677,28 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     { type: 'checkbox', title: i18n.t('static.common.active'), width: 80, readOnly: !shipmentEditable },
                                                     { type: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? 'checkbox' : 'text', visible: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? true : false, readOnly: true, title: this.props.shipmentPage == 'shipmentDataEntry' && (this.props.items.shipmentTypeIds).includes(2) ? i18n.t('static.supplyPlan.erpFlag') : "", width: 80, autoCasting: false },
                                                     { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
-                                                    { type: 'dropdown', title: i18n.t('static.supplyPlan.qatProduct'), width: 150, source: this.props.items.planningUnitListForJexcel },
-                                                    { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
+                                                    { type: 'autocomplete', title: i18n.t('static.supplyPlan.qatProduct'), width: 150, source: this.props.items.planningUnitListForJexcel },
+                                                    { type: 'autocomplete', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
                                                     { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT, validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 150 },
-                                                    { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
-                                                    { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
+                                                    { type: 'autocomplete', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
+                                                    { type: 'autocomplete', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
                                                     { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80, readOnly: !shipmentEditable },
-                                                    { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 100 },
+                                                    { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 150 },
                                                     { type: erpType, visible: erpVisible, title: erpVisible ? i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo') : "", width: 100, readOnly: true, autoCasting: false },
-                                                    { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
+                                                    { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                                                     { type: 'numeric', title: i18n.t("static.shipment.shipmentQtyARU"), width: 130, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                     { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 90, readOnly: true },
                                                     { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
                                                     { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100, readOnly: !shipmentEditable },
-                                                    { type: 'dropdown', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
-                                                    { type: 'dropdown', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
-                                                    { type: 'dropdown', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
+                                                    { type: 'autocomplete', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 120 },
+                                                    { type: 'autocomplete', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
+                                                    { type: 'autocomplete', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
                                                     { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                     { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                     { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                     { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                     // { type: 'hidden', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
-                                                    { type: 'dropdown', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
+                                                    { type: 'autocomplete', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
                                                     { type: 'text', title: i18n.t('static.program.notes'), width: 400 },
                                                     {
                                                         type: 'text',
@@ -933,6 +943,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                                         var cf = window.confirm(i18n.t('static.shipmentDataEntry.suggestedShipmentQtyConfirm1') + " " + this.formatter(suggestedQty) + " " + i18n.t("static.shipmentDataEntry.suggestedShipmentQtyConfirm2") + " " + this.formatter(newSuggestedShipmentQty));
                                                                         if (cf == true) {
                                                                             obj.setValueFromCoords(12, y, newSuggestedShipmentQty, true);
+                                                                            obj.setValueFromCoords(21, y, "", true);
                                                                         } else {
 
                                                                         }
@@ -1383,9 +1394,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         data[17] = "";
         data[18] = USD_CURRENCY_ID;
         data[19] = "";
-        data[20] = `=ROUND(T${parseInt(json.length) + 1}*M${parseInt(json.length) + 1},2)`;
+        data[20] = `=ROUND(T${parseInt(json.length) + 1}*O${parseInt(json.length) + 1},2)`;
         data[21] = "";
-        data[22] = `=ROUND(ROUND(M${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},2)+V${parseInt(json.length) + 1},2)`;
+        data[22] = `=ROUND(ROUND(O${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},2)+V${parseInt(json.length) + 1},2)`;
         data[23] = NONE_SELECTED_DATA_SOURCE_ID;
         data[24] = "";
         data[25] = moment(Date.now()).format("YYYY-MM-DD");
@@ -1451,6 +1462,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         data[7] = "";
         data[8] = "";
         data[9] = "";
+        data[10] = "";
         obj.insertRow(data);
     }
 
@@ -1550,7 +1562,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 if (rowData[1].toString() == "true") {
 
                     var cell = shipmentInstance.getCell(col)
+                    cell.classList.add('shipmentErp');
                     cell.classList.add('readonly');
+                    
 
                 }
                 if (rowData[0].toString() == "false" || rowData[4] == CANCELLED_SHIPMENT_STATUS) {
@@ -1656,6 +1670,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 if (rowData[1].toString() == "true") {
 
                     var cell = shipmentInstance.getCell(col)
+                    cell.classList.add('shipmentErp');
                     cell.classList.add('readonly');
 
                 }
@@ -1807,6 +1822,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         // var elInstance=this.state.plannedPsmShipmentsEl;
 
         var batchInfo = rowData[28];
+        var batchQtyTotalForPopup=0;
+        if(batchInfo!=""){
+        batchInfo.map(item=>{
+            batchQtyTotalForPopup+=Number(item.shipmentQty)
+        })
+    }
+        this.props.updateState("shipmentQtyTotalForPopup", rowData[12]);
+        this.props.updateState("batchQtyTotalForPopup", batchQtyTotalForPopup);
         var tableEditable = shipmentEditable;
         if (rowData[1].toString() == "true" || this.props.shipmentPage == "supplyPlanCompare") {
             tableEditable = false;
@@ -1838,6 +1861,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             data[7] = batchInfo[sb].batch.batchNo;
             data[8] = batchInfo[sb].batch.expiryDate;
             data[9] = batchInfo[sb].batch.autoGenerated;
+            data[10] = batchInfo[sb].shipmentQty;
             json.push(data);
         }
         if (batchInfo.length == 0) {
@@ -1852,6 +1876,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             data[7] = "";
             data[8] = "";
             data[9] = "";
+            data[10] = "";
             json.push(data)
         }
         var options = {
@@ -1895,7 +1920,8 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 { type: 'checkbox', title: i18n.t('static.report.autogenerated'), readOnly: true },
                 { type: 'hidden', readOnly: true },
                 { type: 'hidden', readOnly: true },
-                { type: 'hidden', readOnly: true }
+                { type: 'hidden', readOnly: true },
+                { type: 'hidden', readOnly: true },
             ],
             editable: true,
             pagination: false,
@@ -2124,6 +2150,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             if (valid == true) {
                 var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[11].toString().split(";")[0])[0]).multiplier;
                 elInstance.setValueFromCoords(13, y, multiplier, true);
+            }
+            if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+            } else {
+                elInstance.setValueFromCoords(21, y, "", true);
             }
         }
 
@@ -2478,6 +2509,8 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
                         elInstance.setValueFromCoords(21, y, freightCost.toFixed(2), true);
                     }
+                }else{
+                    elInstance.setValueFromCoords(21, y, "", true);
                 }
                 if ((rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) && (rowData[30].expectedDeliveryDate == "" || rowData[30].expectedDeliveryDate == null || rowData[30].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
@@ -2542,12 +2575,18 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     this.batchDetailsClicked(elInstance, x, y, true, !(rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) ? true : false);
                 }
             }
+            elInstance.setValueFromCoords(21, y, "", true);
         }
 
         if (x == 19) {
             var valid = checkValidtion("number", "T", y, elInstance.getValue(`T${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, 1, 1);
             if (valid == false) {
                 elInstance.setValueFromCoords(34, y, 1, true);
+            }
+            if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
+
+            } else {
+                elInstance.setValueFromCoords(21, y, "", true);
             }
         }
 
@@ -2578,7 +2617,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 var col = (colArr[j]).concat(parseInt(y) + 1);
                 if (rowData[1].toString() == "true") {
                     var cell = elInstance.getCell(col)
+                    cell.classList.add('shipmentErp');
                     cell.classList.add('readonly');
+                    
                 }
                 if (rowData[33].toString() == "false") {
                     elInstance.setStyle(col, "color", "#000");
@@ -2738,6 +2779,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             var rowNumber = rowData[6];
             var shipmentInstance = this.state.shipmentsEl;
             shipmentInstance.setValueFromCoords(12, rowNumber, shipmentQty, true);
+            shipmentInstance.setValueFromCoords(21, rowNumber, "", true);
             this.props.updateState("shipmentQtyChangedFlag", 0);
             this.props.updateState("shipmentChangedFlag", 1);
             this.props.updateState("qtyCalculatorTableEl", "");
@@ -2803,36 +2845,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         if (x == 0) {
             this.props.updateState("shipmentBatchInfoDuplicateError", "");
             positiveValidation("A", y, elInstance);
-            if (rowData[9].toString() == "true") {
-                if (rowData[0] != rowData[7] || rowData[1] != rowData[8]) {
-                    elInstance.setValueFromCoords(6, y, 0, true);
-                } else if (rowData[0] == rowData[7] && rowData[1] == rowData[8] && rowData[6]) {
-                    elInstance.setValueFromCoords(6, y, 1, true);
-                }
-            }
-            if (value != "") {
-                if (value.length > 29) {
-                    inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
-                } else if (!BATCH_NO_REGEX.test(value)) {
-                    inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
-                } else {
-                    positiveValidation("A", y, elInstance);
-                }
-            } else {
-                inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
-            }
         }
 
         if (x == 1) {
             this.props.updateState("shipmentBatchInfoDuplicateError", "");
             positiveValidation("A", y, elInstance);
-            if (rowData[9].toString() == "true") {
-                if (rowData[0] != rowData[7] || rowData[1] != rowData[8]) {
-                    elInstance.setValueFromCoords(6, y, 0, true);
-                } else if (rowData[0] == rowData[7] && rowData[1] == rowData[8] && rowData[6]) {
-                    elInstance.setValueFromCoords(6, y, 1, true);
-                }
-            }
             var valid = checkValidtion("dateWithInvalidDataEntry", "B", y, rowData[1], elInstance, "", "", "", 1);
             if (valid) {
                 var expectedDeliveryDate = (this.state.shipmentsEl).getRowData(parseInt(rowData[4]))[5];
@@ -2846,7 +2863,46 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         }
         if (x == 2) {
             checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
+            var batchInfoList=elInstance.getJson(null,false);
+            var batchQtyTotalForPopup=0;
+            batchInfoList.map(item=>{
+                batchQtyTotalForPopup+=Number(item[2])
+            })
+            this.props.updateState("batchQtyTotalForPopup", batchQtyTotalForPopup);
         }
+
+        if (rowData[0] != "") {
+            if (rowData[0].length > 26) {
+                inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
+            } else if (!BATCH_NO_REGEX.test(rowData[0])) {
+                inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
+            } else {
+                positiveValidation("A", y, elInstance);
+                if (rowData[9].toString() == "true") {
+                    console.log("row Data 1 Test@123", rowData[1])
+                    console.log("row Data 8 Test@123", rowData[8])
+                    if (rowData[0] != rowData[7] || moment(rowData[1]).format("YYYY-MM-DD") != moment(rowData[8]).format("YYYY-MM-DD") || elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "") != elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "")) {
+                        elInstance.setValueFromCoords(6, y, 0, true);
+                        if ((x == 1 || x == 2) && rowData[0].toString().substring(0, 3) == "QAT") {
+                            elInstance.setValueFromCoords(0, y, rowData[0].toString().replace(/^.{3}/g, 'MAN'), true);
+                        }
+                        if (rowData[0] == rowData[7]) {
+                            var col = ("A").concat(parseInt(y) + 1);
+                            if (y % 2 == 0) {
+                                elInstance.setStyle(col, "background-color", "transparent");
+                                elInstance.setStyle(col, "background-color", "#e5edf5");
+                            }
+                            elInstance.setComments(col, i18n.t('static.supplyPlan.recommendToChangeBatchName'));
+                        }
+                    } else if (rowData[0] == rowData[7] && moment(rowData[1]).format("YYYY-MM-DD") == moment(rowData[8]).format("YYYY-MM-DD") && elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "") == elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "")) {
+                        elInstance.setValueFromCoords(6, y, 1, true);
+                    }
+                }
+            }
+        } else {
+            inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
+        }
+
         this.props.updateState("shipmentBatchInfoChangedFlag", 1);
     }.bind(this)
 
@@ -2893,7 +2949,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 var rowData = elInstance.getRowData(y);
                 var value = rowData[0];
                 if (value != "") {
-                    if (value.length > 29) {
+                    if (value.length > 26) {
                         inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
                         valid = false;
                     } else if (!BATCH_NO_REGEX.test(value)) {
@@ -3957,9 +4013,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                         shipmentDataList[parseInt(map.get("27"))].accountFlag = map.get("0");
                                         shipmentDataList[parseInt(map.get("27"))].localProcurement = map.get("8");
                                         shipmentDataList[parseInt(map.get("27"))].active = map.get("33");
-
-                                        shipmentDataList[parseInt(map.get("27"))].orderNo = map.get("9").toString().trim();
-
+                                        if (map.get("1").toString()=="false") {
+                                            shipmentDataList[parseInt(map.get("27"))].orderNo = map.get("9").toString().trim();
+                                        }
                                         shipmentDataList[parseInt(map.get("27"))].emergencyOrder = map.get("15");
                                         var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
                                         shipmentDataList[parseInt(map.get("27"))].currency = c;
@@ -4263,6 +4319,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                 date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                             })
                             programJson.shipmentList = shipmentDataList;
+                            console.log("Shipment data list Test@@@123",shipmentDataList);
                             if (planningUnitDataIndex != -1) {
                                 planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             } else {
@@ -4351,7 +4408,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
             var roundingOptionType = "hidden";
             if ((unitsPerPalletEuro1 != 0 && unitsPerPalletEuro1 != null) || (moq != 0 && moq != null) || (unitsPerPalletEuro2 != 0 && unitsPerPalletEuro2 != null) || (unitsPerContainer != 0 && unitsPerContainer != null)) {
-                roundingOptionType = "dropdown";
+                roundingOptionType = "autocomplete";
             }
             var orderBasedOn = [];
             orderBasedOn.push({ id: 5, name: i18n.t('static.supplyPlan.none') });

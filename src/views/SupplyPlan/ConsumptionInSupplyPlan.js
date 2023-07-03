@@ -35,6 +35,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
         this.formulaChanged = this.formulaChanged.bind(this)
+        this.onchangepage=this.onchangepage.bind(this)
         this.state = {
             consumptionEl: "",
             consumptionBatchInfoTableEl: ""
@@ -137,6 +138,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     showConsumptionData() {
+        var realmId = AuthenticationService.getRealmId();
         var planningUnitId = document.getElementById("planningUnitId").value;
         var consumptionListUnFiltered = this.props.items.consumptionListUnFiltered;
         var consumptionList = this.props.items.consumptionList;
@@ -155,6 +157,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
+            var realmTransaction = db1.transaction(['realm'], 'readwrite');
+            var realmOS = realmTransaction.objectStore('realm');
+            var realmRequest = realmOS.get(realmId);
+            realmRequest.onsuccess = function (event) {
             var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
             var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
             var rcpuRequest = rcpuOs.getAll();
@@ -182,9 +188,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     realmCountryPlanningUnitList = this.props.items.realmCountryPlanningUnitList;
                 }
                 this.setState({
-                    realmCountryPlanningUnitList: realmCountryPlanningUnitList
+                    realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+                    realm:realmRequest.result
                 }, () => {
                     this.props.updateState("realmCountryPlanningUnitList", realmCountryPlanningUnitList);
+                    this.props.updateState("realm", realmRequest.result);
                 })
 
                 var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
@@ -329,10 +337,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         columnDrag: true,
                         columns: [
                             { title: i18n.t('static.pipeline.consumptionDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 100, readOnly: readonlyRegionAndMonth },
-                            { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
-                            { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
-                            { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 120, filter: this.filterDataSourceBasedOnConsumptionType },
-                            { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
+                            { title: i18n.t('static.region.region'), type: 'autocomplete', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
+                            { type: 'autocomplete', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
+                            { title: i18n.t('static.inventory.dataSource'), type: 'autocomplete', source: dataSourceList, width: 120, filter: this.filterDataSourceBasedOnConsumptionType },
+                            { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
                             { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
@@ -448,6 +456,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 }.bind(this)
             }.bind(this)
         }.bind(this);
+    }.bind(this);
     }
 
     batchDetailsClicked(obj, x, y, e, consumptionEditable) {
@@ -494,7 +503,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var consumptionBatchInfoQty = 0;
         var consumptionBatchEditable = consumptionEditable;
         var lastEditableDate = "";
-        lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+        lastEditableDate = moment(Date.now()).subtract(this.state.realm.actualConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
         if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[12] != -1 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
             consumptionBatchEditable = false;
         }
@@ -546,7 +555,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             data: json,
             columnDrag: true,
             columns: [
-                { title: i18n.t('static.supplyPlan.batchId'), type: 'dropdown', source: batchList, filter: this.filterBatchInfoForExistingDataForConsumption, width: 100 },
+                { title: i18n.t('static.supplyPlan.batchId'), type: 'autocomplete', source: batchList, filter: this.filterBatchInfoForExistingDataForConsumption, width: 100 },
                 { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
                 { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                 { title: i18n.t('static.supplyPlan.consumptionTransBatchInfoId'), type: 'hidden', width: 0 },
@@ -712,9 +721,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
                 var lastEditableDate = "";
                 if (rowData[2] == 1) {
-                    lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                    lastEditableDate = moment(Date.now()).subtract(this.state.realm.actualConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 } else {
-                    lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                    lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 }
                 if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                     for (var c = 0; c < colArr.length; c++) {
@@ -799,9 +808,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
                 var lastEditableDate = "";
                 if (rowData[2] == 1) {
-                    lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                    lastEditableDate = moment(Date.now()).subtract(this.state.realm.actualConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 } else {
-                    lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                    lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 }
                 if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                     for (var c = 0; c < colArr.length; c++) {
@@ -912,9 +921,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
                 var lastEditableDate = "";
                 if (rowData[2] == 1) {
-                    lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                    lastEditableDate = moment(Date.now()).subtract(this.state.realm.actualConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 } else {
-                    lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                    lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 }
 
                 if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
@@ -1454,9 +1463,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 if (rowData[12] !== "" && rowData[12] != undefined) {
                     var lastEditableDate = "";
                     if (rowData[2] == 1) {
-                        lastEditableDate = moment(Date.now()).subtract(ACTUAL_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                        lastEditableDate = moment(Date.now()).subtract(this.state.realm.actualConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                     } else {
-                        lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
+                        lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                     }
                     if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
 

@@ -365,10 +365,10 @@ class ApplicationDashboard extends Component {
               var programTransaction = transaction.objectStore('datasetData');
               var deleteRequest = programTransaction.delete(id);
               deleteRequest.onsuccess = function (event) {
-                var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
-                var deleteRequest1 = programTransaction1.delete(id);
-                deleteRequest1.onsuccess = function (event) {
+                // var transaction1 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                // var programTransaction1 = transaction1.objectStore('downloadedDatasetData');
+                // var deleteRequest1 = programTransaction1.delete(id);
+                // deleteRequest1.onsuccess = function (event) {
                   var transaction2 = db1.transaction(['datasetDetails'], 'readwrite');
                   var programTransaction2 = transaction2.objectStore('datasetDetails');
                   var deleteRequest2 = programTransaction2.delete(id);
@@ -386,7 +386,7 @@ class ApplicationDashboard extends Component {
                   }.bind(this)
                 }.bind(this)
               }.bind(this)
-            }.bind(this)
+            // }.bind(this)
           }
         }, {
           label: i18n.t('static.program.no'),
