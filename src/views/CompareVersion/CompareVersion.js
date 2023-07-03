@@ -444,6 +444,8 @@ class CompareVersion extends Component {
                                         nodeDataMomList.map(ele => {
                                             total += Number(ele.calculatedMmdValue);
                                         });
+                                    }else{
+                                        total=null;
                                     }
                                     var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId)[0];
                                     label = {
@@ -465,15 +467,21 @@ class CompareVersion extends Component {
                                         label_fr: getLabelText(ceFilter[0].extrapolationMethod.label, this.state.lang),
 
                                     }
+                                }else{
+                                    total=null
                                 }
+                                }else{
+                                    total=null;
                                 }
+                            }else{
+                                total=null;
                             }
                             // var selectedForecastMap=planningUnitList[pu].selectedForecastMap;
                             // planningUnitList[pu].selectedForecastMap != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "" ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId).length > 0 ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId)[0].id : 0 : selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId : 0 : 0
                             // planningUnitList[puList].totalForecast=
                             list.push({
                                 selectedForecast: label,
-                                totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? Math.round(total) : "",
+                                totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined && total!=null ? Math.round(total) : "",
                                 notes: { label_en: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].notes : "" },
                                 planningUnit: planningUnitList[pu].planningUnit,
                                 region: {
@@ -614,6 +622,8 @@ class CompareVersion extends Component {
                                         nodeDataMomList.map(ele => {
                                             total += Number(ele.calculatedMmdValue);
                                         });
+                                    }else{
+                                        total=null;
                                     }
                                     var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId)[0];
                                     label = {
@@ -635,15 +645,21 @@ class CompareVersion extends Component {
                                         label_fr: getLabelText(ceFilter[0].extrapolationMethod.label, this.state.lang),
 
                                     }
+                                }else{
+                                    total=null
                                 }
+                                }else{
+                                    total=null
                                 }
+                            }else{
+                                total=null
                             }
                             // var selectedForecastMap=planningUnitList[pu].selectedForecastMap;
                             // planningUnitList[pu].selectedForecastMap != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "" ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId).length > 0 ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId)[0].id : 0 : selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId : 0 : 0
                             // planningUnitList[puList].totalForecast=
                             list.push({
                                 selectedForecast: label,
-                                totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? Math.round(total) : "",
+                                totalForecast: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined && total!=null ? Math.round(total) : "",
                                 notes: { label_en: planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined ? planningUnitList[pu].selectedForecastMap[regionList[r].regionId].notes : "" },
                                 planningUnit: planningUnitList[pu].planningUnit,
                                 region: {
