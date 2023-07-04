@@ -4373,7 +4373,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </div>
                                         </div>
                                         <div className="row pl-lg-0 pr-lg-0 extrapolateTable consumptionDataEntryTable" style={{ display: this.state.showJexcelData ? 'block' : 'none' }}>
-                                            <div id="tableDiv" className=""></div>
+                                            <div id="tableDiv" style={{width: '100%'}} className=""></div>
                                         </div>
                                         {/* Graph */}
                                         <div className="row">

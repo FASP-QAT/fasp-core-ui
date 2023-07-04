@@ -513,6 +513,8 @@ export default class CompareVersion extends Component {
                         nodeDataMomList.map(ele => {
                             total += Number(ele.calculatedMmdValue);
                         });
+                    }else{
+                        total=null;
                     }
 
                 }else if(regionalSelectedForecastData != undefined && regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null && ce.length > 0){
@@ -521,11 +523,15 @@ export default class CompareVersion extends Component {
                     ceFilter[0].extrapolationDataList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(datasetData.currentVersion.forecastStartDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(datasetData.currentVersion.forecastStopDate).format("YYYY-MM-DD")).map(ele => {
                         total += Number(ele.amount);
                     });
+                }else{
+                    total=null;
                 }
+                }else{
+                    total=null;
                 }
 
                 data[2] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? selectedTreeScenario.length > 0 ? selectedTreeScenario[0].treeLabel + " ~ " + selectedTreeScenario[0].scenarioLabel : "" : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null && ce.length > 0 ? getLabelText(ce[0].extrapolationMethod.label, this.state.lang) : "" : ""
-                data[3] = regionalSelectedForecastData != undefined ?  total.toFixed(2) : "";
+                data[3] = regionalSelectedForecastData != undefined && total!=null ?  total.toFixed(2) : "";
                 data[4] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.notes : "";
                 // count += 3;
                 // }
@@ -550,6 +556,8 @@ export default class CompareVersion extends Component {
                         nodeDataMomList1.map(ele1 => {
                             total1 += Number(ele1.calculatedMmdValue);
                         });
+                    }else{
+                        total1=null;
                     }
 
                 }else if(regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null && ce1.length > 0){
@@ -558,11 +566,13 @@ export default class CompareVersion extends Component {
                     ceFilter1[0].extrapolationDataList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(datasetData1.currentVersion.forecastStartDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(datasetData1.currentVersion.forecastStopDate).format("YYYY-MM-DD")).map(ele1 => {
                         total1 += Number(ele1.amount);
                     });
+                }else{
+                    total1=null;
                 }
                 }
 
                 data[5] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? selectedTreeScenario1.length > 0 ? selectedTreeScenario1[0].treeLabel + " ~ " + selectedTreeScenario1[0].scenarioLabel : "" : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null && ce1.length > 0 ? getLabelText(ce1[0].extrapolationMethod.label, this.state.lang) : "" : ""
-                data[6] = regionalSelectedForecastData1 != undefined ? total1 > 0 ? total1.toFixed(2) : "" : "";
+                data[6] = regionalSelectedForecastData1 != undefined && total1!=null ? total1 > 0 ? total1.toFixed(2) : "" : "";
                 data[7] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.notes : "";
                 //     count += 3;
                 // }
@@ -586,6 +596,8 @@ export default class CompareVersion extends Component {
                         nodeDataMomList2.map(ele2 => {
                             total2 += Number(ele2.calculatedMmdValue);
                         });
+                    }else{
+                        total2=null;
                     }
 
                 }else if(regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null && ce2.length > 0){
@@ -594,10 +606,14 @@ export default class CompareVersion extends Component {
                     ceFilter2[0].extrapolationDataList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(datasetData2.currentVersion.forecastStartDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(datasetData2.currentVersion.forecastStopDate).format("YYYY-MM-DD")).map(ele2 => {
                         total2 += Number(ele2.amount);
                     });
+                }else{
+                    total2=null;
                 }
+                }else{
+                    total2=null;
                 }
                 data[8] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? selectedTreeScenario2.length > 0 ? selectedTreeScenario2[0].treeLabel + " ~ " + selectedTreeScenario2[0].scenarioLabel : "" : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null && ce2.length > 0 ? getLabelText(ce2[0].extrapolationMethod.label, this.state.lang) : "" : ""
-                data[9] = regionalSelectedForecastData2 != undefined ? total2 : "";
+                data[9] = regionalSelectedForecastData2 != undefined && total2!=null ? total2>0?total2.toFixed(2) : "":"";
                 data[10] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.notes : "";
 
                 // data[11] = 1;
