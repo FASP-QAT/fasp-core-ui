@@ -399,6 +399,19 @@ export default class ListTreeTemplate extends Component {
             regionList.map(c => {
                 regionMultiList.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
             })
+            if(regionMultiList.length==1){
+                regionList = [];
+                var regions = regionMultiList;
+                for (let i = 0; i < regions.length; i++) {
+                    var json = {
+                        id: regions[i].value,
+                        label: {
+                            label_en: regions[i].label
+                        }
+                    }
+                    regionList.push(json);
+                }
+            }
         }
         this.setState({
             regionList,
@@ -693,9 +706,10 @@ export default class ListTreeTemplate extends Component {
             data[3] = treeTemplateList[j].monthsInPast;
             data[4] = treeTemplateList[j].monthsInFuture;
             data[5] = getLabelText(treeTemplateList[j].flatList[0].payload.nodeType.label,this.state.lang);
-            data[6] = treeTemplateList[j].active;
-            data[7] = treeTemplateList[j].lastModifiedBy.username;
-            data[8] = (treeTemplateList[j].lastModifiedDate ? moment(treeTemplateList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[6] = treeTemplateList[j].notes;
+            data[7] = treeTemplateList[j].active;
+            data[8] = treeTemplateList[j].lastModifiedBy.username;
+            data[9] = (treeTemplateList[j].lastModifiedDate ? moment(treeTemplateList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             if (selStatus != "") {
                 if (tempSelStatus == treeTemplateList[j].active) {
                     treeTemplateArray[count] = data;
@@ -705,7 +719,7 @@ export default class ListTreeTemplate extends Component {
                 treeTemplateArray[count] = data;
                 count++;
             }
-            data[9] = treeTemplateList[j];
+            data[10] = treeTemplateList[j];
 
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -746,6 +760,11 @@ export default class ListTreeTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.treeTemplate.startNode'),
+                    type: 'text',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.ManageTree.Notes'),
                     type: 'text',
                     // readOnly: true
                 },
@@ -820,14 +839,14 @@ export default class ListTreeTemplate extends Component {
                                 onclick: function () {
                                     this.setState({
                                         isModalCreateTree:!this.state.isModalCreateTree,
-                                        treeTemplate:this.state.treeEl.getValueFromCoords(9, y),
-                                        treeName: this.state.treeEl.getValueFromCoords(9, y).label.label_en,
-                                        active: this.state.treeEl.getValueFromCoords(9, y).active,
-                                        forecastMethod: this.state.treeEl.getValueFromCoords(9, y).forecastMethod,
+                                        treeTemplate:this.state.treeEl.getValueFromCoords(10, y),
+                                        treeName: this.state.treeEl.getValueFromCoords(10, y).label.label_en,
+                                        active: this.state.treeEl.getValueFromCoords(10, y).active,
+                                        forecastMethod: this.state.treeEl.getValueFromCoords(10, y).forecastMethod,
                                         regionId: '',
                                         regionList: [],
                                         regionValues: [],
-                                        notes: this.state.treeEl.getValueFromCoords(9, y).notes,
+                                        notes: this.state.treeEl.getValueFromCoords(10, y).notes,
                                         missingPUList: [],
                                         datasetIdModal:""
                                     },()=>{
