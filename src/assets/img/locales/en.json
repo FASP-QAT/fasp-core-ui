@@ -3106,5 +3106,8 @@
     "static.programIntegration.duplicateIntegration":"Duplicate Integration",
     "static.commit.untaggedShipments":"This program contains shipments tagged to a budget that is no longer associated with this program. To proceed with committing, please re-assign those shipments to a different budget or re-assign the budget to this program.",
     "static.forecastSummary.priceNotAvaiable":"Price is missing - please add in Update Planning Unit screen",
-    "static.forecastSummary.priceIsMissing":"Price is missing - please add in Update Planning Unit screen (click to open new tab)"
+    "static.forecastSummary.priceIsMissing":"Price is missing - please add in Update Planning Unit screen (click to open new tab)",
+    "static.treeTemplate.createTreeFromTemplate":"Use this template",
+    "static.treeTemplate.monthsInPastTooltip":"Number of past months (shown as negative) available in the “Node Data” dropdown, where Month -1 is the month immediately before forecast period",
+    "static.treeTemplate.monthsInFutureTooltip":"Number of future months (show as positive) available in the “Node Data” dropdown, where Month 1 is the first month of the forecast period."
 }
