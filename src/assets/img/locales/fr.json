@@ -3058,5 +3058,12 @@
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.tree.firstMonthOfTarget":"First Month of Target"
+    "static.tree.firstMonthOfTarget": "First Month of Target",
+    "static.tree.annualTargetLabel": "This calculator is reaching annual targets (sum across 12 months) and is generally appropriate for products are discrete, rather than continuous.  QAT uses your targets and the change between your targets to generate a monthly % change. Using this calculator provides a dynamic rather than stairstep forecast. Note that will always be minor differences in the final annual total and your target. However, the difference will be small if your targets change at a similar rate from year to year. See show guidance for more detail on the calculation.",
+    "static.tree.targetYears": "How many years of targets?",
+    "static.tree.actualOrTarget":"Actual / Target",
+    "static.tree.annualChangePer":"Annual Change (%)",
+    "static.tree.calculatedTotal":"Calculated Total",
+    "static.tree.differenceTargetVsCalculatedNumber":"Difference (Target vs Calculated, #)",
+    "static.tree.differenceTargetVsCalculatedPer":"Difference (Target vs Calculated, %)"
 }
