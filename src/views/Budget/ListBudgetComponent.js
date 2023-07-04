@@ -717,7 +717,7 @@ class ListBudgetComponent extends Component {
 
   buildJExcel() {
     let budgetList = this.state.selBudget;
-    // console.log("budgetList---->", budgetList);
+    console.log("budgetList---->", budgetList);
     let budgetArray = [];
     let count = 0;
 
@@ -725,7 +725,7 @@ class ListBudgetComponent extends Component {
       data = [];
       data[0] = budgetList[j].budgetId
       // data[1] = getLabelText(budgetList[j].program.label, this.state.lang)
-      data[1] = ""
+      data[1] = budgetList[j].programs.filter(x=>x.id!=0).map(x => getLabelText(x.label, this.state.lang)).join(", ")
       data[2] = getLabelText(budgetList[j].label, this.state.lang)
       data[3] = budgetList[j].budgetCode;
       data[4] = getLabelText(budgetList[j].fundingSource.label, this.state.lang)
@@ -782,7 +782,7 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.budget.program'),
-          type: 'hidden',
+          type: 'text',
           // readOnly: true
         },
         {
