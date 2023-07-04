@@ -339,8 +339,9 @@ class AddBudgetComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     var programList = [];
-                    for (var i = 0; i < response.data.length; i++) {
-                        programList[i + 1] = { value: response.data[i].id, label: getLabelText(response.data[i].label, this.state.lang) }
+                    var responseData=response.data.filter(c=>c.active);
+                    for (var i = 0; i < responseData.length; i++) {
+                        programList[i + 1] = { value: responseData[i].id, label: getLabelText(responseData[i].label, this.state.lang) }
                     }
                     var listArray = programList;
                     listArray.sort((a, b) => {

@@ -12,11 +12,12 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
-import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX, API_URL } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import FundingSourceService from '../../api/FundingSourceService';
 import ProgramService from '../../api/ProgramService';
+import DropdownService from '../../api/DropdownService';
 
 
 const entityname = i18n.t('static.dashboard.budget');
@@ -244,12 +245,14 @@ class EditBudgetComponent extends Component {
 
     componentDidMount() {
         this.setState({ loading: true })
-        ProgramService.getProgramList()
+        let realmId=AuthenticationService.getRealmId();
+        DropdownService.getProgramForDropdown(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
                     var programList = [];
-                    for (var i = 0; i < response.data.length; i++) {
-                        programList[i + 1] = { value: response.data[i].programId, label: getLabelText(response.data[i].label, this.state.lang) }
+                    var responseData=response.data.filter(c=>c.active);
+                    for (var i = 0; i < responseData.length; i++) {
+                        programList[i + 1] = { value: responseData[i].id, label: getLabelText(responseData[i].label, this.state.lang) }
                     }
                     var listArray = programList;
                     listArray.sort((a, b) => {
