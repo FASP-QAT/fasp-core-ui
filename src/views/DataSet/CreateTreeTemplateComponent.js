@@ -1012,6 +1012,19 @@ export default class CreateTreeTemplate extends Component {
             regionListForCreateTree.map(c => {
                 regionMultiListForCreateTree.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
             })
+            if(regionMultiListForCreateTree.length==1){
+                regionListForCreateTree = [];
+                var regions = regionMultiListForCreateTree;
+                for (let i = 0; i < regions.length; i++) {
+                    var json = {
+                        id: regions[i].value,
+                        label: {
+                            label_en: regions[i].label
+                        }
+                    }
+                    regionListForCreateTree.push(json);
+                }
+            }
         }
         this.setState({
             regionListForCreateTree,
@@ -7714,7 +7727,7 @@ export default class CreateTreeTemplate extends Component {
                 currentTargetChangeNumberEdit: false
             });
         }
-        if (event.target.name != "treeNameForCreateTree" && event.target.name != "forecastMethodIdForCreateTree" && event.target.name != "notesForCreateTree" && event.target.name != "activeForCreateTree" && event.target.name != "datasetIdModalForCreateTree") {
+        if (event.target.name != "treeNameForCreateTree" && event.target.name != "forecastMethodIdForCreateTree" && event.target.name != "notesForCreateTree" && event.target.name != "activeForCreateTree" && event.target.name != "datasetIdModalForCreateTree" && event.target.name!="treeTemplateId") {
             this.setState({isChanged: true})
         }
         this.setState({ currentItemConfig }, () => {
@@ -11833,7 +11846,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 </FormGroup>
                                                                 <div>
                                                                     <Popover placement="top" isOpen={this.state.popoverOpenMonthInPast} target="Popover26" trigger="hover" toggle={this.toggleMonthInPast}>
-                                                                        <PopoverBody>Need to add info</PopoverBody>
+                                                                        <PopoverBody>{i18n.t("static.treeTemplate.monthsInPastTooltip")}</PopoverBody>
                                                                     </Popover>
                                                                 </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
@@ -11858,7 +11871,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 </FormGroup>
                                                                 <div>
                                                                     <Popover placement="top" isOpen={this.state.popoverOpenMonthInFuture} target="Popover27" trigger="hover" toggle={this.toggleMonthInFuture}>
-                                                                        <PopoverBody>Need to add info</PopoverBody>
+                                                                        <PopoverBody>{i18n.t("static.treeTemplate.monthsInFutureTooltip")}</PopoverBody>
                                                                     </Popover>
                                                                 </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
@@ -11980,7 +11993,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 {/* ---hehehe */}
                                                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                                                 <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                                <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                                {(this.state.isChanged || this.state.isTemplateChanged) && <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>}
                                                             </CardFooter>}
 
                                                     </CardBody>
