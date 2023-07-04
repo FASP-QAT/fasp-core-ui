@@ -16,6 +16,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
 import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX, API_URL } from '../../Constants.js';
+import DropdownService from '../../api/DropdownService';
 
 let initialValues = {
     realmId: '',
@@ -270,15 +271,16 @@ export default class EditOrganisationComponent extends Component {
                 );
 
 
-            OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
+            // OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
+            DropdownService.getRealmCountryDropdownList(this.state.organisation.realm.id)   
                 .then(response => {
-                    console.log("Realm Country List list---", response.data);
+                    console.log("Realm Country List list---Seema ", response.data);
                     if (response.status == 200) {
-                        // var json = response.data;
-                        var json = (response.data).filter(c => c.active == true);
+                        var json = response.data;
+                        // var json = (response.data).filter(c => c.active == true);
                         var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                            regList[i + 1] = { value: json[i].id, label: json[i].label.label_en }
                         }
                         var listArray = regList;
                         listArray.sort((a, b) => {
@@ -836,14 +838,15 @@ export default class EditOrganisationComponent extends Component {
                     }
                 );
 
-            OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
+            // OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
+            DropdownService.getRealmCountryDropdownList(this.state.organisation.realm.id)   
                 .then(response => {
-                    console.log("Realm Country List list---", response.data);
+                    console.log("Realm Country List list---Edit ", response.data);
                     if (response.status == 200) {
                         var json = response.data;
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
-                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                            regList[i] = { value: json[i].id, label: json[i].label.label_en }
                         }
                         this.setState({
                             realmCountryList: regList, loading: false

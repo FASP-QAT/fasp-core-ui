@@ -14,9 +14,10 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import '../Forms/ValidationForms/ValidationForms.css';
 import classNames from 'classnames';
 import Select from 'react-select';
-import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL,PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
+import DropdownService from '../../api/DropdownService';
 
 const entityname = i18n.t('static.dashboard.budget');
 // const [startDate, setStartDate] = useState(new Date());
@@ -333,12 +334,13 @@ class AddBudgetComponent extends Component {
     componentDidMount() {
         console.log("new date--->", new Date());
         this.setState({ loading: true })
-        ProgramService.getProgramList()
+        let realmId=AuthenticationService.getRealmId();
+        DropdownService.getProgramForDropdown(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
                     var programList = [];
                     for (var i = 0; i < response.data.length; i++) {
-                        programList[i + 1] = { value: response.data[i].programId, label: getLabelText(response.data[i].label, this.state.lang) }
+                        programList[i + 1] = { value: response.data[i].id, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
                     var listArray = programList;
                     listArray.sort((a, b) => {

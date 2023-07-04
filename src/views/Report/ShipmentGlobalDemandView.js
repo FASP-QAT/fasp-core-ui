@@ -24,7 +24,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -42,6 +42,7 @@ import { MultiSelect } from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Multiselect } from 'multiselect-react-dropdown';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 const ref = React.createRef();
 
@@ -658,7 +659,7 @@ class ShipmentGlobalDemandView extends Component {
             let groupByProcurementAgentType = document.getElementById("procurementAgentTypeId").value
 
             let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-            let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+            let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
 
 
             // if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && productCategoryId != -1 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
@@ -1117,7 +1118,7 @@ class ShipmentGlobalDemandView extends Component {
 
         if (isSiteOnline()) {
             this.getCountrys();
-            this.getPrograms();
+            // this.getPrograms();
             //this.getRelamList();
             // this.getProductCategories();
             this.getFundingSource();
@@ -1135,9 +1136,9 @@ class ShipmentGlobalDemandView extends Component {
 
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
-        RealmCountryService.getRealmCountryForProgram(realmId)
+        DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
-                var listArray = response.data.map(ele => ele.realmCountry);
+                var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -1204,7 +1205,7 @@ class ShipmentGlobalDemandView extends Component {
             countryValues: countrysId.map(ele => ele),
             countryLabels: countrysId.map(ele => ele.label)
         }, () => {
-            this.filterProgram();
+            this.getPrograms();
             // this.fetchData()
         })
     }
@@ -1591,7 +1592,10 @@ class ShipmentGlobalDemandView extends Component {
 
     getPrograms = () => {
         if (isSiteOnline()) {
-            ProgramService.getProgramList()
+            let countryIds = this.state.countryValues.map((ele) => ele.value);
+            let newCountryList = [...new Set(countryIds)];
+    
+            DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN,newCountryList)
                 .then(response => {
                     console.log(JSON.stringify(response.data))
                     var listArray = response.data;
@@ -1601,12 +1605,12 @@ class ShipmentGlobalDemandView extends Component {
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
-                        programs: listArray, loading: false
+                        programLst: listArray, loading: false
                     })
                 }).catch(
                     error => {
                         this.setState({
-                            programs: [], loading: false
+                            programLst: [], loading: false
                         })
                         if (error.message === "Network Error") {
                             this.setState({
@@ -1656,8 +1660,8 @@ class ShipmentGlobalDemandView extends Component {
 
     consolidatedProgramList = () => {
         const lan = 'en';
-        const { programs } = this.state
-        var proList = programs;
+        const { programLst } = this.state
+        var proList = programLst;
 
         var db1;
         getDatabase();
@@ -1694,7 +1698,7 @@ class ShipmentGlobalDemandView extends Component {
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    programs: proList
+                    programLst: proList
                 })
             }.bind(this);
         }.bind(this);
@@ -1704,7 +1708,7 @@ class ShipmentGlobalDemandView extends Component {
         let programId = document.getElementById("programId").value;
         if (programId != 0) {
 
-            const program = this.state.programs.filter(c => c.programId == programId)
+            const program = this.state.programLst.filter(c => c.id == programId)
             // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
@@ -1972,16 +1976,22 @@ class ShipmentGlobalDemandView extends Component {
                 // }
 
 
-                let programValues = this.state.programValues;
-                // console.log("programValues----->", programValues);
+                let programValues = this.state.programValues.map(c=>c.value);
+                console.log("programValues----->", programValues);
                 this.setState({
                     planningUnits: [],
                     planningUnitValues: [],
                     planningUnitLabels: []
                 }, () => {
                     if (programValues.length > 0) {
-                        PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
-                            .then(response => {
+                        var programJson = {
+                            tracerCategoryIds: [],
+                            programIds: programValues
+                        }
+                        console.log('*$$$*' + programJson);
+    
+                        DropdownService.getProgramPlanningUnitDropdownList(programJson)
+        .then(response => {
                                 // (response.data).sort(function (a, b) {
                                 //     return getLabelText(a.label, this.state.lang).localeCompare(getLabelText(b.label, this.state.lang)); //using String.prototype.localCompare()
                                 // });
@@ -2151,13 +2161,13 @@ class ShipmentGlobalDemandView extends Component {
                 return (
 
                     // { label: getLabelText(item.label, this.state.lang), value: item.programId }
-                    { label: (item.programCode), value: item.programId }
+                    { label: (item.code), value: item.id }
 
                 )
             }, this);
         const { countrys } = this.state;
         let countryList = countrys.length > 0 && countrys.map((item, i) => {
-            console.log(JSON.stringify(item))
+            // console.log(JSON.stringify(item))
             return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
 
