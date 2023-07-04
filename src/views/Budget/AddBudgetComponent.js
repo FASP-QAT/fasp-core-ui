@@ -338,9 +338,10 @@ class AddBudgetComponent extends Component {
         DropdownService.getProgramForDropdown(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
-                    var programList = [{ value: "-1", label: i18n.t("static.common.all") }];
-                    for (var i = 0; i < response.data.length; i++) {
-                        programList[i + 1] = { value: response.data[i].id, label: getLabelText(response.data[i].label, this.state.lang) }
+                    var programList = [];
+                    var responseData=response.data.filter(c=>c.active);
+                    for (var i = 0; i < responseData.length; i++) {
+                        programList[i + 1] = { value: responseData[i].id, label: getLabelText(responseData[i].label, this.state.lang) }
                     }
                     var listArray = programList;
                     listArray.sort((a, b) => {
@@ -348,6 +349,7 @@ class AddBudgetComponent extends Component {
                         var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
+                    listArray.unshift({ value: "-1", label: i18n.t("static.common.all") });
                     this.setState({
                         programs: listArray, loading: false
                     })
