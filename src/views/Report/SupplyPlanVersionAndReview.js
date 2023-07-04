@@ -100,7 +100,7 @@ class SupplyPlanVersionAndReview extends Component {
             maxDate: { year: new Date().getFullYear() + 3, month: new Date().getMonth() + 1 },
             programId: localStorage.getItem("sesProgramIdSPVR") != "" && localStorage.getItem("sesProgramIdSPVR") != null && localStorage.getItem("sesProgramIdSPVR") != undefined ? localStorage.getItem("sesProgramIdSPVR") : -1,
             realmCountryId:localStorage.getItem("sesCountryIdSPVR") != "" && localStorage.getItem("sesCountryIdSPVR") != null && localStorage.getItem("sesCountryIdSPVR") != undefined ? localStorage.getItem("sesCountryIdSPVR") : -1,
-            versionStatusId:localStorage.getItem("sesVersionStatusSPVR") != "" && localStorage.getItem("sesVersionStatusSPVR") != null && localStorage.getItem("sesVersionStatusSPVR") != undefined ? localStorage.getItem("sesVersionStatusSPVR") : -1,
+            versionStatusId:this.props.match.params.statusId!="" && this.props.match.params.statusId!= undefined? this.props.match.params.statusId : localStorage.getItem("sesVersionStatusSPVR") != "" && localStorage.getItem("sesVersionStatusSPVR") != null && localStorage.getItem("sesVersionStatusSPVR") != undefined ? localStorage.getItem("sesVersionStatusSPVR") : -1,
             versionTypeId:localStorage.getItem("sesVersionTypeSPVR") != "" && localStorage.getItem("sesVersionTypeSPVR") != null && localStorage.getItem("sesVersionTypeSPVR") != undefined ? localStorage.getItem("sesVersionTypeSPVR") : -1,
             lang: localStorage.getItem('lang')
 
@@ -762,12 +762,7 @@ class SupplyPlanVersionAndReview extends Component {
         console.log("function called-------------------------------")
         let programId = document.getElementById("programId").value;
         let countryId = document.getElementById("countryId").value;
-        if(this.props.match.params.statusId!="" && this.props.match.params.statusId!= undefined){
-            console.log("this.props.match.params.statusId---->",this.props.match.params.statusId)
-            document.getElementById("versionStatusId").value =this.props.match.params.statusId;
-            console.log("versionStatusId-----> 1 ",document.getElementById("versionStatusId").value)
-        }
-
+        
         let versionStatusId = document.getElementById("versionStatusId").value;
         let versionTypeId = document.getElementById("versionTypeId").value;
         console.log("D------------->VersionTypeId", versionTypeId);
