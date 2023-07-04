@@ -517,6 +517,19 @@ export default class ListTreeComponent extends Component {
             regionList.map(c => {
                 regionMultiList.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
             })
+            if(regionMultiList.length==1){
+                regionList = [];
+                var regions = regionMultiList;
+                for (let i = 0; i < regions.length; i++) {
+                    var json = {
+                        id: regions[i].value,
+                        label: {
+                            label_en: regions[i].label
+                        }
+                    }
+                    regionList.push(json);
+                }
+            }
         }
         this.setState({
             regionList,
