@@ -105,6 +105,7 @@ class VersionSettingsComponent extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.updateState = this.updateState.bind(this);
+        this.onchangepage=this.onchangepage.bind(this)
     }
 
     updateState(parameterName, value) {
@@ -527,10 +528,11 @@ class VersionSettingsComponent extends Component {
                 }
             }
         }
-
-        this.setState({
-            isChanged1: true,
-        });
+        if(!this.state.isChanged1){
+            this.setState({
+                isChanged1: true,
+            });
+        }   
 
 
 
@@ -934,6 +936,58 @@ class VersionSettingsComponent extends Component {
         // }
     }
 
+    onchangepage(el, pageNo, oldPageNo) {
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        for (var y = start; y < jsonLength; y++) {
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+            var rowData = elInstance.getRowData(y);
+            if (rowData[10] == 1) {
+                var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+            } else {
+                var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+    }
 
     buildJExcel() {
         console.log("buildJExcel dataList--->", this.state.dataList)
@@ -1210,53 +1264,8 @@ class VersionSettingsComponent extends Component {
             parseFormulas: true,
             allowDeleteRow: false,
             onselection: this.selected,
-            updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el;
-                if (y != null) {
-                    //left align
-                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
-
-                    var rowData = elInstance.getRowData(y);
-                    if (rowData[10] == 1) {
-                        var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                    }
-                    else {
-                        var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                    }
-
-                }
-            }.bind(this),
             onchange: this.changed,
+            onchangepage: this.onchangepage,
             oneditionend: this.oneditionend,
             // oncreateeditor: this.oncreateeditor,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
@@ -1377,6 +1386,59 @@ class VersionSettingsComponent extends Component {
         tr.children[15].title = i18n.t('static.tooltip.FreightPercent');
         tr.children[16].title = i18n.t('static.tooltip.ForecastThresholdHigh');
         tr.children[17].title = i18n.t('static.tooltip.ForecastThresholdLow');
+
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        }
+        
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+        for (var y = 0; y < jsonLength; y++) {
+            var rowData = elInstance.getRowData(y);
+            if (rowData[10] == 1) {
+                var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+            } else {
+                var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+            }
+        }
 
     }
     oncreateeditor = function (el, cell, x, y) {
