@@ -1881,7 +1881,7 @@ class EditUserComponent extends Component {
                                                     <h5><Label htmlFor="select">{'Access control'}</Label></h5>
                                                 </FormGroup>
                                                 <div className="" style={{ display: this.state.loading1 ? "none" : "block" }} >
-                                                    <div style={{width: '100%'}} id="paputableDiv" className="RowheightForjexceladdRow consumptionDataEntryTable">
+                                                    <div style={{width: '100%'}}  id="paputableDiv" className="RowheightForjexceladdRow consumptionDataEntryTable">
                                                     </div>
                                                 </div>
                                                 <div style={{ display: this.state.loading1 ? "block" : "none" }}>
