@@ -2039,6 +2039,7 @@ class EditUserComponent extends Component {
                         }}
                       >
                         <div
+                          style={{width: '100%'}}
                           id="paputableDiv"
                           className="RowheightForjexceladdRow consumptionDataEntryTable"
                         ></div>
