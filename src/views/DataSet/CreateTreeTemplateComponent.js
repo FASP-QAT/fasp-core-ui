@@ -11376,6 +11376,7 @@ export default class CreateTreeTemplate extends Component {
                     // canDropItem={this.canDropItem}
                     // onMoveItem={this.onMoveItem}
                     />;
+                },
                 onHighlightRender: ({ context: itemConfig }) => {
                     return <HighlightNode
                     itemConfig={itemConfig}
