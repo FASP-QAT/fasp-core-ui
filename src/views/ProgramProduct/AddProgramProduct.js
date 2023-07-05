@@ -381,17 +381,11 @@ class AddprogramPlanningUnit extends Component {
                                                                         autocomplete: true,
                                                                         remoteSearch: true,
                                                                         onbeforesearch: function(instance, request) {
-                                                                            console.log("Hello Test@123",instance);
-                                                                            console.log("Requset Test@123",request);
                                                                             request.method = 'POST';
-                                                                            // request.data=""
-                                                                            // request.data = { searchText: "be", language: "en"  };
+                                                                            request.data = { productCategorySortOrder: "", searchText: instance.search, language: "en" };
                                                                             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                                                                             let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                                                                            // request.headers={"Authorization":'Bearer ' + jwtToken}
-                                                                            // request.setRequestHeader('Authorization', 'Bearer ' + jwtToken);
                                                                             request.beforeSend = (httpRequest) => {
-                                                                                console.log("Http Request Test@123",httpRequest);
                                                                                 httpRequest.setRequestHeader('Authorization', 'Bearer '+jwtToken);
                                                                             }
                                                                             return request;
