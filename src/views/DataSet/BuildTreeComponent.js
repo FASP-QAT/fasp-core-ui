@@ -3113,6 +3113,7 @@ export default class BuildTree extends Component {
     // }
 
     showMomData() {
+        
         console.log("show mom data---", this.state.currentScenario);
         var getMomDataForCurrentNode = this.state.items.filter(x => x.id == this.state.currentItemConfig.context.id).length > 0 ? this.state.items.filter(x => x.id == this.state.currentItemConfig.context.id)[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList : [];
         console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
@@ -7301,8 +7302,8 @@ export default class BuildTree extends Component {
         }
     }
 
+    
     componentDidMount() {
-
         this.setState({
             treeId: this.props.match.params.treeId,
             templateId: this.props.match.params.templateId
@@ -10428,7 +10429,7 @@ export default class BuildTree extends Component {
                         </div>
                         {this.state.showCalculatorFields &&
                             <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                <fieldset className="scheduler-border">
+                                <fieldset style={{width: '100%'}} className="scheduler-border">
                                     <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool')}</legend>
                                     <div className="row">
                                         <FormGroup className="col-md-6">
@@ -10666,7 +10667,7 @@ export default class BuildTree extends Component {
                     </div>
                     {this.state.showMomData &&
                         <div className="row pl-lg-2 pr-lg-2">
-                            <fieldset className="scheduler-border">
+                            <fieldset style={{width: '100%'}} className="scheduler-border">
                                 <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
@@ -10758,7 +10759,7 @@ export default class BuildTree extends Component {
                     }
                     {this.state.showMomDataPercent &&
                         <div className="row pl-lg-2 pr-lg-2">
-                            <fieldset className="scheduler-border">
+                            <fieldset style={{width: '100%'}} className="scheduler-border">
                                 <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
