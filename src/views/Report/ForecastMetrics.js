@@ -585,7 +585,6 @@ class ForecastMetrics extends Component {
     }, () => {
       this.filterTracerCategory(programIds);
       this.getPlanningUnit();
-      this.filterData()
     })
 
   }
