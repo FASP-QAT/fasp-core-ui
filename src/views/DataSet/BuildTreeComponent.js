@@ -6093,6 +6093,7 @@ export default class BuildTree extends Component {
                     console.log("pl 4---");
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.unit.id = this.state.planningUnitList[0].unit.id;
                     console.log("pl 5---");
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].displayCalculatedDataValue=currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue;
                     if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
                         console.log("pl 6---");
                         currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(this.state.planningUnitList[0].label));
@@ -9297,7 +9298,7 @@ export default class BuildTree extends Component {
                                                         id="nodeValue"
                                                         name="nodeValue"
                                                         bsSize="sm"
-                                                        valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.displayCalculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
+                                                        valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
                                                         invalid={touched.nodeValue && !!errors.nodeValue}
                                                         onBlur={handleBlur}
                                                         readOnly={this.state.numberNode || this.state.currentScenario.extrapolation ? true : false}
@@ -9307,7 +9308,7 @@ export default class BuildTree extends Component {
                                                         }}
                                                         // step={.01}
                                                         // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
-                                                        value={this.state.numberNode ? this.state.currentScenario.displayCalculatedDataValue == 0 ? "0" : addCommasNodeValue(this.state.currentScenario.displayCalculatedDataValue) : addCommasNodeValue(this.state.currentScenario.dataValue)}
+                                                        value={this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(this.state.currentScenario.calculatedDataValue) : addCommasNodeValue(this.state.currentScenario.dataValue)}
                                                     ></Input>
                                                     <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                 </FormGroup>
