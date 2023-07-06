@@ -48,13 +48,13 @@ const entityname = i18n.t('static.report.problem');
 const validationSchemaForAddingProblem = function (values) {
     return Yup.object().shape({
         problemDescription: Yup.string()
-            .matches(/^[^'":\\]+$/, i18n.t("static.label.someSpecialCaseNotAllowed"))
+            // .matches(/^[^'":\\]+$/, i18n.t("static.label.someSpecialCaseNotAllowed"))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.editStatus.problemDescText')),
         modelPlanningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         suggession: Yup.string()
-            .matches(/^[^'":\\]+$/, i18n.t('static.label.someSpecialCaseNotAllowed'))
+            // .matches(/^[^'":\\]+$/, i18n.t('static.label.someSpecialCaseNotAllowed'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.editStatus.problemSuggestionText')),
         modelCriticalityId: Yup.string()
@@ -255,7 +255,7 @@ class EditSupplyPlanStatus extends Component {
             problemStatusValues: [{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }],
             problemCategoryList: [],
             problemReportChanged: 0,
-            remainingDataChanged:0,
+            remainingDataChanged: 0,
             problemReviewedList: [{ name: i18n.t("static.program.yes"), id: 1 }, { name: i18n.t("static.program.no"), id: 0 }],
             problemReviewedValues: [{ label: i18n.t("static.program.no"), value: 0 }],
             isModalOpen: false,
@@ -1073,7 +1073,7 @@ class EditSupplyPlanStatus extends Component {
                                             } else if (supplyPlanType == 'plannedErpShipments') {
                                                 shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.erpFlag == true && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                                             } else if (supplyPlanType == 'allShipments') {
-                                                shipmentList = shipmentList.filter(c => 
+                                                shipmentList = shipmentList.filter(c =>
                                                     (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
                                                     // && c.erpFlag == false 
                                                     && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value
@@ -2279,7 +2279,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState(
             {
                 program,
-                remainingDataChanged:1
+                remainingDataChanged: 1
             }
         )
 
@@ -3161,7 +3161,7 @@ class EditSupplyPlanStatus extends Component {
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
@@ -3171,14 +3171,14 @@ class EditSupplyPlanStatus extends Component {
                                             {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                         </ul>
                                     </FormGroup>
-                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
                                             <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
                                             <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                                         </ul>
                                     </FormGroup>
-                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                                    <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
                                             {
@@ -3278,10 +3278,10 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone" ><b>+ {i18n.t('static.dashboard.shipments')}</b></td>
                                                             {
                                                                 this.state.shipmentsTotalData.map((item1, index) => {
-                                                                    if(item1.toString()!=""){
-                                                                        return(<td align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${this.state.monthsArray[index].startDate}`, `${this.state.monthsArray[index].endDate}`, ``, 'allShipments', index)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
-                                                                    }else{
-                                                                        return(<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    if (item1.toString() != "") {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('shipments', '', '', `${this.state.monthsArray[index].startDate}`, `${this.state.monthsArray[index].endDate}`, ``, 'allShipments', index)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    } else {
+                                                                        return (<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
                                                                     }
                                                                 })
                                                             }
@@ -4569,7 +4569,7 @@ class EditSupplyPlanStatus extends Component {
                     this.setState({
                         message: response.data.message,
                         problemReportChanged: 0,
-                        remainingDataChanged:0,
+                        remainingDataChanged: 0,
 
                         // isModalOpen: !this.state.isModalOpen,
                     })
@@ -4746,7 +4746,7 @@ class EditSupplyPlanStatus extends Component {
                 <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <h5 className={this.state.submitColor} id="div3">{i18n.t(this.state.submitMessage)}</h5>
 
-                <Col sm={12} sm={12} style={{ flexBasis: 'auto' }}>
+                <Col sm={12} style={{ flexBasis: 'auto' }}>
                     <Card>
                         <ProblemListFormulas ref="formulaeChild" />
                         <div className="Card-header-addicon">
@@ -4816,7 +4816,7 @@ class EditSupplyPlanStatus extends Component {
 
                         </CardBody>
                         <Modal isOpen={this.state.consumption}
-                            className={'modal-lg ' + this.props.className, "modalWidth"} >
+                            className={'modal-lg ' + this.props.className + "modalWidth"} >
                             <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.dashboard.consumptiondetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                                 <ul className="legendcommitversion list-group" style={{ display: 'inline-flex' }}>
@@ -4922,7 +4922,7 @@ class EditSupplyPlanStatus extends Component {
                         {/* Consumption modal */}
                         {/* Adjustments modal */}
                         <Modal isOpen={this.state.adjustments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
+                            className={'modal-lg ' + this.props.className + "modalWidth"}>
                             <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.supplyPlan.adjustmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                                 <div className="card-header-actions" style={{ marginTop: '0px' }}>
@@ -5130,7 +5130,7 @@ class EditSupplyPlanStatus extends Component {
 
                         {/* Shipments modal */}
                         <Modal isOpen={this.state.shipments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
+                            className={'modal-lg ' + this.props.className + "modalWidth"}>
                             <ModalHeader toggle={() => this.toggleLarge('shipments')} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.supplyPlan.shipmentsDetails')} -  {i18n.t('static.planningunit.planningunit')} - {this.state.planningUnitName} </strong>
                                 <ul className="legendcommitversion">
@@ -5160,9 +5160,9 @@ class EditSupplyPlanStatus extends Component {
                                                     {
                                                         this.state.monthsArray.map((item, count) => {
                                                             if (count < 7) {
-                                                                if(this.state.shipmentsTotalData[count]!=undefined && this.state.shipmentsTotalData[count].toString()!=''){
+                                                                if (this.state.shipmentsTotalData[count] != undefined && this.state.shipmentsTotalData[count].toString() != '') {
                                                                     return (<th onClick={() => this.shipmentsDetailsClicked('allShipments', `${item.startDate}`, `${item.endDate}`)} className={moment(this.state.shipmentStartDateClicked).format("YYYY-MM-DD") == moment(item.startDate).format("YYYY-MM-DD") ? "supplyplan-Thead supplyplanTdWidthForMonths hoverTd" : "supplyplanTdWidthForMonths hoverTd"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
-                                                                }else{
+                                                                } else {
                                                                     return (<th className={moment(this.state.shipmentStartDateClicked).format("YYYY-MM-DD") == moment(item.startDate).format("YYYY-MM-DD") ? "supplyplan-Thead supplyplanTdWidthForMonths" : "supplyplanTdWidthForMonths"}>{item.monthName.concat(" ").concat(item.monthYear)}</th>)
                                                                 }
                                                             }
@@ -5345,7 +5345,7 @@ class EditSupplyPlanStatus extends Component {
                         </Modal>
                         {/* problem trans modal */}
                         <Modal isOpen={this.state.transView}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
+                            className={'modal-lg ' + this.props.className + "modalWidth"}>
                             <ModalHeader toggle={() => this.toggleTransModal()} className="modalHeaderSupplyPlan">
                                 <strong>{i18n.t('static.problemContext.transDetails')}</strong>
                             </ModalHeader>
@@ -5662,23 +5662,23 @@ class EditSupplyPlanStatus extends Component {
                                     console.log("reviewedProblemList===>", reviewedProblemList);
                                     ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
                                         .then(response => {
-                                            if(this.state.program.currentVersion.versionStatus.id!=1){
+                                            if (this.state.program.currentVersion.versionStatus.id != 1) {
                                                 console.log("messageCode", response)
                                                 this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
-                                            }else{
+                                            } else {
                                                 document.getElementById("submitButton").disabled = false;
-                                            this.setState({
-                                                submitMessage: "static.message.supplyplanversionapprovedsuccess",
-                                                submitColor: "green",
-                                                problemReportChanged: 0,
-                                                remainingDataChanged:0
+                                                this.setState({
+                                                    submitMessage: "static.message.supplyplanversionapprovedsuccess",
+                                                    submitColor: "green",
+                                                    problemReportChanged: 0,
+                                                    remainingDataChanged: 0
 
-                                                // isModalOpen: !this.state.isModalOpen,
-                                            }, () => {
-                                                this.hideMessageComponent()
-                                                this.componentDidMount();
-                                            })
-                                        }
+                                                    // isModalOpen: !this.state.isModalOpen,
+                                                }, () => {
+                                                    this.hideMessageComponent()
+                                                    this.componentDidMount();
+                                                })
+                                            }
 
                                         })
                                         .catch(
@@ -5825,8 +5825,8 @@ class EditSupplyPlanStatus extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                {this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                {this.state.editable && (this.state.problemReportChanged==1 || this.state.remainingDataChanged==1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                {this.state.editable && (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {this.state.editable && (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
 
                                                 &nbsp;
@@ -5891,7 +5891,7 @@ class EditSupplyPlanStatus extends Component {
 
     cancelClicked = () => {
         var cont = false;
-        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged==1) {
+        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
             if (cf == true) {
                 cont = true;
@@ -5907,7 +5907,7 @@ class EditSupplyPlanStatus extends Component {
     }
     resetClicked = () => {
         var cont = false;
-        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged==1) {
+        if (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
             if (cf == true) {
                 cont = true;
@@ -5919,15 +5919,15 @@ class EditSupplyPlanStatus extends Component {
         }
         if (cont == true) {
             this.setState({
-                problemReportChanged:0,
-                remainingDataChanged:0
-            },()=>{
+                problemReportChanged: 0,
+                remainingDataChanged: 0
+            }, () => {
                 this.componentDidMount();
             })
         }
     }
 
-    resetClickedModal=()=>{
+    resetClickedModal = () => {
 
     }
 
