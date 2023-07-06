@@ -1469,7 +1469,25 @@ export default class CreateTreeTemplate extends Component {
         } else {
             alert('Error: Failed to create file stream.');
         }
-
+        newItems = [];
+        for (var i = 0; i < items1.length; i++) {
+            var e = items1[i];
+            console.log("items1[i]--------------", items1[i]);
+            e.scenarioId = 0
+            e.showModelingValidation = this.state.showModelingValidation
+            console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
+            console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
+            e.result = this.getPayloadData(items1[i], 4)//Up
+            e.result1 = this.getPayloadData(items1[i], 6)//Down
+            e.result2 = this.getPayloadData(items1[i], 5)//Link
+            var text = this.getPayloadData(items1[i], 3)
+            e.text = text;
+            if(items1[i].expanded)
+                e.templateName = "contactTemplateMin";
+            else
+                e.templateName = "contactTemplate";
+            newItems.push(e)
+        }
     }
 
     getMaxNodeDataId() {
