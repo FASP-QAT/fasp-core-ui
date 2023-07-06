@@ -1833,7 +1833,8 @@ export default class CreateTreeTemplate extends Component {
     formSubmitLoader() {
         // alert("load 1")
         this.setState({
-            modelingJexcelLoader: true
+            modelingJexcelLoader: true,
+            isTemplateChanged:true
         }, () => {
             // alert("load 2")
             setTimeout(() => {
@@ -2120,7 +2121,8 @@ export default class CreateTreeTemplate extends Component {
 
     updateMomDataInDataSet() {
         this.setState({
-            momJexcelLoader: true
+            momJexcelLoader: true,
+            isTemplateChanged:true
         }, () => {
             setTimeout(() => {
                 var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
@@ -4970,7 +4972,8 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             // items: [...items, newItem],
             items,
-            cursorItem: nodeId
+            cursorItem: nodeId,
+            isTemplateChanged:true
         }, () => {
             console.log("on add items-------", this.state.items);
             this.calculateMOMData(0, 2);
@@ -7641,7 +7644,7 @@ export default class CreateTreeTemplate extends Component {
                 currentTargetChangeNumberEdit: false
             });
         }
-        if (event.target.name != "treeNameForCreateTree" && event.target.name != "forecastMethodIdForCreateTree" && event.target.name != "notesForCreateTree" && event.target.name != "activeForCreateTree" && event.target.name != "datasetIdModalForCreateTree" && event.target.name!="treeTemplateId") {
+        if (event.target.name != "treeNameForCreateTree" && event.target.name != "forecastMethodIdForCreateTree" && event.target.name != "notesForCreateTree" && event.target.name != "activeForCreateTree" && event.target.name != "datasetIdModalForCreateTree" && event.target.name!="treeTemplateId" && event.target.name != "monthId") {
             this.setState({isChanged: true})
         }
         this.setState({ currentItemConfig }, () => {
@@ -8523,7 +8526,7 @@ export default class CreateTreeTemplate extends Component {
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             if (!this.state.isSubmitClicked) {
-                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true, isTemplateChanged:true }, () => {
                                     console.log("all ok>>>");
                                     setTimeout(() => {
                                         console.log("inside set timeout on submit")
@@ -10993,6 +10996,7 @@ export default class CreateTreeTemplate extends Component {
                                 console.log("level unit id on add button click---", levelUnitId);
                                 this.setState({
                                     isValidError: true,
+                                    isTemplateChanged:true,
                                     tempPlanningUnitId: '',
                                     showMomDataPercent: false,
                                     showMomData: false,
@@ -11795,6 +11799,9 @@ export default class CreateTreeTemplate extends Component {
                             }}
                             validate={validate(validationSchemaBranch)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.setState({
+                                    isTemplateChanged:true
+                                })
                                 this.generateBranchFromTemplate(this.state.branchTemplateId);
                             }}
 
