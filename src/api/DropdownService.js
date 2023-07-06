@@ -159,7 +159,7 @@ class DropdownService {
 
   getBudgetDropdownFilterMultipleFundingSources(json) {
     return axios.post(
-      `${API_URL}/api/dropdown/budget/filter/multipleFundingSources/`,
+      `${API_URL}/api/dropdown/budget/filter/multipleFundingSources`,
       json,
       {}
     );
