@@ -840,8 +840,8 @@ export default class CreateTreeTemplate extends Component {
             programListForCreateTree:[],
             activeForCreateTree: true,
             datasetListJexcelForCreateTree:{},
-            treeTemplateForCreateTree:{}
-
+            treeTemplateForCreateTree:{},
+            collapseState: false
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -1749,6 +1749,7 @@ export default class CreateTreeTemplate extends Component {
             e.result2 = this.getPayloadData(items1[i], 5)//Link
             var text = this.getPayloadData(items1[i], 3)
             e.text = text;
+            delete e.templateName;
             newItems.push(e)
         }
         console.log("newItems---", newItems);
@@ -5924,10 +5925,11 @@ export default class CreateTreeTemplate extends Component {
         });
     }
 
-    expandCollapse(){
+    expandCollapse(e){
         var updatedItems = this.state.items;
         var tempToggleArray = this.state.toggleArray;
-        if(this.state.toggleArray.length == 0){
+        if(e.target.checked){
+            this.setState({collapseState: true})
             updatedItems = updatedItems.map(item => {
                 tempToggleArray.push(item.id);
                 if(item.parent != null){
@@ -5937,6 +5939,7 @@ export default class CreateTreeTemplate extends Component {
             });
             this.setState({toggleArray: tempToggleArray})
         }else{
+            this.setState({collapseState: false})
             updatedItems = updatedItems.map(item => {
                 tempToggleArray = tempToggleArray.filter((e) => e != item.id)
                 return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
@@ -6801,6 +6804,15 @@ export default class CreateTreeTemplate extends Component {
                     //         return {...item, templateName: "contactTemplateMin", expanded: true} 
                     //     return {...item, templateName: "contactTemplate", expanded: false} 
                     // })
+                    if(Array.from(new Set(tempToggleList)).length + 1 >= items.length){
+                        var parentNode = items.filter(item => 
+                            (item.parent == null) 
+                        );
+                        tempToggleList.push(parentNode[0].id)
+                        this.setState({ collapseState: true })
+                    }else{
+                        this.setState({ collapseState: false })
+                    }
                     this.setState({
                         treeTemplate: response.data,
                         items,
@@ -8151,7 +8163,8 @@ export default class CreateTreeTemplate extends Component {
                             return item;
                         });
                         this.setState({toggleArray: tempToggleArray})
-                    }               
+                    }
+                    this.setState({ collapseState: false })         
                     this.setState({ items: updatedItems })
                 }
                 console.log("555>>>", this.state.items);
@@ -11334,6 +11347,11 @@ export default class CreateTreeTemplate extends Component {
                                                 }
                                                 return item;
                                             });
+                                            if(Array.from(new Set(tempToggleArray)).length >= items.length){
+                                                this.setState({ collapseState: true })
+                                            }else{
+                                                this.setState({ collapseState: false })
+                                            }
                                             this.setState({toggleArray: tempToggleArray})
                                         }else{
                                             var parentId = itemConfig.payload.parentNodeId;
@@ -11353,6 +11371,11 @@ export default class CreateTreeTemplate extends Component {
                                                 }
                                                 return item;
                                             });
+                                            if(Array.from(new Set(tempToggleArray)).length >= items.length){
+                                                this.setState({ collapseState: true })
+                                            }else{
+                                                this.setState({ collapseState: false })
+                                            }
                                             this.setState({toggleArray: tempToggleArray})
                                         }
                                         
@@ -11834,7 +11857,7 @@ export default class CreateTreeTemplate extends Component {
                                                                                 type="checkbox"
                                                                                 id="active9"
                                                                                 name="active9"
-                                                                                checked={this.state.toggleArray.length != 0 }
+                                                                                checked={ this.state.collapseState }
                                                                                 onClick={(e) => { this.expandCollapse(e); }}
                                                                             />
                                                                             <Label
