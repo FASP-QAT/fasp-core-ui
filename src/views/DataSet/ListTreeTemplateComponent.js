@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import DatasetService from '../../api/DatasetService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback, Form } from 'reactstrap';
+import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback, Form, Row } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jspreadsheet';
@@ -1263,9 +1263,9 @@ export default class ListTreeTemplate extends Component {
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         {/* <div id="loader" className="center"></div> */}
-                        <Col md="3 pl-0">
-                            <div className="d-md-flex Selectdiv2">
-                                <FormGroup className="tab-ml-0 mt-md-2 mb-md-0 ">
+                        <div className=" pl-0" style={{marginTop:"-35px"}}>
+                            <div className="row">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -1285,8 +1285,9 @@ export default class ListTreeTemplate extends Component {
                                     </div>
                                 </FormGroup>
                             </div>
-                        </Col>
-                        <div className="TreeTemplateTable consumptionDataEntryTable">
+                        </div>
+                        <div className="col-md-10 pl-0">{"Left click on any tree template to preview. Right click to create tree from template (only available for templates starting from aggregation or number nodes)."}</div>
+                        <div className="TreeTemplateTable consumptionDataEntryTable treeTemplateSearchMarginTop">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
