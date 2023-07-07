@@ -363,10 +363,11 @@ export default class ReactListComponent extends Component {
                             data[6] = realmList[j].minQplTolerance;
                             data[7] = realmList[j].minQplToleranceCutOff;
                             data[8] = realmList[j].maxQplTolerance;
-
-                            data[9] = realmList[j].lastModifiedBy.username;
-                            data[10] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-                            data[11] = realmList[j].active;
+                            data[9] = "";
+                            data[10] = "";
+                            data[11] = realmList[j].lastModifiedBy.username;
+                            data[12] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+                            data[13] = realmList[j].active;
 
                             realmArray[count] = data;
                             count++;
@@ -431,6 +432,14 @@ export default class ReactListComponent extends Component {
                                     title: i18n.t('static.realm.maxQplTolerance'),
                                     type: 'numeric', mask: '#,##.00', decimal: '.',
                                     // readOnly: true
+                                },
+                                {
+                                    title: "MIN_MODE_PER_REQ",
+                                    type: 'numeric'
+                                },
+                                {
+                                    title: "MIN_MODE_COUNT_REQ",
+                                    type: 'numeric'
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedBy'),
