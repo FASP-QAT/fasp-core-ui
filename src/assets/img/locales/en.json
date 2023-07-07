@@ -3108,6 +3108,8 @@
     "static.forecastSummary.priceNotAvaiable":"Price is missing - please add in Update Planning Unit screen",
     "static.forecastSummary.priceIsMissing":"Price is missing - please add in Update Planning Unit screen (click to open new tab)",
     "static.treeTemplate.createTreeFromTemplate":"Use this template",
-    "static.treeTemplate.monthsInPastTooltip":"Number of past months (shown as negative) available in the “Node Data” dropdown, where Month -1 is the month immediately before forecast period",
-    "static.treeTemplate.monthsInFutureTooltip":"Number of future months (show as positive) available in the “Node Data” dropdown, where Month 1 is the first month of the forecast period."
+    "static.treeTemplate.monthsInPastTooltip":"Choose the number of past months available in the Month dropdown for nodes in this tree template. Months will be negative, relative to the forecast start month. (e.g. if you select 2, you will see Month -1 and Month -2 available, which are the 2 months immediately before the forecast period.) When the template is used, actual months will be shown based on the user-selected forecast start month.",
+    "static.treeTemplate.monthsInFutureTooltip":"Choose the number of future months available in the Month dropdown for nodes in this tree template. Months will be positive, relative to the forecast start month. (e.g. if you select 2, you will see Month 1 and Month 2 available, which are first 2 months of forecast period.) When the template is used, actual months will be shown based on the user-selected forecast start month.",
+    "static.treeTemplate.listTreeTemplateTooltip":"Left click on any tree template to preview. Right click to create tree from template (only available for templates starting from aggregation or number nodes).",
+    "static.treeTemplate.createTreeTemplateTooltip":"Create a tree first, then add this template to a node."
 }
