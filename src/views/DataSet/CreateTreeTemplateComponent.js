@@ -11403,7 +11403,7 @@ export default class CreateTreeTemplate extends Component {
                                             this.setState({toggleArray: tempToggleArray})
                                         }
                                         
-                                        this.setState({ items: updatedItems })
+                                        this.setState({ items: updatedItems,isTemplateChanged:true })
             
                                     }}>
                                     {this.state.toggleArray.includes(itemConfig.id) ? <i class="fa fa-caret-square-o-left" aria-hidden="true"></i> : <i class="fa fa-caret-square-o-down" aria-hidden="true"></i> }    
