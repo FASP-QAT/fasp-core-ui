@@ -248,6 +248,9 @@ export default class ListTreeComponent extends Component {
                                 {
                                     label: i18n.t('static.program.yes'),
                                     onClick: () => {
+                                        console.log("this.state.datasetIdModal Test@123",this.state.datasetIdModal)
+                                        localStorage.setItem("sesDatasetId",this.state.datasetIdModal.split("~")[0]);
+                                        localStorage.setItem("sesVersionIdReport", this.state.datasetIdModal.split("~v")[1]+" (Local)");
                                         this.props.history.push({
                                             pathname: `/dataSet/buildTree/tree/${treeId}/${id}`,
                                             // state: { role }

@@ -1892,7 +1892,8 @@ export default class CreateTreeTemplate extends Component {
     formSubmitLoader() {
         // alert("load 1")
         this.setState({
-            modelingJexcelLoader: true
+            modelingJexcelLoader: true,
+            isTemplateChanged:true
         }, () => {
             // alert("load 2")
             setTimeout(() => {
@@ -2179,7 +2180,8 @@ export default class CreateTreeTemplate extends Component {
 
     updateMomDataInDataSet() {
         this.setState({
-            momJexcelLoader: true
+            momJexcelLoader: true,
+            isTemplateChanged:true
         }, () => {
             setTimeout(() => {
                 var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
@@ -5038,7 +5040,8 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             // items: [...items, newItem],
             items,
-            cursorItem: nodeId
+            cursorItem: nodeId,
+            isTemplateChanged:true
         }, () => {
             console.log("on add items-------", this.state.items);
             this.calculateMOMData(0, 2);
@@ -5229,7 +5232,7 @@ export default class CreateTreeTemplate extends Component {
                         currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.label = this.state.planningUnitList[0].label;
                         currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.multiplier = this.state.planningUnitList[0].multiplier;
                         currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id = this.state.planningUnitList[0].unit.id;
-                        currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].displayCalculatedDataValue = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue;
+                        currentItemConfig.context.payload.nodeDataMap[0][0].displayCalculatedDataValue = currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue;
                     }
                     if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
                         currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(this.state.planningUnitList[0].label));
@@ -7385,6 +7388,8 @@ export default class CreateTreeTemplate extends Component {
             if(event.target.value!=""){
                 this.setState({
                     loading:true,
+                    isTemplateChanged:false,
+                    isChanged:false,
                     treeTemplateId:event.target.value
                 },()=>{
                     this.componentDidMount()
@@ -7758,7 +7763,7 @@ export default class CreateTreeTemplate extends Component {
                 currentTargetChangeNumberEdit: false
             });
         }
-        if (event.target.name != "treeNameForCreateTree" && event.target.name != "forecastMethodIdForCreateTree" && event.target.name != "notesForCreateTree" && event.target.name != "activeForCreateTree" && event.target.name != "datasetIdModalForCreateTree" && event.target.name!="treeTemplateId") {
+        if (event.target.name != "treeNameForCreateTree" && event.target.name != "forecastMethodIdForCreateTree" && event.target.name != "notesForCreateTree" && event.target.name != "activeForCreateTree" && event.target.name != "datasetIdModalForCreateTree" && event.target.name!="treeTemplateId" && event.target.name != "monthId") {
             this.setState({isChanged: true})
         }
         this.setState({ currentItemConfig }, () => {
@@ -8679,7 +8684,7 @@ export default class CreateTreeTemplate extends Component {
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             if (!this.state.isSubmitClicked) {
-                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true, isTemplateChanged:true }, () => {
                                     console.log("all ok>>>");
                                     setTimeout(() => {
                                         console.log("inside set timeout on submit")
@@ -11209,6 +11214,7 @@ export default class CreateTreeTemplate extends Component {
                                     console.log("level unit id on add button click---", levelUnitId);
                                     this.setState({
                                         isValidError: true,
+                                        isTemplateChanged:true,
                                         tempPlanningUnitId: '',
                                         showMomDataPercent: false,
                                         showMomData: false,
@@ -11244,7 +11250,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 nodeDataModelingList: [],
                                                                 nodeDataOverrideList: [],
                                                                 nodeDataMomList: [],
-                                                                monthNo: 1,
+                                                                monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                                                 dataValue: '',
                                                                 calculatedDataValue: '',
                                                                 notes: '',
@@ -11282,7 +11288,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         multiplier: ''
                                                                     },
                                                                     refillMonths: '',
-                                                                    sharePlanningUnit: "false"
+                                                                    sharePlanningUnit: "true"
                                                                 }
                                                             }
                                                         ]
@@ -11449,7 +11455,7 @@ export default class CreateTreeTemplate extends Component {
                                         onClick={() => this.exportPDF()}
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
-                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.createTreeFromTemplate')}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span>}
+                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeTemplate.flatList[0].payload.nodeType.id==1 || this.state.treeTemplate.flatList[0].payload.nodeType.id==2) && <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.createTreeFromTemplate')}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span>}
                                 </a>
                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
@@ -12092,6 +12098,9 @@ export default class CreateTreeTemplate extends Component {
                             }}
                             validate={validate(validationSchemaBranch)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.setState({
+                                    isTemplateChanged:true
+                                })
                                 this.generateBranchFromTemplate(this.state.branchTemplateId);
                             }}
 
