@@ -563,7 +563,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         fuPerPu = nodeDataMapForScenario.puNode.planningUnit.multiplier;
                                     }
 
-                                    var monthsPerVisit = nodeDataMapForScenario.puNode.refillMonths;
+                                    var monthsPerVisit = 1;
                                     var noOfBottlesInOneVisit = nodeDataMapForScenario.puNode.puPerVisit;
                                     var puPerBaseMonth = Math.floor(patients / monthsPerVisit);
                                     var puPerMonthBalance = patients - puPerBaseMonth * monthsPerVisit + puPerBaseMonth;
