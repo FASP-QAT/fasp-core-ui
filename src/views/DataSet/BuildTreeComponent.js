@@ -3223,8 +3223,15 @@ export default class BuildTree extends Component {
                 console.log("program min date--->", this.state.minDate);
                 console.log("program max date--->", this.state.maxDate);
                 this.fetchTracerCategoryList(programData);
-
-                if(this.state.treeId!="" && this.state.treeData.filter(c=>c.treeId==this.state.treeId).length>0){
+                if(this.state.treeData.length==1){
+                    var event={
+                        target:{
+                            value:this.state.treeData[0].treeId,
+                            name:"treeId"
+                        }
+                    }
+                    this.dataChange(event)
+                } else if(this.state.treeId!="" && this.state.treeData.filter(c=>c.treeId==this.state.treeId).length>0){
                     var event={
                         target:{
                             value:this.state.treeId,
