@@ -766,6 +766,7 @@ export default class ListTreeTemplate extends Component {
                 {
                     title: i18n.t('static.ManageTree.Notes'),
                     type: 'text',
+                    width:250
                     // readOnly: true
                 },
                 {
@@ -833,7 +834,7 @@ export default class ListTreeTemplate extends Component {
                                 }.bind(this)
                             });
                         }
-                        if(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE')){
+                        if(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeEl.getValueFromCoords(10, y).flatList[0].payload.nodeType.id==1 || this.state.treeEl.getValueFromCoords(10, y).flatList[0].payload.nodeType.id==2)){
                             items.push({
                                 title: "Create tree from this template",
                                 onclick: function () {
