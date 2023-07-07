@@ -3202,6 +3202,21 @@ export default class BuildTree extends Component {
                 console.log("program min date--->", this.state.minDate);
                 console.log("program max date--->", this.state.maxDate);
                 this.fetchTracerCategoryList(programData);
+
+                if(this.state.treeId!="" && this.state.treeData.filter(c=>c.treeId==this.state.treeId).length>0){
+                    var event={
+                        target:{
+                            value:this.state.treeId,
+                            name:"treeId"
+                        }
+                    }
+                    this.dataChange(event)
+                }else{
+                    this.setState({
+                        treeId:"",
+                        scenarioId:""
+                    })
+                }
                 // if (proList.length == 1) {
                 //     var treeId = proList[0].treeId;
                 //     this.setState({
