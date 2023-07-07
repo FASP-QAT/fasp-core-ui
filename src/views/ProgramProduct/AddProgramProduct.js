@@ -384,7 +384,7 @@ class AddprogramPlanningUnit extends Component {
                                                                         autocomplete: true,
                                                                         remoteSearch: true,
                                                                         onbeforesearch: function(instance, request) {
-                                                                            // if(this.state.sortOrderLoading == false){
+                                                                            if(this.state.sortOrderLoading == false){
                                                                                 request.method = 'GET';
                                                                                 // request.data = { productCategorySortOrder: "", searchText: instance.search, language: "en" };
                                                                                 let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -393,13 +393,12 @@ class AddprogramPlanningUnit extends Component {
                                                                                     httpRequest.setRequestHeader('Authorization', 'Bearer '+jwtToken);
                                                                                 }
                                                                                 const searchText = instance.search;
-                                                                                const language = "en";
-                                                                                const sortOrder = "00";
-                                                                                console.log("Hello",sortOrder)
+                                                                                const language = this.state.lang;
+                                                                                const sortOrder = this.state.tempSortOrder;
                                                                                 request.url = request.url.replace("searchText/language/sortOrder", `${searchText}/${language}/${sortOrder}`);
                                                                                 return request;
-                                                                            // }
-                                                                        }
+                                                                            }
+                                                                        }.bind(this),
                                                                     },
                                                                 },
                                                                 {
@@ -587,14 +586,14 @@ class AddprogramPlanningUnit extends Component {
                                                                 this.setState({ sortOrderLoading: true })
                                                                 let tempId = data[y][0]
                                                                 let sortOrder;
-                                                                if(tempId == -1){
+                                                                if(tempId == -1 || tempId == 0){
                                                                     sortOrder="00"
-                                                                }else if(tempId == 0){
-                                                                    sortOrder=""
                                                                 }else{
-                                                                    sortOrder = this.state.productCategoryList.filter(item => item.id == tempId)[0].sortOrder
+                                                                    sortOrder = this.state.productCategoryList.filter(item => item.payload.productCategoryId == tempId)[0].sortOrder
                                                                 }
-                                                                this.setState({ tempSortOrder: sortOrder, sortOrderLoading: false })
+                                                                this.setState({ tempSortOrder: sortOrder }, () => {
+                                                                    this.setState({sortOrderLoading: false})
+                                                                })
                                                             }.bind(this),
                                                             copyCompatibility: true,
                                                             allowManualInsertRow: false,
@@ -1397,6 +1396,7 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(14, y, 1, true);
                 valid = true;
             }
+            this.el.setValueFromCoords(1, y, "", true);
             console.log("test11111", jexcel);
 
             // var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
