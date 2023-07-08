@@ -493,8 +493,8 @@ class ForecastSummary extends Component {
                         for (var k = 0; k < regRegionList.length; k++) {
                             var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
                             // console.log("Array--------->2", filterForecastSelected);
-                            total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
-                            total1 = total1 + (filterForecastSelected != undefined ? filterForecastSelected.totalForecast : '');
+                            total += Number(filterForecastSelected != undefined && filterForecastSelected.totalForecast!=null ? filterForecastSelected.totalForecast : 0);
+                            total1 = total1 + (filterForecastSelected != undefined && filterForecastSelected.totalForecast!=null ? filterForecastSelected.totalForecast : '');
 
                             // (tsList.filter(c => c.id == )[0].label)
                             let nameTC = '';
@@ -798,8 +798,8 @@ class ForecastSummary extends Component {
                         for (var k = 0; k < regRegionList.length; k++) {
                             var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
                             // console.log("Array--------->2", filterForecastSelected);
-                            total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : '');
-                            total1 = total1 + (filterForecastSelected != undefined ? filterForecastSelected.totalForecast : '');
+                            total += Number(filterForecastSelected != undefined && filterForecastSelected.totalForecast!=null ? filterForecastSelected.totalForecast : '');
+                            total1 = total1 + (filterForecastSelected != undefined && filterForecastSelected.totalForecast!=null ? filterForecastSelected.totalForecast : '');
 
                             let nameTC = '';
                             try {
@@ -1215,7 +1215,7 @@ class ForecastSummary extends Component {
                                 console.log("Test------------>3", Object.keys(selectedForecastMap)[0]);
                                 console.log("Test------------>4", (selectedForecastMap[Object.keys(selectedForecastMap)[0]]));
                                 let notes1 = '';
-
+                                var isForecastSelected=false;
                                 if ((selectedForecastMap[Object.keys(selectedForecastMap)[0]]) != undefined && (selectedForecastMap[Object.keys(selectedForecastMap)[0]]) != '' && (selectedForecastMap[Object.keys(selectedForecastMap)[0]]) != null) {
 
                                     let keys = Object.keys(selectedForecastMap);
@@ -1223,24 +1223,28 @@ class ForecastSummary extends Component {
                                         let selectedForecastMapObjIn = (selectedForecastMap[keys[k]]);
 
                                         //add notes
-                                        if (selectedForecastMapObjIn.notes != '') {
+                                        if (selectedForecastMapObjIn.notes != '' && selectedForecastMapObjIn.notes!=undefined) {
                                             if (notes1 == '') {
                                                 notes1 = regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ': ' + selectedForecastMapObjIn.notes;
                                             } else {
                                                 notes1 = notes1.concat(' | ' + regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ': ' + selectedForecastMapObjIn.notes);
                                             }
                                         }
-
+                                        console.log("planningUnitList Test@123",planningUnitList[j]);
                                         console.log("checkPU------------>2", selectedForecastMapObjIn);
                                         if (((selectedForecastMapObjIn.scenarioId != null) ? true : ((selectedForecastMapObjIn.consumptionExtrapolationId != 0) ? true : false))) {
+                                            console.log("In side scenario Id Test@123")
                                             let treeId = selectedForecastMapObjIn.treeId;
                                             let scenarioId = selectedForecastMapObjIn.scenarioId;
                                             let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
                                             if (scenarioId != null) {//scenarioId
+                                                console.log("In side scenario Id is not null Test@123")
                                                 for (let p = 0; p < treeList.length; p++) {
                                                     // let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
                                                     let filteredScenario = (treeList[p].treeId == treeId ? treeList[p].scenarioList.filter(c => c.id == scenarioId) : []);
                                                     if (filteredScenario.length > 0) {
+                                                        isForecastSelected=true;
+                                                        console.log("Inside filter scenario Test@123")
                                                         let flatlist = treeList[p].tree.flatList;
                                                         let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
                                                         console.log("Test------------>5", listContainNodeType5);
@@ -1249,12 +1253,15 @@ class ForecastSummary extends Component {
 
                                                         let myTempData = [];
                                                         for (let k = 0; k < listContainNodeType5.length; k++) {
+                                                            console.log("Indise list of node Test@123")
                                                             let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
                                                             console.log("Test------------>7.1", arrayOfNodeDataMap);
 
                                                             if (arrayOfNodeDataMap.length > 0) {
+                                                                console.log("Inside array of node data mao Test@123")
                                                                 console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList, ' --- ', planningUnitList[j].planningUnit);
                                                                 nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
+                                                                console.log("Node data mom list Test@123")
                                                                 let consumptionList = nodeDataMomList.map(m => {
                                                                     return {
                                                                         consumptionDate: m.month,
@@ -1277,10 +1284,12 @@ class ForecastSummary extends Component {
 
                                                 }
                                             } else {//consumptionExtrapolationId
-
+                                                console.log("in else Test@123")
                                                 let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
-                                                console.log("consumptionExtrapolationObj----------->", consumptionExtrapolationObj);
+                                                console.log("consumptionExtrapolationObj-----------> Test@123", consumptionExtrapolationObj);
                                                 if (consumptionExtrapolationObj.length > 0) {
+                                                    isForecastSelected=true;
+                                                    console.log("In if Test@123")
                                                     let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                         return {
                                                             consumptionDate: m.month,
@@ -1366,7 +1375,7 @@ class ForecastSummary extends Component {
 
 
 
-
+                                    console.log("consumptionData Test@123",consumptionData)
                                     let totalForecastedQuantity0ri = 0;
                                     let tempList = [];
                                     let tempList1 = [];
@@ -1396,13 +1405,15 @@ class ForecastSummary extends Component {
                                                 a[id].consumptionQty = parseFloat(a[id].consumptionQty) + parseFloat(consumptionQty);
                                             return a;
                                         }, {}));
-
+                                        console.log("Result True Test@123",resultTrue)
                                         totalForecastedQuantity0ri = (resultTrue.length > 0 ? parseFloat(resultTrue[0].consumptionQty).toFixed(2) : 0);
 
                                     }
 
                                     totalForecastedQuantity0ri = Math.round(totalForecastedQuantity0ri);
-
+                                    if(!isForecastSelected){
+                                        totalForecastedQuantity0ri=null;
+                                    }
 
 
                                     //obj parameter decleration
@@ -1469,6 +1480,7 @@ class ForecastSummary extends Component {
                                 if (displayId == 2) {
                                     // console.log("langaugeList---->", langaugeList);
                                     let dataArray = [];
+                                    console.log("Test@123 datasetJson",this.state.regDatasetJson)
                                     var treeList = this.state.regDatasetJson.treeList.filter(c => c.active == true);;
                                     console.log("TreeList+++", treeList)
                                     var consumptionExtrapolation = this.state.regDatasetJson.consumptionExtrapolation;
@@ -1539,12 +1551,40 @@ class ForecastSummary extends Component {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
                                                 console.log("filterForecastSelected+++", filterForecastSelected);
                                                 console.log("filterForecastSelected != undefined ? filterForecastSelected.notes : +++", filterForecastSelected != undefined ? filterForecastSelected.notes : "");
-                                                data[(k + 1) * 3] = (filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
-                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "";
-                                                total += Number(filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : 0);
+                                                var selectedForecast=(filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
+                                                data[(k + 1) * 3] = selectedForecast;
+                                                var totalForecast = 0;
+                                                if(selectedForecast!=""){
+                                                    var tsListFilter = tsList.filter(c => c.id == selectedForecast)[0]
+                                                    if(tsListFilter!=undefined){
+                                                        console.log("totalForecast---------->0", tsListFilter);
+                                                        totalForecast = 0;
+                                                        if (tsListFilter.type == "C") {
+                                                            totalForecast = tsListFilter.totalForecast;
+                                                        } else {
+                                                            var flatList = tsListFilter.flatList;
+                                                            console.log("Flat List @@@@@@@ Test", flatList)
+                                                            var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == puListFiltered[j].planningUnit.id);
+                                                            console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
+                                                            var nodeDataMomList = [];
+                                                            for (var fl = 0; fl < flatListFilter.length; fl++) {
+                                                                nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM")));
+                                                            }
+                                                            nodeDataMomList.map(ele => {
+                                                                totalForecast += Number(ele.calculatedMmdValue);
+                                                            });
+                                                        }
+                                                    }else{
+                                                        totalForecast=null;
+                                                    }
+                                                }else{
+                                                    totalForecast=null;
+                                                }
+                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast!=null ? Math.round(totalForecast) : "";
+                                                total += Number(filterForecastSelected != undefined ? Math.round(totalForecast) : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
 
-                                                if ((filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "") != "") {
+                                                if ((filterForecastSelected != undefined ? Math.round(totalForecast) : "") != "") {
                                                     selectedForecastQty = selectedForecastQty + 1;
                                                 }
                                             }
