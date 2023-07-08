@@ -301,6 +301,23 @@ class ProductValidation extends Component {
         }
     }
 
+    addCommasWith8Decimals(cell1, row) {
+        if (cell1 != null && cell1 != "") {
+            cell1 += '';
+            var x = cell1.replaceAll(",", "").split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+            // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        } else {
+            return "";
+        }
+    }
+
     addCommas(cell1, row) {
 
         if (cell1 != null && cell1 != "") {
@@ -441,10 +458,10 @@ class ProductValidation extends Component {
                 usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
                 var unitList = this.state.unitList;
                 // selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
-                try{
-                selectedText = getLabelText(unitList.filter(c => c.unitId == nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang);
-                }catch(err){
-                    
+                try {
+                    selectedText = getLabelText(unitList.filter(c => c.unitId == nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.id)[0].label, this.state.lang);
+                } catch (err) {
+
                 }
                 // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
                 console.log("finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit", finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit);
@@ -517,19 +534,19 @@ class ProductValidation extends Component {
                     if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                         var sharePu;
                         if (finalData[i].nodeDataMap.puNode.sharePlanningUnit != "true") {
-                            sharePu = finalData[i].nodeDataMap.puNode.puPerVisit;
+                            sharePu = parseFloat(finalData[i].nodeDataMap.puNode.puPerVisit).toFixed(8);
                         } else {
-                            sharePu = this.round((noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier));
+                            sharePu = parseFloat(noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier).toFixed(8);
                         }
-                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommas(sharePu) + " " + planningUnit;
+                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
                     } else {
                         console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
                         console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
                         console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
-                        var puPerInterval = finalData[i].nodeDataMap.puNode.puPerVisit;
-                        console.log("puPerInterval###", puPerInterval);
+                        var puPerInterval = parseFloat(finalData[i].nodeDataMap.puNode.puPerVisit).toFixed(8);
+                        console.log("puPerInterval###", parseFloat(puPerInterval).toFixed(8));
 
-                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommas((puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + finalData[i].nodeDataMap.puNode.refillMonths + " " + i18n.t('static.report.month');
+                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommasWith8Decimals((puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + finalData[i].nodeDataMap.puNode.refillMonths + " " + i18n.t('static.report.month');
                     }
                     var currency = this.state.currencyList.filter(c => c.id == this.state.currencyId)[0];
                     var cost = 0;
@@ -572,7 +589,7 @@ class ProductValidation extends Component {
                     data[5] = "";
                     data[6] = "";
                     data[7] = i18n.t('static.productValidation.subTotal');
-                    data[8] = totalCost.toFixed(2);
+                    data[8] = totalCost.toFixed(8);
                     data[9] = 1;
                     totalCost = 0;
                     dataArray.push(data);
@@ -585,9 +602,9 @@ class ProductValidation extends Component {
                 var planningUnitObj = finalData[i].nodeDataMap != "" ? this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id) : [];
                 data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length > 0 && planningUnitObj[0].planningUnit.forecastingUnit.id == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) + " | " + planningUnitObj[0].planningUnit.id : "";
                 data[5] = usageTextPU;
-                data[6] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? qty.toFixed(2) : "";
-                data[7] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? this.formatter((price / currency.conversionRateToUsd).toFixed(2)) : "";
-                data[8] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? ((qty * price) / currency.conversionRateToUsd).toFixed(2) : "";
+                data[6] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? qty.toFixed(8) : "";
+                data[7] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? this.formatter((price / currency.conversionRateToUsd).toFixed(8)) : "";
+                data[8] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? ((qty * price) / currency.conversionRateToUsd).toFixed(8) : "";
                 data[9] = 0;
                 totalCost += Number(data[8])
                 dataArray.push(data);
@@ -606,7 +623,7 @@ class ProductValidation extends Component {
                 data[5] = "";
                 data[6] = "";
                 data[7] = i18n.t('static.productValidation.subTotal');
-                data[8] = totalCost.toFixed(2);
+                data[8] = totalCost.toFixed(8);
                 data[9] = 1;
                 totalCost = 0;
                 dataArray.push(data);
@@ -647,7 +664,7 @@ class ProductValidation extends Component {
                     },
                     {
                         title: i18n.t('static.report.qty') + "/" + i18n.t('static.common.person'),
-                        type: 'numeric', mask: '#,##.00', decimal: '.'
+                        type: 'numeric', mask: '#,##.00000000', decimal: '.'
                     },
                     {
                         title: i18n.t('static.supplyPlan.pricePerPlanningUnit'),
@@ -655,7 +672,7 @@ class ProductValidation extends Component {
                     },
                     {
                         title: i18n.t('static.productValidation.cost') + "/" + i18n.t("static.common.person"),
-                        type: 'numeric', mask: '#,##.00', decimal: '.'
+                        type: 'numeric', mask: '#,##.00000000', decimal: '.'
                     },
                     {
                         title: "IsTotal",
