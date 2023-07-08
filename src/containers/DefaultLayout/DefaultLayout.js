@@ -82,6 +82,7 @@ const ListRealmCountry = React.lazy(() => import('../../views/RealmCountry/ListR
 const AddRealmCountry = React.lazy(() => import('../../views/RealmCountry/AddRealmCountryComponent'));
 const RealmCountry = React.lazy(() => import('../../views/RealmCountry/RealmCountry'));
 const AddProgramIntegration = React.lazy(() => import('../../views/Integration/AddProgramIntegration'));
+const MapProcurementAgent = React.lazy(() => import('../../views/Program/MapProcurementAgent'));
 const ManualJsonTrigger = React.lazy(() => import('../../views/Integration/ManualJsonTrigger'));
 const AddCountrySpecificPrice = React.lazy(() => import('../../views/ProgramProduct/AddCountrySpecificPrice'));
 const ChangePassword = React.lazy(() => import('../../views/Pages/Login/ChangePasswordComponent'));
@@ -499,6 +500,8 @@ const routes = [
   { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
   { path: '/program/addManualIntegration', exact: true, name: 'static.integration.manualProgramIntegration', component: ManualJsonTrigger },
   { path: '/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+
+  { path: '/program/mapProcurementAgent/:programId', exact: true, name: 'static.integration.programIntegration', component: MapProcurementAgent },
 
   { path: '/changePassword', exact: true, name: 'static.dashboard.changepassword', component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },

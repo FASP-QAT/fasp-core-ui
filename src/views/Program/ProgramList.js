@@ -654,26 +654,34 @@ export default class ProgramList extends Component {
       //   return [];
       // }.bind(this),
       contextMenu: function (obj, x, y, e) {
-        if (
-          AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes(
-            "ROLE_BF_ADD_INTEGRATION_PROGRAM"
-          )
-        ) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_INTEGRATION_PROGRAM') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT')) {
           var items = [];
           if (y != null) {
             if (obj.options.allowInsertRow == true) {
-              items.push({
-                title: i18n.t("static.integration.addProgramIntegration"),
-                onclick: function () {
-                  // console.log("onclick------>", this.el.getValueFromCoords(0, y));
-                  this.props.history.push({
-                    pathname: `/program/addIntegration/${this.el.getValueFromCoords(
-                      0,
-                      y
-                    )}`,
-                  });
-                }.bind(this),
-              });
+              if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_INTEGRATION_PROGRAM')){
+                items.push({
+                  title: i18n.t('static.integration.addProgramIntegration'),
+                  onclick: function () {
+                    // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                    this.props.history.push({
+                      pathname: `/program/addIntegration/${this.el.getValueFromCoords(0, y)}`,
+                    })
+
+                  }.bind(this)
+                });
+              }
+              if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT')){
+                items.push({
+                  title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementAgent'),
+                  onclick: function () {
+                    // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                    this.props.history.push({
+                      pathname: `/program/mapProcurementAgent/${this.el.getValueFromCoords(0, y)}`,
+                    })
+
+                  }.bind(this)
+                });
+              }
             }
           }
           return items;
