@@ -18,7 +18,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
 import { API_URL, MAX_PROGRAM_CODE_LENGTH } from "../../Constants";
-
+import DropdownService from '../../api/DropdownService';
 
 const entityname = i18n.t('static.program.programMaster');
 let initialValues = {
@@ -372,7 +372,8 @@ export default class EditProgram extends Component {
                     }
                 );
 
-            ProgramService.getOrganisationListByRealmCountryId(response.data.realmCountry.realmCountryId)
+            // ProgramService.getOrganisationListByRealmCountryId(response.data.realmCountry.realmCountryId)
+            DropdownService.getOrganisationListByRealmCountryId(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
@@ -560,7 +561,8 @@ export default class EditProgram extends Component {
     }
 
     generateOrganisationCode(event) {
-        let organisationCode = this.state.organisationList.filter(c => (c.organisationId == event.target.value))[0].organisationCode;
+        console.log("generateOrganisationCode===",this.state.organisationList)
+        let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({
             organisationCode: organisationCode
         })
@@ -673,7 +675,7 @@ export default class EditProgram extends Component {
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
-                    <option key={i} value={item.organisationId}>
+                    <option key={i} value={item.id}>
                         {/* {item.organisationCode} */}
                         {getLabelText(item.label, this.state.lang)}
                     </option>

@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment, { version } from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -54,6 +54,7 @@ import ReportService from '../../api/ReportService';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -345,11 +346,21 @@ class ForcastMatrixOverTime extends Component {
   getPrograms = () => {
     if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
-      ProgramService.getProgramList()
+      let realmId = AuthenticationService.getRealmId();
+
+      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then(response => {
-          console.log(JSON.stringify(response.data))
+          var proList = []
+          for (var i = 0; i < response.data.length; i++) {
+            var programJson = {
+              programId: response.data[i].id,
+              label: response.data[i].label,
+              programCode: response.data[i].code
+            }
+            proList[i] = programJson
+          }
           this.setState({
-            programs: response.data, loading: false
+            programs: proList, loading: false
           }, () => { this.consolidatedProgramList() })
         }).catch(
           error => {
@@ -395,30 +406,6 @@ class ForcastMatrixOverTime extends Component {
             }
           }
         );
-      // .catch(
-      //   error => {
-      //     this.setState({
-      //       programs: [], loading: false
-      //     }, () => { this.consolidatedProgramList() })
-      //     if (error.message === "Network Error") {
-      //       this.setState({ loading: false, message: error.message });
-      //     } else {
-      //       switch (error.response ? error.response.status : "") {
-      //         case 500:
-      //         case 401:
-      //         case 404:
-      //         case 406:
-      //         case 412:
-      //           this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-      //           break;
-      //         default:
-      //           this.setState({ loading: false, message: 'static.unkownError' });
-      //           break;
-      //       }
-      //     }
-      //   }
-      // );
-
     } else {
       console.log('offline')
       this.consolidatedProgramList()
@@ -516,11 +503,62 @@ class ForcastMatrixOverTime extends Component {
             versions: [],
             planningUnits: []
           }, () => {
-            this.setState({
-              versions: program[0].versionList.filter(function (x, i, a) {
-                return a.indexOf(x) === i;
-              })
-            }, () => { this.consolidatedVersionList(programId) });
+            DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+              .then(response => {
+                console.log("response===>", response.data)
+                this.setState({
+                  versions: []
+                }, () => {
+                  this.setState({
+                    versions: response.data
+                  }, () => {
+                    this.consolidatedVersionList(programId)
+                  });
+                });
+              }).catch(
+                error => {
+                  this.setState({
+                    programs: [], loading: false
+                  })
+                  if (error.message === "Network Error") {
+                    this.setState({
+                      // message: 'static.unkownError',
+                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                      loading: false
+                    });
+                  } else {
+                    switch (error.response ? error.response.status : "") {
+
+                      case 401:
+                        this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                      case 403:
+                        this.props.history.push(`/accessDenied`)
+                        break;
+                      case 500:
+                      case 404:
+                      case 406:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                          loading: false
+                        });
+                        break;
+                      case 412:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                          loading: false
+                        });
+                        break;
+                      default:
+                        this.setState({
+                          message: 'static.unkownError',
+                          loading: false
+                        });
+                        break;
+                    }
+                  }
+                }
+              );
           });
 
 
@@ -665,14 +703,14 @@ class ForcastMatrixOverTime extends Component {
               for (var i = 0; i < myResult.length; i++) {
                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
-                  proList[i] = myResult[i]
+                  proList[i] = myResult[i].planningUnit
                 }
               }
               var lang = this.state.lang;
               this.setState({
                 planningUnits: proList.sort(function (a, b) {
-                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                  a = getLabelText(a.label, lang).toLowerCase();
+                  b = getLabelText(b.label, lang).toLowerCase();
                   return a < b ? -1 : a > b ? 1 : 0;
                 }), message: ''
               }, () => {
@@ -686,12 +724,17 @@ class ForcastMatrixOverTime extends Component {
         else {
           // AuthenticationService.setupAxiosInterceptors();
 
-          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-            console.log('**' + JSON.stringify(response.data))
+          var programJson = {
+            tracerCategoryIds: [],
+            programIds: [programId]
+          }
+          console.log('**' + programJson);
+          DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+            console.log('**' + JSON.stringify(response.data));
             var listArray = response.data;
             listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
               return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -868,7 +911,7 @@ class ForcastMatrixOverTime extends Component {
                 supplyPlan: []
               }
             }
-            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+            var pu = (this.state.planningUnits.filter(c => c.id == planningUnitId))[0]
 
             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
 
@@ -1133,8 +1176,8 @@ class ForcastMatrixOverTime extends Component {
     let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
         return (
-          <option key={i} value={item.planningUnit.id}>
-            {getLabelText(item.planningUnit.label, this.state.lang)}
+          <option key={i} value={item.id}>
+            {getLabelText(item.label, this.state.lang)}
           </option>
         )
       }, this);
@@ -1510,42 +1553,42 @@ class ForcastMatrixOverTime extends Component {
                       <div className="row">
                         <div className="col-md-12 mt-2">
                           {this.state.show && this.state.matricsList.length > 0 &&
-                          <div className='fixTableHead table-responsive'>
-                            <Table  className="table-striped table-bordered text-center ">
+                            <div className='fixTableHead table-responsive'>
+                              <Table className="table-striped table-bordered text-center ">
 
-                              <thead>
-                                <tr>
-                                  <th className="text-center" style={{ width: '20%' }}> {i18n.t('static.report.month')} </th>
-                                  <th className="text-center" style={{ width: '20%' }}> {i18n.t('static.report.forecastConsumption')} </th>
-                                  <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.report.actualConsumption')}</th>
-                                  <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.report.error')}</th>
-                                </tr>
-                              </thead>
+                                <thead>
+                                  <tr>
+                                    <th className="text-center" style={{ width: '20%' }}> {i18n.t('static.report.month')} </th>
+                                    <th className="text-center" style={{ width: '20%' }}> {i18n.t('static.report.forecastConsumption')} </th>
+                                    <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.report.actualConsumption')}</th>
+                                    <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.report.error')}</th>
+                                  </tr>
+                                </thead>
 
-                              <tbody>
-                                {
-                                  this.state.matricsList.length > 0
-                                  &&
-                                  this.state.matricsList.map((item, idx) =>
+                                <tbody>
+                                  {
+                                    this.state.matricsList.length > 0
+                                    &&
+                                    this.state.matricsList.map((item, idx) =>
 
-                                    <tr id="addr0" key={idx} className={this.rowtextFormatClassName(item)} >
+                                      <tr id="addr0" key={idx} className={this.rowtextFormatClassName(item)} >
 
-                                      <td>{this.dateFormatter(this.state.matricsList[idx].month)}</td>
-                                      <td className="textcolor-purple">
+                                        <td>{this.dateFormatter(this.state.matricsList[idx].month)}</td>
+                                        <td className="textcolor-purple">
 
-                                        {this.formatter(this.state.matricsList[idx].forecastedConsumption)}
-                                      </td>
-                                      <td>
-                                        {this.formatter(this.state.matricsList[idx].actualConsumption)}
-                                      </td>
-                                      <td>
-                                        {this.state.matricsList[idx].message == null ? this.PercentageFormatter(this.state.matricsList[idx].forecastError) : i18n.t(this.state.matricsList[idx].message)}
-                                      </td>
-                                    </tr>)
+                                          {this.formatter(this.state.matricsList[idx].forecastedConsumption)}
+                                        </td>
+                                        <td>
+                                          {this.formatter(this.state.matricsList[idx].actualConsumption)}
+                                        </td>
+                                        <td>
+                                          {this.state.matricsList[idx].message == null ? this.PercentageFormatter(this.state.matricsList[idx].forecastError) : i18n.t(this.state.matricsList[idx].message)}
+                                        </td>
+                                      </tr>)
 
-                                }
-                              </tbody>
-                            </Table>
+                                  }
+                                </tbody>
+                              </Table>
                             </div>}
 
                         </div>

@@ -13,15 +13,17 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import '../Forms/ValidationForms/ValidationForms.css';
 import classNames from 'classnames';
-import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js';
+import Select from 'react-select';
+import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL,PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
+import DropdownService from '../../api/DropdownService';
 
 const entityname = i18n.t('static.dashboard.budget');
 // const [startDate, setStartDate] = useState(new Date());
 const initialValues = {
     budget: '',
-    programId: '',
+    programId: [],
     fundingSourceId: '',
     budgetAmt: '',
     programList: [],
@@ -37,8 +39,8 @@ const validationSchema = function (values, t) {
             // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.budget.budgetamountdesc')),
-        programId: Yup.string()
-            .required(i18n.t('static.budget.programtext')),
+        // programId: Yup.string()
+        //     .required(i18n.t('static.budget.programtext')),
         fundingSourceId: Yup.string()
             .required(i18n.t('static.budget.fundingtext')),
         budgetAmt: Yup.string()
@@ -139,6 +141,7 @@ class AddBudgetComponent extends Component {
                 budgetAmt: '',
                 notes: '',
                 budgetCode: '',
+                programs:[]
 
             },
 
@@ -157,7 +160,40 @@ class AddBudgetComponent extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
+        this.programChange = this.programChange.bind(this);
 
+    }
+
+    programChange(programId) {
+        var selectedArray = [];
+        for (var p = 0; p < programId.length; p++) {
+            selectedArray.push(programId[p].value);
+        }
+        if (selectedArray.includes("-1")) {
+            this.setState({ programId: [] });
+            var list = this.state.programs.filter(c => c.value != -1)
+            this.setState({ programId: list });
+            var programId = list;
+        } else {
+            this.setState({ programId: programId });
+            var programId = programId;
+        }
+
+        let { budget } = this.state;
+        // this.setState({ roleId });
+        var programIdArray = [];
+        for (var i = 0; i < programId.length; i++) {
+            programIdArray[i] = {
+                id: programId[i].value
+            }
+        }
+
+        budget.programs = programIdArray;
+
+        this.setState({
+            budget,
+        },
+            () => { });
     }
 
     _handleClickRangeBox(e) {
@@ -298,13 +334,18 @@ class AddBudgetComponent extends Component {
     componentDidMount() {
         console.log("new date--->", new Date());
         this.setState({ loading: true })
-        ProgramService.getProgramList()
+        let realmId=AuthenticationService.getRealmId();
+        DropdownService.getProgramForDropdown(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
-                    var listArray = response.data;
+                    var programList = [{ value: "-1", label: i18n.t("static.common.all") }];
+                    for (var i = 0; i < response.data.length; i++) {
+                        programList[i + 1] = { value: response.data[i].id, label: getLabelText(response.data[i].label, this.state.lang) }
+                    }
+                    var listArray = programList;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -477,7 +518,7 @@ class AddBudgetComponent extends Component {
 
     render() {
 
-        const { programs } = this.state;
+        // const { programs } = this.state;
         const { fundingSources } = this.state;
         const { currencyList } = this.state;
 
@@ -493,14 +534,14 @@ class AddBudgetComponent extends Component {
         }
 
 
-        let programList = programs.length > 0 && programs.map((item, i) => {
-            return (
-                <option key={i} value={item.programId}>
-                    {/* {getLabelText(item.label, this.state.lang)} */}
-                    {item.programCode}
-                </option>
-            )
-        }, this);
+        // let programList = programs.length > 0 && programs.map((item, i) => {
+        //     return (
+        //         <option key={i} value={item.programId}>
+        //             {/* {getLabelText(item.label, this.state.lang)} */}
+        //             {item.programCode}
+        //         </option>
+        //     )
+        // }, this);
         let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
             return (
                 <option key={i} value={item.fundingSourceId}>
@@ -554,6 +595,11 @@ class AddBudgetComponent extends Component {
                                     // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
                                     budget.stopDate = stopDate;
 
+                                    for (var i = 0; i < budget.programs.length; i++) {
+                                        if (budget.programs[i].id == 0) {
+                                            budget.programs = []
+                                        }
+                                    }
                                     // this.setState({
                                     //     loading: true
                                     // })
@@ -645,26 +691,28 @@ class AddBudgetComponent extends Component {
                                     }) => (
                                         <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
-                                                <FormGroup>
-                                                    <Label htmlFor="programId">{i18n.t('static.budget.program')}<span className="red Reqasterisk">*</span></Label>
-                                                    {/* <InputGroupAddon addonType="prepend"> */}
-                                                    {/* <InputGroupText><i className="fa-object-group"></i></InputGroupText> */}
-                                                    <Input
-                                                        type="select"
+                                            <FormGroup className="Selectcontrol-bdrNone">
+                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
+                                                    <Select
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.programId && this.state.budget.programs.length != 0 },
+                                                            { 'is-invalid': (touched.programId && !!errors.programId) }
+                                                        )}
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("programId", e);
+                                                            this.programChange(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("programId", true)}
                                                         name="programId"
                                                         id="programId"
-                                                        bsSize="sm"
-                                                        valid={!errors.programId && this.state.budget.program.id != ''}
-                                                        invalid={touched.programId && !!errors.programId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                        onBlur={handleBlur}
+                                                        multi
                                                         required
-                                                        value={this.state.budget.program.id}
-                                                    >
-                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                        {programList}
-                                                    </Input>
-                                                    {/* </InputGroupAddon> */}
+                                                        // min={1}
+                                                        options={this.state.programs}
+                                                        value={this.state.programId}
+                                                    />
                                                     <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                 </FormGroup>
 

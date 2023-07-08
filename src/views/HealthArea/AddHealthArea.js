@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
 import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX, API_URL } from '../../Constants.js';
-
+import DropdownService from '../../api/DropdownService';
 const entityname = i18n.t('static.healtharea.healtharea');
 
 let initialValues = {
@@ -448,15 +448,16 @@ export default class AddHealthAreaComponent extends Component {
   getRealmCountryList(e) {
     let realmId = this.state.healthArea.realm.id;
     if (realmId != "") {
-      HealthAreaService.getRealmCountryList(realmId)
+      // HealthAreaService.getRealmCountryList(realmId)
+      DropdownService.getRealmCountryDropdownList(realmId)
         .then(response => {
           console.log("Realm Country List list---", response.data);
           if (response.status == 200) {
             var json = response.data;
-            json = json.filter(c => c.active)
+            // json = json.filter(c => c.active)
             var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
             for (var i = 0; i < json.length; i++) {
-              regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+              regList[i + 1] = { value: json[i].id, label: json[i].label.label_en }
             }
             var listArray = regList;
             listArray.sort((a, b) => {

@@ -12,12 +12,12 @@ import 'react-select/dist/react-select.min.css';
 import ProgramService from "../../api/ProgramService";
 import { lang } from "moment";
 import i18n from "../../i18n"
-import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
 import { API_URL, MAX_PROGRAM_CODE_LENGTH } from "../../Constants";
+import DropdownService from "../../api/DropdownService";
 
 
 const entityname = i18n.t('static.program.programMaster');
@@ -134,7 +134,6 @@ const getErrorsFromValidationError = (validationError) => {
 }
 export default class EditProgram extends Component {
     constructor(props) {
-        console.log("in constructor");
         super(props);
         this.state = {
             // program: this.props.location.state.program,
@@ -265,7 +264,6 @@ export default class EditProgram extends Component {
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
-            console.log("program obj===>", response.data);
             var proObj = response.data;
             // var healthAreaArrayDummy=[];
             // healthAreaArrayDummy.push(response.data.healthArea.id);
@@ -318,7 +316,6 @@ export default class EditProgram extends Component {
             // ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
             ProgramService.getProgramManagerListByProgramId(this.props.match.params.programId)
                 .then(response => {
-                    console.log("realm list---", response.data);
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -382,7 +379,6 @@ export default class EditProgram extends Component {
             ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
-                        console.log("region list---", response.data);
                         var json = response.data;
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
@@ -443,7 +439,7 @@ export default class EditProgram extends Component {
                     }
                 );
 
-            ProgramService.getOrganisationListByRealmCountryId(response.data.realmCountry.realmCountryId)
+            DropdownService.getOrganisationListByRealmCountryId(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
@@ -631,7 +627,7 @@ export default class EditProgram extends Component {
     }
 
     generateOrganisationCode(event) {
-        let organisationCode = this.state.organisationList.filter(c => (c.organisationId == event.target.value))[0].organisationCode;
+        let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({
             organisationCode: organisationCode
         })
@@ -711,7 +707,7 @@ export default class EditProgram extends Component {
             program.programNotes = event.target.value;
         }
 
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => {})
 
     }
     touchAll(setTouched, errors) {
@@ -778,7 +774,7 @@ export default class EditProgram extends Component {
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
-                    <option key={i} value={item.organisationId}>
+                    <option key={i} value={item.id}>
                         {/* {item.organisationCode} */}
                         {getLabelText(item.label, this.state.lang)}
                     </option>
@@ -827,7 +823,6 @@ export default class EditProgram extends Component {
                                     // AuthenticationService.setupAxiosInterceptors();
                                     let pro = this.state.program;
                                     pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
-                                    console.log("Pro=---------------->+++", pro)
                                     ProgramService.editProgram(pro).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -1390,7 +1385,6 @@ export default class EditProgram extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
                 .then(response => {
-                    console.log("realm list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             programManagerList: response.data
@@ -1445,7 +1439,6 @@ export default class EditProgram extends Component {
             ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
-                        console.log("region list---", response.data);
                         var json = response.data;
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {

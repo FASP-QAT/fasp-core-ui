@@ -19,7 +19,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, SPV_REPORT_DATEPICKER_START_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, SPV_REPORT_DATEPICKER_START_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -34,6 +34,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js'
+import DropdownService from '../../api/DropdownService';
 
 const entityname = ""
 const options = {
@@ -366,9 +367,9 @@ class SupplyPlanVersionAndReview extends Component {
     }
 
     componentDidMount() {
-        if(this.props.match.params.statusId!="" && this.props.match.params.statusId!= undefined){
-            document.getElementById("versionStatusId").value =this.props.match.params.statusId;
-            console.log("versionStatusId-----> 1 ",document.getElementById("versionStatusId").value)
+        if (this.props.match.params.statusId != "" && this.props.match.params.statusId != undefined) {
+            document.getElementById("versionStatusId").value = this.props.match.params.statusId;
+            console.log("versionStatusId-----> 1 ", document.getElementById("versionStatusId").value)
         }
         this.hideFirstComponent();
         // clearTimeout(this.timeout);
@@ -416,17 +417,17 @@ class SupplyPlanVersionAndReview extends Component {
         });
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();
-        RealmCountryService.getRealmCountryForProgram(realmId)
+        DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
-                var listArray = response.data.map(ele => ele.realmCountry);
+                var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    countries: listArray
-                }, () => { this.getPrograms() });
+                    countries: listArray, loading: false
+                });
             }).catch(
                 error => {
                     this.setState({
@@ -520,65 +521,73 @@ class SupplyPlanVersionAndReview extends Component {
 
     getPrograms() {
         // AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramList()
-            .then(response => {
-                console.log(JSON.stringify(response.data))
-                var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState({
-                    programs: listArray, programLst: listArray
-                }, () => { this.getVersionTypeList() });
-            }).catch(
-                error => {
-                    this.setState({
-                        programs: [], loading: false
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            // message: 'static.unkownError',
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
+        // let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
+        let CountryIds = document.getElementById("countryId").value;
+        this.setState({
+            programs: [],
+        }, () => {
+            if (CountryIds.length != 0) {
+                var newCountryList = [CountryIds];
+                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+                    .then(response => {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
                         });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+                        this.setState({
+                            programs: listArray, programLst: listArray
+                        }, () => { this.getVersionTypeList() });
+                    }).catch(
+                        error => {
+                            this.setState({
+                                programs: [], loading: false
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
                         }
-                    }
-                }
-            );
+                    );
+            }
+        })
         // .catch(
         //     error => {
         //         this.setState({
@@ -758,7 +767,7 @@ class SupplyPlanVersionAndReview extends Component {
             document.getElementById("versionStatusId").value =this.props.match.params.statusId;
             console.log("versionStatusId-----> 1 ",document.getElementById("versionStatusId").value)
         }
-        
+
         let versionStatusId = document.getElementById("versionStatusId").value;
         let versionTypeId = document.getElementById("versionTypeId").value;
         console.log("D------------->VersionTypeId", versionTypeId);
@@ -1045,13 +1054,13 @@ class SupplyPlanVersionAndReview extends Component {
             entries: " ",
         });
 
-        const { programLst } = this.state;
-        let programList = programLst.length > 0
-            && programLst.map((item, i) => {
+        const { programs } = this.state;
+        let programList = programs.length > 0
+            && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
+                    <option key={i} value={item.id}>
                         {/* {getLabelText(item.label, this.state.lang)} */}
-                        {item.programCode}
+                        {item.code}
                     </option>
                 )
             }, this);
@@ -1311,7 +1320,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                     name="countryId"
                                                     id="countryId"
                                                     value={this.state.realmCountryId}
-                                                    onChange={(e) => { this.filterProgram(); this.dataChange(e) }}
+                                                    onChange={(e) => { this.getPrograms(); this.fetchData() }}
                                                 >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                     {countryList}</Input>
                                                 {!!this.props.error &&
