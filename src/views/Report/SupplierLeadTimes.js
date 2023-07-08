@@ -105,13 +105,15 @@ class SupplierLeadTimes extends Component {
             data[2] = outPutList[j].plannedToSubmittedLeadTime
             data[3] = outPutList[j].submittedToApprovedLeadTime
             data[4] = outPutList[j].approvedToShippedLeadTime
-            data[5] = outPutList[j].shippedToArrivedBySeaLeadTime
+            data[5] = outPutList[j].shippedToArrivedByRoadLeadTime
+            data[6] = outPutList[j].shippedToArrivedBySeaLeadTime
 
-            data[6] = outPutList[j].shippedToArrivedByAirLeadTime
-            data[7] = outPutList[j].arrivedToDeliveredLeadTime
-            data[8] = outPutList[j].totalSeaLeadTime
-            data[9] = outPutList[j].totalAirLeadTime
-            data[10] = outPutList[j].localProcurementAgentLeadTime
+            data[7] = outPutList[j].shippedToArrivedByAirLeadTime
+            data[8] = outPutList[j].arrivedToDeliveredLeadTime
+            data[9] = outPutList[j].totalRoadLeadTime
+            data[10] = outPutList[j].totalSeaLeadTime
+            data[11] = outPutList[j].totalAirLeadTime
+            data[12] = outPutList[j].localProcurementAgentLeadTime
             // data[13] = outPutList[j].
             outPutArray[count] = data;
             count++;
@@ -166,6 +168,11 @@ class SupplierLeadTimes extends Component {
                     // readOnly: true
                 },
                 {
+                    title: i18n.t('static.report.shippedToArrivedRoadLeadTime'),
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    // readOnly: true
+                },
+                {
                     title: i18n.t('static.report.shippedToArrivedSeaLeadTime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
                     // readOnly: true
@@ -177,6 +184,11 @@ class SupplierLeadTimes extends Component {
                 },
                 {
                     title: i18n.t('static.shipment.arrivedToreceivedLeadTime'),
+                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    // readOnly: true
+                },
+                {
+                    title: i18n.t('static.report.totalRoadLeadTime'),
                     type: 'numeric', mask: '#,##.00', decimal: '.',
                     // readOnly: true
                 },
@@ -288,9 +300,11 @@ class SupplierLeadTimes extends Component {
                 // ele.draftToSubmittedLeadTime,
                 ele.submittedToApprovedLeadTime == null ? '' : ele.submittedToApprovedLeadTime,
                 ele.approvedToShippedLeadTime == null ? '' : ele.approvedToShippedLeadTime,
+                ele.shippedToArrivedByRoadLeadTime == null ? '' : ele.shippedToArrivedByRoadLeadTime,
                 ele.shippedToArrivedBySeaLeadTime == null ? '' : ele.shippedToArrivedBySeaLeadTime,
                 ele.shippedToArrivedByAirLeadTime == null ? '' : ele.shippedToArrivedByAirLeadTime,
                 ele.arrivedToDeliveredLeadTime == null ? '' : ele.arrivedToDeliveredLeadTime,
+                ele.totalRoadLeadTime == undefined || ele.totalRoadLeadTime == null ? '' : ele.totalRoadLeadTime,
                 ele.totalSeaLeadTime == undefined || ele.totalSeaLeadTime == null ? '' : ele.totalSeaLeadTime,
                 ele.totalAirLeadTime == undefined || ele.totalAirLeadTime == null ? '' : ele.totalAirLeadTime,
                 ele.localProcurementAgentLeadTime == null ? '' : ele.localProcurementAgentLeadTime
@@ -429,9 +443,11 @@ class SupplierLeadTimes extends Component {
             // ele.draftToSubmittedLeadTime,
             ele.submittedToApprovedLeadTime,
             ele.approvedToShippedLeadTime,
+            ele.shippedToArrivedByRoadLeadTime,
             ele.shippedToArrivedBySeaLeadTime,
             ele.shippedToArrivedByAirLeadTime,
             ele.arrivedToDeliveredLeadTime,
+            ele.totalRoadLeadTime,
             ele.totalSeaLeadTime,
             ele.totalAirLeadTime,
             ele.localProcurementAgentLeadTime
@@ -443,7 +459,7 @@ class SupplierLeadTimes extends Component {
             startY: startYtable,
             head: [headers],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 57, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 47, halign: 'center' },
             columnStyles: {
                 // 0: { cellWidth: 170 },
                 // 1: { cellWidth: 171.89 },
@@ -1400,6 +1416,7 @@ class SupplierLeadTimes extends Component {
                                                 country: result.realmCountry.country,
                                                 plannedToSubmittedLeadTime: result.plannedToSubmittedLeadTime,
                                                 // draftToSubmittedLeadTime: draftToSubmittedLeadTime,
+                                                shippedToArrivedByRoadLeadTime: result.shippedToArrivedByRoadLeadTime,
                                                 shippedToArrivedBySeaLeadTime: result.shippedToArrivedBySeaLeadTime,
                                                 shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
                                                 arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
@@ -1407,6 +1424,7 @@ class SupplierLeadTimes extends Component {
 
                                                 totalAirLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(submittedToApprovedLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime),
                                                 totalSeaLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(submittedToApprovedLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime),
+                                                totalRoadLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(submittedToApprovedLeadTime) + parseFloat(approvedToShippedLeadTime) + parseFloat(result.shippedToArrivedByRoadLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime),
                                             }
                                             // }
 
@@ -1431,10 +1449,12 @@ class SupplierLeadTimes extends Component {
                                             // draftToSubmittedLeadTime: result.draftToSubmittedLeadTime,
                                             shippedToArrivedBySeaLeadTime: result.shippedToArrivedBySeaLeadTime,
                                             shippedToArrivedByAirLeadTime: result.shippedToArrivedByAirLeadTime,
+                                            shippedToArrivedByRoadLeadTime: result.shippedToArrivedByRoadLeadTime,
                                             arrivedToDeliveredLeadTime: result.arrivedToDeliveredLeadTime,
                                             submittedToApprovedLeadTime: result.submittedToApprovedLeadTime,
                                             totalAirLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByAirLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(result.submittedToApprovedLeadTime),
                                             totalSeaLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedBySeaLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(result.submittedToApprovedLeadTime),
+                                            totalRoadLeadTime: parseFloat(result.plannedToSubmittedLeadTime) + parseFloat(result.shippedToArrivedByRoadLeadTime) + parseFloat(result.arrivedToDeliveredLeadTime) + parseFloat(result.approvedToShippedLeadTime) + parseFloat(result.submittedToApprovedLeadTime),
                                         }
                                         var localProcurmentAgentJson = {
                                             planningUnit: result1[i].planningUnit,
@@ -1454,11 +1474,13 @@ class SupplierLeadTimes extends Component {
                                             plannedToSubmittedLeadTime: '',
                                             // draftToSubmittedLeadTime: result.draftToSubmittedLeadTime,
                                             shippedToArrivedBySeaLeadTime: '',
+                                            shippedToArrivedByRoadLeadTime: '',
                                             shippedToArrivedByAirLeadTime: '',
                                             arrivedToDeliveredLeadTime: '',
                                             submittedToApprovedLeadTime: '',
                                             totalAirLeadTime: '',
                                             totalSeaLeadTime: '',
+                                            totalRoadLeadTime: '',
                                         }
                                         outPutList.push(noProcurmentAgentJson);
                                         outPutList.push(localProcurmentAgentJson);
@@ -1719,6 +1741,15 @@ class SupplierLeadTimes extends Component {
 
             },
             {
+                dataField: 'shippedToArrivedByRoadLeadTime',
+                text: i18n.t('static.report.shippedToArrivedRoadLeadTime'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+            {
                 dataField: 'shippedToArrivedBySeaLeadTime',
                 text: i18n.t('static.report.shippedToArrivedSeaLeadTime'),
                 sort: true,
@@ -1739,6 +1770,15 @@ class SupplierLeadTimes extends Component {
             {
                 dataField: 'arrivedToDeliveredLeadTime',
                 text: i18n.t('static.shipment.arrivedToreceivedLeadTime'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                style: { width: '80px' },
+
+            },
+            {
+                dataField: 'totalRoadLeadTime',
+                text: i18n.t('static.report.totalRoadLeadTime'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',

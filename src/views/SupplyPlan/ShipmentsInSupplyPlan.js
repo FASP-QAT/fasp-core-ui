@@ -560,6 +560,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 var shipmentMode = 1;
                                                 if (shipmentList[i].shipmentMode == "Air") {
                                                     shipmentMode = 2;
+                                                }else if (shipmentList[i].shipmentMode == "Road") {
+                                                    shipmentMode = 3;
                                                 }
                                                 // if (shipmentList[i].erpFlag.toString() == "true" && this.props.shipmentPage != "shipmentDataEntry") {
                                                 //     erpType = "text";
@@ -708,7 +710,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     },
                                                     { type: 'autocomplete', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
                                                     { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT, validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 150 },
-                                                    { type: 'autocomplete', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
+                                                    { type: 'autocomplete', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') },{id:3,name:i18n.t('static.dataentry.road')}], width: 100 },
                                                     { type: 'autocomplete', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
                                                     { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80, readOnly: !shipmentEditable },
                                                     { type: 'text', title: i18n.t('static.shipmentDataentry.procurementAgentOrderNo'), width: 150 },
@@ -1083,6 +1085,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 var shippedToArrivedLeadTime = ""
                                                                                 if (shipmentMode == 2) {
                                                                                     shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                                                                }else if (shipmentMode == 3) {
+                                                                                    shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByRoadLeadTime);
                                                                                 } else {
                                                                                     shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                                                                 }
@@ -2011,6 +2015,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var shippedToArrivedLeadTime = ""
                     if (shipmentMode == 2) {
                         shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByAirLeadTime);
+                    }else if (shipmentMode == 3) {
+                        shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByRoadLeadTime);
                     } else {
                         shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedBySeaLeadTime);
                     }
@@ -2050,8 +2056,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     expectedPlannedDate = moment(expectedSubmittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                 } else {
                     expectedArrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                    if (shipmentMode == 3) {
+                    if (shipmentMode == 2) {
                         expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime * 30), 'days').format("YYYY-MM-DD");
+                    }if (shipmentMode == 3) {
+                        expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime * 30), 'days').format("YYYY-MM-DD");
                     } else {
                         expectedShippedDate = moment(expectedArrivedDate).subtract(parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime * 30), 'days').format("YYYY-MM-DD");
                     }
@@ -2423,6 +2431,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         var seaFreightPercentage = this.props.items.generalProgramJson.seaFreightPerc;
                         freightCost = Number(rate) * (Number(Number(seaFreightPercentage) / 100));
                         elInstance.setValueFromCoords(21, y, freightCost.toFixed(2), true);
+                    }else if (rowData[6] == 3) {
+                        var roadFreightPercentage = this.props.items.generalProgramJson.roadFreightPerc;
+                        freightCost = Number(rate) * (Number(Number(roadFreightPercentage) / 100));
+                        elInstance.setValueFromCoords(21, y, freightCost.toFixed(2), true);
                     } else {
                         var airFreightPercentage = this.props.items.generalProgramJson.airFreightPerc;
                         freightCost = Number(rate) * (Number(Number(airFreightPercentage) / 100));
@@ -2446,6 +2458,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 if (rowData[6] == 1) {
                     var seaFreightPercentage = this.props.items.generalProgramJson.seaFreightPerc;
                     freightCost = Number(rate) * (Number(Number(seaFreightPercentage) / 100));
+                    elInstance.setValueFromCoords(21, y, freightCost.toFixed(2), true);
+                }else if (rowData[6] == 3) {
+                    var roadFreightPercentage = this.props.items.generalProgramJson.roadFreightPerc;
+                    freightCost = Number(rate) * (Number(Number(roadFreightPercentage) / 100));
                     elInstance.setValueFromCoords(21, y, freightCost.toFixed(2), true);
                 } else {
                     var airFreightPercentage = this.props.items.generalProgramJson.airFreightPerc;
@@ -3037,6 +3053,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var shippedToArrivedLeadTime = ""
                 if (shipmentMode == 2) {
                     shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByAirLeadTime);
+                }if (shipmentMode == 3) {
+                    shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByRoadLeadTime);
                 } else {
                     shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedBySeaLeadTime);
                 }
@@ -3149,6 +3167,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var shippedToArrivedLeadTime = ""
                                 if (shipmentMode == 2) {
                                     shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                }else if (shipmentMode == 3) {
+                                    shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedByRoadLeadTime);
                                 } else {
                                     shippedToArrivedLeadTime = Number(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                 }
@@ -3814,6 +3834,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             var shipmentMode = "Sea";
                             if (map.get("6") == 2) {
                                 shipmentMode = "Air";
+                            }else if (map.get("6") == 3) {
+                                shipmentMode = "Road";
                             }
                             var shipmentDatesJson = map.get("30");
                             var plannedDate = shipmentDatesJson.plannedDate != "" && shipmentDatesJson.plannedDate != "Invalid date" ? shipmentDatesJson.plannedDate : null;

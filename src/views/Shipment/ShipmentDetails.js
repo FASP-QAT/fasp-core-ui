@@ -245,7 +245,7 @@ export default class ShipmentDetails extends React.Component {
             worksheet.getCell('F' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
         }
 
-        let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air')];
+        let shipmentModeDropdown = [i18n.t('static.supplyPlan.sea'), i18n.t('static.supplyPlan.air'), i18n.t('static.dataentry.road')];
         worksheet.dataValidations.add('G2:G100', {
             type: 'list',
             allowBlank: false,

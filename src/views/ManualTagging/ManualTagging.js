@@ -2259,7 +2259,7 @@ export default class ManualTagging extends Component {
                                                             },
                                                             rate: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)),//Price per planning unit
                                                             shipmentId: 0,
-                                                            shipmentMode: (tableJson[y][16].shipBy == "Land" || tableJson[y][16].shipBy == "Ship" ? "Sea" : tableJson[y][16].shipBy == "Air" ? "Air" : "Sea"),//Yeh
+                                                            shipmentMode: (tableJson[y][16].shipBy == "Land"?"Road":tableJson[y][16].shipBy == "Air" ? "Air" : "Sea"),//Yeh
                                                             shipmentStatus: tableJson[y][15],
                                                             suggestedQty: 0,
                                                             budget: {
@@ -2362,7 +2362,7 @@ export default class ManualTagging extends Component {
                                                         },
                                                         rate: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)),//Price per planning unit
                                                         shipmentId: 0,
-                                                        shipmentMode: (getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Land" || getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Ship" ? "Sea" : getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Air" ? "Air" : "Sea"),//Yeh
+                                                        shipmentMode: (getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Land"?"Road": getUniqueOrderNoAndPrimeLineNoList[uq][16].shipBy == "Air" ? "Air" : "Sea"),//Yeh
                                                         shipmentStatus: getUniqueOrderNoAndPrimeLineNoList[uq][15],
                                                         suggestedQty: 0,
                                                         budget: shipmentList[shipmentIndex].budget,
