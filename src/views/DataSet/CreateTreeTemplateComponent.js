@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP, API_URL } from '../../Constants.js'
+import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP, API_URL, } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -47,7 +47,7 @@ import docicon from '../../assets/img/doc.png';
 import AggregationNode from '../../assets/img/Aggregation-icon.png';
 import { saveAs } from "file-saver";
 import { convertInchesToTwip, Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
-import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculationForTreeTemplate';
+import { calculateModelingDataForTreeTemplate } from '../../views/DataSet/ModelingDataCalculationForTreeTemplate';
 import PDFDocument from 'pdfkit-nodejs-webpack';
 import blobStream from 'blob-stream';
 import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit';
@@ -58,6 +58,8 @@ import 'react-select/dist/react-select.min.css';
 import { Prompt } from 'react-router';
 import AuthenticationService from '../Common/AuthenticationService';
 import RotatedText from 'basicprimitivesreact/dist/umd/Templates/RotatedText';
+import CryptoJS from 'crypto-js'
+import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import DropdownService from '../../api/DropdownService';
 
 const entityname = 'Tree Template';
@@ -83,6 +85,57 @@ let initialValuesNodeData = {
     nodeUnitId: "",
     percentageOfParent: ""
     // nodeValue: ""
+}
+
+const validationSchemaCreateTree = function (values) {
+    return Yup.object().shape({
+        datasetIdModalForCreateTree: Yup.string()
+            .test('datasetIdModalForCreateTree', 'Please select program',
+                function (value) {
+                    if (document.getElementById("datasetIdModalForCreateTree").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        treeNameForCreateTree: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.validation.selectTreeName')),
+        forecastMethodIdForCreateTree: Yup.string()
+            .test('forecastMethodIdForCreateTree', i18n.t('static.validation.selectForecastMethod'),
+                function (value) {
+                    if (document.getElementById("forecastMethodIdForCreateTree").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        regionIdForCreateTree: Yup.string()
+                    .required(i18n.t('static.common.regiontext'))
+                    .typeError(i18n.t('static.common.regiontext')),
+    })
+}
+
+const validateCreateTree = (getValidationSchema) => {
+    return (values) => {
+        const validationSchemaCreateTree = getValidationSchema(values)
+        try {
+            validationSchemaCreateTree.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorCreateTree(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorCreateTree = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
 }
 
 const validationSchemaNodeData = function (values) {
@@ -526,8 +579,8 @@ function addCommasThreeDecimal(cell1, row) {
 }
 
 export default class CreateTreeTemplate extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.pickAMonth5 = React.createRef()
         this.pickAMonth4 = React.createRef()
         this.pickAMonth2 = React.createRef()
@@ -764,7 +817,29 @@ export default class CreateTreeTemplate extends Component {
             lastRowDeleted: false,
             modelingChanged: false,
             levelModal: false,
-            nodeTransferDataList: []
+            nodeTransferDataList: [],
+            editable:AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE')?true:false,
+            treeTemplateList:[],
+            treeTemplateId:this.props.match.params.templateId!=undefined && this.props.match.params.templateId!=-1?this.props.match.params.templateId:"",
+            isModalForCreateTree:false,
+            treeNameForCreateTree:"",
+            forecastMethodForCreateTree:{
+                id:"",
+                label:{
+                    label_en:""
+                }
+            },
+            datasetIdModalForCreateTree:"",
+            regionIdForCreateTree: '',
+            regionListForCreateTree: [],
+            regionValuesForCreateTree: [],
+            missingPUListForCreateTree:[],
+            forecastMethodListForCreateTree:[],
+            datasetListForCreateTree:[],
+            programListForCreateTree:[],
+            activeForCreateTree: true,
+            datasetListJexcelForCreateTree:{},
+            treeTemplateForCreateTree:{}
 
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -871,6 +946,8 @@ export default class CreateTreeTemplate extends Component {
         this.filterUsageTemplateList = this.filterUsageTemplateList.bind(this);
         this.generateBranchFromTemplate = this.generateBranchFromTemplate.bind(this);
         this.cancelNodeDataClicked=this.cancelNodeDataClicked.bind(this);
+        this.createTree=this.createTree.bind(this)
+        this.modelOpenCloseForCreateTree=this.modelOpenCloseForCreateTree.bind(this)
     }
 
     cancelNodeDataClicked(){
@@ -889,7 +966,230 @@ export default class CreateTreeTemplate extends Component {
             })
         }
     }
-    
+
+    modelOpenCloseForCreateTree() {
+        this.setState({
+            isModalForCreateTree: !this.state.isModalForCreateTree,
+            treeNameForCreateTree:"",
+            forecastMethodForCreateTree:{
+                id:"",
+                label:{
+                    label_en:""
+                }
+            },
+            datasetIdModalForCreateTree:"",
+            regionIdForCreateTree: '',
+            regionListForCreateTree: [],
+            regionValuesForCreateTree: [],
+            missingPUListForCreateTree:[],
+            activeForCreateTree: true,
+            datasetListJexcelForCreateTree:{},
+            treeTemplateForCreateTree:{}
+        })
+    }
+
+    touchAllCreateTree(setTouched, errors) {
+        setTouched({
+            treeNameForCreateTree: true,
+            forecastMethodIdForCreateTree: true,
+            regionIdForCreateTree: true,
+            datasetIdModalForCreateTree: true
+        }
+        )
+        this.validateFormCreateTree(errors)
+    }
+
+    validateFormCreateTree(errors) {
+        this.findFirstErrorCreateTree('userForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorCreateTree(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
+    getRegionListForCreateTree(datasetId) {
+        console.log("datasetId details---", datasetId);
+
+        var regionListForCreateTree = [];
+        var regionMultiListForCreateTree = [];
+        if (datasetId != 0 && datasetId != "" && datasetId != null) {
+            var programForCreateTree = this.state.datasetListForCreateTree.filter(c=>c.id==datasetId);
+            if(programForCreateTree.length>0){
+                var databytes = CryptoJS.AES.decrypt(programForCreateTree[0].programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+            regionListForCreateTree = programData.regionList;
+            regionListForCreateTree.map(c => {
+                regionMultiListForCreateTree.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
+            })
+            if(regionMultiListForCreateTree.length==1){
+                regionListForCreateTree = [];
+                var regions = regionMultiListForCreateTree;
+                for (let i = 0; i < regions.length; i++) {
+                    var json = {
+                        id: regions[i].value,
+                        label: {
+                            label_en: regions[i].label
+                        }
+                    }
+                    regionListForCreateTree.push(json);
+                }
+            }
+        }
+        this.setState({
+            regionListForCreateTree,
+            regionMultiListForCreateTree,
+            missingPUListForCreateTree: [],
+            datasetListJexcelForCreateTree:programData,
+            regionValuesForCreateTree:regionMultiListForCreateTree.length==1?regionMultiListForCreateTree:[],
+        }, () => {
+                this.findMissingPUsForCreateTree();
+        });
+    }
+    }
+
+    findMissingPUsForCreateTree() {
+        var missingPUListForCreateTree = [];
+        var json;
+        var treeTemplateForCreateTree = this.state.treeTemplateForCreateTree;
+        if (this.state.datasetIdModalForCreateTree != "" && this.state.datasetIdModalForCreateTree != null) {
+            var dataset = this.state.datasetListJexcelForCreateTree;
+            var puNodeList = treeTemplateForCreateTree.flatList.filter(x => x.payload.nodeType.id == 5);
+            var planningUnitList = dataset.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
+            for (let i = 0; i < puNodeList.length; i++) {
+                if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
+                    var parentNodeData = treeTemplateForCreateTree.flatList.filter(x => x.id == puNodeList[i].parent)[0];
+                    var productCategory=parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory;
+                    json = {
+                        productCategory: productCategory!=undefined?productCategory:{id:"",label:{label_en:""}},
+                        planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
+                    };
+                    missingPUListForCreateTree.push(json);
+                }
+            }
+        }
+        if (missingPUListForCreateTree.length > 0) {
+            missingPUListForCreateTree = missingPUListForCreateTree.filter((v, i, a) => a.findIndex(v2 => (v2.planningUnit.id === v.planningUnit.id)) === i)
+        }
+        this.setState({
+            missingPUListForCreateTree
+        }, () => {
+            this.buildMissingPUJexcelForCreateTree();
+        });
+    }
+
+    buildMissingPUJexcelForCreateTree() {
+        var missingPUListForCreateTree = this.state.missingPUListForCreateTree;
+        var dataArray = [];
+        let count = 0;
+        if (missingPUListForCreateTree.length > 0) {
+            for (var j = 0; j < missingPUListForCreateTree.length; j++) {
+                data = [];
+                // data[0] = missingPUList[j].month
+                // data[1] = missingPUList[j].startValue
+                data[0] = getLabelText(missingPUListForCreateTree[j].productCategory.label, this.state.lang)
+                data[1] = getLabelText(missingPUListForCreateTree[j].planningUnit.label, this.state.lang) + " | " + missingPUListForCreateTree[j].planningUnit.id
+                dataArray[count] = data;
+                count++;
+            }
+        }
+        this.el = jexcel(document.getElementById("missingPUJexcelForCreateTree"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("missingPUJexcelForCreateTree"), true);
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [20, 80],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    // 0
+                    title: i18n.t('static.productCategory.productCategory'),
+                    type: 'test',
+                    // readOnly: true
+                },
+                {
+                    // 1
+                    title: i18n.t('static.product.product'),
+                    type: 'text',
+                    // readOnly: true
+
+                }
+
+            ],
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
+            editable: false,
+            onload: this.loadedMissingPUForCreateTree,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: false,
+            columnSorting: true,
+            // tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+
+        };
+        var missingPUJexcelForCreateTree = jexcel(document.getElementById("missingPUJexcelForCreateTree"), options);
+        this.el = missingPUJexcelForCreateTree;
+        this.setState({
+            missingPUJexcelForCreateTree
+        }
+        );
+    }
+
+    loadedMissingPUForCreateTree = function (instance, cell, x, y, value) {
+        jExcelLoadedFunctionOnlyHideRow(instance, 1);
+    }
+
+    handleRegionChangeForCreateTree = (regionIds) => {
+        console.log("regionIds---", regionIds);
+
+        this.setState({
+            regionValuesForCreateTree: regionIds.map(ele => ele),
+            // regionLabels: regionIds.map(ele => ele.label)
+        }, () => {
+            // console.log("regionLabels---", this.state.regionLabels);
+            // if ((this.state.regionValues).length > 0) {
+            var regionListForCreateTree = [];
+            var regions = this.state.regionValuesForCreateTree;
+            for (let i = 0; i < regions.length; i++) {
+                var json = {
+                    id: regions[i].value,
+                    label: {
+                        label_en: regions[i].label
+                    }
+                }
+                regionListForCreateTree.push(json);
+            }
+            this.setState({ regionListForCreateTree });
+            // }
+        })
+    }
+
     filterUsageTemplateList(forecastingUnitId) {
         var usageTemplateList;
         if (forecastingUnitId > 0) {
@@ -1116,8 +1416,8 @@ export default class CreateTreeTemplate extends Component {
                 // (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
                 (items[i].payload.nodeDataMap[0])[0].fuPerMonth = fuPerMonth;
             }
-            console.log("This.state Test@123", this.state)
-            if (items[i].payload.nodeType.id == 5) {
+            // console.log("This.state Test@123",this.state)
+            if(items[i].payload.nodeType.id==5){
                 var findNodeIndexFU = items.findIndex(n => n.id == items[i].parent);
                 var forecastingUnitId = (items[findNodeIndexFU].payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id;
                 PlanningUnitService.getActivePlanningUnitListByFUId(forecastingUnitId).then(response => {
@@ -1572,7 +1872,8 @@ export default class CreateTreeTemplate extends Component {
     formSubmitLoader() {
         // alert("load 1")
         this.setState({
-            modelingJexcelLoader: true
+            modelingJexcelLoader: true,
+            isTemplateChanged:true
         }, () => {
             // alert("load 2")
             setTimeout(() => {
@@ -1631,7 +1932,7 @@ export default class CreateTreeTemplate extends Component {
 
         treeTemplate.flatList = items;
         console.log("after---*", treeTemplate)
-        calculateModelingData(treeTemplate, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), 0, type, -1, true);
+        calculateModelingDataForTreeTemplate(treeTemplate, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), 0, type, -1, true);
     }
 
     updateState(parameterName, value) {
@@ -1699,6 +2000,53 @@ export default class CreateTreeTemplate extends Component {
 
 
             }
+            if (parameterName == 'programId' && value != "") {
+                try{
+                    console.log("In else if Test@123")
+                console.log("tempTreeId---", this.state.tempTreeId)
+                var programId = this.state.programId;
+                var program = this.state.datasetListJexcelForCreateTree;
+                console.log("my program---", program);
+                let tempProgram = JSON.parse(JSON.stringify(program))
+                let treeList = tempProgram.treeList;
+                var tree = treeList.filter(x => x.treeId == this.state.tempTreeId)[0];
+                console.log("my tree---", tree);
+                var items = tree.tree.flatList;
+                console.log("my items---", items);
+                var nodeDataMomList = this.state.nodeDataMomList;
+                console.log("nodeDataMomList---", nodeDataMomList);
+                if (nodeDataMomList.length > 0) {
+                    for (let i = 0; i < nodeDataMomList.length; i++) {
+                        // console.log("nodeDataMomList[i]---", nodeDataMomList[i])
+                        var nodeId = nodeDataMomList[i].nodeId;
+                        var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
+                        // console.log("this.state.nodeDataMomList---", this.state.nodeDataMomList);
+                        // console.log("my items---", items);
+                        // console.log("my nodeId---", nodeId);
+                        var node = items.filter(n => n.id == nodeId)[0];
+                        // console.log("node---", node);
+                        (node.payload.nodeDataMap[1])[0].nodeDataMomList = nodeDataMomListForNode;
+                        var findNodeIndex = items.findIndex(n => n.id == nodeId);
+                        // console.log("findNodeIndex---", findNodeIndex);
+                        items[findNodeIndex] = node;
+                    }
+                }
+                tree.flatList = items;
+                console.log("TempTreeId Test@123",this.state.tempTreeId)
+                var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);
+                console.log("Tree Test@123",tree)
+                console.log("findTreeIndex---", findTreeIndex);
+                treeList[findTreeIndex] = tree;
+                tempProgram.treeList = treeList;
+                var programCopy = JSON.parse(JSON.stringify(tempProgram));
+                var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
+                tempProgram.programData = programData;
+                // var treeTemplateId = document.getElementById('templateId').value;
+                this.saveTreeData(3, tempProgram, this.state.treeTemplate.treeTemplateId, programId, this.state.tempTreeId, programCopy);
+            }catch(error){
+                console.log("Error Test@123",error)
+            }
+            }
             this.updateTreeData(this.state.monthId);
             if (parameterName == 'type' && value == 0) {
                 this.calculateValuesForAggregateNode(this.state.items);
@@ -1707,9 +2055,113 @@ export default class CreateTreeTemplate extends Component {
         })
     }
 
+    saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy) {
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var version = tempProgram.currentVersion.versionId;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+            var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
+            var id = tempProgram.programId + "_v" + version + "_uId_" + userId;
+            var json = {
+                id: id,
+                programCode: tempProgram.programCode,
+                versionList: tempProgram.versionList,
+                programData: programData,
+                programId: tempProgram.programId,
+                version: version,
+                programName: (CryptoJS.AES.encrypt(JSON.stringify((tempProgram.label)), SECRET_KEY)).toString(),
+                userId: userId
+            }
+            var programRequest = programTransaction.put(json);
+
+            transaction.oncomplete = function (event) {
+                console.log("in side datasetDetails")
+                db1 = e.target.result;
+                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetIdModalForCreateTree);
+                datasetDetailsRequest.onsuccess = function (e) {         
+                  var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                  datasetDetailsRequestJson.changed = 1;
+                  var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                  datasetDetailsRequest1.onsuccess = function (event) {
+
+                      }}
+                this.setState({
+                    loading: false,
+                    message: i18n.t('static.mt.dataUpdateSuccess'),
+                    color: "green",
+                }, () => {
+
+                    if (operationId == 3) {
+                        // if (treeTemplateId != "" && treeTemplateId != null) {
+                        //     console.log("programId 1---", programId);
+                        //     calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false);
+                        // } else {
+                        // confirmAlert({
+                        //     message: i18n.t('static.listTree.manageTreePage'),
+                        //     buttons: [
+                        //         {
+                        //             label: i18n.t('static.program.yes'),
+                        //             onClick: () => {
+                                        this.props.history.push({
+                                            pathname: `/dataSet/buildTree/tree/${treeId}/${id}`,
+                                            // state: { role }
+                                        });
+
+                        //             }
+                        //         },
+                        //         {
+                        //             label: i18n.t('static.program.no'),
+                        //             onClick: () => {
+                        //                 // this.getDatasetList();
+                        //                 this.componentDidMount();
+                        //             }
+                        //         }
+                        //     ]
+                        // });
+                        // }
+                    } else {
+                        // this.getDatasetList();
+                        // this.getPrograms();
+                    }
+
+                });
+                console.log("Data update success1");
+                // alert("success");
+
+
+            }.bind(this);
+            transaction.onerror = function (event) {
+                this.setState({
+                    loading: false,
+                    color: "red",
+                }, () => {
+                    this.hideSecondComponent();
+                });
+                console.log("Data update errr");
+            }.bind(this);
+        }.bind(this);
+
+    }
+
     updateMomDataInDataSet() {
         this.setState({
-            momJexcelLoader: true
+            momJexcelLoader: true,
+            isTemplateChanged:true
         }, () => {
             setTimeout(() => {
                 var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
@@ -1757,7 +2209,7 @@ export default class CreateTreeTemplate extends Component {
                         treeTemplate
                     }, () => {
                         console.log("treeTemplate mom---", treeTemplate);
-                        calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
+                        calculateModelingDataForTreeTemplate(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
                     });
                 });
 
@@ -3132,7 +3584,7 @@ export default class CreateTreeTemplate extends Component {
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.0000%', decimal: '.',
-                    readOnly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') ? false : true,
+                    readOnly: this.state.editable ? false : true,
 
                 },
                 {
@@ -3252,6 +3704,7 @@ export default class CreateTreeTemplate extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            editable:this.state.editable,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -3403,6 +3856,7 @@ export default class CreateTreeTemplate extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
+            editable:this.state.editable,
             onchange: this.changed1,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el;
@@ -3707,6 +4161,7 @@ export default class CreateTreeTemplate extends Component {
             //     entries: '',
             // },
             onload: this.loaded,
+            editable:this.state.editable,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -3911,7 +4366,7 @@ export default class CreateTreeTemplate extends Component {
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
 
-            if (y == 8 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES')) {
+            if (y == 8 && this.state.editable) {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
                 if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
@@ -4350,7 +4805,7 @@ export default class CreateTreeTemplate extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable: true,
+            editable: this.state.editable,
             onload: this.loadedPer,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -4560,7 +5015,8 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             // items: [...items, newItem],
             items,
-            cursorItem: nodeId
+            cursorItem: nodeId,
+            isTemplateChanged:true
         }, () => {
             console.log("on add items-------", this.state.items);
             this.calculateMOMData(0, 2);
@@ -4568,6 +5024,163 @@ export default class CreateTreeTemplate extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/dataset/listTreeTemplate/`)
+    }
+
+    createTree(){
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+            var planningunitTransaction = db1.transaction(['forecastMethod'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('forecastMethod');
+            var planningunitRequest = planningunitOs.getAll();
+            planningunitRequest.onsuccess = function (e) {
+
+                var programTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+            var programOs = programTransaction.objectStore('datasetDetails');
+            var programRequest = programOs.getAll();
+            programRequest.onsuccess = function (e) {
+
+                var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
+            var datasetOs = datasetTransaction.objectStore('datasetData');
+            var datasetRequest = datasetOs.getAll();
+            datasetRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                console.log("myResult===============2", myResult)
+                this.setState({
+                    forecastMethodListForCreateTree: myResult.filter(x => x.forecastMethodTypeId == 1),
+                    programListForCreateTree:programRequest.result.filter(c=>c.userId==userId),
+                    datasetListForCreateTree:datasetRequest.result.filter(c=>c.userId==userId)
+                }, () => {
+
+                    this.setState({
+                        isModalForCreateTree:!this.state.isModalForCreateTree,
+                        treeTemplateForCreateTree:this.state.treeTemplate,
+                        treeNameForCreateTree: this.state.treeTemplate.label.label_en,
+                        activeForCreateTree: this.state.treeTemplate.active,
+                        forecastMethodForCreateTree: this.state.treeTemplate.forecastMethod,
+                        regionIdForCreateTree: '',
+                        regionListForCreateTree: [],
+                        regionValuesForCreateTree: [],
+                        notesForCreateTree: this.state.treeTemplate.notes,
+                        missingPUListForCreateTree: [],
+                        datasetIdModalForCreateTree:""
+                    },()=>{
+                        if(this.state.programListForCreateTree.length==1){
+                            var event={
+                                target:{
+                                    name:"datasetIdModalForCreateTree",
+                                    value:this.state.programListForCreateTree[0].id,
+                                }
+                            }
+                            this.dataChange(event)
+                        }
+                    })
+                })
+            }.bind(this);
+        }.bind(this);
+        }.bind(this);
+        }.bind(this)
+    }
+
+    createTreeForCreateTree(){
+        // var program = this.state.treeFlag ? (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]) : (this.state.datasetList.filter(x => x.id == programId)[0]);
+        var program = this.state.datasetListJexcelForCreateTree;
+        let tempProgram = JSON.parse(JSON.stringify(program))
+        let treeList = program.treeList;
+        console.log("delete treeList---", treeList);
+        var treeTemplateId = '';
+        var treeId=""
+        var maxTreeId = treeList.length > 0 ? Math.max(...treeList.map(o => o.treeId)) : 0;
+            treeId = parseInt(maxTreeId) + 1;
+            var nodeDataMap = {};
+            var tempArray = [];
+            var tempJson = {};
+            var tempTree = {};
+            // var curMonth = moment(new Date()).format('YYYY-MM-DD');
+            // console
+            var curMonth = moment(program.currentVersion.forecastStartDate).format('YYYY-MM-DD');
+            // treeTemplateId = document.getElementById('templateId').value;
+            // console.log("treeTemplateId===", treeTemplateId);
+            // if (treeTemplateId != "" && treeTemplateId != 0) {
+                var treeTemplate = this.state.treeTemplateForCreateTree;
+                // console.log("treeTemplate 123----", treeTemplate);
+                var flatList = JSON.parse(JSON.stringify(treeTemplate.flatList));
+                for (let i = 0; i < flatList.length; i++) {
+                    nodeDataMap = {};
+                    tempArray = [];
+                    if (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
+                        for (let j = 0; j < flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length; j++) {
+                            var modeling = (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j];
+                            // var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
+                            // var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
+                            var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
+                            console.log("startMonthNoModeling---", startMonthNoModeling);
+                            modeling.startDate = moment(curMonth).startOf('month').add(startMonthNoModeling, 'months').format("YYYY-MM-DD");
+                            var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
+                            console.log("stopMonthNoModeling---", stopMonthNoModeling);
+                            modeling.stopDate = moment(curMonth).startOf('month').add(stopMonthNoModeling, 'months').format("YYYY-MM-DD");
+
+
+                            console.log("modeling---", modeling);
+                            (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j] = modeling;
+                        }
+                    }
+                    // console.log("flatList[i]---", flatList[i]);
+                    tempJson = flatList[i].payload.nodeDataMap[0][0];
+                    if (flatList[i].payload.nodeType.id != 1) {
+                        // console.log("month from tree template---", flatList[i].payload.nodeDataMap[0][0].monthNo + " cur month---", curMonth + " final result---", moment(curMonth).startOf('month').add(flatList[i].payload.nodeDataMap[0][0].monthNo, 'months').format("YYYY-MM-DD"))
+                        var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo - 1)
+                        tempJson.month = moment(curMonth).startOf('month').add(monthNo, 'months').format("YYYY-MM-DD");
+                    }
+                    tempArray.push(tempJson);
+                    nodeDataMap[1] = tempArray;
+                    flatList[i].payload.nodeDataMap = nodeDataMap;
+                }
+                // console.log("treeTemplate@@@@@@@@@@@@@@",treeTemplate)
+                tempTree = {
+                    treeId: treeId,
+                    active: this.state.activeForCreateTree,
+                    forecastMethod: this.state.forecastMethodForCreateTree,
+                    label: {
+                        label_en: this.state.treeNameForCreateTree,
+                        label_fr: '',
+                        label_sp: '',
+                        label_pr: ''
+                    },
+                    notes: this.state.notesForCreateTree,
+                    regionList: this.state.regionListForCreateTree,
+                    levelList: treeTemplate.levelList,
+                    scenarioList: [{
+                        id: 1,
+                        label: {
+                            label_en: i18n.t('static.realm.default'),
+                            label_fr: '',
+                            label_sp: '',
+                            label_pr: ''
+                        },
+                        active: true,
+                        notes: ''
+                    }],
+                    tree: {
+                        flatList: flatList
+                    }
+                }
+                treeList.push(tempTree);
+        // }
+        console.log("TreeList@@@@@@@@@@@@@@", treeList)
+        tempProgram.treeList = treeList;
+        var programCopy = JSON.parse(JSON.stringify(tempProgram));
+        // var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
+        // tempProgram = programData;
+        // if (operationId == 3) {
+            programCopy.programData = tempProgram;
+            calculateModelingData(programCopy, this, this.state.datasetIdModalForCreateTree, 0, 1, 1, treeId, false, true,true);
     }
 
 
@@ -6002,6 +6615,58 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
             );
+            DropdownService.getTreeTemplateListForDropdown().then(response => {
+                console.log("tree template list---", response.data)
+                var treeTemplateList = response.data.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                this.setState({
+                    treeTemplateList,
+                })
+            })
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+    
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
         // DatasetService.getNodeTypeList().then(response => {
         //     console.log("node type list---", response.data);
         //     var listArray = response.data;
@@ -6056,8 +6721,8 @@ export default class CreateTreeTemplate extends Component {
         //         }
         //     );
         setTimeout(() => {
-            if (this.props.match.params.templateId != -1 || this.state.treeTemplate.treeTemplateId > 0) {
-                var treeTemplateId = this.props.match.params.templateId != -1 ? this.props.match.params.templateId : this.state.treeTemplate.treeTemplateId;
+            if (this.state.treeTemplateId != "" || this.state.treeTemplate.treeTemplateId > 0) {
+                var treeTemplateId = this.state.treeTemplateId != "" ? this.state.treeTemplateId : this.state.treeTemplate.treeTemplateId;
                 DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
                     console.log("my tree---", response.data);
                     var items = response.data.flatList;
@@ -6575,11 +7240,89 @@ export default class CreateTreeTemplate extends Component {
         console.log("event---", event);
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
+        if (event.target.name == "treeNameForCreateTree") {
+            this.setState({
+                treeNameForCreateTree: event.target.value,
+            });
+        }
+
+        if (event.target.name == "forecastMethodIdForCreateTree") {
+            var forecastMethodForCreateTree = document.getElementById("forecastMethodIdForCreateTree");
+            var selectedTextForCreateTree = forecastMethodForCreateTree.options[forecastMethodForCreateTree.selectedIndex].text;
+            let label = {
+                label_en: selectedTextForCreateTree,
+                label_fr: '',
+                label_sp: '',
+                label_pr: ''
+            }
+            this.setState({
+                forecastMethodForCreateTree: {
+                    id: event.target.value,
+                    label: label
+                },
+            });
+        }
+
+        if (event.target.name == "notesForCreateTree") {
+            this.setState({
+                notesForCreateTree: event.target.value,
+            });
+        }
+        if (event.target.name == "activeForCreateTree") {
+            this.setState({
+                activeForCreateTree: event.target.id === "active11ForCreateTree" ? false : true
+            });
+
+        }
+
+        if (event.target.name == "datasetIdModalForCreateTree") {
+            // var realmCountryId = "";
+            if (event.target.value != "") {
+                // var program = (this.state.datasetList.filter(x => x.id == event.target.value)[0]);
+                // console.log("program for display---",program);
+                // realmCountryId = program.programData.realmCountry.realmCountryId;
+            }
+            this.setState({
+                // realmCountryId,
+                datasetIdModalForCreateTree: event.target.value,
+            }, () => {
+                localStorage.setItem("sesDatasetId", event.target.value);
+                this.getRegionListForCreateTree(event.target.value);
+                // if (document.getElementById('templateId').value != "") {
+                //     this.findMissingPUs();
+                // }
+            });
+        }
 
         if (event.target.name === "branchTemplateId") {
             this.setState({ branchTemplateId: event.target.value }, () => {
 
             });
+        }
+        if (event.target.name === "treeTemplateId") {
+            var cont = false;
+        if (this.state.isChanged == true || this.state.isTemplateChanged == true) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            if(event.target.value!=""){
+                this.setState({
+                    loading:true,
+                    isTemplateChanged:false,
+                    isChanged:false,
+                    treeTemplateId:event.target.value
+                },()=>{
+                    this.componentDidMount()
+                })
+            }
+        }
         }
 
         if (event.target.name == "calculatorStartDate") {
@@ -6947,9 +7690,10 @@ export default class CreateTreeTemplate extends Component {
                 currentTargetChangeNumberEdit: false
             });
         }
-
-
-        this.setState({ currentItemConfig, isChanged: true }, () => {
+        if (event.target.name != "treeNameForCreateTree" && event.target.name != "forecastMethodIdForCreateTree" && event.target.name != "notesForCreateTree" && event.target.name != "activeForCreateTree" && event.target.name != "datasetIdModalForCreateTree" && event.target.name!="treeTemplateId" && event.target.name != "monthId") {
+            this.setState({isChanged: true})
+        }
+        this.setState({ currentItemConfig }, () => {
             console.log("after state update---", this.state.currentItemConfig);
             if (flag) {
                 if (event.target.name === "planningUnitId") {
@@ -7181,7 +7925,7 @@ export default class CreateTreeTemplate extends Component {
         console.log("end>>>", Date.now());
     }
     onRemoveButtonClick(itemConfig) {
-        this.setState({ loading: true }, () => {
+        this.setState({ loading: true,isTemplateChanged:true }, () => {
             var { items } = this.state;
             const ids = items.map(o => o.id)
             const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
@@ -7828,7 +8572,7 @@ export default class CreateTreeTemplate extends Component {
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             if (!this.state.isSubmitClicked) {
-                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true, isTemplateChanged:true }, () => {
                                     console.log("all ok>>>");
                                     setTimeout(() => {
                                         console.log("inside set timeout on submit")
@@ -7901,6 +8645,7 @@ export default class CreateTreeTemplate extends Component {
                                                         invalid={touched.nodeTitle && !!errors.nodeTitle}
                                                         onBlur={handleBlur}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        readOnly={!this.state.editable}
                                                         value={this.state.currentItemConfig.context.payload.label.label_en}>
                                                     </Input>
                                                     <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
@@ -7923,6 +8668,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="nodeTypeId"
                                                         name="nodeTypeId"
                                                         bsSize="sm"
+                                                        disabled={!this.state.editable}
                                                         valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
                                                         invalid={touched.nodeTypeId && !!errors.nodeTypeId}
                                                         onBlur={handleBlur}
@@ -7957,7 +8703,7 @@ export default class CreateTreeTemplate extends Component {
                                                         onBlur={handleBlur}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         required
-                                                        disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 && this.state.currentItemConfig.context.parent != null ? true : false}
+                                                        disabled={!this.state.editable?true:this.state.currentItemConfig.context.payload.nodeType.id > 3 && this.state.currentItemConfig.context.parent != null ? true : false}
                                                         value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.parent != null ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
@@ -8006,6 +8752,7 @@ export default class CreateTreeTemplate extends Component {
                                                         onBlur={handleBlur}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         required
+                                                        disabled={!this.state.editable}
                                                         value={this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
@@ -8037,6 +8784,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="percentageOfParent"
                                                             name="percentageOfParent"
                                                             bsSize="sm"
+                                                            readOnly={!this.state.editable}
                                                             valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
                                                             invalid={touched.percentageOfParent && !!errors.percentageOfParent}
                                                             onBlur={handleBlur}
@@ -8059,6 +8807,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <Input type="text"
                                                         id="parentValue"
                                                         name="parentValue"
+                                                        readOnly={!this.state.editable}
                                                         bsSize="sm"
                                                         readOnly={true}
                                                         onChange={(e) => { this.dataChange(e) }}
@@ -8083,7 +8832,7 @@ export default class CreateTreeTemplate extends Component {
                                                         valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue) != ''}
                                                         invalid={touched.nodeValue && !!errors.nodeValue}
                                                         onBlur={handleBlur}
-                                                        readOnly={this.state.numberNode ? true : false}
+                                                        readOnly={!this.state.editable?true:this.state.numberNode ? true : false}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         // step={.01}
                                                         // value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].displayCalculatedDataValue == 0 ? "0" : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].displayCalculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue.toString())}
@@ -8100,6 +8849,7 @@ export default class CreateTreeTemplate extends Component {
                                                         name="notes"
                                                         onChange={(e) => { this.dataChange(e) }}
                                                         // value={this.getNotes}
+                                                        readOnly={!this.state.editable}
                                                         value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].notes}
                                                     ></Input>
                                                 </FormGroup>
@@ -8143,6 +8893,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="nodeTitle"
                                                             name="nodeTitle"
                                                             bsSize="sm"
+                                                            readOnly={!this.state.editable}
                                                             valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
                                                             invalid={touched.nodeTitle && !!errors.nodeTitle}
                                                             onBlur={handleBlur}
@@ -8168,6 +8919,7 @@ export default class CreateTreeTemplate extends Component {
                                                             type="select"
                                                             id="nodeTypeId"
                                                             name="nodeTypeId"
+                                                            disabled={!this.state.editable}
                                                             bsSize="sm"
                                                             valid={!errors.nodeTypeId && this.state.currentItemConfig.context.payload.nodeType.id != ''}
                                                             invalid={touched.nodeTypeId && !!errors.nodeTypeId}
@@ -8195,6 +8947,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="monthNo"
                                                             name="monthNo"
                                                             bsSize="sm"
+                                                            disabled={!this.state.editable}
                                                             valid={!errors.monthNo && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo != ''}
                                                             invalid={touched.monthNo && !!errors.monthNo}
                                                             onBlur={handleBlur}
@@ -8235,6 +8988,7 @@ export default class CreateTreeTemplate extends Component {
                                                         <Input type="textarea"
                                                             id="notes"
                                                             name="notes"
+                                                            readOnly={!this.state.editable}
                                                             style={{ height: "100px" }}
                                                             onChange={(e) => { this.dataChange(e) }}
                                                             // value={this.getNotes}
@@ -8253,6 +9007,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 id="percentageOfParent"
                                                                 name="percentageOfParent"
                                                                 bsSize="sm"
+                                                                readOnly={!this.state.editable}
                                                                 valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
                                                                 invalid={touched.percentageOfParent && !!errors.percentageOfParent}
                                                                 onBlur={handleBlur}
@@ -8279,7 +9034,7 @@ export default class CreateTreeTemplate extends Component {
                                                             valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].displayCalculatedDataValue) : addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue) != ''}
                                                             invalid={touched.nodeValue && !!errors.nodeValue}
                                                             onBlur={handleBlur}
-                                                            readOnly={this.state.numberNode ? true : false}
+                                                            readOnly={!this.state.editable?true:this.state.numberNode ? true : false}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             // step={.01}
                                                             // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
@@ -8389,7 +9144,8 @@ export default class CreateTreeTemplate extends Component {
                                                             id="planningUnitId"
                                                             name="planningUnitId"
                                                             bsSize="sm"
-                                                            className={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].isPUMappingCorrect == 0 ? "redPU" : ""}
+                                                            disabled={!this.state.editable}
+                                                            className={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].isPUMappingCorrect==0?"redPU":""}
                                                             valid={!errors.planningUnitId && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != '' : !errors.planningUnitId}
                                                             invalid={touched.planningUnitId && !!errors.planningUnitId}
                                                             onBlur={handleBlur}
@@ -8504,6 +9260,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         handleChange(e);
                                                                         this.dataChange(e)
                                                                     }}
+                                                                    readOnly={!this.state.editable}
                                                                     bsSize="sm"
                                                                     value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 5 && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths : "")}>
                                                                 </Input>
@@ -8516,7 +9273,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 <Input type="number"
                                                                     id="puPerVisit"
                                                                     name="puPerVisit"
-                                                                    readOnly={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
+                                                                    readOnly={!this.state.editable?true:this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
                                                                     bsSize="sm"
                                                                     valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit != '' : !errors.puPerVisit}
                                                                     invalid={touched.puPerVisit && !!errors.puPerVisit}
@@ -8568,6 +9325,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         id="sharePlanningUnitTrue"
                                                                         name="sharePlanningUnit"
                                                                         value={true}
+                                                                        disabled={!this.state.editable}
                                                                         checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true" || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == true}
                                                                         onChange={(e) => {
                                                                             this.dataChange(e)
@@ -8586,6 +9344,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         type="radio"
                                                                         id="sharePlanningUnitFalse"
                                                                         name="sharePlanningUnit"
+                                                                        disabled={!this.state.editable}
                                                                         value={false}
                                                                         checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == false || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == false}
                                                                         onChange={(e) => {
@@ -8623,7 +9382,7 @@ export default class CreateTreeTemplate extends Component {
                                                                     <Input type="number"
                                                                         id="puPerVisit"
                                                                         name="puPerVisit"
-                                                                        readOnly={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
+                                                                        readOnly={!this.state.editable?true:this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
                                                                         bsSize="sm"
                                                                         valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit != '' : !errors.puPerVisit}
                                                                         invalid={touched.puPerVisit && !!errors.puPerVisit}
@@ -8664,6 +9423,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id="tracerCategoryId"
                                                     name="tracerCategoryId"
                                                     bsSize="sm"
+                                                    disabled={!this.state.editable}
                                                     // valid={!errors.tracerCategoryId && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory.id != '' : !errors.tracerCategoryId}
                                                     // invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
                                                     onBlur={handleBlur}
@@ -8697,6 +9457,7 @@ export default class CreateTreeTemplate extends Component {
                                                     name="usageTemplateId"
                                                     id="usageTemplateId"
                                                     bsSize="sm"
+                                                    disabled={!this.state.editable}
                                                     // valid={!errors.usageTemplateId && this.state.usageTemplateId != ''}
                                                     // invalid={touched.usageTemplateId && !!errors.usageTemplateId}
                                                     onBlur={handleBlur}
@@ -8744,6 +9505,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="forecastingUnitId"
                                                         name="forecastingUnitId"
                                                         bsSize="sm"
+                                                        disabled={!this.state.editable}
                                                         onChange={(e) => {
                                                             handleChange(e);
                                                             setFieldValue("forecastingUnitId", e);
@@ -8799,6 +9561,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="planningUnitIdFU"
                                                         name="planningUnitIdFU"
                                                         bsSize="sm"
+                                                        disabled={!this.state.editable}
                                                         valid={!errors.planningUnitIdFU}
                                                         invalid={touched.planningUnitIdFU && !!errors.planningUnitIdFU}
                                                         onBlur={handleBlur}
@@ -8831,6 +9594,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id="usageTypeIdFU"
                                                     name="usageTypeIdFU"
                                                     bsSize="sm"
+                                                    disabled={!this.state.editable}
                                                     valid={!errors.usageTypeIdFU && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id != '' : !errors.usageTypeIdFU}
                                                     invalid={touched.usageTypeIdFU && !!errors.usageTypeIdFU}
                                                     onBlur={handleBlur}
@@ -8864,6 +9628,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id="lagInMonths"
                                                     name="lagInMonths"
                                                     bsSize="sm"
+                                                    readOnly={!this.state.editable}
                                                     valid={!errors.lagInMonths && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.lagInMonths != '' : !errors.lagInMonths}
                                                     invalid={touched.lagInMonths && !!errors.lagInMonths}
                                                     onBlur={handleBlur}
@@ -8890,7 +9655,7 @@ export default class CreateTreeTemplate extends Component {
                                                     valid={!errors.noOfPersons && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfPersons != '' : !errors.noOfPersons}
                                                     invalid={touched.noOfPersons && !!errors.noOfPersons}
                                                     onBlur={handleBlur}
-                                                    readOnly={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? true : false}
+                                                    readOnly={!this.state.editable?true:this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? true : false}
                                                     onChange={(e) => {
                                                         handleChange(e);
                                                         this.dataChange(e)
@@ -8927,6 +9692,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id="forecastingUnitPerPersonsFC"
                                                     name="forecastingUnitPerPersonsFC"
                                                     bsSize="sm"
+                                                    readOnly={!this.state.editable}
                                                     valid={!errors.forecastingUnitPerPersonsFC && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson != '' : !errors.forecastingUnitPerPersonsFC}
                                                     invalid={touched.forecastingUnitPerPersonsFC && !!errors.forecastingUnitPerPersonsFC}
                                                     onBlur={handleBlur}
@@ -8972,6 +9738,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 ? 'block' : 'none' }}>
                                                     <Input type="select"
                                                         id="oneTimeUsage"
+                                                        disabled={!this.state.editable}
                                                         name="oneTimeUsage"
                                                         bsSize="sm"
                                                         valid={!errors.oneTimeUsage && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != '' : !errors.oneTimeUsage}
@@ -8998,6 +9765,7 @@ export default class CreateTreeTemplate extends Component {
                                                         <Input type="text"
                                                             id="usageFrequencyDis"
                                                             name="usageFrequencyDis"
+                                                            readOnly={!this.state.editable}
                                                             bsSize="sm"
                                                             valid={!errors.usageFrequencyDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency != "" : false)}
                                                             invalid={touched.usageFrequencyDis && !!errors.usageFrequencyDis}
@@ -9022,6 +9790,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="usagePeriodIdDis"
                                                             name="usagePeriodIdDis"
                                                             bsSize="sm"
+                                                            disabled={!this.state.editable}
                                                             valid={!errors.usagePeriodIdDis && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" : false)}
                                                             invalid={touched.usagePeriodIdDis && !!errors.usagePeriodIdDis}
                                                             onBlur={handleBlur}
@@ -9052,6 +9821,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="repeatCount"
                                                             name="repeatCount"
                                                             bsSize="sm"
+                                                            readOnly={!this.state.editable}
                                                             valid={!errors.repeatCount && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatCount != '' : !errors.repeatCount}
                                                             invalid={touched.repeatCount && !!errors.repeatCount}
                                                             onBlur={handleBlur}
@@ -9068,6 +9838,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="repeatUsagePeriodId"
                                                             name="repeatUsagePeriodId"
                                                             bsSize="sm"
+                                                            disabled={!this.state.editable}
                                                             valid={!errors.repeatUsagePeriodId && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage == false) ? (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod != '' && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId != '') : !errors.repeatUsagePeriodId}
                                                             invalid={touched.repeatUsagePeriodId && !!errors.repeatUsagePeriodId}
                                                             onBlur={handleBlur}
@@ -9114,6 +9885,7 @@ export default class CreateTreeTemplate extends Component {
                                                             handleChange(e);
                                                             this.dataChange(e)
                                                         }}
+                                                        readOnly={!this.state.editable}
                                                         value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency : ""}></Input>
                                                     <FormFeedback className="red">{errors.usageFrequencyCon}</FormFeedback>
                                                     {/* <FormFeedback className="red">{errors.usageFrequency}</FormFeedback> */}
@@ -9124,6 +9896,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="usagePeriodIdCon"
                                                         name="usagePeriodIdCon"
                                                         bsSize="sm"
+                                                        disabled={!this.state.editable}
                                                         valid={!errors.usagePeriodIdCon && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" : false)}
                                                         invalid={touched.usagePeriodIdCon && !!errors.usagePeriodIdCon}
                                                         onBlur={handleBlur}
@@ -9201,8 +9974,8 @@ export default class CreateTreeTemplate extends Component {
                                     }
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelNodeDataClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelNodeDataClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        {this.state.editable && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
@@ -9294,7 +10067,7 @@ export default class CreateTreeTemplate extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.aggregationNode && this.state.editable && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>
@@ -9584,6 +10357,7 @@ export default class CreateTreeTemplate extends Component {
                                                         type="checkbox"
                                                         id="manualChange"
                                                         name="manualChange"
+                                                        readOnly={!this.state.editable}
                                                         // checked={true}
                                                         checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture}
                                                         onClick={(e) => { this.momCheckbox(e, 1); }}
@@ -9634,7 +10408,7 @@ export default class CreateTreeTemplate extends Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                                    {this.state.editable && this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
                                 {/* </div> */}
@@ -9669,6 +10443,7 @@ export default class CreateTreeTemplate extends Component {
                                                         type="checkbox"
                                                         id="manualChange"
                                                         name="manualChange"
+                                                        readOnly={!this.state.editable}
                                                         // checked={true}
                                                         checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture}
                                                         onClick={(e) => { this.momCheckbox(e, 2); }}
@@ -9714,7 +10489,7 @@ export default class CreateTreeTemplate extends Component {
                                         });
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.}><i className="fa fa-check"></i> {'Update'}</Button> */}
-                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                                    {this.state.editable && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
                                 {/* </div> */}
@@ -9978,6 +10753,26 @@ export default class CreateTreeTemplate extends Component {
             entries: " ",
         });
 
+        const { programListForCreateTree } = this.state;    
+            let downloadedDatasetsForCreateTree = programListForCreateTree.length > 0
+            && programListForCreateTree.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>
+                        {item.programCode+"~v"+item.version}
+                    </option>
+                )
+            }, this);
+        const { forecastMethodListForCreateTree } = this.state;
+        let forecastMethodsForCreateTree = forecastMethodListForCreateTree.length > 0
+            && forecastMethodListForCreateTree.map((item, i) => {
+                return (
+                    <option key={i} value={item.forecastMethodId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+
         const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
             const opacity = isDragging ? 0.4 : 1
             let itemTitleColor = Colors.RoyalBlue;
@@ -10057,6 +10852,16 @@ export default class CreateTreeTemplate extends Component {
             && forecastMethodList.map((item, i) => {
                 return (
                     <option key={i} value={item.forecastMethodId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+            const { treeTemplateList } = this.state;
+        let treeTemplates = treeTemplateList.length > 0
+            && treeTemplateList.map((item, i) => {
+                return (
+                    <option key={i} value={item.treeTemplateId}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -10180,7 +10985,7 @@ export default class CreateTreeTemplate extends Component {
                 return <>
                     {itemConfig.parent != null &&
                         <>
-                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                            {this.state.editable &&
                                 <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                     onClick={(event) => {
                                         event.stopPropagation();
@@ -10189,7 +10994,7 @@ export default class CreateTreeTemplate extends Component {
                                     <i class="fa fa-clone" aria-hidden="true"></i>
                                 </button>
                             }
-                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                            {this.state.editable &&
                                 <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                     onClick={(event) => {
                                         event.stopPropagation();
@@ -10212,7 +11017,7 @@ export default class CreateTreeTemplate extends Component {
                                     <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                 </button>}
                         </>}
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 && this.state.editable &&
 
                         <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
@@ -10224,7 +11029,7 @@ export default class CreateTreeTemplate extends Component {
                         </button>
                     }
 
-                    {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                    {parseInt(itemConfig.payload.nodeType.id) != 5 && this.state.editable &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
@@ -10238,6 +11043,7 @@ export default class CreateTreeTemplate extends Component {
                                 console.log("level unit id on add button click---", levelUnitId);
                                 this.setState({
                                     isValidError: true,
+                                    isTemplateChanged:true,
                                     tempPlanningUnitId: '',
                                     showMomDataPercent: false,
                                     showMomData: false,
@@ -10425,6 +11231,7 @@ export default class CreateTreeTemplate extends Component {
                                         onClick={() => this.exportPDF()}
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
+                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeTemplate.flatList[0].payload.nodeType.id==1 || this.state.treeTemplate.flatList[0].payload.nodeType.id==2) ? <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.createTreeFromTemplate')}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span>:<span><i>{"Create a tree first, then add this template to a node."}</i></span>}
                                 </a>
                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
@@ -10566,6 +11373,7 @@ export default class CreateTreeTemplate extends Component {
                                                             }
                                                             this.setState({
                                                                 treeTemplate: response.data,
+                                                                treeTemplateId:0,
                                                                 items,
                                                                 message: i18n.t('static.message.addTreeTemplate'),
                                                                 color: 'green',
@@ -10743,6 +11551,40 @@ export default class CreateTreeTemplate extends Component {
                                                     <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                         <div className="col-md-12 pl-lg-0">
                                                             <Row>
+                                                            <FormGroup className="col-md-3 pl-lg-0">
+                                                            {treeTemplateList.length>0 && <><Label htmlFor="languageId">{i18n.t('static.dataset.TreeTemplate')}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="treeTemplateId"
+                                                                        id="treeTemplateId"
+                                                                        bsSize="sm"
+                                                                        required
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        value={this.state.treeTemplateId}
+                                                                    >
+                                                                        {this.state.treeTemplateId==0 && <option value="">{i18n.t('static.common.select')}</option>}
+                                                                        {treeTemplates}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.forecastMethodId}</FormFeedback></>}
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Template Name'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        name="treeName"
+                                                                        id="treeName"
+                                                                        bsSize="sm"
+                                                                        readOnly={!this.state.editable}
+                                                                        valid={!errors.treeName && this.state.treeTemplate.label.label_en != ''}
+                                                                        invalid={touched.treeName && !!errors.treeName}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                        value={this.state.treeTemplate.label.label_en}
+                                                                    >
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.treeName}</FormFeedback>
+                                                                </FormGroup>
                                                                 <FormGroup className="col-md-3 pl-lg-0" style={{ marginBottom: '0px' }}>
                                                                     <Label htmlFor="languageId">{'Forecast Method'}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
@@ -10750,6 +11592,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         name="forecastMethodId"
                                                                         id="forecastMethodId"
                                                                         bsSize="sm"
+                                                                        disabled={!this.state.editable}
                                                                         valid={!errors.forecastMethodId && this.state.treeTemplate.forecastMethod.id != ''}
                                                                         invalid={touched.forecastMethodId && !!errors.forecastMethodId}
                                                                         onBlur={handleBlur}
@@ -10761,59 +11604,6 @@ export default class CreateTreeTemplate extends Component {
                                                                         {forecastMethods}
                                                                     </Input>
                                                                     <FormFeedback>{errors.forecastMethodId}</FormFeedback>
-                                                                </FormGroup>
-
-                                                                <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Template Name'}<span class="red Reqasterisk">*</span></Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        name="treeName"
-                                                                        id="treeName"
-                                                                        bsSize="sm"
-                                                                        valid={!errors.treeName && this.state.treeTemplate.label.label_en != ''}
-                                                                        invalid={touched.treeName && !!errors.treeName}
-                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                        value={this.state.treeTemplate.label.label_en}
-                                                                    >
-                                                                    </Input>
-                                                                    <FormFeedback>{errors.treeName}</FormFeedback>
-                                                                </FormGroup>
-                                                                <FormGroup className="col-md-3 pl-lg-0" style={{ marginTop: '28px' }}>
-                                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
-                                                                    <FormGroup check inline>
-                                                                        <Input
-                                                                            className="form-check-input"
-                                                                            type="radio"
-                                                                            id="active1"
-                                                                            name="active"
-                                                                            value={true}
-                                                                            checked={this.state.treeTemplate.active === true}
-                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        />
-                                                                        <Label
-                                                                            className="form-check-label"
-                                                                            check htmlFor="inline-radio1">
-                                                                            {i18n.t('static.common.active')}
-                                                                        </Label>
-                                                                    </FormGroup>
-                                                                    <FormGroup check inline>
-                                                                        <Input
-                                                                            className="form-check-input"
-                                                                            type="radio"
-                                                                            id="active2"
-                                                                            name="active"
-                                                                            value={false}
-                                                                            checked={this.state.treeTemplate.active === false}
-                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        />
-                                                                        <Label
-                                                                            className="form-check-label"
-                                                                            check htmlFor="inline-radio2">
-                                                                            {i18n.t('static.common.disabled')}
-                                                                        </Label>
-                                                                    </FormGroup>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3" >
                                                                     <div className="check inline  pl-lg-1 pt-lg-3">
@@ -10852,7 +11642,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 </FormGroup>
                                                                 <div>
                                                                     <Popover placement="top" isOpen={this.state.popoverOpenMonthInPast} target="Popover26" trigger="hover" toggle={this.toggleMonthInPast}>
-                                                                        <PopoverBody>Need to add info</PopoverBody>
+                                                                        <PopoverBody>{i18n.t("static.treeTemplate.monthsInPastTooltip")}</PopoverBody>
                                                                     </Popover>
                                                                 </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
@@ -10864,6 +11654,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         bsSize="sm"
                                                                         min={0}
                                                                         step={1}
+                                                                        readOnly={!this.state.editable}
                                                                         valid={!errors.monthsInPast && this.state.treeTemplate.monthsInPast != ''}
                                                                         invalid={touched.monthsInPast && !!errors.monthsInPast}
                                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -10876,7 +11667,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 </FormGroup>
                                                                 <div>
                                                                     <Popover placement="top" isOpen={this.state.popoverOpenMonthInFuture} target="Popover27" trigger="hover" toggle={this.toggleMonthInFuture}>
-                                                                        <PopoverBody>Need to add info</PopoverBody>
+                                                                        <PopoverBody>{i18n.t("static.treeTemplate.monthsInFutureTooltip")}</PopoverBody>
                                                                     </Popover>
                                                                 </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
@@ -10886,6 +11677,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         name="monthsInFuture"
                                                                         id="monthsInFuture"
                                                                         bsSize="sm"
+                                                                        readOnly={!this.state.editable}
                                                                         min={0}
                                                                         step={1}
                                                                         valid={!errors.monthsInFuture && this.state.treeTemplate.monthsInFuture != ''}
@@ -10906,6 +11698,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         name="templateNotes"
                                                                         id="templateNotes"
                                                                         bsSize="sm"
+                                                                        readOnly={!this.state.editable}
                                                                         onChange={(e) => { this.dataChange(e) }}
                                                                         value={this.state.treeTemplate.notes}
                                                                     >
@@ -10931,8 +11724,7 @@ export default class CreateTreeTemplate extends Component {
                                                                             }, this)}
                                                                     </Input>
                                                                 </FormGroup> */}
-                                                            </Row>
-                                                            <FormGroup className="row col-md-3 pl-lg-0 MarginTopMonthSelector">
+                                                            <FormGroup className="col-md-3 pl-lg-0 MarginTopMonthSelector">
                                                                 <Label htmlFor="languageId">{'Month Selector'}</Label>
                                                                 <Input
                                                                     type="select"
@@ -10952,6 +11744,44 @@ export default class CreateTreeTemplate extends Component {
                                                                         }, this)}
                                                                 </Input>
                                                             </FormGroup>
+                                                            <FormGroup className="col-md-3 pl-lg-0" style={{ marginTop: '12px',marginLeft:'30px' }}>
+                                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                                                    <FormGroup check inline>
+                                                                        <Input
+                                                                            className="form-check-input"
+                                                                            type="radio"
+                                                                            id="active1"
+                                                                            name="active"
+                                                                            disabled={!this.state.editable}
+                                                                            value={true}
+                                                                            checked={this.state.treeTemplate.active === true}
+                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        />
+                                                                        <Label
+                                                                            className="form-check-label"
+                                                                            check htmlFor="inline-radio1">
+                                                                            {i18n.t('static.common.active')}
+                                                                        </Label>
+                                                                    </FormGroup>
+                                                                    <FormGroup check inline>
+                                                                        <Input
+                                                                            className="form-check-input"
+                                                                            type="radio"
+                                                                            id="active2"
+                                                                            name="active"
+                                                                            disabled={!this.state.editable}
+                                                                            value={false}
+                                                                            checked={this.state.treeTemplate.active === false}
+                                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        />
+                                                                        <Label
+                                                                            className="form-check-label"
+                                                                            check htmlFor="inline-radio2">
+                                                                            {i18n.t('static.common.disabled')}
+                                                                        </Label>
+                                                                    </FormGroup>
+                                                                </FormGroup>
+                                                                </Row>
                                                         </div>
 
                                                         {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')) &&
@@ -10959,7 +11789,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 {/* ---hehehe */}
                                                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                                                 <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                                <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                                {(this.state.isChanged || this.state.isTemplateChanged) && <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>}
                                                             </CardFooter>}
 
                                                     </CardBody>
@@ -11016,6 +11846,9 @@ export default class CreateTreeTemplate extends Component {
                             }}
                             validate={validate(validationSchemaBranch)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.setState({
+                                    isTemplateChanged:true
+                                })
                                 this.generateBranchFromTemplate(this.state.branchTemplateId);
                             }}
 
@@ -11205,6 +12038,7 @@ export default class CreateTreeTemplate extends Component {
                                             id="levelName"
                                             name="levelName"
                                             required
+                                            readOnly={!this.state.editable}
                                             valid={!errors.levelName && this.state.levelName != null ? this.state.levelName : '' != ''}
                                             invalid={touched.levelName && !!errors.levelName}
                                             onBlur={handleBlur}
@@ -11221,6 +12055,7 @@ export default class CreateTreeTemplate extends Component {
                                             id="levelUnit"
                                             name="levelUnit"
                                             bsSize="sm"
+                                            disabled={!this.state.editable}
                                             onChange={(e) => { this.levelUnitChange(e) }}
                                             value={this.state.levelUnit}
                                         >
@@ -11245,6 +12080,244 @@ export default class CreateTreeTemplate extends Component {
                             </Form>
                         )} />
             </Modal>
+            <Modal isOpen={this.state.isModalForCreateTree}
+                        className={'modal-lg ' + this.props.className}>
+                        <ModalHeader>
+                            <strong>{i18n.t('static.listTree.treeDetails')}</strong>
+                            <Button size="md" onClick={this.modelOpenCloseForCreateTree} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                        </ModalHeader>
+                        <ModalBody className='pb-lg-0'>
+                            {/* <h6 className="red" id="div3"></h6> */}
+                            <Col sm={12} style={{ flexBasis: 'auto' }}>
+                                {/* <Card> */}
+                                <Formik
+                                    initialValues={{
+                                        treeNameForCreateTree: this.state.treeNameForCreateTree,
+                                        forecastMethodIdForCreateTree: this.state.forecastMethodForCreateTree.id,
+                                        datasetIdModalForCreateTree: this.state.datasetIdModalForCreateTree,
+                                        regionIdForCreateTree: this.state.regionValuesForCreateTree
+                                    }}
+                                    enableReinitialize={true}
+                                    validate={validate(validationSchemaCreateTree)}
+                                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                                            this.setState({ loading: true }, () => {
+                                                this.createTreeForCreateTree();
+                                                this.setState({
+                                                    isModalForCreateTree: !this.state.isModalForCreateTree,
+                                                    // treeName:"",
+                                                    // forecastMethod:{
+                                                    //     id:"",
+                                                    //     label:{
+                                                    //         label_en:""
+                                                    //     }
+                                                    // },
+                                                    // datasetIdModal:"",
+                                                    // regionId: '',
+                                                    // regionList: [], 
+                                                    // regionValues: [],
+                                                    // missingPUList:[],
+                                                    // active: true,
+                                                    // datasetListJexcel:{},
+                                                    // treeTemplate:{}
+                                                })
+                                            })
+
+                                    }}
+
+
+                                    render={
+                                        ({
+                                            values,
+                                            errors,
+                                            touched,
+                                            handleChange,
+                                            handleBlur,
+                                            handleSubmit,
+                                            isSubmitting,
+                                            isValid,
+                                            setTouched,
+                                            handleReset,
+                                            setFieldValue,
+                                            setFieldTouched
+                                        }) => (
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                                {/* <CardBody> */}
+                                                <div className="col-md-12">
+                                                    <div className="">
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
+
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="datasetIdModalForCreateTree"
+                                                                        id="datasetIdModalForCreateTree"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.datasetIdModalForCreateTree && this.state.datasetIdModalForCreateTree != null ? this.state.datasetIdModalForCreateTree : '' != ''}
+                                                                        invalid={touched.datasetIdModalForCreateTree && !!errors.datasetIdModalForCreateTree}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        value={this.state.datasetIdModalForCreateTree}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.mt.selectProgram')}</option>
+                                                                        {downloadedDatasetsForCreateTree}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.datasetIdModalForCreateTree}</FormFeedback>
+                                                                </div>
+
+                                                            </FormGroup>
+
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
+
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="forecastMethodIdForCreateTree"
+                                                                        id="forecastMethodIdForCreateTree"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.forecastMethodIdForCreateTree && this.state.forecastMethodForCreateTree.id != null ? this.state.forecastMethodForCreateTree.id : '' != ''}
+                                                                        invalid={touched.forecastMethodIdForCreateTree && !!errors.forecastMethodIdForCreateTree}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        required
+                                                                        value={this.state.forecastMethodForCreateTree.id}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.forecastmethod')}</option>
+                                                                        {forecastMethodsForCreateTree}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.forecastMethodIdForCreateTree}</FormFeedback>
+                                                                </div>
+
+                                                            </FormGroup>
+                                                        </div>
+                                                    </div>
+                                                    <div className="row">
+                                                        <FormGroup className={"col-md-6"}>
+                                                            <Label for="number1">{i18n.t('static.common.treeName')}<span className="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
+                                                                <Input type="text"
+                                                                    bsSize="sm"
+                                                                    name="treeNameForCreateTree"
+                                                                    id="treeNameForCreateTree"
+                                                                    valid={!errors.treeNameForCreateTree && this.state.treeNameForCreateTree != ''}
+                                                                    invalid={touched.treeNameForCreateTree && !!errors.treeNameForCreateTree}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                    value={this.state.treeNameForCreateTree}
+                                                                />
+                                                                <FormFeedback className="red">{errors.treeNameForCreateTree}</FormFeedback>
+                                                            </div>
+
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6" >
+                                                            <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
+                                                                <Select
+                                                                    className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                        { 'is-valid': !errors.regionIdForCreateTree },
+                                                                        { 'is-invalid': (touched.regionIdForCreateTree && !!errors.regionIdForCreateTree || this.state.regionValuesForCreateTree.length == 0) }
+                                                                    )}
+                                                                    bsSize="sm"
+                                                                    onChange={(e) => {
+                                                                        handleChange(e);
+                                                                        setFieldValue("regionIdForCreateTree", e);
+                                                                        this.handleRegionChangeForCreateTree(e);
+                                                                    }}
+                                                                    onBlur={() => setFieldTouched("regionIdForCreateTree", true)}
+                                                                    multi
+                                                                    options={this.state.regionMultiListForCreateTree}
+                                                                    value={this.state.regionValuesForCreateTree}
+                                                                />
+                                                                <FormFeedback>{errors.regionIdForCreateTree}</FormFeedback>
+                                                            </div>
+
+                                                        </FormGroup>
+                                                    </div>
+                                                    <div >
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                                <div className="controls">
+                                                                    <Input type="textarea"
+                                                                        id="notesForCreateTree"
+                                                                        name="notesForCreateTree"
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        value={this.state.notesForCreateTree}
+                                                                    ></Input>
+                                                                </div>
+
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-6 mt-lg-4">
+                                                                <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active10ForCreateTree"
+                                                                        name="activeForCreateTree"
+                                                                        value={true}
+                                                                        checked={this.state.activeForCreateTree === true}
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio1">
+                                                                        {i18n.t('static.common.active')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active11ForCreateTree"
+                                                                        name="activeForCreateTree"
+                                                                        value={false}
+                                                                        checked={this.state.activeForCreateTree === false}
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        {i18n.t('static.common.disabled')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                            </FormGroup>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                        <div style={{ display: this.state.missingPUListForCreateTree.length > 0 ? 'block' : 'none' }}><div><b>{i18n.t('static.listTree.missingPlanningUnits')} : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.Update.PlanningUnits')}</a>)</b></div><br />
+                                                            <div id="missingPUJexcelForCreateTree" className="RowClickable">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseForCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        &nbsp;
+
+                                                    </FormGroup>
+                                                </div>
+
+                                                {/* <CardFooter>
+                                                        <FormGroup>
+                                                            <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+                                                        </FormGroup>
+                                                    </CardFooter> */}
+                                            </Form>
+
+                                        )} />
+
+                                {/* </Card> */}
+                            </Col>
+                            <br />
+                        </ModalBody>
+                    </Modal>
         </div>
     }
 }

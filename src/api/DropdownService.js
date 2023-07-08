@@ -211,6 +211,13 @@ class DropdownService {
       {}
     );
   }
+
+  getTreeTemplateListForDropdown(){
+    return axios.get(
+      `${API_URL}/api/dropdown/treeTemplate`,
+      {}
+    );
+  }
 }
 
 export default new DropdownService();
