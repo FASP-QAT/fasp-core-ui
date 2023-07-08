@@ -2309,7 +2309,7 @@
     "static.commitVersion.sendLocalToServer": "Envoi au serveur de la version locale",
     "static.tree.startMonthForHistoricData": "Mois de début pour les données historiques",
     "static.importFromQATSupplyPlan.currentQATConsumption": "Consommation actuelle QAT",
-    "static.mt.orderNoAndPrimeLineNo": "N° de commande|N° de ligne principale",
+    "static.mt.orderNoAndPrimeLineNo": "N° de commande - N° de ligne principale",
     "static.monthlyForecast.GraphView": "Pour la vue graphique, vous pouvez masquer l'affichage des produits de 3 manières :",
     "static.loadDelDataset.forForecastPeriod": "pour la période de prévision",
     "static.supplyPlan.maxStockMos": "Max Mois de Stock",
@@ -3057,5 +3057,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.mt.roNoAndPrimeLineNo": "RO - Ligne principale Non"
 }
