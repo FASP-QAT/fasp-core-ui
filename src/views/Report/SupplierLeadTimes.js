@@ -1823,7 +1823,7 @@ class SupplierLeadTimes extends Component {
                         </div>
                         {/* } */}
                     </div>
-                    <CardBody className="pt-lg-0 pb-lg-5">
+                    <CardBody className="pt-lg-0 ">
                         {/* <div ref={ref}> */}
                         {/* <Form> */}
                         <div className="pl-0">
@@ -1848,7 +1848,7 @@ class SupplierLeadTimes extends Component {
                                             </div>
                                         </FormGroup>
                                     </Online> */}
-                                <FormGroup className="col-md-3 pl-0">
+                                <FormGroup className="col-md-3 px-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls">
                                         <InputGroup>
@@ -1913,7 +1913,7 @@ class SupplierLeadTimes extends Component {
                         </div>
                         {/* </Form> */}
                         <div className="ReportSearchMarginTop SupplierLeadTable">
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className="mt-5 jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
