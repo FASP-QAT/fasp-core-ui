@@ -2289,7 +2289,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     }
                 }
                 if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
-                    var budget = rowData[17];
+                    var budget = elInstance.getValueFromCoords(17, y, true);
                     var valid = checkValidtion("text", "R", y, budget, elInstance);
                     var procurementAgent = rowData[7];
                     var fundingSource = rowData[16];
@@ -2337,7 +2337,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         if (x == 17) {
             var value = rowData[4];
             if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
-                var budget = rowData[17];
+                var budget = elInstance.getValueFromCoords(17, y, true);
                 var valid = checkValidtion("text", "R", y, budget, elInstance);
                 if (valid == false) {
                     elInstance.setValueFromCoords(34, y, 1, true);
@@ -3561,7 +3561,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 }
                 if (validation == true) {
                     if (rowData[4] == SUBMITTED_SHIPMENT_STATUS || rowData[4] == ARRIVED_SHIPMENT_STATUS || rowData[4] == SHIPPED_SHIPMENT_STATUS || rowData[4] == DELIVERED_SHIPMENT_STATUS || rowData[4] == APPROVED_SHIPMENT_STATUS && json[y][1].toString() == "false") {
-                        var budget = rowData[17];
+                        var budget = elInstance.getValueFromCoords(17, y, true);
                         var v = checkValidtion("text", "R", y, budget, elInstance);
                         if (v == false) {
                             valid = false;
@@ -3585,7 +3585,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     } else {
                         positiveValidation("R", y, elInstance);
                     }
-                    if (map.get("17") != "" && map.get("17") != undefined && map.get("17") != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false") {
+                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false") {
                         var budget = this.state.budgetListAll.filter(c => c.id == map.get("17"))[0]
                         var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
                         var shipmentList = shipmentListAfterUpdate.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.budget.id == map.get("17") && c.planningUnit.id == map.get("3"));
@@ -3746,7 +3746,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
 
                 var value = rowData[4];
                 if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS && json[y][1].toString() == "false") {
-                    var budget = rowData[17];
+                    var budget =  elInstance.getValueFromCoords(17, y, true);
                     var validation = checkValidtion("text", "R", y, budget, elInstance);
                     if (validation == false) {
                         valid = false;

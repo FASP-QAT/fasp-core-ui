@@ -507,12 +507,13 @@ import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import ProgramService from "../../api/ProgramService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, API_URL } from '../../Constants.js';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import DropdownService from '../../api/DropdownService';
 
 const entityname = i18n.t('static.dashboard.budget');
 
@@ -725,7 +726,7 @@ class ListBudgetComponent extends Component {
       data = [];
       data[0] = budgetList[j].budgetId
       // data[1] = getLabelText(budgetList[j].program.label, this.state.lang)
-      data[1] = ""
+      data[1] = budgetList[j].programs.filter(x=>x.id!=0).map(x => getLabelText(x.label, this.state.lang)).join(", ")
       data[2] = getLabelText(budgetList[j].label, this.state.lang)
       data[3] = budgetList[j].budgetCode;
       data[4] = getLabelText(budgetList[j].fundingSource.label, this.state.lang)
@@ -785,7 +786,7 @@ class ListBudgetComponent extends Component {
         },
         {
           title: i18n.t('static.budget.program'),
-          type: 'hidden',
+          type: 'text',
           // readOnly: true
         },
         {
@@ -1002,13 +1003,15 @@ class ListBudgetComponent extends Component {
   componentDidMount() {
     this.hideFirstComponent();
 
-    ProgramService.getProgramList()
+    let realmId=AuthenticationService.getRealmId();
+    DropdownService.getProgramForDropdown(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
       .then(response => {
         if (response.status == 200) {
-          var listArray = response.data;
+          var listArray = response.data.filter(c=>c.active);
+          console.log("list Array Test@123",listArray)
           listArray.sort((a, b) => {
-            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
@@ -1029,6 +1032,7 @@ class ListBudgetComponent extends Component {
       })
       .catch(
         error => {
+          console.log("Error Test@123",error)
           if (error.message === "Network Error") {
             this.setState({
               // message: 'static.unkownError',
