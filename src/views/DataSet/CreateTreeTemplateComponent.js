@@ -870,7 +870,26 @@ export default class CreateTreeTemplate extends Component {
         this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this);
         this.filterUsageTemplateList = this.filterUsageTemplateList.bind(this);
         this.generateBranchFromTemplate = this.generateBranchFromTemplate.bind(this);
+        this.cancelNodeDataClicked=this.cancelNodeDataClicked.bind(this);
     }
+
+    cancelNodeDataClicked(){
+        if(this.state.isChanged == true || this.state.isTemplateChanged == true){
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                this.setState({
+                    openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1')
+                })
+            }else{
+
+            }
+        }else{
+            this.setState({
+                openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1')
+            })
+        }
+    }
+    
     filterUsageTemplateList(forecastingUnitId) {
         var usageTemplateList;
         if (forecastingUnitId > 0) {
@@ -9182,7 +9201,7 @@ export default class CreateTreeTemplate extends Component {
                                     }
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1') })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelNodeDataClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
@@ -11087,6 +11106,7 @@ export default class CreateTreeTemplate extends Component {
                         <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
                     <Button size="md"
                         onClick={() => {
+                            if(this.state.isChanged == true || this.state.isTemplateChanged == true){
                             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
                             if (cf == true) {
                                 this.setState({
@@ -11096,7 +11116,12 @@ export default class CreateTreeTemplate extends Component {
                             } else {
 
                             }
-
+                        }else{
+                            this.setState({
+                                openAddNodeModal: false, isChanged: false,
+                                cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1')
+                            })
+                        }
                         }
                         }
                         color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
