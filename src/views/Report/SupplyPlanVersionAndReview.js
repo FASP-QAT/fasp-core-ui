@@ -376,8 +376,8 @@ class SupplyPlanVersionAndReview extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         this.getCountrylist();
         // this.getPrograms()
-        // this.getVersionTypeList()
-        // this.getStatusList()
+        this.getVersionTypeList()
+        this.getStatusList()
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -538,7 +538,7 @@ class SupplyPlanVersionAndReview extends Component {
                         });
                         this.setState({
                             programs: listArray, programLst: listArray
-                        }, () => { this.getVersionTypeList() });
+                        });
                     }).catch(
                         error => {
                             this.setState({
