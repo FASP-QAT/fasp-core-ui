@@ -344,8 +344,8 @@ class SupplyPlanVersionAndReview extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         this.getCountrylist();
         // this.getPrograms()
-        // this.getVersionTypeList()
-        // this.getStatusList()
+        this.getVersionTypeList()
+        this.getStatusList()
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -506,7 +506,7 @@ class SupplyPlanVersionAndReview extends Component {
                         });
                         this.setState({
                             programs: listArray, programLst: listArray
-                        }, () => { this.getVersionTypeList() });
+                        });
                     }).catch(
                         error => {
                             this.setState({
@@ -730,11 +730,6 @@ class SupplyPlanVersionAndReview extends Component {
         console.log("function called-------------------------------")
         let programId = document.getElementById("programId").value;
         let countryId = document.getElementById("countryId").value;
-        if(this.props.match.params.statusId!="" && this.props.match.params.statusId!= undefined){
-            console.log("this.props.match.params.statusId---->",this.props.match.params.statusId)
-            document.getElementById("versionStatusId").value =this.props.match.params.statusId;
-            console.log("versionStatusId-----> 1 ",document.getElementById("versionStatusId").value)
-        }
 
         let versionStatusId = document.getElementById("versionStatusId").value;
         let versionTypeId = document.getElementById("versionTypeId").value;
