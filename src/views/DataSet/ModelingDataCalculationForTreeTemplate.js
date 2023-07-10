@@ -563,7 +563,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                         fuPerPu = nodeDataMapForScenario.puNode.planningUnit.multiplier;
                                     }
 
-                                    var monthsPerVisit = nodeDataMapForScenario.puNode.refillMonths;
+                                    var monthsPerVisit = 1;
                                     var noOfBottlesInOneVisit = nodeDataMapForScenario.puNode.puPerVisit;
                                     var puPerBaseMonth = Math.floor(patients / monthsPerVisit);
                                     var puPerMonthBalance = patients - puPerBaseMonth * monthsPerVisit + puPerBaseMonth;

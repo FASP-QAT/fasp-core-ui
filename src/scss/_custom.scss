@@ -9396,6 +9396,13 @@ legend.scheduler-border {
 .table-striped1 tbody tr:nth-of-type(even):hover {
   background-color: transparent;
 }
+.treeTemplateSearchMarginTop{
+  margin-top: -40px;
+}
+
+.jexcel_contextmenu>.header {
+  display: none
+}
 
 .AggregationNodeSize {
   width: 13px;

@@ -542,11 +542,11 @@ class ProductValidation extends Component {
                     } else {
                         console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
                         console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
-                        console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
+                        // console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
                         var puPerInterval = parseFloat(finalData[i].nodeDataMap.puNode.puPerVisit).toFixed(8);
                         console.log("puPerInterval###", parseFloat(puPerInterval).toFixed(8));
 
-                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommasWith8Decimals((puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + finalData[i].nodeDataMap.puNode.refillMonths + " " + i18n.t('static.report.month');
+                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommasWith8Decimals((puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + "1" + " " + i18n.t('static.report.month');
                     }
                     var currency = this.state.currencyList.filter(c => c.id == this.state.currencyId)[0];
                     var cost = 0;
@@ -557,7 +557,7 @@ class ProductValidation extends Component {
                     }
                     var qty = Number(finalData[i].nodeDataMap.puNode.puPerVisit);
                     if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2) {
-                        qty = Number(qty) / Number(finalData[i].nodeDataMap.puNode.refillMonths)
+                        qty = Number(qty) / Number(1)
                     }
 
                     // if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
