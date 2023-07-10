@@ -298,7 +298,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 }
                             }
                         }
-                        console.log("paResult", listArrays)
+                        // console.log("paResult", listArrays)
 
                         for (var k = 0; k < listArrays.length; k++) {
                             var paJson = {
@@ -534,7 +534,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     shipmentEditable: false
                                                 })
                                             }
-                                            console.log("ShipmentListMohit@@@@@", shipmentList)
+                                            // console.log("ShipmentListMohit@@@@@", shipmentList)
                                             for (var i = 0; i < shipmentList.length; i++) {
                                                 var shipmentLinkingList = (generalProgramJson.shipmentLinkingList == null || generalProgramJson.shipmentLinkingList == undefined) ? [] : generalProgramJson.shipmentLinkingList;
                                                 var orderNo = shipmentList[i].orderNo;
@@ -858,7 +858,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             var existingShipmentQty = 0;
                                                             var shipmentsJson = (obj.getJson(null, false));
                                                             shipmentsJson.map((item, index) => {
-                                                                console.log("item[3]+++", item[3])
+                                                                // console.log("item[3]+++", item[3])
                                                                 if (item[0] != false && item[4] != CANCELLED_SHIPMENT_STATUS) {
                                                                     existingShipmentQty += Number(obj.getValue(`M${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""));
                                                                 }
@@ -2778,8 +2778,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             } else {
                 positiveValidation("A", y, elInstance);
                 if (rowData[9].toString() == "true") {
-                    console.log("row Data 1 Test@123", rowData[1])
-                    console.log("row Data 8 Test@123", rowData[8])
+                    // console.log("row Data 1 Test@123", rowData[1])
+                    // console.log("row Data 8 Test@123", rowData[8])
                     if (rowData[0] != rowData[7] || moment(rowData[1]).format("YYYY-MM-DD") != moment(rowData[8]).format("YYYY-MM-DD") || elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "") != elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "")) {
                         elInstance.setValueFromCoords(6, y, 0, true);
                         if ((x == 1 || x == 2) && rowData[0].toString().substring(0, 3) == "QAT") {

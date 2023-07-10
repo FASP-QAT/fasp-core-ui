@@ -47,23 +47,23 @@ export default class ChangeInLocalProgramVersion extends Component {
     checkIfLocalProgramVersionChanged() {
         // checkClick = (e, programDataLastModifiedDate, downloadedProgramDataLastModifiedDate) => {
         // e.preventDefault();
-        console.log("d---this.state.programDataLastModifiedDate---", this.state.programDataLastModifiedDate);
-        console.log("d---downloadedProgramDataLastModifiedDate  ", this.state.downloadedProgramDataLastModifiedDate);
-        console.log("d---result local version---", moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
+        // console.log("d---this.state.programDataLastModifiedDate---", this.state.programDataLastModifiedDate);
+        // console.log("d---downloadedProgramDataLastModifiedDate  ", this.state.downloadedProgramDataLastModifiedDate);
+        // console.log("d---result local version---", moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss"))
         localStorage.removeItem("sesLocalVersionChange");
         if (moment(this.state.programDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(this.state.downloadedProgramDataLastModifiedDate).format("YYYY-MM-DD HH:mm:ss")) {
-            console.log("d---hurrey local version changed-------------------------------------------------------------");
+            // console.log("d---hurrey local version changed-------------------------------------------------------------");
             localStorage.setItem("sesLocalVersionChange", true);
-            console.log("d--------in if---------------")
+            // console.log("d--------in if---------------")
         } else {
             localStorage.setItem("sesLocalVersionChange", false);
-            console.log("d--------in else---------------")
+            // console.log("d--------in else---------------")
         }
         //   }
     }
 
     componentDidMount() {
-        console.log("component did mount change in local program version--------------------------");
+        // console.log("component did mount change in local program version--------------------------");
         this.getProgramData();
         this.getDownloadedPrograms();
         // this.checkIfLocalProgramVersionChanged();
@@ -78,7 +78,7 @@ export default class ChangeInLocalProgramVersion extends Component {
     // }
 
     getProgramData() {
-        console.log("get programs called");
+        // console.log("get programs called");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -112,19 +112,19 @@ export default class ChangeInLocalProgramVersion extends Component {
                         var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
-                        console.log("1---programJson1 program id---", programJson1.programId);
-                        console.log("1---programData---", programData);
-                        console.log("1---programJson1.consumptionList---", programJson1.consumptionList);
-                        console.log("1---programJson1.inventoryList---", programJson1.inventoryList);
-                        console.log("1---programJson1.shipmentList---", programJson1.shipmentList);
+                        // console.log("1---programJson1 program id---", programJson1.programId);
+                        // console.log("1---programData---", programData);
+                        // console.log("1---programJson1.consumptionList---", programJson1.consumptionList);
+                        // console.log("1---programJson1.inventoryList---", programJson1.inventoryList);
+                        // console.log("1---programJson1.shipmentList---", programJson1.shipmentList);
                         let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
-                        console.log("1---cmax---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
+                        // console.log("1---cmax---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
                         let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
-                        console.log("1---imax---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
+                        // console.log("1---imax---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
                         let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
-                        console.log("1---smax---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
+                        // console.log("1---smax---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
                         let pmax = moment.max(cmax, imax, smax)
-                        console.log("1---pmax---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
+                        // console.log("1---pmax---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
                         var programJson = {
                             lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
                         }
@@ -143,7 +143,7 @@ export default class ChangeInLocalProgramVersion extends Component {
 
     }
     getDownloadedPrograms() {
-        console.log("get programs called");
+        // console.log("get programs called");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -178,19 +178,19 @@ export default class ChangeInLocalProgramVersion extends Component {
                         var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson1 = JSON.parse(programData);
-                        console.log("1---programJson program id 1---", programJson1.programId);
-                        console.log("1---programData 1---", programData);
-                        console.log("1---programJson.consumptionList 1---", programJson1.consumptionList);
-                        console.log("1---programJson.inventoryList 1---", programJson1.inventoryList);
-                        console.log("1---programJson.shipmentList 1---", programJson1.shipmentList);
+                        // console.log("1---programJson program id 1---", programJson1.programId);
+                        // console.log("1---programData 1---", programData);
+                        // console.log("1---programJson.consumptionList 1---", programJson1.consumptionList);
+                        // console.log("1---programJson.inventoryList 1---", programJson1.inventoryList);
+                        // console.log("1---programJson.shipmentList 1---", programJson1.shipmentList);
                         let cmax = moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate)))
-                        console.log("1---cmax1---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
+                        // console.log("1---cmax1---", moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))));
                         let imax = moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate)))
-                        console.log("1---imax1---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
+                        // console.log("1---imax1---", moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))));
                         let smax = moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))
-                        console.log("1---smax1---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
+                        // console.log("1---smax1---", moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
                         let pmax = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
-                        console.log("1---pmax1---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
+                        // console.log("1---pmax1---", moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate)))));
                         var programJson = {
                             lastModifiedDate: moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))))
                         }

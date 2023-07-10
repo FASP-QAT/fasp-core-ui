@@ -84,7 +84,7 @@
 //         HealthAreaService.getHealthAreaList()
 //             .then(response => {
 //                 if (response.status == 200) {
-//                     console.log("response---", response.data);
+//                     // console.log("response---", response.data);
 //                     this.setState({
 //                         healthAreas: response.data,
 //                         selSource: response.data
@@ -380,7 +380,7 @@ export default class HealthAreaListComponent extends Component {
     }
     buildJexcel() {
         let healthAreas = this.state.selSource;
-        // console.log("healthAreas---->", healthAreas);
+        // // console.log("healthAreas---->", healthAreas);
         let healthAreasArray = [];
         let count = 0;
 
@@ -400,7 +400,7 @@ export default class HealthAreaListComponent extends Component {
         //     data = [];
         //     healthAreasArray[0] = data;
         // }
-        console.log("healthAreasArray---->", this.state.lang);
+        // console.log("healthAreasArray---->", this.state.lang);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -589,7 +589,7 @@ export default class HealthAreaListComponent extends Component {
         HealthAreaService.getHealthAreaList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response---", response.data);
+                    // console.log("response---", response.data);
 
                     this.setState({
                         healthAreas: response.data,
@@ -790,7 +790,7 @@ export default class HealthAreaListComponent extends Component {
         if (e.buttons == 1) {
 
             if ((x == 0 && value != 0) || (y == 0)) {
-                // console.log("HEADER SELECTION--------------------------");
+                // // console.log("HEADER SELECTION--------------------------");
             } else {
                 if (this.state.selSource.length != 0) {
                     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_HEALTH_AREA')) {

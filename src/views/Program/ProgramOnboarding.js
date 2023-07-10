@@ -151,7 +151,7 @@ export default class ProgramOnboarding extends Component {
             document.getElementById('realmId').disabled = true;
 
         } else {
-            console.log("in else");
+            // console.log("in else");
             document.getElementById('realmId').disabled = false;
         }
 
@@ -290,16 +290,16 @@ export default class ProgramOnboarding extends Component {
         program.programPlanningUnits = j;
         this.setState({ program }, () => { });
 
-        console.log("validation status----", validation)
-        console.log("planningUnit ----------------", j);
-        console.log("program-----------", this.state.program);
+        // console.log("validation status----", validation)
+        // console.log("planningUnit ----------------", j);
+        // console.log("program-----------", this.state.program);
 
         if (validation == true) {
             this.setState({ loading: true });
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.programInitialize(this.state.program).then(response => {
                 if (response.status == "200") {
-                    console.log("in success--------");
+                    // console.log("in success--------");
                     this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
@@ -379,7 +379,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         let { program } = this.state;
         program.healthArea.id = '';
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => { 
+            // console.log(this.state) 
+        })
     }
 
     previousToStepThree() {
@@ -393,7 +395,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         let { program } = this.state;
         program.organisation.id = '';
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => { 
+            // console.log(this.state) 
+        })
     }
 
     previousToStepFour() {
@@ -407,7 +411,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         let { program } = this.state;
         program.regionArray = [];
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => { 
+            // console.log(this.state) 
+        })
     }
     previousToStepFive() {
         this.setState({ progressPer: 68 });
@@ -538,7 +544,9 @@ export default class ProgramOnboarding extends Component {
             program.programNotes = event.target.value;
         }
 
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => { 
+            // console.log(this.state)
+         })
 
     }
 

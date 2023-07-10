@@ -144,8 +144,8 @@ export default class EditOrganisationComponent extends Component {
 
     dataChange(event) {
         let { organisation } = this.state
-        console.log(event.target.name);
-        console.log(event.target.value);
+        // console.log(event.target.name);
+        // console.log(event.target.value);
         if (event.target.name === "organisationName") {
             organisation.label.label_en = event.target.value
         } else if (event.target.name === "organisationCode") {
@@ -161,7 +161,7 @@ export default class EditOrganisationComponent extends Component {
             organisation
         }, (
         ) => {
-            console.log("state after update---", this.state.organisation)
+            // console.log("state after update---", this.state.organisation)
         })
     }
 
@@ -218,7 +218,7 @@ export default class EditOrganisationComponent extends Component {
             }
             UserService.getRealmList()
                 .then(response => {
-                    console.log("realm list---", response.data);
+                    // console.log("realm list---", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -274,7 +274,7 @@ export default class EditOrganisationComponent extends Component {
             // OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
             DropdownService.getRealmCountryDropdownList(this.state.organisation.realm.id)   
                 .then(response => {
-                    console.log("Realm Country List list---Seema ", response.data);
+                    // console.log("Realm Country List list---Seema ", response.data);
                     if (response.status == 200) {
                         var json = response.data;
                         // var json = (response.data).filter(c => c.active == true);
@@ -342,7 +342,7 @@ export default class EditOrganisationComponent extends Component {
 
             OrganisationTypeService.getOrganisationTypeByRealmId(this.state.organisation.realm.id)
                 .then(response => {
-                    console.log("Realm Country List list---", response.data);
+                    // console.log("Realm Country List list---", response.data);
                     if (response.status == 200) {
                         // var json = response.data;
                         var listArray = response.data;
@@ -535,7 +535,7 @@ export default class EditOrganisationComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("state-------------------->" + this.state.organisation);
+                                    // console.log("state-------------------->" + this.state.organisation);
                                     OrganisationService.editOrganisation(this.state.organisation)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -792,7 +792,7 @@ export default class EditOrganisationComponent extends Component {
             // }
             UserService.getRealmList()
                 .then(response => {
-                    console.log("realm list---", response.data);
+                    // console.log("realm list---", response.data);
                     this.setState({
                         realms: response.data, loading: false
                     })
@@ -841,7 +841,7 @@ export default class EditOrganisationComponent extends Component {
             // OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
             DropdownService.getRealmCountryDropdownList(this.state.organisation.realm.id)   
                 .then(response => {
-                    console.log("Realm Country List list---Edit ", response.data);
+                    // console.log("Realm Country List list---Edit ", response.data);
                     if (response.status == 200) {
                         var json = response.data;
                         var regList = [];

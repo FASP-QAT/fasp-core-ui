@@ -86,7 +86,7 @@ class AuthenticationService {
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
             let roleList = [];
             for (let i = 0; i < decryptedUser.roleList.length; i++) {
-                console.log("decryptedUser.roleList[i]", (decryptedUser.roleList[i]).roleId);
+                // console.log("decryptedUser.roleList[i]", (decryptedUser.roleList[i]).roleId);
                 roleList.push((decryptedUser.roleList[i]).roleId);
                 // if (role != null && role != "") {
                 //     if (i > 0) {
@@ -102,7 +102,7 @@ class AuthenticationService {
     }
 
     displayDashboardBasedOnRole() {
-        console.log("M sync role based dashboard 1");
+        // console.log("M sync role based dashboard 1");
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
@@ -111,10 +111,10 @@ class AuthenticationService {
                 let role = decryptedUser.roleList[i];
                 if (role != null && role != "") {
                     roleList.push(role.roleId);
-                    console.log("M sync role based dashboard 2");
+                    // console.log("M sync role based dashboard 2");
                 }
             }
-            console.log("M sync role based dashboard 3");
+            // console.log("M sync role based dashboard 3");
             if (roleList.includes("ROLE_APPLICATION_ADMIN"))
                 return 1;
             if (roleList.includes("ROLE_REALM_ADMIN"))
@@ -168,7 +168,7 @@ class AuthenticationService {
         if ((typeOfSession === 'Online' && checkSite) || (typeOfSession === 'Offline' && !checkSite) || (typeOfSession === 'Online' && !checkSite && urlarr.includes(url)) || (typeOfSession === 'Offline' && urlarr.includes(url))) {
             return true;
         } else {
-            console.log("offline to online false");
+            // console.log("offline to online false");
             return false;
 
 
@@ -213,13 +213,13 @@ class AuthenticationService {
         return decryptedUser.sessionExpiresOn;
     }
     updateUserLanguage(languageCode) {
-        console.log("Going to change language code---", languageCode)
+        // console.log("Going to change language code---", languageCode)
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("Going to change language decryptedCurUser---", decryptedCurUser)
+        // console.log("Going to change language decryptedCurUser---", decryptedCurUser)
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
-        console.log("Going to change language decryptedUser---", decryptedUser)
+        // console.log("Going to change language decryptedUser---", decryptedUser)
         decryptedUser.language.languageCode = languageCode;
-        console.log("Going to change language decryptedUser after change---", decryptedUser)
+        // console.log("Going to change language decryptedUser after change---", decryptedUser)
         localStorage.removeItem('user-' + decryptedCurUser);
         localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
     }
@@ -487,19 +487,19 @@ class AuthenticationService {
     }
     authenticatedRoute(route, url) {
         if (url == "") {
-            console.log("route---" + route);
+            // console.log("route---" + route);
 
             localStorage.setItem("isOfflinePage", 0);
             var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
             if (urlarr.includes(route)) {
                 localStorage.setItem("isOfflinePage", 1);
             }
-            console.log("offline 1---------------")
+            // console.log("offline 1---------------")
             if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
-                console.log("cur user available");
+                // console.log("cur user available");
                 let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                 if (localStorage.getItem("sessionType") === 'Online' && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
-                    console.log("token not available");
+                    // console.log("token not available");
                     return true;
                 }
                 // console.log("going to check bf functions");
@@ -896,7 +896,7 @@ class AuthenticationService {
                     case "/forecastingUnit/listForecastingUnit":
                     case "/forecastingUnit/listForecastingUnit/:message":
                     case "/forecastingUnit/listForecastingUnit/:color/:message":
-                        console.log("result---" + bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT"));
+                        // console.log("result---" + bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT"));
                         if (bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT")) {
                             return true;
                         }
@@ -980,7 +980,7 @@ class AuthenticationService {
                     case "/consumptionDetails/:programId/:versionId/:planningUnitId":
                         if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA")) {
                             localStorage.setItem("isOfflinePage", 1);
-                            console.log("offline 2---------------")
+                            // console.log("offline 2---------------")
                             return true;
                         }
                         break;
@@ -988,7 +988,7 @@ class AuthenticationService {
                     case "/inventory/addInventory/:programId/:versionId/:planningUnitId":
                         if (bfunction.includes("ROLE_BF_INVENTORY_DATA")) {
                             localStorage.setItem("isOfflinePage", 1);
-                            console.log("offline 3---------------")
+                            // console.log("offline 3---------------")
                             return true;
                         }
                         break;
@@ -1009,7 +1009,7 @@ class AuthenticationService {
                     case "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId":
                         if (bfunction.includes("ROLE_BF_SHIPMENT_DATA")) {
                             localStorage.setItem("isOfflinePage", 1);
-                            console.log("offline 4---------------")
+                            // console.log("offline 4---------------")
                             return true;
                         }
                         break;
@@ -1046,7 +1046,7 @@ class AuthenticationService {
                     case "/supplyPlan/:programId/:planningUnitId/:batchNo/:expiryDate":
                         if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
                             localStorage.setItem("isOfflinePage", 1);
-                            console.log("offline 5---------------")
+                            // console.log("offline 5---------------")
                             return true;
                         }
                         break;
@@ -1519,15 +1519,15 @@ class AuthenticationService {
                         return true;
 
                     default:
-                        console.log("default case");
+                        // console.log("default case");
                         return false;
                 }
                 // localStorage.removeItem("token-" + decryptedCurUser);
             } else {
-                console.log("else in route");
+                // console.log("else in route");
                 return true;
             }
-            console.log("route access denied------------------------");
+            // console.log("route access denied------------------------");
             // let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
             // keysToRemove.forEach(k => localStorage.removeItem(k))
             return false;
@@ -1556,7 +1556,7 @@ class AuthenticationService {
     }
 
     validateRequest() {
-        console.log("inside validate request")
+        // console.log("inside validate request")
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             // if (this.checkTypeOfSession()) {
@@ -1577,7 +1577,7 @@ class AuthenticationService {
                     //     return "/logout/static.message.sessionExpired";
                     // }
                 } else {
-                    console.log("common component token error");
+                    // console.log("common component token error");
                     return "/logout/static.message.tokenError";
                 }
             } else {
@@ -1598,7 +1598,7 @@ class AuthenticationService {
             //     return "/login/static.message.sessionChange";
             // }
         } else {
-            console.log("offline to online ");
+            // console.log("offline to online ");
             if (localStorage.getItem("sessionChanged") == 1) {
                 return "/login/static.message.sessionChange";
             } else {
@@ -1607,7 +1607,7 @@ class AuthenticationService {
         }
     }
     clearUserDetails() {
-        console.log("timeout going to clear cache");
+        // console.log("timeout going to clear cache");
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport", "sesShipmentType", "sesCountryId", "sesPlanningUnitIdMulti","sesAutoCalculate", "sesRangeValueManualJson","sesLatestDataset","sesCountryIdSPVR","sesProgramIdSPVR","sesVersionTypeSPVR","sesVersionStatusSPVR","sesReportRangeSPVR"];
@@ -1676,13 +1676,13 @@ class AuthenticationService {
         localStorage.setItem('sesBudStatus', "");
         localStorage.setItem('sesForecastProgramIds', "");
         var currentDate = moment(Date.now()).utcOffset('-0500');
-        console.log("&&&&&&&&&&&&&&&&&Current Date in authetication service", currentDate);
+        // console.log("&&&&&&&&&&&&&&&&&Current Date in authetication service", currentDate);
         var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
-        console.log("&&&&&&&&&&&&&&&&&Current Date after subtraction in authetication service", curDate);
+        // console.log("&&&&&&&&&&&&&&&&&Current Date after subtraction in authetication service", curDate);
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
 
-        console.log("&&&&&&&&&&&&&&&&&Current Date json. stringfy", JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }));
+        // console.log("&&&&&&&&&&&&&&&&&Current Date json. stringfy", JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }));
         localStorage.setItem('sesAutoCalculate',true)
     }
 

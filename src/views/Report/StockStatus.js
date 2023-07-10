@@ -144,7 +144,7 @@ class StockStatus extends Component {
       programId: event.target.value,
       versionId: ''
     }, () => {
-      console.log("ProgramId-------->1", this.state.programId);
+      // console.log("ProgramId-------->1", this.state.programId);
       localStorage.setItem("sesVersionIdReport", '');
       this.filterVersion();
     })
@@ -295,7 +295,7 @@ class StockStatus extends Component {
 
 
     for (var i = 0; i < A.length; i++) {
-      // console.log(A[i])
+      // // console.log(A[i])
       csvRow.push(A[i].join(","))
 
     }
@@ -337,7 +337,7 @@ class StockStatus extends Component {
           // i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]
         ])];
         A = headers
-        console.log(' item.data', item.data)
+        // console.log(' item.data', item.data)
         item.data.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
         (ele.shipmentInfo.map(item1 => {
           return (
@@ -362,16 +362,16 @@ class StockStatus extends Component {
         }).join(' \n')).replaceAll(' ', '%20')
           , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundN(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
 
-        console.log('A===>', A)
+        // console.log('A===>', A)
         for (var i = 0; i < A.length; i++) {
-          //  console.log(A1[i])
+          //  // console.log(A1[i])
           csvRow.push(A[i].join(","))
 
         }
 
       })
     var csvString = csvRow.join("%0A")
-    // console.log('csvString' + csvString)
+    // // console.log('csvString' + csvString)
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
@@ -565,7 +565,7 @@ class StockStatus extends Component {
     var height = doc.internal.pageSize.height;
     // var h1 = 100;
     // var aspectwidth1 = (width - h1);
-    // console.log("Document+++", doc.internal)
+    // // console.log("Document+++", doc.internal)
     // doc.setTextColor("#002f6c");
     // doc.addImage(canvasImg, 'png', 50, 150, 750, 300, 'CANVAS');
 
@@ -770,7 +770,7 @@ class StockStatus extends Component {
     // var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0];
     // pageArray.push({ "startPage": 1, "endPage": lastPage, "planningUnit": document.getElementById("planningUnitId").selectedOptions[0].text, "min": this.state.stockStatusList[0].minMos, "max": this.state.stockStatusList[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc, minStock: ppu.minQty, distributionLeadTime: ppu.distributionLeadTime, planBasedOn: ppu.planBasedOn });
     var list = this.state.PlanningUnitDataForExport
-    console.log("List@@@@@@@@Mohit", list)
+    // console.log("List@@@@@@@@Mohit", list)
     var count = 0;
     list.map(
       (item, itemCount) => {
@@ -858,9 +858,9 @@ class StockStatus extends Component {
         // })
 
         var canv = document.getElementById("cool-canvas" + count)
-        console.log('canv', canv)
+        // console.log('canv', canv)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
-        //console.log('canvasImg1',canvasImg1)    
+        //// console.log('canvasImg1',canvasImg1)    
         doc.addImage(canvasImg1, 'png', 50, 150, 750, 300, "a" + count, 'CANVAS')
         count++
 
@@ -1112,7 +1112,7 @@ class StockStatus extends Component {
 
       }
     )
-    console.log("PageArray+++", pageArray);
+    // console.log("PageArray+++", pageArray);
     addHeaders(doc, pageArray)
     addFooters(doc)
     doc.save(i18n.t('static.dashboard.stockstatus') + ".pdf")
@@ -1291,9 +1291,9 @@ class StockStatus extends Component {
 
                     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
                     let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
-                    console.log("EndDate+++", endDate)
+                    // console.log("EndDate+++", endDate)
                     var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
-                    console.log("ShipmentList+++", shipmentList);
+                    // console.log("ShipmentList+++", shipmentList);
                     var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
                     var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
                     var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
@@ -1334,7 +1334,7 @@ class StockStatus extends Component {
                         }
                       }
                     })
-                    console.log("ShList+++", shList);
+                    // console.log("ShList+++", shList);
                     this.setState({
                       inList: inList,
                       coList: coList,
@@ -1356,14 +1356,14 @@ class StockStatus extends Component {
                     var monthstartfrom = this.state.rangeValue.from.month
                     for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                       var monthlydata = [];
-                      console.log(programJson)
+                      // console.log(programJson)
                       for (var month = monthstartfrom; month <= 12; month++) {
                         var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
                         var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                        console.log(dtstr, ' ', enddtStr)
+                        // console.log(dtstr, ' ', enddtStr)
                         var dt = dtstr
                         var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
-                        console.log(list)
+                        // console.log(list)
                         if (list.length > 0) {
                           var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
                           var totalShipmentQty = 0;
@@ -1398,9 +1398,9 @@ class StockStatus extends Component {
                           conListAct.map(elt => {
                             totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
-                          console.log(conList)
-                          console.log(totalforecastConsumption)
-                          console.log("paResult==>>>", shiplist)
+                          // console.log(conList)
+                          // console.log(totalforecastConsumption)
+                          // console.log("paResult==>>>", shiplist)
 
                           var json = {
                             dt: new Date(from, month - 1),
@@ -1455,7 +1455,7 @@ class StockStatus extends Component {
                           }
                         }
                         data.push(json)
-                        console.log("jsjsjs", json)
+                        // console.log("jsjsjs", json)
                         if (month == this.state.rangeValue.to.month && from == to) {
                           this.setState({
                             stockStatusList: data,
@@ -1533,7 +1533,7 @@ class StockStatus extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ReportService.getStockStatusData(inputjson)
           .then(response => {
-            console.log("Response", JSON.stringify(response.data));
+            // console.log("Response", JSON.stringify(response.data));
             var inventoryList = [];
             var consumptionList = [];
             var shipmentList = [];
@@ -1546,7 +1546,7 @@ class StockStatus extends Component {
               c.shipmentInfo.map(si => shipmentList.push(si))
             }
             );
-            console.log("ConsumptionList+++", filteredResponseData);
+            // console.log("ConsumptionList+++", filteredResponseData);
             this.setState({
               firstMonthRegionCount: responseData.length > 0 ? responseData[0].regionCount : 1,
               firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
@@ -1559,7 +1559,7 @@ class StockStatus extends Component {
             })
           }).catch(
             error => {
-              console.log("Error+++", error);
+              // console.log("Error+++", error);
               this.setState({
                 stockStatusList: [], loading: false
               })
@@ -1737,11 +1737,11 @@ class StockStatus extends Component {
                   var paResult = paRequest.result;
                   // var selectedPlanningUnitdata = {};
                   // var selectedplanningunit = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]
-                  // console.log('selectedplanningunit', selectedplanningunit)
+                  // // console.log('selectedplanningunit', selectedplanningunit)
                   // var planningunitList = this.state.planningUnits.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
                   // planningunitList.push(selectedplanningunit)
                   var pcnt = 0
-                  // console.log('planningunitList', planningunitList)
+                  // // console.log('planningunitList', planningunitList)
                   var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
                     a = a.label.toLowerCase();
                     b = b.label.toLowerCase();
@@ -1769,7 +1769,7 @@ class StockStatus extends Component {
                         supplyPlan: []
                       }
                     }
-                    console.log('**pu', pu)
+                    // console.log('**pu', pu)
                     var data = [];
                     var monthstartfrom = this.state.rangeValue.from.month
                     var fromYear = this.state.rangeValue.from.year
@@ -1851,11 +1851,11 @@ class StockStatus extends Component {
                       for (var month = monthstartfrom; month <= 12; month++) {
                         var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
                         var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                        console.log(dtstr, ' ', enddtStr)
+                        // console.log(dtstr, ' ', enddtStr)
                         var dt = dtstr
                         var list = programJson.supplyPlan.filter(c => c.planningUnitId == pu.value && c.transDate == dt)
 
-                        console.log(list)
+                        // console.log(list)
                         if (list.length > 0) {
                           var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
                           var totalShipmentQty = 0;
@@ -1891,8 +1891,8 @@ class StockStatus extends Component {
                           conListAct.map(elt => {
                             totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
-                          console.log(conList)
-                          console.log(totalforecastConsumption)
+                          // console.log(conList)
+                          // console.log(totalforecastConsumption)
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
@@ -2334,11 +2334,11 @@ class StockStatus extends Component {
                           //   loading: false,
                           //  }, () => {
                           //   this.forceUpdate()
-                          //   console.log('updating data')
+                          //   // console.log('updating data')
                           // })
                           // } else {
                           //   selectedPlanningUnitdata = planningUnitexport
-                          //   console.log('selectedPlanningUnitdata', selectedPlanningUnitdata)
+                          //   // console.log('selectedPlanningUnitdata', selectedPlanningUnitdata)
                           // }
                         }
 
@@ -2353,7 +2353,7 @@ class StockStatus extends Component {
 
 
                     pcnt = pcnt + 1
-                    console.log('pcnt', pcnt, 'PlanningUnitDataForExport', PlanningUnitDataForExport)
+                    // console.log('pcnt', pcnt, 'PlanningUnitDataForExport', PlanningUnitDataForExport)
                     if (pcnt == sortedPlanningUnitData.length) {
                       // PlanningUnitDataForExport.push(selectedPlanningUnitdata)
                       this.setState({
@@ -2388,7 +2388,7 @@ class StockStatus extends Component {
 
     }
     else {
-      console.log('in true')
+      // console.log('in true')
       this.setState({ loading: true })
       var inputjson = {
         "programId": programId,
@@ -2399,7 +2399,7 @@ class StockStatus extends Component {
       }
       ReportService.getStockStatusData(inputjson)
         .then(response => {
-          console.log('response+++=>', response.data);
+          // console.log('response+++=>', response.data);
           var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
             a = a.label.toLowerCase();
             b = b.label.toLowerCase();
@@ -2745,14 +2745,14 @@ class StockStatus extends Component {
             let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
             var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
             var planningUnit = planningUnitItemFilter[0].planningUnit
-            console.log('planningUnit', planningUnit)
+            // console.log('planningUnit', planningUnit)
             var conList = [];
             var invList = [];
             var shipList = [];
             filteredData.map(c => c.consumptionInfo.map(ci => conList.push(ci)));
             filteredData.map(c => c.inventoryInfo.map(ii => invList.push(ii)));
             filteredData.map(c => c.shipmentInfo.map(si => shipList.push(si)));
-            console.log("Consum:List+++", conList);
+            // console.log("Consum:List+++", conList);
             var planningUnitexport = {
               planningUnit: planningUnit,
               firstMonthRegionCount: data.length > 0 ? data[0].regionCount : 1,
@@ -2771,7 +2771,7 @@ class StockStatus extends Component {
             PlanningUnitDataForExport: PlanningUnitDataForExport,
             message: '', loading: false
           }, () => {
-            console.log('PlanningUnitDataForExport', PlanningUnitDataForExport)
+            // console.log('PlanningUnitDataForExport', PlanningUnitDataForExport)
             setTimeout(() => {
 
               if (report == 1) {
@@ -2787,7 +2787,7 @@ class StockStatus extends Component {
         }
         ).catch(
           error => {
-            console.log("Error+++", error)
+            // console.log("Error+++", error)
             this.setState({
               stockStatusList: [], loading: false
             })
@@ -2838,14 +2838,14 @@ class StockStatus extends Component {
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
-          console.log(JSON.stringify(response.data))
+          // console.log(JSON.stringify(response.data))
           this.setState({
             programs: response.data, message: '',
             loading: false
           }, () => { this.consolidatedProgramList() })
         }).catch(
           error => {
-            console.log("Error+++", error)
+            // console.log("Error+++", error)
             this.setState({
               programs: [], loading: false
             }, () => { this.consolidatedProgramList() })
@@ -2913,7 +2913,7 @@ class StockStatus extends Component {
       // );
 
     } else {
-      console.log('offline')
+      // console.log('offline')
       this.setState({ loading: false })
       this.consolidatedProgramList()
     }
@@ -2947,13 +2947,13 @@ class StockStatus extends Component {
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-            console.log(programNameLabel)
+            // console.log(programNameLabel)
 
             var f = 0
             for (var k = 0; k < this.state.programs.length; k++) {
               if (this.state.programs[k].programId == programData.programId) {
                 f = 1;
-                console.log('already exist')
+                // console.log('already exist')
               }
             }
             if (f == 0) {
@@ -2965,7 +2965,7 @@ class StockStatus extends Component {
         }
         var lang = this.state.lang;
         if (proList.length == 1) {
-          console.log("*****1");
+          // console.log("*****1");
           this.setState({
             programs: proList.sort(function (a, b) {
               a = getLabelText(a.label, lang).toLowerCase();
@@ -2978,7 +2978,7 @@ class StockStatus extends Component {
           })
         } else if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
           //from session
-          console.log("*****2");
+          // console.log("*****2");
           this.setState({
             programs: proList.sort(function (a, b) {
               a = getLabelText(a.label, lang).toLowerCase();
@@ -2990,7 +2990,7 @@ class StockStatus extends Component {
             this.filterVersion();
           })
         } else {
-          console.log("*****3");
+          // console.log("*****3");
           this.setState({
             programs: proList.sort(function (a, b) {
               a = getLabelText(a.label, lang).toLowerCase();
@@ -3010,14 +3010,14 @@ class StockStatus extends Component {
 
 
   filterVersion = () => {
-    console.log("ProgramId-------->2", this.state.programId);
+    // console.log("ProgramId-------->2", this.state.programId);
     // let programId = document.getElementById("programId").value;
     let programId = this.state.programId;
     if (programId != 0) {
 
       localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
-      console.log(program)
+      // console.log(program)
       if (program.length == 1) {
         if (isSiteOnline()) {
           this.setState({
@@ -3087,7 +3087,7 @@ class StockStatus extends Component {
 
         }
 
-        console.log(verList);
+        // console.log(verList);
         let versionList = verList.filter(function (x, i, a) {
           return a.indexOf(x) === i;
         });
@@ -3147,7 +3147,7 @@ class StockStatus extends Component {
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
-    console.log("VERSION-------->", versionId);
+    // console.log("VERSION-------->", versionId);
     this.setState({
       planningUnits: [],
       planningUnitsMulti: [],
@@ -3177,7 +3177,7 @@ class StockStatus extends Component {
               myResult = planningunitRequest.result;
               var programId = (document.getElementById("programId").value).split("_")[0];
               var proList = []
-              console.log(myResult)
+              // console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -3211,7 +3211,7 @@ class StockStatus extends Component {
           // AuthenticationService.setupAxiosInterceptors();
 
           ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-            console.log('**' + JSON.stringify(response.data))
+            // console.log('**' + JSON.stringify(response.data))
             var listArray = response.data;
             var planningUnitsMulti = []
             listArray.sort((a, b) => {
@@ -3230,7 +3230,7 @@ class StockStatus extends Component {
             })
           }).catch(
             error => {
-              console.log("Error+++", error)
+              // console.log("Error+++", error)
               this.setState({
                 planningUnits: [],
                 planningUnitsMulti: []

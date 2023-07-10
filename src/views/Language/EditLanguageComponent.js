@@ -231,7 +231,7 @@ export default class EditLanguageComponent extends Component {
                                     })
                                     // AuthenticationService.setupAxiosInterceptors();
                                     LanguageService.editLanguage(this.state.language).then(response => {
-                                        console.log(response)
+                                        // console.log(response)
                                         if (response.status == 200) {
                                             this.props.history.push(`/language/listLanguage/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {

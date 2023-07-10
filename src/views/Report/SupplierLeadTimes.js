@@ -92,13 +92,13 @@ class SupplierLeadTimes extends Component {
     buildJexcel() {
 
         let outPutList = this.state.outPutList;
-        console.log("outPutList---->", outPutList);
+        // console.log("outPutList---->", outPutList);
         let outPutArray = [];
         let count = 0;
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-            console.log("outPutList[j].totalSeaLeadTime-----------------", outPutList[j].totalSeaLeadTime);
+            // console.log("outPutList[j].totalSeaLeadTime-----------------", outPutList[j].totalSeaLeadTime);
             // data[0] = getLabelText(outPutList[j].program.label, this.state.lang)
             data[0] = getLabelText(outPutList[j].planningUnit.label, this.state.lang)
             data[1] = outPutList[j].procurementAgent.code
@@ -122,7 +122,7 @@ class SupplierLeadTimes extends Component {
         //     data = [];
         //     outPutArray[0] = data;
         // }
-        // console.log("outPutArray---->", outPutArray);
+        // // console.log("outPutArray---->", outPutArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -288,7 +288,7 @@ class SupplierLeadTimes extends Component {
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
         var A = [this.addDoubleQuoteToRowContent(headers)];
 
-        console.log("output list--->", this.state.outPutList);
+        // console.log("output list--->", this.state.outPutList);
         this.state.outPutList.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
                 //  (getLabelText(ele.country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'),
@@ -393,7 +393,7 @@ class SupplierLeadTimes extends Component {
             }
             doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
             y = y + 10;
-            console.log(y)
+            // console.log(y)
         }
         planningText = doc.splitTextToSize(i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.toString(), doc.internal.pageSize.width * 3 / 4);
         //doc.text(doc.internal.pageSize.width / 8, 130, planningText)
@@ -406,7 +406,7 @@ class SupplierLeadTimes extends Component {
             }
             doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
             y = y + 10;
-            console.log(y)
+            // console.log(y)
         }
 
         doc.setFontSize(8);
@@ -422,7 +422,7 @@ class SupplierLeadTimes extends Component {
         // const headers = [["Program Name", "Freight Cost Sea (%)", "Freight Cost Air (%)", "Plan to Draft LT (Months)", "Draft to Submitted LT (Months)", "Submitted to Approved LT (Months)", "Approved to Shipped LT (Months)", "Shipped to Arrived by Sea LT (Months)", "Shipped to Arrived by Air LT (Months)", "Arrived to Delivered LT (Months)", "Total LT By Sea (Months)", "Total LT By Air (Months)"]]
         // const data = this.state.procurementAgents.map(elt => [getLabelText(elt.label), elt.seaFreightPerc, elt.airFreightPerc, elt.plannedToDraftLeadTime, elt.draftToSubmittedLeadTime, elt.submittedToApprovedLeadTime, elt.approvedToShippedLeadTime, elt.shippedToArrivedBySeaLeadTime, elt.shippedToArrivedByAirLeadTime, elt.arrivedToDeliveredLeadTime, (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedBySeaLeadTime + elt.arrivedToDeliveredLeadTime), (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedByAirLeadTime + elt.arrivedToDeliveredLeadTime)]);
         let startY = y
-        console.log('startY', startY)
+        // console.log('startY', startY)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
             doc.addPage()
@@ -517,7 +517,7 @@ class SupplierLeadTimes extends Component {
 
             ReportService.getProcurementAgentExportData(programIds)
                 .then(response => {
-                    console.log(JSON.stringify(response.data));
+                    // console.log(JSON.stringify(response.data));
                     this.setState({
                         procurementAgents: response.data,
                         message: '',
@@ -610,7 +610,7 @@ class SupplierLeadTimes extends Component {
 
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    // console.log(JSON.stringify(response.data))
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
                         var programJson = {
@@ -691,7 +691,7 @@ class SupplierLeadTimes extends Component {
             //     }
             // );
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.setState({ loading: false })
             this.consolidatedProgramList()
         }
@@ -725,13 +725,13 @@ class SupplierLeadTimes extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -772,7 +772,7 @@ class SupplierLeadTimes extends Component {
         let programId = document.getElementById("programId").value;
         if (programId != 0) {
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     this.setState({
@@ -839,7 +839,7 @@ class SupplierLeadTimes extends Component {
                         verList.push(version)
                     }
                 }
-                console.log(verList)
+                // console.log(verList)
                 this.setState({
                     versions: verList.filter(function (x, i, a) {
                         return a.indexOf(x) === i;
@@ -886,7 +886,7 @@ class SupplierLeadTimes extends Component {
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
                             var proList = []
-                            console.log(myResult)
+                            // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -917,11 +917,11 @@ class SupplierLeadTimes extends Component {
                         tracerCategoryIds: [],
                         programIds: [programId]
                     }
-                    console.log('**' + programJson);
+                    // console.log('**' + programJson);
 
                     DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
 
-                        console.log('**' + JSON.stringify(response.data));
+                        // console.log('**' + JSON.stringify(response.data));
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1024,7 +1024,7 @@ class SupplierLeadTimes extends Component {
             var programJson = [programId]
             DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programJson)
                 .then(response => {
-                    console.log("=====>", JSON.stringify(response.data))
+                    // console.log("=====>", JSON.stringify(response.data))
                     var procurementAgent = response.data
                     var listArrays = [];
                     for (var i = 0; i < procurementAgent.length; i++) {
@@ -1105,7 +1105,7 @@ class SupplierLeadTimes extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.setState({ loading: false })
             this.consolidatedProcurementAgentList()
         }
@@ -1135,14 +1135,14 @@ class SupplierLeadTimes extends Component {
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                // console.log("ProcurementAgentMyResult------>>>>", myResult);
+                // // console.log("ProcurementAgentMyResult------>>>>", myResult);
                 for (var i = 0; i < myResult.length; i++) {
 
                     var f = 0
                     for (var k = 0; k < this.state.procurementAgents.length; k++) {
                         if (this.state.procurementAgents[k].id == myResult[i].procurementAgentId) {
                             f = 1;
-                            console.log('already exist')
+                            // console.log('already exist')
                         }
                     }
                     var programData = myResult[i];
@@ -1200,12 +1200,12 @@ class SupplierLeadTimes extends Component {
                     planningUnitIds: planningUnitIds,
                     procurementAgentIds: procurementAgentIds
                 }
-                console.log("json---", json);
+                // console.log("json---", json);
                 // alert("in");
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.programLeadTimes(json)
                     .then(response => {
-                        console.log("-----response", JSON.stringify(response.data));
+                        // console.log("-----response", JSON.stringify(response.data));
                         var outPutList = response.data;
                         // var responseData = response.data;
                         this.setState({
@@ -1319,7 +1319,7 @@ class SupplierLeadTimes extends Component {
 
                     programRequest.onsuccess = function (e) {
                         var result = programRequest.result;
-                        console.log("1------>", result);
+                        // console.log("1------>", result);
 
                         var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var ppuOs = ppuTransaction.objectStore('programPlanningUnit');
@@ -1338,13 +1338,13 @@ class SupplierLeadTimes extends Component {
                                 for (var i = 0; i < planningUnitIds.length; i++) {
                                     var l = result1.filter(c => c.planningUnit.id == planningUnitIds[i]);
                                     for (var j = 0; j < l.length; j++) {
-                                        // console.log("------status", l[j].shipmentStatus.id);
+                                        // // console.log("------status", l[j].shipmentStatus.id);
                                         planningUnitfilteredList.push(l[j]);
                                     }
                                 }
                                 result1 = planningUnitfilteredList;
                             }
-                            console.log("2------>", result1);
+                            // console.log("2------>", result1);
 
                             var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                             var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
@@ -1358,21 +1358,21 @@ class SupplierLeadTimes extends Component {
 
                             papuRequest.onsuccess = function (e) {
                                 var result2;
-                                console.log("procurementAgentIds------>", procurementAgentIds);
+                                // console.log("procurementAgentIds------>", procurementAgentIds);
 
                                 if (procurementAgentIds.length > 0) {
                                     var procurementAgentFilteredList = []
                                     for (var i = 0; i < procurementAgentIds.length; i++) {
                                         var l = (papuRequest.result).filter(c => c.procurementAgent.id == parseInt(procurementAgentIds[i]));
-                                        console.log("l------------", l);
+                                        // console.log("l------------", l);
                                         for (var j = 0; j < l.length; j++) {
                                             procurementAgentFilteredList.push(l[j]);
                                         }
-                                        console.log("procurementAgentFilteredList---", procurementAgentFilteredList)
+                                        // console.log("procurementAgentFilteredList---", procurementAgentFilteredList)
                                     }
                                     result2 = procurementAgentFilteredList;
                                 }
-                                console.log("my result ===", (papuRequest.result).filter(c => c.procurementAgent.id == 2))
+                                // console.log("my result ===", (papuRequest.result).filter(c => c.procurementAgent.id == 2))
                                 var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                                 var paOs = paTransaction.objectStore('procurementAgent');
                                 var paRequest = paOs.getAll();
@@ -1385,24 +1385,24 @@ class SupplierLeadTimes extends Component {
 
                                 paRequest.onsuccess = function (e) {
                                     var result3 = paRequest.result;
-                                    console.log("result3------>", result3);
+                                    // console.log("result3------>", result3);
                                     // this.setState({ loading: true })
                                     var outPutList = [];
-                                    console.log("result1---", result1);
-                                    console.log("result2---", result2)
+                                    // console.log("result1---", result1);
+                                    // console.log("result2---", result2)
                                     for (var i = 0; i < result1.length; i++) {
                                         var filteredList = result2.filter(c => c.planningUnit.id == result1[i].planningUnit.id);
                                         var localProcurementAgentLeadTime = result1[i].localProcurementLeadTime;
-                                        console.log("result1[i].localProcurementLeadTime---", result1[i].localProcurementLeadTime);
-                                        console.log("filteredList----", filteredList);
+                                        // console.log("result1[i].localProcurementLeadTime---", result1[i].localProcurementLeadTime);
+                                        // console.log("filteredList----", filteredList);
                                         var program = result1[i].program;
 
                                         for (var k = 0; k < procurementAgentIds.length; k++) {
                                             var submittedToApprovedLeadTime = (result3.filter(c => c.procurementAgentId == procurementAgentIds[k])[0]).submittedToApprovedLeadTime;
                                             var approvedToShippedLeadTime = (result3.filter(c => c.procurementAgentId == procurementAgentIds[k])[0]).approvedToShippedLeadTime;
                                             // var draftToSubmittedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).draftToSubmittedLeadTime;
-                                            // console.log("filteredList[j]-------", filteredList[j])
-                                            console.log("procurementAgent filtered---", (result3.filter(c => c.procurementAgentId == procurementAgentIds[k])[0]));
+                                            // // console.log("filteredList[j]-------", filteredList[j])
+                                            // console.log("procurementAgent filtered---", (result3.filter(c => c.procurementAgentId == procurementAgentIds[k])[0]));
                                             // var json;
                                             // for(){
                                             var json = {
@@ -1489,8 +1489,8 @@ class SupplierLeadTimes extends Component {
                                         // var submittedToApprovedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).submittedToApprovedLeadTime;
                                         //     var approvedToShippedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).approvedToShippedLeadTime;
                                         //     // var draftToSubmittedLeadTime = (result3.filter(c => c.procurementAgentId == filteredList[j].procurementAgent.id)[0]).draftToSubmittedLeadTime;
-                                        //     console.log("filteredList[j]-------", filteredList[j])
-                                        //     console.log("filteredList[j].procurementAgent---", filteredList[j].procurementAgent);
+                                        //     // console.log("filteredList[j]-------", filteredList[j])
+                                        //     // console.log("filteredList[j].procurementAgent---", filteredList[j].procurementAgent);
                                         //     // var json;
                                         //     // for(){
                                         //     var json = {
@@ -1564,7 +1564,7 @@ class SupplierLeadTimes extends Component {
                                         //     outPutList.push(json);
                                         // }
                                     }
-                                    console.log("outPutList------>", outPutList);
+                                    // console.log("outPutList------>", outPutList);
                                     this.setState({ outPutList: outPutList, message: '', loading: false }, () => { this.buildJexcel() })
                                 }.bind(this)
                             }.bind(this)
@@ -1574,7 +1574,7 @@ class SupplierLeadTimes extends Component {
             }
 
         } else if (programId == 0) {
-            console.log("inside destroy");
+            // console.log("inside destroy");
             this.setState({ message: i18n.t('static.common.selectProgram'), outPutList: [] },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');

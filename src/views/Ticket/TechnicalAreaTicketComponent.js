@@ -308,7 +308,7 @@ export default class TechnicalAreaTicketComponent extends Component {
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         var json = listArray;
-                        console.log("json", json)
+                        // console.log("json", json)
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
                             regList[i] = { value: json[i].realmCountry.id, label: getLabelText(json[i].realmCountry.label, this.state.lang) }
@@ -408,10 +408,10 @@ export default class TechnicalAreaTicketComponent extends Component {
 
             if (healthAreaValue.length >= 6) {//minus 2
                 healthAreaValue = healthAreaValue.slice(0, 4);
-                console.log("DISPLAYNAME-BEF----->", healthAreaValue);
+                // console.log("DISPLAYNAME-BEF----->", healthAreaValue);
                 HealthAreaService.getHealthAreaDisplayName(realmId, healthAreaValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP----->", response);
+                        // console.log("DISPLAYNAME-RESP----->", response);
                         let { technicalArea } = this.state
                         technicalArea.technicalAreaCode = response.data;
                         this.setState({
@@ -462,10 +462,10 @@ export default class TechnicalAreaTicketComponent extends Component {
                     );
 
             } else {// not need to minus
-                console.log("DISPLAYNAME-BEF-else----->", healthAreaValue);
+                // console.log("DISPLAYNAME-BEF-else----->", healthAreaValue);
                 HealthAreaService.getHealthAreaDisplayName(realmId, healthAreaValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        // console.log("DISPLAYNAME-RESP-else----->", response);
                         let { technicalArea } = this.state
                         technicalArea.technicalAreaCode = response.data;
                         this.setState({
@@ -555,7 +555,7 @@ export default class TechnicalAreaTicketComponent extends Component {
                             this.state.technicalArea.summary = summaryText_2;
                             this.state.technicalArea.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.technicalArea).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

@@ -497,7 +497,7 @@ class EditTracerCategoryComponent extends Component {
                     DropdownService.getHealthAreaDropdownList(realmId)
                     .then(response => {
                         if (response.status == 200) {
-                 console.log("response.data--",response.data)
+                //  console.log("response.data--",response.data)
                             var listArray = response.data;
                             var haArray = response.data;
                             haArray = haArray.filter( (item) => {
@@ -664,7 +664,7 @@ class EditTracerCategoryComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("this.state.tracerCategory---", this.state.tracerCategory);
+                                    // console.log("this.state.tracerCategory---", this.state.tracerCategory);
                                     // AuthenticationService.setupAxiosInterceptors();
                                     TracerCategoryService.updateTracerCategory(this.state.tracerCategory)
                                         .then(response => {

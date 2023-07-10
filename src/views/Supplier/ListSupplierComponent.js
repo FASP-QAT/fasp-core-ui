@@ -579,7 +579,7 @@ class SupplierListComponent extends Component {
 
         SupplierService.getSupplierListAll()
             .then(response => {
-                console.log(response.data)
+                // console.log(response.data)
                 this.setState({
                     supplierList: response.data,
                     selSource: response.data,

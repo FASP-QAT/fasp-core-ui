@@ -173,7 +173,7 @@ class StockAdjustmentComponent extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
             this.setState({ loading: false })
         }
@@ -207,13 +207,13 @@ class StockAdjustmentComponent extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        // console.log(programNameLabel)
+                        // // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -262,12 +262,12 @@ class StockAdjustmentComponent extends Component {
 
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
-            // console.log(program)
+            // // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
                         .then(response => {
-                            console.log("response===>", response.data)
+                            // console.log("response===>", response.data)
                             this.setState({
                                 versions: []
                             }, () => {
@@ -385,7 +385,7 @@ class StockAdjustmentComponent extends Component {
 
                 }
 
-                // console.log(verList)
+                // // console.log(verList)
                 let versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
                 })
@@ -469,7 +469,7 @@ class StockAdjustmentComponent extends Component {
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
                             var proList = []
-                            // console.log(myResult)
+                            // // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -497,11 +497,11 @@ class StockAdjustmentComponent extends Component {
                         tracerCategoryIds: [],
                         programIds: [programId]
                     }
-                    console.log('**', programJson)
+                    // console.log('**', programJson)
 
                     //let productCategoryId = document.getElementById("productCategoryId").value;
                     DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
-                        console.log('**', JSON.stringify(response.data))
+                        // console.log('**', JSON.stringify(response.data))
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -654,13 +654,13 @@ class StockAdjustmentComponent extends Component {
         var A = [this.addDoubleQuoteToRowContent(headers)]
         this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
         for (var i = 0; i < A.length; i++) {
-            // console.log(A[i])
+            // // console.log(A[i])
             csvRow.push(A[i].join(","))
 
         }
 
         var csvString = csvRow.join("%0A")
-        // console.log('csvString' + csvString)
+        // // console.log('csvString' + csvString)
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
@@ -761,7 +761,7 @@ class StockAdjustmentComponent extends Component {
 
     buildJExcel() {
         let stockAdjustmentList = this.state.data;
-        // console.log("stockAdjustmentList---->", stockAdjustmentList);
+        // // console.log("stockAdjustmentList---->", stockAdjustmentList);
         let stockAdjustmentArray = [];
         let count = 0;
 
@@ -782,7 +782,7 @@ class StockAdjustmentComponent extends Component {
         //     data = [];
         //     stockAdjustmentArray[0] = data;
         // }
-        // console.log("stockAdjustmentArray---->", stockAdjustmentArray);
+        // // console.log("stockAdjustmentArray---->", stockAdjustmentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -882,13 +882,13 @@ class StockAdjustmentComponent extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-        console.log("versionId----", versionId);
-        console.log("programId----", programId);
-        console.log("planningUnitIds---", planningUnitIds);
+        // console.log("versionId----", versionId);
+        // console.log("programId----", programId);
+        // console.log("planningUnitIds---", planningUnitIds);
 
 
         if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
-            console.log("INSIDE IF-----------------");
+            // console.log("INSIDE IF-----------------");
             if (versionId.includes('Local')) {
                 startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
                 endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
@@ -914,7 +914,7 @@ class StockAdjustmentComponent extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    console.log("1----", program)
+                    // console.log("1----", program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -942,13 +942,13 @@ class StockAdjustmentComponent extends Component {
                                 var puResult = [];
                                 puResult = puRequest.result;
 
-                                console.log("2----", programRequest);
+                                // console.log("2----", programRequest);
                                 var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                                 var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                                 var generalProgramJson = JSON.parse(generalProgramData);
 
                                 var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                                console.log(startDate, endDate)
+                                // console.log(startDate, endDate)
                                 var data = []
                                 planningUnitIds.map(planningUnitId => {
                                     var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
@@ -968,7 +968,7 @@ class StockAdjustmentComponent extends Component {
                                         }
                                     }
                                     var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && (c.adjustmentQty != 0 && c.adjustmentQty != null)));
-                                    console.log(inventoryList)
+                                    // console.log(inventoryList)
 
                                     inventoryList.map(ele => {
                                         var dataSource = dataSourceResult.filter(c => c.dataSourceId == ele.dataSource.id);
@@ -987,7 +987,7 @@ class StockAdjustmentComponent extends Component {
                                         data.push(json)
                                     })
                                 })
-                                console.log("inventory List--------->", data);;
+                                // console.log("inventory List--------->", data);;
                                 this.setState({
                                     data: data
                                     , message: ''
@@ -1008,11 +1008,11 @@ class StockAdjustmentComponent extends Component {
                     planningUnitIds: planningUnitIds
                 }
                 // AuthenticationService.setupAxiosInterceptors();
-                console.log("inputJson---->", inputjson);
+                // console.log("inputJson---->", inputjson);
                 ReportService.stockAdjustmentList(inputjson)
                     .then(response => {
 
-                        console.log("RESP-------->", response.data);
+                        // console.log("RESP-------->", response.data);
                         this.setState({
                             data: response.data,
                             message: ''
@@ -1143,12 +1143,12 @@ class StockAdjustmentComponent extends Component {
         //     versionId: event.target.value
         // }, () => {
         //     if (this.state.data.length != 0) {
-        //         console.log("************1");
+        //         // console.log("************1");
         //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
         //         this.fetchData();
         //     } else {
-        //         console.log("************3", this.state.data);
-        //         console.log("************2");
+        //         // console.log("************3", this.state.data);
+        //         // console.log("************2");
         //         this.getPlanningUnit();
         //     }
         // })
@@ -1188,7 +1188,7 @@ class StockAdjustmentComponent extends Component {
             </span>
         );
         const { programs } = this.state
-        // console.log(programs)
+        // // console.log(programs)
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {

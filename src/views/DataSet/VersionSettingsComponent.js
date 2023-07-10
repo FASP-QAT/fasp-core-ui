@@ -190,7 +190,7 @@ class VersionSettingsComponent extends Component {
                 var col = ("N").concat(parseInt(y) + 1);
                 var reg = JEXCEL_INTEGER_REGEX;
                 var value = this.el.getValueFromCoords(13, y);
-                console.log("Value@@@", value)
+                // console.log("Value@@@", value)
                 if (value === "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -211,7 +211,7 @@ class VersionSettingsComponent extends Component {
                 var col = ("I").concat(parseInt(y) + 1);
                 var reg = /^[0-9]*[1-9][0-9]*$/;
                 var value = this.el.getValueFromCoords(8, y);
-                console.log("Value@@@", value)
+                // console.log("Value@@@", value)
                 if (value === "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -343,7 +343,7 @@ class VersionSettingsComponent extends Component {
             var col = ("I").concat(parseInt(y) + 1);
             var reg = /^[0-9]*[1-9][0-9]*$/;
             var value = this.el.getValueFromCoords(8, y);
-            console.log("Value@@@", value)
+            // console.log("Value@@@", value)
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -413,7 +413,7 @@ class VersionSettingsComponent extends Component {
         if (x == 8 && this.el.getValueFromCoords(17, y) == 0) {//forecastPeriodInMonth
             let startDate = this.el.getValueFromCoords(7, y);
             let month = this.el.getValueFromCoords(8, y);
-            console.log("startDate--------->", startDate);
+            // console.log("startDate--------->", startDate);
             if (startDate != null && month != null && month != "" && startDate != "") {
                 let newStartDate = new Date(startDate);
                 newStartDate.setMonth(newStartDate.getMonth() + (month - 1));
@@ -427,7 +427,7 @@ class VersionSettingsComponent extends Component {
 
 
         if ((x == 9 || x == 7) && this.el.getValueFromCoords(17, y) == 0) {//endDate
-            console.log("startDate--------->1111111");
+            // console.log("startDate--------->1111111");
             let startDate = this.el.getValueFromCoords(7, y);
             let endDate = this.el.getValueFromCoords(9, y);
 
@@ -559,20 +559,20 @@ class VersionSettingsComponent extends Component {
                var count = 0;
                for (var i = 0; i < tableJson.length; i++) {
                    var map1 = new Map(Object.entries(tableJson[i]));
-                   console.log("12 map---" + map1.get("12"))
+                //    console.log("12 map---" + map1.get("12"))
                    if (parseInt(map1.get("12")) === 1) {
-                       console.log("map1.get(11)---", map1.get("11"));
-                       console.log("map1.get(13)---", map1.get("13"));
-                       console.log("map1.get(7)---", map1.get("7"));
-                       console.log("map1.get(9)---", map1.get("9"));
+                    //    console.log("map1.get(11)---", map1.get("11"));
+                    //    console.log("map1.get(13)---", map1.get("13"));
+                    //    console.log("map1.get(7)---", map1.get("7"));
+                    //    console.log("map1.get(9)---", map1.get("9"));
                        var notes = map1.get("4");
                        var startDate = map1.get("7");
                        var stopDate = map1.get("9");
                        var id = map1.get("11");
                        var noOfDaysInMonth = Number(map1.get("13"));
-                       console.log("start date ---", startDate);
-                       console.log("stop date ---", stopDate);
-                       console.log("noOfDaysInMonth ---", noOfDaysInMonth);
+                    //    console.log("start date ---", startDate);
+                    //    console.log("stop date ---", stopDate);
+                    //    console.log("noOfDaysInMonth ---", noOfDaysInMonth);
                        var program = (this.state.datasetList.filter(x => x.id == id)[0]);
                        var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
@@ -614,7 +614,7 @@ class VersionSettingsComponent extends Component {
                        count++;
                    }
                }
-               console.log("programs to update---", programs);
+            //    console.log("programs to update---", programs);
                if (count > 0) {
                    var db1;
                    getDatabase();
@@ -632,10 +632,10 @@ class VersionSettingsComponent extends Component {
                        var programTransaction = transaction.objectStore('datasetData');
                        programs.forEach(program => {
                            var programRequest = programTransaction.put(program);
-                           console.log("---hurrey---");
+                        //    console.log("---hurrey---");
                        })
                        transaction.oncomplete = function (event) {
-                           console.log("in side datasetDetails")
+                        //    console.log("in side datasetDetails")
                            db1 = e.target.result;
                            var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                            var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
@@ -647,7 +647,7 @@ class VersionSettingsComponent extends Component {
                                 var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
                                 datasetDetailsRequest1.onsuccess = function (event) {                               
                                     }}                         
-                            console.log("---hurrey---");
+                            // console.log("---hurrey---");
                              })
                         
                            
@@ -662,7 +662,7 @@ class VersionSettingsComponent extends Component {
                                this.hideSecondComponent();
                                // this.getOnLineDatasetsVersion();
                            });
-                           console.log("Data update success");
+                        //    console.log("Data update success");
                        }.bind(this);
                        transaction.onerror = function (event) {
                            this.setState({
@@ -672,7 +672,7 @@ class VersionSettingsComponent extends Component {
                            }, () => {
                                this.hideSecondComponent();
                            });
-                           console.log("Data update errr");
+                        //    console.log("Data update errr");
                        }.bind(this);
                    }.bind(this);
                }
@@ -689,8 +689,8 @@ class VersionSettingsComponent extends Component {
             }
         })
         versionSettingsListOffLine = versionSettingsList.filter(c => c.id)
-        console.log("versionSettingsListOffLine!!!!", versionSettingsListOffLine)
-        console.log("versionSettingsList!!!!", versionSettingsList)
+        // console.log("versionSettingsListOffLine!!!!", versionSettingsListOffLine)
+        // console.log("versionSettingsList!!!!", versionSettingsList)
         this.setState({
             versionSettingsList: versionSettingsListOffLine,
             datasetIds
@@ -738,7 +738,7 @@ class VersionSettingsComponent extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                console.log("myResult version type---", myResult)
+                // console.log("myResult version type---", myResult)
                 myResult = myResult.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -748,7 +748,7 @@ class VersionSettingsComponent extends Component {
                     versionTypeList: myResult
                 });
                 for (var i = 0; i < myResult.length; i++) {
-                    console.log("version type--->", myResult[i])
+                    // console.log("version type--->", myResult[i])
 
                 }
 
@@ -773,7 +773,7 @@ class VersionSettingsComponent extends Component {
                 var myResult = [];
                 var proList = [];
                 myResult = getRequest.result;
-                console.log("myResult--->", myResult)
+                // console.log("myResult--->", myResult)
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 var list = [];
@@ -788,7 +788,7 @@ class VersionSettingsComponent extends Component {
                     }
                 }
                 var proList = proList.concat(this.state.datasetList);
-                console.log("proList---", proList);
+                // console.log("proList---", proList);
 
                 proList = proList.sort(function (a, b) {
                     a = a.programCode.toLowerCase();
@@ -807,11 +807,11 @@ class VersionSettingsComponent extends Component {
 
 
                     }, () => {
-                        console.log("uniquePrograms", this.state.uniquePrograms)
-                        console.log("programValues", this.state.programValues)
-                        console.log("programValues.map(x => x.value).join(", ")", this.state.programValues.map(x => x.value).join(", "))
+                        // console.log("uniquePrograms", this.state.uniquePrograms)
+                        // console.log("programValues", this.state.programValues)
+                        // console.log("programValues.map(x => x.value).join(", ")", this.state.programValues.map(x => x.value).join(", "))
                         var programIds = this.state.programValues.map(x => x.value).join(", ");
-                        console.log("programIds", programIds)
+                        // console.log("programIds", programIds)
 
                         programIds = Array.from(new Set(programIds.split(','))).toString();
                         this.getDatasetById(programIds);
@@ -877,11 +877,11 @@ class VersionSettingsComponent extends Component {
             startDate: startDate,
             stopDate: stopDate
         }
-        console.log("Input Json", inputjson)
+        // console.log("Input Json", inputjson)
         ProgramService.getDatasetVersions(inputjson).then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
-                console.log("responseData------->", responseData);
+                // console.log("responseData------->", responseData);
                 for (var i = 0; i < responseData.length; i++) {
                     var data = [];
                     data[0] = responseData[i].program.id
@@ -912,10 +912,10 @@ class VersionSettingsComponent extends Component {
                     data[16] = responseData[i].forecastThresholdLowPerc
                     data[17] = 0;
                     data[18] = {};
-                    console.log("data---------->", data)
+                    // console.log("data---------->", data)
                     dataList1.push(data);
                 }
-                console.log("dataList1---------->", dataList1)
+                // console.log("dataList1---------->", dataList1)
                 this.setState({
                     dataList: dataList1
                 },
@@ -991,7 +991,7 @@ class VersionSettingsComponent extends Component {
     }
 
     buildJExcel() {
-        console.log("buildJExcel dataList--->", this.state.dataList)
+        // console.log("buildJExcel dataList--->", this.state.dataList)
         let versionSettingsListUnSorted = this.state.versionSettingsList;
         let versionSettingsList = versionSettingsListUnSorted.sort(
             function (a, b) {
@@ -1004,7 +1004,7 @@ class VersionSettingsComponent extends Component {
         let versionSettingsArray = [];
         let count = 0;
         var versionTypeId = document.getElementById('versionTypeId').value;
-        console.log("versionSettingsList-->", versionSettingsList)
+        // console.log("versionSettingsList-->", versionSettingsList)
         for (var j = 0; j < versionSettingsList.length; j++) {
             if (versionSettingsList[j].programData) {
                 var bytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
@@ -1113,24 +1113,24 @@ class VersionSettingsComponent extends Component {
         //     }
         // }
         var dataLists = this.state.dataList;
-        console.log("dataLists", dataLists)
-        console.log("dataLists length", dataLists.length)
+        // console.log("dataLists", dataLists)
+        // console.log("dataLists length", dataLists.length)
         for (var i = 0; i < this.state.dataList.length; i++) {
-            console.log("dataList----1009--->3");
+            // console.log("dataList----1009--->3");
 
             count = (versionSettingsArray.length);
             versionSettingsArray[count] = dataLists[i];
             count++;
         }
 
-        console.log("versionSettingsArray------->1", versionSettingsArray);
+        // console.log("versionSettingsArray------->1", versionSettingsArray);
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = versionSettingsArray;
-        console.log("versionSettingsArray------->2", data);
+        // console.log("versionSettingsArray------->2", data);
         var options = {
             data: data,
             columnDrag: true,
@@ -1298,15 +1298,15 @@ class VersionSettingsComponent extends Component {
                         });
                     } else {
                         var programId = this.state.programId;
-                        console.log("programId------->", programId);
+                        // console.log("programId------->", programId);
                         items.push({
                             title: i18n.t('static.commitTree.showValidation'),
                             onclick: function () {
                                 DatasetService.getDatasetData(rowData[0], rowData[2]).then(response => {
                                     if (response.status == 200) {
                                         var responseData = response.data;
-                                        console.log("getDatasetData responseData------->", responseData);
-                                        console.log("rowData-->", rowData)
+                                        // console.log("getDatasetData responseData------->", responseData);
+                                        // console.log("rowData-->", rowData)
                                         this.setState({
                                             programName: rowData[1] + "~v" + rowData[2],
                                             programCode: rowData[1],
@@ -1456,7 +1456,7 @@ class VersionSettingsComponent extends Component {
         .then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
-                console.log("getDataSetList**********responseData------->", responseData);
+                // console.log("getDataSetList**********responseData------->", responseData);
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
                     var json = {
@@ -1512,7 +1512,7 @@ class VersionSettingsComponent extends Component {
             programLabels: programIds.map(ele => ele.label)
         }, () => {
             var programIds = this.state.programValues.map(x => x.value).join(", ");
-            console.log("program------------->>>", programIds);
+            // console.log("program------------->>>", programIds);
             localStorage.setItem("sesForecastProgramIds", JSON.stringify(this.state.programValues));
             programIds = Array.from(new Set(programIds.split(','))).toString();
             this.getDatasetById(programIds);

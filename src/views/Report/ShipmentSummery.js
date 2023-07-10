@@ -512,9 +512,9 @@ class ShipmentSummery extends Component {
 
     re = this.state.shipmentDetailsList;
 
-    console.log("shipment detail length", re.length);
+    // console.log("shipment detail length", re.length);
     for (var item = 0; item < re.length; item++) {
-      //console.log(item,'===>',re[item])
+      //// console.log(item,'===>',re[item])
       B.push(
         this.addDoubleQuoteToRowContent([
           re[item].planningUnit.id,
@@ -568,12 +568,12 @@ class ShipmentSummery extends Component {
       );
     }
     for (var i = 0; i < B.length; i++) {
-      console.log(B[i]);
+      // console.log(B[i]);
       csvRow.push(B[i].join(","));
     }
 
     var csvString = csvRow.join("%0A");
-    console.log(csvString);
+    // console.log(csvString);
     var a = document.createElement("a");
     a.href = "data:attachment/csv," + csvString;
     a.target = "_Blank";
@@ -916,7 +916,7 @@ class ShipmentSummery extends Component {
         }.bind(this);
         fSourceRequest.onsuccess = function (event) {
           fSourceResult = fSourceRequest.result;
-          console.log("funding source list offline--->", fSourceResult);
+          // console.log("funding source list offline--->", fSourceResult);
           var fundingSource = [];
           for (var i = 0; i < fSourceResult.length; i++) {
             var arr = {
@@ -950,7 +950,7 @@ class ShipmentSummery extends Component {
       // AuthenticationService.setupAxiosInterceptors();
       DropdownService.getBudgetDropdownBasedOnProgram(programId)
         .then((response) => {
-          console.log("programId=========>", response.data);
+          // console.log("programId=========>", response.data);
 
           var listArray = response.data;
           var proList = [];
@@ -979,10 +979,10 @@ class ShipmentSummery extends Component {
             });
             budgetLabelsFromProps.push(this.props.match.params.budgetCode);
           }
-          console.log(
-            "budgetValuesFromProps online===>",
-            budgetValuesFromProps
-          );
+          // console.log(
+            // "budgetValuesFromProps online===>",
+            // budgetValuesFromProps
+          // );
           this.setState(
             {
               budgetValues: budgetValuesFromProps,
@@ -1053,15 +1053,15 @@ class ShipmentSummery extends Component {
             });
             budgetLabelsFromProps.push(this.props.match.params.budgetCode);
           }
-          console.log(
-            "budgetValuesFromProps offline===>",
-            budgetValuesFromProps
-          );
+          // console.log(
+            // "budgetValuesFromProps offline===>",
+            // budgetValuesFromProps
+          // );
 
           fSourceResult = fSourceRequest.result.filter(
             (b) => b.program.id == programId
           );
-          console.log("budget list offline--->", fSourceResult);
+          // console.log("budget list offline--->", fSourceResult);
           this.setState(
             {
               budgetValues: budgetValuesFromProps,
@@ -1093,12 +1093,12 @@ class ShipmentSummery extends Component {
         return parseInt(a.value) - parseInt(b.value);
       });
       let newFundingSourceList = [... new Set(fundingSourceIds.map((ele) => ele.value))];
-      console.log("budgetList+++123", newFundingSourceList);
+      // console.log("budgetList+++123", newFundingSourceList);
 
       DropdownService.getBudgetDropdownFilterMultipleFundingSources(newFundingSourceList)
         .then((response) => {
           var budgetList = response.data;
-          console.log("budgetList+++", budgetList);
+          // console.log("budgetList+++", budgetList);
 
           var bList = [];
           for (var i = 0; i < budgetList.length; i++) {
@@ -1183,7 +1183,7 @@ class ShipmentSummery extends Component {
   };
 
   handleBudgetChange = (budgetIds) => {
-    console.log("budgetIds", budgetIds);
+    // console.log("budgetIds", budgetIds);
     budgetIds = budgetIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
     });
@@ -1200,7 +1200,7 @@ class ShipmentSummery extends Component {
 
   buildJExcel() {
     let shipmentDetailsList = this.state.shipmentDetailsList;
-    console.log("shipmentDetailsList--->", shipmentDetailsList);
+    // console.log("shipmentDetailsList--->", shipmentDetailsList);
     let shipmentDetailsListArray = [];
     let count = 0;
     for (var j = 0; j < shipmentDetailsList.length; j++) {
@@ -1434,7 +1434,7 @@ class ShipmentSummery extends Component {
   selected = function (instance, cell, x, y, value, e) {
     if (e.buttons == 1) {
       if ((x == 0 && value != 0) || y == 0) {
-        // console.log("HEADER SELECTION--------------------------");
+        // // console.log("HEADER SELECTION--------------------------");
       } else {
         // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
         let versionId = document.getElementById("versionId").value;
@@ -1446,9 +1446,9 @@ class ShipmentSummery extends Component {
           var rangeValue = this.state.rangeValue;
           var programIdd =
             programId + "_v" + versionId.split(" ")[0] + "_uId_" + userId;
-          console.log("proId***", programIdd);
-          console.log("p***", planningUnitId);
-          console.log("rangeVlaue***", this.state.rangeValue);
+          // console.log("proId***", programIdd);
+          // console.log("p***", planningUnitId);
+          // console.log("rangeVlaue***", this.state.rangeValue);
           localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
           window.open(
             window.location.origin +
@@ -1564,7 +1564,7 @@ class ShipmentSummery extends Component {
       //     }
       // );
     } else {
-      console.log("offline");
+      // console.log("offline");
       this.setState({ loading: false });
       this.consolidatedProgramList();
     }
@@ -1607,13 +1607,13 @@ class ShipmentSummery extends Component {
               SECRET_KEY
             );
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-            // console.log(programNameLabel)
+            // // console.log(programNameLabel)
 
             var f = 0;
             for (var k = 0; k < this.state.programs.length; k++) {
               if (this.state.programs[k].programId == programData.programId) {
                 f = 1;
-                console.log("already exist");
+                // console.log("already exist");
               }
             }
             if (f == 0) {
@@ -1662,7 +1662,7 @@ class ShipmentSummery extends Component {
       const program = this.state.programs.filter(
         (c) => c.programId == programId
       );
-      // console.log(program)
+      // // console.log(program)
       if (program.length == 1) {
         if (isSiteOnline()) {
           this.setState(
@@ -1677,7 +1677,7 @@ class ShipmentSummery extends Component {
                 programId
               )
                 .then((response) => {
-                  console.log("response===>", response.data);
+                  // console.log("response===>", response.data);
                   this.setState(
                     {
                       versions: [],
@@ -1820,7 +1820,7 @@ class ShipmentSummery extends Component {
           }
         }
 
-        // console.log(verList)
+        // // console.log(verList)
         let versionList = verList.filter(function (x, i, a) {
           return a.indexOf(x) === i;
         });
@@ -1920,7 +1920,7 @@ class ShipmentSummery extends Component {
                   .getElementById("programId")
                   .value.split("_")[0];
                 var proList = [];
-                // console.log(myResult)
+                // // console.log(myResult)
                 for (var i = 0; i < myResult.length; i++) {
                   if (
                     myResult[i].program.id == programId &&
@@ -1952,12 +1952,12 @@ class ShipmentSummery extends Component {
               tracerCategoryIds: [],
               programIds: [programId],
             };
-            console.log("**", programJson);
+            // console.log("**", programJson);
 
             //let productCategoryId = document.getElementById("productCategoryId").value;
             DropdownService.getProgramPlanningUnitDropdownList(programJson)
               .then((response) => {
-                // console.log('**' + JSON.stringify(response.data))
+                // // console.log('**' + JSON.stringify(response.data))
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                   var itemLabelA = getLabelText(
@@ -2166,11 +2166,11 @@ class ShipmentSummery extends Component {
         ? []
         : this.state.budgetValues.map((ele) => ele.value);
 
-    console.log("versionId++++", versionId);
-    console.log("programId++++", programId);
-    console.log("planningUnitIds++++", planningUnitIds);
-    console.log("fundingSourceIds++++", myFundingSourceIds);
-    console.log("budgetIds++++", myBudgetIds);
+    // console.log("versionId++++", versionId);
+    // console.log("programId++++", programId);
+    // console.log("planningUnitIds++++", planningUnitIds);
+    // console.log("fundingSourceIds++++", myFundingSourceIds);
+    // console.log("budgetIds++++", myBudgetIds);
 
     if (
       programId > 0 &&
@@ -2182,15 +2182,15 @@ class ShipmentSummery extends Component {
         //////////////////------------------------table two content
 
         planningUnitIds = this.state.planningUnitValues.map((ele) => ele.value);
-        console.log("planninuit ids====>", planningUnitIds);
+        // console.log("planninuit ids====>", planningUnitIds);
 
         myFundingSourceIds = this.state.fundingSourceValues.map(
           (ele) => ele.value
         );
-        console.log("fundingSource ids====>", myFundingSourceIds);
+        // console.log("fundingSource ids====>", myFundingSourceIds);
 
         myBudgetIds = this.state.budgetValues.map((ele) => ele.value);
-        console.log("budget ids====>", myBudgetIds);
+        // console.log("budget ids====>", myBudgetIds);
 
         var db1;
         var storeOS;
@@ -2217,7 +2217,7 @@ class ShipmentSummery extends Component {
           var userId = userBytes.toString(CryptoJS.enc.Utf8);
           var program = `${programId}_v${version}_uId_${userId}`;
           var programDataOs = programDataTransaction.objectStore("programData");
-          // console.log("1----", program)
+          // // console.log("1----", program)
           var programRequest = programDataOs.get(program);
           programRequest.onerror = function (event) {
             this.setState({
@@ -2226,7 +2226,7 @@ class ShipmentSummery extends Component {
             });
           }.bind(this);
           programRequest.onsuccess = function (e) {
-            // console.log("2----", programRequest)
+            // // console.log("2----", programRequest)
             // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson = JSON.parse(programData);
@@ -2262,7 +2262,7 @@ class ShipmentSummery extends Component {
 
               var shipmentList = programJson.shipmentList;
 
-              console.log("shipmentList------>", shipmentList);
+              // console.log("shipmentList------>", shipmentList);
               const activeFilter = shipmentList.filter(
                 (c) =>
                   (c.active == true || c.active == "true") &&
@@ -2270,7 +2270,7 @@ class ShipmentSummery extends Component {
                   c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS
               );
               // const activeFilter = shipmentList;
-              console.log(startDate, endDate);
+              // console.log(startDate, endDate);
               // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
               let dateFilter = activeFilter.filter((c) =>
                 c.receivedDate == null || c.receivedDate === ""
@@ -2281,7 +2281,7 @@ class ShipmentSummery extends Component {
                   : c.receivedDate >= moment(startDate).format("YYYY-MM-DD") &&
                   c.receivedDate <= moment(endDate).format("YYYY-MM-DD")
               );
-              console.log("dateFilter", dateFilter);
+              // console.log("dateFilter", dateFilter);
 
               for (let j = 0; j < dateFilter.length; j++) {
                 if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
@@ -2289,7 +2289,7 @@ class ShipmentSummery extends Component {
                 }
               }
             }
-            console.log("planningUnitFilter", planningUnitFilter);
+            // console.log("planningUnitFilter", planningUnitFilter);
             var planningunitTransaction = db1.transaction(
               ["planningUnit"],
               "readwrite"
@@ -2351,7 +2351,7 @@ class ShipmentSummery extends Component {
                 bRequest.onsuccess = function (e) {
                   var bResult = [];
                   bResult = bRequest.result;
-                  console.log("planningList------>", planningList);
+                  // console.log("planningList------>", planningList);
 
                   for (let i = 0; i < planningUnitFilter.length; i++) {
                     let multiplier = 0;
@@ -2469,13 +2469,13 @@ class ShipmentSummery extends Component {
                     return parseInt(a.shipmentId) - parseInt(b.shipmentId);
                   });
 
-                  console.log("data***", data);
+                  // console.log("data***", data);
                   ///////////--------------------------- table one content
                   var shipmentDetailsFundingSourceList = [];
                   const fundingSourceIds = [
                     ...new Set(data.map((q) => parseInt(q.fundingSource.id))),
                   ];
-                  console.log("fundingSourceIds", fundingSourceIds);
+                  // console.log("fundingSourceIds", fundingSourceIds);
                   fundingSourceIds.map((ele) => {
                     var fundingSource = this.state.fundingSources.filter(
                       (c) => c.id == ele
@@ -2490,10 +2490,10 @@ class ShipmentSummery extends Component {
                     var fundingSourceList = data.filter(
                       (c) => c.fundingSource.id == ele
                     );
-                    console.log("fundingSourceList", fundingSourceList);
+                    // console.log("fundingSourceList", fundingSourceList);
                     var cost = 0;
                     var quantity = 0;
-                    console.log("fundingSourceList", fundingSourceList);
+                    // console.log("fundingSourceList", fundingSourceList);
                     fundingSourceList.map((c) => {
                       cost =
                         cost + Number(c.productCost) + Number(c.freightCost);
@@ -2514,11 +2514,11 @@ class ShipmentSummery extends Component {
                     };
                     shipmentDetailsFundingSourceList.push(json);
                   });
-                  console.log("data ofline----->", data);
-                  console.log(
-                    "shipmentDetailsFundingSourceList ofline----->",
-                    shipmentDetailsFundingSourceList
-                  );
+                  // console.log("data ofline----->", data);
+                  // console.log(
+                    // "shipmentDetailsFundingSourceList ofline----->",
+                    // shipmentDetailsFundingSourceList
+                  // );
 
                   var shipmentDetailsMonthList = [];
                   var monthstartfrom = this.state.rangeValue.from.month;
@@ -2529,7 +2529,7 @@ class ShipmentSummery extends Component {
                     from++
                   ) {
                     var monthlydata = [];
-                    console.log(programJson);
+                    // console.log(programJson);
                     for (var month = monthstartfrom; month <= 12; month++) {
                       var dtstr =
                         from + "-" + String(month).padStart(2, "0") + "-01";
@@ -2539,7 +2539,7 @@ class ShipmentSummery extends Component {
                         String(month).padStart(2, "0") +
                         "-" +
                         new Date(from, month, 0).getDate();
-                      console.log(dtstr, " ", enddtStr);
+                      // console.log(dtstr, " ", enddtStr);
                       var dt = dtstr;
                       var shiplist = planningUnitFilter.filter((c) =>
                         c.receivedDate == null || c.receivedDate == ""
@@ -2560,7 +2560,7 @@ class ShipmentSummery extends Component {
                             myBudgetIds.includes(b.budget.id)
                           )
                           : shiplist;
-                      console.log("shipList***", shiplist);
+                      // console.log("shipList***", shiplist);
 
                       var onholdCost = 0;
                       var plannedCost = 0;
@@ -2571,7 +2571,7 @@ class ShipmentSummery extends Component {
                       var arrivedCost = 0;
                       var submittedCost = 0;
                       shiplist.map((ele) => {
-                        console.log(ele);
+                        // console.log(ele);
                         if (ele.shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
                           plannedCost =
                             plannedCost +
@@ -2641,10 +2641,10 @@ class ShipmentSummery extends Component {
                         month == this.state.rangeValue.to.month &&
                         from == to
                       ) {
-                        console.log(
-                          "shipmentDetailsMonthList",
-                          shipmentDetailsMonthList
-                        );
+                        // console.log(
+                          // "shipmentDetailsMonthList",
+                          // shipmentDetailsMonthList
+                        // );
                         this.setState(
                           {
                             shipmentDetailsList: data,
@@ -2682,10 +2682,10 @@ class ShipmentSummery extends Component {
           reportView: viewById,
         };
 
-        // console.log("inputJson---->", inputjson);
+        // // console.log("inputJson---->", inputjson);
         ReportService.ShipmentSummery(inputjson)
           .then((response) => {
-            console.log("RESP-------->", response.data);
+            // console.log("RESP-------->", response.data);
             this.setState(
               {
                 data: response.data,
@@ -2944,7 +2944,7 @@ class ShipmentSummery extends Component {
     /*
                 //Graph start
                 let shipmentStatus = [...new Set(this.state.data.map(ele => (getLabelText(ele.shipmentStatus.label, this.state.lang))))];
-                console.log("shipmentStatus=======>>>", shipmentStatus.sort());
+                // console.log("shipmentStatus=======>>>", shipmentStatus.sort());
                 shipmentStatus=shipmentStatus.sort()
                 let shipmentSummerydata = [];
                 let data = [];
@@ -2952,10 +2952,10 @@ class ShipmentSummery extends Component {
                 mainData = mainData.sort(function (a, b) {
                     return new Date(a.expectedDeliveryDate) - new Date(b.expectedDeliveryDate);
                 });
-                console.log("mainData=======>>>>", mainData);
+                // console.log("mainData=======>>>>", mainData);
                 let dateArray = [...new Set(mainData.map(ele => (moment(ele.expectedDeliveryDate, 'YYYY-MM-dd').format('MM-YYYY'))))]
         
-                console.log("dateArray=====>", dateArray);
+                // console.log("dateArray=====>", dateArray);
         
                 for (var i = 0; i < shipmentStatus.length; i++) {
         
@@ -2992,7 +2992,7 @@ class ShipmentSummery extends Component {
                     var result = result1.filter(function (itm, i, a) {
                         return i == a.indexOf(itm);
                     });
-                    console.log("result====>", result);
+                    // console.log("result====>", result);
                     let tempdata = [];
                     for (var j = 0; j < dateArray.length; j++) {
                         let hold = 0
@@ -3008,12 +3008,12 @@ class ShipmentSummery extends Component {
                         tempdata.push(hold);
         
                     }
-                    console.log("tempdata==>", tempdata);
+                    // console.log("tempdata==>", tempdata);
                     shipmentSummerydata.push(tempdata);
         
                 }
         
-                console.log("shipmentSummeryData===>", shipmentSummerydata);
+                // console.log("shipmentSummeryData===>", shipmentSummerydata);
                 const bar = {
                     labels: [...new Set(mainData.map(ele => (moment(ele.expectedDeliveryDate, 'YYYY-MM-dd').format('MMM YYYY'))))],
                     datasets: shipmentSummerydata.map((item, index) => ({ label: shipmentStatus[index], data: item, backgroundColor: backgroundColor[index] })),
@@ -3032,7 +3032,7 @@ class ShipmentSummery extends Component {
                     }
                 });
         
-                console.log("tempDataTable------>>", tempDataTable);
+                // console.log("tempDataTable------>>", tempDataTable);
         
                 var result1 = tempDataTable.reduce(function (tempDataTable, val) {
                     var o = tempDataTable.filter(function (obj) {
@@ -3049,7 +3049,7 @@ class ShipmentSummery extends Component {
                     return i == a.indexOf(itm);
                 });
         
-                console.log("RESULT------->", result);
+                // console.log("RESULT------->", result);
         
                 // let result = Object.values(tempDataTable.reduce((a, { shipmentId, fundingSource, shipmentQty, totalCost, forecastCost }) => {
                 //     if (!a[fundingSource.id])
@@ -3060,7 +3060,7 @@ class ShipmentSummery extends Component {
                 //     a[fundingSource.id].forecastCost += forecastCost;
                 //     return a;
                 // }, {}));
-                // console.log("RESULT------>>", result);
+                // // console.log("RESULT------>>", result);
         
         
                 //yessolution
@@ -3083,7 +3083,7 @@ class ShipmentSummery extends Component {
                 // var finalresult = result1.filter(function (itm, i, a) {
                 //     return i == a.indexOf(itm);
                 // });
-                // console.log("result1------->>>>>>>>>>", finalresult);
+                // // console.log("result1------->>>>>>>>>>", finalresult);
         
         
         
@@ -3107,7 +3107,7 @@ class ShipmentSummery extends Component {
         
                 perResult = perResult.sort((a, b) => parseFloat(b.orders) - parseFloat(a.orders));
         
-                // console.log("perResult-------->>", perResult);
+                // // console.log("perResult-------->>", perResult);
         
                 //Table-1 end
         

@@ -186,7 +186,7 @@ export default class RealmCountryPlanningUnitList extends Component {
       !isNaN(rowData[5]) &&
       rowData[5].toString().indexOf(".") != -1
     ) {
-      console.log("RESP---------", parseFloat(rowData[5]));
+      // console.log("RESP---------", parseFloat(rowData[5]));
       elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
     }
     this.el.setValueFromCoords(9, y, 1, true);
@@ -222,7 +222,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         loading: true,
       },
       () => {
-        console.log("VALUE--------->", this.state.programValues);
+        // console.log("VALUE--------->", this.state.programValues);
         this.filterData();
       }
     );
@@ -236,7 +236,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         loading: true,
       });
       var tableJson = this.el.getJson(null, false);
-      console.log("tableJson---", tableJson);
+      // console.log("tableJson---", tableJson);
       let changedpapuList = [];
       var isMultiplierChanged = 0;
       for (var i = 0; i < tableJson.length; i++) {
@@ -249,7 +249,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         if (value != oldValue && map1.get("8") > 0) {
           isMultiplierChanged = 1;
         }
-        console.log("9 map---" + map1.get("9"));
+        // console.log("9 map---" + map1.get("9"));
         if (parseInt(map1.get("9")) === 1) {
           let json = {
             planningUnit: {
@@ -287,12 +287,12 @@ export default class RealmCountryPlanningUnitList extends Component {
         }
       }
       if (submitChanges) {
-        console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+        // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
         RealmCountryService.editPlanningUnitCountry(changedpapuList)
           .then((response) => {
-            console.log(response.data);
+            // console.log(response.data);
             if (response.status == "200") {
-              console.log(response);
+              // console.log(response);
               this.filterData();
               this.setState(
                 {
@@ -319,7 +319,7 @@ export default class RealmCountryPlanningUnitList extends Component {
             }
           })
           .catch((error) => {
-            console.log("Error", error);
+            // console.log("Error", error);
             if (error.message === "Network Error") {
               this.setState(
                 {
@@ -404,7 +404,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         });
       }
     } else {
-      console.log("Something went wrong");
+      // console.log("Something went wrong");
     }
   };
 
@@ -413,7 +413,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     let count = 0;
 
     let tempArray = tableJson;
-    console.log("hasDuplicate------", tempArray);
+    // console.log("hasDuplicate------", tempArray);
 
     var hasDuplicate = false;
     tempArray
@@ -422,7 +422,7 @@ export default class RealmCountryPlanningUnitList extends Component {
       .sort((a, b) => {
         if (a === b) hasDuplicate = true;
       });
-    console.log("hasDuplicate", hasDuplicate);
+    // console.log("hasDuplicate", hasDuplicate);
     if (hasDuplicate) {
       this.setState(
         {
@@ -443,14 +443,14 @@ export default class RealmCountryPlanningUnitList extends Component {
   checkValidation = function () {
     var valid = true;
     var json = this.el.getJson(null, false);
-    console.log("json.length-------", json.length);
+    // console.log("json.length-------", json.length);
     for (var y = 0; y < json.length; y++) {
       var value = this.el.getValueFromCoords(9, y);
       if (parseInt(value) == 1) {
         //Country
         var col = "A".concat(parseInt(y) + 1);
         var value = this.el.getValueFromCoords(0, y);
-        console.log("value-----", value);
+        // console.log("value-----", value);
         if (value == "") {
           this.el.setStyle(col, "background-color", "transparent");
           this.el.setStyle(col, "background-color", "yellow");
@@ -464,7 +464,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         //Planning Unit
         var col = "B".concat(parseInt(y) + 1);
         var value = this.el.getValueFromCoords(1, y);
-        console.log("value-----", value);
+        // console.log("value-----", value);
         if (value == "") {
           this.el.setStyle(col, "background-color", "transparent");
           this.el.setStyle(col, "background-color", "yellow");
@@ -526,7 +526,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         // var value = this.el.getValueFromCoords(5, y);
         // // var reg = /^[0-9\b]+$/;
         // var reg = /^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/;
-        // // console.log("---------VAL----------", value);
+        // // // console.log("---------VAL----------", value);
         // if (value == "" || isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
         //     this.el.setStyle(col, "background-color", "transparent");
         //     this.el.setStyle(col, "background-color", "yellow");
@@ -585,7 +585,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         // this.el.setValueFromCoords(2, y, value, true);
         // var text = this.el.getValueFromCoords(1, y);
         // var text = this.el.getValue(`B${parseInt(y) + 1}`, true)
-        // console.log("TEXT-------->", text);
+        // // console.log("TEXT-------->", text);
         // this.el.setVaslueFromCoords(2, y, text, true);
       }
     }
@@ -603,7 +603,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         // this.el.setValueFromCoords(2, y, value, true);
         // var text = this.el.getValueFromCoords(1, y);
         var text = this.el.getValue(`B${parseInt(y) + 1}`, true);
-        console.log("TEXT-------->", text);
+        // console.log("TEXT-------->", text);
         // this.el.setVaslueFromCoords(2, y, text, true);
       }
     }
@@ -624,17 +624,17 @@ export default class RealmCountryPlanningUnitList extends Component {
 
     //Sku code
     if (x == 3) {
-      console.log("-----------------3--------------------");
+      // console.log("-----------------3--------------------");
       var col = "D".concat(parseInt(y) + 1);
       // var value = this.el.getValueFromCoords(3, y);
       // var reg = /^[a-zA-Z0-9\b]+$/;
       if (value == "") {
-        console.log("-----------------blank--------------------");
+        // console.log("-----------------blank--------------------");
         this.el.setStyle(col, "background-color", "transparent");
         this.el.setStyle(col, "background-color", "yellow");
         this.el.setComments(col, i18n.t("static.label.fieldRequired"));
       } else {
-        console.log("-----------------3--------------------");
+        // console.log("-----------------3--------------------");
         // if (!(reg.test(value))) {
         //     this.el.setStyle(col, "background-color", "transparent");
         //     this.el.setStyle(col, "background-color", "yellow");
@@ -1135,12 +1135,12 @@ export default class RealmCountryPlanningUnitList extends Component {
 
   filterData() {
     if (this.state.programValues.length > 0) {
-      console.log("VALUE--------->IF");
+      // console.log("VALUE--------->IF");
       // let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
       let programIds = this.state.programValues.map((ele) =>
         ele.value.toString()
       );
-      console.log("RESP--->", programIds);
+      // console.log("RESP--->", programIds);
       const { programs } = this.state;
       let realmCountryList = [];
       for (var i = 0; i < programIds.length; i++) {
@@ -1170,24 +1170,24 @@ export default class RealmCountryPlanningUnitList extends Component {
         });
       }
 
-      console.log("REALM-COUNTRY--->1", realmCountryList);
+      // console.log("REALM-COUNTRY--->1", realmCountryList);
       const realmCountrys = [
         ...new Map(
           realmCountryList.map((item) => [item.realmCountryId, item])
         ).values(),
       ];
-      console.log("REALM-COUNTRY--->2", realmCountrys);
+      // console.log("REALM-COUNTRY--->2", realmCountrys);
 
       RealmCountryService.getRealmCountryPlanningUnitByProgramId(programIds)
         .then((response1) => {
-          console.log("RESP--->1", response1.data);
+          // console.log("RESP--->1", response1.data);
           UnitService.getUnitListAll()
             .then((response2) => {
-              console.log("RESP--->2", response2.data);
+              // console.log("RESP--->2", response2.data);
               // PlanningUnitService.getActivePlanningUnitList()
               PlanningUnitService.getPlanningUnitByProgramIds(programIds)
                 .then((response3) => {
-                  console.log("RESP--->3", response3.data);
+                  // console.log("RESP--->3", response3.data);
                   this.setState(
                     {
                       rows: response1.data.sort((a, b) => {
@@ -1424,7 +1424,7 @@ export default class RealmCountryPlanningUnitList extends Component {
           }
         });
     } else {
-      console.log("VALUE--------->ELSE");
+      // console.log("VALUE--------->ELSE");
       this.setState(
         {
           allowAdd: false,
@@ -1457,15 +1457,15 @@ export default class RealmCountryPlanningUnitList extends Component {
   };
 
   blur = function (instance) {
-    console.log("on blur called");
+    // console.log("on blur called");
   };
 
   focus = function (instance) {
-    console.log("on focus called");
+    // console.log("on focus called");
   };
 
   onedit = function (instance, cell, x, y, value) {
-    console.log("------------onedit called");
+    // console.log("------------onedit called");
     this.el.setValueFromCoords(9, y, 1, true);
   }.bind(this);
 
@@ -1480,8 +1480,8 @@ export default class RealmCountryPlanningUnitList extends Component {
       1
     )
       .then((response) => {
-        // console.log(JSON.stringify(response.data))
-        console.log("Program----->", response.data);
+        // // console.log(JSON.stringify(response.data))
+        // console.log("Program----->", response.data);
         this.setState({
           programs: response.data,
           loading: false,

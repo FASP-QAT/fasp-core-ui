@@ -562,9 +562,9 @@ class ListTracerCategoryComponent extends Component {
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            console.log("this.state.tracerCategoryList---", this.state.tracerCategoryList);
+            // console.log("this.state.tracerCategoryList---", this.state.tracerCategoryList);
             const selTracerCategory = this.state.tracerCategoryList.filter(c => c.realm.id == realmId)
-            console.log("selTracerCategory---", selTracerCategory);
+            // console.log("selTracerCategory---", selTracerCategory);
             this.setState({
                 selTracerCategory
             },
@@ -669,7 +669,7 @@ class ListTracerCategoryComponent extends Component {
 
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
-                console.log("response.data----", response.data);
+                // console.log("response.data----", response.data);
                 this.setState({
                     tracerCategoryList: response.data,
                     selTracerCategory: response.data

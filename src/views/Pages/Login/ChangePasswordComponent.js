@@ -174,13 +174,13 @@ class ChangePasswordComponent extends Component {
                                             })
                                             .catch(
                                                 error => {
-                                                    console.log("error---", error);
+                                                    // console.log("error---", error);
                                                     if (error.message === "Network Error") {
                                                         this.setState({
                                                             // message: error.message 
                                                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         }, () => {
-                                                            console.log("inside412");
+                                                            // console.log("inside412");
                                                             document.getElementById('div1').style.display = 'block';
                                                             this.hideFirstComponent();
                                                         });
@@ -192,11 +192,11 @@ class ChangePasswordComponent extends Component {
                                                             case 404:
                                                             case 406:
                                                             case 412:
-                                                                //          console.log("error.response.data.messageCode 111 ---", error.response);
-                                                                console.log("error.response.data.messageCode ---", error.response.data.messageCode);
+                                                                //          // console.log("error.response.data.messageCode 111 ---", error.response);
+                                                                // console.log("error.response.data.messageCode ---", error.response.data.messageCode);
                                                                 this.setState({ message: error.response.data.messageCode },
                                                                     () => {
-                                                                        console.log("inside412->", this.state.message);
+                                                                        // console.log("inside412->", this.state.message);
                                                                         // document.getElementById('div1').style.display = 'block';
                                                                         this.hideFirstComponent();
                                                                     });
@@ -205,7 +205,7 @@ class ChangePasswordComponent extends Component {
                                                             default:
                                                                 this.setState({ message: 'static.unkownError' },
                                                                     () => {
-                                                                        console.log("inside412");
+                                                                        // console.log("inside412");
                                                                         //  document.getElementById('div1').style.display = 'block';
                                                                         this.hideFirstComponent();
                                                                     });
@@ -220,7 +220,7 @@ class ChangePasswordComponent extends Component {
                                             message: 'static.common.onlinepasswordtext'
                                         },
                                             () => {
-                                                console.log("inside412");
+                                                // console.log("inside412");
                                                 document.getElementById('div1').style.display = 'block';
                                                 this.hideFirstComponent();
                                             });

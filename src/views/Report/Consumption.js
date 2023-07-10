@@ -142,7 +142,7 @@ class Consumption extends Component {
   }
 
   toggleView() {
-    console.log("In toggle view");
+    // console.log("In toggle view");
     var tempConsumptionList = [];
     var tempConsumptionList1 = [];
     var multiplier = this.state.multiplier;
@@ -178,7 +178,7 @@ class Consumption extends Component {
               })
 
               PlanningUnitService.getPlanningUnitById(productId).then(response => {
-                console.log("RESP-----", response.data)
+                // console.log("RESP-----", response.data)
                 this.setState({
                   multiplier: response.data.multiplier,
                   planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text,
@@ -186,7 +186,7 @@ class Consumption extends Component {
                 },
                   () => {
                     this.filterData()
-                    console.log("MULTIPLIER----", this.state.multiplier);
+                    // console.log("MULTIPLIER----", this.state.multiplier);
                   })
               }).catch(
                 error => {
@@ -306,7 +306,7 @@ class Consumption extends Component {
             },
               () => {
                 this.filterData()
-                console.log("MULTIPLIER----", this.state.multiplier);
+                // console.log("MULTIPLIER----", this.state.multiplier);
               })
           }.bind(this);
         }.bind(this)
@@ -338,7 +338,7 @@ class Consumption extends Component {
     }
   }
   addDoubleQuoteToRowContent = (arr) => {
-    console.log(arr)
+    // console.log(arr)
     return arr.map(ele => '"' + ele + '"')
   }
 
@@ -562,11 +562,11 @@ class Consumption extends Component {
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-    console.log('values =>', planningUnitId, programId, versionId);
+    // console.log('values =>', planningUnitId, programId, versionId);
     if (planningUnitId > 0 && programId > 0 && versionId != 0) {
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
-        console.log("------------OFFLINE PART------------");
+        // console.log("------------OFFLINE PART------------");
         var db1;
         var storeOS;
         getDatabase();
@@ -591,7 +591,7 @@ class Consumption extends Component {
           db1 = e.target.result;
           var programDataTransaction = db1.transaction(['programData'], 'readwrite');
           var programDataOs = programDataTransaction.objectStore('programData');
-          // console.log(program)
+          // // console.log(program)
           var programRequest = programDataOs.get(program);
           programRequest.onerror = function (event) {
             this.setState({
@@ -620,7 +620,7 @@ class Consumption extends Component {
                 supplyPlan: []
               }
             }
-            console.log("consumptionList----*********----", (programJson.consumptionList));
+            // console.log("consumptionList----*********----", (programJson.consumptionList));
 
             var offlineConsumptionList = (programJson.consumptionList);
 
@@ -629,12 +629,12 @@ class Consumption extends Component {
             const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
             const dateFilter = planningUnitFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
 
-            console.log("dateFilter------->>>", dateFilter);
+            // console.log("dateFilter------->>>", dateFilter);
 
             const flagTrue = dateFilter.filter(c => c.actualFlag == true);
-            console.log("flagTrue---->", flagTrue);
+            // console.log("flagTrue---->", flagTrue);
             const flagFalse = dateFilter.filter(c => c.actualFlag == false);
-            console.log("flagFalse---->", flagFalse);
+            // console.log("flagFalse---->", flagFalse);
             //logic for add same date data
             //True
             let resultTrue = Object.values(flagTrue.reduce((a, { consumptionId, consumptionDate, actualFlag, consumptionQty }) => {
@@ -644,7 +644,7 @@ class Consumption extends Component {
                 a[consumptionDate].consumptionQty += Number(consumptionQty);
               return a;
             }, {}));
-            console.log("resultTrue---->", resultTrue);
+            // console.log("resultTrue---->", resultTrue);
 
 
             //Flase
@@ -655,19 +655,19 @@ class Consumption extends Component {
                 a[consumptionDate].consumptionQty += Number(consumptionQty);
               return a;
             }, {}));
-            console.log("resultFalse---->", resultFalse);
+            // console.log("resultFalse---->", resultFalse);
 
 
             let result = resultTrue.concat(resultFalse);
-            console.log("result------->>>", result);
+            // console.log("result------->>>", result);
             const sorted = result.sort((a, b) => {
               var dateA = new Date(a.consumptionDate).getTime();
               var dateB = new Date(b.consumptionDate).getTime();
               return dateA > dateB ? 1 : -1;
             });
-            console.log("sorted------->>>", sorted);
+            // console.log("sorted------->>>", sorted);
 
-            // console.log("CHECK----->>", dateFilter.filter(c => c.consumptionQty == 1800));
+            // // console.log("CHECK----->>", dateFilter.filter(c => c.consumptionQty == 1800));
 
             let dateArray = [...new Set(sorted.map(ele => (moment(ele.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'))))]
             let finalOfflineConsumption = [];
@@ -705,7 +705,7 @@ class Consumption extends Component {
 
 
 
-            console.log("final consumption---", finalOfflineConsumption);
+            // console.log("final consumption---", finalOfflineConsumption);
             this.setState({
               offlineConsumptionList: finalOfflineConsumption,
               consumptions: finalOfflineConsumption,
@@ -733,10 +733,10 @@ class Consumption extends Component {
           planningUnitId: planningUnitId,
           reportView: viewById
         }
-        console.log("JSON INPUT---------->", inputjson);
+        // console.log("JSON INPUT---------->", inputjson);
         ProductService.getConsumptionData(inputjson)
           .then(response => {
-            console.log("RESP---------->", response.data);
+            // console.log("RESP---------->", response.data);
             this.setState({
               consumptions: response.data,
               message: '',
@@ -922,13 +922,13 @@ class Consumption extends Component {
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-            console.log(programNameLabel)
+            // console.log(programNameLabel)
 
             var f = 0
             for (var k = 0; k < this.state.programs.length; k++) {
               if (this.state.programs[k].programId == programData.programId) {
                 f = 1;
-                console.log('already exist')
+                // console.log('already exist')
               }
             }
             if (f == 0) {
@@ -1004,7 +1004,7 @@ class Consumption extends Component {
               myResult = planningunitRequest.result;
               var programId = (document.getElementById("programId").value).split("_")[0];
               var proList = []
-              console.log("myResult===============", myResult)
+              // console.log("myResult===============", myResult)
               for (var i = 0; i < myResult.length; i++) {
                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -1034,9 +1034,9 @@ class Consumption extends Component {
             tracerCategoryIds: [],
             programIds: [programId]
           }
-          console.log('**' + programJson);
+          // console.log('**' + programJson);
           DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
-            console.log('**' + JSON.stringify(response.data));
+            // console.log('**' + JSON.stringify(response.data));
             var listArray = response.data;
             listArray.sort((a, b) => {
               var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1129,7 +1129,7 @@ class Consumption extends Component {
 
       localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
-      console.log(program)
+      // console.log(program)
       if (program.length == 1) {
         if (isSiteOnline()) {
           this.setState({
@@ -1140,7 +1140,7 @@ class Consumption extends Component {
           }, () => {
             DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
               .then(response => {
-                console.log("response===>", response.data)
+                // console.log("response===>", response.data)
                 this.setState({
                   versions: []
                 }, () => {
@@ -1261,7 +1261,7 @@ class Consumption extends Component {
           }
         }
 
-        console.log(verList)
+        // console.log(verList)
         var versionList = verList.filter(function (x, i, a) {
           return a.indexOf(x) === i;
         })

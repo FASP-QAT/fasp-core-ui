@@ -1145,7 +1145,7 @@ export default class syncPage extends Component {
       }
       shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => (c.shipmentId == 0 && c.erpFlag == true) || (c.shipmentId == 0 && c.active.toString() == "true")));
 
-      console.log("shipmentData Test@@@123", shipmentData)
+      // console.log("shipmentData Test@@@123", shipmentData)
       //Make all active erp shipments not active
       shipmentData.map((item, index) => {
         if (item.erpFlag.toString() == "true") {
@@ -4746,7 +4746,7 @@ export default class syncPage extends Component {
   // }
 
   synchronize() {
-    console.log("CommitLogs --- 1 inside synchronize function")
+    // console.log("CommitLogs --- 1 inside synchronize function")
     this.setState({ loading: true });
     var checkValidations = true;
     if (checkValidations) {
@@ -5044,11 +5044,11 @@ export default class syncPage extends Component {
               // ProgramService.checkIfCommitRequestExists((this.state.singleProgramId)).then(response1 => {
               // if (response1.status == 200) {
               // if (response1.data == false) {
-              console.log("Program Json Final Test@@@123", programJson)
-              console.log("CommitLogs --- 2 Log before sending data to server")
+              // console.log("Program Json Final Test@@@123", programJson)
+              // console.log("CommitLogs --- 2 Log before sending data to server")
               ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
-                  console.log("CommitLogs --- 3 Log after response 200")
+                  // console.log("CommitLogs --- 3 Log after response 200")
                   // console.log(")))) Commit Request generated successfully");
                   // var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
                   // var programDataOs1 = programDataTransaction1.objectStore('programData');
@@ -5120,13 +5120,13 @@ export default class syncPage extends Component {
                     progressPer: 50
                     , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
                   }, () => {
-                    console.log("CommitLogs --- 4 After 50% completed before redirect to dashboard")
+                    // console.log("CommitLogs --- 4 After 50% completed before redirect to dashboard")
                     this.hideFirstComponent();
                     this.redirectToDashbaord(response.data);
                   })
                   // }.bind(this)
                 } else {
-                  console.log("CommitLogs --- 5 in else response not 200")
+                  // console.log("CommitLogs --- 5 in else response not 200")
                   this.setState({
                     message: response.data.messageCode,
                     color: "red",
@@ -5137,9 +5137,9 @@ export default class syncPage extends Component {
               })
                 .catch(
                   error => {
-                    console.log("CommitLogs --- 6 inside error", error)
-                    console.log("CommitLogs --- 7 inside error.message", error.message)
-                    console.log("CommitLogs --- 8 inside error.response", error.response ? error.response.status : "")
+                    // console.log("CommitLogs --- 6 inside error", error)
+                    // console.log("CommitLogs --- 7 inside error.message", error.message)
+                    // console.log("CommitLogs --- 8 inside error.response", error.response ? error.response.status : "")
 
                     // console.log("@@@Error4", error);
                     // console.log("@@@Error4", error.message);
@@ -5375,35 +5375,35 @@ export default class syncPage extends Component {
   }
 
   redirectToDashbaord(commitRequestId) {
-    console.log("CommitLogs --- 9 inside redirect to dashboard", commitRequestId)
+    // console.log("CommitLogs --- 9 inside redirect to dashboard", commitRequestId)
     this.setState({ loading: true });
     // console.log("method called", commitRequestId);
     AuthenticationService.setupAxiosInterceptors();
     ProgramService.sendNotificationAsync(commitRequestId).then(resp => {
-      console.log("CommitLogs --- 10 send notification async Response", resp)
-      console.log("CommitLogs --- 11 send notification async Response data", resp.data)
-      console.log("CommitLogs --- 12 send notification async created by user Id", resp.data.createdBy.userId)
-      console.log("CommitLogs --- 13 send notification async status", resp.data.status)
+      // console.log("CommitLogs --- 10 send notification async Response", resp)
+      // console.log("CommitLogs --- 11 send notification async Response data", resp.data)
+      // console.log("CommitLogs --- 12 send notification async created by user Id", resp.data.createdBy.userId)
+      // console.log("CommitLogs --- 13 send notification async status", resp.data.status)
       var curUser = AuthenticationService.getLoggedInUserId();
       if (resp.data.createdBy.userId == curUser && resp.data.status == 1) {
-        console.log("CommitLogs --- 14 inside status 1")
+        // console.log("CommitLogs --- 14 inside status 1")
         setTimeout(function () {
-          console.log("CommitLogs --- 15 Again call for redirect to dashboard")
+          // console.log("CommitLogs --- 15 Again call for redirect to dashboard")
           this.redirectToDashbaord(commitRequestId)
         }.bind(this), 10000);
       } else if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
-        console.log("CommitLogs --- 14 inside else if for status is 2")
+        // console.log("CommitLogs --- 14 inside else if for status is 2")
         this.setState({
           progressPer: 75
           , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
         }, () => {
           this.hideFirstComponent();
-          console.log("CommitLogs --- 15 call to bring latest program")
+          // console.log("CommitLogs --- 15 call to bring latest program")
           this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
         })
         // eventBus.dispatch("testDataAccess", { openModal: true, notificationDetails: resp.data });
       } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
-        console.log("CommitLogs --- 15 inside else if for status is 3")
+        // console.log("CommitLogs --- 15 inside else if for status is 3")
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -5449,13 +5449,13 @@ export default class syncPage extends Component {
 
     }).catch(
       error => {
-        console.log("CommitLogs --- 16 in catch before calling redirect to dashboard")
+        // console.log("CommitLogs --- 16 in catch before calling redirect to dashboard")
         this.redirectToDashbaord(commitRequestId)
       })
   }
 
   getLatestProgram(notificationDetails) {
-    console.log("CommitLogs --- 17 in get latest program")
+    // console.log("CommitLogs --- 17 in get latest program")
     // console.log(")))) inside getting latest version")
     this.setState({ loading: true });
     var checkboxesChecked = [];
@@ -5473,7 +5473,7 @@ export default class syncPage extends Component {
     // console.log(")))) Before calling get notification api")
     ProgramService.getAllProgramData(checkboxesChecked)
       .then(response => {
-        console.log("CommitLogs --- 18 after getting latest program from server")
+        // console.log("CommitLogs --- 18 after getting latest program from server")
         // console.log(")))) After calling get notification api")
         // console.log("Resposne+++", response);
         var json = response.data;

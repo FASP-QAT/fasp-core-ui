@@ -132,7 +132,7 @@ export default class EditProgramTicketComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramList().then(response => {
             if (response.status == 200) {
-                console.log("resp--------------------", response.data);
+                // console.log("resp--------------------", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -247,7 +247,7 @@ export default class EditProgramTicketComponent extends Component {
                             this.state.program.summary = summaryText_2;
                             this.state.program.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.program).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

@@ -89,7 +89,7 @@ export default class CostOfInventory extends Component {
 
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    // console.log(JSON.stringify(response.data))
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
                         var programJson = {
@@ -171,7 +171,7 @@ export default class CostOfInventory extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
             this.setState({ loading: false })
         }
@@ -205,13 +205,13 @@ export default class CostOfInventory extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -267,13 +267,13 @@ export default class CostOfInventory extends Component {
 
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
 
                     DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
                             .then(response => {
-                                console.log("response===>1", response.data)
+                                // console.log("response===>1", response.data)
                                 this.setState({
                                     versions: []
                                 }, () => {
@@ -388,7 +388,7 @@ export default class CostOfInventory extends Component {
 
                 }
 
-                console.log(verList);
+                // console.log(verList);
                 let versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
                 });
@@ -399,7 +399,7 @@ export default class CostOfInventory extends Component {
                     //     versions: versionList,
                     //     versionId: localStorage.getItem("sesVersionIdReport")
                     // }, () => {
-                    //     console.log("VERSIONID-----", this.state.versionId);
+                    //     // console.log("VERSIONID-----", this.state.versionId);
                     //     // this.dataChange(e); 
                     //     let costOfInventoryInput = this.state.CostOfInventoryInput;
                     //     costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
@@ -413,7 +413,7 @@ export default class CostOfInventory extends Component {
                             versions: versionList,
                             versionId: localStorage.getItem("sesVersionIdReport")
                         }, () => {
-                            console.log("VERSIONID-----", this.state.versionId);
+                            // console.log("VERSIONID-----", this.state.versionId);
                             // this.dataChange(e); 
                             let costOfInventoryInput = this.state.CostOfInventoryInput;
                             costOfInventoryInput.versionId = localStorage.getItem("sesVersionIdReport");
@@ -424,7 +424,7 @@ export default class CostOfInventory extends Component {
                             versions: versionList,
                             versionId: versionList[0].versionId
                         }, () => {
-                            console.log("VERSIONID-----", this.state.versionId);
+                            // console.log("VERSIONID-----", this.state.versionId);
                             // this.dataChange(e); 
                             let costOfInventoryInput = this.state.CostOfInventoryInput;
                             costOfInventoryInput.versionId = versionList[0].versionId;
@@ -649,8 +649,8 @@ export default class CostOfInventory extends Component {
 
     componentDidMount() {
         this.getPrograms()
-        console.log("1-------1", localStorage.getItem("sesProgramIdReport"));
-        console.log("1-------2", localStorage.getItem("sesVersionIdReport"));
+        // console.log("1-------1", localStorage.getItem("sesProgramIdReport"));
+        // console.log("1-------2", localStorage.getItem("sesVersionIdReport"));
     }
 
     setProgramId(event) {
@@ -684,7 +684,7 @@ export default class CostOfInventory extends Component {
 
     buildJExcel() {
         let costOfInventory = this.state.costOfInventory;
-        // console.log("costOfInventory---->", costOfInventory);
+        // // console.log("costOfInventory---->", costOfInventory);
         let costOfInventoryArray = [];
         let count = 0;
 
@@ -703,7 +703,7 @@ export default class CostOfInventory extends Component {
         //     data = [];
         //     costOfInventoryArray[0] = data;
         // }
-        // console.log("costOfInventoryArray---->", costOfInventoryArray);
+        // // console.log("costOfInventoryArray---->", costOfInventoryArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -786,10 +786,10 @@ export default class CostOfInventory extends Component {
 
 
     formSubmit() {
-        console.log('in form submit')
+        // console.log('in form submit')
         var programId = this.state.CostOfInventoryInput.programId;
         var versionId = this.state.CostOfInventoryInput.versionId
-        console.log("1-------3", versionId);
+        // console.log("1-------3", versionId);
         if (programId != 0 && versionId != 0 && versionId != "") {
             localStorage.setItem("sesVersionIdReport", versionId);
             if (versionId.toString().includes('Local')) {
@@ -815,7 +815,7 @@ export default class CostOfInventory extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    console.log(program)
+                    // console.log(program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -828,7 +828,7 @@ export default class CostOfInventory extends Component {
                         // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         // var programJson = JSON.parse(programData);
-                        // console.log(programJson)
+                        // // console.log(programJson)
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                         var proList = []
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
@@ -873,7 +873,7 @@ export default class CostOfInventory extends Component {
                                 var dtstr = this.state.singleValue2.year + "-" + String(this.state.singleValue2.month).padStart(2, '0') + "-01"
                                 var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnit.id && c.transDate == dtstr)
                                 if (list.length > 0) {
-                                    console.log(list)
+                                    // console.log(list)
                                     var json = {
                                         planningUnit: planningUnit.planningUnit,
                                         stock: document.getElementById("includePlanningShipments").value.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,
@@ -915,7 +915,7 @@ export default class CostOfInventory extends Component {
                 }
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.costOfInventory(inputjson).then(response => {
-                    console.log("costOfInentory=====>", response.data);
+                    // console.log("costOfInentory=====>", response.data);
                     this.setState({
                         costOfInventory: response.data, message: ''
                     }, () => {
@@ -986,7 +986,7 @@ export default class CostOfInventory extends Component {
         }
     }
     formatLabel(cell, row) {
-        // console.log("celll----", cell);
+        // // console.log("celll----", cell);
         if (cell != null && cell != "") {
             return getLabelText(cell, this.state.lang);
         }

@@ -187,14 +187,14 @@ class usageTemplate extends Component {
     }
 
     getForcastingUnitById(forecastingUnitId) {
-        console.log("forecastingUnitObj-----1 ", forecastingUnitId);
+        // console.log("forecastingUnitObj-----1 ", forecastingUnitId);
         ForecastingUnitService.getForcastingUnitById(forecastingUnitId).then(response => {
             if (response.status == 200) {
                 this.setState({
                     forecastingUnitObj: response.data, loading: false
                 },
                     () => {
-                        console.log("forecastingUnitObj-----", this.state.forecastingUnitObj);
+                        // console.log("forecastingUnitObj-----", this.state.forecastingUnitObj);
                     })
             }
             else {
@@ -255,7 +255,7 @@ class usageTemplate extends Component {
     getDataSet() {
         ProgramService.getDataSetList()
             .then(response => {
-                console.log("PROGRAM---------->", response.data)
+                // console.log("PROGRAM---------->", response.data)
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
@@ -361,7 +361,7 @@ class usageTemplate extends Component {
         DropdownService.getTracerCategoryDropdownList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("TracerCategory------->123", response.data);
+                    // console.log("TracerCategory------->123", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -388,7 +388,7 @@ class usageTemplate extends Component {
                         // loading: false
                     },
                         () => {
-                            console.log("TracerCategory------->", this.state.tracerCategoryList)
+                            // console.log("TracerCategory------->", this.state.tracerCategoryList)
                             this.getDimensionList();
                         })
                 } else {
@@ -447,7 +447,7 @@ class usageTemplate extends Component {
         UnitService.getUnitListByDimensionId(5)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("getUnitListByDimensionId------->123", response.data);
+                    // console.log("getUnitListByDimensionId------->123", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = (a.unitCode).toUpperCase(); // ignore upper and lowercase
@@ -471,7 +471,7 @@ class usageTemplate extends Component {
                         dimensionList: tempList,
                     },
                         () => {
-                            console.log("dimensionList----------->", this.state.dimensionList);
+                            // console.log("dimensionList----------->", this.state.dimensionList);
                             this.getForecastingUnit();
                         })
                 } else {
@@ -528,7 +528,7 @@ class usageTemplate extends Component {
 
     getForecastingUnit() {
         ForecastingUnitService.getForecastingUnitListAll().then(response => {
-            console.log("response------->" + response.data);
+            // console.log("response------->" + response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -615,7 +615,7 @@ class usageTemplate extends Component {
 
     getUnit() {
         UnitService.getUnitListAll().then(response => {
-            console.log("response------->" + response.data);
+            // console.log("response------->" + response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -701,7 +701,7 @@ class usageTemplate extends Component {
 
     getUsagePeriod() {
         UsagePeriodService.getUsagePeriod().then(response => {
-            console.log("response------->" + JSON.stringify(response.data));
+            // console.log("response------->" + JSON.stringify(response.data));
             if (response.status == 200) {
                 var listArray = response.data;
                 // listArray.sort((a, b) => {
@@ -908,7 +908,7 @@ class usageTemplate extends Component {
         jexcel.destroy(document.getElementById("paputableDiv"), true);
         var json = [];
         var data = papuDataArr;
-        console.log("data-->", data)
+        // console.log("data-->", data)
         var options = {
             data: data,
             columnDrag: true,
@@ -1227,7 +1227,7 @@ class usageTemplate extends Component {
                 let roleArray = this.state.roleArray;
                 var jsonLength;
                 jsonLength = json.length;
-                console.log("JsonLength", jsonLength)
+                // console.log("JsonLength", jsonLength)
 
                 for (var j = 0; j < jsonLength; j++) {
                     try {
@@ -1240,8 +1240,8 @@ class usageTemplate extends Component {
                         var typeId = rowData[6];
                         var oneTimeUsage = rowData[10];
 
-                        console.log("roleArray--------->1", j);
-                        console.log("roleArray--------->2", elInstance);
+                        // console.log("roleArray--------->1", j);
+                        // console.log("roleArray--------->2", elInstance);
                         if (typeId == 2) {
                             var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -1367,7 +1367,7 @@ class usageTemplate extends Component {
                 let roleArray = this.state.roleArray;
                 var jsonLength;
                 jsonLength = json.length;
-                console.log("JsonLength", jsonLength)
+                // console.log("JsonLength", jsonLength)
 
                 for (var j = 0; j < jsonLength; j++) {
                     try {
@@ -1380,8 +1380,8 @@ class usageTemplate extends Component {
                         var typeId = rowData[6];
                         var oneTimeUsage = rowData[10];
 
-                        console.log("roleArray--------->1", j);
-                        console.log("roleArray--------->2", elInstance);
+                        // console.log("roleArray--------->1", j);
+                        // console.log("roleArray--------->2", elInstance);
                         if (typeId == 2) {
                             var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -1545,12 +1545,12 @@ class usageTemplate extends Component {
                                     let value = this.el.getValueFromCoords(12, y);
                                     value = Number(value);
                                     let tempUsagePeriodList = [];
-                                    console.log("number---------------------->0", value);
-                                    console.log("number---------------------->0", typeof value);
+                                    // console.log("number---------------------->0", value);
+                                    // console.log("number---------------------->0", typeof value);
 
                                     if (typeof value === 'number') {
                                         //it's a number
-                                        console.log("number---------------------->1");
+                                        // console.log("number---------------------->1");
                                         let tempList = this.state.usagePeriodListLong;
 
                                         if (value == 0) {
@@ -1559,18 +1559,18 @@ class usageTemplate extends Component {
                                             let selectedPickerConvertTOMonth = tempList.filter(c => c.usagePeriodId == value)[0].convertToMonth;
 
                                             for (var i = 0; i < tempList.length; i++) {
-                                                console.log("number---------------------->1.1");
+                                                // console.log("number---------------------->1.1");
                                                 if (parseFloat(tempList[i].convertToMonth) <= parseFloat(selectedPickerConvertTOMonth)) {
                                                     tempUsagePeriodList.push(tempList[i]);
                                                 }
                                             }
-                                            console.log("number---------------------->2", tempUsagePeriodList);
+                                            // console.log("number---------------------->2", tempUsagePeriodList);
                                         }
 
 
                                     }
 
-                                    console.log("number---------------------->3");
+                                    // console.log("number---------------------->3");
 
 
 
@@ -2253,7 +2253,7 @@ class usageTemplate extends Component {
             }
             mylist = tempMyList;
         }
-        console.log("check---------------->3", mylist);
+        // console.log("check---------------->3", mylist);
         return mylist;
 
 
@@ -2347,7 +2347,7 @@ class usageTemplate extends Component {
         this.hideSecondComponent();
         UsageTemplateService.getUsageTemplateListAll().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data)
+                // console.log("response.data---->", response.data)
                 // console.log("response.data---->", response.data.filter(c => c.usageTemplateId == 26));
 
                 // var listArray = response.data;
@@ -2547,15 +2547,15 @@ class usageTemplate extends Component {
     formSubmit = function () {
 
         var validation = this.checkValidation();
-        console.log("validation--------->", validation);
+        // console.log("validation--------->", validation);
         if (validation == true) {
             this.setState({ loading: true })
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("17 map---" + map1.get("17"))
+                // console.log("17 map---" + map1.get("17"))
                 if (parseInt(map1.get("17")) === 1) {
                     let json = {
                         usageTemplateId: parseInt(map1.get("0")),
@@ -2592,12 +2592,12 @@ class usageTemplate extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             UsageTemplateService.addUpdateUsageTemplateMapping(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         this.setState({
                             message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged1: false
@@ -2666,7 +2666,7 @@ class usageTemplate extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -2822,7 +2822,7 @@ class usageTemplate extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
 
-        console.log("instance===>", instance.worksheets[0])
+        // console.log("instance===>", instance.worksheets[0])
         // var asterisk = document.getElementsByClassName("resizable")[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -3229,9 +3229,9 @@ class usageTemplate extends Component {
                 VLookUp = usagePeriodObj.convertToMonth;
             }
 
-            console.log("Checked----------->1.1", v14);
-            console.log("Checked----------->2.1", VLookUp);
-            console.log("Checked----------->3.1", t14);
+            // console.log("Checked----------->1.1", v14);
+            // console.log("Checked----------->2.1", VLookUp);
+            // console.log("Checked----------->3.1", t14);
 
 
             let string = (selectedOneTimeUsageID ? o14 : v14 / VLookUp * t14);
@@ -3261,7 +3261,7 @@ class usageTemplate extends Component {
         if (x == 4 || x == 7 || x == 9 || x == 11 || x == 12 || x == 13 || x == 14 || x == 8) {
 
             let unitIdValue = this.el.getValueFromCoords(8, y);
-            console.log("unitIdValue--------->", unitIdValue);
+            // console.log("unitIdValue--------->", unitIdValue);
             let unitName = '';
             if (unitIdValue != 0) {
                 unitName = this.state.dimensionList.filter(c => c.id == unitIdValue)[0].name;
@@ -3286,7 +3286,7 @@ class usageTemplate extends Component {
             // } else {
             //     q1 = '';
             // }
-            console.log("Test-1--", string)
+            // console.log("Test-1--", string)
             if (this.el.getValueFromCoords(10, y) == false) {
                 if (this.el.getValueFromCoords(6, y) == 1) {
                     q1 = '';
@@ -3297,7 +3297,7 @@ class usageTemplate extends Component {
             } else {
                 q1 = '';
             }
-            console.log("Test-2--", string)
+            // console.log("Test-2--", string)
 
             let t1 = ''
             if (this.el.getValueFromCoords(6, y) == 1 && !this.el.getValueFromCoords(10, y)) {
@@ -3318,14 +3318,14 @@ class usageTemplate extends Component {
                 } else {
                     string += " " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (q1 == '' ? '____' : q1) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
                 }
-                console.log("Test-3--", string)
+                // console.log("Test-3--", string)
                 if (this.el.getValueFromCoords(6, y) == 2) {
                     string += " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
                 } else {
                     string += " " + (t1 == '' ? '____' : t1) + " " + (this.el.getValue(`N${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`N${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
                 }
             }
-            console.log("Test-4--", string)
+            // console.log("Test-4--", string)
 
 
             this.el.setValueFromCoords(16, y, string, true);
@@ -3336,7 +3336,7 @@ class usageTemplate extends Component {
         // if (x != 24) {
         //     this.el.setValueFromCoords(24, y, 1, true);
         // }
-        console.log("LOG---------->2", x);
+        // console.log("LOG---------->2", x);
 
         if (x == 10 || x == 11 || x == 12 || x == 21) {
             this.el.setValueFromCoords(17, y, 1, true);
@@ -3346,7 +3346,7 @@ class usageTemplate extends Component {
 
         //Tracer Category
         if (x == 3) {
-            console.log("LOG---------->2", value);
+            // console.log("LOG---------->2", value);
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("D").concat(parseInt(y) + 1);
             this.el.setValueFromCoords(4, y, '', true);
@@ -3524,7 +3524,7 @@ class usageTemplate extends Component {
         //People Validation
         if (x == 8) {
             this.el.setValueFromCoords(24, y, 1, true);
-            console.log("LOG---------->3", value);
+            // console.log("LOG---------->3", value);
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
@@ -3668,8 +3668,8 @@ class usageTemplate extends Component {
         if (x == 13) {
             let onTimeUsage = this.el.getValueFromCoords(10, y);
             let typeId = this.el.getValueFromCoords(6, y);
-            console.log("onTimeUsage------>1", onTimeUsage);
-            console.log("onTimeUsage------>2", typeId);
+            // console.log("onTimeUsage------>1", onTimeUsage);
+            // console.log("onTimeUsage------>2", typeId);
             if (!onTimeUsage && typeId == 1) {
                 var col = ("N").concat(parseInt(y) + 1);
                 value = this.el.getValue(`N${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -4418,7 +4418,7 @@ class usageTemplate extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(17, y);
             if (parseInt(value) == 1) {
@@ -4507,7 +4507,7 @@ class usageTemplate extends Component {
                 //Lag in month 
                 var col = ("F").concat(parseInt(y) + 1);
                 value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                console.log("LAG----------->", value);
+                // console.log("LAG----------->", value);
                 var reg = INTEGER_NO_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");

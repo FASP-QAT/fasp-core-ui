@@ -509,7 +509,7 @@ export default class ForecastingUnitTicketComponent extends Component {
                             this.state.forecastingUnit.summary = summaryText_2;
                             this.state.forecastingUnit.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.forecastingUnit).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

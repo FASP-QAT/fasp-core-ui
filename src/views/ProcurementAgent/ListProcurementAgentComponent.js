@@ -668,7 +668,7 @@ class ListProcurementAgentComponent extends Component {
         }
     }
     buttonFormatter(cell, row) {
-        console.log("button formater cell-----------", cell);
+        // console.log("button formater cell-----------", cell);
         return <Button type="button" size="sm" color="success" onClick={(event) => this.addPlanningUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
     }
 
@@ -678,7 +678,7 @@ class ListProcurementAgentComponent extends Component {
 
     buildJExcel() {
         let procurementAgentList = this.state.selProcurementAgent;
-        console.log("procurementAgentList---->", procurementAgentList);
+        // console.log("procurementAgentList---->", procurementAgentList);
         let procurementAgentArray = [];
         let count = 0;
 
@@ -818,7 +818,7 @@ class ListProcurementAgentComponent extends Component {
                             items.push({
                                 title: i18n.t('static.program.mapPlanningUnit'),
                                 onclick: function () {
-                                    console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                                    // console.log("onclick------>", this.el.getValueFromCoords(0, y));
 
                                     this.props.history.push({
                                         pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${this.el.getValueFromCoords(0, y)}`,

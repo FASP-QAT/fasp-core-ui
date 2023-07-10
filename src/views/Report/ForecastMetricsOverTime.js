@@ -407,7 +407,7 @@ class ForcastMatrixOverTime extends Component {
           }
         );
     } else {
-      console.log('offline')
+      // console.log('offline')
       this.consolidatedProgramList()
       this.setState({ loading: false })
     }
@@ -441,13 +441,13 @@ class ForcastMatrixOverTime extends Component {
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-            console.log(programNameLabel)
+            // console.log(programNameLabel)
 
             var f = 0
             for (var k = 0; k < this.state.programs.length; k++) {
               if (this.state.programs[k].programId == programData.programId) {
                 f = 1;
-                console.log('already exist')
+                // console.log('already exist')
               }
             }
             if (f == 0) {
@@ -496,7 +496,7 @@ class ForcastMatrixOverTime extends Component {
 
       localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
-      console.log(program)
+      // console.log(program)
       if (program.length == 1) {
         if (isSiteOnline()) {
           this.setState({
@@ -505,7 +505,7 @@ class ForcastMatrixOverTime extends Component {
           }, () => {
             DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
               .then(response => {
-                console.log("response===>", response.data)
+                // console.log("response===>", response.data)
                 this.setState({
                   versions: []
                 }, () => {
@@ -621,7 +621,7 @@ class ForcastMatrixOverTime extends Component {
 
         }
 
-        console.log(verList);
+        // console.log(verList);
         let versionList = verList.filter(function (x, i, a) {
           return a.indexOf(x) === i;
         });
@@ -699,7 +699,7 @@ class ForcastMatrixOverTime extends Component {
               myResult = planningunitRequest.result;
               var programId = (document.getElementById("programId").value).split("_")[0];
               var proList = []
-              console.log(myResult)
+              // console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -728,9 +728,9 @@ class ForcastMatrixOverTime extends Component {
             tracerCategoryIds: [],
             programIds: [programId]
           }
-          console.log('**' + programJson);
+          // console.log('**' + programJson);
           DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
-            console.log('**' + JSON.stringify(response.data));
+            // console.log('**' + JSON.stringify(response.data));
             var listArray = response.data;
             listArray.sort((a, b) => {
               var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -893,7 +893,7 @@ class ForcastMatrixOverTime extends Component {
             // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson = JSON.parse(programData);
-            // console.log('programJson', programJson)
+            // // console.log('programJson', programJson)
             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
             var programJson = {}
@@ -933,7 +933,7 @@ class ForcastMatrixOverTime extends Component {
                   }
                   var dt = year + "-" + String(i).padStart(2, '0') + "-01"
                   var conlist = consumptionList.filter(c => c.consumptionDate === dt)
-                  console.log(dt, conlist)
+                  // console.log(dt, conlist)
                   var actconsumption = null;
                   var forConsumption = null;
                   if (conlist.length == 2) {
@@ -949,7 +949,7 @@ class ForcastMatrixOverTime extends Component {
                   actualconsumption = actualconsumption + actconsumption
                   forcastConsumption = forcastConsumption + forConsumption
                   if (j == 0) {
-                    console.log(currentActualconsumption, ' ', actconsumption)
+                    // console.log(currentActualconsumption, ' ', actconsumption)
                     if (currentActualconsumption == null && actconsumption != null) {
                       currentActualconsumption = actconsumption
                     } else if (currentActualconsumption != null) {
@@ -974,7 +974,7 @@ class ForcastMatrixOverTime extends Component {
                   message: montcnt == 0 ? "static.reports.forecastMetrics.noConsumptionAcrossPeriod" : currentActualconsumption == null || currentForcastConsumption == null ? "static.reports.forecastMetrics.noConsumption" : (actualconsumption == null) ? "static.reports.forecastMetrics.totalConsumptionIs0" : null
                 }
                 data.push(json)
-                console.log("Json------------->", json);
+                // console.log("Json------------->", json);
                 if (month == this.state.rangeValue.to.month && from == to) {
                   this.setState({
                     matricsList: data,
@@ -1001,7 +1001,7 @@ class ForcastMatrixOverTime extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ReportService.getForecastMatricsOverTime(input)
           .then(response => {
-            console.log(JSON.stringify(response.data));
+            // console.log(JSON.stringify(response.data));
             this.setState({
               matricsList: response.data,
               message: '', loading: false,
@@ -1091,7 +1091,7 @@ class ForcastMatrixOverTime extends Component {
     /*   this.setState({
          matricsList: [{ACTUAL_DATE:"2019-04",errorperc:30},{ACTUAL_DATE:"2019-05",errorperc:50},{ACTUAL_DATE:"2019-06",errorperc:40},]
        })*/
-    console.log('matrix list updated' + this.state.matricsList)
+    // console.log('matrix list updated' + this.state.matricsList)
   }
 
 

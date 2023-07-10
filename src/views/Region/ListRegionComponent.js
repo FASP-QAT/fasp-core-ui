@@ -70,7 +70,7 @@
 //         AuthenticationService.setupAxiosInterceptors();
 //         RegionService.getRegionList()
 //             .then(response => {
-//                 console.log(response.data);
+//                 // console.log(response.data);
 //                 if (response.status == 200) {
 //                     this.setState({
 //                         regionList: response.data,
@@ -136,7 +136,7 @@
 //         //                     break;
 //         //                 default:
 //         //                     this.setState({ message: 'static.unkownError' });
-//         //                     console.log("Error code unkown");
+//         //                     // console.log("Error code unkown");
 //         //                     break;
 //         //             }
 //         //         }
@@ -512,13 +512,13 @@ class RegionListComponent extends Component {
         var A = [this.addDoubleQuoteToRowContent(headers)]
         this.state.selRegion.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln == null ? '' : ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
         for (var i = 0; i < A.length; i++) {
-            // console.log(A[i])
+            // // console.log(A[i])
             csvRow.push(A[i].join(","))
 
         }
 
         var csvString = csvRow.join("%0A")
-        // console.log('csvString' + csvString)
+        // // console.log('csvString' + csvString)
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
@@ -550,7 +550,7 @@ class RegionListComponent extends Component {
 
     buildJexcel() {
         let regionList = this.state.selRegion;
-        // console.log("regionList---->", regionList);
+        // // console.log("regionList---->", regionList);
         let regionListArray = [];
         let count = 0;
         for (var j = 0; j < regionList.length; j++) {
@@ -568,7 +568,7 @@ class RegionListComponent extends Component {
         //     data = [];
         //     regionListArray[0] = data;
         // }
-        // console.log("regionListArray---->", regionListArray);
+        // // console.log("regionListArray---->", regionListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -668,9 +668,9 @@ class RegionListComponent extends Component {
         // }
 
         // let CountryIds = this.state.countryValues.length == this.state.realmCountryList.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-        // console.log("CountryIds---", CountryIds);
+        // // console.log("CountryIds---", CountryIds);
         let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
-        console.log("CountryIds123---", this.state.countryValues.map(ele => (ele.value).toString()));
+        // console.log("CountryIds123---", this.state.countryValues.map(ele => (ele.value).toString()));
         if (this.state.countryValues.length > 0) {
             this.setState({ loading: true, message: '' })
             // AuthenticationService.setupAxiosInterceptors();
@@ -679,7 +679,7 @@ class RegionListComponent extends Component {
             }
             ReportService.wareHouseCapacityByCountry(inputjson)
                 .then(response => {
-                    console.log("RESP-------->>", response.data)
+                    // console.log("RESP-------->>", response.data)
                     this.setState({
                         regionList: response.data,
                         selRegion: response.data,
@@ -755,9 +755,9 @@ class RegionListComponent extends Component {
     // selected = function (instance, cell, x, y, value) {
 
     //     if ((x == 0 && value != 0) || (y == 0)) {
-    //         // console.log("HEADER SELECTION--------------------------");
+    //         // // console.log("HEADER SELECTION--------------------------");
     //     } else {
-    //         // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+    //         // // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
     //         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_LANGUAGE')) {
     //             this.props.history.push({
     //                 pathname: `/region/editRegion/${this.el.getValueFromCoords(0, x)}`,
@@ -767,7 +767,7 @@ class RegionListComponent extends Component {
     // }.bind(this);
     // selected = function (instance, cell, x, y, value) {
     //     if ((x == 0 && value != 0) || (y == 0)) {
-    //         // console.log("HEADER SELECTION--------------------------");
+    //         // // console.log("HEADER SELECTION--------------------------");
     //     } else {
     //         if (this.state.selSource.length != 0) {
     //             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_ROLE')) {
@@ -789,7 +789,7 @@ class RegionListComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         // RegionService.getRegionList()
         //     .then(response => {
-        //         console.log(response.data);
+        //         // console.log(response.data);
         //         if (response.status == 200) {
 
         //             this.setState({
@@ -867,7 +867,7 @@ class RegionListComponent extends Component {
         // RealmCountryService.getRealmCountryForProgram(realmId)
         DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
-                console.log("RealmCountryService---->", response.data)
+                // console.log("RealmCountryService---->", response.data)
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {

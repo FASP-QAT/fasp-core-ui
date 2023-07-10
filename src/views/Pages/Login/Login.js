@@ -120,7 +120,7 @@ class Login extends Component {
       getRequest1.onsuccess = function (event) {
         var languageList = [];
         languageList = getRequest1.result;
-        console.log("my language list---", languageList);
+        // console.log("my language list---", languageList);
         this.setState({
           languageList
         });
@@ -139,7 +139,7 @@ class Login extends Component {
       })
     }.bind(this);
 
-    console.log("Hey anchal going to get languages for profile section")
+    // console.log("Hey anchal going to get languages for profile section")
     var lastSyncDateRealm = "2020-01-01 00:00:00";
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
@@ -157,20 +157,20 @@ class Login extends Component {
         // var lastSyncDateRequest = lastSyncDateTransaction.getAll();
         // lastSyncDateRequest.onsuccess = function (event) {
         //   var lastSyncDate = lastSyncDateRequest.result[0];
-        //   console.log("lastsyncDate", lastSyncDate);
+        //   // console.log("lastsyncDate", lastSyncDate);
         //   var result = lastSyncDateRequest.result;
-        //   console.log("Result", result)
+        //   // console.log("Result", result)
         //   var realmId = 1;
-        //   console.log("RealmId", realmId)
+        //   // console.log("RealmId", realmId)
         //   for (var i = 0; i < result.length; i++) {
         //     if (result[i].id == realmId) {
-        //       console.log("in if")
+        //       // console.log("in if")
         //       lastSyncDateRealm = lastSyncDateRequest.result[i];
-        //       console.log("last sync date in realm", lastSyncDateRealm)
+        //       // console.log("last sync date in realm", lastSyncDateRealm)
         //     }
         //     if (result[i].id == 0) {
         //       var lastSyncDate = lastSyncDateRequest.result[i];
-        //       console.log("last sync date", lastSyncDate)
+        //       // console.log("last sync date", lastSyncDate)
         //     }
         //   }
         //   if (lastSyncDate == undefined) {
@@ -183,16 +183,16 @@ class Login extends Component {
         //   } else {
         //     lastSyncDateRealm = lastSyncDateRealm.lastSyncDate;
         //   }
-        //   console.log("Last sync date above", lastSyncDateRealm);
+        //   // console.log("Last sync date above", lastSyncDateRealm);
         // }
-        // console.log("lastSyncDateRealm---", lastSyncDateRealm);
+        // // console.log("lastSyncDateRealm---", lastSyncDateRealm);
         MasterSyncService.getLanguageListForSync(lastSyncDateRealm).then(response => {
-          console.log("response---", response);
+          // console.log("response---", response);
           var transaction = db1.transaction(['language'], 'readwrite');
           var program = transaction.objectStore('language');
           var json = (response.data);
           for (var i = 0; i < json.length; i++) {
-            console.log("json[i]---", json[i]);
+            // console.log("json[i]---", json[i]);
             var psuccess = program.put(json[i]);
 
           }
@@ -242,19 +242,19 @@ class Login extends Component {
   }
 
   componentDidMount() {
-    // console.log("############## Login component did mount #####################");
+    // // console.log("############## Login component did mount #####################");
     localStorage.setItem("loginOnline", this.state.loginOnline);
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
-    // console.log("--------Going to call version api-----------")
+    // // console.log("--------Going to call version api-----------")
     AuthenticationService.clearUserDetails()
     // if (isSiteOnline()) {
 
     // } else {
-    //   console.log("############## Offline so can't fetch version #####################");
+    //   // console.log("############## Offline so can't fetch version #####################");
     // }
     AuthenticationService.setRecordCount(JEXCEL_DEFAULT_PAGINATION);
-    console.log("timeout going to change language")
+    // console.log("timeout going to change language")
     this.getLanguageList();
     i18n.changeLanguage(AuthenticationService.getDefaultUserLanguage())
     this.checkIfApiIsActive();
@@ -270,8 +270,8 @@ class Login extends Component {
     // } else {
     LoginService.getApiVersion()
       .then(response => {
-        console.log("In then Test@@@123")
-        // console.log("--------version api success----------->", response)
+        // console.log("In then Test@@@123")
+        // // console.log("--------version api success----------->", response)
         if (response != null && response != "") {
           this.setState({
             apiVersionForDisplay: response.data.app.version,
@@ -294,9 +294,9 @@ class Login extends Component {
               this.checkIfApiIsActive();
             }.bind(this), 180000);
           })
-          // console.log("response---", response.data.app.version)
+          // // console.log("response---", response.data.app.version)
         } else {
-          console.log("In else Test@@@123")
+          // console.log("In else Test@@@123")
         }
       }).catch(error => {
 
@@ -307,7 +307,7 @@ class Login extends Component {
         setTimeout(function () {
           this.checkIfApiIsActive();
         }.bind(this), 180000);
-        // console.log("--------version api error----------->", error)
+        // // console.log("--------version api error----------->", error)
       })
     // }
     this.setState({
@@ -332,7 +332,7 @@ class Login extends Component {
   }
 
   incorrectPassmessageHide() {
-    // console.log("-----------------incorrectPassmessageHide---------------");
+    // // console.log("-----------------incorrectPassmessageHide---------------");
     // setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
     setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 30000);
     var incorrectPassword = document.getElementById('div2');
@@ -357,11 +357,11 @@ class Login extends Component {
   }
 
   logoutMessagehide() {
-    // console.log("-----------logoutMessagehide---------------");
+    // // console.log("-----------logoutMessagehide---------------");
     setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 30000);
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
-    // console.log("htnl content....... ", htmlContent);
+    // // console.log("htnl content....... ", htmlContent);
     if (htmlContent.includes('Cancelled') || htmlContent.includes('cancelled') || htmlContent.includes('sessionChange') || htmlContent.includes('change your session') || htmlContent.includes('expire') || htmlContent.includes('exceeded the maximum')) {
       logoutMessage.style.color = '#BA0C2F';
     }
@@ -445,11 +445,11 @@ class Login extends Component {
                           if (this.state.loginOnline == true && isSiteOnline()) {
                             var languageCode = AuthenticationService.getDefaultUserLanguage();
                             var lastLoggedInUsersLanguageChanged = localStorage.getItem('lastLoggedInUsersLanguageChanged');
-                            console.log("Language change flag---", lastLoggedInUsersLanguageChanged);
+                            // console.log("Language change flag---", lastLoggedInUsersLanguageChanged);
                             LoginService.authenticate(emailId, password, languageCode, lastLoggedInUsersLanguageChanged)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
-                                // console.log("decoded token---", decoded);
+                                // // console.log("decoded token---", decoded);
 
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage", "sessionType"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
@@ -489,11 +489,11 @@ class Login extends Component {
                                       case 401:
                                       case 404:
                                       case 412:
-                                        // console.log("Login page 401---");
+                                        // // console.log("Login page 401---");
                                         this.setState({ message: error.response.data.messageCode });
                                         break;
                                       case 406:
-                                        // console.log("Login page password expired----------->" + emailId)
+                                        // // console.log("Login page password expired----------->" + emailId)
                                         this.props.history.push({
                                           pathname: "/updateExpiredPassword",
                                           state: {
@@ -502,7 +502,7 @@ class Login extends Component {
                                         });
                                         break;
                                       default:
-                                        // console.log("Login page unknown error---");
+                                        // // console.log("Login page unknown error---");
                                         this.setState({ message: 'static.unkownError' });
                                         break;
                                     }
@@ -512,20 +512,20 @@ class Login extends Component {
 
                           }
                           else {
-                            // console.log("offline emailId---", emailId)
+                            // // console.log("offline emailId---", emailId)
                             var decryptedPassword = AuthenticationService.isUserLoggedIn(emailId);
-                            // console.log("offline decryptedPassword---", decryptedPassword)
+                            // // console.log("offline decryptedPassword---", decryptedPassword)
                             if (decryptedPassword != "") {
                               bcrypt.compare(password, decryptedPassword, function (err, res) {
                                 if (err) {
-                                  // console.log("offline error---", err)
+                                  // // console.log("offline error---", err)
                                   this.setState({ message: 'static.label.labelFail' });
                                 }
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
-                                  // console.log("offline tempuser---", tempUser)
+                                  // // console.log("offline tempuser---", tempUser)
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                                  // console.log("offline user next---", user)
+                                  // // console.log("offline user next---", user)
                                   let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage", "sessionType"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
@@ -546,13 +546,13 @@ class Login extends Component {
 
                                   }
                                 } else {
-                                  // console.log("offline invalid credentials---")
+                                  // // console.log("offline invalid credentials---")
                                   this.setState({ message: 'static.message.login.invalidCredentials' });
                                 }
                               }.bind(this));
                             }
                             else {
-                              // console.log("offline decryptedPassword empty---", decryptedPassword)
+                              // // console.log("offline decryptedPassword empty---", decryptedPassword)
                               this.setState({ message: 'static.message.login.invalidCredentials' });
                             }
                           }

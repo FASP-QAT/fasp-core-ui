@@ -63,7 +63,7 @@ export default class SyncProgram extends Component {
     }
 
     componentDidMount() {
-        console.log("In sync Program+++");
+        // console.log("In sync Program+++");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -102,7 +102,7 @@ export default class SyncProgram extends Component {
                     var programList = myResult;
                     var datasetList = datasetMyResult;
                     // var readonlyProgramList = myResult.filter(c => c.readonly);
-                    console.log("MyResult+++", myResult);
+                    // console.log("MyResult+++", myResult);
                     this.setState({
                         totalMasters: myResult.length + datasetList.length + 2,
                         loading: false,
@@ -115,7 +115,7 @@ export default class SyncProgram extends Component {
                             if (programList.length > 0) {
                                 this.syncPrograms(programList);
                             } else {
-                                console.log("In else###")
+                                // console.log("In else###")
                                 var syncedMasters = this.state.syncedMasters;
                                 this.setState({
                                     syncedMasters: syncedMasters + 1,
@@ -149,7 +149,7 @@ export default class SyncProgram extends Component {
     }
 
     syncDataset(programList) {
-        console.log("In syncDataset###")
+        // console.log("In syncDataset###")
         var programIdsToLoad = this.state.datasetIdsToLoad;
         var pIds = [];
         var uniqueProgramList = []
@@ -166,11 +166,11 @@ export default class SyncProgram extends Component {
             if (response1.status == 200) {
                 var list = response1.data;
                 var readonlyProgramToBeDeleted = [];
-                console.log("List+++", list);
+                // console.log("List+++", list);
                 for (var i = 0; i < programList.length; i++) {
-                    console.log("In i+++", i)
+                    // console.log("In i+++", i)
                     var latestVersion = list.filter(c => c.programId == programList[i].programId)[0].versionId;
-                    console.log("LatestVersion+++", latestVersion);
+                    // console.log("LatestVersion+++", latestVersion);
                     var checkIfLatestVersionExists = []
                     checkIfLatestVersionExists = programList.filter(c => c.programId == programList[i].programId && c.version == latestVersion);
                     // Means user ke pass latest version nhi hai
@@ -265,9 +265,9 @@ export default class SyncProgram extends Component {
                         })
                     }
                 }
-                console.log("outside for+++");
-                console.log("this.state.syncedDataset%%%", this.state.syncedDataset)
-                console.log("this.state.syncedDataset%%%", this.state.syncedDataset)
+                // console.log("outside for+++");
+                // console.log("this.state.syncedDataset%%%", this.state.syncedDataset)
+                // console.log("this.state.syncedDataset%%%", this.state.syncedDataset)
                 if (this.state.syncedDataset == this.state.totalDatasetList) {
                     this.loadLatestVersionDataset(programIdsToLoad, readonlyProgramToBeDeleted)
                 }
@@ -298,11 +298,11 @@ export default class SyncProgram extends Component {
             if (response1.status == 200) {
                 var list = response1.data;
                 var readonlyProgramToBeDeleted = [];
-                console.log("List+++", list);
+                // console.log("List+++", list);
                 for (var i = 0; i < programList.length; i++) {
-                    console.log("In i+++", i)
+                    // console.log("In i+++", i)
                     var latestVersion = list.filter(c => c.programId == programList[i].programId)[0].versionId;
-                    console.log("LatestVersion+++", latestVersion);
+                    // console.log("LatestVersion+++", latestVersion);
                     var checkIfLatestVersionExists = []
                     checkIfLatestVersionExists = programList.filter(c => c.programId == programList[i].programId && c.version == latestVersion);
                     // Means user ke pass latest version nhi hai
@@ -397,7 +397,7 @@ export default class SyncProgram extends Component {
                         })
                     }
                 }
-                console.log("outside for+++");
+                // console.log("outside for+++");
                 if (this.state.syncedProgram == this.state.totalProgramList) {
                     this.loadLatestVersion(programIdsToLoad, readonlyProgramToBeDeleted)
                 }
@@ -412,21 +412,21 @@ export default class SyncProgram extends Component {
     }
 
     loadLatestVersionDataset(programIds, readonlyProgramToBeDeleted) {
-        console.log("In load latest version+++", programIds.length);
+        // console.log("In load latest version+++", programIds.length);
         if (programIds.length > 0) {
-            console.log("In if===")
+            // console.log("In if===")
             var checkboxesChecked = [];
             for (var i = 0; i < programIds.length; i++) {
-                console.log("In for", programIds[i])
+                // console.log("In for", programIds[i])
                 var program = this.state.datasetList.filter(c => c.programId == programIds[i])[0];
-                console.log("Program+++", program)
+                // console.log("Program+++", program)
                 checkboxesChecked.push({ programId: program.programId, versionId: -1 })
             }
-            console.log("checkbozes checked+++", checkboxesChecked)
+            // console.log("checkbozes checked+++", checkboxesChecked)
             DatasetService.getAllDatasetData(checkboxesChecked)
                 .then(response => {
-                    console.log(")))) After calling get notification api")
-                    console.log("Resposne+++", response);
+                    // console.log(")))) After calling get notification api")
+                    // console.log("Resposne+++", response);
                     var json = response.data;
                     var updatedJson = json;
                     // for (var r = 0; r < json.length; r++) {
@@ -494,7 +494,7 @@ export default class SyncProgram extends Component {
                             var myResult = [];
                             myResult = getRequest.result;
                             var userId = AuthenticationService.getLoggedInUserId();
-                            console.log("Myresult+++", myResult);
+                            // console.log("Myresult+++", myResult);
 
                             var programDataTransaction1 = db1.transaction(['datasetData'], 'readwrite');
                             var programDataOs1 = programDataTransaction1.objectStore('datasetData');
@@ -586,7 +586,7 @@ export default class SyncProgram extends Component {
                                                     var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                 }
                                                 programQPLDetailsTransaction.oncomplete = function (event) {
-                                                    console.log(")))) Data saved successfully")
+                                                    // console.log(")))) Data saved successfully")
                                                     var syncedMasters = this.state.syncedMasters;
                                                     this.setState({
                                                         syncedMasters: syncedMasters + 1,
@@ -634,13 +634,13 @@ export default class SyncProgram extends Component {
                     var myResult = [];
                     myResult = getRequest.result;
                     var userId = AuthenticationService.getLoggedInUserId();
-                    console.log("Myresult+++", myResult);
+                    // console.log("Myresult+++", myResult);
 
                     var programDataTransaction1 = db1.transaction(['datasetData'], 'readwrite');
                     var programDataOs1 = programDataTransaction1.objectStore('datasetData');
                     for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
                         var checkIfProgramExists = myResult.filter(c => c.programId == readonlyProgramToBeDeleted[dpd].programId && c.version == readonlyProgramToBeDeleted[dpd].version && c.readonly == 1 && c.userId == userId);
-                        console.log("checkIfProgramExists+++", checkIfProgramExists);
+                        // console.log("checkIfProgramExists+++", checkIfProgramExists);
                         var programIdToDelete = 0;
                         if (checkIfProgramExists.length > 0) {
                             programIdToDelete = checkIfProgramExists[0].id;
@@ -653,7 +653,7 @@ export default class SyncProgram extends Component {
 
                         for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
                             var checkIfProgramExists = myResult.filter(c => c.programId == readonlyProgramToBeDeleted[dpd].programId && c.version == readonlyProgramToBeDeleted[dpd].version && c.readonly == 1 && c.userId == userId);
-                            console.log("checkIfProgramExists+++", checkIfProgramExists);
+                            // console.log("checkIfProgramExists+++", checkIfProgramExists);
                             var programIdToDelete = 0;
                             if (checkIfProgramExists.length > 0) {
                                 programIdToDelete = checkIfProgramExists[0].id;
@@ -674,7 +674,7 @@ export default class SyncProgram extends Component {
                             //     var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
                             // }
                             // programDataTransaction2.oncomplete = function (event) {
-                                console.log(")))) Data saved successfully")
+                                // console.log(")))) Data saved successfully")
                                 var syncedMasters = this.state.syncedMasters;
                                 this.setState({
                                     syncedMasters: syncedMasters + 1,
@@ -694,21 +694,21 @@ export default class SyncProgram extends Component {
     }
 
     loadLatestVersion(programIds, readonlyProgramToBeDeleted) {
-        console.log("In load latest version+++", programIds.length);
+        // console.log("In load latest version+++", programIds.length);
         if (programIds.length > 0) {
-            console.log("In if===")
+            // console.log("In if===")
             var checkboxesChecked = [];
             for (var i = 0; i < programIds.length; i++) {
-                console.log("In for", programIds[i])
+                // console.log("In for", programIds[i])
                 var program = this.state.programList.filter(c => c.programId == programIds[i])[0];
-                console.log("Program+++", program)
+                // console.log("Program+++", program)
                 checkboxesChecked.push({ programId: program.programId, versionId: -1 })
             }
-            console.log("checkbozes checked+++", checkboxesChecked)
+            // console.log("checkbozes checked+++", checkboxesChecked)
             ProgramService.getAllProgramData(checkboxesChecked)
                 .then(response => {
-                    console.log(")))) After calling get notification api")
-                    console.log("Resposne+++", response);
+                    // console.log(")))) After calling get notification api")
+                    // console.log("Resposne+++", response);
                     var json = response.data;
                     var updatedJson = [];
                     for (var r = 0; r < json.length; r++) {
@@ -719,7 +719,7 @@ export default class SyncProgram extends Component {
                         var batchInfoList = json[r].batchInfoList;
                         var problemReportList = json[r].problemReportList;
                         var supplyPlan = json[r].supplyPlan;
-                        console.log("Supply plan+++", supplyPlan)
+                        // console.log("Supply plan+++", supplyPlan)
                         var generalData = json[r];
                         delete generalData.consumptionList;
                         delete generalData.inventoryList;
@@ -740,7 +740,7 @@ export default class SyncProgram extends Component {
                                 batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
                                 supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
                             }
-                            console.log("Supply plan Filtered+++", supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id));
+                            // console.log("Supply plan Filtered+++", supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id));
                             var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
                             planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
                         }
@@ -776,7 +776,7 @@ export default class SyncProgram extends Component {
                             var myResult = [];
                             myResult = getRequest.result;
                             var userId = AuthenticationService.getLoggedInUserId();
-                            console.log("Myresult+++", myResult);
+                            // console.log("Myresult+++", myResult);
 
                             var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
                             var programDataOs1 = programDataTransaction1.objectStore('programData');
@@ -872,7 +872,7 @@ export default class SyncProgram extends Component {
                                                     var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                 }
                                                 programQPLDetailsTransaction.oncomplete = function (event) {
-                                                    console.log(")))) Data saved successfully")
+                                                    // console.log(")))) Data saved successfully")
                                                     var syncedMasters = this.state.syncedMasters;
                                                     var pIds = this.state.programIds;
                                                     pIds = pIds.concat(programIds)
@@ -923,13 +923,13 @@ export default class SyncProgram extends Component {
                     var myResult = [];
                     myResult = getRequest.result;
                     var userId = AuthenticationService.getLoggedInUserId();
-                    console.log("Myresult+++", myResult);
+                    // console.log("Myresult+++", myResult);
 
                     var programDataTransaction1 = db1.transaction(['programData'], 'readwrite');
                     var programDataOs1 = programDataTransaction1.objectStore('programData');
                     for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
                         var checkIfProgramExists = myResult.filter(c => c.programId == readonlyProgramToBeDeleted[dpd].programId && c.version == readonlyProgramToBeDeleted[dpd].version && c.readonly == 1 && c.userId == userId);
-                        console.log("checkIfProgramExists+++", checkIfProgramExists);
+                        // console.log("checkIfProgramExists+++", checkIfProgramExists);
                         var programIdToDelete = 0;
                         if (checkIfProgramExists.length > 0) {
                             programIdToDelete = checkIfProgramExists[0].id;
@@ -942,7 +942,7 @@ export default class SyncProgram extends Component {
 
                         for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
                             var checkIfProgramExists = myResult.filter(c => c.programId == readonlyProgramToBeDeleted[dpd].programId && c.version == readonlyProgramToBeDeleted[dpd].version && c.readonly == 1 && c.userId == userId);
-                            console.log("checkIfProgramExists+++", checkIfProgramExists);
+                            // console.log("checkIfProgramExists+++", checkIfProgramExists);
                             var programIdToDelete = 0;
                             if (checkIfProgramExists.length > 0) {
                                 programIdToDelete = checkIfProgramExists[0].id;
@@ -955,7 +955,7 @@ export default class SyncProgram extends Component {
 
                             for (var dpd = 0; dpd < readonlyProgramToBeDeleted.length; dpd++) {
                                 var checkIfProgramExists = myResult.filter(c => c.programId == readonlyProgramToBeDeleted[dpd].programId && c.version == readonlyProgramToBeDeleted[dpd].version && c.readonly == 1 && c.userId == userId);
-                                console.log("checkIfProgramExists+++", checkIfProgramExists);
+                                // console.log("checkIfProgramExists+++", checkIfProgramExists);
                                 var programIdToDelete = 0;
                                 if (checkIfProgramExists.length > 0) {
                                     programIdToDelete = checkIfProgramExists[0].id;
@@ -963,7 +963,7 @@ export default class SyncProgram extends Component {
                                 var programRequest2 = programDataOs2.delete(checkIfProgramExists[0].id);
                             }
                             programDataTransaction2.oncomplete = function (event) {
-                                console.log(")))) Data saved successfully")
+                                // console.log(")))) Data saved successfully")
                                 var syncedMasters = this.state.syncedMasters;
                                 this.setState({
                                     syncedMasters: syncedMasters + 1,

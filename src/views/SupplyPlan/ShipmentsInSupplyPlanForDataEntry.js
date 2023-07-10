@@ -201,7 +201,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
     showShipmentData() {
         // var programJson = this.props.items.programJson;
         var generalProgramJson = this.props.items.generalProgramJson;
-        console.log("General program Json Test@@@123",generalProgramJson)
+        // console.log("General program Json Test@@@123",generalProgramJson)
         this.setState({
             actualProgramId: generalProgramJson.programId
         })
@@ -296,7 +296,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                 }
                             }
                         }
-                        console.log("paResult", listArrays)
+                        // console.log("paResult", listArrays)
 
                         for (var k = 0; k < listArrays.length; k++) {
                             var paJson = {
@@ -510,7 +510,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     shipmentEditable: false
                                                 })
                                             }
-                                            console.log("ShipmentListMohit@@@@@", shipmentList)
+                                            // console.log("ShipmentListMohit@@@@@", shipmentList)
                                             for (var i = 0; i < shipmentList.length; i++) {
                                                 var shipmentLinkingList=(generalProgramJson.shipmentLinkingList == null || generalProgramJson.shipmentLinkingList == undefined) ? [] : generalProgramJson.shipmentLinkingList;
                                                 var orderNo=shipmentList[i].orderNo;
@@ -839,7 +839,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                             var existingShipmentQty = 0;
                                                             var shipmentsJson = (obj.getJson(null, false));
                                                             shipmentsJson.map((item, index) => {
-                                                                console.log("item[3]+++", item[3])
+                                                                // console.log("item[3]+++", item[3])
                                                                 if (item[0] != false && item[4] != CANCELLED_SHIPMENT_STATUS) {
                                                                     existingShipmentQty += Number(obj.getValue(`M${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""));
                                                                 }
@@ -2466,20 +2466,20 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 elInstance.setValueFromCoords(34, y, 1, true);
             } else {
                 var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList.filter(c => c.planningUnitId == value && c.active);
-                console.log("realmCountryPlanningUnitList@@@@@@@", realmCountryPlanningUnitList)
+                // console.log("realmCountryPlanningUnitList@@@@@@@", realmCountryPlanningUnitList)
                 if (realmCountryPlanningUnitList.length == 1) {
                     elInstance.setValueFromCoords(11, y, realmCountryPlanningUnitList[0].id, true);
                     elInstance.setValueFromCoords(13, y, realmCountryPlanningUnitList[0].multiplier, true);
                 }
                 var pricePerUnit = elInstance.getValue(`T${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
-                console.log("rowData[27]@@@@Mohit", rowData[27])
+                // console.log("rowData[27]@@@@Mohit", rowData[27])
                 if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
                     var puData = this.props.items.puData.filter(c => c.id == value)[0];
                     var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[7] && c.planningUnit.id == value && c.active);
-                    console.log("puData[27]@@@@Mohit", puData)
+                    // console.log("puData[27]@@@@Mohit", puData)
                     var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == value && c.active);
-                    console.log("program PU price[27]@@@@Mohit", puData.programPlanningUnitForPrice)
-                    console.log("program procurem[27]@@@@Mohit", puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices)
+                    // console.log("program PU price[27]@@@@Mohit", puData.programPlanningUnitForPrice)
+                    // console.log("program procurem[27]@@@@Mohit", puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices)
 
                     if (programPriceList.length > 0) {
                         pricePerUnit = Number(programPriceList[0].price);
@@ -2895,8 +2895,8 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             } else {
                 positiveValidation("A", y, elInstance);
                 if (rowData[9].toString() == "true") {
-                    console.log("row Data 1 Test@123", rowData[1])
-                    console.log("row Data 8 Test@123", rowData[8])
+                    // console.log("row Data 1 Test@123", rowData[1])
+                    // console.log("row Data 8 Test@123", rowData[8])
                     if (rowData[0] != rowData[7] || moment(rowData[1]).format("YYYY-MM-DD") != moment(rowData[8]).format("YYYY-MM-DD") || elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "") != elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "")) {
                         elInstance.setValueFromCoords(6, y, 0, true);
                         if ((x == 1 || x == 2) && rowData[0].toString().substring(0, 3) == "QAT") {
@@ -4341,7 +4341,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                 date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                             })
                             programJson.shipmentList = shipmentDataList;
-                            console.log("Shipment data list Test@@@123",shipmentDataList);
+                            // console.log("Shipment data list Test@@@123",shipmentDataList);
                             if (planningUnitDataIndex != -1) {
                                 planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             } else {

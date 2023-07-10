@@ -337,10 +337,10 @@ class SupplyPlanVersionAndReview extends Component {
                     // let versionStatusId = this.el.getValueFromCoords(5, x);
                     // let versionTypeId =this.el.getValueFromCoords(2, x);
 
-                    console.log("instance----->", instance.jexcel, "----------->", x);
+                    // console.log("instance----->", instance.jexcel, "----------->", x);
                     var elInstance = instance;
                     var rowData = elInstance.getRowData(x);
-                    console.log("rowData==>", rowData);
+                    // console.log("rowData==>", rowData);
                     let programId = rowData[11];
                     let versionStatusId = rowData[10];
                     let versionTypeId = rowData[9];
@@ -369,7 +369,7 @@ class SupplyPlanVersionAndReview extends Component {
     componentDidMount() {
         if (this.props.match.params.statusId != "" && this.props.match.params.statusId != undefined) {
             document.getElementById("versionStatusId").value = this.props.match.params.statusId;
-            console.log("versionStatusId-----> 1 ", document.getElementById("versionStatusId").value)
+            // console.log("versionStatusId-----> 1 ", document.getElementById("versionStatusId").value)
         }
         this.hideFirstComponent();
         // clearTimeout(this.timeout);
@@ -389,7 +389,7 @@ class SupplyPlanVersionAndReview extends Component {
             return '';
     }
     editprogramStatus(supplyPlan) {
-        console.log(supplyPlan);
+        // console.log(supplyPlan);
         this.props.history.push({
             pathname: `/report/editStatus/${supplyPlan.program.id}/${supplyPlan.versionId}`,
             // state: { country: country }
@@ -619,7 +619,7 @@ class SupplyPlanVersionAndReview extends Component {
     getVersionTypeList() {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionTypeList().then(response => {
-            console.log('**' + JSON.stringify(response.data))
+            // console.log('**' + JSON.stringify(response.data))
             var listArray = response.data;
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -677,7 +677,7 @@ class SupplyPlanVersionAndReview extends Component {
     getStatusList() {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionStatusList().then(response => {
-            console.log('**' + JSON.stringify(response.data))
+            // console.log('**' + JSON.stringify(response.data))
             var listArray = response.data;
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -759,27 +759,27 @@ class SupplyPlanVersionAndReview extends Component {
 
     }
     fetchData() {
-        console.log("function called-------------------------------")
+        // console.log("function called-------------------------------")
         let programId = document.getElementById("programId").value;
         let countryId = document.getElementById("countryId").value;
         if(this.props.match.params.statusId!="" && this.props.match.params.statusId!= undefined){
-            console.log("this.props.match.params.statusId---->",this.props.match.params.statusId)
+            // console.log("this.props.match.params.statusId---->",this.props.match.params.statusId)
             document.getElementById("versionStatusId").value =this.props.match.params.statusId;
-            console.log("versionStatusId-----> 1 ",document.getElementById("versionStatusId").value)
+            // console.log("versionStatusId-----> 1 ",document.getElementById("versionStatusId").value)
         }
 
         let versionStatusId = document.getElementById("versionStatusId").value;
         let versionTypeId = document.getElementById("versionTypeId").value;
-        console.log("D------------->VersionTypeId", versionTypeId);
+        // console.log("D------------->VersionTypeId", versionTypeId);
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        console.log('endDate', endDate)
+        // console.log('endDate', endDate)
         if (programId != 0 && countryId != 0) {
             // this.setState({ loading: true })
             // AuthenticationService.setupAxiosInterceptors();
             ReportService.getProgramVersionList(programId, countryId, versionStatusId, versionTypeId, startDate, endDate)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    // console.log(JSON.stringify(response.data))
                     var result = response.data;
                     if (versionStatusId == 1) {
                         result = result.filter(c => c.versionType.id != 1);
@@ -1010,7 +1010,7 @@ class SupplyPlanVersionAndReview extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = item.text });
         const header = [headers];
-        console.log(header);
+        // console.log(header);
         const data = this.state.matricsList.map(elt => [elt.program.label.label_en, elt.versionId, elt.versionType.label.label_en, new moment(elt.createdDate).format(`${DATE_FORMAT_CAP}`), elt.createdBy.username, elt.versionStatus.label.label_en, elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? (elt.lastModifiedDate ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} HH:mm`) : '') : '', elt.notes]);
 
         let content = {
@@ -1040,7 +1040,7 @@ class SupplyPlanVersionAndReview extends Component {
             countryIdArray[i] = countrysId[i].value;
 
         }
-        console.log(countryIdArray);
+        // console.log(countryIdArray);
         this.setState({
             countryValues: countryIdArray
         })

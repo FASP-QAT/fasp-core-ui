@@ -111,8 +111,8 @@ export default class EditOrganisationTypeComponent extends Component {
 
     dataChange(event) {
         let { organisationType } = this.state
-        console.log(event.target.name);
-        console.log(event.target.value);
+        // console.log(event.target.name);
+        // console.log(event.target.value);
         if (event.target.name === "organisationName") {
             organisationType.label.label_en = event.target.value
         } else if (event.target.name === "realmId") {
@@ -124,7 +124,7 @@ export default class EditOrganisationTypeComponent extends Component {
             organisationType
         }, (
         ) => {
-            console.log("state after update---", this.state.organisationType)
+            // console.log("state after update---", this.state.organisationType)
         })
     }
 
@@ -177,7 +177,7 @@ export default class EditOrganisationTypeComponent extends Component {
             }
             UserService.getRealmList()
                 .then(response => {
-                    console.log("realm list---", response.data);
+                    // console.log("realm list---", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -321,7 +321,7 @@ export default class EditOrganisationTypeComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    // console.log("-------------------->" + this.state.healthArea);
+                                    // // console.log("-------------------->" + this.state.healthArea);
                                     OrganisationTypeService.editOrganisationType(this.state.organisationType)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -515,7 +515,7 @@ export default class EditOrganisationTypeComponent extends Component {
             // }
             UserService.getRealmList()
                 .then(response => {
-                    console.log("realm list---", response.data);
+                    // console.log("realm list---", response.data);
                     this.setState({
                         realms: response.data, loading: false
                     })

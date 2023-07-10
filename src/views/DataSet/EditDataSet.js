@@ -92,7 +92,7 @@ const getErrorsFromValidationError = (validationError) => {
 }
 export default class EditProgram extends Component {
     constructor(props) {
-        console.log("in constructor");
+        // console.log("in constructor");
         super(props);
         this.state = {
             // program: this.props.location.state.program,
@@ -215,7 +215,7 @@ export default class EditProgram extends Component {
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getDatasetById(this.props.match.params.dataSetId).then(response => {
-            console.log("program obj===>", response.data);
+            // console.log("program obj===>", response.data);
             var proObj = response.data;
             // var healthAreaArrayDummy=[];
             // healthAreaArrayDummy.push(response.data.healthArea.id);
@@ -246,7 +246,7 @@ export default class EditProgram extends Component {
             // ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
             ProgramService.getProgramManagerListByProgramId(this.props.match.params.dataSetId)
                 .then(response => {
-                    console.log("realm list---", response.data);
+                    // console.log("realm list---", response.data);
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -311,7 +311,7 @@ export default class EditProgram extends Component {
             ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
-                        console.log("region list---", response.data);
+                        // console.log("region list---", response.data);
                         var json = response.data;
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {
@@ -561,7 +561,7 @@ export default class EditProgram extends Component {
     }
 
     generateOrganisationCode(event) {
-        console.log("generateOrganisationCode===",this.state.organisationList)
+        // console.log("generateOrganisationCode===",this.state.organisationList)
         let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({
             organisationCode: organisationCode
@@ -616,7 +616,9 @@ export default class EditProgram extends Component {
             program.programNotes = event.target.value;
         }
 
-        this.setState({ program, isChanged: true }, () => { console.log(this.state) })
+        this.setState({ program, isChanged: true }, () => { 
+            // console.log(this.state) 
+        })
 
     }
     touchAll(setTouched, errors) {
@@ -715,7 +717,7 @@ export default class EditProgram extends Component {
                                     // AuthenticationService.setupAxiosInterceptors();
                                     let pro = this.state.program;
                                     pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
-                                    console.log("Pro=---------------->+++", pro)
+                                    // console.log("Pro=---------------->+++", pro)
                                     ProgramService.editDataset(pro).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/dataSet/listDataSet/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -1073,7 +1075,7 @@ export default class EditProgram extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
                 .then(response => {
-                    console.log("realm list---", response.data);
+                    // console.log("realm list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             programManagerList: response.data
@@ -1128,7 +1130,7 @@ export default class EditProgram extends Component {
             ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
-                        console.log("region list---", response.data);
+                        // console.log("region list---", response.data);
                         var json = response.data;
                         var regList = [];
                         for (var i = 0; i < json.length; i++) {

@@ -150,7 +150,7 @@ class EquivalancyUnit extends Component {
     changed1 = function (instance, cell, x, y, value) {
         var elInstance = this.state.table2Instance;
         var rowData = elInstance.getRowData(y);
-        console.log("LOG---------->2", elInstance);
+        // console.log("LOG---------->2", elInstance);
 
         //Equivalancy Unit
         if (x == 2) {
@@ -174,7 +174,7 @@ class EquivalancyUnit extends Component {
 
         //HealthArea
         if (x == 1) {
-            console.log("LOG---------->2", value);
+            // console.log("LOG---------->2", value);
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
@@ -360,7 +360,7 @@ class EquivalancyUnit extends Component {
 
                     var rowData = elInstance.getRowData(y);
                     var addRowId = rowData[10];
-                    console.log("addRowId------>", addRowId);
+                    // console.log("addRowId------>", addRowId);
                     if (addRowId == 1) {//active grade out
                         var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
@@ -524,17 +524,17 @@ class EquivalancyUnit extends Component {
             loading: false
         },
             () => {
-                console.log("eqUnitTableEl---------->", this.state.eqUnitTableEl);
+                // console.log("eqUnitTableEl---------->", this.state.eqUnitTableEl);
             })
     }
 
     filterHealthArea = function (instance, cell, c, r, source) {
-        console.log("myList--------->0", this.state.technicalAreaList);
+        // console.log("myList--------->0", this.state.technicalAreaList);
 
         var mylist = this.state.technicalAreaList.filter(c => c.id != '' && c.id != null);
         // mylist = mylist.filter(c => c.active.toString() == "true");
 
-        console.log("myList--------->1", this.state.technicalAreaList);
+        // console.log("myList--------->1", this.state.technicalAreaList);
         // console.log("myList--------->2", mylist);
         // console.log("myList--------->3", this.state.forecastingUnitList);
         return mylist.sort(function (a, b) {
@@ -547,7 +547,7 @@ class EquivalancyUnit extends Component {
     getEquivalancyUnitAll() {
         EquivalancyUnitService.getEquivalancyUnitList().then(response => {
             if (response.status == 200) {
-                console.log("EQ1------->ALL", response.data);
+                // console.log("EQ1------->ALL", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1152,7 +1152,7 @@ class EquivalancyUnit extends Component {
     }.bind(this)
 
     filterDataset1 = function (instance, cell, c, r, source) {
-        console.log("Source Test123", source)
+        // console.log("Source Test123", source)
         var mylist = this.state.typeList1;
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
             mylist = mylist.filter(c => c.id != -1);
@@ -1173,17 +1173,17 @@ class EquivalancyUnit extends Component {
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
             mylist = mylist.filter(c => c.id != -1);
         }
-        console.log("My List Test123", mylist)
+        // console.log("My List Test123", mylist)
         var eq = this.state.table1Instance.getRowData(r)[1];
         if (eq != "") {
-            console.log("Eq != Test123", eq)
+            // console.log("Eq != Test123", eq)
             var eqObject = this.state.equivalancyUnitList.filter(c => c.id == eq)[0];
-            console.log("Eq obj Test123", eqObject)
+            // console.log("Eq obj Test123", eqObject)
             if (eqObject.program == null || eqObject.program.id == 0) {
-                console.log("In if Test123")
+                // console.log("In if Test123")
                 mylist = mylist;
             } else {
-                console.log("In else Test123")
+                // console.log("In else Test123")
                 mylist = mylist.filter(c => c.id == eqObject.program.id);
             }
         }
@@ -1199,7 +1199,7 @@ class EquivalancyUnit extends Component {
         this.hideSecondComponent();
         EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data);
+                // console.log("response.data---->", response.data);
                 let listArray = response.data;
 
                 listArray.sort((a, b) => {
@@ -1302,12 +1302,12 @@ class EquivalancyUnit extends Component {
         let newTracerCategoryIdList = tracerCategoryIdList.concat(tracerCategoryListOfMappingData);
         newTracerCategoryIdList = [... new Set(newTracerCategoryIdList)];
 
-        console.log("response------->123", tracerCategoryIdList);
-        console.log("response------->124", tracerCategoryListOfMappingData);
-        console.log("response------->125", newTracerCategoryIdList);
+        // console.log("response------->123", tracerCategoryIdList);
+        // console.log("response------->124", tracerCategoryListOfMappingData);
+        // console.log("response------->125", newTracerCategoryIdList);
 
         ForecastingUnitService.getForecastingUnitByTracerCategoriesId(newTracerCategoryIdList).then(response => {
-            console.log("response------->126", response.data);
+            // console.log("response------->126", response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -1395,7 +1395,7 @@ class EquivalancyUnit extends Component {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("TracerCategory------->", response.data)
+                    // console.log("TracerCategory------->", response.data)
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1422,7 +1422,7 @@ class EquivalancyUnit extends Component {
                         // loading: false
                     },
                         () => {
-                            console.log("TracerCategory------->", this.state.tracerCategoryList)
+                            // console.log("TracerCategory------->", this.state.tracerCategoryList)
                             // this.getForecastingUnit();
                             this.getUnit();
                         })
@@ -1480,7 +1480,7 @@ class EquivalancyUnit extends Component {
 
     getForecastingUnit() {
         ForecastingUnitService.getForecastingUnitListAll().then(response => {
-            console.log("response------->" + response.data);
+            // console.log("response------->" + response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -1566,7 +1566,7 @@ class EquivalancyUnit extends Component {
 
     getUnit() {
         UnitService.getUnitListAll().then(response => {
-            console.log("response------->" + response.data);
+            // console.log("response------->" + response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -1654,7 +1654,7 @@ class EquivalancyUnit extends Component {
     getType() {
         ProgramService.getDataSetList()
             .then(response => {
-                console.log("PROGRAM---------->", response.data)
+                // console.log("PROGRAM---------->", response.data)
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
@@ -1775,7 +1775,7 @@ class EquivalancyUnit extends Component {
     getEquivalancyUnit() {
         EquivalancyUnitService.getEquivalancyUnitList().then(response => {
             if (response.status == 200) {
-                console.log("EQ1------->", response.data);
+                // console.log("EQ1------->", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1903,7 +1903,7 @@ class EquivalancyUnit extends Component {
         DropdownService.getHealthAreaDropdownList(realmId)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response---", response.data);
+                    // console.log("response---", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -2068,18 +2068,18 @@ class EquivalancyUnit extends Component {
 
         var validation = this.checkValidation1();
         var elInstance = this.state.table2Instance
-        console.log("validation------->", validation)
+        // console.log("validation------->", validation)
         if (validation == true) {
             this.setState({ loading: true })
             var tableJson = elInstance.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("8 map---" + map1.get("8"))
+                // console.log("8 map---" + map1.get("8"))
                 if (parseInt(map1.get("9")) === 1) {
                     let healthAreaSplit = elInstance.getValueFromCoords(1, i).split(';');
-                    console.log("healthAreaSplit--------->1", healthAreaSplit);
+                    // console.log("healthAreaSplit--------->1", healthAreaSplit);
                     let healthAreaTempList = []
                     for (let k = 0; k < healthAreaSplit.length; k++) {
                         // healthAreaTempList.push({ id: healthAreaSplit[k] });
@@ -2087,7 +2087,7 @@ class EquivalancyUnit extends Component {
                             healthAreaTempList.push({ id: healthAreaSplit[k] });
                         }
                     }
-                    console.log("healthAreaSplit--------->2", healthAreaTempList);
+                    // console.log("healthAreaSplit--------->2", healthAreaTempList);
                     let json = {
 
                         equivalencyUnitId: parseInt(map1.get("0")),
@@ -2104,12 +2104,12 @@ class EquivalancyUnit extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             EquivalancyUnitService.addUpdateEquivalancyUnit(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         // window.location.reload();
                         this.setState({
                             message: i18n.t('static.usagePeriod.addUpdateMessage'), loading: true, color: 'green', isChanged1: false
@@ -2188,7 +2188,7 @@ class EquivalancyUnit extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -2196,7 +2196,7 @@ class EquivalancyUnit extends Component {
         var elInstance = this.state.table1Instance;
         var tableJson = elInstance.getJson(null, false);
 
-        console.log("tableJson------->", tableJson);
+        // console.log("tableJson------->", tableJson);
 
         let array = tableJson.map(m => {
             return {
@@ -2208,7 +2208,7 @@ class EquivalancyUnit extends Component {
             }
         });
 
-        console.log("tableJson------->1.1", array);
+        // console.log("tableJson------->1.1", array);
 
         let duplicates = array
             .map((el, i) => {
@@ -2220,7 +2220,7 @@ class EquivalancyUnit extends Component {
             })
             .filter(x => x);
 
-        console.log("tableJson------->1", duplicates);
+        // console.log("tableJson------->1", duplicates);
 
         // duplicates = duplicates.filter(c => c.isChanged == 1);
 
@@ -2230,7 +2230,7 @@ class EquivalancyUnit extends Component {
                     var value = elInstance.getValueFromCoords(16, y);
                     // console.log("tableJson------->3", value);
                     if (duplicates[k].countVar == parseInt(value)) {
-                        console.log("tableJson------->4", y);
+                        // console.log("tableJson------->4", y);
                         var col = ("B").concat(parseInt(y) + 1);
                         elInstance.setStyle(col, "background-color", "yellow");
 
@@ -2263,16 +2263,16 @@ class EquivalancyUnit extends Component {
         var validation = this.checkValidation();
         var elInstance = this.state.table1Instance;
         let duplicateValidationFlag = this.checkAndMarkDuplicate();
-        console.log("duplicateValidationFlag------->1", duplicateValidationFlag);
+        // console.log("duplicateValidationFlag------->1", duplicateValidationFlag);
         if (validation == true && duplicateValidationFlag == false) {
 
             this.setState({ loading: true })
             var tableJson = elInstance.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("12 map---" + map1.get("12"))
+                // console.log("12 map---" + map1.get("12"))
                 let equivalencyUnitObj = this.state.equivalancyUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
                 if (parseInt(map1.get("12")) === 1) {
                     let json = {
@@ -2299,12 +2299,12 @@ class EquivalancyUnit extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             EquivalancyUnitService.addUpdateEquivalancyUnitMapping(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         this.setState({
                             message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged: false
@@ -2374,7 +2374,7 @@ class EquivalancyUnit extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -2416,7 +2416,7 @@ class EquivalancyUnit extends Component {
             let selectedEquivalencyUnitId = this.el.getValueFromCoords(1, y);
             if (selectedEquivalencyUnitId != null && selectedEquivalencyUnitId != '' && selectedEquivalencyUnitId != undefined) {
                 let selectedEqObj = this.state.equivalancyUnitList.filter(c => c.id == selectedEquivalencyUnitId)[0];
-                console.log("selectedEqObj--------->", selectedEqObj);
+                // console.log("selectedEqObj--------->", selectedEqObj);
                 let healthAreaList = selectedEqObj.healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
                 elInstance.setValueFromCoords(2, y, healthAreaList, true);//calculate
             } else {
@@ -2510,7 +2510,7 @@ class EquivalancyUnit extends Component {
                     elInstance.setComments(col, "");
 
                     let obj = this.state.forecastingUnitList.filter(c => c.id == parseInt(value))[0];
-                    console.log("-----------XXXXXXXXXXXXXXXXXX", obj);
+                    // console.log("-----------XXXXXXXXXXXXXXXXXX", obj);
                     if (obj != undefined && obj != null) {
                         this.el.setValueFromCoords(5, y, obj.unit.id, true);
                     }
@@ -2618,7 +2618,7 @@ class EquivalancyUnit extends Component {
         var valid = true;
         var elInstance = this.state.table2Instance;
         var json = elInstance.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = elInstance.getValueFromCoords(9, y);
             if (parseInt(value) == 1) {
@@ -2626,7 +2626,7 @@ class EquivalancyUnit extends Component {
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(2, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
@@ -2706,7 +2706,7 @@ class EquivalancyUnit extends Component {
         var valid = true;
         var elInstance = this.state.table1Instance;
         var json = elInstance.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = elInstance.getValueFromCoords(12, y);
             if (parseInt(value) == 1) {
@@ -2926,7 +2926,7 @@ class EquivalancyUnit extends Component {
         let statusId = document.getElementById("statusId").value;
 
         if (typeId != 0 && tracerCategoryId != 0) {
-            console.log("statusId------->11");
+            // console.log("statusId------->11");
             let selSource = this.state.equivalancyUnitMappingList.filter(c => (typeId == 2 ? c.program != null : c.program == null) && c.tracerCategory.id == tracerCategoryId)
             if (statusId == 1) {
                 selSource = selSource.filter(c => c.active == true);
@@ -2938,7 +2938,7 @@ class EquivalancyUnit extends Component {
             },
                 () => { this.buildJexcel() });
         } else if (typeId != 0) {
-            console.log("statusId------->111");
+            // console.log("statusId------->111");
             let selSource = this.state.equivalancyUnitMappingList.filter(c => (typeId == 2 ? c.program != null : c.program == null))
             if (statusId == 1) {
                 selSource = selSource.filter(c => c.active == true);
@@ -2950,7 +2950,7 @@ class EquivalancyUnit extends Component {
             },
                 () => { this.buildJexcel() });
         } else if (tracerCategoryId != 0) {
-            console.log("statusId------->1111");
+            // console.log("statusId------->1111");
             let selSource = this.state.equivalancyUnitMappingList.filter(c => c.tracerCategory.id == tracerCategoryId)
             if (statusId == 1) {
                 selSource = selSource.filter(c => c.active == true);
@@ -2962,13 +2962,13 @@ class EquivalancyUnit extends Component {
             },
                 () => { this.buildJexcel() });
         } else {
-            console.log("statusId------->1111", statusId);
+            // console.log("statusId------->1111", statusId);
             let selSource = this.state.equivalancyUnitMappingList;
             if (statusId == 1) {
-                console.log("statusId------->IF");
+                // console.log("statusId------->IF");
                 selSource = selSource.filter(c => c.active == true);
             } else if (statusId == 2) {
-                console.log("statusId------->ELSE");
+                // console.log("statusId------->ELSE");
                 selSource = selSource.filter(c => c.active == false);
             }
             this.setState({

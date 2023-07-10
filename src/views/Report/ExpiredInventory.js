@@ -133,7 +133,7 @@ export default class ExpiredInventory extends Component {
 
             DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    // console.log(JSON.stringify(response.data))
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
                         var programJson = {
@@ -215,7 +215,7 @@ export default class ExpiredInventory extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.setState({ loading: false })
             this.consolidatedProgramList()
         }
@@ -249,13 +249,13 @@ export default class ExpiredInventory extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -305,12 +305,12 @@ export default class ExpiredInventory extends Component {
 
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
                             .then(response => {
-                                console.log("response===>2", response.data)
+                                // console.log("response===>2", response.data)
                                 this.setState({
                                     versions: []
                                 }, () => {
@@ -426,7 +426,7 @@ export default class ExpiredInventory extends Component {
 
                 }
 
-                console.log(verList)
+                // console.log(verList)
                 let versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
                 });
@@ -503,7 +503,7 @@ export default class ExpiredInventory extends Component {
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
                             var proList = []
-                            console.log(myResult)
+                            // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -524,7 +524,7 @@ export default class ExpiredInventory extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
 
                     ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                        console.log('**' + JSON.stringify(response.data))
+                        // console.log('**' + JSON.stringify(response.data))
                         this.setState({
                             planningUnits: response.data, message: ''
                         }, () => {
@@ -675,7 +675,7 @@ export default class ExpiredInventory extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    console.log("1----", program)
+                    // console.log("1----", program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -699,7 +699,7 @@ export default class ExpiredInventory extends Component {
                     }
 
                     programRequest.onsuccess = function (e) {
-                        console.log("2----", programRequest)
+                        // console.log("2----", programRequest)
                         this.setState({
                             localProgramId: programRequest.result.id
                         })
@@ -726,8 +726,8 @@ export default class ExpiredInventory extends Component {
                             supplyPlanDataForAllTransDate: supplyPlan
                         })
                         var list = (supplyPlan).filter(c => (c.expiredStock > 0 && (c.transDate >= startDate && c.transDate <= endDate)));
-                        console.log("D----------------->List---------------->", list);
-                        // console.log("D-----------------> supply plan", (programJson.supplyPlan).filter(c => (c.expiredStock > 0)));
+                        // console.log("D----------------->List---------------->", list);
+                        // // console.log("D-----------------> supply plan", (programJson.supplyPlan).filter(c => (c.expiredStock > 0)));
                         var data = []
                         list.map(ele => {
                             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnitId))[0]
@@ -781,7 +781,7 @@ export default class ExpiredInventory extends Component {
                                 })
                             }
                         })
-                        console.log(data)
+                        // console.log(data)
                         this.setState({
                             outPutList: data
                         }, () => {
@@ -794,14 +794,14 @@ export default class ExpiredInventory extends Component {
                 this.setState({ loading: true })
                 ReportService.getExpiredStock(json)
                     .then(response => {
-                        console.log("-----response", JSON.stringify(response.data));
+                        // console.log("-----response", JSON.stringify(response.data));
                         var data = []
                         data = response.data.map(ele => ({
                             ...ele, ...{
                                 shelfLife: (this.state.planningUnits.filter(c => c.planningUnit.id == ele.planningUnit.id))[0].shelfLife
                             }
                         }))
-                        console.log(data)
+                        // console.log(data)
                         this.setState({
                             outPutList: data
                         }, () => {
@@ -814,7 +814,7 @@ export default class ExpiredInventory extends Component {
                             }, () => {
                                 this.buildJExcel();
                             });
-                            console.log(error)
+                            // console.log(error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     // message: 'static.unkownError',
@@ -915,7 +915,7 @@ export default class ExpiredInventory extends Component {
             ledgerForBatch: ledgerForBatch,
             loading: false
         })
-        console.log("ledgerForBatch+++", ledgerForBatch)
+        // console.log("ledgerForBatch+++", ledgerForBatch)
     }
 
     showBatchLedgerClickedServer(batchId) {
@@ -1057,7 +1057,7 @@ export default class ExpiredInventory extends Component {
 
     buildJExcel() {
         let outPutList = this.state.outPutList;
-        // console.log("outPutList---->", outPutList);
+        // // console.log("outPutList---->", outPutList);
         let outPutListArray = [];
         let count = 0;
 
@@ -1082,7 +1082,7 @@ export default class ExpiredInventory extends Component {
         //     data = [];
         //     outPutListArray[0] = data;
         // }
-        // console.log("outPutListArray---->", outPutListArray);
+        // // console.log("outPutListArray---->", outPutListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -1185,7 +1185,7 @@ export default class ExpiredInventory extends Component {
             var elInstance = instance;
             var rowData = elInstance.getRowData(x);
             if (y == 1) {
-                console.log("+++in y==1")
+                // console.log("+++in y==1")
                 this.toggleLarge(rowData[2], rowData[4], rowData[6], rowData[7]);
             }
             if (y == 2) {
@@ -1200,7 +1200,7 @@ export default class ExpiredInventory extends Component {
     }.bind(this);
 
     toggleLarge(batchNo, createdDate, expiryDate, batchId) {
-        console.log("+++in toggle large")
+        // console.log("+++in toggle large")
         this.setState({
             expiredStockModal: !this.state.expiredStockModal
         })

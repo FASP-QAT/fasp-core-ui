@@ -388,7 +388,7 @@ export default class ListProcurementUnit extends Component {
 
   editProcurementUnit(procurementUnit) {
     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_UNIT')) {
-      console.log(procurementUnit.procurementUnitId)
+      // console.log(procurementUnit.procurementUnitId)
       this.props.history.push({
         pathname: `/procurementUnit/editProcurementUnit/${procurementUnit.procurementUnitId}`,
       });
@@ -555,7 +555,7 @@ export default class ListProcurementUnit extends Component {
     this.hideFirstComponent();
     ProcurementUnitService.getProcurementUnitList().then(response => {
       if (response.status == 200) {
-        console.log("LIST-------", response.data);
+        // console.log("LIST-------", response.data);
         this.setState({
           procurementUnitList: response.data,
           selProcurementUnit: response.data,
@@ -615,7 +615,7 @@ export default class ListProcurementUnit extends Component {
 
     DropdownService.getPlanningUnitDropDownList().then(response => {
       if (response.status == 200) {
-        console.log("response--->", response.data);
+        // console.log("response--->", response.data);
         var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase

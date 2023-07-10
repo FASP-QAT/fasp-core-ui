@@ -98,7 +98,7 @@ const validationSchema = function (values) {
         i18n.t("static.common.roleinvalidtext"),
         function (value) {
           if (document.getElementById("roleValid").value == "false") {
-            console.log("inside if ---", value);
+            // console.log("inside if ---", value);
             return true;
           }
         }
@@ -895,7 +895,7 @@ class EditUserComponent extends Component {
       healthAreaList.unshift(paJson);
     }
 
-    console.log("programList----", programList);
+    // console.log("programList----", programList);
     // console.log("countryList----",countryList);
     // console.log("organisationList----",organisationList);
     // console.log("healthAreaList---",healthAreaList);
@@ -903,7 +903,7 @@ class EditUserComponent extends Component {
     var papuList = this.state.rows;
     var data = [];
     var papuDataArr = [];
-    console.log("this.state.user.username------", papuList);
+    // console.log("this.state.user.username------", papuList);
 
     var count = 0;
     if (papuList.length != 0) {
@@ -919,7 +919,7 @@ class EditUserComponent extends Component {
       }
     }
 
-    console.log("inventory Data Array-->", papuDataArr);
+    // console.log("inventory Data Array-->", papuDataArr);
     if (papuDataArr.length == 0) {
       data = [];
       data[0] = this.state.user.username;
@@ -1668,7 +1668,7 @@ class EditUserComponent extends Component {
 
                     user.userAcls = userAcls;
 
-                    console.log("user object--->>>>", userAcls);
+                    // console.log("user object--->>>>", userAcls);
 
                     this.setState({
                       message: "",

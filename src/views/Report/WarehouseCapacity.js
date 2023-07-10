@@ -399,7 +399,7 @@ class warehouseCapacity extends Component {
     }
     filterProgram = () => {
         let countryIds = this.state.countryValues.map(ele => ele.value);
-        console.log('countryIds', countryIds, 'programs', this.state.programs)
+        // console.log('countryIds', countryIds, 'programs', this.state.programs)
         this.setState({
             programLst: [],
             programValues: [],
@@ -411,7 +411,7 @@ class warehouseCapacity extends Component {
                     programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
                 }
 
-                console.log('programLst', programLst)
+                // console.log('programLst', programLst)
                 if (programLst.length > 0) {
 
                     this.setState({
@@ -561,7 +561,7 @@ class warehouseCapacity extends Component {
             //     }
             // );
         } else {
-            console.log('offline Program list')
+            // console.log('offline Program list')
             this.setState({ loading: false })
             this.consolidatedProgramList()
         }
@@ -637,7 +637,7 @@ class warehouseCapacity extends Component {
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let CountryIds = this.state.countryValues.length == this.state.countries.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
 
-            console.log("programId---", programId);
+            // console.log("programId---", programId);
             if (this.state.programValues.length > 0 && this.state.countryValues.length > 0) {
                 this.setState({ loading: true })
                 // AuthenticationService.setupAxiosInterceptors();
@@ -647,7 +647,7 @@ class warehouseCapacity extends Component {
                 }
                 ReportService.wareHouseCapacityExporttList(inputjson)
                     .then(response => {
-                        console.log("RESP-------->>", response.data)
+                        // console.log("RESP-------->>", response.data)
                         this.setState({
                             data: response.data,
                             message: '', loading: false
@@ -747,7 +747,7 @@ class warehouseCapacity extends Component {
         } else {
             // let programId = document.getElementById("programIdOffline").value;
             let programId = this.state.programId;
-            console.log("offline ProgramId---", programId);
+            // console.log("offline ProgramId---", programId);
 
             if (programId != 0) {
                 localStorage.setItem("sesProgramId", programId);
@@ -782,7 +782,7 @@ class warehouseCapacity extends Component {
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
-                        console.log("Program Json Test@123",programJson)
+                        // console.log("Program Json Test@123",programJson)
                         var regionList = (programJson.regionList);
                         var realmCountry = (programJson.realmCountry);
                         var programName = (document.getElementById("programIdOffline").selectedOptions[0].text);
@@ -805,8 +805,8 @@ class warehouseCapacity extends Component {
                             offlineData.push(json);
                         }
 
-                        console.log("offlineData--4-", offlineData);
-                        console.log("final wareHouseCapacity Report---", regionList);
+                        // console.log("offlineData--4-", offlineData);
+                        // console.log("final wareHouseCapacity Report---", regionList);
                         this.setState({
                             data: offlineData, loading: false
                         }, () => {

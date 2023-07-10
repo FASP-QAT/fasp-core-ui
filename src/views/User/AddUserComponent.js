@@ -70,13 +70,13 @@ const validationSchema = function (values) {
     showRealm: Yup.boolean(),
     realmId: Yup.string().when("showRealm", {
       is: (val) => {
-        console.log(
-          "validation---------" + document.getElementById("showRealm").value
-        );
-        console.log(
-          "result---",
-          document.getElementById("showRealm").value === "true"
-        );
+        // console.log(
+        //   "validation---------" + document.getElementById("showRealm").value
+        // );
+        // console.log(
+        //   "result---",
+        //   document.getElementById("showRealm").value === "true"
+        // );
         return document.getElementById("showRealm").value === "true";
       },
       then: Yup.string().required(i18n.t("static.common.realmtext")),
@@ -107,7 +107,7 @@ const validationSchema = function (values) {
         i18n.t("static.common.roleinvalidtext"),
         function (value) {
           if (document.getElementById("roleValid").value == "false") {
-            console.log("inside if ---", value);
+            // console.log("inside if ---", value);
             return true;
           }
         }
@@ -224,7 +224,7 @@ class AddUserComponent extends Component {
     let { user } = this.state;
     let count = 0;
     let count1 = 0;
-    console.log("roles---", this.state.user.roles);
+    // console.log("roles---", this.state.user.roles);
     for (var i = 0; i < this.state.user.roles.length; i++) {
       if (this.state.user.roles[i] != "ROLE_APPLICATION_ADMIN") {
         count++;
@@ -344,10 +344,10 @@ class AddUserComponent extends Component {
           appAdminRole: false,
         },
         () => {
-          console.log("show--------------" + this.state.showRealmValidation);
+          // console.log("show--------------" + this.state.showRealmValidation);
         }
       );
-      console.log("inside else");
+      // console.log("inside else");
       document.getElementById("showRealm").value = false;
       document.getElementById("roleValid").value = false;
     }
@@ -468,7 +468,7 @@ class AddUserComponent extends Component {
   getAccessControlData() {
     // RealmCountryService.getRealmCountryListAll()
     let realmId = AuthenticationService.getRealmId();
-    console.log("getAccessControlData-->", realmId);
+    // console.log("getAccessControlData-->", realmId);
     DropdownService.getRealmCountryDropdownList(realmId)
       .then((response) => {
         if (response.status == 200) {
@@ -534,7 +534,7 @@ class AddUserComponent extends Component {
                       )
                         .then((response1) => {
                           if (response1.status == "200") {
-                            console.log("CountryList------->2", response1.data);
+                            // console.log("CountryList------->2", response1.data);
 
                             var listArray = response1.data;
                             listArray.sort((a, b) => {
@@ -965,7 +965,7 @@ class AddUserComponent extends Component {
       healthAreaList.unshift(paJson);
     }
 
-    console.log("programList----", programList);
+    // console.log("programList----", programList);
     // console.log("countryList----",countryList);
     // console.log("organisationList----",organisationList);
     // console.log("healthAreaList---",healthAreaList);
@@ -1607,7 +1607,7 @@ class AddUserComponent extends Component {
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
                   let isValid = this.checkValidation();
-                  console.log("isValid------------>", isValid);
+                  // console.log("isValid------------>", isValid);
                   if (isValid) {
                     let user = this.state.user;
 
@@ -1681,14 +1681,14 @@ class AddUserComponent extends Component {
                     this.setState({
                       loading: true,
                     });
-                    console.log("user object--->>>>", user);
+                    // console.log("user object--->>>>", user);
                     this.setState({
                       message: "",
                     });
-                    console.log("user object---------------------", user);
+                    // console.log("user object---------------------", user);
                     UserService.addNewUser(user)
                       .then((response) => {
-                        console.log("user object--->>>>response", response);
+                        // console.log("user object--->>>>response", response);
                         if (response.status == 200) {
                           this.props.history.push(
                             `/user/listUser/` +

@@ -119,7 +119,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 proList.push(myResult[i].planningUnit)
                             }
                         }
-                        console.log('proList', proList)
+                        // console.log('proList', proList)
                         this.setState({ programPlanningUnitList: myResult })
                         var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
@@ -132,18 +132,18 @@ class StockStatusAcrossPlanningUnits extends Component {
                             var myResult = [];
                             myResult = planningunitRequest1.result;
                             var flList = []
-                            console.log(myResult)
+                            // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
                                 for (var j = 0; j < proList.length; j++) {
                                     if (myResult[i].planningUnitId == proList[j].id) {
-                                        console.log(myResult[i].planningUnitId, proList[j].id)
+                                        // console.log(myResult[i].planningUnitId, proList[j].id)
 
                                         flList.push(myResult[i].forecastingUnit)
                                         planningList.push(myResult[i])
                                     }
                                 }
                             }
-                            console.log('flList', flList)
+                            // console.log('flList', flList)
 
                             var tcList = [];
                             flList.filter(function (item) {
@@ -154,7 +154,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 return null;
                             });
 
-                            console.log('tcList', tcList)
+                            // console.log('tcList', tcList)
                             var lang = this.state.lang;
                             this.setState({
                                 tracerCategories: tcList.sort(function (a, b) {
@@ -460,7 +460,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
             this.setState({ loading: false })
         }
@@ -494,13 +494,13 @@ class StockStatusAcrossPlanningUnits extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -510,7 +510,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
 
                 }
-                console.log("D---------------->", proList);
+                // console.log("D---------------->", proList);
                 var lang = this.state.lang;
 
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
@@ -550,12 +550,12 @@ class StockStatusAcrossPlanningUnits extends Component {
 
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
                         .then(response => {
-                            console.log("response===>", response.data)
+                            // console.log("response===>", response.data)
                             this.setState({
                                 versions: []
                             }, () => {
@@ -667,7 +667,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
                 }
 
-                console.log(verList);
+                // console.log(verList);
                 var versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
                 })
@@ -721,14 +721,14 @@ class StockStatusAcrossPlanningUnits extends Component {
     }
 
     formatLabel = (cell, row) => {
-        // console.log("celll----", cell);
+        // // console.log("celll----", cell);
         if (cell != null && cell != "") {
             return getLabelText(cell, this.state.lang);
         }
     }
 
     formatterDate = (cell, row) => {
-        // console.log("celll----", cell);
+        // // console.log("celll----", cell);
         if (cell != null && cell != "") {
             return moment(cell).format('MMM-yy');
         }
@@ -803,10 +803,10 @@ class StockStatusAcrossPlanningUnits extends Component {
 
     buildJExcel() {
         let dataStockStatus = this.state.data;
-        // console.log("dataStockStatus---->", dataStockStatus);
+        // // console.log("dataStockStatus---->", dataStockStatus);
         let dataArray = [];
         let count = 0;
-        console.log("DataStockStatus+++", dataStockStatus);
+        // console.log("DataStockStatus+++", dataStockStatus);
         for (var j = 0; j < dataStockStatus.length; j++) {
             let data1 = '';
             if (dataStockStatus[j].planBasedOn == 1) {
@@ -860,13 +860,13 @@ class StockStatusAcrossPlanningUnits extends Component {
         //     data = [];
         //     dataArray[0] = data;
         // }
-        // console.log("dataArray---->", dataArray);
+        // // console.log("dataArray---->", dataArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = dataArray;
-        console.log("Data+++", data);
+        // console.log("Data+++", data);
         var options = {
             data: data,
             columnDrag: true,
@@ -939,7 +939,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 // var maxMos = parseFloat(rowData[4]);
                 // //------------B--------------
                 // if (mos < minMos) {
-                //     console.log('1')
+                //     // console.log('1')
                 //     for (var i = 0; i < colArrB.length; i++) {
                 //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                 //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[1].color);
@@ -947,7 +947,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
                 //     }
                 // } else if (mos > maxMos) {
-                //     console.log('2')
+                //     // console.log('2')
                 //     for (var i = 0; i < colArrB.length; i++) {
                 //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                 //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[0].color);
@@ -955,7 +955,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'color', textColor);
                 //     }
                 // } else {
-                //     console.log('3')
+                //     // console.log('3')
                 //     for (var i = 0; i < colArrB.length; i++) {
                 //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
                 //         elInstance.setStyle(`${colArrB[i]}${parseInt(y) + 1}`, 'background-color', legendcolor[2].color);
@@ -1045,7 +1045,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
-        console.log("Json@@@@@@@@@@", json)
+        // console.log("Json@@@@@@@@@@", json)
         var colArrB = ['C', 'D', 'E'];
         var colArrC = ['C', 'D'];
         var colArrE = ['E'];
@@ -1059,7 +1059,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             var maxMos = parseFloat(rowData[6]);
             //------------B--------------
             if (mos == 0) {
-                console.log('1')
+                // console.log('1')
                 for (var i = 0; i < colArrB.length; i++) {
                     var cell = elInstance.getCell(`${colArrB[i]}${parseInt(j) + 1}`);
                     cell.classList.add('legendColor0');
@@ -1074,19 +1074,19 @@ class StockStatusAcrossPlanningUnits extends Component {
                     cell.classList.add('legendColor4');
                 }
             } else if (mos < minMos) {
-                console.log('1')
+                // console.log('1')
                 for (var i = 0; i < colArrB.length; i++) {
                     var cell = elInstance.getCell(`${colArrB[i]}${parseInt(j) + 1}`);
                     cell.classList.add('legendColor1');
                 }
             } else if (mos > maxMos) {
-                console.log('2')
+                // console.log('2')
                 for (var i = 0; i < colArrB.length; i++) {
                     var cell = elInstance.getCell(`${colArrB[i]}${parseInt(j) + 1}`);
                     cell.classList.add('legendColor3');
                 }
             } else {
-                console.log('3')
+                // console.log('3')
                 for (var i = 0; i < colArrB.length; i++) {
                     var cell = elInstance.getCell(`${colArrB[i]}${parseInt(j) + 1}`);
                     cell.classList.add('legendColor2');
@@ -1101,33 +1101,33 @@ class StockStatusAcrossPlanningUnits extends Component {
 
     filterDataAsperstatus = () => {
         let stockStatusId = document.getElementById("stockStatusId").value;
-        console.log(stockStatusId)
+        // console.log(stockStatusId)
         var filteredData = []
         if (stockStatusId != -1) {
 
             this.state.selData.map(ele => {
-                console.log(ele)
+                // console.log(ele)
                 var min = ele.minMos
                 var max = ele.maxMos
                 //  var reorderFrequency = ele.reorderFrequency
                 if (stockStatusId == 0) {
                     if ((ele.mos != null && this.roundN(ele.mos) == 0)) {
-                        console.log('in 0')
+                        // console.log('in 0')
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 1) {
                     if ((ele.mos != null && this.roundN(ele.mos) != 0 && this.roundN(ele.mos) < min)) {
-                        console.log('in 1')
+                        // console.log('in 1')
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 3) {
                     if (this.roundN(ele.mos) > max) {
-                        console.log('in 2')
+                        // console.log('in 2')
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 2) {
                     if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
-                        console.log('in 3')
+                        // console.log('in 3')
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 4) {
@@ -1139,7 +1139,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         } else {
             filteredData = this.state.selData
         }
-        console.log(filteredData)
+        // console.log(filteredData)
         this.setState({
             data: filteredData
         }, () => { this.buildJExcel(); })
@@ -1168,7 +1168,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         let endDate = moment(new Date(this.state.singleValue2.year, this.state.singleValue2.month - 1, new Date(this.state.singleValue2.year, this.state.singleValue2.month, 0).getDate()));
         let includePlanningShipments = document.getElementById("includePlanningShipments").value
         let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
-        console.log('this.state.tracerCategoryValues.length', this.state.tracerCategoryValues.length)
+        // console.log('this.state.tracerCategoryValues.length', this.state.tracerCategoryValues.length)
         if (programId != 0 && versionId != 0 && this.state.tracerCategoryValues.length > 0) {
             if (versionId.includes('Local')) {
 
@@ -1235,7 +1235,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         supplyPlan: []
                                     }
                                 }
-                                console.log(planningUnit)
+                                // console.log(planningUnit)
                                 this.state.tracerCategoryValues.map(tc => {
                                     if (tc.value == planningUnit.forecastingUnit.tracerCategory.id) {
                                         var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnit.planningUnitId);
@@ -1243,7 +1243,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         var maxDate = moments.length > 0 ? moment.max(moments) : ''
                                         var dtstr = startDate.startOf('month').format('YYYY-MM-DD')
                                         var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnit.planningUnitId && c.transDate == dtstr)
-                                        console.log("D-------------->programPlanningUnitList", this.state.programPlanningUnitList)
+                                        // console.log("D-------------->programPlanningUnitList", this.state.programPlanningUnitList)
                                         var pu = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == planningUnit.planningUnitId)[0];
                                         var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
                                         var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
@@ -1266,7 +1266,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                         if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
                                             maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
                                         }
-                                        console.log(planningUnit)
+                                        // console.log(planningUnit)
                                         if (list.length > 0) {
                                             var json = {
                                                 planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
@@ -1296,7 +1296,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                     }
                                 })
                             })
-                            console.log(data)
+                            // console.log(data)
                             this.setState({
                                 selData: data,
                                 message: ''
@@ -1354,7 +1354,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.stockStatusForProgram(inputjson)
                     .then(response => {
-                        console.log(JSON.stringify(response.data));
+                        // console.log(JSON.stringify(response.data));
                         this.setState({
                             selData: response.data, message: ''
                         }, () => {

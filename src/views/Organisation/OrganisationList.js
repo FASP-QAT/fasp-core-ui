@@ -260,7 +260,7 @@ export default class OrganisationListComponent extends Component {
 
         OrganisationService.getOrganisationList()
             .then(response => {
-                console.log("response---", response);
+                // console.log("response---", response);
                 // this.setState({
                 //     organisations: response.data,
                 //     selSource: response.data

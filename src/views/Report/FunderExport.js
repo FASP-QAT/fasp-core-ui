@@ -78,7 +78,7 @@ class FunderExport extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
-                    // console.log(JSON.stringify(response.data))
+                    // // console.log(JSON.stringify(response.data))
                     this.setState({
                         programs: response.data
                     }, () => { this.consolidatedProgramList() })
@@ -151,7 +151,7 @@ class FunderExport extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
         }
 
@@ -184,13 +184,13 @@ class FunderExport extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -217,7 +217,7 @@ class FunderExport extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
-                    // console.log(JSON.stringify(response.data))
+                    // // console.log(JSON.stringify(response.data))
                     this.setState({
                         fundingSources: response.data
                     }, () => { this.consolidatedFundingSourceList() })
@@ -290,7 +290,7 @@ class FunderExport extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedFundingSourceList()
         }
 
@@ -324,7 +324,7 @@ class FunderExport extends Component {
                     for (var k = 0; k < this.state.fundingSources.length; k++) {
                         if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
                             f = 1;
-                            console.log('already exist')
+                            // console.log('already exist')
                         }
                     }
                     var programData = myResult[i];
@@ -349,7 +349,7 @@ class FunderExport extends Component {
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     this.setState({
@@ -419,7 +419,7 @@ class FunderExport extends Component {
 
                 }
 
-                console.log(verList)
+                // console.log(verList)
                 this.setState({
                     versions: verList.filter(function (x, i, a) {
                         return a.indexOf(x) === i;
@@ -461,7 +461,7 @@ class FunderExport extends Component {
                         myResult = planningunitRequest.result;
                         var programId = (document.getElementById("programId").value).split("_")[0];
                         var proList = []
-                        // console.log(myResult)
+                        // // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -483,7 +483,7 @@ class FunderExport extends Component {
 
                 //let productCategoryId = document.getElementById("productCategoryId").value;
                 ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                    // console.log('**' + JSON.stringify(response.data))
+                    // // console.log('**' + JSON.stringify(response.data))
                     this.setState({
                         planningUnits: response.data, message: ''
                     }, () => {
@@ -631,13 +631,13 @@ class FunderExport extends Component {
         this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.fundingSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer, ele.freightCost, ele.totalCost])));
         // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
         for (var i = 0; i < A.length; i++) {
-            console.log(A[i])
+            // console.log(A[i])
             csvRow.push(A[i].join(","))
 
         }
 
         var csvString = csvRow.join("%0A")
-        console.log('csvString' + csvString)
+        // console.log('csvString' + csvString)
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
@@ -745,7 +745,7 @@ class FunderExport extends Component {
 
 
     fetchData = () => {
-        console.log("-------------------IN FETCHDATA-----------------------------");
+        // console.log("-------------------IN FETCHDATA-----------------------------");
         let versionId = document.getElementById("versionId").value;
         let programId = document.getElementById("programId").value;
         let fundingSourceId = document.getElementById("fundingSourceId").value;
@@ -780,7 +780,7 @@ class FunderExport extends Component {
                     db1 = e.target.result;
                     var programDataTransaction = db1.transaction(['programData'], 'readwrite');
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    // console.log(program)
+                    // // console.log(program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -824,8 +824,8 @@ class FunderExport extends Component {
 
                             const dateFilter = fundingSourceFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
 
-                            console.log("DB LIST---", dateFilter);
-                            console.log("SELECTED LIST---", planningUnitIds);
+                            // console.log("DB LIST---", dateFilter);
+                            // console.log("SELECTED LIST---", planningUnitIds);
 
                             let data = [];
                             let planningUnitFilter = [];
@@ -837,7 +837,7 @@ class FunderExport extends Component {
                                 }
                             }
 
-                            console.log("offline data----", planningUnitFilter);
+                            // console.log("offline data----", planningUnitFilter);
                             for (let j = 0; j < planningUnitFilter.length; j++) {
                                 let freight = 0;
                                 if (planningUnitFilter[j].shipmentMode === "Air") {
@@ -858,7 +858,7 @@ class FunderExport extends Component {
                                 }
                                 data.push(json);
                             }
-                            console.log("end offline data----", data);
+                            // console.log("end offline data----", data);
                             this.setState({
                                 data: data
                                 , message: ''
@@ -888,7 +888,7 @@ class FunderExport extends Component {
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.fundingSourceExportList(inputjson)
                     .then(response => {
-                        // console.log(JSON.stringify(response.data))
+                        // // console.log(JSON.stringify(response.data))
                         this.setState({
                             data: response.data
                         }, () => {
@@ -999,7 +999,7 @@ class FunderExport extends Component {
     }
 
     addCommas(cell, row) {
-        // console.log("row---------->", row);
+        // // console.log("row---------->", row);
         // var currencyCode = row.currency.currencyCode;
         cell += '';
         var x = cell.split('.');

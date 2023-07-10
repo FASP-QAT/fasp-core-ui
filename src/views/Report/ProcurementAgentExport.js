@@ -252,7 +252,7 @@ class ProcurementAgentExport extends Component {
       //     }
       // );
     } else {
-      console.log("offline");
+      // console.log("offline");
       this.consolidatedProgramList();
       this.setState({ loading: false });
     }
@@ -294,13 +294,13 @@ class ProcurementAgentExport extends Component {
               SECRET_KEY
             );
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-            console.log(programNameLabel);
+            // console.log(programNameLabel);
 
             var f = 0;
             for (var k = 0; k < this.state.programs.length; k++) {
               if (this.state.programs[k].programId == programData.programId) {
                 f = 1;
-                console.log("already exist");
+                // console.log("already exist");
               }
             }
             if (f == 0) {
@@ -351,7 +351,7 @@ class ProcurementAgentExport extends Component {
         programJson
       )
         .then((response) => {
-          console.log("getProcurementAgent", JSON.stringify(response.data));
+          // console.log("getProcurementAgent", JSON.stringify(response.data));
           var listArray = response.data;
           var listArrays = [];
           for (var i = 0; i < listArray.length; i++) {
@@ -456,7 +456,7 @@ class ProcurementAgentExport extends Component {
       //     }
       // );
     } else {
-      console.log("offline");
+      // console.log("offline");
       this.consolidatedProcurementAgentList();
       this.setState({ loading: false });
     }
@@ -484,11 +484,11 @@ class ProcurementAgentExport extends Component {
         myResult = getRequest.result;
         // var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         // var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        // console.log("ProcurementAgentMyResult------>>>>", myResult);
+        // // console.log("ProcurementAgentMyResult------>>>>", myResult);
         for (var i = 0; i < myResult.length; i++) {
           // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
           // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-          // console.log(programNameLabel);
+          // // console.log(programNameLabel);
 
           // var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
           // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
@@ -500,7 +500,7 @@ class ProcurementAgentExport extends Component {
               myResult[i].procurementAgentId
             ) {
               f = 1;
-              console.log("already exist");
+              // console.log("already exist");
             }
           }
           if (f == 0) {
@@ -513,7 +513,7 @@ class ProcurementAgentExport extends Component {
           }
           var listArray = proList;
         }
-        console.log("listArrays", listArray, "==programId", programId);
+        // console.log("listArrays", listArray, "==programId", programId);
         this.setState({
           procurementAgents: listArray.sort(function (a, b) {
             a = a.procurementAgentCode.toLowerCase();
@@ -523,14 +523,14 @@ class ProcurementAgentExport extends Component {
         });
         let viewby = document.getElementById("viewById").value;
         if (viewby == 1) {
-          // console.log("viewby", this.state.procurementAgents)
+          // // console.log("viewby", this.state.procurementAgents)
 
           if (listArray.length > 0) {
             document.getElementById("procurementAgentDiv").style.display =
               "block";
             // document.getElementById("fundingSourceDiv").style.display = "block";
           } else {
-            // console.log("viewby", viewby)
+            // // console.log("viewby", viewby)
             this.setState({
               viewby: 2,
             });
@@ -552,7 +552,7 @@ class ProcurementAgentExport extends Component {
       const program = this.state.programs.filter(
         (c) => c.programId == programId
       );
-      console.log(program);
+      // console.log(program);
       if (program.length == 1) {
         if (isSiteOnline()) {
           this.setState(
@@ -565,7 +565,7 @@ class ProcurementAgentExport extends Component {
                 programId
               )
                 .then((response) => {
-                  console.log("response===>", response.data);
+                  // console.log("response===>", response.data);
                   this.setState(
                     {
                       versions: [],
@@ -705,12 +705,12 @@ class ProcurementAgentExport extends Component {
           }
         }
 
-        console.log(verList);
+        // console.log(verList);
         let versionList = verList.filter(function (x, i, a) {
           return a.indexOf(x) === i;
         });
         versionList.reverse();
-        console.log("versionList", versionList);
+        // console.log("versionList", versionList);
         if (
           localStorage.getItem("sesVersionIdReport") != "" &&
           localStorage.getItem("sesVersionIdReport") != undefined
@@ -838,15 +838,15 @@ class ProcurementAgentExport extends Component {
               tracerCategoryIds: [],
               programIds: [programId],
             };
-            console.log("**", programJson);
+            // console.log("**", programJson);
 
             //let productCategoryId = document.getElementById("productCategoryId").value;
             DropdownService.getProgramPlanningUnitDropdownList(programJson)
               .then((response) => {
-                console.log(
-                  "**getProgramPlanningUnitDropdownList",
-                  response.data
-                );
+                // console.log(
+                  // "**getProgramPlanningUnitDropdownList",
+                  // response.data
+                // );
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                   var itemLabelA = getLabelText(
@@ -875,9 +875,9 @@ class ProcurementAgentExport extends Component {
                   planningUnits: [],
                   loading: false,
                 });
-                console.log(
-                  "**getProgramPlanningUnitDropdownList" + error.response
-                );
+                // console.log(
+                  // "**getProgramPlanningUnitDropdownList" + error.response
+                // );
 
                 if (error.message === "Network Error") {
                   this.setState({
@@ -1199,12 +1199,12 @@ class ProcurementAgentExport extends Component {
 
     // this.state.data.map(ele => [(ele.procurementAgent).replaceAll(',', ' ').replaceAll(' ', '%20'), (ele.planningUnit).replaceAll(',', ' ').replaceAll(' ', '%20'), ele.qty, ele.totalProductCost, ele.freightPer,ele.freightCost, ele.totalCost]);
     for (var i = 0; i < A.length; i++) {
-      console.log(A[i]);
+      // console.log(A[i]);
       csvRow.push(A[i].join(","));
     }
 
     var csvString = csvRow.join("%0A");
-    console.log("csvString" + csvString);
+    // console.log("csvString" + csvString);
     var a = document.createElement("a");
     a.href = "data:attachment/csv," + csvString;
     a.target = "_Blank";
@@ -1315,7 +1315,7 @@ class ProcurementAgentExport extends Component {
           } else {
             poslen = 90;
           }
-          console.log(poslen);
+          // console.log(poslen);
           poslen = poslen + 20;
           doc.text(
             i18n.t("static.program.program") +
@@ -1493,7 +1493,7 @@ class ProcurementAgentExport extends Component {
 
   buildJExcel() {
     let shipmentCosttList = this.state.data;
-    console.log("shipmentCosttList @@@---->", shipmentCosttList);
+    // console.log("shipmentCosttList @@@---->", shipmentCosttList);
     let shipmentCostArray = [];
     let count = 0;
 
@@ -1536,14 +1536,14 @@ class ProcurementAgentExport extends Component {
     //     data = [];
     //     shipmentCostArray[0] = data;
     // }
-    // console.log("shipmentCostArray---->", shipmentCostArray);
+    // // console.log("shipmentCostArray---->", shipmentCostArray);
     this.el = jexcel(document.getElementById("tableDiv"), "");
     // this.el.destroy();
     jexcel.destroy(document.getElementById("tableDiv"), true);
     var json = [];
     var data = shipmentCostArray;
 
-    // console.log("RENDER VIEWBY-------", viewby);
+    // // console.log("RENDER VIEWBY-------", viewby);
     let obj1 = {};
     let obj2 = {};
     if (viewby == 1) {
@@ -1705,7 +1705,7 @@ class ProcurementAgentExport extends Component {
   };
 
   fetchData = () => {
-    console.log("-------------------IN FETCHDATA-----------------------------");
+    // console.log("-------------------IN FETCHDATA-----------------------------");
     let versionId = document.getElementById("versionId").value;
     let programId = document.getElementById("programId").value;
     let viewby = document.getElementById("viewById").value;
@@ -1785,7 +1785,7 @@ class ProcurementAgentExport extends Component {
             );
             var programDataOs =
               programDataTransaction.objectStore("programData");
-            // console.log(program)
+            // // console.log(program)
             var programRequest = programDataOs.get(program);
             programRequest.onerror = function (event) {
               this.setState({
@@ -1837,7 +1837,7 @@ class ProcurementAgentExport extends Component {
                 }
 
                 // var shipmentList = (programJson.shipmentList);
-                console.log("shipmentList----*********----", shipmentList);
+                // console.log("shipmentList----*********----", shipmentList);
 
                 const activeFilter = shipmentList.filter(
                   (c) =>
@@ -1870,8 +1870,8 @@ class ProcurementAgentExport extends Component {
                   );
                   // const dateFilter = procurementAgentFilter.filter(c => moment(c.shippedDate).isBetween(startDate, endDate, null, '[)'));
                   // EXPECTED_DELIVERY_DATE
-                  // console.log("startDate===>", startDate);
-                  // console.log("stopDate===>", endDate);
+                  // // console.log("startDate===>", startDate);
+                  // // console.log("stopDate===>", endDate);
                   const dateFilter = procurementAgentFilter.filter((c) =>
                     moment(
                       c.receivedDate == null || c.receivedDate == ""
@@ -1879,7 +1879,7 @@ class ProcurementAgentExport extends Component {
                         : c.receivedDate
                     ).isBetween(startDate, endDate, null, "[)")
                   );
-                  console.log("dateFilter====>", dateFilter);
+                  // console.log("dateFilter====>", dateFilter);
 
                   let planningUnitFilter = [];
                   for (let i = 0; i < planningUnitIds.length; i++) {
@@ -1889,9 +1889,9 @@ class ProcurementAgentExport extends Component {
                       }
                     }
                   }
-                  // console.log("offline data----", planningUnitFilter);
+                  // // console.log("offline data----", planningUnitFilter);
                   for (let j = 0; j < planningUnitFilter.length; j++) {
-                    // console.log("hi===>", parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)));
+                    // // console.log("hi===>", parseFloat((((planningUnitFilter[j].freightCost * planningUnitFilter[j].currency.conversionRateToUsd) / (planningUnitFilter[j].productCost * planningUnitFilter[j].currency.conversionRateToUsd)) * 100).toFixed(2)));
                     let freight = 0;
                     if (planningUnitFilter[j].shipmentMode === "Air") {
                       freight = airFreight;
@@ -1957,14 +1957,14 @@ class ProcurementAgentExport extends Component {
                     data.push(json);
                   }
                 });
-                console.log("data----->", data);
+                // console.log("data----->", data);
                 var planningUnitsinData = data.map((q) =>
                   parseInt(q.planningUnit.id)
                 );
                 var useFilter = planningUnitsinData.filter(
                   (q, idx) => planningUnitsinData.indexOf(q) === idx
                 );
-                console.log("userFilter===>###", useFilter);
+                // console.log("userFilter===>###", useFilter);
                 var filteredData = [];
                 var myJson = [];
                 for (var uf = 0; uf < useFilter.length; uf++) {
@@ -1978,7 +1978,7 @@ class ProcurementAgentExport extends Component {
                   var uniqueProcurementAgentIds = procurementAgentIds.filter(
                     (q, idx) => procurementAgentIds.indexOf(q) === idx
                   );
-                  // console.log("planningUnitFilterdata===>", planningUnitFilterdata[0]);
+                  // // console.log("planningUnitFilterdata===>", planningUnitFilterdata[0]);
                   for (var u = 0; u < uniqueProcurementAgentIds.length; u++) {
                     var pupaFilterdata = planningUnitFilterdata.filter(
                       (c) =>
@@ -2030,7 +2030,7 @@ class ProcurementAgentExport extends Component {
                     filteredData.push(myJson);
                   }
                 }
-                console.log("filteredData===>", filteredData);
+                // console.log("filteredData===>", filteredData);
                 this.setState(
                   {
                     data: filteredData,
@@ -2063,13 +2063,13 @@ class ProcurementAgentExport extends Component {
             planningUnitIds: planningUnitIds,
             includePlannedShipments: includePlannedShipments,
           };
-          console.log("inputjson-------", inputjson);
+          // console.log("inputjson-------", inputjson);
           // AuthenticationService.setupAxiosInterceptors();
           this.setState({ loading: true });
 
           ReportService.procurementAgentExporttList(inputjson)
             .then((response) => {
-              console.log("Online Data------", response.data);
+              // console.log("Online Data------", response.data);
               this.setState(
                 {
                   data: response.data,
@@ -2254,7 +2254,7 @@ class ProcurementAgentExport extends Component {
             );
             var programDataOs =
               programDataTransaction.objectStore("programData");
-            // console.log(program)
+            // // console.log(program)
             var programRequest = programDataOs.get(program);
             programRequest.onerror = function (event) {
               this.setState({
@@ -2348,8 +2348,8 @@ class ProcurementAgentExport extends Component {
                         : c.receivedDate
                     ).isBetween(startDate, endDate, null, "[)")
                   );
-                  console.log("DB LIST---", dateFilter);
-                  console.log("SELECTED LIST---", planningUnitIds);
+                  // console.log("DB LIST---", dateFilter);
+                  // console.log("SELECTED LIST---", planningUnitIds);
 
                   let planningUnitFilter = [];
                   for (let i = 0; i < planningUnitIds.length; i++) {
@@ -2360,7 +2360,7 @@ class ProcurementAgentExport extends Component {
                     }
                   }
 
-                  console.log("offline data----", planningUnitFilter);
+                  // console.log("offline data----", planningUnitFilter);
                   for (let j = 0; j < planningUnitFilter.length; j++) {
                     let freight = 0;
                     if (planningUnitFilter[j].shipmentMode === "Air") {
@@ -2415,7 +2415,7 @@ class ProcurementAgentExport extends Component {
                 var useFilter = planningUnitsinData.filter(
                   (q, idx) => planningUnitsinData.indexOf(q) === idx
                 );
-                // console.log("userFilter===>", useFilter);
+                // // console.log("userFilter===>", useFilter);
                 var filteredData = [];
                 var myJson = [];
                 for (var uf = 0; uf < useFilter.length; uf++) {
@@ -2479,7 +2479,7 @@ class ProcurementAgentExport extends Component {
                     filteredData.push(myJson);
                   }
                 }
-                console.log("end offline data----", filteredData);
+                // console.log("end offline data----", filteredData);
                 this.setState(
                   {
                     data: filteredData,
@@ -2517,7 +2517,7 @@ class ProcurementAgentExport extends Component {
           // AuthenticationService.setupAxiosInterceptors();
           ReportService.fundingSourceExportList(inputjson)
             .then((response) => {
-              // console.log(JSON.stringify(response.data))
+              // // console.log(JSON.stringify(response.data))
               this.setState(
                 {
                   data: response.data,
@@ -2703,7 +2703,7 @@ class ProcurementAgentExport extends Component {
             );
             var programDataOs =
               programDataTransaction.objectStore("programData");
-            // console.log(program)
+            // // console.log(program)
             var programRequest = programDataOs.get(program);
             programRequest.onerror = function (event) {
               this.setState({
@@ -2799,7 +2799,7 @@ class ProcurementAgentExport extends Component {
                   }
                 }
 
-                console.log("offline data----", planningUnitFilter);
+                // console.log("offline data----", planningUnitFilter);
                 for (let j = 0; j < planningUnitFilter.length; j++) {
                   let freight = 0;
                   if (planningUnitFilter[j].shipmentMode === "Air") {
@@ -2838,25 +2838,25 @@ class ProcurementAgentExport extends Component {
                 var useFilter = planningUnitsinData.filter(
                   (q, idx) => planningUnitsinData.indexOf(q) === idx
                 );
-                // console.log("userFilter===>", useFilter);
+                // // console.log("userFilter===>", useFilter);
                 var filteredData = [];
                 var myJson = [];
-                console.log("User Filter@@@", useFilter);
+                // console.log("User Filter@@@", useFilter);
                 for (var uf = 0; uf < useFilter.length; uf++) {
                   // for (var p = 0; p < data.length; p++) {
                   var planningUnitFilterdata = data.filter(
                     (c) => c.planningUnit.id == useFilter[uf]
                   );
-                  // console.log("planningUnitFilterdata===>", planningUnitFilterdata[0]);
+                  // // console.log("planningUnitFilterdata===>", planningUnitFilterdata[0]);
                   var qty = 0;
                   var productCost = 0;
                   var freightPerc = 0;
                   var freightCost = 0;
                   var totalCost = 0;
-                  console.log(
-                    "@@@PlanningUnitFiltered data",
-                    planningUnitFilterdata
-                  );
+                  // console.log(
+                    // "@@@PlanningUnitFiltered data",
+                    // planningUnitFilterdata
+                  // );
                   for (var pf = 0; pf < planningUnitFilterdata.length; pf++) {
                     qty = Number(qty) + Number(planningUnitFilterdata[pf].qty);
                     productCost =
@@ -2938,7 +2938,7 @@ class ProcurementAgentExport extends Component {
           // AuthenticationService.setupAxiosInterceptors();
           ReportService.AggregateShipmentByProduct(inputjson)
             .then((response) => {
-              console.log("Online Data------", response.data);
+              // console.log("Online Data------", response.data);
               this.setState(
                 {
                   data: response.data,
@@ -3190,7 +3190,7 @@ class ProcurementAgentExport extends Component {
       // AuthenticationService.setupAxiosInterceptors();
       FundingSourceService.getFundingSourceListAll()
         .then((response) => {
-          // console.log(JSON.stringify(response.data))
+          // // console.log(JSON.stringify(response.data))
           this.setState(
             {
               fundingSources: response.data,
@@ -3280,7 +3280,7 @@ class ProcurementAgentExport extends Component {
       //     }
       // );
     } else {
-      console.log("offline");
+      // console.log("offline");
       this.consolidatedFundingSourceList();
       this.setState({ loading: false });
     }
@@ -3319,7 +3319,7 @@ class ProcurementAgentExport extends Component {
               myResult[i].fundingSourceId
             ) {
               f = 1;
-              console.log("already exist");
+              // console.log("already exist");
             }
           }
           var programData = myResult[i];
@@ -3344,7 +3344,7 @@ class ProcurementAgentExport extends Component {
   }
 
   addCommas(cell, row) {
-    // console.log("row---------->", row);
+    // // console.log("row---------->", row);
 
     cell += "";
     var x = cell.split(".");
@@ -3404,7 +3404,7 @@ class ProcurementAgentExport extends Component {
     const { rangeValue } = this.state;
 
     let viewby = this.state.viewby;
-    // console.log("RENDER VIEWBY-------", viewby);
+    // // console.log("RENDER VIEWBY-------", viewby);
     let obj1 = {};
     let obj2 = {};
     if (viewby == 1) {

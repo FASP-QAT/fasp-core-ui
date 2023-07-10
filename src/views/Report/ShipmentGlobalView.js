@@ -561,7 +561,7 @@ class ShipmentGlobalView extends Component {
 
 
     // handleChange(countrysId) {
-    //     console.log('==>', countrysId)
+    //     // console.log('==>', countrysId)
     //     countrysId = countrysId.sort(function (a, b) {
     //         return parseInt(a.value) - parseInt(b.value);
     //     })
@@ -609,7 +609,7 @@ class ShipmentGlobalView extends Component {
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
         DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
-                console.log("RealmCountryService---->", response.data)
+                // console.log("RealmCountryService---->", response.data)
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -814,7 +814,7 @@ class ShipmentGlobalView extends Component {
         })
         ProgramService.getProgramList()
             .then(response => {
-                console.log(JSON.stringify(response.data))
+                // console.log(JSON.stringify(response.data))
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -944,7 +944,7 @@ class ShipmentGlobalView extends Component {
         //                     break;
         //                 default:
         //                     this.setState({ message: 'static.unkownError', loading: false });
-        //                     console.log("Error code unkown");
+        //                     // console.log("Error code unkown");
         //                     break;
         //             }
         //         }
@@ -958,7 +958,7 @@ class ShipmentGlobalView extends Component {
         var programJson = programIds
         DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programJson)
             .then(response => {
-                console.log("getProcurementAgent==>", JSON.stringify(response.data))
+                // console.log("getProcurementAgent==>", JSON.stringify(response.data))
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
@@ -1008,7 +1008,7 @@ class ShipmentGlobalView extends Component {
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
-                console.log("listArray", listArray)
+                // console.log("listArray", listArray)
                 this.setState({
                     procurementAgentTypes: listArray.filter(c => c.active == true && realmId == c.realm.id), loading: false,
                 }, () => { this.fetchData(); })
@@ -1042,12 +1042,12 @@ class ShipmentGlobalView extends Component {
     }
 
     getFundingSource = () => {
-        console.log("==>>inside funding src")
+        // console.log("==>>inside funding src")
         this.setState({ loading: true })
         // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
-                // console.log(JSON.stringify(response.data))
+                // // console.log(JSON.stringify(response.data))
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
@@ -1134,7 +1134,7 @@ class ShipmentGlobalView extends Component {
         let realmId = AuthenticationService.getRealmId();
         ProductService.getProductCategoryList(realmId)
             .then(response => {
-                // console.log(response.data)
+                // // console.log(response.data)
                 // var list = response.data.slice(1);
                 var list = response.data;
                 list.sort((a, b) => {
@@ -1251,7 +1251,7 @@ class ShipmentGlobalView extends Component {
     }
 
     fetchData = () => {
-        console.log("==>>inside fetch data")
+        // console.log("==>>inside fetch data")
         let viewby = document.getElementById("viewById").value;
         let realmId = AuthenticationService.getRealmId()
         let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
@@ -1275,17 +1275,17 @@ class ShipmentGlobalView extends Component {
             fundingSourceProcurementAgentIds = procurementAgentTypeIds;
 
         }
-        // console.log("planningUnitId-------", planningUnitId);
-        // console.log("productCategoryId------", productCategoryId);
-        // console.log("CountryIds-----", CountryIds);
-        // console.log("procurementAgentIds----", procurementAgentIds);
-        // console.log("viewby-----", viewby);
-        // console.log("startDate-----", startDate);
-        // console.log("endDate-----", endDate);
+        // // console.log("planningUnitId-------", planningUnitId);
+        // // console.log("productCategoryId------", productCategoryId);
+        // // console.log("CountryIds-----", CountryIds);
+        // // console.log("procurementAgentIds----", procurementAgentIds);
+        // // console.log("viewby-----", viewby);
+        // // console.log("startDate-----", startDate);
+        // // console.log("endDate-----", endDate);
 
         if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && this.state.programValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 3 && this.state.procurementAgentTypeValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0))) {
             let planningUnitUnit = this.state.planningUnits.filter(c => c.planningUnitId == planningUnitId)[0].unit;
-            console.log("planningUnitUnit------>", planningUnitUnit);
+            // console.log("planningUnitUnit------>", planningUnitUnit);
             this.setState({
                 message: '',
                 loading: true,
@@ -1304,11 +1304,11 @@ class ShipmentGlobalView extends Component {
                 , useApprovedSupplyPlanOnly: useApprovedVersion,
                 includePlannedShipments: includePlanningShipments
             }
-            console.log("INPUTJSON--------->", inputjson);
+            // console.log("INPUTJSON--------->", inputjson);
             // AuthenticationService.setupAxiosInterceptors();
             ReportService.ShipmentGlobalView(inputjson)
                 .then(response => {
-                    console.log("RESP------", response.data);
+                    // console.log("RESP------", response.data);
                     if (response.data.countrySplitList.length != 0) {
                         var table1Headers = [];
                         var lab = [];
@@ -1350,15 +1350,15 @@ class ShipmentGlobalView extends Component {
                             val: val,
                             loading: false
                         }, () => {
-                            console.log("shipmentList-----", this.state.shipmentList);
-                            console.log("dateSplitList-----", this.state.dateSplitList);
-                            console.log("countrySplitList-----", this.state.countrySplitList);
-                            console.log("countryShipmentSplitList-----", this.state.countryShipmentSplitList);
+                            // console.log("shipmentList-----", this.state.shipmentList);
+                            // console.log("dateSplitList-----", this.state.dateSplitList);
+                            // console.log("countrySplitList-----", this.state.countrySplitList);
+                            // console.log("countryShipmentSplitList-----", this.state.countryShipmentSplitList);
 
-                            // console.log("labels---", this.state.labels);
-                            // console.log("values---", this.state.values);
-                            // console.log("DATA--1---", this.state.table1Headers);
-                            // console.log("DATA---2--", this.state.table1Body);
+                            // // console.log("labels---", this.state.labels);
+                            // // console.log("values---", this.state.values);
+                            // // console.log("DATA--1---", this.state.table1Headers);
+                            // // console.log("DATA---2--", this.state.table1Body);
                         })
                     }
                     else {
@@ -1641,7 +1641,7 @@ class ShipmentGlobalView extends Component {
 
     filterProgram = () => {
         let countryIds = this.state.countryValues.map(ele => ele.value);
-        console.log('countryIds', countryIds, 'programLst', this.state.programLst)
+        // console.log('countryIds', countryIds, 'programLst', this.state.programLst)
         this.setState({
             programLst: [],
             programValues: [],
@@ -1661,7 +1661,7 @@ class ShipmentGlobalView extends Component {
                             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
-                        console.log('programLst', listArray)
+                        // console.log('programLst', listArray)
                         if (listArray.length > 0) {
                             this.setState({
                                 programLst: listArray
@@ -1786,7 +1786,7 @@ class ShipmentGlobalView extends Component {
         let procurementAgentTypeList = [];
         procurementAgentTypeList = procurementAgentTypes.length > 0
             && procurementAgentTypes.map((item, i) => {
-                console.log("procurementAgentTypes", procurementAgentTypes)
+                // console.log("procurementAgentTypes", procurementAgentTypes)
                 return (
 
                     { label: item.procurementAgentTypeCode, value: item.procurementAgentTypeId }
@@ -2114,16 +2114,16 @@ class ShipmentGlobalView extends Component {
         // }
         // displaylabel = displaylabel[0];
         let displaylabel = (this.state.dateSplitList.length > 0 ? Object.keys(this.state.dateSplitList[0].amount) : []);
-        console.log("displaylabel------->>>>", displaylabel);
+        // console.log("displaylabel------->>>>", displaylabel);
         let dateSplitList = this.state.dateSplitList;
         let displayObject = [];
 
         // for (var j = 0; j < dateSplitList.length; j++) {
-        //     console.log("NODE------", dateSplitList[j].amount);
+        //     // console.log("NODE------", dateSplitList[j].amount);
         // }
 
         for (var i = 0; i < displaylabel.length; i++) {
-            // console.log("DDD------", displaylabel[i]);
+            // // console.log("DDD------", displaylabel[i]);
             let holdArray = [];
             for (var j = 0; j < dateSplitList.length; j++) {
                 let subArraylab = Object.keys(dateSplitList[j].amount);
@@ -2137,7 +2137,7 @@ class ShipmentGlobalView extends Component {
             }
             displayObject.push(holdArray);
         }
-        console.log("displayObject------", displayObject);
+        // console.log("displayObject------", displayObject);
 
 
 
@@ -2155,7 +2155,7 @@ class ShipmentGlobalView extends Component {
             datasets: dataSet
 
         }
-        console.log(bar1)
+        // console.log(bar1)
         let viewby = this.state.viewby;
 
 
@@ -2445,7 +2445,7 @@ class ShipmentGlobalView extends Component {
                                         {this.state.dateSplitList.length > 0 &&
                                             <div className="col-md-6">
                                                 <div className="chart-wrapper chart-graph-report">
-                                                    {console.log(bar1)/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                    {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
                                                     <Bar id="cool-canvas2" data={bar1} options={this.state.viewby == 1 ? options1 : this.state.viewby == 2 ? options2 : options3} />
                                                 </div>
                                             </div>

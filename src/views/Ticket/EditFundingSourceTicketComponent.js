@@ -128,7 +128,7 @@ export default class EditFundingSourceTicketComponent extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("RESP----", response.data);
+                    // console.log("RESP----", response.data);
                     // this.setState({
                     //     fundingSourceList: response.data,
                     //     selSource: response.data
@@ -244,7 +244,7 @@ export default class EditFundingSourceTicketComponent extends Component {
                             this.state.fundingSource.summary = summaryText_2;
                             this.state.fundingSource.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.fundingSource).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

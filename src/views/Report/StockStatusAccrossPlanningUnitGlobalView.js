@@ -319,7 +319,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     //           break;
     //         default:
     //           this.setState({ loading: false, message: 'static.unkownError' });
-    //           console.log("Error code unkown");
+    //           // console.log("Error code unkown");
     //           break;
     //       }
     //     }
@@ -472,7 +472,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   };
 
   cellstyleWithData = (item) => {
-    console.log(item);
+    // console.log(item);
     if (item.mos != null && this.roundN(item.mos) == 0) {
       return { backgroundColor: legendcolor[0].color };
     } else if (
@@ -695,12 +695,12 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     for (var i = 0; i < programIds.length; i++) {
       programIdsValue.push(programIds[i].value);
     }
-    // console.log("programids=====>", programIdsValue);
+    // // console.log("programids=====>", programIdsValue);
     DropdownService.getTracerCategoryForMultipleProgramsDropdownList(
       programIdsValue
     )
       .then((response) => {
-        console.log("tc respons==>", response.data);
+        // console.log("tc respons==>", response.data);
         var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -821,12 +821,12 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       this.state.tracerCategories.length
         ? []
         : this.state.tracerCategoryValues.map((ele) => ele.value.toString());
-    console.log(
-      "countryIds",
-      countryIds,
-      "programs",
-      this.state.programLstFiltered
-    );
+    // console.log(
+      // "countryIds",
+      // countryIds,
+      // "programs",
+      // this.state.programLstFiltered
+    // );
     this.setState(
       {
         programLstFiltered: [],
@@ -853,7 +853,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                 ).toUpperCase(); // ignore upper and lowercase
                 return itemLabelA > itemLabelB ? 1 : -1;
               });
-              console.log("programLstFiltered", listArray);
+              // console.log("programLstFiltered", listArray);
               if (listArray.length > 0) {
                 this.setState(
                   {
@@ -944,10 +944,10 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     setTimeout(function () {
       var theSelect = document.getElementById("planningUnitId").length;
 
-      console.log(
-        "INHIDEDIV------------------------------------------------------",
-        theSelect
-      );
+      // console.log(
+        // "INHIDEDIV------------------------------------------------------",
+        // theSelect
+      // );
     }, 9000);
   }
 
@@ -975,7 +975,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         ? []
         : this.state.programValues.map((ele) => ele.value.toString());
 
-    console.log(realmId);
+    // console.log(realmId);
     if (
       realmId > 0 &&
       this.state.countryValues.length > 0 &&
@@ -994,7 +994,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       // AuthenticationService.setupAxiosInterceptors();
       ReportService.stockStatusAcrossProducts(inputjson)
         .then((response) => {
-          console.log("response", JSON.stringify(response.data));
+          // console.log("response", JSON.stringify(response.data));
           // let data=programs.map(p=>{
           //   planningUnits.map(pu=>
           //     response.data.filter(c=> c.planningUnit.id=pu.planningUnit.id &&c.programData.program.id==p.id)).map(ele=>
@@ -1010,7 +1010,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           //         }
           //       })
           //      } )
-          //console.log('data',data);
+          //// console.log('data',data);
           this.setState(
             {
               selData: response.data,
@@ -1130,19 +1130,19 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
 
   filterDataAsperstatus = () => {
     let stockStatusId = document.getElementById("stockStatusId").value;
-    console.log(stockStatusId);
+    // console.log(stockStatusId);
     var filteredData = [];
     if (stockStatusId != -1) {
       this.state.selData.map((ele1) => {
         var filterProgramData = [];
         ele1.programData.map((ele) => {
-          console.log(ele);
+          // console.log(ele);
           var min = ele.minMos;
           var max = ele.maxMos;
           //  var reorderFrequency = ele.reorderFrequency
           if (stockStatusId == 0) {
             if (ele.mos != null && this.roundN(ele.mos) == 0) {
-              console.log("in 0");
+              // console.log("in 0");
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 1) {
@@ -1151,17 +1151,17 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
               this.roundN(ele.mos) != 0 &&
               this.roundN(ele.mos) < min
             ) {
-              console.log("in 1");
+              // console.log("in 1");
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 3) {
             if (this.roundN(ele.mos) > max) {
-              console.log("in 2");
+              // console.log("in 2");
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 2) {
             if (this.roundN(ele.mos) < max && this.roundN(ele.mos) > min) {
-              console.log("in 3");
+              // console.log("in 3");
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 4) {
@@ -1180,11 +1180,11 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     } else {
       filteredData = this.state.selData;
     }
-    console.log(filteredData);
+    // console.log(filteredData);
     let planningUnits = [
       ...new Set(filteredData.map((ele) => ele.planningUnit)),
     ];
-    console.log("planningUnits", JSON.stringify(planningUnits));
+    // console.log("planningUnits", JSON.stringify(planningUnits));
     //let programs=[...new Set((response.data.map(ele=> ele.programData.program.code)).flat(1))]
     let programs = [
       ...new Set(
@@ -1193,7 +1193,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           .flat(1)
       ),
     ];
-    console.log("programs", JSON.stringify(programs));
+    // console.log("programs", JSON.stringify(programs));
 
     this.setState({
       data: filteredData,
@@ -1394,7 +1394,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
   getPrograms = () => {
     ProgramService.getProgramList()
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
