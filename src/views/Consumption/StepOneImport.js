@@ -1030,12 +1030,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
         let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
 
-        let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+        let forecastStopDate = new Date('01-' + selectedForecastProgram.forecastStartDate);
         forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
         this.setState({
             forecastProgramId: event.target.value,
-            rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+            rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date('01-' + selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
             forecastProgramVersionId: forecastProgramVersionId,
             selectedForecastProgram: selectedForecastProgram
         }, () => {
@@ -1301,9 +1301,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 </div>
 
-                <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
+                <div className="consumptionDataEntryTable">
 
-                    <div id="mapPlanningUnit">
+                    <div id="mapPlanningUnit" style={{ display: this.props.items.loading ? "none" : "block" }} >
                     </div>
                     <FormGroup>
                         <Button color="info" size="md" className="float-right mr-1" id="stepOneBtn" type="submit" onClick={() => this.formSubmit()} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
