@@ -2299,7 +2299,7 @@ class CompareAndSelectScenario extends Component {
                                                 <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                 <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                             </ul><br />
-                                            <div className="table-responsive RemoveStriped">
+                                            <div className="RemoveStriped removeOddColor">
                                                 <div id="table1" className="compareAndSelect"></div>
                                             </div>
 
