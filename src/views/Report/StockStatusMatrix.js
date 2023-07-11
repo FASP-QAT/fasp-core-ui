@@ -1288,8 +1288,8 @@ export default class StockStatusMatrix extends React.Component {
           this.setState(
             {
               programs: proList.sort(function (a, b) {
-                a = getLabelText(a.label, lang).toLowerCase();
-                b = getLabelText(b.label, lang).toLowerCase();
+                a = a.programCode.toLowerCase();
+                b = b.programCode.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }),
               programId: localStorage.getItem("sesProgramIdReport"),
@@ -1302,8 +1302,8 @@ export default class StockStatusMatrix extends React.Component {
         } else {
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             }),
           });

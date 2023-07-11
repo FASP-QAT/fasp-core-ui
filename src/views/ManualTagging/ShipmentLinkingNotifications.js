@@ -620,7 +620,11 @@ export default class ShipmentLinkingNotifications extends Component {
                 // console.log("proList.length@@@@@@@@@@", proList.length)
                 if (proList.length == 1) {
                     this.setState({
-                        programs: proList,
+                        programs: proList.sort(function (a, b) {
+                            a = a.label.toLowerCase();
+                            b = b.label.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                          }),
                         loading: false,
                         programId: proList[0].value
                     }, () => {
@@ -629,7 +633,11 @@ export default class ShipmentLinkingNotifications extends Component {
                 } else {
                     if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
                         this.setState({
-                            programs: proList,
+                            programs: proList.sort(function (a, b) {
+                                a = a.label.toLowerCase();
+                                b = b.label.toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                              }),
                             loading: false,
                             programId: localStorage.getItem("sesProgramId")
                         }, () => {
@@ -637,7 +645,11 @@ export default class ShipmentLinkingNotifications extends Component {
                         });
                     } else {
                         this.setState({
-                            programs: proList,
+                            programs: proList.sort(function (a, b) {
+                                a = a.label.toLowerCase();
+                                b = b.label.toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                              }),
                             loading: false
                         })
                     }
