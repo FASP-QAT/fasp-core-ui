@@ -37,7 +37,7 @@ import ProgramService from '../../api/ProgramService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, INTEGER_NO_REGEX, API_URL,PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, INTEGER_NO_REGEX, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import TracerCategoryService from "../../api/TracerCategoryService";
@@ -276,7 +276,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     getDatasetList() {
-console.log("getDatasetList----------->");
+        console.log("getDatasetList----------->");
 
         var db1;
         getDatabase();
@@ -368,9 +368,9 @@ console.log("getDatasetList----------->");
     getPrograms() {
         // ProgramService.getProgramList()
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
-                console.log("getProgramBasedOnRealmIdAndProgramTypeId----",response.data)
+                console.log("getProgramBasedOnRealmIdAndProgramTypeId----", response.data)
                 this.setState({
                     programs: response.data,
                     loading: false
@@ -454,7 +454,7 @@ console.log("getDatasetList----------->");
         console.log("Seema---->programId---", programId);
         console.log("Seema---->versionId---", versionId);
         console.log("Seema---->forecastProgramId---", forecastProgramId);
-        
+
 
         if (versionId != 0 && programId > 0 && forecastProgramId > 0) {
 
@@ -1004,61 +1004,61 @@ console.log("getDatasetList----------->");
                 versions: [],
             }, () => {
                 DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
-                .then(response => {
-                  console.log("response===>", response.data)
-                  this.setState({
-                    versions: []
-                  }, () => {
-                    this.setState({
-                        versions: (response.data.filter(function (x, i, a) {
-                            return a.indexOf(x) === i;
-                        })).reverse()
-                    }, () => { });
-                  });
-                }).catch(
-                  error => {
-                    this.setState({
-                      programs: [], loading: false
-                    })
-                    if (error.message === "Network Error") {
-                      this.setState({
-                        // message: 'static.unkownError',
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                      });
-                    } else {
-                      switch (error.response ? error.response.status : "") {
-  
-                        case 401:
-                          this.props.history.push(`/login/static.message.sessionExpired`)
-                          break;
-                        case 403:
-                          this.props.history.push(`/accessDenied`)
-                          break;
-                        case 500:
-                        case 404:
-                        case 406:
-                          this.setState({
-                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                            loading: false
-                          });
-                          break;
-                        case 412:
-                          this.setState({
-                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                            loading: false
-                          });
-                          break;
-                        default:
-                          this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                          });
-                          break;
-                      }
-                    }
-                  }
-                );
+                    .then(response => {
+                        console.log("response===>", response.data)
+                        this.setState({
+                            versions: []
+                        }, () => {
+                            this.setState({
+                                versions: (response.data.filter(function (x, i, a) {
+                                    return a.indexOf(x) === i;
+                                })).reverse()
+                            }, () => { });
+                        });
+                    }).catch(
+                        error => {
+                            this.setState({
+                                programs: [], loading: false
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
             });
         } else {
 
@@ -1072,21 +1072,21 @@ console.log("getDatasetList----------->");
 
     filterForcastUnit = () => {
         let programId = this.state.programId;
-        console.log("programId--->",programId)
+        console.log("programId--->", programId)
         if (programId != 0) {
             const countryId = this.state.programs.filter(c => c.id == programId)[0].realmCountry.id;
-            console.log("programId--->programs---",this.state.programs)
-            console.log("programId--->countryId---",countryId)
-            console.log("programId--->this.state.datasetList---",this.state.datasetList)
-            
+            console.log("programId--->programs---", this.state.programs)
+            console.log("programId--->countryId---", countryId)
+            console.log("programId--->this.state.datasetList---", this.state.datasetList)
+
             this.state.getDatasetFilterList = this.state.datasetList
-            console.log("programId--->this.state.getDatasetFilterList---",this.state.getDatasetFilterList)
-            
+            console.log("programId--->this.state.getDatasetFilterList---", this.state.getDatasetFilterList)
+
             // var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.country.countryId == countryId);
             var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.realmCountryId == countryId);
-            
-            console.log("programId--->datasetlist---",datasetlist)
-            
+
+            console.log("programId--->datasetlist---", datasetlist)
+
             this.setState({
                 data: [],
             }, () => {
@@ -1125,12 +1125,12 @@ console.log("getDatasetList----------->");
         let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
         let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
 
-        let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+        let forecastStopDate = new Date('01-' + selectedForecastProgram.forecastStartDate);
         forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
         this.setState({
             forecastProgramId: event.target.value,
-            rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+            rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date('01-' + selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
             forecastProgramVersionId: forecastProgramVersionId,
             selectedForecastProgram: selectedForecastProgram
         }, () => {
@@ -1396,9 +1396,9 @@ console.log("getDatasetList----------->");
 
                 </div>
 
-                <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
+                <div className="consumptionDataEntryTable">
 
-                    <div style={{width: '100%'}} id="mapPlanningUnit">
+                    <div id="mapPlanningUnit" style={{ display: this.props.items.loading ? "none" : "block", width: '100%' }} >
                     </div>
                     <FormGroup>
                         <Button color="info" size="md" className="float-right mr-1" id="stepOneBtn" type="submit" onClick={() => this.formSubmit()} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
