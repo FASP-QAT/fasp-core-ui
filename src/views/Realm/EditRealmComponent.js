@@ -269,7 +269,7 @@ export default class UpdateDataSourceComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
-                console.log("=====>", response.data);
+                // console.log("=====>", response.data);
                 this.setState({
                     realm: response.data, loading: false
                 });
@@ -372,7 +372,7 @@ export default class UpdateDataSourceComponent extends Component {
                                         loading: true
                                     })
                                     // AuthenticationService.setupAxiosInterceptors();
-                                    console.log("====>+++", this.state.realm);
+                                    // console.log("====>+++", this.state.realm);
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {

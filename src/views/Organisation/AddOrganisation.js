@@ -124,10 +124,10 @@ export default class AddOrganisationComponent extends Component {
 
             if (organisationValue.length >= 4) {//minus 2
                 organisationValue = organisationValue.slice(0, 2);
-                console.log("DISPLAYNAME-BEF----->", organisationValue);
+                // console.log("DISPLAYNAME-BEF----->", organisationValue);
                 OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP----->", response);
+                        // console.log("DISPLAYNAME-RESP----->", response);
                         let { organisation } = this.state
                         organisation.organisationCode = response.data;
                         this.setState({
@@ -177,10 +177,10 @@ export default class AddOrganisationComponent extends Component {
                     );
 
             } else {// not need to minus
-                console.log("DISPLAYNAME-BEF-else----->", organisationValue);
+                // console.log("DISPLAYNAME-BEF-else----->", organisationValue);
                 OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        // console.log("DISPLAYNAME-RESP-else----->", response);
                         let { organisation } = this.state
                         organisation.organisationCode = response.data;
                         this.setState({
@@ -236,8 +236,8 @@ export default class AddOrganisationComponent extends Component {
 
     dataChange(event) {
         let { organisation } = this.state
-        console.log(event.target.name);
-        console.log(event.target.value);
+        // console.log(event.target.name);
+        // console.log(event.target.value);
         if (event.target.name === "organisationName") {
             organisation.label.label_en = event.target.value
         } else if (event.target.name === "organisationCode") {
@@ -251,7 +251,7 @@ export default class AddOrganisationComponent extends Component {
             organisation
         }, (
         ) => {
-            console.log("state after update---", this.state.organisation)
+            // console.log("state after update---", this.state.organisation)
         })
     }
 
@@ -283,13 +283,13 @@ export default class AddOrganisationComponent extends Component {
     }
 
     componentDidMount() {
-        console.log("IN componentDidMount------------------");
+        // console.log("IN componentDidMount------------------");
         // AuthenticationService.setupAxiosInterceptors();
         // CountryService.getCountryListAll()
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getRealmCountryDropdownList(realmId)   
         .then(response => {
-                console.log("***country list---", response.data);
+                // console.log("***country list---", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -343,7 +343,7 @@ export default class AddOrganisationComponent extends Component {
 
         UserService.getRealmList()
             .then(response => {
-                console.log("realm list---", response.data);
+                // console.log("realm list---", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -453,7 +453,7 @@ export default class AddOrganisationComponent extends Component {
         if (this.state.organisation.realm.id != "") {
             OrganisationTypeService.getOrganisationTypeByRealmId(this.state.organisation.realm.id)
                 .then(response => {
-                    console.log("OrganisationType list------>", response.data);
+                    // console.log("OrganisationType list------>", response.data);
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -525,11 +525,11 @@ export default class AddOrganisationComponent extends Component {
     getRealmCountryList(e) {
         // AuthenticationService.setupAxiosInterceptors();
         if (this.state.organisation.realm.id != "") {
-            console.log("Realm Country List this.state.organisation.realm.id",this.state.organisation.realm.id)
+            // console.log("Realm Country List this.state.organisation.realm.id",this.state.organisation.realm.id)
             DropdownService.getRealmCountryDropdownList(this.state.organisation.realm.id)           
             // OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
                 .then(response => {
-                    console.log("Realm Country List list---", response.data);
+                    // console.log("Realm Country List list---", response.data);
                     if (response.status == 200) {
                         // var json = (response.data).filter(c => c.active == true);
                         var json = (response.data);
@@ -671,7 +671,7 @@ export default class AddOrganisationComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                                    console.log("ORGANISATION-------------------->1" + JSON.stringify(this.state.organisation));
+                                    // console.log("ORGANISATION-------------------->1" + JSON.stringify(this.state.organisation));
                                     if (this.state.organisation.organisationCode != '') {
                                         this.setState({
                                             loading: true

@@ -165,7 +165,7 @@ class ScaleUpType extends Component {
 
                     var rowData = elInstance.getRowData(y);
                     var addRowId = rowData[6];
-                    console.log("addRowId------>", addRowId);
+                    // console.log("addRowId------>", addRowId);
                     if (addRowId == 1) {//active grade out
                         var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
@@ -243,7 +243,7 @@ class ScaleUpType extends Component {
         this.hideSecondComponent();
         ModelingTypeService.getModelingTypeList().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data)
+                // console.log("response.data---->", response.data)
 
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -454,7 +454,7 @@ class ScaleUpType extends Component {
         var rowData = elInstance.getRowData(y);
 
         // if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
-        //     // console.log("RESP---------", parseFloat(rowData[2]));
+        // console.log("RESP---------", parseFloat(rowData[2]));
         //     elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
         // }
         this.el.setValueFromCoords(5, y, 1, true);
@@ -498,11 +498,11 @@ class ScaleUpType extends Component {
         if (validation == true) {
             this.setState({ loading: true })
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("5 map---" + map1.get("5"))
+                // console.log("5 map---" + map1.get("5"))
                 if (parseInt(map1.get("5")) === 1) {
                     let json = {
                         modelingTypeId: parseInt(map1.get("0")),
@@ -524,12 +524,12 @@ class ScaleUpType extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             ModelingTypeService.addUpdateModelingType(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         this.setState({
                             message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged: false
@@ -598,7 +598,7 @@ class ScaleUpType extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -652,7 +652,7 @@ class ScaleUpType extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(5, y);
             if (parseInt(value) == 1) {
@@ -660,7 +660,7 @@ class ScaleUpType extends Component {
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");

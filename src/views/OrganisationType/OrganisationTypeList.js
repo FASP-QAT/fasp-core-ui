@@ -251,7 +251,7 @@ export default class OrganisationTypeListComponent extends Component {
 
         OrganisationTypeService.getOrganisationTypeList()
             .then(response => {
-                console.log("response------->", response);
+                // console.log("response------->", response);
                 // this.setState({
                 //     organisationsType: response.data,
                 //     selSource: response.data

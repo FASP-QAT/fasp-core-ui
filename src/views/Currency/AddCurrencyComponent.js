@@ -439,7 +439,7 @@ export default class AddCurrencyComponent extends Component {
 
 
     dataChange(event) {
-        console.log(event.target.name)
+        // console.log(event.target.name)
         if (event.target.name === "currencyCode") {
             this.state.currencyCode = event.target.value.toUpperCase();
         }

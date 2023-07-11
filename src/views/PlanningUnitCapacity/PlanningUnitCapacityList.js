@@ -425,7 +425,7 @@ export default class PlanningUnitCapacityList extends Component {
 
     filterData() {
         let planningUnitId = document.getElementById("planningUnitId").value;
-        console.log("planningUnitId---" + planningUnitId);
+        // console.log("planningUnitId---" + planningUnitId);
         // AuthenticationService.setupAxiosInterceptors();
         if (planningUnitId != 0) {
             const planningUnitCapacityList = this.state.selSource.filter(c => c.planningUnit.id == planningUnitId)
@@ -497,7 +497,7 @@ export default class PlanningUnitCapacityList extends Component {
             }
         );
         PlanningUnitCapacityService.getPlanningUnitCapacityList().then(response => {
-            console.log("response.data---", response.data);
+            // console.log("response.data---", response.data);
             this.setState({
                 planningUnitCapacityList: response.data,
                 selSource: response.data

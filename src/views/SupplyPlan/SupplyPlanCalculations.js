@@ -7,11 +7,11 @@ import { generateRandomAplhaNumericCode, paddingZero } from '../../CommonCompone
 import { convertSuggestedShipmentsIntoPlannedShipments } from '../SupplyPlan/SupplyPlanCalculationsForWhatIf.js';
 
 export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, rebuild, rebuildQPL) {
-    console.log("###Started with calculations of supply plan", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
-    console.log("###ProgramId", programId);
-    console.log("###Planning unit Id", planningUnitId);
-    console.log("###Planning unit list", planningUnitList);
-    console.log("###Planning unit list", minimumDate);
+    // console.log("###Started with calculations of supply plan", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+    // console.log("###ProgramId", programId);
+    // console.log("###Planning unit Id", planningUnitId);
+    // console.log("###Planning unit list", planningUnitList);
+    // console.log("###Planning unit list", minimumDate);
     if (page == 'masterDataSync' && !rebuild) {
         // if (moment(lastSyncDate).format("YYYY-MM-DD") < (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'))) {
         if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
@@ -138,7 +138,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     minDate = undefined;
                                 }
                                 if (minDate == undefined) {
-                                    console.log("Min date is undefined###");
+                                    // console.log("Min date is undefined###");
                                     let invmin = moment.min(inventoryListForMax.map(d => moment(d.inventoryDate)))
                                     let shipmin = moment.min(shipmentListForMax.map(d => moment(d.expectedDeliveryDate)))
                                     let conmin = moment.min(consumptionListForMax.map(d => moment(d.consumptionDate)))
@@ -397,7 +397,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             }
                                         }
                                     }
-                                    console.log("Trans Date+++", startDate)
+                                    // console.log("Trans Date+++", startDate)
 
                                     // Inventory part
                                     // Filtering inventory for planning unit and that particular month
@@ -1044,8 +1044,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
 
                                     var diffBetweenTrueDemandAndConsumption = Number(trueDemandPerMonth) - (consumptionQty !== "" ? Number(consumptionQty) : 0);
-                                    console.log("diffBetweenTrueDemandAndConsumption###", diffBetweenTrueDemandAndConsumption, "STart Month", startDate)
-                                    // Calculations of unmet demand
+                                    // console.log("diffBetweenTrueDemandAndConsumption###", diffBetweenTrueDemandAndConsumption, "STart Month", startDate)
                                     if (closingBalance - diffBetweenTrueDemandAndConsumption < 0) {
                                         unmetDemandQty = 0 - expectedStock + diffBetweenTrueDemandAndConsumption;
                                         closingBalance = 0;
@@ -1138,7 +1137,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             }
                         } catch (err) {
-                            console.log("@@@ in error in calculate", err)
+                            // console.log("@@@ in error in calculate", err)
                             props.fetchData(1, programId)
                         }
                         programDataJson.planningUnitDataList = planningUnitDataList;
@@ -1154,8 +1153,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                             var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
                             var programQPLDetailsRequest1 = programQPLDetailsOs1.put(programQPLDetailsJson);
                             programQPLDetailsRequest1.onsuccess = function (event) {
-                                console.log("### completed calculations", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
-                                console.log("planningUnitDataListMohit", planningUnitDataList)
+                                // console.log("### completed calculations", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+                                // console.log("planningUnitDataListMohit", planningUnitDataList)
                                 if (page == "consumption") {
                                     props.updateState("message", i18n.t('static.message.consumptionSaved'));
                                     props.updateState("color", 'green');
@@ -1239,7 +1238,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     // props.updateState("color", 'green');
                                     // props.updateState("shipmentChangedFlag", 0);
                                     // props.updateState("budgetChangedFlag", 0);
-                                    console.log("props.shipmentPage Mohit", props)
+                                    // console.log("props.shipmentPage Mohit", props)
                                     props.updateState("shipmentsEl", "");
                                     if (props.shipmentPage != "shipmentDataEntry") {
                                         if (props.shipmentPage != undefined) {
@@ -1291,7 +1290,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     props.hideFirstComponent()
                                 }
                                 else if (page == "whatIf") {
-                                    console.log("In WHat If Mohit Pooja", props.state.scenarioId)
+                                    // console.log("In WHat If Mohit Pooja", props.state.scenarioId)
                                     if (props.state.scenarioId != 7) {
                                         props.updateState("programJson", programJsonForStoringTheResult);
                                         props.updateState("planningUnitDataList", planningUnitDataList);
@@ -1333,7 +1332,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     // }
                                 } else if (page == 'erp') {
                                     props.getLocalProgramList(props.state.active3 ? 1 : 0)
-                                    console.log("ProgramJson@@@@@@@@@@@@@@@@", props)
+                                    // console.log("ProgramJson@@@@@@@@@@@@@@@@", props)
                                     props.updateState("message", (props.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')))
                                     props.updateState("color", "green");
                                     // props.updateState("loading",false);
@@ -1348,7 +1347,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                 } else if (page == 'erpDelink') {
                                     props.getLocalProgramList(props.state.active3 ? 1 : 0)
-                                    console.log("ProgramJson@@@@@@@@@@@@@@@@", props)
+                                    // console.log("ProgramJson@@@@@@@@@@@@@@@@", props)
                                     props.updateState("message", (props.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')))
                                     props.updateState("color", "green");
                                     props.updateState("changedDataForTab2", false);

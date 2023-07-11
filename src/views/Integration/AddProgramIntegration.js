@@ -72,7 +72,7 @@ class ProgramIntegration extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         IntegrationService.getProgramIntegrationByProgramId(this.props.match.params.programId).then(response => {
             if (response.status == 200) {
-                console.log("getProgramIntegrationByProgramId---", response.data);
+                // console.log("getProgramIntegrationByProgramId---", response.data);
                 let myResponse = response.data;
                 if (myResponse.length > 0) {
                     this.setState({ rows: myResponse });
@@ -170,7 +170,7 @@ class ProgramIntegration extends Component {
                                                     var papuList = this.state.rows;
                                                     var data = [];
                                                     var papuDataArr = [];
-                                                    console.log("Success-----------", papuList);
+                                                    // console.log("Success-----------", papuList);
                                                     var count = 0;
                                                     if (papuList.length != 0) {
                                                         for (var j = 0; j < papuList.length; j++) {
@@ -776,11 +776,11 @@ class ProgramIntegration extends Component {
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("6 map---" + map1.get("6"))
+                // console.log("6 map---" + map1.get("6"))
                 if (parseInt(map1.get("6")) === 1) {
                     let json = {
                         integration: {
@@ -801,12 +801,12 @@ class ProgramIntegration extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             IntegrationService.addprogramIntegration(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
@@ -861,7 +861,7 @@ class ProgramIntegration extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -878,11 +878,11 @@ class ProgramIntegration extends Component {
     }
 
     blur = function (instance) {
-        console.log('on blur called');
+        // console.log('on blur called');
     }
 
     focus = function (instance) {
-        console.log('on focus called');
+        // console.log('on focus called');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
@@ -948,7 +948,7 @@ class ProgramIntegration extends Component {
     // -----end of changed function
 
     onedit = function (instance, cell, x, y, value) {
-        console.log("------------onedit called")
+        // console.log("------------onedit called")
         this.el.setValueFromCoords(6, y, 1, true);
 
         var elInstance = instance;
@@ -961,10 +961,10 @@ class ProgramIntegration extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var checkDuplicate=json.filter(c=>c[1]==json[y][1] && c[2]==json[y][2] && c[3]==json[y][3] && c[4].toString()==json[y][4].toString());
-            console.log("check duplicate Test@123",checkDuplicate)
+            // console.log("check duplicate Test@123",checkDuplicate)
             if(checkDuplicate.length>1){
                 this.setState({
                     message:'static.programIntegration.duplicateIntegration',
@@ -983,7 +983,7 @@ class ProgramIntegration extends Component {
                 //Integration
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");

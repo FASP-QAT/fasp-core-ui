@@ -93,14 +93,14 @@ class RealmCountryRegion extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         RegionService.getRegionForCountryId(this.props.match.params.realmCountryId).then(response => {
             if (response.status == 200) {
-                console.log(response.data);
+                // console.log(response.data);
                 let myResponse = response.data;
                 if (myResponse.length > 0) {
                     this.setState({ rows: myResponse });
                 }
                 RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
                     if (response.status == 200) {
-                        console.log(JSON.stringify(response.data))
+                        // console.log(JSON.stringify(response.data))
                         this.setState({
                             realmCountry: response.data
                         })
@@ -497,7 +497,7 @@ class RealmCountryRegion extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
-            // console.log("RESP---------", parseFloat(rowData[2]));
+            // // console.log("RESP---------", parseFloat(rowData[2]));
             elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
         }
         this.el.setValueFromCoords(7, y, 1, true);
@@ -541,11 +541,11 @@ class RealmCountryRegion extends Component {
         var validation = this.checkValidation();
         if (validation == true && duplicateValidation == true) {
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("7 map---" + map1.get("7"))
+                // console.log("7 map---" + map1.get("7"))
                 if (parseInt(map1.get("7")) === 1) {
                     let json = {
                         label: {
@@ -565,12 +565,12 @@ class RealmCountryRegion extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             RegionService.editRegionsForcountry(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
@@ -631,7 +631,7 @@ class RealmCountryRegion extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
     checkDuplicateRegion = function () {
@@ -639,13 +639,13 @@ class RealmCountryRegion extends Component {
         let count = 0;
 
         let tempArray = tableJson;
-        console.log('hasDuplicate------', tempArray);
+        // console.log('hasDuplicate------', tempArray);
 
         var hasDuplicate = false;
         tempArray.map(v => v[Object.keys(v)[1]]).sort().sort((a, b) => {
             if (a === b) hasDuplicate = true
         })
-        console.log('hasDuplicate', hasDuplicate);
+        // console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
                 message: i18n.t('static.region.duplicateRegion'),
@@ -739,7 +739,7 @@ class RealmCountryRegion extends Component {
 
         //GLN
         if (x == 3) {
-            console.log("value.length---" + value.length);
+            // console.log("value.length---" + value.length);
             var col = ("D").concat(parseInt(y) + 1);
             var reg = /^[0-9\b]+$/;
             if (this.el.getValueFromCoords(x, y) != "") {
@@ -772,14 +772,14 @@ class RealmCountryRegion extends Component {
     // -----end of changed function
 
     onedit = function (instance, cell, x, y, value) {
-        console.log("------------onedit called")
+        // console.log("------------onedit called")
         this.el.setValueFromCoords(7, y, 1, true);
     }.bind(this);
 
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
             if (parseInt(value) == 1) {
@@ -787,7 +787,7 @@ class RealmCountryRegion extends Component {
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -853,7 +853,7 @@ class RealmCountryRegion extends Component {
                 // var col = ("D").concat(parseInt(y) + 1);
                 // var value = this.el.getValueFromCoords(3, y);
                 // var reg = /^[0-9\b]+$/;
-                // // console.log("---------VAL----------", value);
+                // // // console.log("---------VAL----------", value);
                 // if (value != "" && (isNaN(Number.parseFloat(value)) || value < 0 || value.length != 13)) {
                 //     this.el.setStyle(col, "background-color", "transparent");
                 //     this.el.setStyle(col, "background-color", "yellow");

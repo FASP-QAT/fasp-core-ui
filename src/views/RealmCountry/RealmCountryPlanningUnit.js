@@ -721,11 +721,11 @@ class PlanningUnitCountry extends Component {
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson();
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("9 map---" + map1.get("9"))
+                // console.log("9 map---" + map1.get("9"))
                 if (parseInt(map1.get("9")) === 1) {
                     let json = {
                         planningUnit: {
@@ -749,12 +749,12 @@ class PlanningUnitCountry extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             RealmCountryService.editPlanningUnitCountry(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
@@ -808,7 +808,7 @@ class PlanningUnitCountry extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
     checkDuplicatePlanningUnit = function () {
@@ -816,13 +816,13 @@ class PlanningUnitCountry extends Component {
         let count = 0;
 
         let tempArray = tableJson;
-        console.log('hasDuplicate------', tempArray);
+        // console.log('hasDuplicate------', tempArray);
 
         var hasDuplicate = false;
         tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {
             if (a === b) hasDuplicate = true
         })
-        console.log('hasDuplicate', hasDuplicate);
+        // console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
                 message: i18n.t('static.country.duplicatePlanningUnit'),
@@ -852,11 +852,11 @@ class PlanningUnitCountry extends Component {
     }
 
     blur = function (instance) {
-        console.log('on blur called');
+        // console.log('on blur called');
     }
 
     focus = function (instance) {
-        console.log('on focus called');
+        // console.log('on focus called');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
@@ -894,18 +894,18 @@ class PlanningUnitCountry extends Component {
 
         //Sku code
         if (x == 3) {
-            console.log("-----------------3--------------------");
+            // console.log("-----------------3--------------------");
             var col = ("D").concat(parseInt(y) + 1);
             // var value = this.el.getValueFromCoords(3, y);
             // var reg = /^[a-zA-Z0-9\b]+$/;
             if (value == "") {
-                console.log("-----------------blank--------------------");
+                // console.log("-----------------blank--------------------");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
             else {
-                console.log("-----------------3--------------------");
+                // console.log("-----------------3--------------------");
                 // if (!(reg.test(value))) {
                 //     this.el.setStyle(col, "background-color", "transparent");
                 //     this.el.setStyle(col, "background-color", "yellow");
@@ -978,14 +978,14 @@ class PlanningUnitCountry extends Component {
     // -----end of changed function
 
     onedit = function (instance, cell, x, y, value) {
-        console.log("------------onedit called")
+        // console.log("------------onedit called")
         this.el.setValueFromCoords(9, y, 1, true);
     }.bind(this);
 
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson();
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(9, y);
             if (parseInt(value) == 1) {
@@ -993,7 +993,7 @@ class PlanningUnitCountry extends Component {
                 //Planning Unit
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1055,7 +1055,7 @@ class PlanningUnitCountry extends Component {
                 // var value = this.el.getValueFromCoords(5, y);
                 // // var reg = /^[0-9\b]+$/;
                 // var reg = /^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/;
-                // // console.log("---------VAL----------", value);
+                // // // console.log("---------VAL----------", value);
                 // if (value == "" || isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                 //     this.el.setStyle(col, "background-color", "transparent");
                 //     this.el.setStyle(col, "background-color", "yellow");

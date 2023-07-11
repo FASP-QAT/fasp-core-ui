@@ -190,7 +190,7 @@ export default class StockStatusMatrix extends React.Component {
                     proList.push(myResult[i].planningUnit);
                   }
                 }
-                console.log("proList", proList);
+                // console.log("proList", proList);
                 this.setState({ programPlanningUnitList: myResult });
                 var planningunitTransaction1 = db1.transaction(
                   ["planningUnit"],
@@ -207,18 +207,18 @@ export default class StockStatusMatrix extends React.Component {
                   var myResult = [];
                   myResult = planningunitRequest1.result;
                   var flList = [];
-                  console.log(myResult);
+                  // console.log(myResult);
                   for (var i = 0; i < myResult.length; i++) {
                     for (var j = 0; j < proList.length; j++) {
                       if (myResult[i].planningUnitId == proList[j].id) {
-                        console.log(myResult[i].planningUnitId, proList[j].id);
+                        // console.log(myResult[i].planningUnitId, proList[j].id);
 
                         flList.push(myResult[i].forecastingUnit);
                         planningList.push(myResult[i]);
                       }
                     }
                   }
-                  console.log("flList", flList);
+                  // console.log("flList", flList);
 
                   var tcList = [];
                   flList.filter(function (item) {
@@ -234,7 +234,7 @@ export default class StockStatusMatrix extends React.Component {
                     return null;
                   });
 
-                  console.log("tcList", tcList);
+                  // console.log("tcList", tcList);
                   var lang = this.state.lang;
                   this.setState(
                     {
@@ -362,7 +362,7 @@ export default class StockStatusMatrix extends React.Component {
         endYear: value[1].format("YYYY"),
       },
       () => {
-        console.log(this.state.startYear, " ", this.state.endYear);
+        // console.log(this.state.startYear, " ", this.state.endYear);
         this.filterData();
       }
     );
@@ -400,7 +400,7 @@ export default class StockStatusMatrix extends React.Component {
   };
 
   handleProductCategoryChange = (planningUnitIds) => {
-    console.log("###########################");
+    // console.log("###########################");
     this.setState(
       {
         planningUnitValues: planningUnitIds.map((ele) => ele.value),
@@ -413,11 +413,11 @@ export default class StockStatusMatrix extends React.Component {
   };
   filterDataAsperstatus = () => {
     let stockStatusId = document.getElementById("stockStatusId").value;
-    console.log(stockStatusId);
+    // console.log(stockStatusId);
     var filteredData = [];
     if (stockStatusId != -1) {
       this.state.selData.map((ele) => {
-        console.log(ele);
+        // console.log(ele);
         var min = ele.minMonthsOfStock;
         var reorderFrequency = ele.reorderFrequency;
         if (stockStatusId == 0) {
@@ -435,7 +435,7 @@ export default class StockStatusMatrix extends React.Component {
             (ele.nov != null && this.roundN(ele.nov) == 0) ||
             (ele.dec != null && this.roundN(ele.dec) == 0)
           ) {
-            console.log("in 0");
+            // console.log("in 0");
             filteredData.push(ele);
           }
         } else if (stockStatusId == 1) {
@@ -477,7 +477,7 @@ export default class StockStatusMatrix extends React.Component {
               this.roundN(ele.dec) != 0 &&
               this.roundN(ele.dec) < min)
           ) {
-            console.log("in 1");
+            // console.log("in 1");
             filteredData.push(ele);
           }
         } else if (stockStatusId == 3) {
@@ -495,7 +495,7 @@ export default class StockStatusMatrix extends React.Component {
             this.roundN(ele.nov) > min + reorderFrequency ||
             this.roundN(ele.dec) > min + reorderFrequency
           ) {
-            console.log("in 2");
+            // console.log("in 2");
             filteredData.push(ele);
           }
         } else if (stockStatusId == 2) {
@@ -525,7 +525,7 @@ export default class StockStatusMatrix extends React.Component {
             (this.roundN(ele.dec) < min + reorderFrequency &&
               this.roundN(ele.dec) > min)
           ) {
-            console.log("in 3");
+            // console.log("in 3");
             filteredData.push(ele);
           }
         } else if (stockStatusId == 4) {
@@ -550,13 +550,13 @@ export default class StockStatusMatrix extends React.Component {
     } else {
       filteredData = this.state.selData;
     }
-    console.log(filteredData);
+    // console.log(filteredData);
     this.setState({
       data: filteredData,
     });
   };
   filterData() {
-    //console.log('In filter data---' + this.state.rangeValue.from.year)
+    //// console.log('In filter data---' + this.state.rangeValue.from.year)
     let startDate = this.state.startYear + "-01-01";
     let endDate =
       this.state.endYear +
@@ -567,7 +567,7 @@ export default class StockStatusMatrix extends React.Component {
     let planningUnitIds = this.state.planningUnitValues.map((ele) =>
       ele.value.toString()
     ); //this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-    console.log("planningUnitIds------>", planningUnitIds);
+    // console.log("planningUnitIds------>", planningUnitIds);
     let versionId = document.getElementById("versionId").value;
     let tracercategory =
       this.state.tracerCategoryValues.length ==
@@ -618,8 +618,8 @@ export default class StockStatusMatrix extends React.Component {
           planningunitRequest.onsuccess = function (e) {
             var myResult1 = [];
             myResult1 = e.target.result;
-            console.log("RESP------>0", planningUnitIds);
-            console.log("RESP------>1", myResult1);
+            // console.log("RESP------>0", planningUnitIds);
+            // console.log("RESP------>1", myResult1);
             var plunit1 = [];
             planningUnitIds.map((planningUnitId) => {
               plunit = [
@@ -627,7 +627,7 @@ export default class StockStatusMatrix extends React.Component {
                 ...myResult1.filter((c) => c.planningUnitId == planningUnitId),
               ];
             });
-            console.log("RESP------>2", plunit);
+            // console.log("RESP------>2", plunit);
           }.bind(this);
           var transaction = db1.transaction(["programData"], "readwrite");
           var programTransaction = transaction.objectStore("programData");
@@ -698,15 +698,15 @@ export default class StockStatusMatrix extends React.Component {
                     String(month).padStart(2, "0") +
                     "-" +
                     new Date(from, month, 0).getDate();
-                  console.log(dtstr, " ", enddtStr);
+                  // console.log(dtstr, " ", enddtStr);
                   var dt = dtstr;
                   var list = programJson.supplyPlan.filter(
                     (c) =>
                       c.planningUnitId == planningUnitId && c.transDate == dt
                   );
-                  console.log(list);
+                  // console.log(list);
                   if (list.length > 0) {
-                    console.log(includePlannedShipments);
+                    // console.log(includePlannedShipments);
                     if (includePlannedShipments.toString() == "true") {
                       monthlydata.push(
                         pu.planBasedOn == 1 ? list[0].mos : list[0].maxStock
@@ -727,10 +727,10 @@ export default class StockStatusMatrix extends React.Component {
                     monthlydata1.push(null);
                   }
                 }
-                console.log(monthlydata);
-                console.log("Planning Unit Mohit", pu.planningUnit);
-                console.log("monthlydataTotal Mohit", monthlydataTotal);
-                console.log("totalMonths Mohit", totalMonths);
+                // console.log(monthlydata);
+                // console.log("Planning Unit Mohit", pu.planningUnit);
+                // console.log("monthlydataTotal Mohit", monthlydataTotal);
+                // console.log("totalMonths Mohit", totalMonths);
 
                 var json = {
                   tracerCategoryId: this.state.planningUnitList.filter(
@@ -777,10 +777,10 @@ export default class StockStatusMatrix extends React.Component {
                 data.push(json);
               }
             });
-            console.log("RESP------>3", data);
+            // console.log("RESP------>3", data);
 
             let tracerCategoryValues = this.state.tracerCategoryValues;
-            console.log("RESP------>31", tracerCategoryValues);
+            // console.log("RESP------>31", tracerCategoryValues);
             for (let i = 0; i < data.length; i++) {
               for (let j = 0; j < tracerCategoryValues.length; j++) {
                 if (tracerCategoryValues[j].value == data[i].tracerCategoryId) {
@@ -797,7 +797,7 @@ export default class StockStatusMatrix extends React.Component {
               },
               () => {
                 this.filterDataAsperstatus();
-                console.log("RESP------>4", this.state.selData);
+                // console.log("RESP------>4", this.state.selData);
               }
             );
           }.bind(this);
@@ -818,7 +818,7 @@ export default class StockStatusMatrix extends React.Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProductService.getStockStatusMatrixData(inputjson)
           .then((response) => {
-            console.log("data---", response.data);
+            // console.log("data---", response.data);
 
             this.setState(
               {
@@ -1011,7 +1011,7 @@ export default class StockStatusMatrix extends React.Component {
                 );
               }
 
-              console.log(productCategories);
+              // console.log(productCategories);
               this.setState(
                 {
                   productCategories: productCategories.reduce(
@@ -1025,7 +1025,7 @@ export default class StockStatusMatrix extends React.Component {
                   ),
                 },
                 () => {
-                  console.log(this.state.productCategories);
+                  // console.log(this.state.productCategories);
                 }
               );
             }.bind(this);
@@ -1036,7 +1036,7 @@ export default class StockStatusMatrix extends React.Component {
           let programId = document.getElementById("programId").value;
           ProductService.getProductCategoryListByProgram(realmId, programId)
             .then((response) => {
-              console.log("***" + JSON.stringify(response.data));
+              // console.log("***" + JSON.stringify(response.data));
               this.setState({
                 productCategories: response.data,
               });
@@ -1265,13 +1265,13 @@ export default class StockStatusMatrix extends React.Component {
               SECRET_KEY
             );
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-            console.log(programNameLabel);
+            // console.log(programNameLabel);
 
             var f = 0;
             for (var k = 0; k < this.state.programs.length; k++) {
               if (this.state.programs[k].programId == programData.programId) {
                 f = 1;
-                console.log("already exist");
+                // console.log("already exist");
               }
             }
             if (f == 0) {
@@ -1288,8 +1288,8 @@ export default class StockStatusMatrix extends React.Component {
           this.setState(
             {
               programs: proList.sort(function (a, b) {
-                a = getLabelText(a.label, lang).toLowerCase();
-                b = getLabelText(b.label, lang).toLowerCase();
+                a = a.programCode.toLowerCase();
+                b = b.programCode.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }),
               programId: localStorage.getItem("sesProgramIdReport"),
@@ -1302,8 +1302,8 @@ export default class StockStatusMatrix extends React.Component {
         } else {
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             }),
           });
@@ -1320,7 +1320,7 @@ export default class StockStatusMatrix extends React.Component {
       const program = this.state.programs.filter(
         (c) => c.programId == programId
       );
-      console.log(program);
+      // console.log(program);
       if (program.length == 1) {
         if (isSiteOnline()) {
           this.setState(
@@ -1333,7 +1333,7 @@ export default class StockStatusMatrix extends React.Component {
                 programId
               )
                 .then((response) => {
-                  console.log("response===>", response.data);
+                  // console.log("response===>", response.data);
                   this.setState(
                     {
                       versions: [],
@@ -1472,7 +1472,7 @@ export default class StockStatusMatrix extends React.Component {
           }
         }
 
-        console.log(verList);
+        // console.log(verList);
         let versionList = verList.filter(function (x, i, a) {
           return a.indexOf(x) === i;
         });
@@ -1594,7 +1594,7 @@ export default class StockStatusMatrix extends React.Component {
                     .getElementById("programId")
                     .value.split("_")[0];
                   var proList = [];
-                  console.log(myResult);
+                  // console.log(myResult);
                   let incrmental = 0;
                   for (var i = 0; i < myResult.length; i++) {
                     if (
@@ -1611,7 +1611,7 @@ export default class StockStatusMatrix extends React.Component {
 
                       proList[incrmental] = tempPUObj;
                       incrmental = incrmental + 1;
-                      // console.log("Log-------->", tempTCId);
+                      // // console.log("Log-------->", tempTCId);
                     }
                   }
 
@@ -1620,15 +1620,15 @@ export default class StockStatusMatrix extends React.Component {
                       return { tracerCategoryId: item.value };
                     }, this);
 
-                  // console.log("Log--------> ******** ", tracerCategoryValues);
-                  console.log("Log--------> ******** 00", proList);
-                  console.log("Log--------> ******** -00", proList.length);
+                  // // console.log("Log--------> ******** ", tracerCategoryValues);
+                  // console.log("Log--------> ******** 00", proList);
+                  // console.log("Log--------> ******** -00", proList.length);
 
                   let data1 = [];
                   for (let i = 0; i < proList.length; i++) {
                     for (let j = 0; j < tracerCategoryValues.length; j++) {
-                      console.log("Log--------> ******** 11", proList[i]);
-                      console.log("Log--------> ******** 22", i);
+                      // console.log("Log--------> ******** 11", proList[i]);
+                      // console.log("Log--------> ******** 22", i);
                       if (
                         tracerCategoryValues[j].tracerCategoryId ==
                         proList[i].tracerCategoryId
@@ -1685,7 +1685,7 @@ export default class StockStatusMatrix extends React.Component {
               };
               DropdownService.getProgramPlanningUnitDropdownList(json)
                 .then((response) => {
-                  console.log("**" + JSON.stringify(response.data));
+                  // console.log("**" + JSON.stringify(response.data));
                   var listArray = response.data;
 
                   for (var i = 0; i < listArray.length; i++) {
@@ -2121,12 +2121,12 @@ export default class StockStatusMatrix extends React.Component {
       )
     );
     for (var i = 0; i < A.length; i++) {
-      console.log(A[i]);
+      // console.log(A[i]);
       csvRow.push(A[i].join(","));
     }
 
     var csvString = csvRow.join("%0A");
-    console.log("csvString" + csvString);
+    // console.log("csvString" + csvString);
     var a = document.createElement("a");
     a.href = "data:attachment/csv," + csvString;
     a.target = "_Blank";
@@ -2742,7 +2742,7 @@ export default class StockStatusMatrix extends React.Component {
     }
   };
   cellStyle = (planBasedOn, min, reorderFrequency, value, valueStock) => {
-    console.log(value);
+    // console.log(value);
     var actualValue = planBasedOn == 1 ? value : valueStock;
     var maxValue = planBasedOn == 1 ? min + reorderFrequency : value;
     if (actualValue != null) {
@@ -2790,14 +2790,14 @@ export default class StockStatusMatrix extends React.Component {
       productCategories
         .filter((c) => c.payload.active == true)
         .map((item, i) => {
-          console.log(item);
+          // console.log(item);
 
           return {
             label: getLabelText(item.payload.label, this.state.lang),
             value: item.payload.productCategoryId,
           };
         }, this);
-    console.log(productCategoryListcheck);
+    // console.log(productCategoryListcheck);
     const pickerLang = {
       months: [
         i18n.t("static.month.jan"),

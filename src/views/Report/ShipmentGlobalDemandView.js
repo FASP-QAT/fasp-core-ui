@@ -394,7 +394,7 @@ class ShipmentGlobalDemandView extends Component {
             tableHeadTemp.push(i18n.t('static.report.qatPID').replaceAll(' ', '%20'));
             tableHeadTemp.push(i18n.t('static.dashboard.product').replaceAll(' ', '%20'));
             for (var i = 0; i < tableHead.length; i++) {
-                console.log(tableHead[i])
+                // console.log(tableHead[i])
                 tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
             }
             tableHeadTemp.push(i18n.t('static.report.totalUnit').replaceAll(' ', '%20'));
@@ -403,7 +403,7 @@ class ShipmentGlobalDemandView extends Component {
             re = this.state.procurementAgentSplit;
             for (var item = 0; item < re.length; item++) {
                 let item1 = Object.values(re[item].procurementAgentQty);
-                console.log(item1)
+                // console.log(item1)
                 A.push([this.addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ...item1, re[item].total])])
             }
             for (var i = 0; i < A.length; i++) {
@@ -529,7 +529,7 @@ class ShipmentGlobalDemandView extends Component {
         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         //     doc.text(doc.internal.pageSize.width / 8, 150, planningText)
         let y = isSiteOnline() ? len : 150
-        console.log(doc.internal.pageSize.height)
+        // console.log(doc.internal.pageSize.height)
         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3), fundingSourceText)
         for (var i = 0; i < fundingSourceText.length; i++) {
@@ -540,7 +540,7 @@ class ShipmentGlobalDemandView extends Component {
             };
             doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
             y = y + 10
-            console.log(y)
+            // console.log(y)
         }
         var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         //     doc.text(doc.internal.pageSize.width / 8, 150+(this.state.planningUnitLabels.length*3)+(this.state.fundingSourceLabels.lenght*2), statusText)
@@ -554,7 +554,7 @@ class ShipmentGlobalDemandView extends Component {
             }
             doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
             y = y + 10;
-            console.log(y)
+            // console.log(y)
         }
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
@@ -565,7 +565,7 @@ class ShipmentGlobalDemandView extends Component {
             }
             doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
             y = y + 10;
-            console.log(y)
+            // console.log(y)
         }
         doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
             align: 'left'
@@ -582,7 +582,7 @@ class ShipmentGlobalDemandView extends Component {
         var h1 = 50;
         var aspectwidth1 = (width - h1);
         let startY = y + 10//150 + (this.state.planningUnitLabels.length * 3) + (this.state.fundingSourceLabels.length * 3) + (this.state.shipmentStatusLabels.length * 3)
-        console.log('startY', startY)
+        // console.log('startY', startY)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
             doc.addPage()
@@ -592,7 +592,7 @@ class ShipmentGlobalDemandView extends Component {
             doc.addPage()
             startYtable = 80
         }
-        console.log(startYtable)
+        // console.log(startYtable)
         doc.addImage(canvasImg, 'png', 10, startYtable, 500, 280, 'a', 'CANVAS');
 
         //creates image2
@@ -686,7 +686,7 @@ class ShipmentGlobalDemandView extends Component {
                 ReportService.shipmentOverview(inputjson)
                     .then(response => {
                         try {
-                            console.log("RESP----->", response.data);
+                            // console.log("RESP----->", response.data);
                             var table1Headers = [];
                             table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
                             // table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
@@ -702,7 +702,7 @@ class ShipmentGlobalDemandView extends Component {
 
                             })
                         } catch (error) {
-                            console.log("ERROR---->", error);
+                            // console.log("ERROR---->", error);
                             this.setState({ loading: false })
                         }
 
@@ -817,11 +817,11 @@ class ShipmentGlobalDemandView extends Component {
 
             let fundingSourceIds = this.state.fundingSourceValues.map(ele => (ele.value).toString());
             let shipmentStatusIds = this.state.shipmentStatusValues.map(ele => (ele.value).toString());
-            console.log("shipmentStatusIds---->", shipmentStatusIds);
-            console.log("planningUnitIds---->", planningUnitIds);
-            console.log("fundingSourceIds---->", fundingSourceIds);
-            console.log("version---->", versionId);
-            console.log("program---->", programId);
+            // console.log("shipmentStatusIds---->", shipmentStatusIds);
+            // console.log("planningUnitIds---->", planningUnitIds);
+            // console.log("fundingSourceIds---->", fundingSourceIds);
+            // console.log("version---->", versionId);
+            // console.log("program---->", programId);
 
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 var db1;
@@ -843,7 +843,7 @@ class ShipmentGlobalDemandView extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    // console.log("1----", program)
+                    // // console.log("1----", program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -853,12 +853,12 @@ class ShipmentGlobalDemandView extends Component {
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
                         this.setState({ loading: true })
-                        // console.log("2----", programRequest)
+                        // // console.log("2----", programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var shipmentList = (programJson.shipmentList);
-                        console.log("shipmentList Original------>", shipmentList);
+                        // console.log("shipmentList Original------>", shipmentList);
                         const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
 
                         // let dateFilter = activeFilter.filter(c => moment(c.deliveredDate).isBetween(startDate, endDate, null, '[)'))
@@ -915,14 +915,14 @@ class ShipmentGlobalDemandView extends Component {
                                 procurementAgentList[k] = procurementAgentObj
                             }
 
-                            console.log("procurementAgentList------>", procurementAgentList);
+                            // console.log("procurementAgentList------>", procurementAgentList);
 
 
                             let data = [];
                             let procurementAgentSplit = [];
 
-                            console.log("shipmentStatusFilter--->", shipmentStatusFilter);
-                            console.log("planningUnitIds--->", planningUnitIds);
+                            // console.log("shipmentStatusFilter--->", shipmentStatusFilter);
+                            // console.log("planningUnitIds--->", planningUnitIds);
                             //Table-1
                             for (let i = 0; i < planningUnitIds.length; i++) {
                                 let obj = {};
@@ -1025,7 +1025,7 @@ class ShipmentGlobalDemandView extends Component {
                                     a[fundingSource.id].amount += amount;
                                 return a;
                             }, {}));
-                            console.log("procurementAgentSplit->", procurementAgentSplit);
+                            // console.log("procurementAgentSplit->", procurementAgentSplit);
                             var table1Headers = [];
                             table1Headers = (procurementAgentSplit.length == 0) ? [] : Object.keys(procurementAgentSplit[0].procurementAgentQty);
                             // table1Headers.unshift(i18n.t('static.planningunit.planningunit'));
@@ -1033,7 +1033,7 @@ class ShipmentGlobalDemandView extends Component {
 
 
 
-                            // console.log("data----->", data);
+                            // // console.log("data----->", data);
                             this.setState({
                                 data: [],
                                 message: '',
@@ -1044,10 +1044,10 @@ class ShipmentGlobalDemandView extends Component {
                                 loading: false
                             }, () => {
 
-                                console.log("procurementAgentSplit----->", this.state.procurementAgentSplit);
-                                console.log("fundingSourceSplit----->", this.state.fundingSourceSplit);
-                                console.log("planningUnitSplit----->", this.state.planningUnitSplit);
-                                console.log("table1Headers----->", this.state.table1Headers);
+                                // console.log("procurementAgentSplit----->", this.state.procurementAgentSplit);
+                                // console.log("fundingSourceSplit----->", this.state.fundingSourceSplit);
+                                // console.log("planningUnitSplit----->", this.state.planningUnitSplit);
+                                // console.log("table1Headers----->", this.state.table1Headers);
                             })
                         }.bind(this);
                     }.bind(this);
@@ -1197,7 +1197,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     handleChange = (countrysId) => {
-        console.log('==>', countrysId)
+        // console.log('==>', countrysId)
         countrysId = countrysId.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
@@ -1211,7 +1211,7 @@ class ShipmentGlobalDemandView extends Component {
     }
     filterProgram = () => {
         let countryIds = this.state.countryValues.map(ele => ele.value);
-        console.log('countryIds', countryIds, 'programs', this.state.programs)
+        // console.log('countryIds', countryIds, 'programs', this.state.programs)
         this.setState({
             programLst: [],
             programValues: [],
@@ -1226,7 +1226,7 @@ class ShipmentGlobalDemandView extends Component {
                     programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
                 }
 
-                console.log('programLst', programLst)
+                // console.log('programLst', programLst)
                 if (programLst.length > 0) {
 
                     this.setState({
@@ -1336,7 +1336,7 @@ class ShipmentGlobalDemandView extends Component {
         //                     break;
         //                 default:
         //                     this.setState({ message: 'static.unkownError', loading: false });
-        //                     console.log("Error code unkown");
+        //                     // console.log("Error code unkown");
         //                     break;
         //             }
         //         }
@@ -1441,7 +1441,7 @@ class ShipmentGlobalDemandView extends Component {
                 }.bind(this);
                 sStatusRequest.onsuccess = function (event) {
                     sStatusResult = sStatusRequest.result;
-                    console.log("shipment status list offline--->", sStatusResult);
+                    // console.log("shipment status list offline--->", sStatusResult);
                     this.setState({ shipmentStatuses: sStatusResult });
                 }.bind(this)
 
@@ -1454,7 +1454,7 @@ class ShipmentGlobalDemandView extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
-                    // console.log(JSON.stringify(response.data))
+                    // // console.log(JSON.stringify(response.data))
                     this.setState({
                         fundingSources: response.data, loading: false
                     }, () => { this.consolidatedFundingSourceList() })
@@ -1527,7 +1527,7 @@ class ShipmentGlobalDemandView extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedFundingSourceList()
         }
 
@@ -1561,7 +1561,7 @@ class ShipmentGlobalDemandView extends Component {
                     for (var k = 0; k < this.state.fundingSources.length; k++) {
                         if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
                             f = 1;
-                            console.log('already exist')
+                            // console.log('already exist')
                         }
                     }
                     var programData = myResult[i];
@@ -1597,11 +1597,11 @@ class ShipmentGlobalDemandView extends Component {
     
             DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN,newCountryList)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    // console.log(JSON.stringify(response.data))
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -1653,7 +1653,7 @@ class ShipmentGlobalDemandView extends Component {
                 );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
         }
     }
@@ -1686,15 +1686,15 @@ class ShipmentGlobalDemandView extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        // console.log(programNameLabel)
+                        // // console.log(programNameLabel)
 
                         proList.push(programData)
 
                     }
                 }
                 proList.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = a.programCode.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.programCode.toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -1709,7 +1709,7 @@ class ShipmentGlobalDemandView extends Component {
         if (programId != 0) {
 
             const program = this.state.programLst.filter(c => c.id == programId)
-            // console.log(program)
+            // // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     this.setState({
@@ -1778,7 +1778,7 @@ class ShipmentGlobalDemandView extends Component {
                     }
                 }
 
-                // console.log(verList)
+                // // console.log(verList)
                 this.setState({
                     versions: verList.filter(function (x, i, a) {
                         return a.indexOf(x) === i;
@@ -1794,7 +1794,7 @@ class ShipmentGlobalDemandView extends Component {
         let realmId = AuthenticationService.getRealmId()//document.getElementById("realmId").value;
         ProductService.getProductCategoryList(realmId)
             .then(response => {
-                // console.log(response.data)
+                // // console.log(response.data)
                 var list = response.data.slice(1);
                 // var list = response.data;
                 this.setState({
@@ -1898,7 +1898,7 @@ class ShipmentGlobalDemandView extends Component {
                         myResult = planningunitRequest.result;
                         var programId = (document.getElementById("programId").value).split("_")[0];
                         var proList = []
-                        // console.log(myResult)
+                        // // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -1921,7 +1921,7 @@ class ShipmentGlobalDemandView extends Component {
                 // var lang = this.state.lang
                 // if (productCategoryId != -1) {
                 //     PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
-                //         // console.log("PLANNING-UNIT--->", response.data);
+                //         // // console.log("PLANNING-UNIT--->", response.data);
                 //         (response.data).sort(function (a, b) {
                 //             return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang)); //using String.prototype.localCompare()
                 //         });
@@ -1977,7 +1977,7 @@ class ShipmentGlobalDemandView extends Component {
 
 
                 let programValues = this.state.programValues.map(c=>c.value);
-                console.log("programValues----->", programValues);
+                // console.log("programValues----->", programValues);
                 this.setState({
                     planningUnits: [],
                     planningUnitValues: [],
@@ -1988,7 +1988,7 @@ class ShipmentGlobalDemandView extends Component {
                             tracerCategoryIds: [],
                             programIds: programValues
                         }
-                        console.log('*$$$*' + programJson);
+                        // console.log('*$$$*' + programJson);
     
                         DropdownService.getProgramPlanningUnitDropdownList(programJson)
         .then(response => {
@@ -2059,7 +2059,7 @@ class ShipmentGlobalDemandView extends Component {
     }
 
     handlePlanningUnitChange = (planningUnitIds) => {
-        console.log(planningUnitIds)
+        // console.log(planningUnitIds)
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
@@ -2116,7 +2116,7 @@ class ShipmentGlobalDemandView extends Component {
             fundingSourceValues: fundingSourceIds.map(ele => ele),
             fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
         }, () => {
-            console.log("***************", this.state);
+            // console.log("***************", this.state);
             this.fetchData();
         })
     }
@@ -2167,7 +2167,7 @@ class ShipmentGlobalDemandView extends Component {
             }, this);
         const { countrys } = this.state;
         let countryList = countrys.length > 0 && countrys.map((item, i) => {
-            // console.log(JSON.stringify(item))
+            // // console.log(JSON.stringify(item))
             return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
 

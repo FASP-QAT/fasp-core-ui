@@ -783,13 +783,13 @@ export default class ProgramTicketComponent extends Component {
         var country = items.realmCountryId;
         var technicalArea = items.healthAreaId;
         var organisation = items.organisationId;
-        console.log(country, "===", technicalArea, "===", organisation)
+        // console.log(country, "===", technicalArea, "===", organisation)
         if ((country != "" && country != undefined) && (technicalArea != "" && technicalArea != undefined) && (organisation != "" && organisation != undefined)) {
             var countryCode = this.state.realmCountryList.filter(c => c.realmCountryId == country)[0].country.countryCode;
             var technicalAreaCode = this.state.healthAreaList.filter(c => c.healthAreaId == technicalArea)[0].healthAreaCode;
             var organisationCode = this.state.organisationList.filter(c => c.organisationId == organisation)[0].organisationCode;
             var programDisplayCode = countryCode + "-" + technicalAreaCode + "-" + organisationCode;
-            console.log("programDisplayCode", programDisplayCode);
+            // console.log("programDisplayCode", programDisplayCode);
 
             let { program } = this.state;
             program.programCode = programDisplayCode;
@@ -892,7 +892,7 @@ export default class ProgramTicketComponent extends Component {
                             this.state.program.summary = summaryText_2;
                             this.state.program.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.program).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

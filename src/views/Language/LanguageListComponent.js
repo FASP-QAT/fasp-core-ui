@@ -347,7 +347,7 @@ export default class LanguageListComponent extends Component {
         this.hideFirstComponent();
         LanguageService.getLanguageList()
             .then(response => {
-                console.log("response.data---->", response.data)
+                // console.log("response.data---->", response.data)
                 if (response.status == 200) {
                     this.setState({
                         langaugeList: response.data, selSource: response.data

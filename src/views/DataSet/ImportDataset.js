@@ -136,7 +136,7 @@ export default class ImportDataset extends Component {
                         proList.push(programJson)
                     }
                 }
-                console.log("T***proList import program---", proList)
+                // console.log("T***proList import program---", proList)
                 // this.setState({
                 //     programs: proList
                 // })
@@ -150,12 +150,12 @@ export default class ImportDataset extends Component {
 
     }
     checkNewerVersions(programs) {
-        console.log("T***going to call check newer versions import program---", programs)
+        // console.log("T***going to call check newer versions import program---", programs)
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors()
             ProgramService.checkNewerVersions(programs)
                 .then(response => {
-                    console.log("T***import program response.data---", response.data);
+                    // console.log("T***import program response.data---", response.data);
                     localStorage.removeItem("sesLatestDataset");
                     localStorage.setItem("sesLatestDataset", response.data);
                 })
@@ -176,7 +176,7 @@ export default class ImportDataset extends Component {
         this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             var selectedPrgArr = this.state.programId;
-            console.log("@@@selectedPrgArr", selectedPrgArr)
+            // console.log("@@@selectedPrgArr", selectedPrgArr)
             if (selectedPrgArr == undefined || selectedPrgArr.length == 0) {
                 this.setState({ loading: false })
                 alert(i18n.t('static.budget.programtext'));
@@ -186,7 +186,7 @@ export default class ImportDataset extends Component {
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
-                    console.log("in success");
+                    // console.log("in success");
                     db1 = e.target.result;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var program = transaction.objectStore('datasetData');
@@ -200,23 +200,23 @@ export default class ImportDataset extends Component {
                         var myResult = [];
                         myResult = getRequest.result;
                         var programDataJson = this.state.programListArray;
-                        console.log("program data json", programDataJson)
+                        // console.log("program data json", programDataJson)
                         for (var i = 0; i < myResult.length; i++) {
                             for (var j = 0; j < programDataJson.length; j++) {
                                 for (var k = 0; k < selectedPrgArr.length; k++) {
-                                    console.log("1", programDataJson[j].filename);
+                                    // console.log("1", programDataJson[j].filename);
                                     if (programDataJson[j].filename == selectedPrgArr[k].value) {
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                        console.log("Id", myResult[i].id)
-                                        console.log("Id from list", programDataJson[j].programId + "_v" + programDataJson[j].version + "_uId_" + userId)
+                                        // console.log("Id", myResult[i].id)
+                                        // console.log("Id from list", programDataJson[j].programId + "_v" + programDataJson[j].version + "_uId_" + userId)
                                         if (myResult[i].id == programDataJson[j].programId + "_v" + programDataJson[j].version + "_uId_" + userId) {
                                             count++;
                                         }
                                     }
                                 }
                             }
-                            console.log("count", count)
+                            // console.log("count", count)
                         }
                         if (count == 0) {
                             JSZip.loadAsync(file).then(function (zip) {
@@ -258,112 +258,112 @@ export default class ImportDataset extends Component {
                                                 delete json.equivalencyUnitList;
 
                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
-                                                console.log("M sync country transaction start")
+                                                // console.log("M sync country transaction start")
                                                 var countryObjectStore = countryTransaction.objectStore('country');
                                                 for (var i = 0; i < countryList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     countryObjectStore.put(countryList[i]);
                                                 }
 
                                                 var forecastingUnitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
-                                                console.log("M sync forecastingUnit transaction start")
+                                                // console.log("M sync forecastingUnit transaction start")
                                                 var forecastingUnitObjectStore = forecastingUnitTransaction.objectStore('forecastingUnit');
                                                 for (var i = 0; i < forecastingUnitList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     forecastingUnitObjectStore.put(forecastingUnitList[i]);
                                                 }
 
                                                 var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
-                                                console.log("M sync planningUnit transaction start")
+                                                // console.log("M sync planningUnit transaction start")
                                                 var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
                                                 for (var i = 0; i < planningUnitList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     planningUnitObjectStore.put(planningUnitList[i]);
                                                 }
 
                                                 var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
-                                                console.log("M sync procurementUnit transaction start")
+                                                // console.log("M sync procurementUnit transaction start")
                                                 var procurementUnitObjectStore = procurementUnitTransaction.objectStore('procurementUnit');
                                                 for (var i = 0; i < procurementUnitList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     procurementUnitObjectStore.put(procurementUnitList[i]);
                                                 }
 
                                                 var realmCountryTransaction = db1.transaction(['realmCountry'], 'readwrite');
-                                                console.log("M sync realmCountry transaction start")
+                                                // console.log("M sync realmCountry transaction start")
                                                 var realmCountryObjectStore = realmCountryTransaction.objectStore('realmCountry');
                                                 for (var i = 0; i < realmCountryList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     realmCountryObjectStore.put(realmCountryList[i]);
                                                 }
 
                                                 var realmCountryPlanningUnitTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
-                                                console.log("M sync realmCountryPlanningUnit transaction start")
+                                                // console.log("M sync realmCountryPlanningUnit transaction start")
                                                 var realmCountryPlanningUnitObjectStore = realmCountryPlanningUnitTransaction.objectStore('realmCountryPlanningUnit');
                                                 for (var i = 0; i < realmCountryPlanningUnitList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     realmCountryPlanningUnitObjectStore.put(realmCountryPlanningUnitList[i]);
                                                 }
 
                                                 var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
-                                                console.log("M sync procurementAgentPlanningUnit transaction start")
+                                                // console.log("M sync procurementAgentPlanningUnit transaction start")
                                                 var procurementAgentPlanningUnitObjectStore = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
                                                 for (var i = 0; i < procurementAgentPlanningUnitList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     procurementAgentPlanningUnitObjectStore.put(procurementAgentPlanningUnitList[i]);
                                                 }
 
                                                 var procurementAgentProcurementUnitTransaction = db1.transaction(['procurementAgentProcurementUnit'], 'readwrite');
-                                                console.log("M sync procurementAgentProcurementUnit transaction start")
+                                                // console.log("M sync procurementAgentProcurementUnit transaction start")
                                                 var procurementAgentProcurementUnitObjectStore = procurementAgentProcurementUnitTransaction.objectStore('procurementAgentProcurementUnit');
                                                 for (var i = 0; i < procurementAgentProcurementUnitList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     procurementAgentProcurementUnitObjectStore.put(procurementAgentProcurementUnitList[i]);
                                                 }
 
                                                 var programTransaction = db1.transaction(['program'], 'readwrite');
-                                                console.log("M sync program transaction start")
+                                                // console.log("M sync program transaction start")
                                                 var programObjectStore = programTransaction.objectStore('program');
                                                 for (var i = 0; i < programList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     programObjectStore.put(programList[i]);
                                                 }
 
                                                 var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                                                console.log("M sync programPlanningUnit transaction start")
+                                                // console.log("M sync programPlanningUnit transaction start")
                                                 var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
                                                 for (var i = 0; i < programPlanningUnitList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     programPlanningUnitObjectStore.put(programPlanningUnitList[i]);
                                                 }
 
                                                 var regionTransaction = db1.transaction(['region'], 'readwrite');
-                                                console.log("M sync region transaction start")
+                                                // console.log("M sync region transaction start")
                                                 var regionObjectStore = regionTransaction.objectStore('region');
                                                 for (var i = 0; i < regionList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     regionObjectStore.put(regionList[i]);
                                                 }
 
                                                 var budgetTransaction = db1.transaction(['budget'], 'readwrite');
-                                                console.log("M sync budget transaction start")
+                                                // console.log("M sync budget transaction start")
                                                 var budgetObjectStore = budgetTransaction.objectStore('budget');
                                                 for (var i = 0; i < budgetList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     budgetObjectStore.put(budgetList[i]);
                                                 }
 
                                                 var usageTemplateTransaction = db1.transaction(['usageTemplate'], 'readwrite');
                                                 var usageTemplateObjectStore = usageTemplateTransaction.objectStore('usageTemplate');
                                                 for (var i = 0; i < usageTemplateList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     usageTemplateObjectStore.put(usageTemplateList[i]);
                                                 }
 
                                                 var equivalencyUnitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
                                                 var equivalencyUnitObjectStore = equivalencyUnitTransaction.objectStore('equivalencyUnit');
                                                 for (var i = 0; i < equivalencyUnitList.length; i++) {
-                                                    console.log("M sync in for", i)
+                                                    // console.log("M sync in for", i)
                                                     equivalencyUnitObjectStore.put(equivalencyUnitList[i]);
                                                 }
 
@@ -374,7 +374,7 @@ export default class ImportDataset extends Component {
                                                 var programDataBytes = CryptoJS.AES.decrypt(json.programData, SECRET_KEY);
                                                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                 var programJson = JSON.parse(programData);
-                                                console.log("@@@programJson.actionList", programJson.actionList);
+                                                // console.log("@@@programJson.actionList", programJson.actionList);
                                                 // if (programJson.actionList == undefined) {
                                                 //     programJson.actionList = [];
                                                 // }
@@ -417,7 +417,7 @@ export default class ImportDataset extends Component {
                                                     }
                                                     var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                                     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
-                                                    console.log("programQPLDetailsJson***", item);
+                                                    // console.log("programQPLDetailsJson***", item);
                                                     var programQPLDetailsRequest = programQPLDetailsOs.put(item);
                                                     programQPLDetailsTransaction.oncomplete = function (event) {
 
@@ -495,112 +495,112 @@ export default class ImportDataset extends Component {
                                                                 delete json.equivalencyUnitList;
 
                                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
-                                                                console.log("M sync country transaction start")
+                                                                // console.log("M sync country transaction start")
                                                                 var countryObjectStore = countryTransaction.objectStore('country');
                                                                 for (var i = 0; i < countryList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     countryObjectStore.put(countryList[i]);
                                                                 }
 
                                                                 var forecastingUnitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
-                                                                console.log("M sync forecastingUnit transaction start")
+                                                                // console.log("M sync forecastingUnit transaction start")
                                                                 var forecastingUnitObjectStore = forecastingUnitTransaction.objectStore('forecastingUnit');
                                                                 for (var i = 0; i < forecastingUnitList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     forecastingUnitObjectStore.put(forecastingUnitList[i]);
                                                                 }
 
                                                                 var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
-                                                                console.log("M sync planningUnit transaction start")
+                                                                // console.log("M sync planningUnit transaction start")
                                                                 var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
                                                                 for (var i = 0; i < planningUnitList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     planningUnitObjectStore.put(planningUnitList[i]);
                                                                 }
 
                                                                 var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
-                                                                console.log("M sync procurementUnit transaction start")
+                                                                // console.log("M sync procurementUnit transaction start")
                                                                 var procurementUnitObjectStore = procurementUnitTransaction.objectStore('procurementUnit');
                                                                 for (var i = 0; i < procurementUnitList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     procurementUnitObjectStore.put(procurementUnitList[i]);
                                                                 }
 
                                                                 var realmCountryTransaction = db1.transaction(['realmCountry'], 'readwrite');
-                                                                console.log("M sync realmCountry transaction start")
+                                                                // console.log("M sync realmCountry transaction start")
                                                                 var realmCountryObjectStore = realmCountryTransaction.objectStore('realmCountry');
                                                                 for (var i = 0; i < realmCountryList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     realmCountryObjectStore.put(realmCountryList[i]);
                                                                 }
 
                                                                 var realmCountryPlanningUnitTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
-                                                                console.log("M sync realmCountryPlanningUnit transaction start")
+                                                                // console.log("M sync realmCountryPlanningUnit transaction start")
                                                                 var realmCountryPlanningUnitObjectStore = realmCountryPlanningUnitTransaction.objectStore('realmCountryPlanningUnit');
                                                                 for (var i = 0; i < realmCountryPlanningUnitList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     realmCountryPlanningUnitObjectStore.put(realmCountryPlanningUnitList[i]);
                                                                 }
 
                                                                 var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
-                                                                console.log("M sync procurementAgentPlanningUnit transaction start")
+                                                                // console.log("M sync procurementAgentPlanningUnit transaction start")
                                                                 var procurementAgentPlanningUnitObjectStore = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
                                                                 for (var i = 0; i < procurementAgentPlanningUnitList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     procurementAgentPlanningUnitObjectStore.put(procurementAgentPlanningUnitList[i]);
                                                                 }
 
                                                                 var procurementAgentProcurementUnitTransaction = db1.transaction(['procurementAgentProcurementUnit'], 'readwrite');
-                                                                console.log("M sync procurementAgentProcurementUnit transaction start")
+                                                                // console.log("M sync procurementAgentProcurementUnit transaction start")
                                                                 var procurementAgentProcurementUnitObjectStore = procurementAgentProcurementUnitTransaction.objectStore('procurementAgentProcurementUnit');
                                                                 for (var i = 0; i < procurementAgentProcurementUnitList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     procurementAgentProcurementUnitObjectStore.put(procurementAgentProcurementUnitList[i]);
                                                                 }
 
                                                                 var programTransaction = db1.transaction(['program'], 'readwrite');
-                                                                console.log("M sync program transaction start")
+                                                                // console.log("M sync program transaction start")
                                                                 var programObjectStore = programTransaction.objectStore('program');
                                                                 for (var i = 0; i < programList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     programObjectStore.put(programList[i]);
                                                                 }
 
                                                                 var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                                                                console.log("M sync programPlanningUnit transaction start")
+                                                                // console.log("M sync programPlanningUnit transaction start")
                                                                 var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
                                                                 for (var i = 0; i < programPlanningUnitList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     programPlanningUnitObjectStore.put(programPlanningUnitList[i]);
                                                                 }
 
                                                                 var regionTransaction = db1.transaction(['region'], 'readwrite');
-                                                                console.log("M sync region transaction start")
+                                                                // console.log("M sync region transaction start")
                                                                 var regionObjectStore = regionTransaction.objectStore('region');
                                                                 for (var i = 0; i < regionList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     regionObjectStore.put(regionList[i]);
                                                                 }
 
                                                                 var budgetTransaction = db1.transaction(['budget'], 'readwrite');
-                                                                console.log("M sync budget transaction start")
+                                                                // console.log("M sync budget transaction start")
                                                                 var budgetObjectStore = budgetTransaction.objectStore('budget');
                                                                 for (var i = 0; i < budgetList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     budgetObjectStore.put(budgetList[i]);
                                                                 }
 
                                                                 var usageTemplateTransaction = db1.transaction(['usageTemplate'], 'readwrite');
                                                                 var usageTemplateObjectStore = usageTemplateTransaction.objectStore('usageTemplate');
                                                                 for (var i = 0; i < usageTemplateList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     usageTemplateObjectStore.put(usageTemplateList[i]);
                                                                 }
 
                                                                 var equivalencyUnitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
                                                                 var equivalencyUnitObjectStore = equivalencyUnitTransaction.objectStore('equivalencyUnit');
                                                                 for (var i = 0; i < equivalencyUnitList.length; i++) {
-                                                                    console.log("M sync in for", i)
+                                                                    // console.log("M sync in for", i)
                                                                     equivalencyUnitObjectStore.put(equivalencyUnitList[i]);
                                                                 }
 
@@ -612,7 +612,7 @@ export default class ImportDataset extends Component {
                                                                 var programDataBytes = CryptoJS.AES.decrypt(json.programData, SECRET_KEY);
                                                                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                                 var programJson = JSON.parse(programData);
-                                                                console.log("@@@programJson.actionList", programJson.actionList);
+                                                                // console.log("@@@programJson.actionList", programJson.actionList);
                                                                 // if (programJson.actionList == undefined) {
                                                                 //     programJson.actionList = [];
                                                                 // }
@@ -656,7 +656,7 @@ export default class ImportDataset extends Component {
                                                                     }
                                                                     var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                                                     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
-                                                                    console.log("programQPLDetailsJson***", item);
+                                                                    // console.log("programQPLDetailsJson***", item);
                                                                     var programQPLDetailsRequest = programQPLDetailsOs.put(item);
                                                                     programQPLDetailsTransaction.oncomplete = function (event) {
                                                                         // Adding data in downloaded program data
@@ -732,7 +732,7 @@ export default class ImportDataset extends Component {
                             zip.files[filename].async('string').then(function (fileData) {
 
                                 var programDataJson;
-                                console.log("File Data", fileData.split("@~-~@")[0]);
+                                // console.log("File Data", fileData.split("@~-~@")[0]);
                                 try {
                                     programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
                                 }
@@ -753,16 +753,16 @@ export default class ImportDataset extends Component {
                                     })
                                 }else{
                                     var programDataJsonDecrypted = JSON.parse(plaintext);
-                                    console.log("programDatajson", programDataJsonDecrypted.label);
-                                    console.log("displayName", getLabelText((programDataJsonDecrypted.label), lan));
-                                    console.log("filename", filename);
+                                    // console.log("programDatajson", programDataJsonDecrypted.label);
+                                    // console.log("displayName", getLabelText((programDataJsonDecrypted.label), lan));
+                                    // console.log("filename", filename);
                                     programDataJson.filename = filename;
                                     fileName[i] = {
                                         value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJson.version
                                     }
                                     programListArray[i] = programDataJson;
                                     i++;
-                                    console.log("Program data list in import", programListArray)
+                                    // console.log("Program data list in import", programListArray)
                                     if (i === size) {
                                         this.setState({
                                             message:"",
@@ -770,8 +770,8 @@ export default class ImportDataset extends Component {
                                             programListArray: programListArray,
                                             loading: false
                                         })
-                                        console.log("programList", fileName)
-                                        console.log("programDataArrayList after state set", programListArray)
+                                        // console.log("programList", fileName)
+                                        // console.log("programDataArrayList after state set", programListArray)
 
                                         document.getElementById("programIdDiv").style.display = "block";
                                         document.getElementById("formSubmitButton").style.display = "block";
@@ -820,7 +820,7 @@ export default class ImportDataset extends Component {
     }
 
     updateFieldData(value) {
-        console.log("Value", value);
+        // console.log("Value", value);
         // console.log(event.value)
         this.setState({ programId: value });
     }

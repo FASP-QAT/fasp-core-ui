@@ -196,14 +196,14 @@ class ForecastMetrics extends Component {
     return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
   }
   formatLabel(cell, row) {
-    // console.log("celll----", cell);
+    // // console.log("celll----", cell);
     if (cell != null && cell != "") {
       return getLabelText(cell, this.state.lang);
     }
   }
 
   formatValue(cell, row) {
-    console.log("cell----", cell);
+    // console.log("cell----", cell);
     if (cell != null && cell != "") {
       return this.roundN(cell) + '%';
     } else if ((cell == "0" && row.months == 0)) {
@@ -252,7 +252,7 @@ class ForecastMetrics extends Component {
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
-      console.log(re[item].planningUnit)
+      // console.log(re[item].planningUnit)
       A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id, re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label)).replaceAll(' ', '%20'),
       // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
       re[item].message != null ? (i18n.t(re[item].message)).replaceAll(' ', '%20') : this.roundN(re[item].forecastError) + '%', re[item].monthCount])])
@@ -346,7 +346,7 @@ class ForecastMetrics extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
     planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
     //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
@@ -359,7 +359,7 @@ class ForecastMetrics extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
 
     planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -373,7 +373,7 @@ class ForecastMetrics extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
 
 
@@ -388,7 +388,7 @@ class ForecastMetrics extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, tracerCategoryText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
 
 
@@ -400,7 +400,7 @@ class ForecastMetrics extends Component {
     var height = doc.internal.pageSize.height;
     var h1 = 50;
     let startY = y + 20
-    console.log('startY', startY)
+    // console.log('startY', startY)
     let pages = Math.ceil(startY / height)
     for (var j = 1; j < pages; j++) {
       doc.addPage()
@@ -483,7 +483,7 @@ class ForecastMetrics extends Component {
 
   filterProgram = () => {
     let countryIds = this.state.countryValues.map(ele => ele.value);
-    // console.log('countryIds', countryIds, 'programs', this.state.programs)
+    // // console.log('countryIds', countryIds, 'programs', this.state.programs)
     this.setState({
       programLst: [],
       programValues: [],
@@ -495,11 +495,11 @@ class ForecastMetrics extends Component {
           .then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
               return itemLabelA > itemLabelB ? 1 : -1;
             });
-            console.log('programLst', listArray)
+            // console.log('programLst', listArray)
             if (listArray.length > 0) {
               this.setState({
                 programLst: listArray
@@ -601,11 +601,11 @@ class ForecastMetrics extends Component {
         for (var i = 0; i < programIds.length; i++) {
           programIdsValue.push(programIds[i].value);
         }
-        // console.log("programids=====>", programIdsValue);
+        // // console.log("programids=====>", programIdsValue);
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
         TracerCategoryService.getTracerCategoryByProgramIds(realmId, programIdsValue)
           .then(response => {
-            console.log("tc respons==>", response.data);
+            // console.log("tc respons==>", response.data);
             var listArray = response.data;
             listArray.sort((a, b) => {
               var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -682,7 +682,7 @@ class ForecastMetrics extends Component {
   }
 
   handlePlanningUnitChange(planningUnitIds) {
-    console.log(planningUnitIds)
+    // console.log(planningUnitIds)
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
     })
@@ -697,7 +697,7 @@ class ForecastMetrics extends Component {
 
   buildJExcel() {
     let consumptions = this.state.consumptions;
-    // console.log("consumptions---->", consumptions);
+    // // console.log("consumptions---->", consumptions);
     let consumptionArray = [];
     let count = 0;
 
@@ -717,7 +717,7 @@ class ForecastMetrics extends Component {
     //   data = [];
     //   consumptionArray[0] = data;
     // }
-    // console.log("consumptionArray---->", consumptionArray);
+    // // console.log("consumptionArray---->", consumptionArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
     // this.el.destroy();
     jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -822,7 +822,7 @@ class ForecastMetrics extends Component {
 
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
-    console.log("INSIDE UPDATE TABLE");
+    // console.log("INSIDE UPDATE TABLE");
 
     var elInstance = instance.worksheets[0];
     var json = elInstance.getJson();
@@ -832,7 +832,7 @@ class ForecastMetrics extends Component {
 
 
       var rowData = elInstance.getRowData(j);
-      // console.log("elInstance---->", elInstance);
+      // // console.log("elInstance---->", elInstance);
 
       var forecastError = rowData[4];
       if (forecastError > 50) {
@@ -869,10 +869,10 @@ class ForecastMetrics extends Component {
 
       }
       // AuthenticationService.setupAxiosInterceptors();
-      console.log("report json---", inputjson);
+      // console.log("report json---", inputjson);
       ReportService.getForecastError(inputjson)
         .then(response => {
-          console.log(JSON.stringify(response.data));
+          // console.log(JSON.stringify(response.data));
           this.setState({
             consumptions: response.data,
             message: ''
@@ -1166,7 +1166,7 @@ class ForecastMetrics extends Component {
               var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
               return itemLabelA > itemLabelB ? 1 : -1;
             });
-            console.log("resp---->", listArray);
+            // console.log("resp---->", listArray);
             this.setState({
               planningUnits: listArray,
               planningUnitValues: listArray.map((item, i) => {
@@ -1233,7 +1233,7 @@ class ForecastMetrics extends Component {
     //let realmId = AuthenticationService.getRealmId();
     ProgramService.getProgramList()
       .then(response => {
-        console.log(JSON.stringify(response.data))
+        // console.log(JSON.stringify(response.data))
         var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1317,7 +1317,7 @@ class ForecastMetrics extends Component {
     let realmId = AuthenticationService.getRealmId();
     ProductService.getProductCategoryList(realmId)
       .then(response => {
-        console.log(response.data)
+        // console.log(response.data)
         var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1482,9 +1482,9 @@ class ForecastMetrics extends Component {
         )
       }, this);
     const { countrys } = this.state;
-    // console.log(JSON.stringify(countrys))
+    // // console.log(JSON.stringify(countrys))
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
-      // console.log(JSON.stringify(item))
+      // // console.log(JSON.stringify(item))
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
     const { productCategories } = this.state;

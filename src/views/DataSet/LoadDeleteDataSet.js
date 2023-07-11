@@ -72,9 +72,9 @@ class LoadDeleteDataSet extends Component {
     programCheckboxChecked(programId) {
         var checkBoxValue = document.getElementById('checkbox_442557.0');
         var txtpid = document.getElementsByName("versionCheckBox" + programId);
-        console.log("event.target.value>>>", programId);
-        console.log("+++", checkBoxValue.checked);
-        console.log("+++", txtpid, "+++", checkBoxValue);
+        // console.log("event.target.value>>>", programId);
+        // console.log("+++", checkBoxValue.checked);
+        // console.log("+++", txtpid, "+++", checkBoxValue);
         if (checkBoxValue.checked) {
             for (var i = 0; i < txtpid.length; i++) {
                 txtpid[i].disabled = true;
@@ -356,7 +356,7 @@ class LoadDeleteDataSet extends Component {
             DatasetService.loadDataset()
                 // getProgramList()
                 .then(response => {
-                    console.log(">>>", response);
+                    // console.log(">>>", response);
                     if (response.status == 200) {
                         this.setState({
                             countryList: response.data.realmCountryList,
@@ -590,7 +590,7 @@ class LoadDeleteDataSet extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                console.log("myResult>>>", myResult);
+                // console.log("myResult>>>", myResult);
 
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -612,7 +612,7 @@ class LoadDeleteDataSet extends Component {
                 // this.setState({
                 //     programs: proList
                 // })
-                console.log("ProList>>>", proList);
+                // console.log("ProList>>>", proList);
                 this.checkNewerVersions(proList);
                 // if (this.props.updateState != undefined) {
                 //     this.props.updateState(false);
@@ -635,7 +635,7 @@ class LoadDeleteDataSet extends Component {
                     </option>
                 )
             }, this);
-        console.log("this.props.match.params.message", this.props.params)
+        // console.log("this.props.match.params.message", this.props.params)
         return (
             <div className="animated fadeIn">
                 {/* <GetLatestProgramVersion ref="programListChild"></GetLatestProgramVersion> */}
@@ -1028,7 +1028,7 @@ class LoadDeleteDataSet extends Component {
     // }
 
     deleteProgramById(id, i, length) {
-        console.log("deleteC---------->4 ", id);
+        // console.log("deleteC---------->4 ", id);
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1070,14 +1070,14 @@ class LoadDeleteDataSet extends Component {
 
     deleteCleanUpIcon(programId) {
 
-        console.log("deleteC---------->1 ", this.state.prgList.filter(c => c.program.id == programId));
-        console.log("deleteC---------->2 ", this.state.programList.filter(c => c.programId == programId));
+        // console.log("deleteC---------->1 ", this.state.prgList.filter(c => c.program.id == programId));
+        // console.log("deleteC---------->2 ", this.state.programList.filter(c => c.programId == programId));
 
         let versionListForSelectedProgram = this.state.prgList.filter(c => c.program.id == programId)[0].versionList;
 
         let versionListRemoveMaxVersionId = versionListForSelectedProgram.filter(c => c.versionId != Math.max.apply(Math, versionListForSelectedProgram.map(a => a.versionId)));
 
-        console.log("deleteC---------->3 ", versionListRemoveMaxVersionId);
+        // console.log("deleteC---------->3 ", versionListRemoveMaxVersionId);
 
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
@@ -1131,7 +1131,7 @@ class LoadDeleteDataSet extends Component {
     }
 
     deleteLocalVersion(programId, versionId, changed) {
-        console.log(">>>", changed);
+        // console.log(">>>", changed);
         confirmAlert({
             title: i18n.t('static.program.confirm'),
             message: changed == 1 ? i18n.t('static.loadDelDataset.changesNotSaved') : i18n.t('static.loadDelDataset.deleteThisLocalVersion'),
@@ -1299,7 +1299,7 @@ class LoadDeleteDataSet extends Component {
                     // var version = (checkboxesChecked[i]).versionId;
                     if (isSiteOnline()) {
                         // AuthenticationService.setupAxiosInterceptors();
-                        console.log("checkBoxValues>>>", JSON.stringify(checkboxesChecked))
+                        // console.log("checkBoxValues>>>", JSON.stringify(checkboxesChecked))
                         var checkboxesCheckedProgram = checkboxesChecked.filter(c => c.versionId == -1);
                         var checkboxesCheckedVersion = checkboxesChecked.filter(c => c.versionId != -1);
                         var versionsThatNeedsToBeDeleted = [];
@@ -1357,7 +1357,7 @@ class LoadDeleteDataSet extends Component {
                         if (continueToLoad == 1) {
                             DatasetService.getAllDatasetData(checkboxesChecked)
                                 .then(response => {
-                                    console.log("response>>>", response.data);
+                                    // console.log("response>>>", response.data);
                                     var json = response.data;
                                     var deleteDatasetTransaction = db1.transaction(['datasetData'], 'readwrite');
                                     var deleteDatasetOs = deleteDatasetTransaction.objectStore('datasetData');
@@ -1449,7 +1449,7 @@ class LoadDeleteDataSet extends Component {
                                                                 readonly: 0
                                                             };
                                                             programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                                            console.log("hey program download changed flag check");
+                                                            // console.log("hey program download changed flag check");
                                                             var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                         }
                                                         programQPLDetailsTransaction.oncomplete = function (event) {

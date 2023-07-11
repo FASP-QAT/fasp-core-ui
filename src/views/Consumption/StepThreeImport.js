@@ -184,20 +184,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     ExtrapolatedParameters() {
         var listOfPlanningUnits = this.state.listOfPlanningUnits;
         var programData = this.state.datasetDataUnencrypted;
-        console.log("List of pus Test", listOfPlanningUnits)
-        console.log("Program Data Test", programData)
+        // console.log("List of pus Test", listOfPlanningUnits)
+        // console.log("Program Data Test", programData)
         if (this.state.listOfPlanningUnits.length > 0) {
             this.setState({ loading: true })
             var datasetJson = programData;
-            console.log("datasetJson**********", datasetJson)
+            // console.log("datasetJson**********", datasetJson)
             // Need to filter
             var regionList = this.state.regionListForExtrapolate;
-            console.log("Region List Test",regionList)
+            // console.log("Region List Test",regionList)
             var count = 0;
             for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                 for (var i = 0; i < regionList.length; i++) {
                     var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu] && c.region.id == regionList[i]);
-                    console.log("actualConsumptionListForPlanningUnitAndRegion Test",actualConsumptionListForPlanningUnitAndRegion)
+                    // console.log("actualConsumptionListForPlanningUnitAndRegion Test",actualConsumptionListForPlanningUnitAndRegion)
                     if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                         let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
                         let maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
@@ -208,14 +208,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         var inputDataTes = [];
                         var inputDataArima = [];
 
-                        console.log("minDate", moment(minDate).format("YYYY-MM"));
-                        console.log("maxDate", moment(maxDate).format("YYYY-MM"));
+                        // console.log("minDate", moment(minDate).format("YYYY-MM"));
+                        // console.log("maxDate", moment(maxDate).format("YYYY-MM"));
                         for (var j = 0; moment(curDate).format("YYYY-MM") < moment(maxDate).format("YYYY-MM"); j++) {
                             curDate = moment(minDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
-                            console.log("curdate", curDate)
+                            // console.log("curdate", curDate)
                             var consumptionData = actualConsumptionListForPlanningUnitAndRegion.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
-                            console.log("consumptionData--->", consumptionData)
-                            console.log("Value@@@@@@@@@@@", consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null);
+                            // console.log("consumptionData--->", consumptionData)
+                            // console.log("Value@@@@@@@@@@@", consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null);
                             inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
                             inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
                             inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
@@ -250,7 +250,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     }
                 }
             }
-            console.log("Count Test",count)
+            // console.log("Count Test",count)
             this.setState({
                 count: count
             })
@@ -261,16 +261,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         var jsonDataMovingAvg = this.state.jsonDataMovingAvg;
         jsonDataMovingAvg.push(data);
-        console.log("jsonDataMovingAvg---> Test", jsonDataMovingAvg)
+        // console.log("jsonDataMovingAvg---> Test", jsonDataMovingAvg)
         var countR = this.state.countRecived
-        console.log("countR--->", countR)
+        // console.log("countR--->", countR)
 
         this.setState({
             jsonDataMovingAvg: jsonDataMovingAvg,
             countRecived: countR + 1
         }, () => {
-            console.log("countRecivedMov", this.state.countRecived)
-            console.log("countMov", this.state.count)
+            // console.log("countRecivedMov", this.state.countRecived)
+            // console.log("countMov", this.state.count)
 
 
             if (this.state.jsonDataMovingAvg.length
@@ -287,16 +287,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     updateSemiAveragesData(data) {
         var jsonDataSemiAverage = this.state.jsonDataSemiAverage;
         jsonDataSemiAverage.push(data);
-        console.log("jsonDataSemiAverage--->", jsonDataSemiAverage)
+        // console.log("jsonDataSemiAverage--->", jsonDataSemiAverage)
         var countR = this.state.countRecived
-        console.log("countR--->", countR)
+        // console.log("countR--->", countR)
 
         this.setState({
             jsonDataSemiAverage: jsonDataSemiAverage,
             countRecived: countR + 1
         }, () => {
-            console.log("countRecivedSemi", this.state.countRecived)
-            console.log("countSemi", this.state.count)
+            // console.log("countRecivedSemi", this.state.countRecived)
+            // console.log("countSemi", this.state.count)
 
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
@@ -312,13 +312,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     updateLinearRegressionData(data) {
         var jsonDataLinearRegression = this.state.jsonDataLinearRegression;
         jsonDataLinearRegression.push(data);
-        console.log("jsonDataLinearRegression--->", jsonDataLinearRegression)
+        // console.log("jsonDataLinearRegression--->", jsonDataLinearRegression)
         this.setState({
             jsonDataLinearRegression: jsonDataLinearRegression,
             countRecived: this.state.countRecived++
         }, () => {
-            console.log("countRecivedL", this.state.countRecived)
-            console.log("countL", this.state.count)
+            // console.log("countRecivedL", this.state.countRecived)
+            // console.log("countL", this.state.count)
 
 
             if (this.state.jsonDataMovingAvg.length
@@ -335,13 +335,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     updateTESData(data) {
         var jsonDataTes = this.state.jsonDataTes;
         jsonDataTes.push(data);
-        console.log("jsonDataTes--->", jsonDataTes)
+        // console.log("jsonDataTes--->", jsonDataTes)
         this.setState({
             jsonDataTes: jsonDataTes,
             countRecived: this.state.countRecived++
         }, () => {
-            console.log("countRecivedT", this.state.countRecived)
-            console.log("countT", this.state.count)
+            // console.log("countRecivedT", this.state.countRecived)
+            // console.log("countT", this.state.count)
 
 
             if (this.state.jsonDataMovingAvg.length
@@ -358,13 +358,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     updateArimaData(data) {
         var jsonDataArima = this.state.jsonDataArima;
         jsonDataArima.push(data);
-        console.log("jsonDataArima--->", jsonDataArima)
+        // console.log("jsonDataArima--->", jsonDataArima)
         this.setState({
             jsonDataArima: jsonDataArima,
             countRecived: this.state.countRecived++
         }, () => {
-            console.log("countRecivedA", this.state.countRecived)
-            console.log("countA", this.state.count)
+            // console.log("countRecivedA", this.state.countRecived)
+            // console.log("countA", this.state.count)
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
@@ -377,7 +377,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     saveForecastConsumptionExtrapolation() {
-        console.log("inside saveForecastConsumptionExtrapolation")
+        // console.log("inside saveForecastConsumptionExtrapolation")
         this.setState({
             loading: true
         })
@@ -400,7 +400,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             extrapolationMethodRequest.onsuccess = function (event) {
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetTransaction = transaction.objectStore('datasetData');
-                console.log("dataset", this.state.datasetId)
+                // console.log("dataset", this.state.datasetId)
                 var datasetRequest = datasetTransaction.get(this.props.items.datasetList[0].id);
                 datasetRequest.onerror = function (event) {
                 }.bind(this);
@@ -411,20 +411,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                     var datasetJson = JSON.parse(datasetData);
                     var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
-                    console.log("consumptionExtrapolationDataUnFiltered@@@@@@@@@@", consumptionExtrapolationDataUnFiltered);
-                    console.log("this.state.planningUnitId@@@@@@@@@@", this.state.planningUnitId);
+                    // console.log("consumptionExtrapolationDataUnFiltered@@@@@@@@@@", consumptionExtrapolationDataUnFiltered);
+                    // console.log("this.state.planningUnitId@@@@@@@@@@", this.state.planningUnitId);
                     var listOfPlanningUnits = this.state.listOfPlanningUnits;
                     var regionList = this.state.regionListForExtrapolate;
                     var consumptionExtrapolationList=datasetJson.consumptionExtrapolation;
                     for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                         for (var r = 0; r < regionList.length; r++) {
                             var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit.id != listOfPlanningUnits[pu] || (c.planningUnit.id == listOfPlanningUnits[pu] && c.region.id != regionList[r]));
-                            console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList);
+                            // console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList);
                             var consumptionExtrapolationData = -1//Semi Averages
                             var consumptionExtrapolationMovingData = -1//Moving averages
                             var consumptionExtrapolationRegression = -1//Linear Regression
                             var consumptionExtrapolationTESL = -1//TES L
-                            console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
+                            // console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
                             var consumptionExtrapolationTESM = -1//TES M
                             var consumptionExtrapolationTESH = -1//TES H
                             //----------------------------
@@ -435,13 +435,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             var inputDataFilter = this.state.jsonDataSemiAverage;
                             var inputDataAverageFilter = this.state.movingAvgData;
                             var inputDataRegressionFilter = this.state.linearRegressionData;
-                            console.log("consumptionExtrapolationData", consumptionExtrapolationData);
-                            console.log("inputDataFilter", inputDataFilter);
+                            // console.log("consumptionExtrapolationData", consumptionExtrapolationData);
+                            // console.log("inputDataFilter", inputDataFilter);
                             var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                             var planningUnitObj = this.props.items.planningUnitList.filter(c => c.id == listOfPlanningUnits[pu])[0];
                             var regionObj = this.state.datasetDataUnencrypted.regionList.filter(c => c.regionId == regionList[r])[0];
-                            console.log("Planning Unit Obj****", planningUnitObj);
-                            console.log("Region Obj****", regionObj);
+                            // console.log("Planning Unit Obj****", planningUnitObj);
+                            // console.log("Region Obj****", regionObj);
                             var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                             var curUser = AuthenticationService.getLoggedInUserId();
                             var datasetJson = this.state.datasetDataUnencrypted;
@@ -450,17 +450,17 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             var maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
 
                             //Semi - averages
-                            console.log("this.state.jsonDataSemiAverage----------->", this.state.jsonDataSemiAverage);
+                            // console.log("this.state.jsonDataSemiAverage----------->", this.state.jsonDataSemiAverage);
                             var jsonDataSemiAvgFilter = this.state.jsonDataSemiAverage.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
-                            console.log("json data semi avg Test",jsonDataSemiAvgFilter)
+                            // console.log("json data semi avg Test",jsonDataSemiAvgFilter)
                             if (jsonDataSemiAvgFilter.length > 0) {
                                 var jsonSemi = jsonDataSemiAvgFilter[0].data;
-                                console.log("this.state.jsonDataSemiAverage--json--------->", jsonSemi);
+                                // console.log("this.state.jsonDataSemiAverage--json--------->", jsonSemi);
                                 var data = [];
                                 for (var i = 0; i < jsonSemi.length; i++) {
                                     data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(2) : null, ci: null })
                                 }
-                                console.log("data--------->", data);
+                                // console.log("data--------->", data);
 
                                 consumptionExtrapolationList.push(
                                     {
@@ -483,13 +483,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     })
                                 id += 1;
                             }
-                            console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
+                            // console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
                             //Moving Averages
                             var data = [];
                             var jsonDataMovingFilter = this.state.jsonDataMovingAvg.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
                             if (jsonDataMovingFilter.length > 0) {
                                 var jsonDataMoving = jsonDataMovingFilter[0].data;
-                                console.log("this.state.jsonDataMovingAvg--json--------->", jsonDataMoving);
+                                // console.log("this.state.jsonDataMovingAvg--json--------->", jsonDataMoving);
                                 for (var i = 0; i < jsonDataMoving.length; i++) {
                                     data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(2) : null, ci: null })
                                 }
@@ -520,7 +520,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
                             if (jsonDataLinearFilter.length > 0) {
                                 var jsonDataLinear = jsonDataLinearFilter[0].data;
-                                console.log("this.state.jsonDataLinear--json--------->", jsonDataLinear);
+                                // console.log("this.state.jsonDataLinear--json--------->", jsonDataLinear);
                                 for (var i = 0; i < jsonDataLinear.length; i++) {
                                     data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(2) : null, ci: (jsonDataLinear[i].ci) })
                                 }
@@ -548,12 +548,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             }
                             //TES L
                             //TES M
-                            console.log("in if2")
+                            // console.log("in if2")
                             var data = [];
                             var jsonDataTesFilter = this.state.jsonDataTes.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
                             if (jsonDataTesFilter.length > 0) {
                                 var jsonDataTes = jsonDataTesFilter[0].data;
-                                console.log("this.state.jsonDataTes--json--------->", jsonDataTes);
+                                // console.log("this.state.jsonDataTes--json--------->", jsonDataTes);
 
                                 for (var i = 0; i < jsonDataTes.length; i++) {
                                     data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(2) : null, ci: (jsonDataTes[i].ci) })
@@ -586,12 +586,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             }
                             //Arima L
                             //TES M
-                            console.log("in if2")
+                            // console.log("in if2")
                             var data = [];
                             var jsonDataArimaFilter = this.state.jsonDataArima.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
                             if (jsonDataArimaFilter.length > 0) {
                                 var jsonDataArima = jsonDataArimaFilter[0].data;
-                                console.log("this.state.jsonDataArima--json--------->", jsonDataArima);
+                                // console.log("this.state.jsonDataArima--json--------->", jsonDataArima);
                                 for (var i = 0; i < jsonDataArima.length; i++) {
                                     data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(2) : null, ci: (jsonDataArima[i].ci) })
                                 }
@@ -623,10 +623,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             }
                         }
                     }
-                    console.log("consumptionExtrapolation@@@@@@@ Test",consumptionExtrapolationList)
-                    console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
+                    // console.log("consumptionExtrapolation@@@@@@@ Test",consumptionExtrapolationList)
+                    // console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
                     datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
-                    console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
+                    // console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
                     datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                     myResult.programData = datasetData;
                     var putRequest = datasetTransaction.put(myResult);
@@ -636,10 +636,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     putRequest.onerror = function (event) {
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
-                        console.log("save");
+                        // console.log("save");
                         // let id = AuthenticationService.displayDashboardBasedOnRole();
                         // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
-                        console.log("Data update success");
+                        // console.log("Data update success");
                         this.setState({
                             isChanged1: false
                         })
@@ -674,10 +674,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     onClick: () => {
                         this.props.updateStepOneData("loading", true);
                         var tableJson = this.el.getJson(null, false);
-                        console.log("Table Json Test", tableJson)
+                        // console.log("Table Json Test", tableJson)
                         var listOfForecastPlanningUnits = [...new Set(tableJson.filter(c => c[8].toString() == "true").map(ele => (ele[1])))];
                         var regionListForExtrapolate= [...new Set(tableJson.filter(c => c[8].toString() == "true").map(ele => (ele[10])))];
-                        console.log("List of forecast planning unit Test", listOfForecastPlanningUnits)
+                        // console.log("List of forecast planning unit Test", listOfForecastPlanningUnits)
 
                         var programs = [];
                         //blank                    
@@ -687,7 +687,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                         let datasetList = this.props.items.datasetList
                         let forecastProgramVersionId = this.props.items.forecastProgramVersionId
-                        console.log("Test", this.props.items)
+                        // console.log("Test", this.props.items)
                         let forecastProgramId = this.props.items.forecastProgramId
                         let selectedForecastProgramObj = datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0];
 
@@ -819,7 +819,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         // programData.currentVersion.forecastStartDate = startDate;
                         // programData.actionList = [1, 2]
 
-                        console.log("Final-------------->", programData.actualConsumptionList);
+                        // console.log("Final-------------->", programData.actualConsumptionList);
                         let originalConsumptionList = programData.actualConsumptionList;
                         for (var i = 0; i < ImportListPink.length; i++) {
                             // let match = originalConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.consumptionUnit.planningUnit.id == stepOneSelectedObject.forecastPlanningUnitId)
@@ -832,9 +832,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             }
                         }
 
-                        console.log("Final-------------->11", ImportListNotPink);
-                        console.log("Final-------------->12", ImportListPink);
-                        console.log("Final-------------->13", originalConsumptionList.concat(ImportListNotPink));
+                        // console.log("Final-------------->11", ImportListNotPink);
+                        // console.log("Final-------------->12", ImportListPink);
+                        // console.log("Final-------------->13", originalConsumptionList.concat(ImportListNotPink));
                         programData.actualConsumptionList = originalConsumptionList.concat(ImportListNotPink);
 
                         var programDataWithoutEncrypt = programData;
@@ -865,7 +865,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         programs.push(program);
 
 
-                        console.log("programs to update---", programs);
+                        // console.log("programs to update---", programs);
 
                         var db1;
                         getDatabase();
@@ -884,7 +884,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             var programTransaction = transaction.objectStore('datasetData');
                             programs.forEach(program => {
                                 var programRequest = programTransaction.put(program);
-                                console.log("---hurrey---");
+                                // console.log("---hurrey---");
                             })
                             transaction.oncomplete = function (event) {
                                 // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
@@ -897,15 +897,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 //     this.props.finishedStepThree();
                                 //     // this.buildJExcel();
                                 // });
-                                console.log("in side datasetDetails")
+                                // console.log("in side datasetDetails")
                                 db1 = e.target.result;
                                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                                 var datasetDetailsRequest = datasetDetailsTransaction.get(this.props.items.datasetList[0].id);
                                 datasetDetailsRequest.onsuccess = function (e) {
-                                    console.log("")
+                                    // console.log("")
                                     var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                                    console.log("Test dataset Request Json", datasetDetailsRequestJson);
+                                    // console.log("Test dataset Request Json", datasetDetailsRequestJson);
                                     datasetDetailsRequestJson.changed = 1;
                                     var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
                                     datasetDetailsRequest1.onsuccess = function (event) {
@@ -929,7 +929,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     this.hideSecondComponent();
                                     this.props.updateStepOneData("loading", false);
                                 });
-                                console.log("Data update errr");
+                                // console.log("Data update errr");
                             }.bind(this);
                         }.bind(this);
 
@@ -987,13 +987,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             regionIds: regionIds
         }
 
-        console.log("ActualConsumptionDataInput-------------->", ActualConsumptionDataInput);
+        // console.log("ActualConsumptionDataInput-------------->", ActualConsumptionDataInput);
 
 
         ProgramService.getActualConsumptionData(ActualConsumptionDataInput)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("getActualConsumptionData------>", response.data);
+                    // console.log("getActualConsumptionData------>", response.data);
                     this.setState({
                         actualConsumptionData: response.data,
                         selSource: response.data
@@ -1057,8 +1057,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var buildCSVTable = [];
 
         var count = 0;
-        console.log("match------>-1", this.props.items.stepOneData);
-        console.log("match------>0", papuList);
+        // console.log("match------>-1", this.props.items.stepOneData);
+        // console.log("match------>0", papuList);
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
 
@@ -1073,8 +1073,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                 // let match = selectedForecastProgram.actualConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.planningUnit.id == stepOneSelectedObject.forecastPlanningUnitId)
                 let match = selectedForecastProgram.actualConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.planningUnit.id == stepOneSelectedObject.supplyPlanPlanningUnitId)
-                console.log("match------>1", selectedForecastProgram.actualConsumptionList);
-                console.log("match------>2", match);
+                // console.log("match------>1", selectedForecastProgram.actualConsumptionList);
+                // console.log("match------>2", match);
                 // let match = selectedForecastProgram.consumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id)
 
                 data = [];
@@ -1135,7 +1135,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         var json = [];
         var data = papuDataArr;
-        console.log("data.length---------->", data.length);
+        // console.log("data.length---------->", data.length);
 
         let planningUnitListJexcel = this.props.items.planningUnitListJexcel
         planningUnitListJexcel.splice(0, 1);

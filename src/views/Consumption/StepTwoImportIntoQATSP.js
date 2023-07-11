@@ -50,11 +50,11 @@ export default class StepTwoImportMapPlanningUnits extends Component {
     formSubmit = function () {
 
         var validation = this.checkValidation();
-        console.log("validation------->", validation)
+        // console.log("validation------->", validation)
         if (validation == true) {
             // this.setState({ loading: true })
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
@@ -80,10 +80,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             this.props.updateStepOneData("stepTwoData", changedpapuList);
             this.props.updateStepOneData("selSource2", tableJson);
 
-            console.log("FINAL SUBMIT changedpapuList---stepTwoData", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---stepTwoData", changedpapuList);
 
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
 
         // this.props.finishedStepTwo();

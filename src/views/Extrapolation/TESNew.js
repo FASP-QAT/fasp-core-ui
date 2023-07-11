@@ -5,16 +5,16 @@ import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 
 export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, page, regionId,planningUnitId) {
-    console.log("inputData@@@@@@", inputData);
-    console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
+    // console.log("inputData@@@@@@", inputData);
+    // console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
     var startMonth = moment(minStartDate).format("M");
     var decimal = (startMonth - 1) / 12;
     var startParam = Number(Number(startYear) + Number(decimal));
-    console.log("StartYear@@@@@@", startYear);
-    console.log("StartMonth@@@@@@", startMonth);
-    console.log("Decimal@@@@@@", decimal);
-    console.log("StartParam@@@@@@", startParam);
+    // console.log("StartYear@@@@@@", startYear);
+    // console.log("StartMonth@@@@@@", startMonth);
+    // console.log("Decimal@@@@@@", decimal);
+    // console.log("StartParam@@@@@@", startParam);
     // var date = minStartDate;
     var data = []
     for (var i = 0; i < inputData.length; i++) {
@@ -30,11 +30,11 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
         "n": Number(noOfProjectionMonths),
         "level": Number(confidenceLevel)
     }
-    console.log("Json@@@@@@", json);
+    // console.log("Json@@@@@@", json);
     ExtrapolationService.tes(json)
         .then(response => {
             if (response.status == 200) {
-                console.log("response.status@@@@@@", response);
+                // console.log("response.status@@@@@@", response);
                 var responseData = response.data;
                 var output = [];
                 var count = 0;
@@ -47,7 +47,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
                     output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecast[j] == 'NA' ? null : responseData.forecast[j] > 0 ? responseData.forecast[j] : 0, ci: responseData.ci[j] > 0 ? responseData.ci[j] : 0 })
                 }
 
-                console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
+                // console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
                 // calculateCI(output, Number(confidenceLevel), "tesData", props)
                 if (page == "DataEntry") {
                     var tesData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
@@ -61,7 +61,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
                 }
             }
         }).catch(error => {
-            console.log("Error@@@@@@", error)
+            // console.log("Error@@@@@@", error)
             if (page == "DataEntry") {
                 var tesData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                 props.updateTESData(tesData);

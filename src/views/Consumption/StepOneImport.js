@@ -126,7 +126,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         // TracerCategoryService.getTracerCategoryListAll()
         DropdownService.getTracerCategoryDropdownList()
             .then(response => {
-                console.log("response.data----", response.data);
+                // console.log("response.data----", response.data);
                 this.setState({
                     tracerCategoryList: response.data,
                 },
@@ -276,7 +276,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     getDatasetList() {
-console.log("getDatasetList----------->");
+// console.log("getDatasetList----------->");
 
         var db1;
         getDatabase();
@@ -295,7 +295,7 @@ console.log("getDatasetList----------->");
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                console.log("DATASET----------->", myResult);
+                // console.log("DATASET----------->", myResult);
                 // this.setState({
                 //     datasetList: myResult
                 // });
@@ -311,7 +311,7 @@ console.log("getDatasetList----------->");
                     var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson1 = JSON.parse(programData);
-                    console.log("programJson1-------->1", programJson1);
+                    // console.log("programJson1-------->1", programJson1);
                     let filterForcastUnitObj = programJson1.planningUnitList.filter(ele => ele.active && ele.consuptionForecast);
 
                     let dupForecastingUnitObj = filterForcastUnitObj.map(ele => ele.planningUnit.forecastingUnit);
@@ -323,7 +323,7 @@ console.log("getDatasetList----------->");
                     let dupPlanningUnitObj = dupPlanningUnitObjwithNull.filter(c => c != null);
                     const idsPU = dupPlanningUnitObj.map(o => o.id)
                     const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
-                    console.log("filteredPU-------->1", filterForcastUnitObj);
+                    // console.log("filteredPU-------->1", filterForcastUnitObj);
 
                     datasetList.push({
                         programCode: filteredGetRequestList[i].programCode,
@@ -345,7 +345,7 @@ console.log("getDatasetList----------->");
                     datasetList1.push(filteredGetRequestList[i])
                     // }
                 }
-                console.log("DATASET-------->", datasetList);
+                // console.log("DATASET-------->", datasetList);
                 datasetList = datasetList.sort(function (a, b) {
                     a = a.programCode.toLowerCase();
                     b = b.programCode.toLowerCase();
@@ -370,7 +370,7 @@ console.log("getDatasetList----------->");
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
-                console.log("getProgramBasedOnRealmIdAndProgramTypeId----",response.data)
+                // console.log("getProgramBasedOnRealmIdAndProgramTypeId----",response.data)
                 this.setState({
                     programs: response.data,
                     loading: false
@@ -451,17 +451,17 @@ console.log("getDatasetList----------->");
 
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        console.log("Seema---->programId---", programId);
-        console.log("Seema---->versionId---", versionId);
-        console.log("Seema---->forecastProgramId---", forecastProgramId);
+        // console.log("Seema---->programId---", programId);
+        // console.log("Seema---->versionId---", versionId);
+        // console.log("Seema---->forecastProgramId---", forecastProgramId);
         
 
         if (versionId != 0 && programId > 0 && forecastProgramId > 0) {
 
             let selectedSupplyPlanProgram = this.state.programs.filter(c => c.id == programId)[0];
-            console.log("Seema---->selectedSupplyPlanProgram---", selectedSupplyPlanProgram);
+            // console.log("Seema---->selectedSupplyPlanProgram---", selectedSupplyPlanProgram);
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
-            console.log("Seema---->selectedForecastProgram---", selectedForecastProgram);
+            // console.log("Seema---->selectedForecastProgram---", selectedForecastProgram);
             if (selectedSupplyPlanProgram.realmCountry.id == selectedForecastProgram.realmCountry.realmCountryId) {
 
                 this.props.updateStepOneData("loading", true);
@@ -489,7 +489,7 @@ console.log("getDatasetList----------->");
                 ProgramService.getPlanningUnitByProgramId(programId, tracerCategory)
                     .then(response => {
                         if (response.status == 200) {
-                            console.log("planningUnit------>", response.data);
+                            // console.log("planningUnit------>", response.data);
                             this.setState({
                                 programPlanningUnitList: response.data,
                                 selSource: response.data,
@@ -610,7 +610,7 @@ console.log("getDatasetList----------->");
         let versionId = this.state.forecastProgramVersionId;
         let forecastProgramId = document.getElementById("forecastProgramId").value;
         let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == versionId)[0];
-        console.log("selectedForecastProgram------------->>>>>>>>", selectedForecastProgram.filteredPlanningUnit)
+        // console.log("selectedForecastProgram------------->>>>>>>>", selectedForecastProgram.filteredPlanningUnit)
 
         // PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
         //     .then(response => {
@@ -619,7 +619,7 @@ console.log("getDatasetList----------->");
             var planningUnitListFilter = selectedForecastProgram.filteredPlanningUnit
 
             var listArray = planningUnitListFilter;
-            console.log("response.data!!!!!!!!", listArray)
+            // console.log("response.data!!!!!!!!", listArray)
 
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -998,14 +998,14 @@ console.log("getDatasetList----------->");
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.id == programId)
-            console.log(program)
+            // console.log(program)
 
             this.setState({
                 versions: [],
             }, () => {
                 DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
                 .then(response => {
-                  console.log("response===>", response.data)
+                //   console.log("response===>", response.data)
                   this.setState({
                     versions: []
                   }, () => {
@@ -1072,20 +1072,20 @@ console.log("getDatasetList----------->");
 
     filterForcastUnit = () => {
         let programId = this.state.programId;
-        console.log("programId--->",programId)
+        // console.log("programId--->",programId)
         if (programId != 0) {
             const countryId = this.state.programs.filter(c => c.id == programId)[0].realmCountry.id;
-            console.log("programId--->programs---",this.state.programs)
-            console.log("programId--->countryId---",countryId)
-            console.log("programId--->this.state.datasetList---",this.state.datasetList)
+            // console.log("programId--->programs---",this.state.programs)
+            // console.log("programId--->countryId---",countryId)
+            // console.log("programId--->this.state.datasetList---",this.state.datasetList)
             
             this.state.getDatasetFilterList = this.state.datasetList
-            console.log("programId--->this.state.getDatasetFilterList---",this.state.getDatasetFilterList)
+            // console.log("programId--->this.state.getDatasetFilterList---",this.state.getDatasetFilterList)
             
             // var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.country.countryId == countryId);
             var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.realmCountryId == countryId);
             
-            console.log("programId--->datasetlist---",datasetlist)
+            // console.log("programId--->datasetlist---",datasetlist)
             
             this.setState({
                 data: [],
@@ -1142,7 +1142,7 @@ console.log("getDatasetList----------->");
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json);
+        // console.log("json.length-------", json);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
             var tracerCategoryId = this.el.getValueFromCoords(5, y);
@@ -1249,12 +1249,12 @@ console.log("getDatasetList----------->");
             }, () => {
                 this.props.finishedStepOne();
             })
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             this.props.updateStepOneData("stepOneData", changedpapuList);
             this.props.updateStepOneData("selSource1", tableJson);
 
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 

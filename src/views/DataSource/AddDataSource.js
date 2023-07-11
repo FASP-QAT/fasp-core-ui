@@ -250,7 +250,7 @@ export default class AddDataSource extends Component {
     if (this.state.realm.id != 0) {
       DataSourceTypeService.getDataSourceTypeByRealmId(this.state.realm.id)
         .then((response) => {
-          console.log("getDataSourceTypeByRealmId---", response.data);
+          // console.log("getDataSourceTypeByRealmId---", response.data);
           var listArray = response.data;
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(
@@ -467,7 +467,7 @@ export default class AddDataSource extends Component {
                   this.setState({
                     loading: true,
                   });
-                  console.log("this.state----", this.state);
+                  // console.log("this.state----", this.state);
                   DataSourceService.addDataSource(this.state)
                     .then((response) => {
                       if (response.status == 200) {

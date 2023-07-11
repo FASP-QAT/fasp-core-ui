@@ -648,10 +648,10 @@ export default class ConsumptionDetails extends Component {
             integrationId: item[2],
           });
         });
-        console.log("List Test@@@123", list);
+        // console.log("List Test@@@123", list);
         IntegrationService.addManualJson(list)
           .then((response) => {
-            console.log(response.data);
+            // console.log(response.data);
             if (response.status == "200") {
               this.setState(
                 {
@@ -757,31 +757,31 @@ export default class ConsumptionDetails extends Component {
     var valid = true;
     var elInstance = this.state.dataEL;
     var json = elInstance.getJson(null, false);
-    console.log("Json Test@@@123", json);
+    // console.log("Json Test@@@123", json);
     var validation = "";
     for (var y = 0; y < json.length; y++) {
       if (json[y][0] != "" || json[y][1] != "" || json[y][2] != "") {
-        console.log("y Test@@@123", y);
+        // console.log("y Test@@@123", y);
         var rowData = elInstance.getRowData(y);
-        console.log("Row Data Test@@@123", rowData);
+        // console.log("Row Data Test@@@123", rowData);
         validation = checkValidtion("text", "A", y, rowData[0], elInstance);
-        console.log("Validation 1 Test@@@123", validation);
+        // console.log("Validation 1 Test@@@123", validation);
         if (validation == false) {
           valid = false;
         }
         validation = checkValidtion("text", "B", y, rowData[1], elInstance);
-        console.log("Validation 2 Test@@@123", validation);
+        // console.log("Validation 2 Test@@@123", validation);
         if (validation == false) {
           valid = false;
         }
         validation = checkValidtion("text", "C", y, rowData[2], elInstance);
-        console.log("Validation 3 Test@@@123", validation);
+        // console.log("Validation 3 Test@@@123", validation);
         if (validation == false) {
           valid = false;
         }
       }
     }
-    console.log("Valid Test@@@123", valid);
+    // console.log("Valid Test@@@123", valid);
     return valid;
   }
 
@@ -835,7 +835,7 @@ export default class ConsumptionDetails extends Component {
 
   filterProgram = () => {
     let countryIds = this.state.countryValues.map((ele) => ele.value);
-    console.log("countryIds", countryIds, "programs", this.state.programs);
+    // console.log("countryIds", countryIds, "programs", this.state.programs);
     this.setState(
       {
         programListBasedOnCountry: [],
@@ -853,7 +853,7 @@ export default class ConsumptionDetails extends Component {
             .then((programResponse) => {
               if (programResponse.status == 200) {
                 var programList = programResponse.data;
-                console.log("programList", programList);
+                // console.log("programList", programList);
                 var plList = [];
                 programList.map((item) => {
                   plList.push({
@@ -883,7 +883,7 @@ export default class ConsumptionDetails extends Component {
                       loading: false,
                     },
                     () => {
-                      console.log("programValues", programValues);
+                      // console.log("programValues", programValues);
 
                       this.getVersions();
                     }
@@ -992,7 +992,7 @@ export default class ConsumptionDetails extends Component {
         let programValues = this.state.programValues.map((ele) => ele.value);
 
         if (progList.length != 0) {
-          console.log("Json Test@@@123", this.state.loading);
+          // console.log("Json Test@@@123", this.state.loading);
 
           var keys = [];
           var values = [];
@@ -1145,10 +1145,10 @@ export default class ConsumptionDetails extends Component {
           realmCountryIds: realmCountryIds,
           programIds: programIds,
         };
-        console.log("Json Test@@@123", json);
+        // console.log("Json Test@@@123", json);
         IntegrationService.reportForManualIntegration(json)
           .then((response) => {
-            console.log(response.data);
+            // console.log(response.data);
             var dataForJexcel = [];
             if (realmCountryIds.length > 0 && programIds.length > 0) {
               dataForJexcel = response.data.sort((a, b) => {
@@ -1158,7 +1158,7 @@ export default class ConsumptionDetails extends Component {
               });
             }
             if (response.status == "200") {
-              console.log("Response.data Test@@@123", response.data);
+              // console.log("Response.data Test@@@123", response.data);
               var data = [];
               var tableData = [];
               for (var i = 0; i < dataForJexcel.length; i++) {
@@ -1280,7 +1280,7 @@ export default class ConsumptionDetails extends Component {
             }
           })
           .catch((error) => {
-            console.log("Err Test@@@123", error);
+            // console.log("Err Test@@@123", error);
             if (error.message === "Network Error") {
               this.setState({
                 // message: 'static.unkownError',

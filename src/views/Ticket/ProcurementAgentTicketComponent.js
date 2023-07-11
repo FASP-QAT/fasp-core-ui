@@ -277,10 +277,10 @@ export default class ProcurementAgentTicketComponent extends Component {
 
             if (procurementAgentValue.length >= 10) {//minus 2
                 procurementAgentValue = procurementAgentValue.slice(0, 8);
-                console.log("DISPLAYNAME-BEF----->", procurementAgentValue);
+                // console.log("DISPLAYNAME-BEF----->", procurementAgentValue);
                 ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP----->", response);
+                        // console.log("DISPLAYNAME-RESP----->", response);
                         let { procurementAgent } = this.state;
                         procurementAgent.procurementAgentCode = response.data;
                         this.setState({
@@ -330,10 +330,10 @@ export default class ProcurementAgentTicketComponent extends Component {
                     );
 
             } else {// not need to minus
-                console.log("DISPLAYNAME-BEF-else----->", procurementAgentValue);
+                // console.log("DISPLAYNAME-BEF-else----->", procurementAgentValue);
                 ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        // console.log("DISPLAYNAME-RESP-else----->", response);
                         let { procurementAgent } = this.state;
                         procurementAgent.procurementAgentCode = response.data;
                         this.setState({
@@ -425,7 +425,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                             this.state.procurementAgent.summary = summaryText_2;
                             this.state.procurementAgent.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.procurementAgent).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

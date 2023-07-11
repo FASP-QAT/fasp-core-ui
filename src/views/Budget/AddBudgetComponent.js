@@ -332,7 +332,7 @@ class AddBudgetComponent extends Component {
     }
 
     componentDidMount() {
-        console.log("new date--->", new Date());
+        // console.log("new date--->", new Date());
         this.setState({ loading: true })
         let realmId=AuthenticationService.getRealmId();
         DropdownService.getProgramForDropdown(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
@@ -576,7 +576,7 @@ class AddBudgetComponent extends Component {
                                     this.setState({
                                         loading:true
                                     })
-                                    console.log("this.state--->", this.state);
+                                    // console.log("this.state--->", this.state);
                                     let { budget } = this.state;
                                     let budget1 = this.state.budget;
                                     var getCurrencyId = this.state.budget.currency.currencyId;
@@ -626,7 +626,7 @@ class AddBudgetComponent extends Component {
                                                 this.setState({
                                                     budget: budget
                                                 }, () => {
-                                                    console.log("BUDGET--->", this.state.budget);
+                                                    // console.log("BUDGET--->", this.state.budget);
                                                 })
                                                 if (error.message === "Network Error") {
                                                     this.setState({

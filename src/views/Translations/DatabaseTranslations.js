@@ -43,7 +43,7 @@ export default class DatabaseTranslations extends React.Component {
         LabelsService.getDatabaseLabelsList().then(response => {
             if (response.status == 200) {
                 var json = response.data;
-                console.log("Json@@@@@@@@@@@@", json)
+                // console.log("Json@@@@@@@@@@@@", json)
                 var data = [];
                 var label = [];
                 for (var i = 0; i < json.length; i++) {
@@ -128,7 +128,7 @@ export default class DatabaseTranslations extends React.Component {
             }
         }).catch(
             error => {
-                console.log("Error@@@@@@@@", error)
+                // console.log("Error@@@@@@@@", error)
                 if (error.message === "Network Error") {
                     this.setState({
                         // message: 'static.unkownError',
@@ -211,7 +211,7 @@ export default class DatabaseTranslations extends React.Component {
                 }
             }).catch(
                 error => {
-                    console.log("Error@@@@@@@@@", error)
+                    // console.log("Error@@@@@@@@@", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             // message: 'static.unkownError',

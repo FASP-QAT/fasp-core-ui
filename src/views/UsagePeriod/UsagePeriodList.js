@@ -175,7 +175,7 @@ class UsagePeriod extends Component {
 
                     var rowData = elInstance.getRowData(y);
                     var addRowId = rowData[7];
-                    console.log("addRowId------>", addRowId);
+                    // console.log("addRowId------>", addRowId);
                     if (addRowId == 1) {//active grade out
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
@@ -252,9 +252,9 @@ class UsagePeriod extends Component {
     getUsagePeriodData() {
         this.hideSecondComponent();
         UsagePeriodService.getUsagePeriodList().then(response => {
-            console.log("response", response.status);
+            // console.log("response", response.status);
             if (response.status == 200) {
-                console.log("response.data---->", response.data);
+                // console.log("response.data---->", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -484,15 +484,15 @@ class UsagePeriod extends Component {
     formSubmit = function () {
 
         var validation = this.checkValidation();
-        console.log("validation------->", validation)
+        // console.log("validation------->", validation)
         if (validation == true) {
             this.setState({ loading: true })
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("6 map---" + map1.get("6"))
+                // console.log("6 map---" + map1.get("6"))
                 if (parseInt(map1.get("6")) === 1) {
                     let json = {
 
@@ -518,12 +518,12 @@ class UsagePeriod extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             UsagePeriodService.addUpdateUsagePeriod(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         // window.location.reload();
                         this.setState({
                             message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged: false
@@ -596,7 +596,7 @@ class UsagePeriod extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -682,7 +682,7 @@ class UsagePeriod extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(6, y);
             if (parseInt(value) == 1) {
@@ -690,7 +690,7 @@ class UsagePeriod extends Component {
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");

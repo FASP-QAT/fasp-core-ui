@@ -119,7 +119,7 @@ export default class PipelineProgramConsumption extends Component {
             }
 
         }
-        console.log("valid=====>", valid);
+        // console.log("valid=====>", valid);
         return valid;
     }
 
@@ -149,8 +149,8 @@ export default class PipelineProgramConsumption extends Component {
         }
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
-            // console.log("value=====>", value);
-            // console.log("list====>", filteredList);
+            // // console.log("value=====>", value);
+            // // console.log("list====>", filteredList);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -306,7 +306,7 @@ export default class PipelineProgramConsumption extends Component {
         this.setState({ abc: true });
         var json = this.el.getJson(null, false);
         var list = this.state.consumptionList;
-        console.log("consumption json------->", json);
+        // console.log("consumption json------->", json);
         var consumptionArray = []
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));
@@ -334,13 +334,13 @@ export default class PipelineProgramConsumption extends Component {
             }
             consumptionArray.push(consumptionJson);
         }
-        console.log("consumptionArray======>", consumptionArray);
+        // console.log("consumptionArray======>", consumptionArray);
         return consumptionArray;
     }
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         PipelineService.getQatTempProgramregion(this.props.pipelineId).then(response => {
-            // console.log("my region List ----->", response.data);
+            // // console.log("my region List ----->", response.data);
             var regionList = [];
             var dataSourceList = [];
             var planningUnitListQat = []
@@ -358,7 +358,7 @@ export default class PipelineProgramConsumption extends Component {
                 var realmCountryPlanningUnitList = [];
 
                 this.setState({ realmCountryPlanningUnitList: response.data });
-                console.log("realmCountryPlanningUnitId====>", response.data);
+                // console.log("realmCountryPlanningUnitId====>", response.data);
 
                 for (var i = 0; i < response.data.length; i++) {
                     var rcpJson = {
@@ -370,7 +370,7 @@ export default class PipelineProgramConsumption extends Component {
 
                 // AuthenticationService.setupAxiosInterceptors();
                 DataSourceService.getAllDataSourceList().then(response => {
-                    // console.log("data source List ----->", response.data);
+                    // // console.log("data source List ----->", response.data);
                     var dataSourceFilterList = response.data.filter(c => c.dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || c.dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE);
                     for (var j = 0; j < dataSourceFilterList.length; j++) {
                         // if (response.data[j].dataSourceType.id == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE || response.data[j].dataSourceType.id == FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE)
@@ -381,11 +381,11 @@ export default class PipelineProgramConsumption extends Component {
                         dataSourceList.push(dataSourceJson);
                     }
 
-                    console.log("final data source====>", dataSourceList);
+                    // console.log("final data source====>", dataSourceList);
                     // AuthenticationService.setupAxiosInterceptors();
                     PlanningUnitService.getActivePlanningUnitList()
                         .then(response => {
-                            // console.log("planning units list in consumption--->", response.data);
+                            // // console.log("planning units list in consumption--->", response.data);
                             // planningUnitListQat = response.data
                             for (var k = 0; k < (response.data).length; k++) {
                                 var planningUnitJson = {
@@ -397,7 +397,7 @@ export default class PipelineProgramConsumption extends Component {
 
                             // AuthenticationService.setupAxiosInterceptors();
                             PipelineService.getQatTempConsumptionById(this.props.pipelineId).then(response => {
-                                console.log("temp consumpton list--->", response.data);
+                                // console.log("temp consumpton list--->", response.data);
                                 if (response.status == 200) {
 
 
@@ -421,7 +421,7 @@ export default class PipelineProgramConsumption extends Component {
                                             // Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) + (consumptionList[j].consumptionQty - ((Math.ceil(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth)) * consumptionList[j].consNumMonth))
                                             // match.ceil(5 + 50 - (5 * 12))
                                             data[6] = Math.round((cm == 0 || cm != consumptionList[j].consNumMonth - 1) ? Math.floor(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) : Math.floor(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth) + (consumptionList[j].consumptionQty - ((Math.floor(consumptionList[j].consumptionQty / consumptionList[j].consNumMonth)) * consumptionList[j].consNumMonth)));
-                                            // console.log("data[6]***", data[6]);
+                                            // // console.log("data[6]***", data[6]);
                                             data[7] = consumptionList[j].dayOfStockOut;
                                             data[1] = consumptionList[j].dataSourceId;
                                             data[3] = consumptionList[j].realmCountryPlanningUnitId;
@@ -437,7 +437,7 @@ export default class PipelineProgramConsumption extends Component {
                                             consumptionDataArr.push(data);
                                         }
                                     }
-                                    console.log('consumptionDataArr', consumptionDataArr)
+                                    // console.log('consumptionDataArr', consumptionDataArr)
                                     this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
                                     // this.el.destroy();
                                     jexcel.destroy(document.getElementById("consumptiontableDiv"), true);
@@ -562,10 +562,10 @@ export default class PipelineProgramConsumption extends Component {
 
                                 }
                                 // else {
-                                //     console.log("in else==================");
+                                //     // console.log("in else==================");
                                 //     AuthenticationService.setupAxiosInterceptors();
                                 //     PipelineService.getPipelineProgramConsumption(this.props.pipelineId).then(response => {
-                                //         console.log("consumption List pipeline ----->", response.data);
+                                //         // console.log("consumption List pipeline ----->", response.data);
                                 //         var data = [];
                                 //         var consumptionDataArr = [];
                                 //         var consumptionList = response.data;
@@ -885,7 +885,7 @@ export default class PipelineProgramConsumption extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[4]));
+            // console.log("RESP---------", parseFloat(rowData[4]));
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
         } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);

@@ -152,7 +152,7 @@ export default class ChangeRequestTicketComponent extends Component {
                             })
                             // this.state.changeRequest.summary = summaryText_2;
                             JiraTikcetService.addChangeRequest(this.state.changeRequest).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     JiraTikcetService.addIssueAttachment(this.state.changeRequest, response.data.id).then(response => {

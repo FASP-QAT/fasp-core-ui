@@ -84,8 +84,8 @@ export default class AddOrganisationTypeComponent extends Component {
 
     dataChange(event) {
         let { organisationType } = this.state
-        console.log(event.target.name);
-        console.log(event.target.value);
+        // console.log(event.target.name);
+        // console.log(event.target.value);
         if (event.target.name === "organisationTypeName") {
             organisationType.label.label_en = event.target.value
         } else if (event.target.name === "realmId") {
@@ -95,7 +95,7 @@ export default class AddOrganisationTypeComponent extends Component {
             organisationType
         }, (
         ) => {
-            console.log("state after update---", this.state.organisationType)
+            // console.log("state after update---", this.state.organisationType)
         })
     }
 
@@ -124,12 +124,12 @@ export default class AddOrganisationTypeComponent extends Component {
     }
 
     componentDidMount() {
-        console.log("INSIDE componentDidMount------------------");
+        // console.log("INSIDE componentDidMount------------------");
         // AuthenticationService.setupAxiosInterceptors();
 
         UserService.getRealmList()
             .then(response => {
-                console.log("realm list---", response.data);
+                // console.log("realm list---", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase

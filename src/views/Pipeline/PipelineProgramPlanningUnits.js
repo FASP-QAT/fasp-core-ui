@@ -44,7 +44,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
         var puList = []
         if (value != -1) {
-            console.log("in if=====>");
+            // console.log("in if=====>");
             var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
             var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
             var pcIdArray = [];
@@ -53,7 +53,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
             puList = (this.state.activePlanningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
         } else {
-            console.log("in else=====>");
+            // console.log("in else=====>");
             puList = this.state.activePlanningUnitList
         }
 
@@ -162,14 +162,14 @@ export default class PipelineProgramPlanningUnits extends Component {
             // instance.jexcel.setValue(columnName, '');
         }
         if (x == 4) {
-            console.log("adasdasda==>", value);
+            // console.log("adasdasda==>", value);
             //var reg = /^[0-9\b]+$/;
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             // var reg = JEXCEL_DECIMAL_LEAD_TIME;
             var reg = JEXCEL_PIPELINE_CONVERSION_FACTOR;
             var col = ("E").concat(parseInt(y) + 1);
             value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            console.log("VALUE==>", value);
+            // console.log("VALUE==>", value);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -270,7 +270,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             var reg = JEXCEL_DECIMAL_LEAD_TIME;
             var col = ("K").concat(parseInt(y) + 1);
             value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            console.log('value=>', value)
+            // console.log('value=>', value)
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -343,12 +343,12 @@ export default class PipelineProgramPlanningUnits extends Component {
 
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("D------------>", json)
+        // console.log("D------------>", json)
         for (var y = 0; y < json.length; y++) {
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
             var currentPlanningUnit = this.el.getRowData(y)[1];
-            console.log("D------------>1", value);
+            // console.log("D------------>1", value);
             if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -360,8 +360,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                 for (var i = 0; i < json.length; i++) {
                     var map = new Map(Object.entries(json[i]));
                     var planningUnitValue = map.get("3");
-                    // console.log("currentvalues---", currentPlanningUnit);
-                    // console.log("planningUnitValue-->", planningUnitValue);
+                    // // console.log("currentvalues---", currentPlanningUnit);
+                    // // console.log("planningUnitValue-->", planningUnitValue);
                     if (planningUnitValue == currentPlanningUnit && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
@@ -589,7 +589,7 @@ export default class PipelineProgramPlanningUnits extends Component {
             }
             planningUnitArray.push(planningUnitJson);
         }
-        console.log("planning unit array====>", planningUnitArray);
+        // console.log("planning unit array====>", planningUnitArray);
         return planningUnitArray;
 
     }
@@ -604,7 +604,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                 // productCategoryList = response.data;
                 for (var k = 0; k < (response.data).length; k++) {
                     var spaceCount = response.data[k].sortOrder.split(".").length;
-                    console.log("spaceCOunt--->", spaceCount);
+                    // console.log("spaceCOunt--->", spaceCount);
                     var indendent = "";
                     for (var p = 1; p <= spaceCount - 1; p++) {
                         if (p == 1) {
@@ -613,8 +613,8 @@ export default class PipelineProgramPlanningUnits extends Component {
                             indendent = indendent.concat("_");
                         }
                     }
-                    console.log("ind", indendent);
-                    console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
+                    // console.log("ind", indendent);
+                    // console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
 
 
                     var productCategoryJson = {};
@@ -634,7 +634,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
                 }
                 this.setState({ productCategoryList: response.data });
-                console.log("category response---->", productCategoryList);
+                // console.log("category response---->", productCategoryList);
 
 
 
@@ -667,7 +667,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                             //seting this for loaded function
                                             this.setState({ planningUnitList: planningUnitList });
                                             //seting this for loaded function
-                                            console.log("planning Unit list==>", planningUnitList);
+                                            // console.log("planning Unit list==>", planningUnitList);
 
                                             if (planningUnitList.length != 0) {
                                                 for (var j = 0; j < planningUnitList.length; j++) {
@@ -710,7 +710,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
                                                 }
                                             } else {
-                                                console.log("product list length is 0.");
+                                                // console.log("product list length is 0.");
                                             }
 
                                             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
@@ -857,7 +857,7 @@ export default class PipelineProgramPlanningUnits extends Component {
 
                                             //                     }
                                             //                 } else {
-                                            //                     console.log("product list length is 0.");
+                                            //                     // console.log("product list length is 0.");
                                             //                 }
 
                                             //                 this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
@@ -1063,7 +1063,7 @@ export default class PipelineProgramPlanningUnits extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[4]));
+            // console.log("RESP---------", parseFloat(rowData[4]));
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
         } else if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);

@@ -772,7 +772,7 @@ export default class AddCountryComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("------IN SUBMIT------", this.state.country)
+                                    // console.log("------IN SUBMIT------", this.state.country)
                                     CountryService.addCountry(this.state.country)
                                         .then(response => {
                                             if (response.status == 200) {

@@ -484,7 +484,7 @@ export default class CompareVersion extends Component {
                 var selectedForecastData2 = pu2.length > 0 ? pu2[0].selectedForecastMap : '';
 
 
-                console.log("consumptionExtrapolation", consumptionExtrapolation);
+                // console.log("consumptionExtrapolation", consumptionExtrapolation);
 
                 data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label, this.state.lang) + " | " + pu[0].planningUnit.id : getLabelText(pu1[0].planningUnit.label) + " | " + pu1[0].planningUnit.id;
                 data[1] = rg.length > 0 ? getLabelText(rg[0].label) : getLabelText(rg1[0].label);
@@ -492,7 +492,7 @@ export default class CompareVersion extends Component {
                 // var count = 1;
                 // for (var r = 0; r < regionList.length; r++) {
                 var regionalSelectedForecastData = selectedForecastData[regionSet[k]];
-                console.log("regionalSelectedForecastData", regionalSelectedForecastData);
+                // console.log("regionalSelectedForecastData", regionalSelectedForecastData);
                 var ce = regionalSelectedForecastData != undefined && regionalSelectedForecastData.consumptionExtrapolationId != null ? consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId) : [];
                 var selectedTreeScenario = [];
                 if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null) {
@@ -503,9 +503,9 @@ export default class CompareVersion extends Component {
                     var tsListFilter=datasetData.treeList.filter(c=>c.treeId==regionalSelectedForecastData.treeId);
                     if(tsListFilter.length>0){
                         var flatList = tsListFilter[0].tree.flatList;
-                        console.log("Flat List @@@@@@@ Test", flatList)
+                        // console.log("Flat List @@@@@@@ Test", flatList)
                         var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[regionalSelectedForecastData.scenarioId][0].puNode != null && c.payload.nodeDataMap[regionalSelectedForecastData.scenarioId][0].puNode.planningUnit.id == pu[0].planningUnit.id);
-                        console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
+                        // console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
                         var nodeDataMomList = [];
                         for (var fl = 0; fl < flatListFilter.length; fl++) {
                             nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[regionalSelectedForecastData.scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData.currentVersion.forecastStopDate).format("YYYY-MM")));
@@ -709,7 +709,7 @@ export default class CompareVersion extends Component {
 
     // functions
     showData(data, index) {
-        console.log('inside');
+        // console.log('inside');
         var dataArray = [];
         dataArray.push([data[0], data[1], data[2], data[3], data[4]]);
         dataArray.push([data[0], data[1], data[5], data[6], data[7]]);
@@ -804,7 +804,7 @@ export default class CompareVersion extends Component {
 
     acceptIncomingChanges() {
         var elInstance = this.state.dataEl;
-        console.log("this.state.index", this.state.index);
+        // console.log("this.state.index", this.state.index);
         elInstance.options.editable = true;
         elInstance.setValueFromCoords(11, this.state.index, 3, true);
         elInstance.options.editable = false;

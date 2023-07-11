@@ -10,11 +10,11 @@ export function calculateModelingData(dataset, props, page) {
     }.bind(this);
     openRequest.onsuccess = function (e) {
         db1 = e.target.result;
-        console.log("In calculate function###", dataset);
+        // console.log("In calculate function###", dataset);
         var datasetDataBytes = CryptoJS.AES.decrypt(dataset.programData, SECRET_KEY);
         var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
         var datasetJson = JSON.parse(datasetData);
-        console.log("DatasetJson###", datasetJson);
+        // console.log("DatasetJson###", datasetJson);
         var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
         var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
         var treeList = datasetJson.treeList;
@@ -71,9 +71,9 @@ export function calculateModelingData(dataset, props, page) {
                             var nodeDataModelingListWithTransfer = nodeDataModelingListUnFiltered.concat(transferNodeList);
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM-DD") >= moment(c.startDate).format("YYYY-MM-DD") && moment(curDate).format("YYYY-MM-DD") <= moment(c.stopDate).format("YYYY-MM-DD"));
                             // console.log("nodeDatamodelingList>>>>",nodeDataModelingList);
-                            console.log("((nodeDataMap[scenarioList[ndm].id])[0]>>>", ((nodeDataMap[scenarioList[ndm].id])[0]));
+                            // console.log("((nodeDataMap[scenarioList[ndm].id])[0]>>>", ((nodeDataMap[scenarioList[ndm].id])[0]));
                             var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
-                            console.log("nodeDataOverrideList>>>", nodeDataOverrideList);
+                            // console.log("nodeDataOverrideList>>>", nodeDataOverrideList);
                             var startValue = 0;
                             var startValueWMC = 0;
                             if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
@@ -234,7 +234,7 @@ export function calculateModelingData(dataset, props, page) {
                                     manualChange: nodeDataOverrideListFiltered.length > 0 ? Number(nodeDataOverrideListFiltered[0].manualChange) : 0
                                 }
                             );
-                            console.log("nodeDataList@@@", nodeDataList);
+                            // console.log("nodeDataList@@@", nodeDataList);
                         }
                     }
                 }
@@ -315,7 +315,7 @@ export function calculateModelingData(dataset, props, page) {
                 props.fetchData(1, dataset.id);
             } else {
                 props.updateState("loading", false);
-                console.log("Data saved")
+                // console.log("Data saved")
             }
         // }.bind(this)
     }.bind(this)

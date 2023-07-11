@@ -842,7 +842,7 @@ export default class ShipmentDetails extends React.Component {
                                     var fundingSourceListPlan = fsRequest.result;
                                     // .filter(c => c.realm.id == generalProgramJson.realmCountry.realm.realmId);
                                     var budgetListPlan = bRequest.result.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(parseInt(programId)));
-                                    console.log("budgetListPlan", budgetListPlan)
+                                    // console.log("budgetListPlan", budgetListPlan)
                                     var myResult = [];
                                     myResult = planningunitRequest.result.filter(c => c.program.id == programId);
                                     var proList = [];
@@ -953,7 +953,7 @@ export default class ShipmentDetails extends React.Component {
     }
 
     formSubmit(value, rangeValue) {
-        console.log("Value@@@@@@@@@", value)
+        // console.log("Value@@@@@@@@@", value)
         var cont = false;
         if (this.state.shipmentChangedFlag == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -1015,18 +1015,18 @@ export default class ShipmentDetails extends React.Component {
                         var puData = [];
                         var shipmentListForSelectedPlanningUnits = [];
                         var shipmentListForSelectedPlanningUnitsUnfiltered = [];
-                        console.log("puList@@@@@@@@", puList)
+                        // console.log("puList@@@@@@@@", puList)
                         var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                         var generalProgramJson = JSON.parse(generalProgramData);
                         var planningUnitListForJexcel = this.state.planningUnitListForJexcelAll;
-                        console.log("planningUnitListForJexcel@@@@@@@@", planningUnitListForJexcel)
+                        // console.log("planningUnitListForJexcel@@@@@@@@", planningUnitListForJexcel)
                         var planningUnitListForJexcelUpdated = [];
                         for (var pu = 0; pu < puList.length; pu++) {
                             planningUnitListForJexcelUpdated.push(planningUnitListForJexcel.filter(c => c.id == puList[pu].value)[0]);
-                            console.log("puList[pu].value@@@@@@@@@Mohit", puList[pu].value)
+                            // console.log("puList[pu].value@@@@@@@@@Mohit", puList[pu].value)
                             var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == puList[pu].value);
-                            console.log("planningUnitDataFilter[pu].value@@@@@@@@@Mohit", planningUnitDataFilter)
+                            // console.log("planningUnitDataFilter[pu].value@@@@@@@@@Mohit", planningUnitDataFilter)
                             var programJson = {};
                             if (planningUnitDataFilter.length > 0) {
                                 var planningUnitData = planningUnitDataFilter[0]
@@ -1055,8 +1055,8 @@ export default class ShipmentDetails extends React.Component {
                             }
                             shipmentList = shipmentList.filter(c => c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? moment(c.receivedDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.receivedDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD") : moment(c.expectedDeliveryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.expectedDeliveryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
                             shipmentListForSelectedPlanningUnits = shipmentListForSelectedPlanningUnits.concat(shipmentList);
-                            console.log("ShipmentList@@@@@@@@@@@@@@", shipmentList)
-                            console.log("ShipmentList@@@@@@@@@@@@@@", shipmentList)
+                            // console.log("ShipmentList@@@@@@@@@@@@@@", shipmentList)
+                            // console.log("ShipmentList@@@@@@@@@@@@@@", shipmentList)
                             puData.push({
                                 id: puList[pu].value,
                                 shelfLife: programPlanningUnit.shelfLife,
@@ -1068,7 +1068,7 @@ export default class ShipmentDetails extends React.Component {
                                 programPlanningUnitForPrice: programPlanningUnit,
                             })
                         }
-                        console.log("planningUnitListForJexcelUpdated", planningUnitListForJexcelUpdated)
+                        // console.log("planningUnitListForJexcelUpdated", planningUnitListForJexcelUpdated)
                         this.setState({
                             generalProgramJson: generalProgramJson,
                             puData: puData,
@@ -1764,16 +1764,16 @@ export default class ShipmentDetails extends React.Component {
                                             }
 
 
-                                            console.log("ProgramJson@@@@@@@@@@", programJson);
+                                            // console.log("ProgramJson@@@@@@@@@@", programJson);
                                             var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-" + this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
                                             var sstd = {}
                                             if (programPlanningUnit.planBasedOn == 1) {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                 var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
-                                                console.log("suingle Mohit", this.state.singleValue)
-                                                console.log("Month Mohit", month)
-                                                console.log("Current minth Mohit", currentMonth)
-                                                console.log("Compare Mohit", compare)
+                                                // console.log("suingle Mohit", this.state.singleValue)
+                                                // console.log("Month Mohit", month)
+                                                // console.log("Current minth Mohit", currentMonth)
+                                                // console.log("Compare Mohit", compare)
                                                 var supplyPlanData = programJson.supplyPlan;
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var batchInfoList = programJson.batchInfoList;
@@ -1808,7 +1808,7 @@ export default class ShipmentDetails extends React.Component {
                                                     suggestShipment = false;
                                                 }
 
-                                                console.log("suggestShipment Mohit", suggestShipment)
+                                                // console.log("suggestShipment Mohit", suggestShipment)
                                                 if (suggestShipment) {
                                                     var suggestedOrd = 0;
                                                     if (useMax) {
@@ -1820,10 +1820,10 @@ export default class ShipmentDetails extends React.Component {
                                             } else {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                 var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
-                                                console.log("suingle Mohit", this.state.singleValue)
-                                                console.log("Month Mohit", month)
-                                                console.log("Current minth Mohit", currentMonth)
-                                                console.log("Compare Mohit", compare)
+                                                // console.log("suingle Mohit", this.state.singleValue)
+                                                // console.log("Month Mohit", month)
+                                                // console.log("Current minth Mohit", currentMonth)
+                                                // console.log("Compare Mohit", compare)
                                                 var supplyPlanData = programJson.supplyPlan;
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var batchInfoList = programJson.batchInfoList;
@@ -1865,9 +1865,9 @@ export default class ShipmentDetails extends React.Component {
                                                     suggestShipment = false;
                                                 }
 
-                                                console.log("suggestShipment Mohit", suggestShipment)
-                                                console.log("maxStockForMonth1 Mohit", maxStockForMonth1)
-                                                console.log("maxStockForMonth1 spd1 Mohit", spd1)
+                                                // console.log("suggestShipment Mohit", suggestShipment)
+                                                // console.log("maxStockForMonth1 Mohit", maxStockForMonth1)
+                                                // console.log("maxStockForMonth1 spd1 Mohit", spd1)
                                                 if (suggestShipment) {
                                                     var suggestedOrd = 0;
                                                     if (useMax) {
@@ -1895,8 +1895,8 @@ export default class ShipmentDetails extends React.Component {
                                                     }
 
 
-                                                    console.log("Planning Unit Id", planningUnitsIds[pu]);
-                                                    console.log("Plan shipment with Qty Mohit", suggestedOrd);
+                                                    // console.log("Planning Unit Id", planningUnitsIds[pu]);
+                                                    // console.log("Plan shipment with Qty Mohit", suggestedOrd);
                                                     var c = cRequest.result.filter(c => c.currencyId == USD_CURRENCY_ID)[0];
                                                     var rcpu = rcpuRequest.result.filter(c => c.multiplier == 1 && c.planningUnit.id == planningUnitsIds[pu].value)[0]
                                                     var programId = (document.getElementById("programId").value).split("_")[0];
@@ -1914,8 +1914,8 @@ export default class ShipmentDetails extends React.Component {
                                                         },
                                                         shipmentQty: suggestedOrd
                                                     }]
-                                                    console.log("Number(Number(pricePerUnit)*Number(suggestedOrd)) Mohit", Number(Number(pricePerUnit) * Number(suggestedOrd)))
-                                                    console.log("Number(Number(pricePerUnit)*Number(suggestedOrd)) Mohit 1", generalProgramJson)
+                                                    // console.log("Number(Number(pricePerUnit)*Number(suggestedOrd)) Mohit", Number(Number(pricePerUnit) * Number(suggestedOrd)))
+                                                    // console.log("Number(Number(pricePerUnit)*Number(suggestedOrd)) Mohit 1", generalProgramJson)
                                                     shipmentDataList.push({
                                                         accountFlag: true,
                                                         active: true,

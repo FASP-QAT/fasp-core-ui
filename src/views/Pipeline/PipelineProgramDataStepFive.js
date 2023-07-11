@@ -86,9 +86,9 @@ export default class PipelineProgramDataStepFive extends Component {
         // var healthAreaIdd = document.getElementById("healthAreaId").value;
         var healthAreaIdd = this.props.items.program.healthAreaArray;
         var organisationIdd = document.getElementById("organisationId").value;
-        console.log("realmCountryIdd", realmCountryIdd);
-        console.log("healthAreaIdd", healthAreaIdd);
-        console.log("organisationIdd", organisationIdd);
+        // console.log("realmCountryIdd", realmCountryIdd);
+        // console.log("healthAreaIdd", healthAreaIdd);
+        // console.log("organisationIdd", organisationIdd);
         if (realmCountryIdd != "") {
             ProgramService.getRealmCountryList(realmId)
                 .then(response => {
