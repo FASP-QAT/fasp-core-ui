@@ -657,7 +657,7 @@ export default class CompareVersion extends Component {
             // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
-            allowManualInsertColumn: false,
+            allowManualInseditabertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
             oneditionend: this.onedit,
@@ -666,7 +666,7 @@ export default class CompareVersion extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            editable: false,
+            // editable: false,
             license: JEXCEL_PRO_KEY,
             // editable: false,
             contextMenu: function (obj, x, y, e) {
@@ -786,8 +786,8 @@ export default class CompareVersion extends Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col1, "background-color", "transparent");
                 } else {
-                    elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-                    elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
+                    elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
+                    elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR, true);
                 }
             }
         }
@@ -837,33 +837,33 @@ export default class CompareVersion extends Component {
                         } else if (server == downloaded) {
                             var col = (colArr[startPt]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                         } else {
                             //yellow color
                             var col = (colArr[0]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[1]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[2]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[3]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[4]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[5]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[6]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[7]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             // elInstance.setValueFromCoords(11, r, 2, true);
                         }
                     }

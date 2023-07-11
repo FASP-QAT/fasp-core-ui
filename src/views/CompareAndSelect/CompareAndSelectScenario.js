@@ -20,8 +20,8 @@ import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOld, jExcelLoadedFunctionOldForCompareAndSelect, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionOnlyHideRowOld } from '../../CommonComponent/JExcelCommonFunctions';
 import NumberFormat from 'react-number-format';
@@ -122,7 +122,6 @@ class CompareAndSelectScenario extends Component {
         //
     }
     handleAMonthDissmis2 = (value) => {
-        // console.log("Value@@@", value)
         this.setState({ singleValue2: value, }, () => {
             this.setMonth1List()
         })
@@ -239,7 +238,6 @@ class CompareAndSelectScenario extends Component {
                     } catch (err) {
                         dataForPlanningUnit = []
                     }
-                    // console.log("dataForPlanningUnit####", dataForPlanningUnit);
                     var data = [];
                     if (dataForPlanningUnit.length > 0) {
                         for (var dfpu = 0; dfpu < dataForPlanningUnit.length; dfpu++) {
@@ -309,8 +307,8 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             loading: true
         })
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el = jexcel(document.getElementById("tableDiv"), '');
+        jexcel.destroy(document.getElementById("tableDiv"), true);
         var columns = [];
         columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), width: 100, type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
         columns.push({ title: i18n.t('static.compareAndSelect.actuals'), width: 100, type: 'numeric', mask: '#,##.00' });
@@ -325,7 +323,6 @@ class CompareAndSelectScenario extends Component {
         var data = [];
         var dataArr = [];
         var consumptionData = this.state.actualConsumptionList;
-        // console.log("this.state.monthList@@@@@", this.state.monthList)
         var monthArrayListWithoutFormat = this.state.monthList;
         var actualConsumptionListForMonth = [];
         var consumptionDataForTree = [];
@@ -341,7 +338,6 @@ class CompareAndSelectScenario extends Component {
             monthArrayForError.push(moment(actualMax).add(-4, 'months').format("YYYY-MM-DD"));
             monthArrayForError.push(moment(actualMax).add(-5, 'months').format("YYYY-MM-DD"));
         }
-        // console.log("monthArrayForError@@@@@@@@@@", monthArrayForError)
         var multiplier = 1;
         // var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
         // if (this.state.viewById == 2) {
@@ -360,7 +356,6 @@ class CompareAndSelectScenario extends Component {
         // } else if (selectedPlanningUnit.consumptionDataType == 3) {
         //     actualMultiplier = selectedPlanningUnit.otherUnit.multiplier
         // }
-        // console.log("Total Actual@@@@@@@@@", totalActual);
         var actualDiff = [];
         var countArray = [];
 
@@ -371,20 +366,16 @@ class CompareAndSelectScenario extends Component {
         var totalActual = 0;
         for (var mo = 0; mo < monthArrayForError.length; mo++) {
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
-            // console.log("ActualFilter@@@@@@@@@@", actualFilter)
             if (actualFilter.length > 0) {
                 totalActual += Number(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0);
             }
-            // console.log("MOnth@@@@@@@@@@@@@@@@", monthArrayForError)
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
-                // console.log("treeScenarioList[tsl]@@@@", treeScenarioList[tsl])
                 if (treeScenarioList[tsl].type == "T") {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
                     var diff = scenarioFilter.length > 0 ? ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : "")) : 0;
                     if (diff < 0) {
                         diff = 0 - diff;
                     }
-                    // console.log("Difference@@@@@@@@@@@@@@@@", diff);
                     actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + diff : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
                     if (scenarioFilter.length > 0) {
                         countArray[tsl] = countArray[tsl] != undefined ? countArray[tsl] + 1 : 0;
@@ -411,7 +402,6 @@ class CompareAndSelectScenario extends Component {
             data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
             // actualConsumptionListForMonth.push(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)) : null);
             var monthArrayForErrorFilter = monthArrayForError.filter(c => moment(c).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-            // console.log("TreeScenarioList###", treeScenarioList)
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 // if (tsl == 0) {
                 //     totalArray[tsl] = 0;
@@ -458,7 +448,6 @@ class CompareAndSelectScenario extends Component {
             // dataArr.push(data)
         }
 
-        // console.log("@@@@Month1 List", this.state.monthList1)
         var monthArrayListWithoutFormat = this.state.monthList1;
         var multiplier = 1;
         var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
@@ -470,7 +459,6 @@ class CompareAndSelectScenario extends Component {
             multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
         }
         var actualCalculationDataType = selectedPlanningUnit[0].consumptionDataType;
-        // console.log("actualCalculationDataType@@@@@@@@@@", actualCalculationDataType)
         var actualMultiplier = 1;
         // 1=Forecast, 2=PlanningUnit, 3=Other Unit
         // if (actualCalculationDataType == 1) {
@@ -517,7 +505,7 @@ class CompareAndSelectScenario extends Component {
                 arrayForTotal.push(totalArray[t])
             }
         }
-        var sortedArray = arrayForTotal.sort(function(a, b) {
+        var sortedArray = arrayForTotal.sort(function (a, b) {
             return a - b;
         });
         higherThenConsumptionThreshold = sortedArray.length > 0 && sortedArray[sortedArray.length - 1] != "" && sortedArray[sortedArray.length - 1] != null && sortedArray[sortedArray.length - 1] != undefined ? sortedArray[sortedArray.length - 1] : 0;
@@ -576,17 +564,17 @@ class CompareAndSelectScenario extends Component {
             colWidths: [0, 150, 150, 150, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: columns,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -605,19 +593,15 @@ class CompareAndSelectScenario extends Component {
         };
         var dataEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataEl;
-        // console.log("ActualDiff@@@@@@@@@@@@@@@@@@@", actualDiff)
 
         this.setState({
             actualDiff: actualDiff,
             finalData: finalData
         }, () => {
             let treeScenarioList1 = this.state.treeScenarioList;
-            // console.log("langaugeList---->", langaugeList);
             let dataArray = [];
             let count = 0;
-            // console.log("")
             for (var j = 0; j < treeScenarioList1.length; j++) {
-                // console.log("this.state.totalArray[j]@@@@@@@@@", totalArray[j])
                 data = [];
                 data[0] = this.state.selectedTreeScenarioId == treeScenarioList1[j].id ? true : false
                 data[1] = treeScenarioList1[j].checked;
@@ -635,10 +619,10 @@ class CompareAndSelectScenario extends Component {
             //     data = [];
             //     languageArray[0] = data;
             // }
-            // console.log("languageArray---->", languageArray);
             try {
-                this.el = jexcel(document.getElementById("table1"), '');
-                this.el.destroy();
+                // this.el = jexcel(document.getElementById("table1"), '');
+                jexcel.destroy(document.getElementById("table1"), true);
+
             } catch (error) {
 
             }
@@ -704,18 +688,18 @@ class CompareAndSelectScenario extends Component {
 
 
                 ],
-                text: {
-                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                    show: '',
-                    entries: '',
-                },
+                // text: {
+                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     show: '',
+                //     entries: '',
+                // },
                 onload: this.loadedTable1,
                 onchange: this.changeTable1,
                 pagination: false,
                 search: false,
                 columnSorting: true,
-                tableOverflow: true,
+                // tableOverflow: true,
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
@@ -774,10 +758,7 @@ class CompareAndSelectScenario extends Component {
         if (e.target.value > 0) {
             var name = this.state.planningUnitList.filter(c => c.planningUnit.id == e.target.value);
             var planningUnitId = e.target.value;
-            // console.log("Forecasting Unit^^^", name[0].planningUnit.forecastingUnit.id);
-            // console.log("this.state.equivalencyUnitList^^^", this.state.equivalencyUnitList);
             var equivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id && c.equivalencyUnit.active);
-            // console.log("Equivalency Unit^^^", equivalencyUnit)
             var viewById = this.state.viewById;
             this.setState({
                 planningUnitId: planningUnitId,
@@ -1398,9 +1379,9 @@ class CompareAndSelectScenario extends Component {
     }
 
     loadedTable1 = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionOnlyHideRowOld(instance);
-        var elInstance = instance.jexcel;
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        jExcelLoadedFunctionOnlyHideRow(instance);
+        var elInstance = instance.worksheets[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('InfoTr');
         tr.children[1].title = i18n.t('static.tooltip.SelectAsForecast');
@@ -1439,8 +1420,6 @@ class CompareAndSelectScenario extends Component {
                     cell.classList.add('notSelectedForecast');
                 }
             }
-            // console.log("Math.min(...this.state.actualDiff.filter(c => c != 0))@@@@@@@@@@@", Math.min(...this.state.actualDiff.filter(c => c != 0)))
-            // console.log("this.state.actualDiff[j]@@@@@@@@@@@", this.state.actualDiff[j])
             if (Math.min(...this.state.actualDiff.filter(c => c != 0)) == this.state.actualDiff[j]) {
                 var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
                 cell.classList.add('lowestError');
@@ -1505,13 +1484,12 @@ class CompareAndSelectScenario extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        // console.log("In loaded Test123")
-        jExcelLoadedFunctionOldForCompareAndSelect(instance);
-        var elInstance = instance.jexcel;
+        jExcelLoadedFunction(instance);
+        var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength;
-        if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
-            jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         }
 
         if (jsonLength == undefined) {
@@ -1524,8 +1502,7 @@ class CompareAndSelectScenario extends Component {
         for (var y = 0; y < jsonLength; y++) {
             var rowData = elInstance.getRowData(y);
             var index = this.state.monthList.findIndex(c => moment(c).format("YYYY-MM") == moment(rowData[0]).format("YYYY-MM"))
-            // console.log("rowData[0]****", this.state.monthList.includes(rowData[0]));
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ','BA', 'BB', 'BC', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BK', 'BL', 'BM', 'BN', 'BO', 'BP', 'BQ', 'BR', 'BS', 'BT', 'BU', 'BV', 'BW', 'BX', 'BY', 'BZ','CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CI', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CO', 'CP', 'CQ', 'CR', 'CS', 'CT', 'CU', 'CV', 'CW', 'CX', 'CY', 'CZ'];
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ', 'BA', 'BB', 'BC', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BK', 'BL', 'BM', 'BN', 'BO', 'BP', 'BQ', 'BR', 'BS', 'BT', 'BU', 'BV', 'BW', 'BX', 'BY', 'BZ', 'CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CI', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CO', 'CP', 'CQ', 'CR', 'CS', 'CT', 'CU', 'CV', 'CW', 'CX', 'CY', 'CZ'];
             if (index != -1) {
                 var cell = elInstance.getCell((colArr[0]).concat(parseInt(y) + 1))
                 cell.classList.add('jexcelBoldCell');
@@ -1550,22 +1527,21 @@ class CompareAndSelectScenario extends Component {
     }
 
     onchangepage(el, pageNo, oldPageNo) {
-        var elInstance = el.jexcel;
+        var elInstance = el;
         var json = elInstance.getJson(null, false);
-        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
-        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         var tList = this.state.treeScenarioList;
         for (var y = start; y < jsonLength; y++) {
             var rowData = elInstance.getRowData(y);
             var index = this.state.monthList.findIndex(c => moment(c).format("YYYY-MM") == moment(rowData[0]).format("YYYY-MM"))
-            // console.log("rowData[0]****", this.state.monthList.includes(rowData[0]));
-            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ','BA', 'BB', 'BC', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BK', 'BL', 'BM', 'BN', 'BO', 'BP', 'BQ', 'BR', 'BS', 'BT', 'BU', 'BV', 'BW', 'BX', 'BY', 'BZ','CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CI', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CO', 'CP', 'CQ', 'CR', 'CS', 'CT', 'CU', 'CV', 'CW', 'CX', 'CY', 'CZ'];
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ', 'BA', 'BB', 'BC', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BK', 'BL', 'BM', 'BN', 'BO', 'BP', 'BQ', 'BR', 'BS', 'BT', 'BU', 'BV', 'BW', 'BX', 'BY', 'BZ', 'CA', 'CB', 'CC', 'CD', 'CE', 'CF', 'CG', 'CH', 'CI', 'CJ', 'CK', 'CL', 'CM', 'CN', 'CO', 'CP', 'CQ', 'CR', 'CS', 'CT', 'CU', 'CV', 'CW', 'CX', 'CY', 'CZ'];
             if (index != -1) {
                 var cell = elInstance.getCell((colArr[0]).concat(parseInt(y) + 1))
                 cell.classList.add('jexcelBoldCell');
@@ -1589,14 +1565,11 @@ class CompareAndSelectScenario extends Component {
     }
 
     setDatasetId(event) {
-        // console.log("In datasetId@@@", event.target.value);
         this.setState({ loading: true })
         var datasetId = event.target.value;
         localStorage.setItem("sesDatasetId", datasetId);
         localStorage.setItem("sesForecastProgramIdReport", parseInt(datasetId.split('_')[0]));
         let versionIdSes = (event.target.value.split('_')[1]).replace('v', '') + ' (Local)';
-        // console.log("In datasetId@@@----1", localStorage.getItem("sesForecastProgramIdReport"));
-        // console.log("In datasetId@@@----2", versionIdSes);
         localStorage.setItem("sesForecastVersionIdReport", versionIdSes);
 
         localStorage.setItem("sesLiveDatasetId", parseInt(datasetId.split('_')[0]));
@@ -1607,7 +1580,6 @@ class CompareAndSelectScenario extends Component {
             changed: false
         }, () => {
             if (datasetId != "") {
-                // console.log("in if for set@@@", this.state.datasetList);
                 var datasetFiltered = this.state.datasetList.filter(c => c.id == datasetId)[0];
                 var datasetDataBytes = CryptoJS.AES.decrypt(datasetFiltered.programJson, SECRET_KEY);
                 var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1741,7 +1713,6 @@ class CompareAndSelectScenario extends Component {
     }
 
     setRegionId(event) {
-        // console.log("In region Id@@@")
         localStorage.setItem("sesDatasetRegionId", event.target.value);
         var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
         var regionId = event.target.value;
@@ -1775,8 +1746,6 @@ class CompareAndSelectScenario extends Component {
     }
 
     scenarioOrderChanged(id) {
-        // console.log("@@@in scenarioOrder changed", this.state.treeScenarioList)
-        // console.log("@@@in scenarioOrder changed", id)
         this.setState({
             loading: true
         })
@@ -1913,7 +1882,6 @@ class CompareAndSelectScenario extends Component {
                 putRequest.onerror = function (event) {
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
-                    // console.log("in side datasetDetails")
                     db1 = e.target.result;
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
@@ -1967,6 +1935,11 @@ class CompareAndSelectScenario extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         var chartOptions = {
             title: {
                 display: true,
@@ -2104,7 +2077,6 @@ class CompareAndSelectScenario extends Component {
                 }
             )
             this.state.treeScenarioList.filter(c => c.checked).map((item, idx) => {
-                // console.log("Check data for grpah@@@", this.state.consumptionDataForTree.filter(c => c.id == item.id))
                 datasetsArr.push(
                     {
                         label: item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang),
@@ -2193,7 +2165,6 @@ class CompareAndSelectScenario extends Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
-        // console.log("%%%", this.state.treeScenarioList.filter(c => c.checked));
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -2328,8 +2299,8 @@ class CompareAndSelectScenario extends Component {
                                                 <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                 <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                             </ul><br />
-                                            <div className="table-responsive RemoveStriped">
-                                                <div id="table1" className="compareAndSelect displayBlock"></div>
+                                            <div className="RemoveStriped removeOddColor">
+                                                <div id="table1" className="compareAndSelect"></div>
                                             </div>
 
                                             <br></br>
@@ -2455,14 +2426,14 @@ class CompareAndSelectScenario extends Component {
                                                             <InputGroup>
                                                                 <Input
                                                                     type="select"
-                                                                    // className="selectWrapText"
+                                                                    className="selectWrapText removeDropdownArrow"
                                                                     name="equivalencyUnitId"
                                                                     id="equivalencyUnitId"
                                                                     // disabled={true}
                                                                     value={this.state.equivalencyUnitId}
                                                                     onChange={this.setEquivalencyUnit}
                                                                     bsSize="sm"
-                                                                    className="selectWrapText removeDropdownArrow">
+                                                                >
                                                                     <option value="0">{i18n.t('static.common.select')}</option>
                                                                     {equivalencies}
                                                                 </Input>
