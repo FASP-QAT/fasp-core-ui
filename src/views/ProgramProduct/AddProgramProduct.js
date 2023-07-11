@@ -55,9 +55,7 @@ class AddprogramPlanningUnit extends Component {
             productCategoryList: [],
             programs: [],
             programId: 0,
-            color: '',
-            tempSortOrder:'',
-            sortOrderLoading: true
+            color: ''
         }
         // this.addRow = this.addRow.bind(this);
         // this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
@@ -378,28 +376,9 @@ class AddprogramPlanningUnit extends Component {
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.dashboard.product'),
-                                                                    type: 'dropdown',
-                                                                    options: {
-                                                                        url: `${API_URL}/api/dropdown/planningUnit/autocomplete/filter/productCategory/searchText/language/sortOrder`,
-                                                                        autocomplete: true,
-                                                                        remoteSearch: true,
-                                                                        onbeforesearch: function(instance, request) {
-                                                                            if(this.state.sortOrderLoading == false){
-                                                                                request.method = 'GET';
-                                                                                // request.data = { productCategorySortOrder: "", searchText: instance.search, language: "en" };
-                                                                                let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                                                                                let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                                                                                request.beforeSend = (httpRequest) => {
-                                                                                    httpRequest.setRequestHeader('Authorization', 'Bearer '+jwtToken);
-                                                                                }
-                                                                                const searchText = instance.search;
-                                                                                const language = this.state.lang;
-                                                                                const sortOrder = this.state.tempSortOrder;
-                                                                                request.url = request.url.replace("searchText/language/sortOrder", `${searchText}/${language}/${sortOrder}`);
-                                                                                return request;
-                                                                            }
-                                                                        }.bind(this),
-                                                                    },
+                                                                    type: 'autocomplete',
+                                                                    source: list,
+                                                                    filter: this.dropdownFilter
                                                                 },
                                                                 {
                                                                     title: i18n.t('static.programPU.planBasedOn'),
@@ -582,19 +561,6 @@ class AddprogramPlanningUnit extends Component {
                                                             allowDeleteRow: true,
                                                             onchange: this.changed,
                                                             // oneditionend: this.onedit,
-                                                            oneditionstart: function (instance, cell, x, y, value) {
-                                                                this.setState({ sortOrderLoading: true })
-                                                                let tempId = data[y][0]
-                                                                let sortOrder;
-                                                                if(tempId == -1 || tempId == 0){
-                                                                    sortOrder="00"
-                                                                }else{
-                                                                    sortOrder = this.state.productCategoryList.filter(item => item.payload.productCategoryId == tempId)[0].sortOrder
-                                                                }
-                                                                this.setState({ tempSortOrder: sortOrder }, () => {
-                                                                    this.setState({sortOrderLoading: false})
-                                                                })
-                                                            }.bind(this),
                                                             copyCompatibility: true,
                                                             allowManualInsertRow: false,
                                                             parseFormulas: true,

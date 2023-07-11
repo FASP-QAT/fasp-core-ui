@@ -106,8 +106,10 @@ export default class PlanningUnitSetting extends Component {
             productCategoryListNew: [],
             planningUnitList: [],
             lang: localStorage.getItem('lang'),
-            isPlanningUnitLoaded: false
-
+            isPlanningUnitLoaded: false,
+            tempSortOrder:'',
+            sortOrderLoading: true,
+            tempPlanningUnitList: []
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
         this.changed = this.changed.bind(this);
@@ -1995,10 +1997,15 @@ export default class PlanningUnitSetting extends Component {
         let outPutListArray = [];
         let count = 0;
         let indexVar = 1;
+        let dropdownList = [];
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-
+            dropdownList.push({
+                id: outPutList[j].planningUnit.id,
+                name : outPutList[j].planningUnit.label.label_en + " | " + outPutList[j].planningUnit.id,
+                label: "test"
+            });
             data[0] = outPutList[j].planningUnit.forecastingUnit.productCategory.id
             data[1] = outPutList[j].planningUnit.id
             data[2] = outPutList[j].consuptionForecast
@@ -2075,10 +2082,31 @@ export default class PlanningUnitSetting extends Component {
                 },
                 {
                     title: i18n.t('static.dashboard.planningunitheader'),
-                    type: 'autocomplete',
-                    source: this.state.allPlanningUnitList,
-                    // filter: this.filterPlanningUnitListByTracerCategoryId,
-                    filter: this.filterPlanningUnitListByProductCategoryId,
+                    type: 'dropdown',
+                    source: dropdownList,
+                    options: {
+                        url: `${API_URL}/api/dropdown/planningUnit/autocomplete/filter/productCategory/searchText/language/sortOrder`,
+                        autocomplete: true,
+                        remoteSearch: true,
+                        onbeforesearch: function(instance, request) {
+                            if(this.state.sortOrderLoading == false){
+                                request.method = 'GET';
+                                
+                                // request.data = { productCategorySortOrder: "", searchText: instance.search, language: "en" };
+                                let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                request.beforeSend = (httpRequest) => {
+                                    httpRequest.setRequestHeader('Authorization', 'Bearer '+jwtToken);
+                                }
+                                const searchText = instance.search;
+                                const language = this.state.lang;
+                                const sortOrder = this.state.tempSortOrder;
+                                request.url = request.url.replace("searchText/language/sortOrder", `${searchText}/${language}/${sortOrder}`);
+
+                                return request;
+                            }
+                        }.bind(this),
+                    },
                     width: '170',
                     // readOnly: true //1B
                 },
@@ -2286,6 +2314,19 @@ export default class PlanningUnitSetting extends Component {
 
                 return items;
             }.bind(this),
+            oneditionstart: function (instance, cell, x, y, value) {
+                this.setState({ sortOrderLoading: true })
+                let tempId = data[y][0]
+                let sortOrder;
+                if(tempId == -1 || tempId == 0){
+                    sortOrder="00"
+                }else{
+                    sortOrder = this.state.productCategoryList.filter(item => item.payload.productCategoryId == tempId)[0].sortOrder
+                }
+                this.setState({ tempSortOrder: sortOrder }, () => {
+                    this.setState({sortOrderLoading: false})
+                })
+            }.bind(this),
             oneditionend: this.oneditionend,
             copyCompatibility: true,
             allowExport: false,
@@ -2301,7 +2342,7 @@ export default class PlanningUnitSetting extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false, allowAdd: true
+            languageEl: languageEl, loading: false, allowAdd: true, tempPlanningUnitList: dropdownList
         }, () => {
             if (addRowInJexcel) {
                 this.addRow();
@@ -2563,7 +2604,7 @@ export default class PlanningUnitSetting extends Component {
 
     formSubmit = function () {
         var validation = this.checkValidation();
-        console.log("validation------------>", validation);
+        console.log("validation------------>", this.state.languageEl.getConfig());
         if (validation == true) {
             this.setState({
                 loading: true,
