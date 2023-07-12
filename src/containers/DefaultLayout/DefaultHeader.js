@@ -8,15 +8,9 @@ import imageNotificationCount from '../../assets/img/icons-truck.png';
 import logo from '../../assets/img/QAT-logo.png';
 import imageUsermanual from '../../assets/img/User-manual-icon.png';
 import ShowGuidanceImg from '../../assets/img/ShowGuidance.png';
-import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import DefaultHeaderDropdown from './DefaultHeaderDropdown';
-import eventBus from './eventBus.js'
-import CryptoJS from 'crypto-js'
-import ProgramService from "../../api/ProgramService"
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 
 const propTypes = {
   children: PropTypes.node,
@@ -213,7 +207,7 @@ class DefaultHeader extends Component {
           </NavItem>
           }
 
-          {isSiteOnline() && <NavItem className="">
+          {checkOnline === 'Online' && <NavItem className="">
             <span className="nav-link">
               <a href={`https://api.quantificationanalytics.org/file/qatUserGuide`}>
                 <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '30px', height: '30px' }} />

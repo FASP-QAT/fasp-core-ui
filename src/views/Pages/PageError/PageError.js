@@ -121,13 +121,13 @@ class PageError extends Component {
           <Row className="justify-content-left">
             <Col md="7" lg="7">
               <span className="clearfix">
-                <h1 className="float-left display-3 mr-4 err_text">Error <img style={{width:"150px"}} className='img-fluid' src={ErrorMessageImg}></img></h1>
+                <h1 className="float-left display-3 mr-4 err_text">{i18n.t('static.errorPage.error')+" "} <img style={{width:"150px"}} className='img-fluid' src={ErrorMessageImg}></img></h1>
                 {/* <h4 className="pt-3">Houston, we have a problem!</h4>
                 <p className="text-muted float-left">The page you are looking for is temporarily unavailable.</p> */}
               </span>
               <span>
-                <h3 className=''>We seem to have encountered an unexpected error. Please show this to one of our engineers so we can get someone working on this right away.</h3>
-                <h4 className="pt-3">Error reason - {this.props.location.state.errorMessage}</h4>
+                <h3 className=''>{i18n.t('static.errorPage.errorMessage')}</h3>
+                <h4 className="pt-3">{i18n.t("static.errorPage.errorReason")+" "} {this.props.location.state.errorMessage}</h4>
               </span>
               <InputGroup className="input-prepend">
                 {/* <InputGroupAddon addonType="prepend">
@@ -137,19 +137,19 @@ class PageError extends Component {
                 </InputGroupAddon>
                 <Input size="16" type="text" placeholder="What are you looking for?" /> */}
                 <InputGroupAddon addonType="append">
-                  <Button color="primary" onClick={()=>this.props.history.push(`/ApplicationDashboard/` + AuthenticationService.displayDashboardBasedOnRole())}>Return to Dashboard</Button>
+                  <Button color="primary" onClick={()=>this.props.history.push(`/ApplicationDashboard/` + AuthenticationService.displayDashboardBasedOnRole())}>{i18n.t('static.errorPage.returnToDashboard')}</Button>
                 </InputGroupAddon>
               </InputGroup>
 
               <FormGroup className='mt-4'>
                     <InputGroup>
-                      <Input type="textarea" id="userComments" name="userComments" placeholder="Your Comments here!"/>
+                      <Input type="textarea" id="userComments" name="userComments" placeholder={i18n.t('static.errorPage.userCommentPlaceholder')}/>
                     </InputGroup>
                   </FormGroup>
 
 
 
-              <Button color="primary" onClick={()=>this.submitBug(this.props)} className='mt-2'>Raise a Ticket</Button>
+              <Button color="primary" onClick={()=>this.submitBug(this.props)} className='mt-2'>{i18n.t('static.errorPage.raiseATicket')}</Button>
             </Col>
           </Row>
         </Container>

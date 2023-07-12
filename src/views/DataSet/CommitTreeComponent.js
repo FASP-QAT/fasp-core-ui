@@ -171,17 +171,21 @@ export default class CommitTreeComponent extends React.Component {
             programRequest.onsuccess = function (e) {
                 var programList = [];
                 var myResult = programRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
-                    var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                    var datasetJson = JSON.parse(datasetData);
-                    var programJson = {
-                        name: datasetJson.programCode,
-                        id: myResult[i].id,
-                        version: datasetJson.currentVersion.versionId,
-                        datasetJson: datasetJson
+                    if (myResult[i].userId == userId) {
+                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                        var datasetJson = JSON.parse(datasetData);
+                        var programJson = {
+                            name: datasetJson.programCode,
+                            id: myResult[i].id,
+                            version: datasetJson.currentVersion.versionId,
+                            datasetJson: datasetJson
+                        }
+                        programList.push(programJson)
                     }
-                    programList.push(programJson)
                 }
                 var programId = "";
                 var event = {
@@ -599,7 +603,7 @@ export default class CommitTreeComponent extends React.Component {
                             programQPLDetailsGetRequest.onsuccess = function (event) {
                                 var programQPLDetails = programQPLDetailsGetRequest.result;
                                 var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8).replaceAll("\"null\"",null);
+                                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8).replaceAll("\"null\"", null);
                                 var datasetJson = JSON.parse(datasetData);
                                 var programJson = datasetJson;
                                 programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
@@ -656,9 +660,9 @@ export default class CommitTreeComponent extends React.Component {
                                     for (var c = 0; c < cel.length; c++) {
                                         cel[c].amount = cel[c].amount < 0 ? 0 : cel[c].amount;
                                     }
-                                    consumptionExtrapolationToUpdate[ce].extrapolationDataList=cel;
+                                    consumptionExtrapolationToUpdate[ce].extrapolationDataList = cel;
                                 }
-                                programJson.consumptionExtrapolation=consumptionExtrapolationToUpdate;
+                                programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
                                 programJson.treeList = treeList;
                                 console.log("commit*** final programJson---", programJson);
 
@@ -1197,7 +1201,7 @@ export default class CommitTreeComponent extends React.Component {
                             <ul>{consumption}</ul>
 
                             <span><b>3. {i18n.t('static.commitTree.treeForecast')}: </b>(<a href={"/#/dataSet/buildTree/tree/0/" + this.state.programId} target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
-                            <span>a. {i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
+                            <span>a. {this.state.includeOnlySelectedForecasts?i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree'):i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
                             <ul>{pu}</ul>
 
                             <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}:</span><br />
