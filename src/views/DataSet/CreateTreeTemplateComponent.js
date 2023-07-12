@@ -969,7 +969,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     cancelNodeDataClicked(){
-        if(this.state.isChanged == true || this.state.isTemplateChanged == true){
+        if(this.state.isChanged == true){
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
             if (cf == true) {
                 this.setState({
@@ -5069,6 +5069,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     createTree(){
+        if(!this.state.isTemplateChanged){
         var db1;
         var storeOS;
         getDatabase();
@@ -5128,6 +5129,9 @@ export default class CreateTreeTemplate extends Component {
         }.bind(this);
         }.bind(this);
         }.bind(this)
+    }else{
+        alert(i18n.t("static.supplyPlan.saveDataFirst"))
+    }
     }
 
     createTreeForCreateTree(){
@@ -12209,7 +12213,7 @@ export default class CreateTreeTemplate extends Component {
                         <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
                     <Button size="md"
                         onClick={() => {
-                            if(this.state.isChanged == true || this.state.isTemplateChanged == true){
+                            if(this.state.isChanged == true){
                             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
                             if (cf == true) {
                                 this.setState({
