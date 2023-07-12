@@ -240,12 +240,12 @@ export default class ListTreeComponent extends Component {
                         //     console.log("programId 1---", programId);
                         //     calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false);
                         // } else {
-                        confirmAlert({
-                            message: i18n.t('static.listTree.manageTreePage'),
-                            buttons: [
-                                {
-                                    label: i18n.t('static.program.yes'),
-                                    onClick: () => {
+                        // confirmAlert({
+                        //     message: i18n.t('static.listTree.manageTreePage'),
+                        //     buttons: [
+                        //         {
+                        //             label: i18n.t('static.program.yes'),
+                        //             onClick: () => {
                                         console.log("this.state.datasetIdModal Test@123",this.state.datasetIdModal)
                                         localStorage.setItem("sesDatasetId",this.state.datasetIdModal.split("~")[0]);
                                         localStorage.setItem("sesVersionIdReport", this.state.datasetIdModal.split("~v")[1]+" (Local)");
@@ -254,17 +254,17 @@ export default class ListTreeComponent extends Component {
                                             // state: { role }
                                         });
 
-                                    }
-                                },
-                                {
-                                    label: i18n.t('static.program.no'),
-                                    onClick: () => {
-                                        // this.getDatasetList();
-                                        this.getPrograms();
-                                    }
-                                }
-                            ]
-                        });
+                        //             }
+                        //         },
+                        //         {
+                        //             label: i18n.t('static.program.no'),
+                        //             onClick: () => {
+                        //                 // this.getDatasetList();
+                        //                 this.getPrograms();
+                        //             }
+                        //         }
+                        //     ]
+                        // });
                         // }
                     } else {
                         // this.getDatasetList();
