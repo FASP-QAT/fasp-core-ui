@@ -308,6 +308,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             dataChanged: false,
+            notesChanged: false,
             noDataMessage: "",
             showFits: false,
             checkIfAnyMissingActualConsumption: false,
@@ -1116,21 +1117,100 @@ export default class ExtrapolateDataComponent extends React.Component {
         console.log("Seema notes",notes)
         this.setState({
             extrapolationNotes:notes,
-            dataChanged: true,
-            extrapolateClicked: true
+            notesChanged: true
         })
     }
 
     saveForecastConsumptionExtrapolation() {
-        // if ((this.state.movingAvgId && !this.state.monthsForMovingAverageValidate) ||
-        //     (this.state.smoothingId && !this.state.noOfMonthsForASeasonValidate) ||
-        //     (this.state.confidenceLevelId && !this.state.confidenceValidate)) {
-        //     alert("Please provide the valid input");
-        // } else {
+        if(this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged){
+                var cont = false;
+                var cf = window.confirm(i18n.t("static.extrapolation.confirmmsg"));
+                if (cf == true) {
+                    cont = true;
+                }
+                if (cont == true) {
+                    this.setState({
+                        loading: true
+                    })
+                    var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                    this.props.updateState("color", "red");
+                    this.props.hideFirstComponent();
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                        var transaction = db1.transaction(['datasetData'], 'readwrite');
+                        var datasetTransaction = transaction.objectStore('datasetData');
+                        var datasetRequest = datasetTransaction.get(this.state.forecastProgramId);
+                        datasetRequest.onerror = function (event) {
+                        }.bind(this);
+                        datasetRequest.onsuccess = function (event) {
+                            var myResult = datasetRequest.result;
+                            var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
+                            var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                            var datasetJson = JSON.parse(datasetData);
+                            var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
+                            var consumptionExtrapolationIndexTes = (datasetJson.consumptionExtrapolation).findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id==2);
+                            var consumptionExtrapolationIndexArima = (datasetJson.consumptionExtrapolation).findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id==4);
+                            var consumptionExtrapolationIndexLineatReg = (datasetJson.consumptionExtrapolation).findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id==5);
+                            var consumptionExtrapolationIndexSemiAvg = (datasetJson.consumptionExtrapolation).findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id==6);
+                            var consumptionExtrapolationIndexMovingAvg = (datasetJson.consumptionExtrapolation).findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id==7);
+                            if(consumptionExtrapolationIndexTes!=-1)
+                                (datasetJson.consumptionExtrapolation)[consumptionExtrapolationIndexTes].notes=this.state.extrapolationNotes;
+                            if(consumptionExtrapolationIndexArima!=-1)
+                                (datasetJson.consumptionExtrapolation)[consumptionExtrapolationIndexArima].notes=this.state.extrapolationNotes;
+                            if(consumptionExtrapolationIndexLineatReg!=-1)
+                                (datasetJson.consumptionExtrapolation)[consumptionExtrapolationIndexLineatReg].notes=this.state.extrapolationNotes;
+                            if(consumptionExtrapolationIndexSemiAvg!=-1)
+                                (datasetJson.consumptionExtrapolation)[consumptionExtrapolationIndexSemiAvg].notes=this.state.extrapolationNotes;
+                            if(consumptionExtrapolationIndexMovingAvg!=-1)
+                                (datasetJson.consumptionExtrapolation)[consumptionExtrapolationIndexMovingAvg].notes=this.state.extrapolationNotes;
+
+                            datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+                            myResult.programData = datasetData;
+                            var putRequest = datasetTransaction.put(myResult);
+                            this.setState({
+                                dataChanged: false
+                            })
+                            putRequest.onerror = function (event) {
+                            }.bind(this);
+                            putRequest.onsuccess = function (event) {
+                                console.log("save");
+                                console.log("in side datasetDetails")
+                                db1 = e.target.result;
+                                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                                var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.forecastProgramId);
+                                datasetDetailsRequest.onsuccess = function (e) {
+                                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                    datasetDetailsRequestJson.changed = 1;
+                                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                    datasetDetailsRequest1.onsuccess = function (event) {
+
+                                    }
+                                }
+                                this.setState({
+                                    loading: false,
+                                    dataChanged: false,
+                                    message: i18n.t('static.compareAndSelect.dataSaved'),     
+                                    extrapolateClicked: false,
+                                    notesChanged: false
+                                }, () => {
+                                    this.hideFirstComponent();
+                                    this.componentDidMount()
+                                })
+                            }.bind(this);
+                        }.bind(this);
+                    }.bind(this);
+                }
+        }else{
         this.setState({
             loading: true
         })
-        console.log("Seema this.state.extrapolationNotes",this.state.extrapolationNotes)
         var db1;
         var storeOS;
         getDatabase();
@@ -1383,15 +1463,16 @@ export default class ExtrapolateDataComponent extends React.Component {
 
                             }
                         }
-
+                    
                         // let id = AuthenticationService.displayDashboardBasedOnRole();
                         // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
                         this.setState({
                             // dataEl: "",
                             loading: false,
                             dataChanged: false,
-                            message: i18n.t('static.compareAndSelect.dataSaved'),
-                            extrapolateClicked: false
+                            message: i18n.t('static.compareAndSelect.dataSaved'),     
+                            extrapolateClicked: false,
+                            notesChanged: false
                         }, () => {
                             this.hideFirstComponent();
                             this.componentDidMount()
@@ -1407,7 +1488,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 }.bind(this);
             }.bind(this);
         }.bind(this);
-        // }
+     }
     }
     hideFirstComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -3717,12 +3798,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </div>
 
                                         <div className=" col-md-4 pt-lg-0">
-                                                        <Label >Notes</Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.ManageTree.Notes')}</Label>
                                                             <Input
                                                                 style={{width: '100%', height: '90%'}}
                                                                 className="controls"
                                                                 bsSize="sm"
                                                                 type="textarea"
+                                                                name="extrapolationNotes"
+                                                                id="extrapolationNotes"
+                                                                value={this.state.extrapolationNotes}
+                                                                onChange={(e) => { this.changeNotes(e.target.value) }}
                                                             ></Input>
                                         </div>
 
@@ -4056,19 +4141,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </div>
                                                     </div>
                                         </div>
-                                        {this.state.showData &&
-                                        <div className=" col-md-4 pt-lg-0">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.ManageTree.Notes')}</Label>
-                                                            <Input
-                                                                className="controls"
-                                                                bsSize="sm"
-                                                                type="textarea"
-                                                                name="extrapolationNotes"
-                                                                id="extrapolationNotes"
-                                                                value={this.state.extrapolationNotes}
-                                                                onChange={(e) => { this.changeNotes(e.target.value) }}
-                                                            ></Input>
-                                                    </div>}
 
                                         {/* </div> */}
                                         {/* <div className="col-md-12">
@@ -4237,7 +4309,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Table>
                                                     </div>
                                                 </div>}
-                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && this.state.dataChanged && this.state.extrapolateClicked && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
+                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && 
+                                            (this.state.dataChanged && this.state.extrapolateClicked) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
+                                            (this.state.dataChanged && this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
+                                            (!this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:
+                                            (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>:""
+                                            }
                                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
                                             {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
                                             <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
