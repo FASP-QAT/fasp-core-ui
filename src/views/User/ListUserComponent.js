@@ -51,7 +51,7 @@ const validationSchema = function (values) {
             .test('roleValid', i18n.t('static.common.roleinvalidtext'),
                 function (value) {
                     if (document.getElementById("roleValid").value == "false") {
-                        console.log("inside if ---", value);
+                        // console.log("inside if ---", value);
                         return true;
                     }
                 })
@@ -664,7 +664,7 @@ class ListUserComponent extends Component {
         UserService.getUserList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response.data---->123", response.data)
+                    // console.log("response.data---->123", response.data)
                     this.setState({
                         userList: response.data,
                         selUserList: response.data
@@ -686,7 +686,7 @@ class ListUserComponent extends Component {
 
                                         roleListInUpdate[i + 1] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                                     }
-                                    console.log("roleListJexcel------->", roleListJexcel);
+                                    // console.log("roleListJexcel------->", roleListJexcel);
                                     var listArray = roleList;
                                     listArray.sort((a, b) => {
                                         var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
@@ -990,7 +990,7 @@ class ListUserComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
                     // this.setState({ roleList: response.data, selSource: response.data, loading: false })
-                    console.log("response.data--->", response.data);
+                    // console.log("response.data--->", response.data);
                     this.setState({
                         userList: response.data,
                         selUserList: response.data
@@ -1055,7 +1055,7 @@ class ListUserComponent extends Component {
 
         UserService.getUserByUserId(this.state.userId).then(response => {
             if (response.status == 200) {
-                console.log("getUpdateUser---", response.data);
+                // console.log("getUpdateUser---", response.data);
                 this.setState({
                     user: response.data,
                     loading: false
@@ -1369,7 +1369,7 @@ class ListUserComponent extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            editable: true,
+            // editable: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -2074,7 +2074,7 @@ class ListUserComponent extends Component {
 
         let userList = this.state.selUserList;
         // console.log("userList---->1", userList.filter(c => c.userId == 663));
-        console.log("userList---->1", userList);
+        // console.log("userList---->1", userList);
 
         // console.log("userList---->1", (userList.filter(c => c.userId == 1)[0].userAclList.map(c => (c.programName.label_en == "" || c.programName.label_en == null ? "All" : c.programName.label_en))).toString());
         // console.log("userList---->1", (userList.filter(c => c.userId == 30)[0].userAclList.map(c => (c.programName.label_en == "" ? "All" : c.programName.label_en))).toString());
@@ -2409,7 +2409,7 @@ class ListUserComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log(JSON.stringify(this.state.user))
+                                    // console.log(JSON.stringify(this.state.user))
                                     this.setState({
                                         message: '',
                                         loading: true

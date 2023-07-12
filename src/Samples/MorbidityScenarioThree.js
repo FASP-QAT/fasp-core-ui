@@ -234,7 +234,7 @@ export default class MorbidityScenarioThree extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id
             }, () => {
-                console.log("highlighted item---", this.state)
+                // console.log("highlighted item---", this.state)
             })
         }
     };
@@ -256,7 +256,7 @@ export default class MorbidityScenarioThree extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id
             }, () => {
-                console.log("highlighted item---", this.state)
+                // console.log("highlighted item---", this.state)
             })
         }
     };
@@ -270,13 +270,13 @@ export default class MorbidityScenarioThree extends Component {
             items: nodes,
             modalOpen: false,
         }, () => {
-            console.log("updated tree data+++", this.state);
+            // console.log("updated tree data+++", this.state);
         });
     }
 
 
     render() {
-        console.log("this.state+++", this.state);
+        // console.log("this.state+++", this.state);
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
         for (var i = 0; i <= treeLevel; i++) {
@@ -321,7 +321,7 @@ export default class MorbidityScenarioThree extends Component {
                     lineType: LineType.Dotted
                 }));
             }
-            console.log("level json***", treeLevelItems);
+            // console.log("level json***", treeLevelItems);
         }
 
         const config = {

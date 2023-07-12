@@ -20,7 +20,7 @@ import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import { MultiSelect } from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import ReportService from '../../api/ReportService';
 import moment from "moment";
 import {
@@ -29,6 +29,7 @@ import {
 import ProgramService from '../../api/ProgramService';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 
 const options = {
     title: {
@@ -233,7 +234,7 @@ class StockStatusOverTime extends Component {
     }
 
     handlePlanningUnitChange = (event) => {
-        console.log('***', event)
+        // console.log('***', event)
         var planningUnitIds = event
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -261,15 +262,15 @@ class StockStatusOverTime extends Component {
 
     unCheck = () => {
 
-        // document.querySelectorAll('.planningUnitId').forEach(e => {console.log('********',e)})
+        // document.querySelectorAll('.planningUnitId').forEach(e => {// console.log('********',e)})
         /*var x = document.getElementById("planningUnitId");
         for(var i=0; i<=x.length; i++) {
            x[i].checked = false;
          }   */
     }
     unCheck1 = (e) => {
-        console.log('uncheck', e)
-        // document.querySelectorAll('.planningUnitId').forEach(e => {console.log('********',e)})
+        // console.log('uncheck', e)
+        // document.querySelectorAll('.planningUnitId').forEach(e => {// console.log('********',e)})
         /*var x = document.getElementById("planningUnitId");
         for(var i=0; i<=x.length; i++) {
            x[i].checked = false;
@@ -371,10 +372,21 @@ class StockStatusOverTime extends Component {
     getPrograms = () => {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
+            let realmId = AuthenticationService.getRealmId();
+
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
+                    var proList = []
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            programId: response.data[i].id,
+                            label: response.data[i].label,
+                            programCode: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: proList, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -445,7 +457,7 @@ class StockStatusOverTime extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
             this.setState({ loading: false })
         }
@@ -479,13 +491,13 @@ class StockStatusOverTime extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -533,7 +545,7 @@ class StockStatusOverTime extends Component {
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            // console.log(program)
             if (program.length == 1) {
                 this.setState({
                     monthsInPastForAmc: "",
@@ -565,7 +577,6 @@ class StockStatusOverTime extends Component {
 
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     this.setState({
@@ -574,12 +585,63 @@ class StockStatusOverTime extends Component {
                         planningUnitValues: [],
                         planningUnitLabels: []
                     }, () => {
-                        this.unCheck();
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
+                        DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                            .then(response => {
+                                // console.log("response===>", response.data)
+                                this.setState({
+                                    versions: []
+                                }, () => {
+                                    this.setState({
+                                        versions: response.data
+                                    }, () => {
+                                        this.unCheck();
+                                        this.consolidatedVersionList(programId)
+                                    });
+                                });
+                            }).catch(
+                                error => {
+                                    this.setState({
+                                        programs: [], loading: false
+                                    })
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
                     });
 
 
@@ -652,7 +714,7 @@ class StockStatusOverTime extends Component {
 
                 }
 
-                console.log(verList)
+                // console.log(verList)
                 let versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
                 })
@@ -731,18 +793,18 @@ class StockStatusOverTime extends Component {
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
                             var proList = []
-                            console.log(myResult)
+                            // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
-                                    proList[i] = myResult[i]
+                                    proList[i] = myResult[i].planningUnit
                                 }
                             }
                             var lang = this.state.lang;
                             this.setState({
                                 planningUnits: proList.sort(function (a, b) {
-                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }), message: ''
                             }, () => {
@@ -756,12 +818,16 @@ class StockStatusOverTime extends Component {
                 else {
                     // AuthenticationService.setupAxiosInterceptors();
 
-                    ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                        console.log('**' + JSON.stringify(response.data))
+                    var json = {
+                        tracerCategoryIds: [],
+                        programIds: [programId]
+                    }
+                    DropdownService.getProgramPlanningUnitDropdownList(json).then(response => {
+                        // console.log('**' + JSON.stringify(response.data))
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -863,7 +929,7 @@ class StockStatusOverTime extends Component {
     }
 
     componentDidMount() {
-        console.log("D----------------->Calculated", (4896 + 20000000000000000000 + 5152 + 5246 + 0) / 9);
+        // console.log("D----------------->Calculated", (4896 + 20000000000000000000 + 5152 + 5246 + 0) / 9);
         this.getPrograms();
 
 
@@ -878,7 +944,7 @@ class StockStatusOverTime extends Component {
 
         let monthsInFutureForAmc = this.state.monthsInFutureForAmc
         let monthsInPastForAmc = this.state.monthsInPastForAmc
-        console.log(monthsInFutureForAmc, monthsInPastForAmc)
+        // console.log(monthsInFutureForAmc, monthsInPastForAmc)
         if (planningUnitIds.length > 0 && versionId != 0 && programId > 0 && monthsInFutureForAmc != undefined && monthsInPastForAmc != undefined && monthsInFutureForAmc != 0 && monthsInPastForAmc != "") {
             if (versionId.includes('Local')) {
                 this.setState({ loading: true })
@@ -933,7 +999,7 @@ class StockStatusOverTime extends Component {
                                     supplyPlan: []
                                 }
                             }
-                            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
+                            var pu = (this.state.planningUnits.filter(c => c.id == planningUnitId))[0]
                             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                             var monthstartfrom = this.state.rangeValue.from.month
                             for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
@@ -941,10 +1007,10 @@ class StockStatusOverTime extends Component {
                                 for (var month = monthstartfrom; month <= 12; month++) {
                                     var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
                                     var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                                    console.log(dtstr, ' ', enddtStr)
+                                    // console.log(dtstr, ' ', enddtStr)
                                     var dt = dtstr
                                     var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
-                                    console.log(list)
+                                    // console.log(list)
                                     if (list.length > 0) {
 
                                         var endingBalance = list[0].closingBalance
@@ -955,8 +1021,8 @@ class StockStatusOverTime extends Component {
                                         for (var c = 0; c < monthsInPastForAmc; c++) {
 
                                             var month1MonthsBefore = moment(dt).subtract(c + 1, 'months').format("YYYY-MM-DD");
-                                            console.log("D------------------>For Dt", dt);
-                                            console.log("D------------------>Months1MONTHSBefore", month1MonthsBefore);
+                                            // console.log("D------------------>For Dt", dt);
+                                            // console.log("D------------------>Months1MONTHSBefore", month1MonthsBefore);
                                             var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsBefore);
                                             if (consumptionListForAMC.length > 0) {
                                                 var consumptionQty = 0;
@@ -983,7 +1049,7 @@ class StockStatusOverTime extends Component {
 
                                             }
                                         }
-                                        console.log("D------------------>CalculatedamcBeforeArray", amcBeforeArray);
+                                        // console.log("D------------------>CalculatedamcBeforeArray", amcBeforeArray);
                                         for (var c = 0; c < monthsInFutureForAmc; c++) {
                                             var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                                             var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
@@ -1013,7 +1079,7 @@ class StockStatusOverTime extends Component {
                                             }
 
                                         }
-                                        console.log("D------------------>AMCAFTERARRAY", amcAfterArray);
+                                        // console.log("D------------------>AMCAFTERARRAY", amcAfterArray);
                                         var amcArray = amcBeforeArray.concat(amcAfterArray);
                                         var amcArrayFilteredForMonth = amcArray.filter(c => dtstr == c.month);
                                         var countAMC = amcArrayFilteredForMonth.length;
@@ -1025,7 +1091,7 @@ class StockStatusOverTime extends Component {
                                         var mos = null
                                         if (countAMC > 0 && sumOfConsumptions > 0) {
                                             amcCalcualted = (sumOfConsumptions) / countAMC;
-                                            console.log('amcCalcualted', amcCalcualted, ' endingBalance', endingBalance)
+                                            // console.log('amcCalcualted', amcCalcualted, ' endingBalance', endingBalance)
                                             mos = endingBalance < 0 ? 0 / amcCalcualted : endingBalance / amcCalcualted
                                         } else if (countAMC == 0) {
                                             amcCalcualted = null;
@@ -1042,8 +1108,8 @@ class StockStatusOverTime extends Component {
 
                                         var json = {
                                             "dt": new Date(from, month - 1),
-                                            "program": pu.program,
-                                            "planningUnit": pu.planningUnit,
+                                            "program": this.state.programs,
+                                            "planningUnit": pu,
                                             "stock": list[0].closingBalance,
                                             "consumptionQty": list[0].consumptionQty,
                                             "amc": amcCalcualted,
@@ -1051,12 +1117,12 @@ class StockStatusOverTime extends Component {
                                             "mos": mos != null ? this.roundN(mos) : null
                                         }
                                         data.push(json)
-                                        console.log(data)
+                                        // console.log(data)
                                     } else {
                                         var json = {
                                             "dt": new Date(from, month - 1),
-                                            "program": pu.program,
-                                            "planningUnit": pu.planningUnit,
+                                            "program": this.state.programs,
+                                            "planningUnit": pu,
                                             "stock": 0,
                                             "consumptionQty": 0,
                                             "amc": null,
@@ -1135,7 +1201,7 @@ class StockStatusOverTime extends Component {
                             { "dt": "Apr 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 10063, "consumptionQty": 5838, "amc": 6103, "amcMonthCount": 7, "mos": 1.6489 },
                             { "dt": "May 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 3913, "consumptionQty": 6150, "amc": 6116, "amcMonthCount": 7, "mos": 0.6397 },
                             { "dt": "Jun 20", "program": { "id": 3, "label": { "active": false, "labelId": 136, "label_en": "HIV/AIDS - Malawi - National", "label_sp": "", "label_fr": "", "label_pr": "" } }, "planningUnit": { "id": 154, "label": { "active": false, "labelId": 9100, "label_en": "Abacavir 300 mg Tablet, 60 Tablets", "label_sp": null, "label_fr": null, "label_pr": null } }, "stock": 17763, "consumptionQty": 6150, "amc": 6081, "amcMonthCount": 7, "mos": 2.9209 }]];
-                            console.log(JSON.stringify(response.data))*/
+                            // console.log(JSON.stringify(response.data))*/
                         // var lineData = [];
                         // var lineDates = [];
                         // var planningUnitlines = [];
@@ -1145,7 +1211,7 @@ class StockStatusOverTime extends Component {
                         // lineDates = response.data[0].map(ele => (ele.dt))
                         // planningUnitlines = response.data.map(ele1 => [...new Set(ele1.map(ele => (getLabelText(ele.program.label, this.state.lang) + '-' + getLabelText(ele.planningUnit.label, this.state.lang))))])
 
-                        console.log("RESP-------->", response.data);
+                        // console.log("RESP-------->", response.data);
                         this.setState({
                             matricsList: response.data,
                             message: '', loading: false
@@ -1387,7 +1453,7 @@ class StockStatusOverTime extends Component {
         }
         let startYtable = startY - ((height - h1) * (pages - 1))
         doc.setTextColor("#fff");
-        console.log(startYtable, (height - 500))
+        // console.log(startYtable, (height - 500))
         if (startYtable > (height - 400)) {
             doc.addPage()
             startYtable = 80
@@ -1429,9 +1495,10 @@ class StockStatusOverTime extends Component {
 
     render() {
         const { planningUnits } = this.state;
+        // console.log("planningUnits", planningUnits)
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
         const { programs } = this.state;
@@ -1464,7 +1531,7 @@ class StockStatusOverTime extends Component {
             }
             return color;
         }
-        console.log(this.state.matricsList)
+        // console.log(this.state.matricsList)
         // const backgroundColor = [
         //     '#4dbd74',
         //     '#c8ced3',
@@ -1491,14 +1558,14 @@ class StockStatusOverTime extends Component {
             '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
             '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
         ]
-        console.log(this.state.matricsList)
+        // console.log(this.state.matricsList)
 
         // var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : this.roundN(ele.mos))))
         var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (this.roundN(ele.mos) > 48 ? 48 : ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
         var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatterLanguage(ele.dt)))))
         // var dts = Array.from(new Set(this.state.matricsList.map(ele => (this.dateFormatter(ele.dt)))))
 
-        console.log(dts)
+        // console.log(dts)
         const bar = {
             labels: dts,
             datasets: this.state.planningUnitValues.map((ele, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele.label, data: v[index], borderColor: backgroundColor[index] }))

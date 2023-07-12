@@ -271,7 +271,7 @@ export default class SupplyPlanComponent extends React.Component {
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.setState({ startDate: value, monthCount: monthDifference })
         localStorage.setItem("sesStartDate", JSON.stringify(value));
-        console.log("Mohit form submit 19")
+        // console.log("Mohit form submit 19")
         this.formSubmit(this.state.planningUnit, monthDifference);
     }
 
@@ -391,7 +391,7 @@ export default class SupplyPlanComponent extends React.Component {
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.program.id == actualProgramId && p.planningUnit.id == value.value))[0];
         this.setState({ planningUnit: value, planningUnitId: value != "" && value != undefined ? value.value : 0, programJson: programJson, planBasedOn: programPlanningUnit.planBasedOn, minQtyPpu: programPlanningUnit.minQty, distributionLeadTime: programPlanningUnit.distributionLeadTime }, () => {
             if (this.state.activeTab[0] === '2') {
-                console.log("Mohit form submit 20")
+                // console.log("Mohit form submit 20")
                 this.refs.compareChild.formSubmit(this.state.monthCount)
             }
         });
@@ -467,10 +467,10 @@ export default class SupplyPlanComponent extends React.Component {
             activeTab: newArray,
         });
         if (tab == 2) {
-            console.log("Mohit form submit 21")
+            // console.log("Mohit form submit 21")
             this.refs.compareChild.formSubmit(this.state.monthCount)
         } else {
-            console.log("Mohit form submit 22")
+            // console.log("Mohit form submit 22")
             this.formSubmit(this.state.planningUnit, this.state.monthCount);
         }
     }
@@ -3105,8 +3105,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                     var fundingSourceListPlan = fsRequest.result;
                                     // .filter(c => c.realm.id == generalProgramJson.realmCountry.realm.realmId);
-                                    var budgetListPlan = bRequest.result.filter(c => c.program.id == programId);
-                                    console.log("budgetListPlan", budgetListPlan)
+                                    var budgetListPlan = bRequest.result.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(parseInt(programId)));
+                                    // console.log("budgetListPlan", budgetListPlan)
                                     var myResult = [];
                                     myResult = planningunitRequest.result.filter(c => c.program.id == programId);
                                     var proList = []
@@ -3240,7 +3240,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             minQtyPpu: programPlanningUnit.minQty,
                                                             distributionLeadTime: programPlanningUnit.distributionLeadTime
                                                         })
-                                                        console.log("Mohit form submit 23")
+                                                        // console.log("Mohit form submit 23")
                                                         this.formSubmit(planningUnit, this.state.monthCount);
                                                     }
                                                 })
@@ -3279,8 +3279,8 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formSubmit(value, monthCount) {
-        console.log("In form submit@@@@@", value)
-        console.log("In form submit@@@@@", monthCount)
+        // console.log("In form submit@@@@@", value)
+        // console.log("In form submit@@@@@", monthCount)
         // this.setState({
         //     showTotalShipment: false,
         //     showManualShipment: false,
@@ -3452,7 +3452,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var papuResult = [];
                         papuResult = papuRequest.result;
                         var supplyPlanData = [];
-                        console.log("programJson@@@@@@@@", programJson)
+                        // console.log("programJson@@@@@@@@", programJson)
                         if (programJson.supplyPlan != undefined) {
                             supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
                         }
@@ -3460,7 +3460,7 @@ export default class SupplyPlanComponent extends React.Component {
                             supplyPlanDataForAllTransDate: supplyPlanData,
                             allShipmentsList: programJson.shipmentList
                         })
-                        console.log("SupplyPlanData--------------->", supplyPlanData);
+                        // console.log("SupplyPlanData--------------->", supplyPlanData);
                         // if (supplyPlanData.length > 0) {
                         var lastClosingBalance = 0;
                         var lastBatchDetails = [];
@@ -3470,7 +3470,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                         for (var n = 0; n < m.length; n++) {
                             var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
-                            console.log("jsonList@@@@@@@@@@@@", jsonList);
+                            // console.log("jsonList@@@@@@@@@@@@", jsonList);
                             var prevMonthJsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).subtract(1, 'months').format("YYYY-MM-DD"));
                             if (jsonList.length > 0) {
                                 openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: jsonList[0].openingBalance });
@@ -3911,7 +3911,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 // inventoryArrayForRegion = inventoryArrayForRegion.concat(jsonList[0].inventoryArrayForRegion);
                                 var sstd = {}
                                 if (this.state.planBasedOn == 1) {
-                                    console.log("In If for plan based on Mohit")
+                                    // console.log("In If for plan based on Mohit")
                                     var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                     var compare = (m[n].startDate >= currentMonth);
                                     // var stockInHand = jsonList[0].closingBalance;
@@ -3975,8 +3975,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     var compare = (m[n].startDate >= currentMonth);
                                     // var stockInHand = jsonList[0].closingBalance;
                                     var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(this.state.distributionLeadTime, 'months').format("YYYY-MM"));
-                                    console.log("Spd1@@@@@@@@@@@", spd1)
-                                    console.log("Spd1@@@@@@@@@@@mn.startDate", m[n].startDate)
+                                    // console.log("Spd1@@@@@@@@@@@", spd1)
+                                    // console.log("Spd1@@@@@@@@@@@mn.startDate", m[n].startDate)
                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
@@ -4295,7 +4295,7 @@ export default class SupplyPlanComponent extends React.Component {
                     monthCountConsumption: monthCountConsumption,
                     consumptionStartDateClicked: count != undefined ? this.state.monthsArray[count].startDate : moment(Date.now()).startOf('month').format("YYYY-MM-DD")
                 }, () => {
-                    console.log("Mohit form submit 24")
+                    // console.log("Mohit form submit 24")
                     this.formSubmit(this.state.planningUnit, monthCountConsumption);
                 });
             } else if (supplyPlanType == 'SuggestedShipments') {
@@ -4338,7 +4338,7 @@ export default class SupplyPlanComponent extends React.Component {
                     monthCountAdjustments: monthCountAdjustments,
                     inventoryStartDateClicked: count != undefined ? this.state.monthsArray[count].startDate : moment(Date.now()).startOf('month').format("YYYY-MM-DD")
                 }, () => {
-                    console.log("Mohit form submit 25")
+                    // console.log("Mohit form submit 25")
                     this.formSubmit(this.state.planningUnit, monthCountAdjustments);
                 });
             } else if (supplyPlanType == 'expiredStock') {
@@ -4448,7 +4448,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        console.log("Mohit form submit 26")
+        // console.log("Mohit form submit 26")
         this.formSubmit(this.state.planningUnit, monthCount)
     }
 
@@ -4457,7 +4457,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        console.log("Mohit form submit 27")
+        // console.log("Mohit form submit 27")
         this.formSubmit(this.state.planningUnit, monthCount)
     }
 
@@ -4466,7 +4466,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        console.log("Mohit form submit 28")
+        // console.log("Mohit form submit 28")
         this.formSubmit(this.state.planningUnit, monthCountConsumption)
     }
 
@@ -4475,7 +4475,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
-        console.log("Mohit form submit 29")
+        // console.log("Mohit form submit 29")
         this.formSubmit(this.state.planningUnit, monthCountConsumption);
     }
 
@@ -4484,7 +4484,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        console.log("Mohit form submit 30")
+        // console.log("Mohit form submit 30")
         this.formSubmit(this.state.planningUnit, monthCountAdjustments)
     }
 
@@ -4493,7 +4493,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
-        console.log("Mohit form submit 31")
+        // console.log("Mohit form submit 31")
         this.formSubmit(this.state.planningUnit, monthCountAdjustments);
     }
 
@@ -4502,7 +4502,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountShipments: monthCountShipments
         })
-        console.log("Mohit form submit 30")
+        // console.log("Mohit form submit 30")
         this.formSubmit(this.state.planningUnit, monthCountShipments)
     }
 
@@ -4511,7 +4511,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountShipments: monthCountShipments
         })
-        console.log("Mohit form submit 31")
+        // console.log("Mohit form submit 31")
         this.formSubmit(this.state.planningUnit, monthCountShipments);
     }
 
@@ -4806,7 +4806,7 @@ export default class SupplyPlanComponent extends React.Component {
                 multiplier: rcpuFilter[0].multiplier
             }
         }
-        console.log("rcpuObject Mohit", rcpuObject);
+        // console.log("rcpuObject Mohit", rcpuObject);
         var json = {
             shipmentQty: suggestedShipmentList[0].suggestedOrderQty,
             shipmentRcpuQty: rcpuFilter.length == 1 ? suggestedShipmentList[0].suggestedOrderQty / rcpuObject.multiplier : suggestedShipmentList[0].suggestedOrderQty,
@@ -5159,7 +5159,7 @@ export default class SupplyPlanComponent extends React.Component {
             //         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = this.state.programJson;
-            console.log("ProgramJson###", programJson);
+            // console.log("ProgramJson###", programJson);
             var planningUnitId = document.getElementById("planningUnitId").value;
             var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
             var shipmentListUnFiltered = programJson.shipmentList;
@@ -5167,7 +5167,7 @@ export default class SupplyPlanComponent extends React.Component {
                 shipmentListUnFiltered: shipmentListUnFiltered
             })
             var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
-            console.log("SupplyPlanType###", supplyPlanType);
+            // console.log("SupplyPlanType###", supplyPlanType);
             // var tableEditableBasedOnSupplyPlan = true;
             if (supplyPlanType == 'deliveredShipments') {
                 shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
@@ -5184,12 +5184,12 @@ export default class SupplyPlanComponent extends React.Component {
                     document.getElementById("addRowId").style.display = "block"
                 }
             } else if (supplyPlanType == 'orderedShipments') {
-                console.log("In else if###", shipmentList);
-                console.log("In else if###", startDate);
+                // console.log("In else if###", shipmentList);
+                // console.log("In else if###", startDate);
                 shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate
                     // && c.erpFlag == false 
                     && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                console.log("In else if###", shipmentList);
+                // console.log("In else if###", shipmentList);
                 if (document.getElementById("addRowId") != null) {
                     document.getElementById("addRowId").style.display = "block"
                 }
@@ -6552,7 +6552,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         distributionLeadTime: programPlanningUnit.distributionLeadTime
 
                                     }
-                                    console.log("PlanningUnitDataForExport@@@@@@@@@@", planningUnitDataforExport)
+                                    // console.log("PlanningUnitDataForExport@@@@@@@@@@", planningUnitDataforExport)
                                     // if (this.state.planningUnitId != programPlanningUnit.planningUnit.id) {
                                     planningUnitData.push(planningUnitDataforExport)
                                     // this.setState({
@@ -6759,16 +6759,16 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
 
 
-                                            console.log("ProgramJson@@@@@@@@@@", programJson);
+                                            // console.log("ProgramJson@@@@@@@@@@", programJson);
                                             var month = moment(this.state.singleValue.year + (this.state.singleValue.month <= 9 ? "-0" + this.state.singleValue.month : "-" + this.state.singleValue.month) + "-01").format("YYYY-MM-DD")
                                             var sstd = {}
                                             if (programPlanningUnit.planBasedOn == 1) {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                 var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
-                                                console.log("suingle Mohit", this.state.singleValue)
-                                                console.log("Month Mohit", month)
-                                                console.log("Current minth Mohit", currentMonth)
-                                                console.log("Compare Mohit", compare)
+                                                // console.log("suingle Mohit", this.state.singleValue)
+                                                // console.log("Month Mohit", month)
+                                                // console.log("Current minth Mohit", currentMonth)
+                                                // console.log("Compare Mohit", compare)
                                                 var supplyPlanData = programJson.supplyPlan;
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var batchInfoList = programJson.batchInfoList;
@@ -6803,7 +6803,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     suggestShipment = false;
                                                 }
 
-                                                console.log("suggestShipment Mohit", suggestShipment)
+                                                // console.log("suggestShipment Mohit", suggestShipment)
                                                 if (suggestShipment) {
                                                     var suggestedOrd = 0;
                                                     if (useMax) {
@@ -6815,10 +6815,10 @@ export default class SupplyPlanComponent extends React.Component {
                                             } else {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                 var compare = (moment(month).format("YYYY-MM") >= moment(currentMonth).format("YYYY-MM"));
-                                                console.log("suingle Mohit", this.state.singleValue)
-                                                console.log("Month Mohit", month)
-                                                console.log("Current minth Mohit", currentMonth)
-                                                console.log("Compare Mohit", compare)
+                                                // console.log("suingle Mohit", this.state.singleValue)
+                                                // console.log("Month Mohit", month)
+                                                // console.log("Current minth Mohit", currentMonth)
+                                                // console.log("Compare Mohit", compare)
                                                 var supplyPlanData = programJson.supplyPlan;
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var batchInfoList = programJson.batchInfoList;
@@ -6861,9 +6861,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     suggestShipment = false;
                                                 }
 
-                                                console.log("suggestShipment Mohit", suggestShipment)
-                                                console.log("maxStockForMonth1 Mohit", maxStockForMonth1)
-                                                console.log("maxStockForMonth1 spd1 Mohit", spd1)
+                                                // console.log("suggestShipment Mohit", suggestShipment)
+                                                // console.log("maxStockForMonth1 Mohit", maxStockForMonth1)
+                                                // console.log("maxStockForMonth1 spd1 Mohit", spd1)
                                                 if (suggestShipment) {
                                                     var suggestedOrd = 0;
                                                     if (useMax) {
@@ -6891,8 +6891,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
 
 
-                                                    console.log("Planning Unit Id", planningUnitsIds[pu]);
-                                                    console.log("Plan shipment with Qty Mohit", suggestedOrd);
+                                                    // console.log("Planning Unit Id", planningUnitsIds[pu]);
+                                                    // console.log("Plan shipment with Qty Mohit", suggestedOrd);
                                                     var c = cRequest.result.filter(c => c.currencyId == USD_CURRENCY_ID)[0];
                                                     var rcpu = rcpuRequest.result.filter(c => c.multiplier == 1 && c.planningUnit.id == planningUnitsIds[pu].value)[0]
                                                     var programId = (document.getElementById("programId").value).split("_")[0];
@@ -6910,8 +6910,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                         },
                                                         shipmentQty: suggestedOrd
                                                     }]
-                                                    console.log("Number(Number(pricePerUnit)*Number(suggestedOrd)) Mohit", Number(Number(pricePerUnit) * Number(suggestedOrd)))
-                                                    console.log("Number(Number(pricePerUnit)*Number(suggestedOrd)) Mohit 1", generalProgramJson)
+                                                    // console.log("Number(Number(pricePerUnit)*Number(suggestedOrd)) Mohit", Number(Number(pricePerUnit) * Number(suggestedOrd)))
+                                                    // console.log("Number(Number(pricePerUnit)*Number(suggestedOrd)) Mohit 1", generalProgramJson)
                                                     shipmentDataList.push({
                                                         accountFlag: true,
                                                         active: true,

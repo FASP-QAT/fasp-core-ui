@@ -28,7 +28,7 @@ class IntegrationSerice {
     }
 
     addprogramIntegration(json) {
-        console.log("json papu---", json);
+        // console.log("json papu---", json);
         return axios.put(`${API_URL}/api/integrationProgram/`, json, {}
         );
     }

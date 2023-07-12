@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form, Button, ModalHeader, ModalBody, Modal, CardFooter
+    Table, FormGroup, Input, InputGroup, Label, Form, Button, ModalHeader, ModalBody, Modal, CardFooter, Row
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, API_URL, } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, API_URL,PROGRAM_TYPE_DATASET } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -34,6 +34,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { Prompt } from 'react-router';
 import ReportService from '../../api/ReportService';
+import DropdownService from '../../api/DropdownService';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import DesiredStockatForecasend from '../../assets/img/DesiredStockatForecasend.png';
 import FreightCost from '../../assets/img/FreightCost.png';
@@ -176,7 +177,7 @@ class ForecastSummary extends Component {
     }
 
     hideCalculation(e) {
-        console.log("E++++++++", e.target.checked);
+        // console.log("E++++++++", e.target.checked);
         this.setState({
             hideCalculation: e.target.checked,
             hideColumn: !this.state.hideColumn
@@ -185,7 +186,7 @@ class ForecastSummary extends Component {
     }
 
     storeProduct(e) {
-        console.log("E++++++++", e.target)
+        // console.log("E++++++++", e.target)
         var name = this.state.planningUnits.filter(c => c.planningUnitId == e.target.value);
         this.setState({
             planningUnitId: e.target.value,
@@ -236,7 +237,7 @@ class ForecastSummary extends Component {
     }
 
     setRegionVal(e) {
-        console.log("e+++", e);
+        // console.log("e+++", e);
         var regionIdArr = [];
         for (var i = 0; i < e.length; i++) {
             regionIdArr.push(e[i].value);
@@ -280,7 +281,7 @@ class ForecastSummary extends Component {
         // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (this.state.programs.filter(c => c.id == this.state.programId)[0].code + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
         // csvRow.push('"' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
@@ -347,7 +348,7 @@ class ForecastSummary extends Component {
                 }
                 let propertyName1 = [];
                 if (!this.state.hideColumn) {
-                    propertyName1.push((ele.priceType == null ? '' : ele.priceType));
+                    propertyName1.push((ele.priceType == null ? '' : ele.priceType.replaceAll(' ', '%20')));
                     propertyName1.push((ele.unitPrice == null ? '' : ele.unitPrice));
                 }
                 return (ele.id != 0 &&
@@ -357,7 +358,7 @@ class ForecastSummary extends Component {
                         ((ele.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                         ((ele.planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                         (ele.totalForecastedQuantity == null ? '' : ele.totalForecastedQuantity)
-                    ].concat(propertyName).concat([(ele.procurementGap == null ? '' : ele.procurementGap)].concat(propertyName1).concat([(ele.procurementNeeded == null ? '' : ele.procurementNeeded), (ele.notes == null ? '' : (ele.notes).replaceAll(' ', '%20'))]))))
+                    ].concat(propertyName).concat([(ele.procurementGap == null ? '' : ele.procurementGap)].concat(propertyName1).concat([(ele.procurementNeeded == null || ele.unitPrice==null ? '' : ele.procurementNeeded), (ele.notes == null ? '' : (ele.notes).replaceAll(' ', '%20'))]))))
                 )
             }
             );
@@ -437,16 +438,16 @@ class ForecastSummary extends Component {
 
 
             for (var i = 0; i < A.length; i++) {
-                // console.log(A[i])
+                // // console.log(A[i])
                 csvRow.push(A[i].join(","))
             }
 
             var csvString = csvRow.join("%0A")
-            // console.log('csvString' + csvString)
+            // // console.log('csvString' + csvString)
             var a = document.createElement("a")
             a.href = 'data:attachment/csv,' + csvString
             a.target = "_Blank"
-            a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
+            a.download = this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
             document.body.appendChild(a)
             a.click();
 
@@ -458,7 +459,7 @@ class ForecastSummary extends Component {
                 var puList = this.state.regPlanningUnitList;
                 let regRegionList = this.state.regRegionList;
                 let tsList = this.state.tsList;
-                console.log("Array--------->31", tsList);
+                // console.log("Array--------->31", tsList);
                 nestedHeaders.push('');
                 for (var k = 0; k < regRegionList.length; k++) {
                     nestedHeaders.push('');
@@ -491,9 +492,9 @@ class ForecastSummary extends Component {
 
                         for (var k = 0; k < regRegionList.length; k++) {
                             var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
-                            // console.log("Array--------->2", filterForecastSelected);
-                            total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
-                            total1 = total1 + (filterForecastSelected != undefined ? filterForecastSelected.totalForecast : '');
+                            // // console.log("Array--------->2", filterForecastSelected);
+                            total += Number(filterForecastSelected != undefined && filterForecastSelected.totalForecast!=null ? filterForecastSelected.totalForecast : 0);
+                            total1 = total1 + (filterForecastSelected != undefined && filterForecastSelected.totalForecast!=null ? filterForecastSelected.totalForecast : '');
 
                             // (tsList.filter(c => c.id == )[0].label)
                             let nameTC = '';
@@ -512,24 +513,24 @@ class ForecastSummary extends Component {
                             regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : Math.round(filterForecastSelected.totalForecast)) : ""));
                             regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes).replaceAll(',', ' ')).replaceAll(' ', '%20')) : ""));
                         }
-                        // console.log("Array--------->", regionArray);
+                        // // console.log("Array--------->", regionArray);
 
                         A.push(this.addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([(total1 == '' ? '' : Math.round(total))])));
-                        // console.log("Array--------->2", [((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total]));
+                        // // console.log("Array--------->2", [((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total]));
                     }
                 }
 
                 for (var i = 0; i < A.length; i++) {
-                    // console.log(A[i])
+                    // // console.log(A[i])
                     csvRow.push(A[i].join(","))
                 }
 
                 var csvString = csvRow.join("%0A")
-                // console.log('csvString' + csvString)
+                // // console.log('csvString' + csvString)
                 var a = document.createElement("a")
                 a.href = 'data:attachment/csv,' + csvString
                 a.target = "_Blank"
-                a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
+                a.download = this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
                 document.body.appendChild(a)
                 a.click();
 
@@ -591,7 +592,7 @@ class ForecastSummary extends Component {
 
                 //         for (var k = 0; k < regRegionList.length; k++) {
                 //             var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
-                //             // console.log("Array--------->2", filterForecastSelected);
+                //             // // console.log("Array--------->2", filterForecastSelected);
                 //             total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
                 //             total1 = total1 + (filterForecastSelected != undefined ? filterForecastSelected.totalForecast : '');
 
@@ -612,24 +613,24 @@ class ForecastSummary extends Component {
                 //             regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : Math.round(filterForecastSelected.totalForecast)) : ""));
                 //             regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes).replaceAll(',', ' ')).replaceAll(' ', '%20')) : ""));
                 //         }
-                //         // console.log("Array--------->", regionArray);
+                //         // // console.log("Array--------->", regionArray);
 
                 //         A.push(this.addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([(total1 == '' ? '' : Math.round(total))])));
-                //         // console.log("Array--------->2", [((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total]));
+                //         // // console.log("Array--------->2", [((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total]));
                 //     }
                 // }
 
                 for (var i = 0; i < A.length; i++) {
-                    // console.log(A[i])
+                    // // console.log(A[i])
                     csvRow.push(A[i].join(","))
                 }
 
                 var csvString = csvRow.join("%0A")
-                // console.log('csvString' + csvString)
+                // // console.log('csvString' + csvString)
                 var a = document.createElement("a")
                 a.href = 'data:attachment/csv,' + csvString
                 a.target = "_Blank"
-                a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
+                a.download = this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
                 document.body.appendChild(a)
                 a.click();
 
@@ -686,7 +687,7 @@ class ForecastSummary extends Component {
                 doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runDate') + "</b> " + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + "</font></span>", doc.internal.pageSize.width - 150, 20)
                 doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runTime') + "</b> " + moment(new Date()).format('hh:mm A') + "</font></span>", doc.internal.pageSize.width - 150, 30)
                 doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + i18n.t('static.user.user') + ":</b> " + AuthenticationService.getLoggedInUsername() + "</font></span>", doc.internal.pageSize.width - 150, 40)
-                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font></span>", doc.internal.pageSize.width - 150, 50)
+                doc.fromHTML("<span style = 'font-family:helvetica;'><font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.id == this.state.programId)[0].code + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font></span>", doc.internal.pageSize.width - 150, 50)
                 // doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
                 //     align: 'right'
                 // })
@@ -796,9 +797,9 @@ class ForecastSummary extends Component {
 
                         for (var k = 0; k < regRegionList.length; k++) {
                             var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
-                            // console.log("Array--------->2", filterForecastSelected);
-                            total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : '');
-                            total1 = total1 + (filterForecastSelected != undefined ? filterForecastSelected.totalForecast : '');
+                            // // console.log("Array--------->2", filterForecastSelected);
+                            total += Number(filterForecastSelected != undefined && filterForecastSelected.totalForecast!=null ? filterForecastSelected.totalForecast : '');
+                            total1 = total1 + (filterForecastSelected != undefined && filterForecastSelected.totalForecast!=null ? filterForecastSelected.totalForecast : '');
 
                             let nameTC = '';
                             try {
@@ -824,7 +825,7 @@ class ForecastSummary extends Component {
                     }
                 }
 
-                console.log("data------------------>12345 ", data);
+                // console.log("data------------------>12345 ", data);
 
                 var startY = 140;
                 let content = {
@@ -843,7 +844,7 @@ class ForecastSummary extends Component {
                 doc.autoTable(content);
                 addHeaders(doc)
                 addFooters(doc)
-                doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
+                doc.save(this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
 
             } else {//server version
 
@@ -887,7 +888,7 @@ class ForecastSummary extends Component {
 
                 }
 
-                console.log("data------------------>123456 ", data);
+                // console.log("data------------------>123456 ", data);
 
                 var startY = 130;
                 let content = {
@@ -906,7 +907,7 @@ class ForecastSummary extends Component {
                 doc.autoTable(content);
                 addHeaders(doc)
                 addFooters(doc)
-                doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
+                doc.save(this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
 
 
 
@@ -954,7 +955,7 @@ class ForecastSummary extends Component {
                         ((ele.planningUnit.label.label_en)),
                         (ele.totalForecastedQuantity == null ? '' : (ele.totalForecastedQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                     )
-                    A = A.concat(propertyName).concat([(ele.procurementGap == null ? '' : (ele.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))].concat(propertyName1).concat([(ele.procurementNeeded == null ? '' : (ele.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")), (ele.notes == null ? '' : ele.notes)]));
+                    A = A.concat(propertyName).concat([(ele.procurementGap == null ? '' : (ele.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))].concat(propertyName1).concat([(ele.procurementNeeded == null || ele.unitPrice==null ? '' : (ele.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")), (ele.notes == null ? '' : ele.notes)]));
                 }
 
                 return (ele.id != 0 &&
@@ -1054,19 +1055,20 @@ class ForecastSummary extends Component {
             doc.autoTable(content);
             addHeaders(doc)
             addFooters(doc)
-            doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
+            doc.save(this.state.programs.filter(c => c.id == this.state.programId)[0].code + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
 
         }
     }
 
     filterData() {
-        console.log("INSIDE FILTERDATA---------------------------------");
+        // console.log("INSIDE FILTERDATA---------------------------------");
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
-        console.log("programId----------->", programId);
-        console.log("versionId----------->", versionId);
+        // console.log("programId----------->", programId);
+        // console.log("versionId----------->", versionId);
         let displayId = this.state.displayId;
         (displayId == 1 ? document.getElementById("hideCalculationDiv").style.display = "block" : document.getElementById("hideCalculationDiv").style.display = "none");
+        (displayId == 1 ? document.getElementById("hideLegendDiv").style.display = "block" : document.getElementById("hideLegendDiv").style.display = "none");
         // (displayId == 1 ? document.getElementById("hideCurrencyDiv").style.display = "block" : document.getElementById("hideCurrencyDiv").style.display = "none");
         // this.setState({
         //     displayId: displayId
@@ -1080,12 +1082,12 @@ class ForecastSummary extends Component {
         let total_months = (end_date.getFullYear() - start_date.getFullYear()) * 12;
         total_months += end_date.getMonth() - start_date.getMonth()
         total_months = total_months + 1;
-        console.log("total_months----------->", programId + '-----------------' + total_months);
+        // console.log("total_months----------->", programId + '-----------------' + total_months);
 
 
         if (versionId != 0 && programId > 0) {
             if (versionId == -1) {
-                console.log("1------------------------");
+                // console.log("1------------------------");
                 this.setState({ message: i18n.t('static.program.validversion'), summeryData: [], dataArray: [], versionId: '', forecastPeriod: '', });
                 try {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1120,7 +1122,7 @@ class ForecastSummary extends Component {
                     getRequest.onsuccess = function (event) {
                         var myResult = [];
                         myResult = getRequest.result;
-                        // console.log("DATASET----------->", myResult);
+                        // // console.log("DATASET----------->", myResult);
                         // this.setState({
                         //     datasetList: myResult
                         // });
@@ -1135,11 +1137,11 @@ class ForecastSummary extends Component {
                             var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson1 = JSON.parse(programData);
-                            console.log("programJson1-------->1", programJson1);
+                            // console.log("programJson1-------->1", programJson1);
                             // let dupForecastingUnitObj = programJson1.consumptionList.map(ele => ele.consumptionUnit.forecastingUnit);
                             // const ids = dupForecastingUnitObj.map(o => o.id)
                             // const filtered = dupForecastingUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
-                            // console.log("programJson1-------->2", filtered);
+                            // // console.log("programJson1-------->2", filtered);
 
                             // let dupPlanningUnitObjwithNull = programJson1.consumptionList.map(ele => ele.consumptionUnit.planningUnit);
                             // let dupPlanningUnitObj = dupPlanningUnitObjwithNull.filter(c => c != null);
@@ -1169,7 +1171,7 @@ class ForecastSummary extends Component {
                             datasetList1.push(filteredGetRequestList[i])
                             // }
                         }
-                        console.log("DATASET-------->", datasetList);
+                        // console.log("DATASET-------->", datasetList);
                         this.setState({
                             datasetList: datasetList,
                             datasetList1: datasetList1,
@@ -1184,7 +1186,7 @@ class ForecastSummary extends Component {
                             localStorage.setItem("sesDatasetVersionId", document.getElementById("versionId").value);
 
                             let filteredProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == (versionId.split('(')[0]).trim())[0];
-                            console.log("Test------------>1", filteredProgram);
+                            // console.log("Test------------>1", filteredProgram);
 
                             let planningUnitList = filteredProgram.planningUnitList;
                             planningUnitList = planningUnitList.filter(c => c.active == true);
@@ -1198,7 +1200,7 @@ class ForecastSummary extends Component {
 
                             let duplicateTracerCategoryId = planningUnitList.map(c => c.planningUnit.forecastingUnit.tracerCategory.id)
                             let filteredTracercategoryId = [...new Set(duplicateTracerCategoryId)];
-                            console.log("Test------------>2", filteredTracercategoryId);
+                            // console.log("Test------------>2", filteredTracercategoryId);
                             let totalProductCost = 0.0;
 
                             // planningUnitList = planningUnitList.filter(c => Object.keys(c.selectedForecastMap).length !== 0)
@@ -1210,11 +1212,11 @@ class ForecastSummary extends Component {
                                 let nodeDataMomList = [];
                                 let consumptionData = [];
                                 let selectedForecastMap = planningUnitList[j].selectedForecastMap;
-                                console.log("Test------------>2", selectedForecastMap);
-                                console.log("Test------------>3", Object.keys(selectedForecastMap)[0]);
-                                console.log("Test------------>4", (selectedForecastMap[Object.keys(selectedForecastMap)[0]]));
+                                // console.log("Test------------>2", selectedForecastMap);
+                                // console.log("Test------------>3", Object.keys(selectedForecastMap)[0]);
+                                // console.log("Test------------>4", (selectedForecastMap[Object.keys(selectedForecastMap)[0]]));
                                 let notes1 = '';
-
+                                var isForecastSelected=false;
                                 if ((selectedForecastMap[Object.keys(selectedForecastMap)[0]]) != undefined && (selectedForecastMap[Object.keys(selectedForecastMap)[0]]) != '' && (selectedForecastMap[Object.keys(selectedForecastMap)[0]]) != null) {
 
                                     let keys = Object.keys(selectedForecastMap);
@@ -1222,38 +1224,45 @@ class ForecastSummary extends Component {
                                         let selectedForecastMapObjIn = (selectedForecastMap[keys[k]]);
 
                                         //add notes
-                                        if (selectedForecastMapObjIn.notes != '') {
+                                        if (selectedForecastMapObjIn.notes != '' && selectedForecastMapObjIn.notes!=undefined) {
                                             if (notes1 == '') {
                                                 notes1 = regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ': ' + selectedForecastMapObjIn.notes;
                                             } else {
                                                 notes1 = notes1.concat(' | ' + regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ': ' + selectedForecastMapObjIn.notes);
                                             }
                                         }
-
-                                        console.log("checkPU------------>2", selectedForecastMapObjIn);
+                                        // console.log("planningUnitList Test@123",planningUnitList[j]);
+                                        // console.log("checkPU------------>2", selectedForecastMapObjIn);
                                         if (((selectedForecastMapObjIn.scenarioId != null) ? true : ((selectedForecastMapObjIn.consumptionExtrapolationId != 0) ? true : false))) {
+                                            // console.log("In side scenario Id Test@123")
                                             let treeId = selectedForecastMapObjIn.treeId;
                                             let scenarioId = selectedForecastMapObjIn.scenarioId;
                                             let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
                                             if (scenarioId != null) {//scenarioId
+                                                // console.log("In side scenario Id is not null Test@123")
                                                 for (let p = 0; p < treeList.length; p++) {
                                                     // let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
                                                     let filteredScenario = (treeList[p].treeId == treeId ? treeList[p].scenarioList.filter(c => c.id == scenarioId) : []);
                                                     if (filteredScenario.length > 0) {
+                                                        isForecastSelected=true;
+                                                        // console.log("Inside filter scenario Test@123")
                                                         let flatlist = treeList[p].tree.flatList;
                                                         let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
-                                                        console.log("Test------------>5", listContainNodeType5);
-                                                        console.log("Test------------>6", listContainNodeType5[0].payload);
-                                                        console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
+                                                        // console.log("Test------------>5", listContainNodeType5);
+                                                        // console.log("Test------------>6", listContainNodeType5[0].payload);
+                                                        // console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
 
                                                         let myTempData = [];
                                                         for (let k = 0; k < listContainNodeType5.length; k++) {
+                                                            // console.log("Indise list of node Test@123")
                                                             let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
-                                                            console.log("Test------------>7.1", arrayOfNodeDataMap);
+                                                            // console.log("Test------------>7.1", arrayOfNodeDataMap);
 
                                                             if (arrayOfNodeDataMap.length > 0) {
-                                                                console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList, ' --- ', planningUnitList[j].planningUnit);
+                                                                // console.log("Inside array of node data mao Test@123")
+                                                                // console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList, ' --- ', planningUnitList[j].planningUnit);
                                                                 nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
+                                                                // console.log("Node data mom list Test@123")
                                                                 let consumptionList = nodeDataMomList.map(m => {
                                                                     return {
                                                                         consumptionDate: m.month,
@@ -1276,10 +1285,12 @@ class ForecastSummary extends Component {
 
                                                 }
                                             } else {//consumptionExtrapolationId
-
+                                                // console.log("in else Test@123")
                                                 let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
-                                                console.log("consumptionExtrapolationObj----------->", consumptionExtrapolationObj);
+                                                // console.log("consumptionExtrapolationObj-----------> Test@123", consumptionExtrapolationObj);
                                                 if (consumptionExtrapolationObj.length > 0) {
+                                                    isForecastSelected=true;
+                                                    // console.log("In if Test@123")
                                                     let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                         return {
                                                             consumptionDate: m.month,
@@ -1303,7 +1314,7 @@ class ForecastSummary extends Component {
 
 
                                     // let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
-                                    // console.log("checkPU------------>2", selectedForecastMapObjIn);
+                                    // // console.log("checkPU------------>2", selectedForecastMapObjIn);
 
                                     // let treeId = selectedForecastMapObjIn.treeId;
                                     // let scenarioId = selectedForecastMapObjIn.scenarioId;
@@ -1316,16 +1327,16 @@ class ForecastSummary extends Component {
                                     //         if (filteredScenario.length > 0) {
                                     //             let flatlist = treeList[p].tree.flatList;
                                     //             let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
-                                    //             console.log("Test------------>5", listContainNodeType5);
-                                    //             console.log("Test------------>6", listContainNodeType5[0].payload);
-                                    //             console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
+                                    //             // console.log("Test------------>5", listContainNodeType5);
+                                    //             // console.log("Test------------>6", listContainNodeType5[0].payload);
+                                    //             // console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
 
                                     //             for (let k = 0; k < listContainNodeType5.length; k++) {
                                     //                 let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
-                                    //                 console.log("Test------------>7.1", arrayOfNodeDataMap);
+                                    //                 // console.log("Test------------>7.1", arrayOfNodeDataMap);
 
                                     //                 if (arrayOfNodeDataMap.length > 0) {
-                                    //                     console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
+                                    //                     // console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
                                     //                     nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
                                     //                     let consumptionList = nodeDataMomList.map(m => {
                                     //                         return {
@@ -1346,7 +1357,7 @@ class ForecastSummary extends Component {
                                     // } else {//consumptionExtrapolationId
 
                                     //     let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
-                                    //     console.log("consumptionExtrapolationObj----------->", consumptionExtrapolationObj);
+                                    //     // console.log("consumptionExtrapolationObj----------->", consumptionExtrapolationObj);
                                     //     if (consumptionExtrapolationObj.length > 0) {
                                     //         let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                     //             return {
@@ -1365,7 +1376,7 @@ class ForecastSummary extends Component {
 
 
 
-
+                                    // console.log("consumptionData Test@123",consumptionData)
                                     let totalForecastedQuantity0ri = 0;
                                     let tempList = [];
                                     let tempList1 = [];
@@ -1395,13 +1406,15 @@ class ForecastSummary extends Component {
                                                 a[id].consumptionQty = parseFloat(a[id].consumptionQty) + parseFloat(consumptionQty);
                                             return a;
                                         }, {}));
-
+                                        // console.log("Result True Test@123",resultTrue)
                                         totalForecastedQuantity0ri = (resultTrue.length > 0 ? parseFloat(resultTrue[0].consumptionQty).toFixed(2) : 0);
 
                                     }
 
                                     totalForecastedQuantity0ri = Math.round(totalForecastedQuantity0ri);
-
+                                    if(!isForecastSelected){
+                                        totalForecastedQuantity0ri=null;
+                                    }
 
 
                                     //obj parameter decleration
@@ -1433,29 +1446,62 @@ class ForecastSummary extends Component {
 
                                     if (isProcurementGapRed == true) {
                                         totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * unitPrice);
-                                        console.log("totalProductCost----------->4", totalProductCost);
+                                        // console.log("totalProductCost----------->4", totalProductCost);
                                     }
 
+                                }else{
+                                    //obj parameter decleration
+                                    let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
+                                    let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
+                                    let planningUnit = planningUnitList[j].planningUnit;
+                                    var totalForecastedQuantity0ri=null;
+                                    let totalForecastedQuantity = totalForecastedQuantity0ri;
+                                    let stock1 = planningUnitList[j].stock;
+                                    let existingShipments = planningUnitList[j].existingShipments;
+                                    let stock2 = (Math.round(planningUnitList[j].stock) + Math.round(planningUnitList[j].existingShipments)) - Math.round(totalForecastedQuantity0ri);
+                                    let isStock2Red = (stock2 < 0 ? true : false);
+                                    let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
+                                    let desiredMonthOfStock2 = Math.round(Math.round(planningUnitList[j].monthsOfStock) * Math.round(totalForecastedQuantity0ri) / Math.round(total_months));
+                                    let tempProcurementGap = ((Math.round(planningUnitList[j].stock) + Math.round(planningUnitList[j].existingShipments)) - Math.round(totalForecastedQuantity0ri)) - (Math.round(planningUnitList[j].monthsOfStock) * Math.round(totalForecastedQuantity0ri) / Math.round(total_months));
+                                    let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
+                                    procurementGap = Math.round(procurementGap)
+                                    let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
+                                    let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
+                                    let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
+                                    let unitPrice = planningUnitList[j].price;
+                                    // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
+                                    let procurementNeeded = (isProcurementGapRed == true ? '$ ' + Math.round(Math.abs(tempProcurementGap) * unitPrice) : '');
+                                    let notes = planningUnitList[j].consumptionNotes;
+
+                                    let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: true, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes1 }
+                                    tempData.push(obj);
+
+
+
+                                    if (isProcurementGapRed == true) {
+                                        totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * unitPrice);
+                                        // console.log("totalProductCost----------->4", totalProductCost);
+                                    }
                                 }
 
 
                             }
                             totalProductCost = parseFloat(totalProductCost).toFixed(2);
-                            console.log("totalProductCost----------->5", totalProductCost);
-                            // console.log("consumptionData----->", consumptionData);
-                            // console.log("Test------------>3331", filteredTracercategoryId);
-                            // console.log("Test------------>3332", tempData);
+                            // console.log("totalProductCost----------->5", totalProductCost);
+                            // // console.log("consumptionData----->", consumptionData);
+                            // // console.log("Test------------>3331", filteredTracercategoryId);
+                            // // console.log("Test------------>3332", tempData);
                             //sort based on tracerCategory
                             for (var i = 0; i < filteredTracercategoryId.length; i++) {
                                 let filteredTracerCategoryList = tempData.filter(c => c.tracerCategory.id == filteredTracercategoryId[i]);
-                                // console.log("Test------------>3333", filteredTracerCategoryList);
+                                // // console.log("Test------------>3333", filteredTracerCategoryList);
                                 if (filteredTracerCategoryList.length > 0) {
                                     let obj = { id: 0, tempTracerCategoryId: filteredTracerCategoryList[0].tracerCategory.id, display: true, tracerCategory: filteredTracerCategoryList[0].tracerCategory, forecastingUnit: '', planningUnit: '', totalForecastedQuantity: '', stock1: '', existingShipments: '', stock2: '', isStock2Red: '', desiredMonthOfStock1: '', desiredMonthOfStock2: '', procurementGap: '', priceType: '', unitPrice: '', procurementNeeded: '', notes: '' }
                                     summeryData.push(obj);
                                     summeryData = summeryData.concat(filteredTracerCategoryList);
                                 }
                             }
-                            console.log("Test------------>301", summeryData);
+                            // console.log("Test------------>301", summeryData);
                             this.setState({
                                 loading: (displayId == 2 ? true : false),
                                 summeryData: summeryData,
@@ -1466,10 +1512,11 @@ class ForecastSummary extends Component {
                                 tracerCategoryList: [...new Set(planningUnitList.map(ele => (ele.planningUnit.forecastingUnit.tracerCategory.id)))]
                             }, () => {
                                 if (displayId == 2) {
-                                    // console.log("langaugeList---->", langaugeList);
+                                    // // console.log("langaugeList---->", langaugeList);
                                     let dataArray = [];
+                                    // console.log("Test@123 datasetJson",this.state.regDatasetJson)
                                     var treeList = this.state.regDatasetJson.treeList.filter(c => c.active == true);;
-                                    console.log("TreeList+++", treeList)
+                                    // console.log("TreeList+++", treeList)
                                     var consumptionExtrapolation = this.state.regDatasetJson.consumptionExtrapolation;
                                     var tsList = [];
                                     let startDate = this.state.regDatasetJson.forecastStartDate;
@@ -1482,11 +1529,11 @@ class ForecastSummary extends Component {
                                     }
                                     for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
                                         var total = 0;
-                                        console.log("consumptionExtrapolation[ce].extrapolationDataList+++", consumptionExtrapolation[ce].extrapolationDataList)
+                                        // console.log("consumptionExtrapolation[ce].extrapolationDataList+++", consumptionExtrapolation[ce].extrapolationDataList)
                                         consumptionExtrapolation[ce].extrapolationDataList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(endDate).format("YYYY-MM-DD")).map(ele => {
                                             total += Number(ele.amount);
                                         });
-                                        console.log("total+++", total);
+                                        // console.log("total+++", total);
                                         // if (consumptionExtrapolation[ce].extrapolationMethod.active == true) {
                                         tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total, region: [consumptionExtrapolation[ce].region] });
                                         // }
@@ -1502,9 +1549,9 @@ class ForecastSummary extends Component {
                                     })
                                     var data = []
                                     var tcList = this.state.tracerCategoryList;
-                                    console.log("tcList+++", tcList);
+                                    // console.log("tcList+++", tcList);
                                     var puList = this.state.regPlanningUnitList;
-                                    console.log("PuList+++", puList);
+                                    // console.log("PuList+++", puList);
                                     var regRegionList = this.state.regRegionList;
                                     for (var tc = 0; tc < tcList.length; tc++) {
                                         data = [];
@@ -1524,7 +1571,7 @@ class ForecastSummary extends Component {
                                         data[(regRegionList.length * 3) + 4] = ""
                                         data[(regRegionList.length * 3) + 5] = 0
 
-                                        console.log("data------------------->3211", data);
+                                        // console.log("data------------------->3211", data);
                                         dataArray.push(data);
                                         var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
                                         for (var j = 0; j < puListFiltered.length; j++) {
@@ -1536,14 +1583,42 @@ class ForecastSummary extends Component {
                                             let selectedForecastQty = 0;
                                             for (var k = 0; k < regRegionList.length; k++) {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
-                                                console.log("filterForecastSelected+++", filterForecastSelected);
-                                                console.log("filterForecastSelected != undefined ? filterForecastSelected.notes : +++", filterForecastSelected != undefined ? filterForecastSelected.notes : "");
-                                                data[(k + 1) * 3] = (filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
-                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "";
-                                                total += Number(filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : 0);
+                                                // console.log("filterForecastSelected+++", filterForecastSelected);
+                                                // console.log("filterForecastSelected != undefined ? filterForecastSelected.notes : +++", filterForecastSelected != undefined ? filterForecastSelected.notes : "");
+                                                var selectedForecast=(filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
+                                                data[(k + 1) * 3] = selectedForecast;
+                                                var totalForecast = 0;
+                                                if(selectedForecast!=""){
+                                                    var tsListFilter = tsList.filter(c => c.id == selectedForecast)[0]
+                                                    if(tsListFilter!=undefined){
+                                                        // console.log("totalForecast---------->0", tsListFilter);
+                                                        totalForecast = 0;
+                                                        if (tsListFilter.type == "C") {
+                                                            totalForecast = tsListFilter.totalForecast;
+                                                        } else {
+                                                            var flatList = tsListFilter.flatList;
+                                                            // console.log("Flat List @@@@@@@ Test", flatList)
+                                                            var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == puListFiltered[j].planningUnit.id);
+                                                            // console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
+                                                            var nodeDataMomList = [];
+                                                            for (var fl = 0; fl < flatListFilter.length; fl++) {
+                                                                nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM")));
+                                                            }
+                                                            nodeDataMomList.map(ele => {
+                                                                totalForecast += Number(ele.calculatedMmdValue);
+                                                            });
+                                                        }
+                                                    }else{
+                                                        totalForecast=null;
+                                                    }
+                                                }else{
+                                                    totalForecast=null;
+                                                }
+                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast!=null ? Math.round(totalForecast) : "";
+                                                total += Number(filterForecastSelected != undefined ? Math.round(totalForecast) : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
 
-                                                if ((filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "") != "") {
+                                                if ((filterForecastSelected != undefined ? Math.round(totalForecast) : "") != "") {
                                                     selectedForecastQty = selectedForecastQty + 1;
                                                 }
                                             }
@@ -1600,7 +1675,7 @@ class ForecastSummary extends Component {
                                     //     data = [];
                                     //     languageArray[0] = data;
                                     // }
-                                    // console.log("languageArray---->", languageArray);
+                                    // // console.log("languageArray---->", languageArray);
                                     try {
                                         this.el = jexcel(document.getElementById("tableDiv"), '');
                                         // this.el.destroy();
@@ -1610,7 +1685,7 @@ class ForecastSummary extends Component {
                                         // document.getElementById("demo").innerHTML = err.message;
                                     }
 
-                                    console.log("DataArray+++", dataArray);
+                                    // console.log("DataArray+++", dataArray);
                                     this.setState({
                                         dataArray: dataArray
                                     }, () => {
@@ -1664,9 +1739,9 @@ class ForecastSummary extends Component {
                                             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
                                             for (var y = 0; y < json.length; y++) {
                                                 var rowData = elInstance.getRowData(y);
-                                                console.log("RowData--------->1", rowData);
+                                                // console.log("RowData--------->1", rowData);
                                                 let rowDataSecondLast = rowData[rowData.length - 3];
-                                                // console.log("RowData--------->2", rowDataSecondLast);
+                                                // // console.log("RowData--------->2", rowDataSecondLast);
                                                 if (rowDataSecondLast == 1) {
                                                     for (var r = 0; r < rowData.length; r++) {
                                                         var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
@@ -1721,13 +1796,13 @@ class ForecastSummary extends Component {
                     "reportView": displayId//2-National 1-Regional
                 }
 
-                console.log("OnlineInputJson---------------->reportView", displayId);
+                // console.log("OnlineInputJson---------------->reportView", displayId);
 
-                console.log("OnlineInputJson---------------->", inputJson);
+                // console.log("OnlineInputJson---------------->", inputJson);
 
                 ReportService.forecastSummary(inputJson)
                     .then(response => {
-                        console.log("RESP---------->forecastSummary", response.data);
+                        // console.log("RESP---------->forecastSummary", response.data);
                         let primaryOutputData = response.data;
                         let totalProductCost = 0;
 
@@ -1735,7 +1810,7 @@ class ForecastSummary extends Component {
                         if (displayId == 2) {//National
                             let duplicateTracerCategoryId = primaryOutputData.map(c => c.tracerCategory.id);
                             let filteredTracercategoryId = [...new Set(duplicateTracerCategoryId)];
-                            console.log("Test------------>Online---2", filteredTracercategoryId);
+                            // console.log("Test------------>Online---2", filteredTracercategoryId);
 
                             let tempData = [];
                             for (let j = 0; j < primaryOutputData.length; j++) {
@@ -1772,14 +1847,14 @@ class ForecastSummary extends Component {
                             let summeryData = [];
                             for (var i = 0; i < filteredTracercategoryId.length; i++) {
                                 let filteredTracerCategoryList = tempData.filter(c => c.tracerCategory.id == filteredTracercategoryId[i]);
-                                // console.log("Test------------>3333", filteredTracerCategoryList);
+                                // // console.log("Test------------>3333", filteredTracerCategoryList);
                                 if (filteredTracerCategoryList.length > 0) {
                                     let obj = { id: 0, tempTracerCategoryId: filteredTracerCategoryList[0].tracerCategory.id, display: true, tracerCategory: filteredTracerCategoryList[0].tracerCategory, forecastingUnit: '', planningUnit: '', totalForecastedQuantity: '', stock1: '', existingShipments: '', stock2: '', isStock2Red: '', desiredMonthOfStock1: '', desiredMonthOfStock2: '', procurementGap: '', priceType: '', unitPrice: '', procurementNeeded: '', notes: '' }
                                     summeryData.push(obj);
                                     summeryData = summeryData.concat(filteredTracerCategoryList);
                                 }
                             }
-                            console.log("Test------------>Online---301", summeryData);
+                            // console.log("Test------------>Online---301", summeryData);
 
                             totalProductCost = parseFloat(totalProductCost).toFixed(2);
                             this.setState({
@@ -1849,7 +1924,7 @@ class ForecastSummary extends Component {
 
                             }
 
-                            console.log("summeryData--------------->", summeryData);
+                            // console.log("summeryData--------------->", summeryData);
 
                             var data = [];
                             let tempListArray = [];
@@ -1918,7 +1993,7 @@ class ForecastSummary extends Component {
                             catch (err) {
                                 // document.getElementById("demo").innerHTML = err.message;
                             }
-                            console.log("DataArray+++", dataArray);
+                            // console.log("DataArray+++", dataArray);
                             this.setState({
                                 dataArray: dataArray,
                                 uniqueRegionList: uniqueRegionList,
@@ -1969,9 +2044,9 @@ class ForecastSummary extends Component {
                                     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
                                     for (var y = 0; y < json.length; y++) {
                                         var rowData = elInstance.getRowData(y);
-                                        console.log("RowData--------->1", rowData);
+                                        // console.log("RowData--------->1", rowData);
                                         let rowDataSecondLast = rowData[0];
-                                        // console.log("RowData--------->2", rowDataSecondLast);
+                                        // // console.log("RowData--------->2", rowDataSecondLast);
                                         if (rowDataSecondLast == 1) {
                                             for (var r = 0; r < rowData.length; r++) {
                                                 var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
@@ -2000,7 +2075,7 @@ class ForecastSummary extends Component {
                         }
 
                         // alert("Hi");
-                        // console.log("2------------------------");
+                        // // console.log("2------------------------");
                         // this.setState({ message: '', summeryData: [], dataArray: [] });
                         // try {
                         //     this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -2066,7 +2141,7 @@ class ForecastSummary extends Component {
             }
 
         } else if (versionId == -1) {
-            console.log("3------------------------");
+            // console.log("3------------------------");
             this.setState({ message: i18n.t('static.program.validversion'), summeryData: [], dataArray: [], versionId: '', forecastPeriod: '', });
             try {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -2097,15 +2172,15 @@ class ForecastSummary extends Component {
             if (value != "") {
                 // alert("If");
                 var tsListFilter = this.state.tsList.filter(c => c.id == value)[0]
-                console.log("totalForecast---------->0", tsListFilter);
+                // console.log("totalForecast---------->0", tsListFilter);
                 var totalForecast = 0;
                 if (tsListFilter.type == "C") {
                     totalForecast = tsListFilter.totalForecast;
                 } else {
                     var flatList = tsListFilter.flatList;
-                    console.log("Flat List @@@@@@@ Test", flatList)
+                    // console.log("Flat List @@@@@@@ Test", flatList)
                     var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
-                    console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
+                    // console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
                     var nodeDataMomList = [];
                     for (var fl = 0; fl < flatListFilter.length; fl++) {
                         nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM")));
@@ -2115,7 +2190,7 @@ class ForecastSummary extends Component {
                     });
                 }
                 // elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
-                console.log("totalForecast---------->1", totalForecast);
+                // console.log("totalForecast---------->1", totalForecast);
                 elInstance.setValueFromCoords((Number(x) + 1), y, Math.round(totalForecast), true);
                 let loopVar = 4;
                 let total = 0;
@@ -2138,7 +2213,7 @@ class ForecastSummary extends Component {
 
                 }
 
-                // console.log("total1------------>", total1);
+                // // console.log("total1------------>", total1);
 
                 elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 2), y, (total == 0 ? '' : Math.round(total)), true);
                 elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 1), y, 1, true);
@@ -2149,8 +2224,8 @@ class ForecastSummary extends Component {
     }
 
     filterTsList(instance, cell, c, r, source) {
-        // console.log("x---------------->1 1", c);
-        // console.log("x---------------->2 2", r);
+        // // console.log("x---------------->1 1", c);
+        // // console.log("x---------------->2 2", r);
         var tsList = this.state.tsList;
         var mylist = [];
         // var value = (instance.jexcel.getJson(null, false)[r])[1].id;
@@ -2160,10 +2235,10 @@ class ForecastSummary extends Component {
         var regionList = this.state.regRegionList;
         // var planningUniObj = this.state.regPlanningUnitList.filter(c => c.planningUnit.id == value);
         var regionId = regionList[(c / 3) - 1].regionId;
-        // console.log("x---------------->2 3", planningUniObj);
-        // console.log("x---------------->2 4", regionId);
-        // console.log("x---------------->2 5", planningUniObj.selectedForecastMap);
-        // console.log("x---------------->2 6", selectedForecastMapObj);
+        // // console.log("x---------------->2 3", planningUniObj);
+        // // console.log("x---------------->2 4", regionId);
+        // // console.log("x---------------->2 5", planningUniObj.selectedForecastMap);
+        // // console.log("x---------------->2 6", selectedForecastMapObj);
         // let selectedForecastMapObj = planningUniObj.selectedForecastMap[regionId];
         mylist = tsList.filter(e => (e.type == "T" && e.flatList.filter(c => c.payload.nodeDataMap[e.id1][0].puNode != null && c.payload.nodeDataMap[e.id1][0].puNode.planningUnit.id == value).length > 0) || (e.type == "C" && e.planningUnitId == value && consumptionForecast.toString() == "true"));
         let mylist1 = [];
@@ -2174,7 +2249,7 @@ class ForecastSummary extends Component {
                 mylist1.push(mylist[i]);
             }
         }
-        console.log("x---------------->mylist1", mylist1);
+        // console.log("x---------------->mylist1", mylist1);
 
         return mylist1;
     }
@@ -2194,7 +2269,7 @@ class ForecastSummary extends Component {
         this.setState({
             summeryData
         }, () => {
-            console.log("tempTracerCategoryId---------->2", summeryData);
+            // console.log("tempTracerCategoryId---------->2", summeryData);
             // this.calculateEquivalencyUnitTotal();
         })
     }
@@ -2204,18 +2279,21 @@ class ForecastSummary extends Component {
         // this.setState({ programs: [{ label: "Benin PRH,Condoms Forecast Dataset", programId: 1 }, { label: "Benin ARV Forecast Dataset", programId: 2 }, { label: "Benin Malaria Forecast Dataset", programId: 3 }], loading: false });
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getDataSetListAll()
+            let realmId = AuthenticationService.getRealmId();
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+            // ProgramService.getDataSetListAll()
                 .then(response => {
                     let datasetList = response.data;
-                    console.log("datasetList-------------->1", datasetList);
-                    datasetList = datasetList.filter(c => c.active == true);
-                    console.log("datasetList-------------->2", datasetList);
+                    // console.log("datasetList-------------->1", datasetList);
+                    // datasetList = datasetList.filter(c => c.active == true);
+                    // console.log("datasetList-------------->2", datasetList);
                     this.setState({
                         programs: datasetList,
-                        allProgramList: response.data
+                        // allProgramList: response.data
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
+                        // console.log("datasetList in catch-------------->2");
                         this.setState({
                             programs: [], loading: false
                         }, () => { this.consolidatedProgramList() })
@@ -2260,7 +2338,7 @@ class ForecastSummary extends Component {
                 );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
             this.setState({ loading: false })
         }
@@ -2295,13 +2373,13 @@ class ForecastSummary extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
-                            if (this.state.programs[k].programId == programData.programId) {
+                            if (this.state.programs[k].id == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -2316,8 +2394,8 @@ class ForecastSummary extends Component {
                 if (proList.length == 1) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = (a.programCode).toLowerCase();
-                            b = (b.programCode).toLowerCase();
+                            a = (a.code).toLowerCase();
+                            b = (b.code).toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         programId: proList[0].programId,
@@ -2325,15 +2403,15 @@ class ForecastSummary extends Component {
                         downloadedProgramData: downloadedProgramData,
                     }, () => {
                         this.getVersionIds();
-                        console.log("programs------------------>", this.state.programs);
+                        // console.log("programs------------------>", this.state.programs);
                     })
                 } else {
-                    console.log("this.props.match.params.programId@@@", this.props.match.params.programId);
+                    // console.log("this.props.match.params.programId@@@", this.props.match.params.programId);
                     if (this.props.match.params.programId != "" && this.props.match.params.programId != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             programId: this.props.match.params.programId,
@@ -2341,14 +2419,14 @@ class ForecastSummary extends Component {
                             loading: false
                         }, () => {
                             this.getVersionIds();
-                            console.log("programs------------------>", this.state.programs);
+                            // console.log("programs------------------>", this.state.programs);
                         })
                     }
                     else if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             programId: localStorage.getItem("sesForecastProgramIdReport"),
@@ -2356,19 +2434,19 @@ class ForecastSummary extends Component {
                             downloadedProgramData: downloadedProgramData,
                         }, () => {
                             this.getVersionIds();
-                            console.log("programs------------------>", this.state.programs);
+                            // console.log("programs------------------>", this.state.programs);
                         })
                     } else {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = (a.programCode).toLowerCase();
-                                b = (b.programCode).toLowerCase();
+                                a = (a.code).toLowerCase();
+                                b = (b.code).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             loading: false,
                             downloadedProgramData: downloadedProgramData,
                         }, () => {
-                            console.log("programs------------------>", this.state.programs);
+                            // console.log("programs------------------>", this.state.programs);
                         })
                     }
 
@@ -2398,6 +2476,7 @@ class ForecastSummary extends Component {
 
     componentDidMount() {
         document.getElementById("hideCalculationDiv").style.display = "none";
+        document.getElementById("hideLegendDiv").style.display = "none";
         // document.getElementById("hideCurrencyDiv").style.display = "none";
         this.getPrograms();
         this.setState({
@@ -2429,11 +2508,11 @@ class ForecastSummary extends Component {
                 // versionId = versionId.split('(')[0];
                 programId = parseInt(programId);
                 versionId = parseInt(versionId);
-                console.log("Test-----------------1100", programId);
-                console.log("Test-----------------1101", versionId);
-                console.log("Test-----------------1102", this.state.downloadedProgramData);
+                // console.log("Test-----------------1100", programId);
+                // console.log("Test-----------------1101", versionId);
+                // console.log("Test-----------------1102", this.state.downloadedProgramData);
                 let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
-                console.log("Test-----------------111", selectedForecastProgram);
+                // console.log("Test-----------------111", selectedForecastProgram);
 
                 if (selectedForecastProgram != undefined && selectedForecastProgram != null) {
 
@@ -2479,7 +2558,7 @@ class ForecastSummary extends Component {
 
                     let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
                     forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
-                    console.log("Test-----------------111", startDateSplit);
+                    // console.log("Test-----------------111", startDateSplit);
 
                     let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
                     let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
@@ -2503,10 +2582,9 @@ class ForecastSummary extends Component {
 
 
             } else {//server version
-                let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId)[0];
+                let selectedForecastProgram = this.state.programs.filter(c => c.id == programId)[0];
 
-                let selectedVersion = selectedForecastProgram.versionList.filter(c => c.versionId == versionId)[0];
-                console.log("Test-----------------111Online", selectedForecastProgram);
+                let selectedVersion = this.state.versions.filter(c => c.versionId == versionId)[0];
 
                 let tempObj = {
                     forecastStartDate: (selectedVersion.forecastStartDate ? moment(selectedVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
@@ -2548,7 +2626,7 @@ class ForecastSummary extends Component {
 
                 let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
                 forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
-                console.log("Test-----------------111", startDateSplit);
+                // console.log("Test-----------------111", startDateSplit);
 
                 let forecastStartDateNew = selectedVersion.forecastStartDate;
                 let forecastStopDateNew = selectedVersion.forecastStopDate;
@@ -2591,13 +2669,13 @@ class ForecastSummary extends Component {
         // var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
         // versionId = parseInt(versionId);
         // var programId = this.state.programId;
-        // console.log("Test-----------------110", event);
-        // console.log("Test-----------------111", versionId);
+        // // console.log("Test-----------------110", event);
+        // // console.log("Test-----------------111", versionId);
 
 
         // if (programId != -1 && versionId != -1) {
         //     let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
-        //     console.log("Test-----------------111", selectedForecastProgram);
+        //     // console.log("Test-----------------111", selectedForecastProgram);
 
         //     let tempObj = {
         //         forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
@@ -2641,7 +2719,7 @@ class ForecastSummary extends Component {
 
         //     let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
         //     forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
-        //     console.log("Test-----------------111", startDateSplit);
+        //     // console.log("Test-----------------111", startDateSplit);
 
         //     let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
         //     let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
@@ -2709,50 +2787,77 @@ class ForecastSummary extends Component {
 
         let programId = this.state.programId;
         if (programId != 0) {
-
-            const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            const program = this.state.programs.filter(c => c.id == programId)
             if (program.length == 1) {
                 if (isSiteOnline()) {
-                    this.setState({
-                        versions: [],
-                    }, () => {
-                        let inactiveProgram = this.state.allProgramList.filter(c => c.active == false);
-                        inactiveProgram = inactiveProgram.filter(c => c.programId == programId);
+                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                            .then(response => {
+                                this.setState({
+                                    versions: []
+                                }, () => {
+                                    this.setState({
+                                        versions: response.data
+                                    }, () => { this.consolidatedVersionList(programId) });
+                                });
+                            }).catch(
+                                error => {
+                                    this.setState({
+                                        programs: [], loading: false
+                                    })
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
 
-                        if (inactiveProgram.length > 0) {//Inactive
-                            this.consolidatedVersionList(programId)
-                        } else {
-                            this.setState({
-                                versions: program[0].versionList.filter(function (x, i, a) {
-                                    return a.indexOf(x) === i;
-                                })
-                            }, () => { this.consolidatedVersionList(programId) });
-                        }
-
-                    });
-
-
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
                 } else {
                     this.setState({
                         versions: [],
-
                     }, () => {
                         this.consolidatedVersionList(programId)
                     })
                 }
             } else {
-
                 this.setState({
                     versions: [],
-
                 }, () => { })
-
             }
         } else {
             this.setState({
                 versions: [],
-
             }, () => { })
         }
     }
@@ -2795,12 +2900,12 @@ class ForecastSummary extends Component {
 
                 }
 
-                console.log(verList)
+                // console.log(verList)
                 let versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
                 })
                 versionList.reverse();
-                console.log("versionList----->", versionList);
+                // console.log("versionList----->", versionList);
                 if (this.props.match.params.versionId != "" && this.props.match.params.versionId != undefined) {
                     // let versionVar = versionList.filter(c => c.versionId == this.props.match.params.versionId+" (Local)");
                     this.setState({
@@ -2894,7 +2999,7 @@ class ForecastSummary extends Component {
     }
 
     setViewById(e) {
-        console.log("e.targetvakue+++", e.target.value)
+        // console.log("e.targetvakue+++", e.target.value)
         var viewById = e.target.value;
         this.setState({
             viewById: viewById,
@@ -2911,12 +3016,12 @@ class ForecastSummary extends Component {
     saveSelectedForecast() {
         var id = this.state.regDatasetJson.id;
         var json = this.state.dataEl.getJson(null, false).filter(c => c[this.state.regRegionList.length * 3 + 3] == 2);
-        console.log("Json+++", json);
+        // console.log("Json+++", json);
         var dataList = [];
         for (var j = 0; j < json.length; j++) {
             for (var k = 0; k < this.state.regRegionList.length; k++) {
-                console.log("(k + 1) * 3+++", (k + 1) * 3);
-                console.log("json[(k + 1) * 3]+++", json[j][(k + 1) * 3]);
+                // console.log("(k + 1) * 3+++", (k + 1) * 3);
+                // console.log("json[(k + 1) * 3]+++", json[j][(k + 1) * 3]);
                 if (json[j][(k + 1) * 3] != "") {
                     var tsList = this.state.tsList.filter(c => c.id == json[j][(k + 1) * 3]);
                     dataList.push({
@@ -2929,7 +3034,7 @@ class ForecastSummary extends Component {
                         region: this.state.regRegionList[k]
                     })
                 } else {
-                    console.log("DataList+++1", json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]]);
+                    // console.log("DataList+++1", json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]]);
                     if (json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]] == 1) {
                         dataList.push({
                             planningUnit: json[j][1],
@@ -2945,7 +3050,7 @@ class ForecastSummary extends Component {
             }
 
         }
-        console.log("DataList+++", dataList)
+        // console.log("DataList+++", dataList)
         var db1;
         var storeOS;
         getDatabase();
@@ -2971,13 +3076,13 @@ class ForecastSummary extends Component {
                 var planningUnitList = datasetJson.planningUnitList;
                 var planningUnitList1 = planningUnitList;
                 for (var dl = 0; dl < dataList.length; dl++) {
-                    console.log("dataList[dl].planningUnit.id+++", dataList[dl].planningUnit.id);
+                    // console.log("dataList[dl].planningUnit.id+++", dataList[dl].planningUnit.id);
                     var index = planningUnitList.findIndex(c => c.planningUnit.id == dataList[dl].planningUnit.id && c.active.toString()=="true");
-                    console.log("Index+++", index)
-                    console.log("Reg+++", dataList[dl].region.regionId)
+                    // console.log("Index+++", index)
+                    // console.log("Reg+++", dataList[dl].region.regionId)
                     var pu = planningUnitList1[index];
                     // let treeId = pu.selectedForecastMap[dataList[dl].region.regionId].treeId;
-                    // console.log("TreeId-----------> ", treeId);
+                    // // console.log("TreeId-----------> ", treeId);
                     if (dataList[dl].treeId == null && dataList[dl].consumptionExtrapolationId == null) {
                         pu.selectedForecastMap[dataList[dl].region.regionId] = {};
                         planningUnitList1[index] = pu;
@@ -2987,7 +3092,7 @@ class ForecastSummary extends Component {
                     }
 
                 }
-                console.log("PlanningUnitList1+++", planningUnitList1);
+                // console.log("PlanningUnitList1+++", planningUnitList1);
                 datasetForEncryption.planningUnitList = planningUnitList1;
 
                 var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetForEncryption), SECRET_KEY)).toString();
@@ -2999,7 +3104,7 @@ class ForecastSummary extends Component {
                 putRequest.onerror = function (event) {
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
-                    console.log("in side datasetDetails")
+                    // console.log("in side datasetDetails")
                     db1 = e.target.result;
                     var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
@@ -3034,7 +3139,7 @@ class ForecastSummary extends Component {
             summeryData: []
         },
             () => {
-                console.log("displayId----------->", this.state.displayId + ' - ' + this.state.displayName);
+                // console.log("displayId----------->", this.state.displayId + ' - ' + this.state.displayName);
                 this.filterData();
             })
     }
@@ -3043,6 +3148,13 @@ class ForecastSummary extends Component {
         this.setState({
             showGuidance: !this.state.showGuidance
         })
+    }
+
+    redirectToForecastSummary(){
+        localStorage.setItem("sesForecastProgramIdReport",this.state.programId)
+        localStorage.setItem("sesForecastVersionIdReport",(this.state.versionId.split('(')[0]).trim())
+        const win = window.open(`/#/planningUnitSetting/listPlanningUnitSetting`, "_blank");
+        win.focus();
     }
 
     render() {
@@ -3055,9 +3167,9 @@ class ForecastSummary extends Component {
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
+                    <option key={i} value={item.id}>
                         {/* {item.label.label_en} */}
-                        {item.programCode}
+                        {item.code}
                     </option>
                 )
             }, this);
@@ -3287,7 +3399,8 @@ class ForecastSummary extends Component {
                                                     </FormGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3" id="hideCalculationDiv">
+                                            {/* <div> */}
+                                            <FormGroup className="col-md-2" id="hideCalculationDiv">
                                                 {/* <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.hideCalculations')}</Label> */}
                                                 <div className="controls pl-lg-4 pt-lg-0">
                                                     {/* <InputGroup>
@@ -3319,6 +3432,12 @@ class ForecastSummary extends Component {
                                                     </Label>
                                                 </div>
                                             </FormGroup>
+                                            <FormGroup className="col-md-6" id="hideLegendDiv">
+                                                {/* <ul className="legendcommitversion list-group"> */}
+                                                    <i class="fa fa-exclamation-triangle" style={{color: "#BA0C2F"}}></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{i18n.t('static.forecastSummary.priceIsMissing')}
+                                                {/* </ul> */}
+                                            </FormGroup>
+                                            {/* </div> */}
                                             <FormGroup className="col-md-3" id="hideCurrencyDiv" style={{ display: 'none' }}>
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.country.currency')}</Label>
                                                 <div className="controls ">
@@ -3449,13 +3568,19 @@ class ForecastSummary extends Component {
                                                                                                     </>
                                                                                                 }
                                                                                                 {item1.isProcurementGapRed == true ? <td className="red" style={{ fontSize: '12px' }}>{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td> : <td>{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>}
-                                                                                                {!this.state.hideColumn &&
+                                                                                                {!this.state.hideColumn && item1.unitPrice != null && item1.unitPrice !== "" && item1.unitPrice != undefined &&
                                                                                                     <>
-                                                                                                        {item1.isPriceTypeRed == true ? <td className="red" style={{ fontSize: '12px' }}>{item1.priceType}</td> : <td>{item1.priceType}</td>}
-                                                                                                        <td>{(item1.unitPrice != null ? (item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                        {item1.isPriceTypeRed == true ? <td onClick={()=>this.state.versionId.toString().includes('Local')?this.redirectToForecastSummary():""} className={this.state.versionId.toString().includes('Local')?"hoverTd red":"red"}  style={{ fontSize: '12px' }}>{item1.priceType}</td> : <td onClick={()=>this.state.versionId.toString().includes('Local')?this.redirectToForecastSummary():""} className={this.state.versionId.toString().includes('Local')?"hoverTd":""}>{item1.priceType}</td>}
+                                                                                                        <td onClick={()=>this.state.versionId.toString().includes('Local')?this.redirectToForecastSummary():""} className={this.state.versionId.toString().includes('Local')?"hoverTd":""}>{(item1.unitPrice != null ? (item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                                     </>
                                                                                                 }
-                                                                                                <td>{(item1.procurementNeeded != null ? (item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                {!this.state.hideColumn && (item1.unitPrice == null || item1.unitPrice === "" || item1.unitPrice == undefined) &&
+                                                                                                    <>
+                                                                                                        {!item1.isProcurementGapRed ?<td onClick={()=>this.state.versionId.toString().includes('Local')?this.redirectToForecastSummary():""} className={this.state.versionId.toString().includes('Local')?"hoverTd":""}></td> : <td onClick={()=>this.state.versionId.toString().includes('Local')?this.redirectToForecastSummary():""} className={this.state.versionId.toString().includes('Local')?"hoverTd":""} title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-exclamation-triangle" style={{"color":"#BA0C2F","margin-top":"7px"}}></i></td>}
+                                                                                                        {!item1.isProcurementGapRed ?<td onClick={()=>this.state.versionId.toString().includes('Local')?this.redirectToForecastSummary():""} className={this.state.versionId.toString().includes('Local')?"hoverTd":""}></td> : <td  onClick={()=>this.state.versionId.toString().includes('Local')?this.redirectToForecastSummary():""} className={this.state.versionId.toString().includes('Local')?"hoverTd":""} title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-exclamation-triangle" style={{"color":"#BA0C2F","margin-top":"7px"}}></i></td>}
+                                                                                                    </>
+                                                                                                }
+                                                                                                {(item1.unitPrice != null && item1.unitPrice !== "" && item1.unitPrice != undefined) ? <td>{(item1.procurementNeeded != null ? (item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>:(!item1.isProcurementGapRed ?<td></td> : <td title={i18n.t("static.forecastSummary.priceNotAvaiable")}><i class="fa fa-exclamation-triangle" style={{"color":"#BA0C2F","margin-top":"7px"}}></i></td>)}
                                                                                                 <td>{item1.notes}</td>
                                                                                             </>
                                                                                         }

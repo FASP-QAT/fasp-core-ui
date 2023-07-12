@@ -254,7 +254,7 @@ class Container extends Component {
             highlightItem: item.id,
             cursorItem: item.id
           }, () => {
-            console.log("highlighted item---", this.state)
+            // console.log("highlighted item---", this.state)
           })
         }
       };
@@ -268,13 +268,13 @@ class Container extends Component {
           items:nodes,
           modalOpen:false,
         },()=>{
-          console.log("updated tree data+++",this.state);
+          // console.log("updated tree data+++",this.state);
         });
       }
 
 
       render() {
-        console.log("this.state+++",this.state);
+        // console.log("this.state+++",this.state);
         const config = {
           ...this.state,
           pageFitMode: PageFitMode.Enabled,
@@ -355,7 +355,7 @@ class Container extends Component {
           <div className="placeholder" style={{ clear: 'both' }} >
             <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged}/>
             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => {
-              console.log("tree json ---", this.state.items)
+              // console.log("tree json ---", this.state.items)
             }}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
             {/* Modal start------------------- */}

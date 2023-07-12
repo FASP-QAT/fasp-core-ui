@@ -3128,10 +3128,10 @@ export default class QatProblemActions extends Component {
                                                                 //     //console.log("dont falg problem mos is  less then min but have shipment in lead times ");
                                                                 // }
                                                             } else {
-                                                                console.log("+++no months with MOS less then min or have shipmnet coming withing lead time===#########");
+                                                                // console.log("+++no months with MOS less then min or have shipmnet coming withing lead time===#########");
                                                                 // if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId && problemActionList[index].versionId == versionID) {
                                                                 if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].programId) {
-                                                                    console.log("+++change status to incompliance");
+                                                                    // console.log("+++change status to incompliance");
                                                                     incomplianceProblem(index, username, userId, problemActionList);
                                                                 }
                                                             }

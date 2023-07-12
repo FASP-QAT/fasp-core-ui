@@ -122,7 +122,7 @@ export default class AddPlanningUnit extends Component {
 
     dataChange(event) {
         let { planningUnit } = this.state
-        console.log(event.target.value);
+        // console.log(event.target.value);
         if (event.target.name === "label") {
             planningUnit.label.label_en = event.target.value
         }
@@ -185,7 +185,7 @@ export default class AddPlanningUnit extends Component {
                     })
                     // AuthenticationService.setupAxiosInterceptors();
                     ForecastingUnitService.getForecastingUnitList().then(response => {
-                        console.log("RESP----->", response.data)
+                        // console.log("RESP----->", response.data)
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -344,7 +344,7 @@ export default class AddPlanningUnit extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log(JSON.stringify(this.state.planningUnit))
+                                    // console.log(JSON.stringify(this.state.planningUnit))
                                     PlanningUnitService.addPlanningUnit(this.state.planningUnit)
                                         .then(response => {
                                             if (response.status == 200) {

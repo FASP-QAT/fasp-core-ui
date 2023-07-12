@@ -59,6 +59,7 @@ export default class PipelineProgramSetup extends Component {
                 },
                 airFreightPerc: '',
                 seaFreightPerc: '',
+                roadFreightPerc: '',
                 deliveredToReceivedLeadTime: '',
                 plannedToSubmittedLeadTime: '',
                 submittedToApprovedLeadTime: '',
@@ -75,7 +76,8 @@ export default class PipelineProgramSetup extends Component {
 
                 arrivedToDeliveredLeadTime: '',
                 shippedToArrivedBySeaLeadTime: '',
-                shippedToArrivedByAirLeadTime: ''
+                shippedToArrivedByAirLeadTime: '',
+                shippedToArrivedByRoadLeadTime: ''
 
             },
             lang: localStorage.getItem('lang'),
@@ -188,7 +190,7 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'block';
     }
     endProgramInfoStepFive() {
-        console.log("program Data=======>", this.state.program);
+        // console.log("program Data=======>", this.state.program);
         // AuthenticationService.setupAxiosInterceptors();
         this.refs.programInfoChild.startLoading();
         PipelineService.addProgramToQatTempTable(this.state.program, this.props.match.params.pipelineId).then(response => {
@@ -280,7 +282,7 @@ export default class PipelineProgramSetup extends Component {
         //     alert("Please resolve all error and then proceed.");
         // }
         // else {
-        // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
+        // // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
         var planningUnits = this.refs.child.savePlanningUnits();
         var checkValidation = this.refs.child.checkValidation();
         this.refs.child.startLoading();
@@ -295,7 +297,7 @@ export default class PipelineProgramSetup extends Component {
                         var realmCountryId = document.getElementById("realmCountryId").value;
                         PipelineService.createRealmCountryPlanningUnits(this.props.match.params.pipelineId, realmCountryId).
                             then(response => {
-                                console.log("createdRealmCountryPlanningUnit Response===>", response)
+                                // console.log("createdRealmCountryPlanningUnit Response===>", response)
                             });
 
                         this.setState({
@@ -348,11 +350,11 @@ export default class PipelineProgramSetup extends Component {
         var datasources = this.refs.datasourcechild.saveDataSource();
         var checkValidation = this.refs.datasourcechild.checkValidation();
         this.refs.datasourcechild.startLoading();
-        // console.log("consumption save------>",consumption);
+        // // console.log("consumption save------>",consumption);
         // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addProgramToQatTempDataSource(datasources, this.props.match.params.pipelineId).
             then(response => {
-                // console.log("consumption add response--->", response);
+                // // console.log("consumption add response--->", response);
                 if (response.status == "200") {
                     this.refs.datasourcechild.stopLoading();
                     if (checkValidation == true) {
@@ -389,11 +391,11 @@ export default class PipelineProgramSetup extends Component {
         var consumption = this.refs.fundingSourceChild.saveFundingSource();
         var checkValidation = this.refs.fundingSourceChild.checkValidation();
         this.refs.fundingSourceChild.startLoading();
-        // console.log("consumption save------>",consumption);
+        // // console.log("consumption save------>",consumption);
         // AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempFundingSource(consumption, this.props.match.params.pipelineId).
             then(response => {
-                // console.log("consumption add response--->", response);
+                // // console.log("consumption add response--->", response);
                 if (response.status == "200") {
                     this.refs.fundingSourceChild.stopLoading();
                     if (checkValidation == true) {
@@ -437,7 +439,7 @@ export default class PipelineProgramSetup extends Component {
     finishedStepFive = () => {
         var inventory = this.refs.procurementAgentChild.saveProcurementAgent();
         var checkValidation = this.refs.procurementAgentChild.checkValidation();
-        console.log("inventory-----data---", inventory);
+        // console.log("inventory-----data---", inventory);
         // AuthenticationService.setupAxiosInterceptors();
         this.refs.procurementAgentChild.startLoading();
         PipelineService.addQatTempProcurementAgent(inventory, this.props.match.params.pipelineId).
@@ -480,7 +482,7 @@ export default class PipelineProgramSetup extends Component {
         // this.refs.consumptionChild.startLoading();
         var consumption = this.refs.consumptionChild.saveConsumption();
 
-        console.log("consumption-----data---", consumption);
+        // console.log("consumption-----data---", consumption);
         // AuthenticationService.setupAxiosInterceptors();
         // this.refs.consumptionChild.startLoading();
         PipelineService.addQatTempConsumption(consumption, this.props.match.params.pipelineId).
@@ -525,13 +527,13 @@ export default class PipelineProgramSetup extends Component {
     finishedStepSeven = () => {
         var inventory = this.refs.inventoryChild.saveInventory();
         // var checkValidation = this.refs.inventoryChild.checkValidation();
-        console.log("inventory-----data---", inventory);
+        // console.log("inventory-----data---", inventory);
         // AuthenticationService.setupAxiosInterceptors();
         // this.refs.inventoryChild.startLoading();
         PipelineService.addQatTempInventory(inventory, this.props.match.params.pipelineId).
             then(response => {
                 if (response.status == "200") {
-                    console.log("save indentory date====>", response);
+                    // console.log("save indentory date====>", response);
                     var checkValidation = this.refs.inventoryChild.checkValidation();
                     this.refs.inventoryChild.stopLoading();
                     if (checkValidation == true) {
@@ -577,7 +579,7 @@ export default class PipelineProgramSetup extends Component {
     }
 
     finishedStepEignt = () => {
-        console.log("final commit -------------->")
+        // console.log("final commit -------------->")
     }
 
     backToprogramInfoStepOne() {
@@ -776,6 +778,8 @@ export default class PipelineProgramSetup extends Component {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
+        }if (event.target.name == 'roadFreightPerc') {
+            program.roadFreightPerc = event.target.value;
         } if (event.target.name == 'deliveredToReceivedLeadTime') {
             program.deliveredToReceivedLeadTime = event.target.value;
         } if (event.target.name == 'plannedToSubmittedLeadTime') {
@@ -798,6 +802,9 @@ export default class PipelineProgramSetup extends Component {
         }
         if (event.target.name == 'shippedToArrivedBySeaLeadTime') {
             program.shippedToArrivedBySeaLeadTime = event.target.value;
+        }
+        if (event.target.name == 'shippedToArrivedByRoadLeadTime') {
+            program.shippedToArrivedByRoadLeadTime = event.target.value;
         }
         if (event.target.name == 'shippedToArrivedByAirLeadTime') {
             program.shippedToArrivedByAirLeadTime = event.target.value;
@@ -903,14 +910,14 @@ export default class PipelineProgramSetup extends Component {
     }
 
     componentDidMount() {
-        // console.log("pipelineProgramId----->", this.props.match.params.pipelineId);
+        // // console.log("pipelineProgramId----->", this.props.match.params.pipelineId);
         // AuthenticationService.setupAxiosInterceptors();
         PipelineService.getQatTempPorgramByPipelineId(this.props.match.params.pipelineId)
             .then(response => {
-                console.log("my resp---", response);
+                // console.log("my resp---", response);
                 if (response.status == 200) {
                     if (response.data != "") {
-                        console.log("in if----->");
+                        // console.log("in if----->");
                         this.setState({ program: response.data });
                         ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                             .then(response => {
@@ -971,12 +978,12 @@ export default class PipelineProgramSetup extends Component {
                                 }
                             );
                     } else {
-                        console.log("in else------->");
+                        // console.log("in else------->");
                         PipelineService.getPipelineProgramDataById(this.props.match.params.pipelineId)
                             .then(response => {
                                 if (response.status == 200) {
                                     let { program } = this.state;
-                                    console.log("============>", response.data);
+                                    // console.log("============>", response.data);
                                     if (isNaN(parseInt(response.data.countryname))) {
                                         program.realmCountry.realmCountryId = '';
                                         this.setState({ validationFailedMessage: `Country ${response.data.countryname} does not exist please create ticket.` })

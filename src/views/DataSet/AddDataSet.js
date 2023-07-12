@@ -21,6 +21,8 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import moment from 'moment';
 import { API_URL } from "../../Constants";
+import DropdownService from '../../api/DropdownService';
+
 // const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
@@ -92,7 +94,7 @@ const getErrorsFromValidationError = (validationError) => {
 }
 export default class AddForecastProgram extends Component {
     constructor(props) {
-        console.log("in constructor");
+        // console.log("in constructor");
         super(props);
         this.state = {
             // program: this.props.location.state.program,
@@ -210,8 +212,8 @@ export default class AddForecastProgram extends Component {
 
     calculateForecastProgramInMonth() {
         let value = this.state.forecastProgramInMonth;
-        console.log("singleValue1------->1--- ", value);
-        console.log("singleValue1------->1--- ", typeof value);
+        // console.log("singleValue1------->1--- ", value);
+        // console.log("singleValue1------->1--- ", typeof value);
 
         if (value == '') {
             this.setState({
@@ -236,9 +238,9 @@ export default class AddForecastProgram extends Component {
                 })
         } else {//whole
             let stopDate = new Date(this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01');
-            console.log("singleValue1------->1", stopDate);
+            // console.log("singleValue1------->1", stopDate);
             stopDate.setMonth(stopDate.getMonth() + (value - 1));
-            console.log("singleValue1------->2", stopDate);
+            // console.log("singleValue1------->2", stopDate);
             this.setState({
                 forecastProgramInMonth: value,
                 singleValue2: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 },
@@ -467,15 +469,18 @@ export default class AddForecastProgram extends Component {
     }
 
     getRealmCountryList() {
-        console.log("in get realmCOuntry list----->", this.state.program.realm.realmId);
-        ProgramService.getRealmCountryList(this.state.program.realm.realmId)
-            .then(response => {
+        // console.log("in get realmCOuntry list----->", this.state.program.realm.realmId);
+        // ProgramService.getRealmCountryList(this.state.program.realm.realmId)
+        DropdownService.getRealmCountryDropdownList(this.state.program.realm.realmId)
+        .then(response => {
+                // console.log("response.data getRealmCountryList",response.data)
                 if (response.status == 200) {
                     // var realmCountries = response.data.filter(c => c.active == true );
-                    var listArray = response.data.filter(c => c.active == true);
+                    // var listArray = response.data.filter(c => c.active == true);
+                    var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -533,7 +538,7 @@ export default class AddForecastProgram extends Component {
         ProgramService.getHealthAreaListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response------>0", response.data);
+                    // console.log("response------>0", response.data);
                     var json = (response.data).filter(c => c.active == true);
                     // var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
                     var regList = [];
@@ -541,14 +546,14 @@ export default class AddForecastProgram extends Component {
                         regList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
                         // regList[i + 1] = { value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
                     }
-                    console.log("response------>1", regList);
+                    // console.log("response------>1", regList);
                     var listArray = regList;
                     listArray.sort((a, b) => {
                         var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
-                    console.log("response------>2", listArray);
+                    // console.log("response------>2", listArray);
                     let { program } = this.state;
                     program.healthAreaArray = [];
                     this.setState({
@@ -557,7 +562,7 @@ export default class AddForecastProgram extends Component {
                         program
                     }, (
                     ) => {
-                        console.log("healthAreaList>>>>>>>", this.state.healthAreaList);
+                        // console.log("healthAreaList>>>>>>>", this.state.healthAreaList);
                     })
                 } else {
                     this.setState({
@@ -620,9 +625,11 @@ export default class AddForecastProgram extends Component {
     }
 
     getOrganisationList() {
-        ProgramService.getOrganisationListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
-            .then(response => {
-                if (response.status == 200) {
+        // ProgramService.getOrganisationListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
+        DropdownService.getOrganisationListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
+        .then(response => {   
+            if (response.status == 200) {
+                // console.log("response.data----",response.data) 
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -746,7 +753,7 @@ export default class AddForecastProgram extends Component {
     }
 
     generateCountryCode(event) {
-        let realmCountryCode = this.state.realmCountryList.filter(c => (c.realmCountryId == event.target.value))[0].country.countryCode;
+        let realmCountryCode = this.state.realmCountryList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({ realmCountryCode: realmCountryCode })
     }
 
@@ -770,7 +777,7 @@ export default class AddForecastProgram extends Component {
             document.getElementById('realmId').disabled = true;
 
         } else {
-            console.log("in else");
+            // console.log("in else");
             document.getElementById('realmId').disabled = false;
         }
 
@@ -789,7 +796,7 @@ export default class AddForecastProgram extends Component {
     }
 
     generateOrganisationCode(event) {
-        let organisationCode = this.state.organisationList.filter(c => (c.organisationId == event.target.value))[0].organisationCode;
+        let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.setState({
             organisationCode: organisationCode
         })
@@ -827,7 +834,9 @@ export default class AddForecastProgram extends Component {
         } else if (event.target.name == 'forecastProgramInMonth') {
             this.setState({ forecastProgramInMonth: event.target.value }, () => { })
         }
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => { 
+            // console.log(this.state) 
+        })
 
     }
     touchAll(setTouched, errors) {
@@ -878,8 +887,8 @@ export default class AddForecastProgram extends Component {
         let realmCountries = realmCountryList.length > 0
             && realmCountryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
+                    <option key={i} value={item.id}>
+                        {getLabelText(item.label, this.state.lang)}
                         {/* {item.country.countryCode} */}
                     </option>
                 )
@@ -910,7 +919,7 @@ export default class AddForecastProgram extends Component {
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
-                    <option key={i} value={item.organisationId}>
+                    <option key={i} value={item.id}>
                         {/* {item.organisationCode} */}
                         {getLabelText(item.label, this.state.lang)}
                     </option>
@@ -956,7 +965,7 @@ export default class AddForecastProgram extends Component {
                                     // pro.currentVersion.forecastStopDate = new Date(new Date(this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01'));
                                     pro.currentVersion.forecastStartDate = this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01';
                                     pro.currentVersion.forecastStopDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
-                                    console.log("Pro=---------------->+++", pro)
+                                    // console.log("Pro=---------------->+++", pro)
                                     ProgramService.addDataset(pro).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/dataSet/listDataSet/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))

@@ -87,7 +87,7 @@ class AddLanguageComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.testAsync = this.testAsync.bind(this);
+        // this.testAsync = this.testAsync.bind(this);
         this.toggleLarge = this.toggleLarge.bind(this);
     }
 
@@ -195,7 +195,7 @@ class AddLanguageComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("values---", this.state.language)
+                                    // console.log("values---", this.state.language)
                                     LanguageService.addLanguage(this.state.language).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/language/listLanguage/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -330,7 +330,7 @@ class AddLanguageComponent extends Component {
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.testAsync} ><i className="fa fa-check"></i>Test Async</Button>
+                                                        {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.testAsync} ><i className="fa fa-check"></i>Test Async</Button> */}
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

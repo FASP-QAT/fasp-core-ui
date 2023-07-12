@@ -74,7 +74,7 @@ export default class ListBranchTemplate extends Component {
 
     getBranchTreeTemplateList() {
         BranchTemplateService.getBranchTemplateList().then(response => {
-            console.log("tree template list---", response.data)
+            // console.log("tree template list---", response.data)
             var treeTemplateList = response.data.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                 var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -163,13 +163,13 @@ export default class ListBranchTemplate extends Component {
 
     copyDeleteTree(treeTemplateId) {
 
-        console.log("treeTemplateId--------------->", treeTemplateId);
+        // console.log("treeTemplateId--------------->", treeTemplateId);
         var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
         treeTemplate.label.label_en = this.state.treeTemplateName;
 
         DatasetService.addTreeTemplate(treeTemplate)
             .then(response => {
-                console.log("after adding tree---", response.data);
+                // console.log("after adding tree---", response.data);
                 if (response.status == 200) {
                     this.setState({
                         message: i18n.t('static.message.addTreeTemplate'),
@@ -256,7 +256,7 @@ export default class ListBranchTemplate extends Component {
     }
     buildJexcel() {
         let treeTemplateList = this.state.treeTemplateList;
-        console.log("treeTemplateList---->", treeTemplateList);
+        // console.log("treeTemplateList---->", treeTemplateList);
         let treeTemplateArray = [];
         let count = 0;
         var selStatus = document.getElementById("active").value;

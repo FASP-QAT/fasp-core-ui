@@ -195,7 +195,7 @@ class CompareScenario extends Component {
     }
 
     storeProduct(e) {
-        console.log("E++++++++", e.target)
+        // console.log("E++++++++", e.target)
         var name = this.state.planningUnits.filter(c => c.planningUnitId == e.target.value);
         var planningUnitId = e.target.value;
         this.setState({
@@ -251,7 +251,7 @@ class CompareScenario extends Component {
     }
 
     setRegionVal(e) {
-        console.log("e+++", e);
+        // console.log("e+++", e);
         var regionIdArr = [];
         for (var i = 0; i < e.length; i++) {
             regionIdArr.push(e[i].value);
@@ -304,7 +304,7 @@ class CompareScenario extends Component {
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        console.log('values =>', planningUnitId, programId, versionId);
+        // console.log('values =>', planningUnitId, programId, versionId);
         if (planningUnitId > 0 && programId > 0 && versionId != 0) {
         }
     }
@@ -439,7 +439,7 @@ class CompareScenario extends Component {
     }
 
     setViewById(e) {
-        console.log("e.targetvakue+++", e.target.value)
+        // console.log("e.targetvakue+++", e.target.value)
         var viewById = e.target.value;
         this.setState({
             viewById: viewById,

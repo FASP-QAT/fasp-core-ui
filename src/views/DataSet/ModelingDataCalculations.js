@@ -222,7 +222,7 @@ export function calculateModelingData(dataset, props, page) {
                 props.fetchData(1, dataset.id);
             } else {
                 props.updateState("loading", false);
-                console.log("Data saved")
+                // console.log("Data saved")
             }
         // }.bind(this)
     // }.bind(this)

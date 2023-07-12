@@ -152,7 +152,7 @@ export default class BugReportTicketComponent extends Component {
                             })
                             // this.state.bugReport.summary = summaryText_2;
                             JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     JiraTikcetService.addIssueAttachment(this.state.bugReport, response.data.id).then(response => {

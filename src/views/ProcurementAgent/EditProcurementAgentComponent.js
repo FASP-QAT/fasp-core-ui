@@ -155,7 +155,9 @@ class EditProcurementAgentComponent extends Component {
             rgba,
             procurementAgent
         },
-            () => { console.log("agent--------------", procurementAgent); });
+            () => { 
+                // console.log("agent--------------", procurementAgent); 
+            });
     };
     hideSecondComponent() {
         setTimeout(function () {
@@ -289,7 +291,7 @@ class EditProcurementAgentComponent extends Component {
                             var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
-                        console.log("listArray", listArray)
+                        // console.log("listArray", listArray)
                         this.setState({
                             programList: listArray,
                             loading: false
@@ -554,14 +556,14 @@ class EditProcurementAgentComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("COLOR----->", this.state.procurementAgent);
+                                    // console.log("COLOR----->", this.state.procurementAgent);
                                     var pAgent = this.state.procurementAgent;
                                     for (var i = 0; i < pAgent.programList.length; i++) {
                                         if (pAgent.programList[i].id == 0) {
                                             pAgent.programList = []
                                         }
                                     }
-                                    console.log("COLOR----->", pAgent);
+                                    // console.log("COLOR----->", pAgent);
 
                                     // AuthenticationService.setupAxiosInterceptors();
                                     ProcurementAgentService.updateProcurementAgent(pAgent)

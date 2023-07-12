@@ -420,7 +420,7 @@ export default class CountryListComponent extends Component {
     }
     editCountry(country) {
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_COUNTRY')) {
-            console.log(country);
+            // console.log(country);
             this.props.history.push({
                 pathname: `/country/editCountry/${country.countryId}`,
                 // state: { country: country }
@@ -544,7 +544,7 @@ export default class CountryListComponent extends Component {
         this.hideFirstComponent();
         CountryService.getCountryListAll().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data)
+                // console.log("response.data---->", response.data)
                 // this.setState({
                 //     countryList: response.data,
                 //     selCountry: response.data, loading: false
