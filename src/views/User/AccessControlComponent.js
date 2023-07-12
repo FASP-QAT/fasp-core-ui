@@ -1350,7 +1350,7 @@ class AccessControlComponent extends Component {
             healthAreaList.unshift(paJson);
         }
 
-        console.log("programList----", programList);
+        // console.log("programList----", programList);
         // console.log("countryList----",countryList);
         // console.log("organisationList----",organisationList);
         // console.log("healthAreaList---",healthAreaList);
@@ -1635,7 +1635,7 @@ class AccessControlComponent extends Component {
     }
     submitForm() {
         var validation = this.checkValidation();
-        console.log("validation************", validation);
+        // console.log("validation************", validation);
         if (validation) {
 
             var tableJson = this.el.getJson(null, false);

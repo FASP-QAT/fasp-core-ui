@@ -133,7 +133,7 @@ export default class EditOrganisationTicketComponent extends Component {
 
         OrganisationService.getOrganisationList()
             .then(response => {
-                console.log("response---", response);
+                // console.log("response---", response);
 
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -253,7 +253,7 @@ export default class EditOrganisationTicketComponent extends Component {
                             this.state.organisation.summary = summaryText_2;
                             this.state.organisation.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.organisation).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

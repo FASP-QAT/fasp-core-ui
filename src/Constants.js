@@ -1,5 +1,5 @@
 // export const API_URL='https://fasp.altius.cc/FASP'
-export const API_URL='http://localhost:8084'
+export const API_URL = 'http://localhost:8084'
 // export const API_URL = 'http://localhost:8081'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
@@ -121,6 +121,8 @@ export const SUBMITTED_TO_APPROVED = 1
 export const APPROVED_TO_SHIPPED = 1
 export const SHIPPED_TO_ARRIVED_AIR = 1
 export const SHIPPED_TO_ARRIVED_SEA = 1
+export const SHIPPED_TO_ARRIVED_ROAD = 0.17
+export const ROAD_FREIGHT_PERC = 10
 export const ARRIVED_TO_RECEIVED = 1
 export const JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER = /^\d{0,10}(\.\d{1,6})?$/
 export const JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY = /^[0-9]{0,15}$/
@@ -162,3 +164,5 @@ export const QAT_SUGGESTED_DATA_SOURCE_ID = 28
 export const SHIPMENT_ID_ARR_MANUAL_TAGGING = ["3", "4", "5", "6", "7", "9"]
 export const DATE_FORMAT_CAP_FOUR_DIGITS = "DD-MMM-YYYY"
 export const DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS = "MMM-YYYY"
+export const PROGRAM_TYPE_SUPPLY_PLAN = 1
+export const PROGRAM_TYPE_DATASET = 2;

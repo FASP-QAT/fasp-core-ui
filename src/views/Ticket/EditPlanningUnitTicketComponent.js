@@ -159,7 +159,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         if (this.props.items.userRealmId > 0) {
             PlanningUnitService.getPlanningUnitByRealmId(this.props.items.userRealmId).then(response => {
-                console.log(response.data)
+                // console.log(response.data)
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -218,7 +218,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
             );
         } else {
             PlanningUnitService.getAllPlanningUnitList().then(response => {
-                console.log(response.data)
+                // console.log(response.data)
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -329,7 +329,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
                             this.state.planningUnit.summary = summaryText_2;
                             this.state.planningUnit.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.planningUnit).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

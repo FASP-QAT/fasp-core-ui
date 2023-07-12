@@ -60,7 +60,7 @@ export default class SyncMasterDataForTree extends Component {
     }
 
     componentDidMount() {
-        console.log("this.props @@@@ Test@@@123",this.props)
+        // console.log("this.props @@@@ Test@@@123",this.props)
         document.getElementById("retryButtonDiv").style.display = "none";
         this.syncMasters();
     }
@@ -137,12 +137,12 @@ export default class SyncMasterDataForTree extends Component {
     }
 
     fetchData(hasPrograms, programId) {
-        console.log("In fetch data+++", this.state.syncedMasters)
+        // console.log("In fetch data+++", this.state.syncedMasters)
         // console.log("In fetch data @@@", this.state.syncedMasters)
         // console.log("HasPrograms@@@", hasPrograms);
         var realmId = AuthenticationService.getRealmId();
-        console.log("ProgramId###", programId);
-        console.log("hasPrograms###", hasPrograms);
+        // console.log("ProgramId###", programId);
+        // console.log("hasPrograms###", hasPrograms);
         if (this.state.syncedMasters === this.state.totalMasters) {
             // console.log("M sync final success updated---", this.state.syncedMasters)
             document.getElementById("retryButtonDiv").style.display = "none";
@@ -189,7 +189,7 @@ export default class SyncMasterDataForTree extends Component {
                     //     readonlyDatasetDataServerIds.push(datasetDataServerDetailsList[rp].programId);
                     // }
                     var datasetDataServerList = ddatasetDataServerRequest.result;
-                    console.log("###datasetDataServerList+++", datasetDataServerList)
+                    // console.log("###datasetDataServerList+++", datasetDataServerList)
                     var datasetDataServerListFiltered = [];
                     if (this.props.location.state != undefined && this.props.location.state.programIds != undefined) {
                         datasetDataServerListFiltered = datasetDataServerList.filter(c => (this.props.location.state.programIds).includes(c.id));
@@ -198,20 +198,20 @@ export default class SyncMasterDataForTree extends Component {
                         pIds.push(program.programId);
                     });
 
-                    console.log("Updated sync date Test@@@123",updatedSyncDate)
+                    // console.log("Updated sync date Test@@@123",updatedSyncDate)
                     AuthenticationService.setupAxiosInterceptors();
-                    console.log("isSiteOnline() Test@@@123",isSiteOnline());
-                    console.log("Rety button Test@@@123",window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none")
+                    // console.log("isSiteOnline() Test@@@123",isSiteOnline());
+                    // console.log("Rety button Test@@@123",window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none")
                     if (isSiteOnline() && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
 
-                        console.log("Updated sync date Test@@@123",updatedSyncDate)
+                        // console.log("Updated sync date Test@@@123",updatedSyncDate)
                         MasterSyncService.getSyncAllMastersForProgram(updatedSyncDate, pIds)
 
 
                             .then(response => {
-                                console.log("Response data Test@@@123",response.data)
+                                // console.log("Response data Test@@@123",response.data)
                                 if (response.status == 200) {
-                                    console.log("M sync Response", response.data)
+                                    // console.log("M sync Response", response.data)
                                     var response = response.data;
 
                                     // country
@@ -386,11 +386,11 @@ export default class SyncMasterDataForTree extends Component {
                                                                                                                             var equivalencyUnitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
                                                                                                                             // console.log("M sync equivalencyUnit transaction start")
                                                                                                                             var equivalencyUnitObjectStore = equivalencyUnitTransaction.objectStore('equivalencyUnit');
-                                                                                                                            console.log("****response.equivalencyUnitMappingList", response.equivalencyUnitMappingList)
+                                                                                                                            // console.log("****response.equivalencyUnitMappingList", response.equivalencyUnitMappingList)
                                                                                                                             var json = (response.equivalencyUnitMappingList);
-                                                                                                                            console.log("****Json", json);
+                                                                                                                            // console.log("****Json", json);
                                                                                                                             for (var i = 0; i < json.length; i++) {
-                                                                                                                                console.log("**** in for loop")
+                                                                                                                                // console.log("**** in for loop")
                                                                                                                                 equivalencyUnitObjectStore.put(json[i]);
                                                                                                                             }
                                                                                                                             // console.log("after equivalencyUnit set statue 1", this.state.syncedMasters);
@@ -463,7 +463,7 @@ export default class SyncMasterDataForTree extends Component {
 
                             }).catch(
                                 error => {
-                                    console.log("Error Test@@@123",error)
+                                    // console.log("Error Test@@@123",error)
                                     if (document.getElementById('div1') != null) {
                                         document.getElementById('div1').style.display = 'none';
                                     }
@@ -478,7 +478,7 @@ export default class SyncMasterDataForTree extends Component {
                                 }
                             )
                     } else {
-                        console.log("in else@@@123")
+                        // console.log("in else@@@123")
                         if (document.getElementById('div1') != null) {
                             document.getElementById('div1').style.display = 'none';
                         }

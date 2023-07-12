@@ -85,7 +85,7 @@ export default class IntegrationListComponent extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable: true,
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -131,7 +131,7 @@ export default class IntegrationListComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         IntegrationService.getIntegrationListAll().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data)
+                // console.log("response.data---->", response.data)
 
                 this.setState({
                     integrationList: response.data,

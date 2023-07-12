@@ -16,7 +16,7 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import FundingSourceService from '../../api/FundingSourceService';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL } from '../../Constants.js';
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import CryptoJS from 'crypto-js';
 import {
     Card,
@@ -31,6 +31,7 @@ import ReportService from '../../api/ReportService';
 
 import { MultiSelect } from 'react-multi-select-component';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -127,7 +128,7 @@ class AnnualShipmentCost extends Component {
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
             let reportbaseValue = document.getElementById("view").value;
-            console.log('****', startDate, endDate)
+            // console.log('****', startDate, endDate)
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgentValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.statusValues.length > 0) {
                 if (versionId.includes('Local')) {
                     var db1;
@@ -150,7 +151,7 @@ class AnnualShipmentCost extends Component {
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var program = `${programId}_v${version}_uId_${userId}`
                         var programDataOs = programDataTransaction.objectStore('programData');
-                        console.log("1----", program)
+                        // console.log("1----", program)
                         var programRequest = programDataOs.get(program);
                         programRequest.onerror = function (event) {
                             this.setState({
@@ -160,12 +161,12 @@ class AnnualShipmentCost extends Component {
                         }.bind(this);
                         programRequest.onsuccess = function (e) {
                             // this.setState({ loading: true })
-                            console.log("2----", programRequest)
+                            // console.log("2----", programRequest)
                             // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
 
                             // var programJson = JSON.parse(programData);
-                            // console.log("3----", programJson);
+                            // // console.log("3----", programJson);
 
                             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                             var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
@@ -197,7 +198,7 @@ class AnnualShipmentCost extends Component {
                                     fsResult = fsRequest.result;
                                     var outPutList = [];
                                     this.state.planningUnitValues.map(p => {
-                                        console.log("P+++++++++++", p);
+                                        // console.log("P+++++++++++", p);
                                         var planningUnitId = p.value;
                                         var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
                                         var programJson = {}
@@ -226,7 +227,7 @@ class AnnualShipmentCost extends Component {
                                         } else {
                                             list = list.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) : (c.receivedDate >= startDate && c.receivedDate <= endDate));
                                         }
-                                        console.log(list)
+                                        // console.log(list)
                                         // var procurementAgentId = document.getElementById("procurementAgentId").value;
                                         // var fundingSourceId = document.getElementById("fundingSourceId").value;
                                         // var shipmentStatusId = document.getElementById("shipmentStatusId").value;
@@ -236,40 +237,40 @@ class AnnualShipmentCost extends Component {
                                         this.state.procurementAgentValues.map(procurementAgent => {
                                             procurementAgentfilteredList = [...procurementAgentfilteredList, ...list.filter(c => c.procurementAgent.id == procurementAgent.value)];
                                         })
-                                        console.log('procurementAgentfilteredList', procurementAgentfilteredList)
+                                        // console.log('procurementAgentfilteredList', procurementAgentfilteredList)
                                         // }
                                         var fundingSourcefilteredList = []
                                         // if (fundingSourceId != -1) {
                                         this.state.fundingSourceValues.map(fundingsource => {
                                             fundingSourcefilteredList = [...fundingSourcefilteredList, ...procurementAgentfilteredList.filter(c => c.fundingSource.id == fundingsource.value)];
                                         })
-                                        console.log('fundingSourcefilteredList', fundingSourcefilteredList)
+                                        // console.log('fundingSourcefilteredList', fundingSourcefilteredList)
                                         // if (shipmentStatusId != -1) {
                                         var list1 = []
                                         this.state.statusValues.map(status => {
                                             list1 = [...list1, ...fundingSourcefilteredList.filter(c => c.shipmentStatus.id == status.value)];
                                         })
-                                        console.log('list1', list1)
+                                        // console.log('list1', list1)
                                         var availableProcure = [...new Set(list1.map(ele => ele.procurementAgent.id))];
                                         var availableFunding = [...new Set(list1.map(ele => ele.fundingSource.id))];
-                                        console.log(availableProcure)
-                                        console.log(availableFunding)
+                                        // console.log(availableProcure)
+                                        // console.log(availableFunding)
                                         var list1 = list
                                         availableProcure.map(p => {
                                             availableFunding.map(f => {
-                                                console.log(p, '======', f)
+                                                // console.log(p, '======', f)
                                                 list = list1.filter(c => c.procurementAgent.id == p && c.fundingSource.id == f)
-                                                console.log(list)
+                                                // console.log(list)
                                                 if (list.length > 0) {
-                                                    var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == f)[0]
-                                                    var procurementAgent = this.state.procurementAgents.filter(c => c.procurementAgentId == p)[0]
-                                                    console.log(fundingSource)
-                                                    console.log(procurementAgent)
+                                                    var fundingSource = this.state.fundingSources.filter(c => c.id == f)[0]
+                                                    var procurementAgent = this.state.procurementAgents.filter(c => c.id == p)[0]
+                                                    // console.log("fundingSource", fundingSource)
+                                                    // console.log("procurementAgent===>",procurementAgent)
                                                     var json = {
                                                         'FUNDING_SOURCE_ID': fundingSource.fundingSourceId,
                                                         'PROCUREMENT_AGENT_ID': procurementAgent.procurementAgentId,
-                                                        'fundingsource': fundingSource.fundingSourceCode,
-                                                        'procurementAgent': procurementAgent.procurementAgentCode,
+                                                        'fundingsource': fundingSource.code,
+                                                        'procurementAgent': procurementAgent.code,
                                                         'PLANNING_UNIT_ID': planningUnitId,
                                                         'planningUnit': planningUnitLabel
 
@@ -279,20 +280,20 @@ class AnnualShipmentCost extends Component {
                                                         var dtstr = from + "-" + String(monthstartfrom).padStart(2, '0') + "-01"
                                                         var m = from == to ? this.state.rangeValue.to.month : 12
                                                         var enddtStr = from + "-" + String(m).padStart(2, '0') + '-' + new Date(from, m, 0).getDate()
-                                                        console.log(dtstr, ' ', enddtStr)
+                                                        // console.log(dtstr, ' ', enddtStr)
                                                         var list2 = []
                                                         if (reportbaseValue == 1) {
                                                             list2 = list.filter(c => (c.plannedDate >= dtstr && c.plannedDate <= enddtStr));
                                                         } else {
                                                             list2 = list.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dtstr && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dtstr && c.receivedDate <= enddtStr));
                                                         }
-                                                        console.log(list2)
+                                                        // console.log(list2)
                                                         var cost = 0;
                                                         for (var k = 0; k < list2.length; k++) {
                                                             cost += Number(list2[k].productCost * list2[k].currency.conversionRateToUsd) + Number(list2[k].freightCost * list2[k].currency.conversionRateToUsd);
                                                         }
                                                         json[from] = this.roundN(cost)
-                                                        console.log(json)
+                                                        // console.log(json)
                                                         monthstartfrom = 1;
 
                                                     }
@@ -315,11 +316,11 @@ class AnnualShipmentCost extends Component {
                 } else {
                     this.setState({ loading: true })
                     // alert("in else online version");
-                    console.log("json---", json);
+                    // console.log("json---", json);
                     // AuthenticationService.setupAxiosInterceptors();
                     ReportService.getAnnualShipmentCost(json)
                         .then(response => {
-                            console.log("-----response", JSON.stringify(response.data));
+                            // console.log("response====))))",response.data);
                             var outPutList = [];
                             var responseData = response.data;
                             for (var i = 0; i < responseData.length; i++) {
@@ -335,13 +336,13 @@ class AnnualShipmentCost extends Component {
                                 for (var key in shipmentAmt) {
                                     var keyName = key.split("-")[1];
                                     var keyValue = shipmentAmt[key];
-                                    console.log("keyName--", keyName);
-                                    console.log("keyValue--", keyValue);
+                                    // console.log("keyName--", keyName);
+                                    // console.log("keyValue--", keyValue);
                                     json[keyName] = Number(keyValue).toFixed(2);
                                 }
                                 outPutList.push(json);
                             }
-                            console.log("json final---", json);
+                            // console.log("json final---", json);
                             this.setState({
                                 outPutList: outPutList, message: '', loading: false
                             })
@@ -398,11 +399,21 @@ class AnnualShipmentCost extends Component {
     getPrograms() {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
+            let realmId = AuthenticationService.getRealmId();
+
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    var proList = []
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            programId: response.data[i].id,
+                            label: response.data[i].label,
+                            programCode: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
                     this.setState({
-                        programs: response.data
+                        programs: proList, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -432,7 +443,7 @@ class AnnualShipmentCost extends Component {
                 );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
         }
 
@@ -466,13 +477,13 @@ class AnnualShipmentCost extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -674,7 +685,7 @@ class AnnualShipmentCost extends Component {
         var yindex = ystart + 20
         var totalAmount = []
         var GrandTotalAmount = []
-        console.log('data', data)
+        // console.log('data', data)
         for (var j = 0; j < data.length; j++) {
             if (yindex > doc.internal.pageSize.height - 50) { doc.addPage(); yindex = 90 } else { yindex = yindex }
             var record = data[j]
@@ -736,7 +747,7 @@ class AnnualShipmentCost extends Component {
             for (var x = 0; x < year.length; x++) {
                 for (var n = 0; n < keys.length; n++) {
                     if (year[x] == keys[n]) {
-                        console.log(values[n])
+                        // console.log(values[n])
                         total = Number(total) + Number(values[n])
                         initalvalue = initalvalue + index
                         totalAmount[x] = totalAmount[x] == null ? Number(values[n]) : Number(totalAmount[x]) + Number(values[n])
@@ -761,7 +772,7 @@ class AnnualShipmentCost extends Component {
                     }
                 }
             }
-            console.log(total)
+            // console.log(total)
             doc.setFont('helvetica', 'bold')
             if (yindex - 40 > doc.internal.pageSize.height - 110) {
                 doc.addPage();
@@ -787,7 +798,7 @@ class AnnualShipmentCost extends Component {
             if (j < data.length - 1) {
 
                 if (data[j].PROCUREMENT_AGENT_ID != data[j + 1].PROCUREMENT_AGENT_ID || data[j].FUNDING_SOURCE_ID != data[j + 1].FUNDING_SOURCE_ID) {
-                    console.log("in this if=======");
+                    // console.log("in this if=======");
                     yindex = yindex + 40
                     if (yindex > doc.internal.pageSize.height - 100) {
                         doc.addPage();
@@ -815,7 +826,7 @@ class AnnualShipmentCost extends Component {
 
                 }
             } if (j == data.length - 1) {
-                console.log("in this second if=======");
+                // console.log("in this second if=======");
                 yindex = yindex + 80
                 if (yindex > doc.internal.pageSize.height - 100) {
                     doc.addPage();
@@ -906,7 +917,7 @@ class AnnualShipmentCost extends Component {
 
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     this.setState({
@@ -917,11 +928,62 @@ class AnnualShipmentCost extends Component {
                         planningUnitValues: []
 
                     }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
+                        DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                            .then(response => {
+                                // console.log("response===>", response.data)
+                                this.setState({
+                                    versions: []
+                                }, () => {
+                                    this.setState({
+                                        versions: response.data
+                                    }, () => {
+                                        this.consolidatedVersionList(programId)
+                                    });
+                                });
+                            }).catch(
+                                error => {
+                                    this.setState({
+                                        programs: [], loading: false
+                                    })
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
                     });
 
 
@@ -982,7 +1044,7 @@ class AnnualShipmentCost extends Component {
 
                 }
 
-                console.log(verList)
+                // console.log(verList)
                 let versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
                 });
@@ -1054,18 +1116,18 @@ class AnnualShipmentCost extends Component {
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
                             var proList = []
-                            console.log(myResult)
+                            // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
-                                    proList[i] = myResult[i]
+                                    proList[i] = myResult[i].planningUnit
                                 }
                             }
                             var lang = this.state.lang;
                             this.setState({
                                 planningUnits: proList.sort(function (a, b) {
-                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }), message: ''
                             }, () => {
@@ -1080,12 +1142,19 @@ class AnnualShipmentCost extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
 
                     //let productCategoryId = document.getElementById("productCategoryId").value;
-                    ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                        console.log('**' + JSON.stringify(response.data))
+                    var programJson = {
+                        tracerCategoryIds: [],
+                        programIds: [programId]
+                    }
+                    // console.log('**' + programJson);
+
+                    DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+
+                        // console.log('**' + JSON.stringify(response.data));
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -1131,7 +1200,7 @@ class AnnualShipmentCost extends Component {
         let realmId = AuthenticationService.getRealmId();
         ProductService.getProductCategoryList(realmId)
             .then(response => {
-                console.log(JSON.stringify(response.data))
+                // console.log(JSON.stringify(response.data))
                 this.setState({
                     productCategories: response.data
                 })
@@ -1168,12 +1237,14 @@ class AnnualShipmentCost extends Component {
         const { fundingSources } = this.state
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            FundingSourceService.getFundingSourceListAll()
+            // FundingSourceService.getFundingSourceListAll()
+            DropdownService.getFundingSourceDropdownList()
+
                 .then(response => {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -1220,12 +1291,18 @@ class AnnualShipmentCost extends Component {
                 }.bind(this);
                 fSourceRequest.onsuccess = function (event) {
 
-                    fSourceResult = fSourceRequest.result;
-                    console.log("funding source list offline--->", fSourceResult);
+                    for (var i = 0; i < fSourceRequest.result.length; i++) {
+                        var arr = {
+                            id: fSourceRequest.result[i].fundingSourceId,
+                            label: fSourceRequest.result[i].label,
+                            code: fSourceRequest.result[i].fundingSourceCode
+                        }
+                        fSourceResult[i] = arr
+                    }
                     this.setState({
                         fundingSources: fSourceResult.sort(function (a, b) {
-                            a = a.fundingSourceCode.toLowerCase();
-                            b = b.fundingSourceCode.toLowerCase();
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     });
@@ -1244,20 +1321,15 @@ class AnnualShipmentCost extends Component {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
 
-            ProcurementAgentService.getProcurementAgentListAll()
+            var programJson = [programId]
+            DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programJson)
                 .then(response => {
-                    var listArray = response.data;
-                    var listArrays = [];
-                    for (var i = 0; i < listArray.length; i++) {
-                        for (var j = 0; j < listArray[i].programList.length; j++) {
-                            if (listArray[i].programList[j].id == programId) {
-                                listArrays.push(listArray[i]);
-                            }
-                        }
-                    }
+                    // console.log("=====>", JSON.stringify(response.data))
+                    // var procurementAgent = response.data
+                    var listArrays = response.data;
                     listArrays.sort((a, b) => {
-                        var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -1305,11 +1377,22 @@ class AnnualShipmentCost extends Component {
                 papuRequest.onsuccess = function (event) {
 
                     papuResult = papuRequest.result;
-                    console.log("procurement agent list offline--->", papuResult);
+                    // console.log("procurement agent list offline--->", papuResult);
+                    var listArrays = []
+                    for (var i = 0; i < papuResult.length; i++) {
+                        var arr = {
+                            id: papuResult[i].procurementAgentId,
+                            label: papuResult[i].label,
+                            code: papuResult[i].procurementAgentCode
+                        }
+                        listArrays.push(arr);
+                    }
+                    // console.log("procurement agent list offline--->", listArrays);
+
                     this.setState({
-                        procurementAgents: papuResult.sort(function (a, b) {
-                            a = a.procurementAgentCode.toLowerCase();
-                            b = b.procurementAgentCode.toLowerCase();
+                        procurementAgents: listArrays.sort(function (a, b) {
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     });
@@ -1375,7 +1458,7 @@ class AnnualShipmentCost extends Component {
                 }.bind(this);
                 sStatusRequest.onsuccess = function (event) {
                     sStatusResult = sStatusRequest.result;
-                    console.log("shipment status list offline--->", sStatusResult);
+                    // console.log("shipment status list offline--->", sStatusResult);
                     this.setState({ shipmentStatuses: sStatusResult });
                 }.bind(this)
 
@@ -1510,7 +1593,7 @@ class AnnualShipmentCost extends Component {
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 
@@ -1522,10 +1605,10 @@ class AnnualShipmentCost extends Component {
         //     }, this);
 
         const { procurementAgents } = this.state;
-        // console.log(JSON.stringify(countrys))
+        // // console.log(JSON.stringify(countrys))
         let procurementAgentList = procurementAgents.length > 0 && procurementAgents.map((item, i) => {
             return (
-                <option key={i} value={item.procurementAgentId}>
+                <option key={i} value={item.id}>
                     {getLabelText(item.label, this.state.lang)}
                 </option>
 
@@ -1742,7 +1825,7 @@ class AnnualShipmentCost extends Component {
                                                         onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                                         options={procurementAgents.length > 0
                                                             && procurementAgents.map((item, i) => {
-                                                                return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
+                                                                return ({ label: item.code, value: item.id })
                                                             }, this)}
                                                         disabled={this.state.loading}
                                                     />
@@ -1762,7 +1845,7 @@ class AnnualShipmentCost extends Component {
                                                         options={fundingSources.length > 0
                                                             && fundingSources.map((item, i) => {
                                                                 return (
-                                                                    { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                                    { label: item.code, value: item.id }
                                                                 )
                                                             }, this)}
                                                         disabled={this.state.loading}

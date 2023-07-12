@@ -327,7 +327,7 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
 
 export function jExcelLoadedFunctionOnlyHideRow(instance) {
     var elInstance = instance.worksheets[0];
-    console.log("elisn===>", instance)
+    // console.log("elisn===>", instance)
     elInstance.hideIndex(0);
 }
 
@@ -473,8 +473,8 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             }
         }
     } else if (type == "dateWithInvalidDataEntry") {
-        console.log("Value$####", moment(value).format("YYYY-MM-DD"))
-        console.log("Condition###", moment(value).format("YYYY-MM") > moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM"));
+        // console.log("Value$####", moment(value).format("YYYY-MM-DD"))
+        // console.log("Condition###", moment(value).format("YYYY-MM") > moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM"));
         var col = (colName).concat(parseInt(rowNo) + 1);
         if (value == "") {
             elInstance.setStyle(col, "background-color", "transparent");
@@ -694,8 +694,8 @@ export function jExcelLoadedFunctionOldForCompareAndSelect(instance,number){
         num=1;
     }
     var pagignation = document.getElementsByClassName('jexcel_pagination')[num];
-    console.log("pagignation choosen Test123",pagignation)
-    console.log("Pagination Test123",document.getElementsByClassName('jexcel_pagination'));
+    // console.log("pagignation choosen Test123",pagignation)
+    // console.log("Pagination Test123",document.getElementsByClassName('jexcel_pagination'));
     pagignation.classList.add('row');
 
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];

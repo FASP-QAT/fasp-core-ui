@@ -85,7 +85,7 @@ export default class ExportProgram extends Component {
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
-            console.log("in success");
+            // console.log("in success");
             db1 = e.target.result;
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
@@ -95,14 +95,14 @@ export default class ExportProgram extends Component {
                 // Handle errors!
             };
             getRequest.onsuccess = function (event) {
-                console.log("in success")
+                // console.log("in success")
                 var json = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < json.length; i++) {
                     var bytes = CryptoJS.AES.decrypt(json[i].programName, SECRET_KEY);
                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                    console.log("ProgramNameLabel", programNameLabel);
+                    // console.log("ProgramNameLabel", programNameLabel);
                     var bytes1 = CryptoJS.AES.decrypt(json[i].programData.generalData, SECRET_KEY);
                     var programData = bytes1.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
@@ -117,7 +117,7 @@ export default class ExportProgram extends Component {
                 }
             }.bind(this)
             transaction.oncomplete = function (event) {
-                console.log("ProgramList", prgList)
+                // console.log("ProgramList", prgList)
                 this.setState({
                     programList: prgList.sort(function (a, b) {
                         a = a.label.toLowerCase();
@@ -126,7 +126,7 @@ export default class ExportProgram extends Component {
                     }),
                     loading: false
                 })
-                console.log("ProgramList", this.state.programList);
+                // console.log("ProgramList", this.state.programList);
             }.bind(this)
         }.bind(this)
     }
@@ -135,7 +135,7 @@ export default class ExportProgram extends Component {
         this.setState({ loading: true });
         var zip = new JSZip();
         var programId = this.state.programId;
-        console.log("ProgramId", programId)
+        // console.log("ProgramId", programId)
         if (programId != "" && programId != undefined) {
             this.setState({
                 selectProgramMessage: ""
@@ -155,7 +155,7 @@ export default class ExportProgram extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    console.log("MyResult+++", myResult);
+                    // console.log("MyResult+++", myResult);
                     var dTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
                     var dProgram = dTransaction.objectStore('downloadedProgramData');
                     var dGetRequest = dProgram.getAll();
@@ -177,7 +177,7 @@ export default class ExportProgram extends Component {
                             countryRequest.onsuccess = function (event) {
                                 var countryList = [];
                                 countryList = countryRequest.result;
-                                console.log("Country List--------------->", countryList);
+                                // console.log("Country List--------------->", countryList);
                                 var forecastingUnitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
                                 var forecastingUnitOs = forecastingUnitTransaction.objectStore('forecastingUnit');
                                 var forecastingUnitRequest = forecastingUnitOs.getAll();
@@ -287,18 +287,18 @@ export default class ExportProgram extends Component {
                                                                                             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                                                             var labelName = (programId[j].label).replaceAll("/", "-")
                                                                                             // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
-                                                                                            console.log("Txt ", txt);
-                                                                                            console.log("Txt 1", txt1);
+                                                                                            // console.log("Txt ", txt);
+                                                                                            // console.log("Txt 1", txt1);
                                                                                             zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
 
                                                                                         } else {
 
-                                                                                            console.log("myResult------------->1", myResult[i]);
+                                                                                            // console.log("myResult------------->1", myResult[i]);
 
                                                                                             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                                                                                             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                                                                                             var programNameLabel1 = JSON.parse(programNameLabel);
-                                                                                            console.log("myResult------------->2", programNameLabel1);
+                                                                                            // console.log("myResult------------->2", programNameLabel1);
 
                                                                                             // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                                                                                             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -312,11 +312,11 @@ export default class ExportProgram extends Component {
                                                                                             var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                                                                                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                                                             var programJson1 = JSON.parse(programData);
-                                                                                            console.log("myResult------------->3", programJson1);
+                                                                                            // console.log("myResult------------->3", programJson1);
 
                                                                                             var planningUnitDataList = myResult[i].programData.planningUnitDataList;
 
-                                                                                            console.log("myResult------------->4", planningUnitDataList);
+                                                                                            // console.log("myResult------------->4", planningUnitDataList);
 
 
 
@@ -327,7 +327,7 @@ export default class ExportProgram extends Component {
 
                                                                                                 planningUnitDataList[h].planningUnitData = programJsonForPlanningUnit;
                                                                                             }
-                                                                                            console.log("myResult------------->5", planningUnitDataList);
+                                                                                            // console.log("myResult------------->5", planningUnitDataList);
 
 
                                                                                             myResult[i].programName = programNameLabel1;
@@ -372,8 +372,8 @@ export default class ExportProgram extends Component {
                                                                                             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                                                             var labelName = (programId[j].label).replaceAll("/", "-")
                                                                                             // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
-                                                                                            console.log("Txt ", txt);
-                                                                                            console.log("Txt 1", txt1);
+                                                                                            // console.log("Txt ", txt);
+                                                                                            // console.log("Txt 1", txt1);
                                                                                             zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
 
                                                                                         }
@@ -410,7 +410,7 @@ export default class ExportProgram extends Component {
                 }.bind(this)
             }.bind(this)
         } else {
-            console.log("in ekse")
+            // console.log("in ekse")
             this.setState({
                 selectProgramMessage: i18n.t('static.program.validselectprogramtext')
             })
@@ -452,7 +452,7 @@ export default class ExportProgram extends Component {
                 selectProgramMessage: i18n.t('static.program.validselectprogramtext')
             })
         }
-        console.log("Value", value);
+        // console.log("Value", value);
         // console.log(event.value)
         this.setState({ programId: value });
     }

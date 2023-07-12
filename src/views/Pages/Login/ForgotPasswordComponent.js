@@ -136,7 +136,7 @@ class ForgotPasswordComponent extends Component {
                                                     .catch(
                                                         error => {
 
-                                                            console.log(error)
+                                                            // console.log(error)
                                                             if (error.message === "Network Error") {
                                                                 this.setState({
                                                                     // message: error.message 
