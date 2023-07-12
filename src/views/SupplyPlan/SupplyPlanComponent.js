@@ -3214,7 +3214,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                                         var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label } : { value: "", label: "" };
                                                         // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                                                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
+                                                        var planningUnitDataFilter = this.state.planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
                                                         var programJson = {};
                                                         if (planningUnitDataFilter.length > 0) {
                                                             var planningUnitData = planningUnitDataFilter[0]
