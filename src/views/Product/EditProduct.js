@@ -121,7 +121,7 @@ export default class EditProduct extends Component {
                     ProductService.getProdcutCategoryListByRealmId(this.state.product.realm.realmId)
                         .then(response => {
                             if (response.status == 200) {
-                                console.log(response.data);
+                                // console.log(response.data);
                                 this.setState({
                                     productCategoryList: response.data
                                 })
@@ -178,7 +178,7 @@ export default class EditProduct extends Component {
         RealmServcie.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
-                    console.log(response.data);
+                    // console.log(response.data);
                     this.setState({
                         realmList: response.data
                     })
@@ -213,7 +213,7 @@ export default class EditProduct extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
-                    console.log(response.data);
+                    // console.log(response.data);
                     this.setState({
                         unitList: response.data
                     })
@@ -253,7 +253,7 @@ export default class EditProduct extends Component {
         ProductService.getProdcutCategoryListByRealmId(event.target.value)
             .then(response => {
                 if (response.status == 200) {
-                    console.log(response.data);
+                    // console.log(response.data);
                     this.setState({
                         productCategoryList: response.data
                     })
@@ -312,7 +312,9 @@ export default class EditProduct extends Component {
         this.setState({
             product
         },
-            () => { console.log(product); console.log(initialValues.realmId); });
+            () => { 
+                // console.log(product); console.log(initialValues.realmId); 
+            });
     };
 
     touchAll(setTouched, errors) {
@@ -378,11 +380,11 @@ export default class EditProduct extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     // AuthenticationService.setupAxiosInterceptors();
-                                    console.log("==============", this.state.product);
+                                    // console.log("==============", this.state.product);
                                     ProductService.editProduct(this.state.product)
                                         .then(response => {
                                             if (response.status == "200") {
-                                                console.log(response);
+                                                // console.log(response);
                                                 this.props.history.push(`/product/listProduct/${response.data.message}`)
                                             } else {
                                                 this.setState({
@@ -408,7 +410,7 @@ export default class EditProduct extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
+                                                            // console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }

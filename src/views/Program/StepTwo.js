@@ -11,6 +11,7 @@ import {
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants';
+import DropdownService from '../../api/DropdownService';
 
 const initialValuesTwo = {
     realmCountryId: ''
@@ -80,22 +81,22 @@ export default class Steptwo extends Component {
     }
 
     generateCountryCode(event) {
-        let realmCountryCode = this.state.realmCountryList.filter(c => (c.realmCountryId == event.target.value))[0].country.countryCode;
+        let realmCountryCode = this.state.realmCountryList.filter(c => (c.id == event.target.value))[0].code;
         // alert(realmCountryCode);
         this.props.generateCountryCode(realmCountryCode);
     }
 
     getRealmCountryList() {
         // AuthenticationService.setupAxiosInterceptors();
-        console.log("in get realmCOuntry list----->", this.props.items.program.realm.realmId);
-        ProgramService.getRealmCountryList(this.props.items.program.realm.realmId)
+        // console.log("in get realmCOuntry list----->", this.props.items.program.realm.realmId);
+        DropdownService.getRealmCountryDropdownList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
                     // var realmCountries = response.data.filter(c => c.active == true );
-                    var listArray = response.data.filter(c => c.active == true);
+                    var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -156,8 +157,8 @@ export default class Steptwo extends Component {
         let realmCountries = realmCountryList.length > 0
             && realmCountryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
+                    <option key={i} value={item.id}>
+                        {getLabelText(item.label, this.state.lang)}
                         {/* {item.country.countryCode} */}
                     </option>
                 )

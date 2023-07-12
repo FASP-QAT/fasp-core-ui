@@ -2,7 +2,7 @@ import { APPLICATION_STATUS_URL } from "../Constants";
 
 export function paddingZero(string, padStr, len) {
   var str = string.toString();
-  console.log("str.length", str.length)
+  // console.log("str.length", str.length)
   while (str.length < len)
     str = padStr + str;
   return str;
@@ -11,7 +11,7 @@ export function paddingZero(string, padStr, len) {
 export function generateRandomAplhaNumericCode(length) {
   var string = Math.random().toString(36).substr(2, length);
   string = string.toUpperCase();
-  console.log("String", string);
+  // console.log("String", string);
   return string;
 }
 
@@ -60,7 +60,7 @@ export function isSiteOnline() {
     request.open('GET', url, false);
     try {
       request.send('');
-      console.log("@@@ in is site online")
+      // console.log("@@@ in is site online")
       if (request.status === 200) {
         return true;
       } else {

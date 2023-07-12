@@ -8,10 +8,11 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import {
     Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input,
+    Form, FormGroup, Label, Input, Dropdown,
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants';
+import DropdownService from '../../api/DropdownService';
 
 const initialValuesFour = {
     organisationId: ''
@@ -79,7 +80,7 @@ export default class StepFour extends Component {
     }
 
     generateOrganisationCode(event) {
-        let organisationCode = this.state.organisationList.filter(c => (c.organisationId == event.target.value))[0].organisationCode;
+        let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         // alert(organisationCode);
         this.props.generateOrganisationCode(organisationCode);
     }
@@ -87,7 +88,7 @@ export default class StepFour extends Component {
     getOrganisationList() {
         // AuthenticationService.setupAxiosInterceptors();
         // ProgramService.getOrganisationList(this.props.items.program.realm.realmId)
-        ProgramService.getOrganisationListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
+        DropdownService.getOrganisationListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
@@ -157,7 +158,7 @@ export default class StepFour extends Component {
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
-                    <option key={i} value={item.organisationId}>
+                    <option key={i} value={item.id}>
                         {/* {item.organisationCode} */}
                         {getLabelText(item.label, this.state.lang)}
                     </option>

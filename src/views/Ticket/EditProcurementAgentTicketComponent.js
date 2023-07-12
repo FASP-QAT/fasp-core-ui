@@ -241,7 +241,7 @@ export default class EditProcurementAgentTicketComponent extends Component {
                             this.state.procurementAgent.summary = summaryText_2;
                             this.state.procurementAgent.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.procurementAgent).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

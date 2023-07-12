@@ -162,7 +162,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
         if (this.props.items.userRealmId > 0) {
             ForecastingUnitService.getForcastingUnitByRealmId(this.props.items.userRealmId).then(response => {
                 if (response.status == 200) {
-                    console.log("response------->" + response);
+                    // console.log("response------->" + response);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -234,7 +234,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
 
             ForecastingUnitService.getForecastingUnitList().then(response => {
                 if (response.status == 200) {
-                    console.log("response------->" + response);
+                    // console.log("response------->" + response);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -357,7 +357,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
                             this.state.forecastingUnit.summary = summaryText_2
                             this.state.forecastingUnit.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.forecastingUnit).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

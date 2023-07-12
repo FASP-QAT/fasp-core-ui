@@ -218,7 +218,7 @@ class RealmDashboard extends Component {
     if (isSiteOnline()) {
       DashboardService.realmLevelDashboard(this.state.realmId)
         .then(response => {
-          console.log("dashboard response===", response);
+          // console.log("dashboard response===", response);
           this.setState({
             dashboard: response.data
           })
@@ -265,7 +265,7 @@ class RealmDashboard extends Component {
         );
       DashboardService.realmLevelDashboardUserList(this.state.realmId)
         .then(response => {
-          console.log("users response===", response);
+          // console.log("users response===", response);
           this.setState({
             users: response.data
           })

@@ -37,13 +37,14 @@ import ProgramService from '../../api/ProgramService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, INTEGER_NO_REGEX, API_URL } from '../../Constants.js';
+import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, INTEGER_NO_REGEX, API_URL,PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import TracerCategoryService from "../../api/TracerCategoryService";
 import moment from "moment";
 import { Prompt } from 'react-router';
-
+import ReportService from '../../api/ReportService';
+import DropdownService from '../../api/DropdownService';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -122,9 +123,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     getTracerCategoryList() {
-        TracerCategoryService.getTracerCategoryListAll()
+        // TracerCategoryService.getTracerCategoryListAll()
+        DropdownService.getTracerCategoryDropdownList()
             .then(response => {
-                console.log("response.data----", response.data);
+                // console.log("response.data----", response.data);
                 this.setState({
                     tracerCategoryList: response.data,
                 },
@@ -274,6 +276,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     getDatasetList() {
+// console.log("getDatasetList----------->");
+
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -307,7 +311,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson1 = JSON.parse(programData);
-                    console.log("programJson1-------->1", programJson1);
+                    // console.log("programJson1-------->1", programJson1);
                     let filterForcastUnitObj = programJson1.planningUnitList.filter(ele => ele.active && ele.consuptionForecast);
 
                     let dupForecastingUnitObj = filterForcastUnitObj.map(ele => ele.planningUnit.forecastingUnit);
@@ -319,7 +323,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     let dupPlanningUnitObj = dupPlanningUnitObjwithNull.filter(c => c != null);
                     const idsPU = dupPlanningUnitObj.map(o => o.id)
                     const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
-                    console.log("filteredPU-------->1", filterForcastUnitObj);
+                    // console.log("filteredPU-------->1", filterForcastUnitObj);
 
                     datasetList.push({
                         programCode: filteredGetRequestList[i].programCode,
@@ -341,7 +345,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     datasetList1.push(filteredGetRequestList[i])
                     // }
                 }
-                console.log("DATASET-------->", datasetList);
+                // console.log("DATASET-------->", datasetList);
                 datasetList = datasetList.sort(function (a, b) {
                     a = a.programCode.toLowerCase();
                     b = b.programCode.toLowerCase();
@@ -362,8 +366,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
 
     getPrograms() {
-        ProgramService.getProgramList()
+        // ProgramService.getProgramList()
+        let realmId = AuthenticationService.getRealmId();
+        DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
+                // console.log("getProgramBasedOnRealmIdAndProgramTypeId----",response.data)
                 this.setState({
                     programs: response.data,
                     loading: false
@@ -444,15 +451,18 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        // console.log("startDate---->1", startDate);
-        // console.log("startDate---->2", stopDate);
+        // console.log("Seema---->programId---", programId);
+        // console.log("Seema---->versionId---", versionId);
+        // console.log("Seema---->forecastProgramId---", forecastProgramId);
+        
 
         if (versionId != 0 && programId > 0 && forecastProgramId > 0) {
 
-            let selectedSupplyPlanProgram = this.state.programs.filter(c => c.programId == programId)[0];
+            let selectedSupplyPlanProgram = this.state.programs.filter(c => c.id == programId)[0];
+            // console.log("Seema---->selectedSupplyPlanProgram---", selectedSupplyPlanProgram);
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
-
-            if (selectedSupplyPlanProgram.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId) {
+            // console.log("Seema---->selectedForecastProgram---", selectedForecastProgram);
+            if (selectedSupplyPlanProgram.realmCountry.id == selectedForecastProgram.realmCountry.realmCountryId) {
 
                 this.props.updateStepOneData("loading", true);
                 this.props.updateStepOneData("programId", programId);
@@ -479,7 +489,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 ProgramService.getPlanningUnitByProgramId(programId, tracerCategory)
                     .then(response => {
                         if (response.status == 200) {
-                            console.log("planningUnit------>", response.data);
+                            // console.log("planningUnit------>", response.data);
                             this.setState({
                                 programPlanningUnitList: response.data,
                                 selSource: response.data,
@@ -600,7 +610,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let versionId = this.state.forecastProgramVersionId;
         let forecastProgramId = document.getElementById("forecastProgramId").value;
         let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == versionId)[0];
-        console.log("selectedForecastProgram------------->>>>>>>>", selectedForecastProgram.filteredPlanningUnit)
+        // console.log("selectedForecastProgram------------->>>>>>>>", selectedForecastProgram.filteredPlanningUnit)
 
         // PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(forecastProgramId, versionId)
         //     .then(response => {
@@ -609,7 +619,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var planningUnitListFilter = selectedForecastProgram.filteredPlanningUnit
 
             var listArray = planningUnitListFilter;
-            console.log("response.data!!!!!!!!", listArray)
+            // console.log("response.data!!!!!!!!", listArray)
 
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -963,19 +973,69 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let programId = this.state.programId;
         if (programId != 0) {
 
-            const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            const program = this.state.programs.filter(c => c.id == programId)
+            // console.log(program)
 
             this.setState({
                 versions: [],
             }, () => {
-                this.setState({
-                    versions: (program[0].versionList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
-                    })).reverse()
-                }, () => { });
+                DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                .then(response => {
+                //   console.log("response===>", response.data)
+                  this.setState({
+                    versions: []
+                  }, () => {
+                    this.setState({
+                        versions: (response.data.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        })).reverse()
+                    }, () => { });
+                  });
+                }).catch(
+                  error => {
+                    this.setState({
+                      programs: [], loading: false
+                    })
+                    if (error.message === "Network Error") {
+                      this.setState({
+                        // message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                      });
+                    } else {
+                      switch (error.response ? error.response.status : "") {
+  
+                        case 401:
+                          this.props.history.push(`/login/static.message.sessionExpired`)
+                          break;
+                        case 403:
+                          this.props.history.push(`/accessDenied`)
+                          break;
+                        case 500:
+                        case 404:
+                        case 406:
+                          this.setState({
+                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                            loading: false
+                          });
+                          break;
+                        case 412:
+                          this.setState({
+                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                            loading: false
+                          });
+                          break;
+                        default:
+                          this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                          });
+                          break;
+                      }
+                    }
+                  }
+                );
             });
-
         } else {
 
             this.setState({
@@ -988,10 +1048,21 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
     filterForcastUnit = () => {
         let programId = this.state.programId;
+        // console.log("programId--->",programId)
         if (programId != 0) {
-            const countryId = this.state.programs.filter(c => c.programId == programId)[0].realmCountry.country.countryId;
+            const countryId = this.state.programs.filter(c => c.id == programId)[0].realmCountry.id;
+            // console.log("programId--->programs---",this.state.programs)
+            // console.log("programId--->countryId---",countryId)
+            // console.log("programId--->this.state.datasetList---",this.state.datasetList)
+            
             this.state.getDatasetFilterList = this.state.datasetList
-            var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.country.countryId == countryId);
+            // console.log("programId--->this.state.getDatasetFilterList---",this.state.getDatasetFilterList)
+            
+            // var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.country.countryId == countryId);
+            var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.realmCountryId == countryId);
+            
+            // console.log("programId--->datasetlist---",datasetlist)
+            
             this.setState({
                 data: [],
             }, () => {
@@ -1047,7 +1118,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        // console.log("json.length-------", json.length);
+        // console.log("json.length-------", json);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
             var tracerCategoryId = this.el.getValueFromCoords(5, y);
@@ -1154,12 +1225,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }, () => {
                 this.props.finishedStepOne();
             })
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             this.props.updateStepOneData("stepOneData", changedpapuList);
             this.props.updateStepOneData("selSource1", tableJson);
 
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -1175,9 +1246,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
+                    <option key={i} value={item.id}>
                         {/* {getLabelText(item.label, this.state.lang)} */}
-                        {item.programCode}
+                        {item.code}
                     </option>
                 )
             }, this);

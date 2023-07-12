@@ -145,7 +145,7 @@ export default class AddDimensionComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log(this.state.dimension)
+                                    // console.log(this.state.dimension)
                                     DimensionService.addDimension(this.state.dimension).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/dimension/listDimension/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))

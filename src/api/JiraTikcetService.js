@@ -35,7 +35,7 @@ class JiraTicketService {
         fields.assignee = assignee;
         // fields.requestParticipants = requestParticipants;
         mainObject.fields = fields;
-        console.log(mainObject);
+        // console.log(mainObject);
         return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
         );
     }
@@ -72,7 +72,7 @@ class JiraTicketService {
         // fields.requestParticipants = requestParticipants;
         mainObject.fields = fields;
 
-        console.log("SUBMIT------->2", mainObject);
+        // console.log("SUBMIT------->2", mainObject);
         return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
         );
     }
@@ -110,7 +110,7 @@ class JiraTicketService {
         // fields.requestParticipants = requestParticipants;
         mainObject.fields = fields;
 
-        console.log(mainObject);
+        // console.log(mainObject);
         return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
         );
     }
@@ -154,7 +154,7 @@ class JiraTicketService {
         fields.assignee = assignee;
         // fields.requestParticipants = requestParticipants;
         mainObject.fields = fields;
-        console.log(mainObject);
+        // console.log(mainObject);
         return axios.post(`${API_URL}/api/ticket/addIssue`, mainObject, {}
         );
     }
@@ -171,7 +171,7 @@ class JiraTicketService {
             dataValue = json[key];
             formatStr = formatStr.concat(dataKey.charAt(0).toUpperCase()).concat(dataKey.slice(1)).concat(" = ").concat(dataValue).concat("\n");
         }
-        console.log("Format String :", formatStr);
+        // console.log("Format String :", formatStr);
         return formatStr;
     }
 

@@ -75,16 +75,16 @@ class CountrySpecificPrices extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getCountrySpecificPricesList(this.props.match.params.programPlanningUnitId).then(response => {
             if (response.status == 200) {
-                console.log("getProcurementAgentPlaningUnitList---", response.data);
+                // console.log("getProcurementAgentPlaningUnitList---", response.data);
                 let myResponse = response.data;
                 if (myResponse.length > 0) {
                     this.setState({ rows: myResponse });
                 }
                 ProgramService.getProgramPlaningUnitListByProgramId(this.props.match.params.programId).then(response => {
                     if (response.status == 200) {
-                        console.log(response.data);
+                        // console.log(response.data);
                         let programPlanningUnit = response.data.filter(c => c.programPlanningUnitId == this.props.match.params.programPlanningUnitId)[0];
-                        console.log("Success-------->", programPlanningUnit);
+                        // console.log("Success-------->", programPlanningUnit);
                         this.setState({
                             programPlanningUnit: programPlanningUnit,
                             //  rows:response.data
@@ -92,8 +92,8 @@ class CountrySpecificPrices extends Component {
 
                         ProcurementAgentService.getProcurementAgentListAll().then(response => {
                             if (response.status == 200) {
-                                console.log(response.data);
-                                console.log("Success-------->1", response.data);
+                                // console.log(response.data);
+                                // console.log("Success-------->1", response.data);
                                 this.setState({
                                     procurementAgents: response.data,
                                     //  rows:response.data
@@ -114,7 +114,7 @@ class CountrySpecificPrices extends Component {
                                         procurementAgentArr[i] = paJson
                                     }
                                 }
-                                console.log("Success-------->2", response.data);
+                                // console.log("Success-------->2", response.data);
                                 procurementAgentArr.sort(function (a, b) {
                                     var itemLabelA = a.name.toUpperCase(); // ignore upper and lowercase
                                     var itemLabelB = b.name.toUpperCase(); // ignore upper and lowercase
@@ -128,7 +128,7 @@ class CountrySpecificPrices extends Component {
                                     // names must be equal
                                     return 0;
                                 });
-                                console.log("Success-------->3", response.data);
+                                // console.log("Success-------->3", response.data);
                                 this.setState({
                                     procurementAgentArr: procurementAgentArr,
                                 })
@@ -575,11 +575,11 @@ class CountrySpecificPrices extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
-            // console.log("RESP---------", parseFloat(rowData[3]));
+            // // console.log("RESP---------", parseFloat(rowData[3]));
             elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
         }
         elInstance.setValueFromCoords(7, y, 1, true);
-        console.log("7 map---11");
+        // console.log("7 map---11");
 
     }
 
@@ -620,11 +620,11 @@ class CountrySpecificPrices extends Component {
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("7 map---" + map1.get("7"))
+                // console.log("7 map---" + map1.get("7"))
                 if (parseInt(map1.get("7")) === 1) {
                     let json = {
                         program: {
@@ -644,12 +644,12 @@ class CountrySpecificPrices extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             ProcurementAgentService.savePlanningUnitProgramPriceForProcurementAgent(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         let programId = this.props.match.params.programId;
                         this.props.history.push(`/programProduct/addProgramProduct/${programId}/` + 'green/' + 'Procurement Agent Prices added successfully')
                     } else {
@@ -705,7 +705,7 @@ class CountrySpecificPrices extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -720,11 +720,11 @@ class CountrySpecificPrices extends Component {
     }
 
     blur = function (instance) {
-        console.log('on blur called');
+        // console.log('on blur called');
     }
 
     focus = function (instance) {
-        console.log('on focus called');
+        // console.log('on focus called');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
@@ -776,14 +776,14 @@ class CountrySpecificPrices extends Component {
     // -----end of changed function
 
     onedit = function (instance, cell, x, y, value) {
-        console.log("------------onedit called")
+        // console.log("------------onedit called")
         this.el.setValueFromCoords(7, y, 1, true);
     }.bind(this);
 
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
             if (parseInt(value) == 1) {
@@ -791,7 +791,7 @@ class CountrySpecificPrices extends Component {
                 //ProcurementAgent
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");

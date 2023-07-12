@@ -4,7 +4,7 @@ import { API_URL } from '../Constants.js';
 class OrganisationService {
 
     addOrganisation(json) {
-        console.log("ORGANISATION-------------------->2" + JSON.stringify(json));
+        // console.log("ORGANISATION-------------------->2" + JSON.stringify(json));
         return axios.post(`${API_URL}/api/organisation/`, json, {}
         );
     }

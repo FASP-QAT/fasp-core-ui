@@ -69,7 +69,7 @@
 //         let realmId = document.getElementById("realmId").value;
 //         if (realmId != 0) {
 //             PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
-//                 console.log(response.data)
+//                 // console.log(response.data)
 //                 this.setState({
 //                     planningUnitList: response.data,
 //                     selSource: response.data
@@ -82,7 +82,7 @@
 //     PlanningUnitCapacity(event, row) {
 //         event.stopPropagation();
 //         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT_CAPACITY')) {
-//             // console.log(JSON.stringify(row))
+//             // // console.log(JSON.stringify(row))
 //             this.props.history.push({
 //                 pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
 //                 state: { planningUnit: row }
@@ -95,7 +95,7 @@
 //         this.hideFirstComponent();
 //         AuthenticationService.setupAxiosInterceptors();
 //         ForecastingUnitService.getForecastingUnitList().then(response => {
-//             // console.log(response.data)
+//             // // console.log(response.data)
 //             if (response.status == 200) {
 //                 this.setState({
 //                     forecastingUnits: response.data, loading: false
@@ -124,7 +124,7 @@
 //                     })
 
 //                     PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
-//                         console.log("RESP-----", response.data)
+//                         // console.log("RESP-----", response.data)
 //                         this.setState({
 //                             planningUnitList: response.data,
 //                             selSource: response.data
@@ -144,7 +144,7 @@
 
 //     editPlanningUnit(planningUnit) {
 //         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_PLANNING_UNIT')) {
-//             console.log('**' + JSON.stringify(planningUnit))
+//             // console.log('**' + JSON.stringify(planningUnit))
 //             this.props.history.push({
 //                 pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
 //                 // state: { planningUnit: planningUnit }
@@ -454,14 +454,14 @@ export default class PlanningUnitListComponent extends Component {
         var tracerCategoryId = document.getElementById("tracerCategoryId").value;
         var productCategoryId = document.getElementById("productCategoryId").value;
         var pc = this.state.productCategoryListAll.filter(c => c.payload.productCategoryId == productCategoryId)[0]
-        console.log("Pc---------->", pc);
+        // console.log("Pc---------->", pc);
         var pcList = this.state.productCategoryListAll.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
-        console.log("PcList", pcList);
+        // console.log("PcList", pcList);
         var pcIdArray = [];
         for (var pcu = 0; pcu < pcList.length; pcu++) {
             pcIdArray.push(pcList[pcu].payload.productCategoryId);
         }
-        console.log("pcIdArray", pcIdArray);
+        // console.log("pcIdArray", pcIdArray);
         if (tracerCategoryId != 0) {
             forecastingUnitList = forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId);
         }
@@ -503,7 +503,7 @@ export default class PlanningUnitListComponent extends Component {
         if (realmId != 0) {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
-                    console.log("product category list---", JSON.stringify(response.data))
+                    // console.log("product category list---", JSON.stringify(response.data))
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -539,7 +539,7 @@ export default class PlanningUnitListComponent extends Component {
                                                 return itemLabelA > itemLabelB ? 1 : -1;
                                             });
                                             PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
-                                                console.log("RESP----->", response.data);
+                                                // console.log("RESP----->", response.data);
                                                 this.setState({
                                                     planningUnitList: response.data,
                                                     selSource: response.data,
@@ -736,7 +736,7 @@ export default class PlanningUnitListComponent extends Component {
     PlanningUnitCapacity(event, row) {
         event.stopPropagation();
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT_CAPACITY')) {
-            // console.log(JSON.stringify(row))
+            // // console.log(JSON.stringify(row))
             this.props.history.push({
                 pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
                 state: { planningUnit: row }
@@ -748,7 +748,7 @@ export default class PlanningUnitListComponent extends Component {
 
     buildJExcel() {
         let planningUnitList = this.state.selSource;
-        // console.log("planningUnitList---->", planningUnitList);
+        // // console.log("planningUnitList---->", planningUnitList);
         let planningUnitArray = [];
         let count = 0;
 
@@ -771,7 +771,7 @@ export default class PlanningUnitListComponent extends Component {
         //     data = [];
         //     planningUnitArray[0] = data;
         // }
-        // console.log("planningUnitArray---->", planningUnitArray);
+        // // console.log("planningUnitArray---->", planningUnitArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -836,7 +836,7 @@ export default class PlanningUnitListComponent extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable: true,
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -863,7 +863,7 @@ export default class PlanningUnitListComponent extends Component {
                         items.push({
                             title: i18n.t('static.planningunit.capacityupdate'),
                             onclick: function () {
-                                // console.log("onclick------>", this.el.getValueFromCoords(0, y));
+                                // // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
                                     this.props.history.push({
                                         pathname: `/planningUnitCapacity/planningUnitCapacity/${this.el.getValueFromCoords(0, y)}`,
@@ -891,9 +891,9 @@ export default class PlanningUnitListComponent extends Component {
         if (e.buttons == 1) {
 
             if ((x == 0 && value != 0) || (y == 0)) {
-                // console.log("HEADER SELECTION--------------------------");
+                // // console.log("HEADER SELECTION--------------------------");
             } else {
-                // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
+                // // console.log("Original Value---->>>>>", this.el.getValueFromCoords(0, x));
                 if (this.state.selSource.length != 0) {
                     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
                         this.props.history.push({
@@ -986,7 +986,7 @@ export default class PlanningUnitListComponent extends Component {
 
     editPlanningUnit(planningUnit) {
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
-            console.log('**' + JSON.stringify(planningUnit))
+            // console.log('**' + JSON.stringify(planningUnit))
             this.props.history.push({
                 pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
                 // state: { planningUnit: planningUnit }
@@ -1046,7 +1046,7 @@ export default class PlanningUnitListComponent extends Component {
         const { productCategories } = this.state;
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
-                console.log(JSON.stringify("----------", item))
+                // console.log(JSON.stringify("----------", item))
                 return (
                     <option key={i} value={item.payload.productCategoryId}>
                         {getLabelText(item.payload.label, this.state.lang)}

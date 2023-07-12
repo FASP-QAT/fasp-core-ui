@@ -23,6 +23,7 @@ const initialValuesSix = {
     userId: '',
     airFreightPerc: '',
     seaFreightPerc: '',
+    roadFreightPerc: '',
     // deliveredToReceivedLeadTime: '',
     draftToSubmittedLeadTime: '',
     plannedToDraftLeadTime: '',
@@ -35,7 +36,8 @@ const initialValuesSix = {
 
     arrivedToDeliveredLeadTime: '',
     shippedToArrivedBySeaLeadTime: '',
-    shippedToArrivedByAirLeadTime: ''
+    shippedToArrivedByAirLeadTime: '',
+    shippedToArrivedByRoadLeadTime: ''
 
 }
 
@@ -55,6 +57,11 @@ const validationSchemaSix = function (values) {
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.program.validseafreighttext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        roadFreightPerc: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.program.validroadfreighttext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         // deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
         // .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
@@ -98,6 +105,11 @@ const validationSchemaSix = function (values) {
             // .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
             .required(i18n.t('static.realmcountry.shippedToArrivedAirLeadTimetext'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        shippedToArrivedByRoadLeadTime: Yup.string()
+            // .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
+            .required(i18n.t('static.realmcountry.shippedToArrivedRoadLeadTimetext'))
             .min(0, i18n.t('static.program.validvaluetext')),
         // healthAreaId: Yup.string()
         //     .required(i18n.t('static.program.validhealthareatext')),
@@ -170,6 +182,7 @@ export default class PipelineProgramDataStepSix extends Component {
             userId: true,
             airFreightPerc: true,
             seaFreightPerc: true,
+            roadFreightPerc: true,
             // deliveredToReceivedLeadTime: true,
             plannedToSubmittedLeadTime: true,
             submittedToApprovedLeadTime: true,
@@ -181,6 +194,7 @@ export default class PipelineProgramDataStepSix extends Component {
             arrivedToDeliveredLeadTime: '',
             shippedToArrivedBySeaLeadTime: '',
             shippedToArrivedByAirLeadTime: '',
+            shippedToArrivedByRoadLeadTime: '',
             programCode1: true
 
         }
@@ -303,6 +317,7 @@ export default class PipelineProgramDataStepSix extends Component {
                             userId: this.props.items.program.programManager.userId,
                             airFreightPerc: this.props.items.program.airFreightPerc,
                             seaFreightPerc: this.props.items.program.seaFreightPerc,
+                            roadFreightPerc: this.props.items.program.roadFreightPerc,
                             // deliveredToReceivedLeadTime: this.props.items.program.deliveredToReceivedLeadTime,
                             plannedToSubmittedLeadTime: this.props.items.program.plannedToSubmittedLeadTime,
                             submittedToApprovedLeadTime: this.props.items.program.submittedToApprovedLeadTime,
@@ -313,6 +328,7 @@ export default class PipelineProgramDataStepSix extends Component {
                             arrivedToDeliveredLeadTime: this.props.items.program.arrivedToDeliveredLeadTime,
                             shippedToArrivedBySeaLeadTime: this.props.items.program.shippedToArrivedBySeaLeadTime,
                             shippedToArrivedByAirLeadTime: this.props.items.program.shippedToArrivedByAirLeadTime,
+                            shippedToArrivedByRoadLeadTime: this.props.items.program.shippedToArrivedByRoadLeadTime,
                             shelfLife: this.props.items.program.shelfLife,
                             programCode1: this.props.items.program.programCode,
                             programCode: this.props.items.realmCountryCode + "-" + this.props.items.healthAreaCode + "-" + this.props.items.organisationCode
@@ -433,6 +449,20 @@ export default class PipelineProgramDataStepSix extends Component {
                                         <FormFeedback className="red">{errors.seaFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
+                                        <Label htmlFor="company">{i18n.t('static.program.roadfreightperc')} (%)<span class="red ">*</span></Label>
+                                        <Input
+                                            onBlur={handleBlur}
+                                            valid={!errors.roadFreightPerc && this.props.items.program.roadFreightPerc != ''}
+                                            invalid={touched.roadFreightPerc && !!errors.roadFreightPerc}
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            value={this.props.items.program.roadFreightPerc}
+                                            name="roadFreightPerc" id="roadFreightPerc" />
+                                        <FormFeedback className="red">{errors.roadFreightPerc}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.planleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
@@ -516,6 +546,20 @@ export default class PipelineProgramDataStepSix extends Component {
                                             value={this.props.items.program.shippedToArrivedByAirLeadTime}
                                             name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" />
                                         <FormFeedback className="red">{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedRoadLeadTime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            onBlur={handleBlur}
+                                            valid={!errors.shippedToArrivedByRoadLeadTime && this.props.items.program.shippedToArrivedByRoadLeadTime != ''}
+                                            invalid={touched.shippedToArrivedByRoadLeadTime && !!errors.shippedToArrivedByRoadLeadTime}
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            value={this.props.items.program.shippedToArrivedByRoadLeadTime}
+                                            name="shippedToArrivedByRoadLeadTime" id="shippedToArrivedByRoadLeadTime" />
+                                        <FormFeedback className="red">{errors.shippedToArrivedByRoadLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}<span class="red Reqasterisk">*</span></Label>

@@ -17,7 +17,7 @@ import ProgramService from "../../api/ProgramService.js";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { inValid, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 
 const entityname = i18n.t('static.integration.programIntegration')
@@ -72,7 +72,7 @@ class ProgramIntegration extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         IntegrationService.getProgramIntegrationByProgramId(this.props.match.params.programId).then(response => {
             if (response.status == 200) {
-                console.log("getProgramIntegrationByProgramId---", response.data);
+                // console.log("getProgramIntegrationByProgramId---", response.data);
                 let myResponse = response.data;
                 if (myResponse.length > 0) {
                     this.setState({ rows: myResponse });
@@ -170,7 +170,7 @@ class ProgramIntegration extends Component {
                                                     var papuList = this.state.rows;
                                                     var data = [];
                                                     var papuDataArr = [];
-                                                    console.log("Success-----------", papuList);
+                                                    // console.log("Success-----------", papuList);
                                                     var count = 0;
                                                     if (papuList.length != 0) {
                                                         for (var j = 0; j < papuList.length; j++) {
@@ -770,11 +770,11 @@ class ProgramIntegration extends Component {
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("6 map---" + map1.get("6"))
+                // console.log("6 map---" + map1.get("6"))
                 if (parseInt(map1.get("6")) === 1) {
                     let json = {
                         integration: {
@@ -795,12 +795,12 @@ class ProgramIntegration extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             IntegrationService.addprogramIntegration(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
@@ -855,7 +855,7 @@ class ProgramIntegration extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -872,14 +872,28 @@ class ProgramIntegration extends Component {
     }
 
     blur = function (instance) {
-        console.log('on blur called');
+        // console.log('on blur called');
     }
 
     focus = function (instance) {
-        console.log('on focus called');
+        // console.log('on focus called');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
+        if(x==1 || x==2 || x==3 || x==4){
+            var col = ("B").concat(parseInt(y) + 1);
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+            var col = ("C").concat(parseInt(y) + 1);
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+            var col = ("D").concat(parseInt(y) + 1);
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+            var col = ("E").concat(parseInt(y) + 1);
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+        }
 
         //Integration
         if (x == 1) {
@@ -928,7 +942,7 @@ class ProgramIntegration extends Component {
     // -----end of changed function
 
     onedit = function (instance, cell, x, y, value) {
-        console.log("------------onedit called")
+        // console.log("------------onedit called")
         this.el.setValueFromCoords(6, y, 1, true);
 
         var elInstance = instance;
@@ -941,15 +955,29 @@ class ProgramIntegration extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
+            var checkDuplicate=json.filter(c=>c[1]==json[y][1] && c[2]==json[y][2] && c[3]==json[y][3] && c[4].toString()==json[y][4].toString());
+            // console.log("check duplicate Test@123",checkDuplicate)
+            if(checkDuplicate.length>1){
+                this.setState({
+                    message:'static.programIntegration.duplicateIntegration',
+                },()=>{
+                    this.hideSecondComponent();
+                })
+                // var colArr = ['B','C','D','E'];
+                // for (var c = 0; c < colArr.length; c++) {
+                //     inValid(colArr[c], y, i18n.t('static.programIntegration.duplicateIntegration'), this.el);
+                // }
+                valid = false;
+            }else{
             var value = this.el.getValueFromCoords(6, y);
             if (parseInt(value) == 1) {
 
                 //Integration
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -987,6 +1015,7 @@ class ProgramIntegration extends Component {
                 }
             }
         }
+    }
         return valid;
     }
     render() {

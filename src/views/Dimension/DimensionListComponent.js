@@ -389,7 +389,7 @@ export default class DimensionListComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         DimensionService.getDimensionListAll().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data)
+                // console.log("response.data---->", response.data)
                 // this.setState({
                 //     dimensionList: response.data,
                 //     selSource: response.data, loading: false

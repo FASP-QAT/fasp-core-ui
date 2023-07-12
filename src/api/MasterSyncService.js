@@ -157,7 +157,7 @@ class MasterSyncService {
     }
 
     syncProgram(programId, versionId, userId, lastSyncDate) {
-        console.log("In service")
+        // console.log("In service")
         return axios.get(`${API_URL}/api/programData/shipmentSync/programId/${programId}/versionId/${versionId}/userId/${userId}/lastSyncDate/${lastSyncDate}`, {
         });
     }

@@ -95,7 +95,7 @@ class EditFundingSourceComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             if (response.status == 200) {
-                console.log("RESP----", response.data);
+                // console.log("RESP----", response.data);
                 this.setState({
                     fundingSource: response.data, loading: false
                 });
@@ -230,7 +230,7 @@ class EditFundingSourceComponent extends Component {
                                         loading: true
                                     })
                                     // AuthenticationService.setupAxiosInterceptors();
-                                    console.log("FUNDING_SOURCE----", this.state.fundingSource);
+                                    // console.log("FUNDING_SOURCE----", this.state.fundingSource);
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
                                             if (response.status == 200) {

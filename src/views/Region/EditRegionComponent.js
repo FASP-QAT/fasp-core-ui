@@ -192,7 +192,7 @@ class EditRegionComponent extends Component {
                                     // AuthenticationService.setupAxiosInterceptors();
                                     RegionService.updateRegion(this.state.region)
                                         .then(response => {
-                                            console.log("---------->", response);
+                                            // console.log("---------->", response);
                                             if (response.status == 200) {
                                                 this.props.history.push(`/region/listRegion/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {

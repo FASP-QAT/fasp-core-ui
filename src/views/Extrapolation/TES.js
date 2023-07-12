@@ -1,18 +1,18 @@
 import { std, sqrt, mean, abs } from 'mathjs';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, seasonality, noOfProjectionMonths, props) {
-    console.log("InputData@@@", inputData)
+    // console.log("InputData@@@", inputData)
     const alpha = alphaParam
     const beta = betaParam
     const gamma = gammaParam
     const noOfMonthsForASeason = seasonality
     const confidence = confidenceLevel;
-    console.log("alpha%%%", alpha)
-    console.log("beta%%%", beta)
-    console.log("gamma%%%", gamma)
-    console.log("noOfMonthsForASeason%%%", noOfMonthsForASeason)
-    console.log("noOfProjectionMonths%%%", noOfProjectionMonths)
-    console.log("confidence%%%", confidenceLevel);
+    // console.log("alpha%%%", alpha)
+    // console.log("beta%%%", beta)
+    // console.log("gamma%%%", gamma)
+    // console.log("noOfMonthsForASeason%%%", noOfMonthsForASeason)
+    // console.log("noOfProjectionMonths%%%", noOfProjectionMonths)
+    // console.log("confidence%%%", confidenceLevel);
 
 
     const tTable = [
@@ -89,28 +89,28 @@ function getZValue(df, confidence, tTable) {
         }
         final_t_table = tTable[x]
     }
-    console.log("confidence###", confidence)
+    // console.log("confidence###", confidence)
     switch (Number(confidence)) {
         case 0.85:
-            console.log("###in 1")
+            // console.log("###in 1")
             return final_t_table.zValue[0];
         case 0.90:
-            console.log("###in 2")
+            // console.log("###in 2")
             return final_t_table.zValue[1];
         case 0.95:
-            console.log("###in 3")
+            // console.log("###in 3")
             return final_t_table.zValue[2];
         case 0.99:
-            console.log("###in 4")
+            // console.log("###in 4")
             return final_t_table.zValue[3];
         case 0.995:
-            console.log("###in 5")
+            // console.log("###in 5")
             return final_t_table.zValue[4];
         case 0.999:
-            console.log("###in 6")
+            // console.log("###in 6")
             return final_t_table.zValue[5];
         default:
-            console.log("###in 7")
+            // console.log("###in 7")
             return null;
     }
 }
@@ -145,7 +145,7 @@ function initial_seasonal_components(data, slen) {
 }
 
 function tes(data, slen, alpha, beta, gamma, n_preds) {
-    console.log("%%%tes start")
+    // console.log("%%%tes start")
     let result = new Array();
     let seasonals = initial_seasonal_components(data, slen)
     let smooth = 0, trend = 0, m = 0, val = 0, last_smooth = 0, last_trend = 0;
@@ -169,7 +169,7 @@ function tes(data, slen, alpha, beta, gamma, n_preds) {
         last_smooth = smooth;
         last_trend = trend;
     }
-    console.log("%%%tes end")
-    console.log("%%%tes end result", result)
+    // console.log("%%%tes end")
+    // console.log("%%%tes end result", result)
     return result;
 }

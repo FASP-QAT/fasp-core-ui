@@ -96,22 +96,22 @@ const validationSchemaNodeData = function (values) {
             .test('nodeUnitId', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2 || parseInt(document.getElementById("nodeTypeId").value) == 4) && document.getElementById("nodeUnitId").value == "") {
-                        console.log("Pass 1");
+                        // // console.log("Pass 1");
                         return false;
                     } else {
-                        console.log("Fail 1");
+                        // // console.log("Fail 1");
                         return true;
                     }
                 }),
         monthNo: Yup.string()
             .test('monthNo', i18n.t('static.validation.fieldRequired'),
                 function (value) {
-                    // console.log("@@@",(parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "");
+                    // // console.log("@@@",(parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "");
                     if (parseInt(document.getElementById("nodeTypeId").value) != 1 && document.getElementById("monthNo").value == "") {
-                        console.log("Pass 2");
+                        // // console.log("Pass 2");
                         return false;
                     } else {
-                        console.log("Fail 2");
+                        // // console.log("Fail 2");
                         return true;
                     }
                 }),
@@ -119,26 +119,26 @@ const validationSchemaNodeData = function (values) {
             .test('percentageOfParent', i18n.t('static.tree.decimalValidation10&2'),
                 function (value) {
                     var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("percentageOfParent").value) : false;
-                    // console.log(">>>>*", parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("percentageOfParent").value == "" || testNumber == false);
+                    // // console.log(">>>>*", parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("percentageOfParent").value == "" || testNumber == false);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4 || parseInt(document.getElementById("nodeTypeId").value) == 5) && (document.getElementById("percentageOfParent").value == "" || testNumber == false)) {
-                        console.log("Pass 3");
+                        // // console.log("Pass 3");
                         return false;
                     } else {
-                        console.log("Fail 3");
+                        // console.log("Fail 3");
                         return true;
                     }
                 }),
         nodeValue: Yup.string()
             .test('nodeValue', 'Please enter a valid number having less then 10 digits.',
                 function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
+                    // // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,4})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
+                    // // console.log("*****", testNumber);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
-                        console.log("Pass 4");
+                        // console.log("Pass 4");
                         return false;
                     } else {
-                        console.log("Fail 4");
+                        // console.log("Fail 4");
                         return true;
                     }
                 }),
@@ -170,24 +170,24 @@ const validationSchemaNodeData = function (values) {
             .test('usageTypeIdFU', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if (parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("usageTypeIdFU").value == "") {
-                        console.log("Pass 5");
+                        // console.log("Pass 5");
                         return false;
                     } else {
-                        console.log("Fail 5");
+                        // console.log("Fail 5");
                         return true;
                     }
                 }),
         lagInMonths:
             Yup.string().test('lagInMonths', 'Please enter a valid number having less then equal to 3 digit.',
                 function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
+                    // // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,3}?$/).test(document.getElementById("lagInMonths").value);
-                    // console.log("*****", testNumber);
+                    // // console.log("*****", testNumber);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("lagInMonths").value == "" || testNumber == false)) {
-                        console.log("Pass 6");
+                        // console.log("Pass 6");
                         return false;
                     } else {
-                        console.log("Fail 6");
+                        // console.log("Fail 6");
                         return true;
                     }
                 }),
@@ -195,14 +195,14 @@ const validationSchemaNodeData = function (values) {
         noOfPersons:
             Yup.string().test('noOfPersons', 'Please enter a valid 10 digit number.',
                 function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
+                    // // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
+                    // // console.log("*****", testNumber);
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("noOfPersons").value == "" || testNumber == false)) {
-                        console.log("Pass 7");
+                        // console.log("Pass 7");
                         return false;
                     } else {
-                        console.log("Fail 7");
+                        // console.log("Fail 7");
                         return true;
                     }
                 }),
@@ -210,13 +210,13 @@ const validationSchemaNodeData = function (values) {
         forecastingUnitPerPersonsFC:
             Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
+                    // // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("forecastingUnitPerPersonsFC").value == "" || testNumber == false)) {
-                        console.log("Pass 8");
+                        // console.log("Pass 8");
                         return false;
                     } else {
-                        console.log("Fail 8");
+                        // console.log("Fail 8");
                         return true;
                     }
                 }),
@@ -225,10 +225,10 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequencyCon").value == "" || testNumber == false)) {
-                        console.log("Pass 9");
+                        // console.log("Pass 9");
                         return false;
                     } else {
-                        console.log("Fail 9");
+                        // console.log("Fail 9");
                         return true;
                     }
                 }),
@@ -237,10 +237,10 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("usageFrequencyDis").value == "" || testNumber == false)) {
-                        console.log("Pass 10");
+                        // console.log("Pass 10");
                         return false;
                     } else {
-                        console.log("Fail 10");
+                        // console.log("Fail 10");
                         return true;
                     }
                 }),
@@ -248,10 +248,10 @@ const validationSchemaNodeData = function (values) {
             .test('usagePeriodIdCon', 'This field is required.',
                 function (value) {
                     if (document.getElementById("usageTypeIdFU").value == 2 && document.getElementById("usagePeriodIdCon").value == "") {
-                        console.log("Pass 11");
+                        // console.log("Pass 11");
                         return false;
                     } else {
-                        console.log("Fail 11");
+                        // console.log("Fail 11");
                         return true;
                     }
 
@@ -260,12 +260,12 @@ const validationSchemaNodeData = function (values) {
             .test('usagePeriodIdDis', 'This field is required.',
                 function (value) {
                     if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && document.getElementById("usagePeriodIdDis").value == "") {
-                        console.log("usagePeriodIdDis false");
-                        console.log("Pass 12");
+                        // console.log("usagePeriodIdDis false");
+                        // console.log("Pass 12");
                         return false;
                     } else {
-                        console.log("usagePeriodIdDis true");
-                        console.log("Fail 12");
+                        // console.log("usagePeriodIdDis true");
+                        // console.log("Fail 12");
                         return true;
                     }
 
@@ -274,10 +274,10 @@ const validationSchemaNodeData = function (values) {
             .test('oneTimeUsage', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if (document.getElementById("usageTypeIdFU").value == 1 && document.getElementById("oneTimeUsage").value == "") {
-                        console.log("Pass 13");
+                        // console.log("Pass 13");
                         return false;
                     } else {
-                        console.log("Fail 13");
+                        // console.log("Fail 13");
                         return true;
                     }
                 }),
@@ -285,20 +285,20 @@ const validationSchemaNodeData = function (values) {
             function (value) {
                 var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
                 if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value === "false" || document.getElementById("oneTimeUsage").value === false) && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
-                    console.log("Pass 14");
+                    // console.log("Pass 14");
                     return false;
                 } else {
-                    console.log("Fail 14");
+                    // console.log("Fail 14");
                     return true;
                 }
             }),
         repeatUsagePeriodId: Yup.string().test('repeatUsagePeriodId', 'This field is required.',
             function (value) {
                 if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == "false" || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("repeatUsagePeriodId").value == "")) {
-                    console.log("Pass 15");
+                    // console.log("Pass 15");
                     return false;
                 } else {
-                    console.log("Fail 15");
+                    // console.log("Fail 15");
                     return true;
                 }
             }),
@@ -306,10 +306,10 @@ const validationSchemaNodeData = function (values) {
             .test('planningUnitId', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if (parseInt(document.getElementById("nodeTypeId").value) == 5 && document.getElementById("planningUnitId").value == "") {
-                        console.log("Pass 16");
+                        // console.log("Pass 16");
                         return false;
                     } else {
-                        console.log("Fail 16");
+                        // console.log("Fail 16");
                         return true;
                     }
                 }),
@@ -317,14 +317,14 @@ const validationSchemaNodeData = function (values) {
         refillMonths: Yup.string()
             .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
                 function (value) {
-                    // console.log("*****", document.getElementById("nodeValue").value);
+                    // // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^[1-9]\d*$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
+                    // // console.log("*****", testNumber);
                     if ((document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 2) && (document.getElementById("refillMonths").value == "" || testNumber == false)) {
-                        console.log("Pass 17");
+                        // console.log("Pass 17");
                         return false;
                     } else {
-                        console.log("Fail 17");
+                        // console.log("Fail 17");
                         return true;
                     }
                 }),
@@ -332,10 +332,10 @@ const validationSchemaNodeData = function (values) {
             .test('sharePlanningUnit', i18n.t('static.validation.fieldRequired'),
                 function (value) {
                     if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 1 && document.getElementById("sharePlanningUnit").value == "") {
-                        console.log("Pass 18");
+                        // console.log("Pass 18");
                         return false;
                     } else {
-                        console.log("Fail 18");
+                        // console.log("Fail 18");
                         return true;
                     }
                 }),
@@ -344,10 +344,10 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
                     if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
-                        console.log("Pass 19");
+                        // console.log("Pass 19");
                         return false;
                     } else {
-                        console.log("Fail 19");
+                        // console.log("Fail 19");
                         return true;
                     }
                 }),
@@ -824,9 +824,9 @@ export default class BranchTemplate extends Component {
         var name = "";
         var unit = "";
         var levelNo = "";
-        console.log("Data@@@@@@@@@@@@", data != "")
+        // console.log("Data@@@@@@@@@@@@", data != "")
         if (data != "") {
-            console.log("Data@@@@###############", data.context.levels[0])
+            // console.log("Data@@@@###############", data.context.levels[0])
             var treeLevelList = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList : [];
             var levelListFiltered = treeLevelList.filter(c => c.levelNo == data.context.levels[0]);
             levelNo = data.context.levels[0]
@@ -834,8 +834,8 @@ export default class BranchTemplate extends Component {
                 name = levelListFiltered[0].label.label_en;
                 unit = levelListFiltered[0].unit != null ? levelListFiltered[0].unit.id : "";
             }
-            console.log("Name@@@@###########", name);
-            console.log("Unit@@@@###########", unit);
+            // console.log("Name@@@@###########", name);
+            // console.log("Unit@@@@###########", unit);
         }
         this.setState({
             levelModal: !this.state.levelModal,
@@ -926,20 +926,20 @@ export default class BranchTemplate extends Component {
             }
         }
         treeTemplate.levelList = treeLevelList;
-        console.log("Cur Tree Obj@@@@@", treeTemplate)
+        // console.log("Cur Tree Obj@@@@@", treeTemplate)
         this.setState({
             levelModal: false,
             treeTemplate,
         }, () => {
             // this.saveTreeData(false)
-            // console.log("final tab list---", this.state.items);
+            // // console.log("final tab list---", this.state.items);
             // if (type == 1) {
             //     var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
-            //     console.log("scenarioId---", scenarioId);
+            //     // console.log("scenarioId---", scenarioId);
             //     for (var i = 0; i < items.length; i++) {
             //         maxNodeDataId = parseInt(maxNodeDataId) + 1;
             //         (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
-            //         console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+            //         // console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
             //     }
             //     this.callAfterScenarioChange(scenarioId);
             //     this.updateTreeData();
@@ -948,51 +948,51 @@ export default class BranchTemplate extends Component {
     }
 
     getMomValueForDateRange(startDate) {
-        console.log("***MOM startDate---", startDate);
+        // console.log("***MOM startDate---", startDate);
         var startValue = 0;
         var items = this.state.items;
         var item = items.filter(x => x.id == this.state.currentItemConfig.context.id);
-        console.log("***MOM item---", item);
+        // console.log("***MOM item---", item);
         var momList = item[0].payload.nodeDataMap[0][0].nodeDataMomList;
-        console.log("***MOM momList---", momList);
+        // console.log("***MOM momList---", momList);
         if (momList.length > 0) {
-            console.log("***MOM inside if---");
+            // console.log("***MOM inside if---");
             var mom = momList.filter(x => x.month == startDate);
-            console.log("***MOM mom---", mom);
+            // console.log("***MOM mom---", mom);
             if (mom.length > 0) {
-                console.log("***MOM mom inside if---");
+                // console.log("***MOM mom inside if---");
                 startValue = mom[0].startValue;
-                console.log("***MOM startValue---", startValue);
+                // console.log("***MOM startValue---", startValue);
             }
         }
-        console.log("***MOM startValue---", startValue);
+        // console.log("***MOM startValue---", startValue);
         return startValue;
 
     }
     updateTreeData(monthId) {
         var items = this.state.items;
-        console.log("monthId filter>>>", monthId);
-        console.log("items>>>", items);
+        // console.log("monthId filter>>>", monthId);
+        // console.log("items>>>", items);
         for (let i = 0; i < items.length; i++) {
-            console.log("items[i]---", items[i]);
+            // console.log("items[i]---", items[i]);
             if (items[i].payload.nodeDataMap[0][0].nodeDataMomList != null) {
-                console.log("before filter mom---", items[i].payload.nodeDataMap[0][0].nodeDataMomList);
-                console.log("before filter date---", monthId);
+                // console.log("before filter mom---", items[i].payload.nodeDataMap[0][0].nodeDataMomList);
+                // console.log("before filter date---", monthId);
                 var nodeDataModelingMap = items[i].payload.nodeDataMap[0][0].nodeDataMomList.filter(x => x.month == monthId);
-                console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
+                // console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
                 if (nodeDataModelingMap.length > 0) {
-                    console.log("get payload 13");
+                    // console.log("get payload 13");
                     if (nodeDataModelingMap[0].calculatedValue != null && nodeDataModelingMap[0].endValue != null) {
-                        console.log("nodeDataModelingMap[0]----", nodeDataModelingMap[0]);
+                        // console.log("nodeDataModelingMap[0]----", nodeDataModelingMap[0]);
                         if (items[i].payload.nodeType.id == 5) {
-                            console.log("my console---", nodeDataModelingMap[0]);
+                            // console.log("my console---", nodeDataModelingMap[0]);
                             (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedMmdValue != null ? nodeDataModelingMap[0].calculatedMmdValue.toString() : '';
                         } else {
                             (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue.toString();
                         }
                         (items[i].payload.nodeDataMap[0])[0].displayDataValue = nodeDataModelingMap[0].endValue.toString();
                     } else {
-                        console.log("get payload 14");
+                        // console.log("get payload 14");
                         (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = "0";
                         (items[i].payload.nodeDataMap[0])[0].displayDataValue = "0";
                     }
@@ -1028,8 +1028,8 @@ export default class BranchTemplate extends Component {
                         totalValue = fuPerMonth * (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue;
                     }
                 }
-                console.log("fuPerMonth without round---", fuPerMonth);
-                console.log("fuPerMonth with round---", Math.round(fuPerMonth));
+                // console.log("fuPerMonth without round---", fuPerMonth);
+                // console.log("fuPerMonth with round---", Math.round(fuPerMonth));
                 // (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
                 (items[i].payload.nodeDataMap[0])[0].fuPerMonth = fuPerMonth;
             }
@@ -1041,7 +1041,7 @@ export default class BranchTemplate extends Component {
         this.setState({
             items
         }, () => {
-            console.log("final updated items---", this.state.items);
+            // console.log("final updated items---", this.state.items);
             // this.calculateValuesForAggregateNode(this.state.items);
         })
     }
@@ -1052,17 +1052,17 @@ export default class BranchTemplate extends Component {
         var monthsInPast = 1;
         var monthsInFuture = 36;
         var treeTemplate = this.state.treeTemplate;
-        console.log("treeTemplate mom---", treeTemplate);
+        // console.log("treeTemplate mom---", treeTemplate);
         if (treeTemplate.hasOwnProperty('monthsInPast')) {
             monthsInPast = treeTemplate.monthsInPast;
             monthsInFuture = treeTemplate.monthsInFuture;
 
 
-            console.log("monthsInPast---", monthsInPast);
-            console.log("monthsInFuture---", monthsInFuture);
+            // console.log("monthsInPast---", monthsInPast);
+            // console.log("monthsInFuture---", monthsInFuture);
             if (monthsInPast != undefined) {
                 for (let i = -monthsInPast; i <= monthsInFuture; i++) {
-                    console.log("i value---", i);
+                    // console.log("i value---", i);
                     if (i != 0) {
                         json = {
                             id: i,
@@ -1076,7 +1076,7 @@ export default class BranchTemplate extends Component {
                     }
 
                 }
-                console.log("monthList---", monthList);
+                // console.log("monthList---", monthList);
                 if (monthList.length > 0) {
                     var minDate = monthList[0];
                     var maxDate = JSON.parse(JSON.stringify(monthList)).sort((a, b) => b.id - a.id)[0].id;
@@ -1090,61 +1090,61 @@ export default class BranchTemplate extends Component {
     }
     calculateParentValueFromMOM(month) {
         var parentValue = 0;
-        console.log("***month----", month);
+        // console.log("***month----", month);
         var currentItemConfig = this.state.currentItemConfig;
-        console.log("***month cur item config----", currentItemConfig);
+        // console.log("***month cur item config----", currentItemConfig);
         if (currentItemConfig.context.payload.nodeType.id != 1 && currentItemConfig.context.payload.nodeType.id != 2) {
             var items = this.state.items;
             var parentItem = items.filter(x => x.id == currentItemConfig.context.parent);
-            console.log("***month parentItem----", parentItem);
+            // console.log("***month parentItem----", parentItem);
             if (parentItem.length > 0) {
-                console.log("***month parentItem if----", parentItem);
+                // console.log("***month parentItem if----", parentItem);
                 var nodeDataMomList = parentItem[0].payload.nodeDataMap[0][0].nodeDataMomList;
-                console.log("***month nodeDataMomList----", nodeDataMomList);
+                // console.log("***month nodeDataMomList----", nodeDataMomList);
                 if (nodeDataMomList.length) {
-                    console.log("***month nodeDataMomList if----", nodeDataMomList);
+                    // console.log("***month nodeDataMomList if----", nodeDataMomList);
                     var momDataForNode = nodeDataMomList.filter(x => x.month == month);
-                    console.log("***month momDataForNode----", momDataForNode);
+                    // console.log("***month momDataForNode----", momDataForNode);
                     if (momDataForNode.length > 0) {
-                        console.log("***month momDataForNode if----", momDataForNode);
+                        // console.log("***month momDataForNode if----", momDataForNode);
                         if (currentItemConfig.context.payload.nodeType.id == 5) {
                             parentValue = momDataForNode[0].calculatedMmdValue;
-                            console.log("***month parentValue 1----", parentValue);
+                            // console.log("***month parentValue 1----", parentValue);
                         } else {
                             parentValue = momDataForNode[0].calculatedValue;
-                            console.log("***month parentValue 2----", parentValue);
+                            // console.log("***month parentValue 2----", parentValue);
                         }
                     }
                 }
             }
             var percentageOfParent = currentItemConfig.context.payload.nodeDataMap[0][0].dataValue;
-            console.log("***month percentageOfParent---", percentageOfParent);
-            console.log("***month calculated value---", ((percentageOfParent * parentValue) / 100));
+            // console.log("***month percentageOfParent---", percentageOfParent);
+            // console.log("***month calculated value---", ((percentageOfParent * parentValue) / 100));
             currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((percentageOfParent * parentValue) / 100).toString();
             // currentItemConfig.context.payload.nodeDataMap[0][0].displayCalculatedDataValue = ((percentageOfParent * parentValue) / 100).toString();
         }
-        console.log("***month parentValue before---", parentValue);
+        // console.log("***month parentValue before---", parentValue);
         this.setState({ parentValue, currentItemConfig }, () => {
-            console.log("***month parentValue after---", this.state.parentValue);
+            // console.log("***month parentValue after---", this.state.parentValue);
         });
     }
     qatCalculatedPUPerVisit(type) {
         var currentItemConfig = this.state.currentItemConfig;
         var qatCalculatedPUPerVisit = "";
-        console.log("currentItemConfig qat cal---", currentItemConfig)
+        // console.log("currentItemConfig qat cal---", currentItemConfig)
         if (currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != "") {
-            console.log("5 1----------------->>>", currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id);
+            // console.log("5 1----------------->>>", currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id);
 
             var pu = this.state.planningUnitList.filter(x => x.planningUnitId == currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id)[0];
-            console.log("5 2----------------->>>", this.state.planningUnitList);
-            console.log("5 3----------------->>>", pu);
-            console.log("pu qat cal 1---", pu.multiplier)
-            console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson);
+            // console.log("5 2----------------->>>", this.state.planningUnitList);
+            // console.log("5 3----------------->>>", pu);
+            // console.log("pu qat cal 1---", pu.multiplier)
+            // console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson);
             // this.getNoOfMonthsInUsagePeriod();
             if (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) {
                 var refillMonths = currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths : this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
-                console.log("refillMonths qat cal---", refillMonths)
-                console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
+                // console.log("refillMonths qat cal---", refillMonths)
+                // console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
                 // qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
                 qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
             } else {
@@ -1154,7 +1154,7 @@ export default class BranchTemplate extends Component {
                 //     qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                 // }
             }
-            console.log("inside qat cal val---", qatCalculatedPUPerVisit)
+            // console.log("inside qat cal val---", qatCalculatedPUPerVisit)
             if (type == 1) {
                 if (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) {
                     currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths = refillMonths;
@@ -1170,14 +1170,14 @@ export default class BranchTemplate extends Component {
         var parentScenario = this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0];
         var currentItemConfig = this.state.currentItemConfig;
         var conversionFactor = this.state.conversionFactor;
-        console.log("PUPERVISIT conversionFactor---", conversionFactor);
+        // console.log("PUPERVISIT conversionFactor---", conversionFactor);
         var refillMonths = isRefillMonth && currentScenario.puNode.refillMonths != "" ? currentScenario.puNode.refillMonths : this.round(parseFloat(conversionFactor / (parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
-        console.log("PUPERVISIT refillMonths---", refillMonths);
-        console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
-        console.log("PUPERVISIT noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+        // console.log("PUPERVISIT refillMonths---", refillMonths);
+        // console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
+        // console.log("PUPERVISIT noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
         // var puPerVisit = this.round(parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(4));
         var puPerVisit = parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(4);
-        console.log("PUPERVISIT puPerVisit---", puPerVisit);
+        // console.log("PUPERVISIT puPerVisit---", puPerVisit);
 
         currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit = puPerVisit;
         if (!isRefillMonth) {
@@ -1187,15 +1187,15 @@ export default class BranchTemplate extends Component {
     }
 
     round(value) {
-        console.log("Round input value---", value);
+        // console.log("Round input value---", value);
         var result = (value - Math.floor(value)).toFixed(4);
-        console.log("Round result---", result);
-        console.log("Round condition---", `${ROUNDING_NUMBER}`);
+        // console.log("Round result---", result);
+        // console.log("Round condition---", `${ROUNDING_NUMBER}`);
         if (result > `${ROUNDING_NUMBER}`) {
-            console.log("Round ceiling---", Math.ceil(value));
+            // console.log("Round ceiling---", Math.ceil(value));
             return Math.ceil(value);
         } else {
-            console.log("Round floor---", Math.floor(value));
+            // console.log("Round floor---", Math.floor(value));
             if (Math.floor(value) == 0) {
                 return Math.ceil(value);
             } else {
@@ -1205,11 +1205,11 @@ export default class BranchTemplate extends Component {
     }
 
     handleFUChange = (regionIds) => {
-        console.log("regionIds 1---", regionIds);
-        // console.log("regionIds 2---", regionIds.label.split("|"));
-        // console.log("regionIds 3---", regionIds.label.split("|")[0]);
+        // console.log("regionIds 1---", regionIds);
+        // // console.log("regionIds 2---", regionIds.label.split("|"));
+        // // console.log("regionIds 3---", regionIds.label.split("|")[0]);
         const { currentItemConfig } = this.state;
-        console.log("regionIds currentItemConfig---", currentItemConfig);
+        // console.log("regionIds currentItemConfig---", currentItemConfig);
         this.setState({
             fuValues: regionIds != null ? regionIds : "",
             // fuLabels: regionIds != null ? regionIds.label : ""
@@ -1240,8 +1240,8 @@ export default class BranchTemplate extends Component {
                     this.filterUsageTemplateList(0);
                 });
             }
-            console.log("regionValues---", this.state.fuValues);
-            console.log("regionLabels---", this.state.fuLabels);
+            // console.log("regionValues---", this.state.fuValues);
+            // console.log("regionLabels---", this.state.fuLabels);
             this.setState({ currentItemConfig }, () => {
 
             });
@@ -1301,7 +1301,7 @@ export default class BranchTemplate extends Component {
                     lineType: LineType.Dotted
                 }));
             }
-            console.log("level json***", treeLevelItems);
+            // console.log("level json***", treeLevelItems);
         }
 
         var templates = [
@@ -1313,11 +1313,11 @@ export default class BranchTemplate extends Component {
         var newItems = [];
         for (var i = 0; i < items1.length; i++) {
             var e = items1[i];
-            console.log("items1[i]--------------", items1[i]);
+            // console.log("items1[i]--------------", items1[i]);
             e.scenarioId = 0
             e.showModelingValidation = this.state.showModelingValidation
-            console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
-            console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
+            // console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
+            // console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
             e.result = this.getPayloadData(items1[i], 4)//Up
             e.result1 = this.getPayloadData(items1[i], 6)//Down
             e.result2 = this.getPayloadData(items1[i], 5)//Link
@@ -1325,7 +1325,7 @@ export default class BranchTemplate extends Component {
             e.text = text;
             newItems.push(e)
         }
-        console.log("newItems---", newItems);
+        // console.log("newItems---", newItems);
         var sampleChart = new OrgDiagramPdfkit({
             ...this.state,
             pageFitMode: PageFitMode.Enabled,
@@ -1416,7 +1416,7 @@ export default class BranchTemplate extends Component {
         var maxNodeDataId = 0;
         // if (this.state.maxNodeDataId != "" && this.state.maxNodeDataId != 0) {
         //     maxNodeDataId = parseInt(this.state.maxNodeDataId + 1);
-        //     console.log("maxNodeDataId 1---", maxNodeDataId)
+        //     // console.log("maxNodeDataId 1---", maxNodeDataId)
         //     this.setState({
         //         maxNodeDataId
         //     })
@@ -1429,8 +1429,8 @@ export default class BranchTemplate extends Component {
             }
         }
         maxNodeDataId = nodeDataMap.length > 0 ? Math.max(...nodeDataMap.map(o => o.nodeDataId)) : 0;
-        console.log("nodeDataMap array---", nodeDataMap);
-        console.log("maxNodeDataId 2---", maxNodeDataId)
+        // console.log("nodeDataMap array---", nodeDataMap);
+        // console.log("maxNodeDataId 2---", maxNodeDataId)
         this.setState({
             maxNodeDataId
         })
@@ -1451,7 +1451,7 @@ export default class BranchTemplate extends Component {
         }, () => {
             // alert("load 2")
             setTimeout(() => {
-                console.log("inside set timeout")
+                // console.log("inside set timeout")
                 this.formSubmit();
             }, 0);
         })
@@ -1475,9 +1475,9 @@ export default class BranchTemplate extends Component {
                 currentItemConfig,
                 items: nodes
             }, () => {
-                console.log("currentItemConfig---", currentItemConfig);
+                // console.log("currentItemConfig---", currentItemConfig);
                 // this.calculateMOMData(0, 1);
-                console.log('manual change---', this.state.manualChange);
+                // console.log('manual change---', this.state.manualChange);
             });
         } else if (e.target.name === "seasonality") {
             this.setState({
@@ -1494,60 +1494,60 @@ export default class BranchTemplate extends Component {
                         this.state.momEl.hideColumn(5);
                     }
                 }
-                console.log('seasonality---', this.state.seasonality);
+                // console.log('seasonality---', this.state.seasonality);
             });
         }
     }
 
     calculateMOMData(nodeId, type) {
         let { treeTemplate } = this.state;
-        console.log("before---*", treeTemplate)
+        // console.log("before---*", treeTemplate)
         var items = this.state.items;
 
         treeTemplate.flatList = items;
-        console.log("after---*", treeTemplate)
+        // console.log("after---*", treeTemplate)
         calculateModelingData(treeTemplate, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), 0, type, -1, true);
     }
 
     updateState(parameterName, value) {
-        console.log("parameterName---", parameterName);
-        console.log("value---", value);
+        // console.log("parameterName---", parameterName);
+        // console.log("value---", value);
         this.setState({
             [parameterName]: value
         }, () => {
             if (parameterName == 'nodeId' && (value != null && value != 0)) {
                 var items = this.state.items;
                 var nodeDataMomList = this.state.nodeDataMomList;
-                console.log("nodeDataMomList---", nodeDataMomList);
+                // console.log("nodeDataMomList---", nodeDataMomList);
                 if (nodeDataMomList.length > 0) {
                     for (let i = 0; i < nodeDataMomList.length; i++) {
-                        console.log("nodeDataMomList[i]---", nodeDataMomList[i])
+                        // console.log("nodeDataMomList[i]---", nodeDataMomList[i])
                         var nodeId = nodeDataMomList[i].nodeId;
                         var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
-                        console.log("this.state.nodeDataMomList---", this.state.nodeDataMomList);
+                        // console.log("this.state.nodeDataMomList---", this.state.nodeDataMomList);
                         var node = items.filter(n => n.id == nodeId)[0];
-                        console.log("node---", node);
+                        // console.log("node---", node);
                         (node.payload.nodeDataMap[0])[0].nodeDataMomList = nodeDataMomListForNode;
                         var findNodeIndex = items.findIndex(n => n.id == nodeId);
-                        console.log("findNodeIndex---", findNodeIndex);
+                        // console.log("findNodeIndex---", findNodeIndex);
                         items[findNodeIndex] = node;
                     }
                 }
                 // var node = items.filter(n => n.id == value)[0];
                 // (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = this.state.nodeDataMomList.length == 1 ? this.state.nodeDataMomList : [];
                 // var findNodeIndex = items.findIndex(n => n.id == value);
-                // console.log("findNodeIndex---", findNodeIndex);
+                // // console.log("findNodeIndex---", findNodeIndex);
                 // items[findNodeIndex] = node;
-                console.log("items---***", items);
+                // console.log("items---***", items);
                 this.setState({ items })
             }
             if (parameterName == 'type' && (value == 1 || value == 0)) {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                    console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
+                    // console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                     var nodeDataMomList = this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id);
                     if (nodeDataMomList.length > 0) {
                         this.setState({ momList: nodeDataMomList[0].nodeDataMomList }, () => {
-                            console.log("going to build mom jexcel");
+                            // console.log("going to build mom jexcel");
                             if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
                                 this.filterScalingDataByMonth(this.state.scalingMonth, nodeDataMomList[0].nodeDataMomList);
                             }
@@ -1557,12 +1557,12 @@ export default class BranchTemplate extends Component {
                         });
                     }
                 } else if (this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) {
-                    console.log("id to filter---", this.state.currentItemConfig.context.id)
-                    console.log("id to filter list---", this.state.nodeDataMomList)
-                    // console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
+                    // console.log("id to filter---", this.state.currentItemConfig.context.id)
+                    // console.log("id to filter list---", this.state.nodeDataMomList)
+                    // // console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
                     var momList = this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id);
                     this.setState({ momListPer: momList.length > 0 ? momList[0].nodeDataMomList : [] }, () => {
-                        console.log("going to build mom jexcel percent");
+                        // console.log("going to build mom jexcel percent");
                         if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
                             this.filterScalingDataByMonth(this.state.scalingMonth, this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
                         }
@@ -1578,7 +1578,7 @@ export default class BranchTemplate extends Component {
             if (parameterName == 'type' && value == 0) {
                 this.calculateValuesForAggregateNode(this.state.items);
             }
-            console.log("returmed list---", this.state.nodeDataMomList);
+            // console.log("returmed list---", this.state.nodeDataMomList);
         })
     }
 
@@ -1589,7 +1589,7 @@ export default class BranchTemplate extends Component {
             setTimeout(() => {
                 var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
                 var json = nodeTypeId == 2 ? this.state.momEl.getJson(null, false) : this.state.momElPer.getJson(null, false);
-                console.log("momData>>>", json);
+                // console.log("momData>>>", json);
                 var overrideListArray = [];
                 for (var i = 0; i < json.length; i++) {
                     var map1 = new Map(Object.entries(json[i]));
@@ -1602,7 +1602,7 @@ export default class BranchTemplate extends Component {
                                 nodeDataId: map1.get("7"),
                                 active: true
                             }
-                            console.log("overrideData>>>", overrideData);
+                            // console.log("overrideData>>>", overrideData);
                             overrideListArray.push(overrideData);
                         }
                     } else if (nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) {
@@ -1614,12 +1614,12 @@ export default class BranchTemplate extends Component {
                                 nodeDataId: map1.get("7"),
                                 active: true
                             }
-                            console.log("overrideData>>>", overrideData);
+                            // console.log("overrideData>>>", overrideData);
                             overrideListArray.push(overrideData);
                         }
                     }
                 }
-                console.log("overRide data list>>>", overrideListArray);
+                // console.log("overRide data list>>>", overrideListArray);
                 let { currentItemConfig } = this.state;
                 let { treeTemplate } = this.state;
                 var items = this.state.items;
@@ -1631,7 +1631,7 @@ export default class BranchTemplate extends Component {
                     this.setState({
                         treeTemplate
                     }, () => {
-                        console.log("treeTemplate mom---", treeTemplate);
+                        // console.log("treeTemplate mom---", treeTemplate);
                         calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
                     });
                 });
@@ -1643,9 +1643,9 @@ export default class BranchTemplate extends Component {
     }
 
     filterScalingDataByMonth(date, nodeDataMomListParam) {
-        console.log("date--->>>>>>>", date);
+        // console.log("date--->>>>>>>", date);
         var json = this.state.modelingEl.getJson(null, false);
-        // console.log("modelingElData>>>", json);
+        // // console.log("modelingElData>>>", json);
         var scalingTotal = 0;
         var nodeDataMomList = nodeDataMomListParam != undefined ? nodeDataMomListParam : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataMomList;
         for (var i = 0; i < json.length; i++) {
@@ -1658,17 +1658,17 @@ export default class BranchTemplate extends Component {
             if (map1.get("5") == -1) {
                 dataValue = 0 - dataValue
             }
-            console.log("startDate---", startDate);
-            console.log("stopDate---", stopDate);
+            // console.log("startDate---", startDate);
+            // console.log("stopDate---", stopDate);
             const result = date >= startDate && date <= stopDate ? true : false;
-            console.log("result---", result);
-            console.log("modelingTypeId---", modelingTypeId);
+            // console.log("result---", result);
+            // console.log("modelingTypeId---", modelingTypeId);
             if (result) {
                 var nodeValue = 0;
                 let scalingDate = date;
-                console.log("@@@@@###########Scaling date", scalingDate);
-                console.log("@@@@@###########Start date", startDate);
-                console.log("@@@@@###########Start date", stopDate);
+                // console.log("@@@@@###########Scaling date", scalingDate);
+                // console.log("@@@@@###########Start date", startDate);
+                // console.log("@@@@@###########Start date", stopDate);
                 if (modelingTypeId == 3) {
                     var nodeDataMomListFilter = [];
                     if (map1.get("12") == 1) {
@@ -1677,7 +1677,7 @@ export default class BranchTemplate extends Component {
                     } else {
                         nodeDataMomListFilter = nodeDataMomList.filter(c => c.month == startDate)
                     }
-                    console.log("@@@@@###########nodeDataMomListFilter", nodeDataMomListFilter);
+                    // console.log("@@@@@###########nodeDataMomListFilter", nodeDataMomListFilter);
                     if (nodeDataMomListFilter.length > 0) {
                         nodeValue = nodeDataMomListFilter[0].startValue;
                     }
@@ -1712,38 +1712,38 @@ export default class BranchTemplate extends Component {
 
     }
     resetNodeData() {
-        // console.log("reset node data function called");
+        // // console.log("reset node data function called");
         const { orgCurrentItemConfig, currentItemConfig } = this.state;
         var nodeTypeId;
         var fuValues = [];
         if (currentItemConfig.context.level != 0 && currentItemConfig.parentItem.payload.nodeType.id == 4) {
             nodeTypeId = PU_NODE_ID;
-            // console.log("reset node data function called 0.1---", currentItemConfig);
+            // // console.log("reset node data function called 0.1---", currentItemConfig);
         } else {
             nodeTypeId = currentItemConfig.context.payload.nodeType.id;
         }
         currentItemConfig.context = JSON.parse(JSON.stringify(orgCurrentItemConfig));
-        // console.log("============1============", orgCurrentItemConfig);
-        // console.log("this.state.addNodeFlag reset 1---", this.state.addNodeFlag);
-        // console.log("this.state.addNodeFlag reset 2---", this.state.addNodeFlag ? [] : { value: orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id });
+        // // console.log("============1============", orgCurrentItemConfig);
+        // // console.log("this.state.addNodeFlag reset 1---", this.state.addNodeFlag);
+        // // console.log("this.state.addNodeFlag reset 2---", this.state.addNodeFlag ? [] : { value: orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id });
         if (nodeTypeId == 5) {
-            // console.log("reset node data function called 2---", orgCurrentItemConfig);
+            // // console.log("reset node data function called 2---", orgCurrentItemConfig);
             currentItemConfig.context.payload.nodeType.id = nodeTypeId;
 
             currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
             if (this.state.addNodeFlag) {
                 var parentCalculatedDataValue = this.state.items.filter(x => x.id == currentItemConfig.context.parent)[0].payload.nodeDataMap[0][0].calculatedDataValue;
-                // console.log("parentCalculatedDataValue 1---", this.state.items.filter(x => x.id == currentItemConfig.context.parent)[0].payload.nodeDataMap[0][0]);
-                // console.log("parentCalculatedDataValue 2---", parentCalculatedDataValue);
+                // // console.log("parentCalculatedDataValue 1---", this.state.items.filter(x => x.id == currentItemConfig.context.parent)[0].payload.nodeDataMap[0][0]);
+                // // console.log("parentCalculatedDataValue 2---", parentCalculatedDataValue);
                 currentItemConfig.context.payload.nodeDataMap[0][0].dataValue = 100;
                 currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((100 * parentCalculatedDataValue) / 100).toString();
             }
-            // console.log("pu value for reset 1---",this.state.planningUnitList);
-            // console.log("pu value for reset 2---",currentItemConfig.context.payload.nodeDataMap[0][0]);
+            // // console.log("pu value for reset 1---",this.state.planningUnitList);
+            // // console.log("pu value for reset 2---",currentItemConfig.context.payload.nodeDataMap[0][0]);
             var planningUnit = this.state.planningUnitList.filter(x => x.planningUnitId == currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id);
-            // console.log("planningUnit--->>>>>>>>",planningUnit);
+            // // console.log("planningUnit--->>>>>>>>",planningUnit);
             var conversionFactor = planningUnit.length > 0 ? planningUnit[0].multiplier : "";
-            console.log("conversionFactor---", conversionFactor);
+            // console.log("conversionFactor---", conversionFactor);
             this.setState({
                 conversionFactor
             }, () => {
@@ -1762,14 +1762,14 @@ export default class BranchTemplate extends Component {
             if (nodeTypeId == 4) {
                 this.getForecastingUnitListByTracerCategoryId(0, 0);
             }
-            console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
+            // console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
         });
     }
 
     formSubmit() {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
-            console.log("validation---", validation);
+            // console.log("validation---", validation);
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
                     var tableJson = this.state.modelingEl.getJson(null, false);
@@ -1783,17 +1783,17 @@ export default class BranchTemplate extends Component {
                     // if (itemIndex1 != -1) {
                     for (var i = 0; i < tableJson.length; i++) {
                         var map1 = new Map(Object.entries(tableJson[i]));
-                        console.log("11 map---" + map1.get("11"))
+                        // console.log("11 map---" + map1.get("11"))
                         if (parseInt(map1.get("11")) === 1 && parseInt(map1.get("12")) != 1) {
                             var startDate = map1.get("1");
                             var stopDate = map1.get("2");
                             if (map1.get("10") != "" && map1.get("10") != 0) {
                                 const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("10"));
-                                console.log("data[itemIndex]---", data[itemIndex]);
+                                // console.log("data[itemIndex]---", data[itemIndex]);
                                 obj = data.filter(x => x.nodeDataModelingId == map1.get("10"))[0];
-                                console.log("obj--->>>>>", obj);
+                                // console.log("obj--->>>>>", obj);
                                 var transfer = map1[3] != "" ? map1.get("3").split('_')[0] : '';
-                                console.log("transfer---", transfer);
+                                // console.log("transfer---", transfer);
                                 obj.transferNodeDataId = transfer;
                                 obj.notes = map1.get("0");
                                 obj.modelingType.id = map1.get("4");
@@ -1805,7 +1805,7 @@ export default class BranchTemplate extends Component {
 
                                 // data[itemIndex] = obj;
                             } else {
-                                console.log("maxModelingId---", maxModelingId);
+                                // console.log("maxModelingId---", maxModelingId);
                                 obj = {
                                     transferNodeDataId: map1[3] != "" ? map1.get("3").split('_')[0] : '',
                                     notes: map1.get("0"),
@@ -1819,14 +1819,14 @@ export default class BranchTemplate extends Component {
                                     nodeDataModelingId: parseInt(maxModelingId) + 1
                                 }
                                 maxModelingId++;
-                                console.log("obj to push---", obj);
+                                // console.log("obj to push---", obj);
                                 // data.push(obj);
                             }
                             dataArr.push(obj);
                         }
                     }
-                    console.log("obj---", obj);
-                    console.log("dataArr--->>>", dataArr);
+                    // console.log("obj---", obj);
+                    // console.log("dataArr--->>>", dataArr);
                     if (itemIndex1 != -1) {
                         if (this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
@@ -1836,9 +1836,9 @@ export default class BranchTemplate extends Component {
                             if (this.state.lastRowDeleted == true) {
                                 (item.payload.nodeDataMap[0])[0].nodeDataModelingList = [];
                             }
-                            console.log("item---", item);
+                            // console.log("item---", item);
                             items[itemIndex1] = item;
-                            console.log("items---", items);
+                            // console.log("items---", items);
                             // Call function by dolly
                             this.setState({
                                 items,
@@ -1848,11 +1848,11 @@ export default class BranchTemplate extends Component {
                                 // openAddNodeModal: false,
                                 activeTab1: new Array(2).fill('2')
                             }, () => {
-                                console.log("going to call MOM data");
+                                // console.log("going to call MOM data");
                                 this.calculateMOMData(0, 0);
                             });
                         } else {
-                            console.log("inside else form submit");
+                            // console.log("inside else form submit");
                             this.setState({
                                 modelingJexcelLoader: false
                             }, () => {
@@ -1862,10 +1862,10 @@ export default class BranchTemplate extends Component {
                     } else {
 
                         if (this.state.isValidError.toString() == "false") {
-                            console.log("inside if form submit");
+                            // console.log("inside if form submit");
                             this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
                         } else {
-                            console.log("inside else form submit");
+                            // console.log("inside else form submit");
                             this.setState({
                                 modelingJexcelLoader: false
                             }, () => {
@@ -1875,7 +1875,7 @@ export default class BranchTemplate extends Component {
                         }
                     }
                 } catch (err) {
-                    console.log("scaling err---", err);
+                    // console.log("scaling err---", err);
                     localStorage.setItem("scalingErrorTemplate", err);
                 }
             } else {
@@ -1917,7 +1917,7 @@ export default class BranchTemplate extends Component {
                 }
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(y);
-                console.log("modelingTypeId-valid--", rowData[4]);
+                // console.log("modelingTypeId-valid--", rowData[4]);
                 // Start date
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
@@ -1932,8 +1932,8 @@ export default class BranchTemplate extends Component {
                 }
                 var startDate = rowData[1];
                 var stopDate = rowData[2];
-                console.log("startDate---", startDate);
-                console.log("stopDate---", stopDate);
+                // console.log("startDate---", startDate);
+                // console.log("stopDate---", stopDate);
                 // Stop date
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
@@ -2016,10 +2016,10 @@ export default class BranchTemplate extends Component {
             var map1 = new Map(Object.entries(tableJson[i]));
             if (map1.get("8") != "") {
                 scalingTotal = scalingTotal + parseFloat(map1.get("8"));
-                console.log("map1.get(8)---", map1.get("8"));
+                // console.log("map1.get(8)---", map1.get("8"));
             }
         }
-        console.log("scalingTotal---", scalingTotal);
+        // console.log("scalingTotal---", scalingTotal);
         this.setState({
             scalingTotal
         }, () => {
@@ -2027,7 +2027,7 @@ export default class BranchTemplate extends Component {
         });
     }
     acceptValue() {
-        // console.log(">>>>", this.state.currentRowIndex);
+        // // console.log(">>>>", this.state.currentRowIndex);
         var elInstance = this.state.modelingEl;
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
             if (this.state.currentModelingType == 5) {
@@ -2091,7 +2091,7 @@ export default class BranchTemplate extends Component {
         var monthArr = this.state.monthList.filter(x => x.id > startDate && x.id < endDate);
         // var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
         var monthDifference = parseInt((monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0) + 1);
-        console.log("month diff>>>", monthDifference);
+        // console.log("month diff>>>", monthDifference);
         var momValue = '', percentForOneMonth = '';
         var currentEndValue = document.getElementById("currentEndValue").value;
         var getValue = currentEndValue.toString().replaceAll(",", "");
@@ -2102,8 +2102,8 @@ export default class BranchTemplate extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
                 var getChangeInPercent = (parseFloat(getValue - (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue) / monthDifference).toFixed(4);
                 var momValue = ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue * getChangeInPercent / 100).toFixed(4);
-                // console.log("getChangeInPercent>>>",getChangeInPercent);
-                // console.log("momValue>>>",momValue)
+                // // console.log("getChangeInPercent>>>",getChangeInPercent);
+                // // console.log("momValue>>>",momValue)
             } else {
                 // var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(4);
                 var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
@@ -2117,7 +2117,7 @@ export default class BranchTemplate extends Component {
         if (this.state.currentModelingType == 5) {
             var momValue = parseFloat((getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
         }
-        // console.log("getmomValue>>>", momValue);
+        // // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
         var targetChangePer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
@@ -2125,7 +2125,7 @@ export default class BranchTemplate extends Component {
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
             percentForOneMonth = targetChangePer;
         }
-        console.log("targetChangeNumber 1---", targetChangeNumber);
+        // console.log("targetChangeNumber 1---", targetChangeNumber);
         this.setState({
             currentTargetChangeNumber: currentEndValue != '' ? targetChangeNumber : '',
             currentTargetChangePercentage: currentEndValue != '' ? targetChangePer : '',
@@ -2171,12 +2171,12 @@ export default class BranchTemplate extends Component {
                 var momValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue * getChangeInPercent / 100).toFixed(4);
             } else {
                 // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(4);
-                console.log("1 mom------------------->", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
-                console.log("2 mom------------------->", getValue);
-                console.log("3 mom------------------->", this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue);
+                // console.log("1 mom------------------->", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
+                // console.log("2 mom------------------->", getValue);
+                // console.log("3 mom------------------->", this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue);
                 var momValue = ((parseFloat(((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100) / monthDifference))).toFixed(4);
                 percentForOneMonth = getValue / monthDifference;
-                console.log("4 mom------------------->", momValue);
+                // console.log("4 mom------------------->", momValue);
             }
 
         }
@@ -2194,7 +2194,7 @@ export default class BranchTemplate extends Component {
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
             targetChangeNumber = parseFloat(getEndValueFromPercentage / monthDifference).toFixed(4);
         }
-        console.log("targetChangeNumber 2---", targetChangeNumber);
+        // console.log("targetChangeNumber 2---", targetChangeNumber);
 
         this.setState({
             currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
@@ -2261,14 +2261,14 @@ export default class BranchTemplate extends Component {
                             if (arr.length > 0) {
                                 for (var i = 0; i <= arr.length; i++) {
                                     if (arr[i] != null) {
-                                        console.log("arr[i]---", arr[i], " ", itemConfig.payload.label.label_en)
+                                        // console.log("arr[i]---", arr[i], " ", itemConfig.payload.label.label_en)
                                         var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
                                         if (nodeDataModelingList.length > 0) {
-                                            console.log("current node data id---", itemConfig.payload.nodeDataMap[0][0].nodeDataId);
+                                            // console.log("current node data id---", itemConfig.payload.nodeDataMap[0][0].nodeDataId);
                                             var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[0][0].nodeDataId)[0];
-                                            console.log("nodedata---", nodedata);
+                                            // console.log("nodedata---", nodedata);
                                             if (nodedata != null && nodedata != "") {
-                                                console.log("nodedata inside if---", itemConfig.payload.label.label_en);
+                                                // console.log("nodedata inside if---", itemConfig.payload.label.label_en);
                                                 result = true;
                                                 break;
                                             }
@@ -2279,7 +2279,7 @@ export default class BranchTemplate extends Component {
                         }
                     }
                     if (type == 6) {
-                        // console.log("nodeDataModelingList 6---", nodeDataModelingList, " name", itemConfig.payload.label.label_en);
+                        // // console.log("nodeDataModelingList 6---", nodeDataModelingList, " name", itemConfig.payload.label.label_en);
                         if (nodeDataModelingList.filter(x => x.increaseDecrease == -1).length > 0) {
                             result = true;
                         }
@@ -2299,14 +2299,14 @@ export default class BranchTemplate extends Component {
                             if (arr.length > 0) {
                                 for (var i = 0; i <= arr.length; i++) {
                                     if (arr[i] != null) {
-                                        console.log("arr[i]---", arr[i], " ", itemConfig.payload.label.label_en)
+                                        // console.log("arr[i]---", arr[i], " ", itemConfig.payload.label.label_en)
                                         var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
                                         if (nodeDataModelingList.length > 0) {
-                                            console.log("current node data id---", itemConfig.payload.nodeDataMap[0][0].nodeDataId);
+                                            // console.log("current node data id---", itemConfig.payload.nodeDataMap[0][0].nodeDataId);
                                             var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[0][0].nodeDataId)[0];
-                                            console.log("nodedata---", nodedata);
+                                            // console.log("nodedata---", nodedata);
                                             if (nodedata != null && nodedata != "") {
-                                                console.log("nodedata inside if---", itemConfig.payload.label.label_en);
+                                                // console.log("nodedata inside if---", itemConfig.payload.label.label_en);
                                                 result = true;
                                                 break;
                                             }
@@ -2352,10 +2352,10 @@ export default class BranchTemplate extends Component {
                             childList.map(c => {
                                 sum += Number((c.payload.nodeDataMap[0])[0].displayDataValue)
                             })
-                            console.log("sum if---", sum);
+                            // console.log("sum if---", sum);
                             return sum.toFixed(2);
                         } else {
-                            console.log("sum else---", itemConfig.payload.label.label_en);
+                            // console.log("sum else---", itemConfig.payload.label.label_en);
                             return "";
                         }
                     } else {
@@ -2403,10 +2403,10 @@ export default class BranchTemplate extends Component {
                             childList.map(c => {
                                 sum += Number((c.payload.nodeDataMap[0])[0].displayDataValue)
                             })
-                            console.log("sum if---", sum);
+                            // console.log("sum if---", sum);
                             return sum.toFixed(2);
                         } else {
-                            console.log("sum else---", itemConfig.payload.label.label_en);
+                            // console.log("sum else---", itemConfig.payload.label.label_en);
                             return "";
                         }
                     } else {
@@ -2439,7 +2439,7 @@ export default class BranchTemplate extends Component {
     //     var parent = this.state.currentItemConfig.context.parent;
     //     var nodeDataId = this.state.currentItemConfig.context.payload.nodeDataMap[0][0].nodeDataId;
     //     var isTransferRow = (instance.jexcel.getJson(null, false)[r])[12];
-    //     console.log("isTransferRow---",isTransferRow);
+    //     // console.log("isTransferRow---",isTransferRow);
     //     var arr = [];
     //     if (nodeTypeId == NUMBER_NODE_ID) {
     //         arr = this.state.items.filter(x => x.level == level && x.id != id && x.payload.nodeType.id == nodeTypeId);
@@ -2449,14 +2449,14 @@ export default class BranchTemplate extends Component {
     //     if (isTransferRow) {
     //         for (let i = 0; i < arr.length; i++) {
     //             var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
-    //             console.log("nodeDataModelingList---", nodeDataModelingList);
+    //             // console.log("nodeDataModelingList---", nodeDataModelingList);
     //             if (nodeDataModelingList != undefined && nodeDataModelingList != null) {
     //                 var transferList = nodeDataModelingList.filter(x => x.transferNodeDataId == nodeDataId);
-    //                 console.log("transferList---", transferList);
+    //                 // console.log("transferList---", transferList);
     //                 if (transferList.length > 0) {
     //                     sameLevelNodeList.push({ id: (arr[i].payload.nodeDataMap[0])[0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) });
     //                 }
-    //                 console.log("sameLevelNodeList transfer---", sameLevelNodeList);
+    //                 // console.log("sameLevelNodeList transfer---", sameLevelNodeList);
     //             }
     //         }
     //     } else {
@@ -2464,7 +2464,7 @@ export default class BranchTemplate extends Component {
     //             sameLevelNodeList[i] = { id: (arr[i].payload.nodeDataMap[0])[0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) }
     //         }
     //     }
-    //     console.log("sameLevelNodeList---", sameLevelNodeList);
+    //     // console.log("sameLevelNodeList---", sameLevelNodeList);
     //     return sameLevelNodeList;
     // }.bind(this)
 
@@ -2490,7 +2490,7 @@ export default class BranchTemplate extends Component {
 
     }
     getNodeTransferList(level, id, nodeTypeId, parent, nodeDataId) {
-        console.log("nodeDataId---", nodeDataId);
+        // console.log("nodeDataId---", nodeDataId);
         var nodeTransferDataList = [];
         var arr = [];
         if (nodeTypeId == NUMBER_NODE_ID) {
@@ -2498,22 +2498,22 @@ export default class BranchTemplate extends Component {
         } else {
             arr = this.state.items.filter(x => x.level == level && x.id != id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == parent);
         }
-        console.log("arr---", arr);
+        // console.log("arr---", arr);
         for (let i = 0; i < arr.length; i++) {
             var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
-            console.log("nodeDataModelingList---", nodeDataModelingList);
+            // console.log("nodeDataModelingList---", nodeDataModelingList);
             if (nodeDataModelingList != undefined && nodeDataModelingList != null) {
                 var transferList = nodeDataModelingList.filter(x => x.transferNodeDataId == nodeDataId);
-                console.log("transferList---", transferList);
+                // console.log("transferList---", transferList);
                 if (transferList.length > 0) {
                     var tempTransferList = JSON.parse(JSON.stringify(transferList));
-                    console.log("transferList.length > 0---", transferList.length);
+                    // console.log("transferList.length > 0---", transferList.length);
                     if (transferList.length == 1) {
-                        console.log("transferList.length == 1---", transferList.length);
+                        // console.log("transferList.length == 1---", transferList.length);
                         tempTransferList[0].transferNodeDataId = arr[i].payload.nodeDataMap[0][0].nodeDataId;
                         nodeTransferDataList.push(tempTransferList[0]);
                     } else {
-                        console.log("transferList.length > 1---", transferList.length);
+                        // console.log("transferList.length > 1---", transferList.length);
                         for (let j = 0; j < transferList.length; j++) {
                             tempTransferList[j].transferNodeDataId = arr[i].payload.nodeDataMap[0][0].nodeDataId;
                             nodeTransferDataList.push(tempTransferList[j]);
@@ -2521,10 +2521,10 @@ export default class BranchTemplate extends Component {
                     }
 
                 }
-                console.log("nodeTransferDataList---", nodeTransferDataList);
+                // console.log("nodeTransferDataList---", nodeTransferDataList);
             }
         }
-        console.log("nodeTransferDataList final---", nodeTransferDataList);
+        // console.log("nodeTransferDataList final---", nodeTransferDataList);
         this.setState({
             nodeTransferDataList
         });
@@ -2686,16 +2686,16 @@ export default class BranchTemplate extends Component {
 
 
     showMomData() {
-        // console.log("show mom data---", this.state.currentItemConfig);
+        // // console.log("show mom data---", this.state.currentItemConfig);
         var getMomDataForCurrentNode = this.state.items.filter(x => x.id == this.state.currentItemConfig.context.id).length > 0 ? this.state.items.filter(x => x.id == this.state.currentItemConfig.context.id)[0].payload.nodeDataMap[0][0].nodeDataMomList : [];
-        console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
+        // console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
             var getMomDataForCurrentNodeParent = this.state.items.filter(x => x.id == this.state.currentItemConfig.context.parent).length > 0 ? this.state.items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0].payload.nodeDataMap[0][0].nodeDataMomList : []
-            console.log("in if>>>>", getMomDataForCurrentNodeParent);
+            // console.log("in if>>>>", getMomDataForCurrentNodeParent);
 
             this.setState({ showMomDataPercent: !this.state.showMomDataPercent, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
                 if (this.state.showMomDataPercent) {
-                    console.log("inside show mom data percent node");
+                    // console.log("inside show mom data percent node");
                     this.setState({ viewMonthlyData: false }, () => {
                         this.buildMomJexcelPercent();
                     })
@@ -2704,10 +2704,10 @@ export default class BranchTemplate extends Component {
                 }
             });
         } else {
-            console.log("in else>>>>");
+            // console.log("in else>>>>");
             this.setState({ showMomDataPercent: false, showMomData: !this.state.showMomData, momList: getMomDataForCurrentNode }, () => {
                 if (this.state.showMomData) {
-                    console.log("inside show mom data number node");
+                    // console.log("inside show mom data number node");
                     this.setState({ viewMonthlyData: false }, () => {
                         this.buildMomJexcel();
                     })
@@ -2723,7 +2723,7 @@ export default class BranchTemplate extends Component {
     buildMomJexcelPercent() {
         var momList = this.state.momListPer;
         var momListParent = this.state.momListPerParent;
-        console.log("momListParent---", momListParent)
+        // console.log("momListParent---", momListParent)
         var dataArray = [];
         let count = 0;
         var fuPerMonth, totalValue, usageFrequency, convertToMonth;
@@ -2765,7 +2765,7 @@ export default class BranchTemplate extends Component {
                 var patients = 0;
                 var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[0])[0];
                 grandParentMomList = grandParentNodeData.nodeDataMomList;
-                console.log("grandParentNodeData$$$%%%", grandParentNodeData)
+                // console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                 if (grandParentNodeData != undefined) {
                     var minusNumber = (momList[0].month == 1 ? momList[0].month - 2 : momList[0].month - 1);
                     var grandParentPrevMonthMMDValue = grandParentNodeData.nodeDataMomList.filter(c => c.month == minusNumber);
@@ -2786,7 +2786,7 @@ export default class BranchTemplate extends Component {
 
             }
         }
-        console.log("Lag in months@@@", lagInMonths)
+        // console.log("Lag in months@@@", lagInMonths)
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
@@ -2849,7 +2849,7 @@ export default class BranchTemplate extends Component {
         // this.el.destroy();
         jexcel.destroy(document.getElementById("momJexcelPer"), true);
         var data = dataArray;
-        // console.log("DataArray>>>", (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level != 0 ? "Branch test 123 if":"Branch test 123 else"));
+        // // console.log("DataArray>>>", (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level != 0 ? "Branch test 123 if":"Branch test 123 else"));
 
         var options = {
             data: data,
@@ -3022,7 +3022,7 @@ export default class BranchTemplate extends Component {
         jexcel.destroy(document.getElementById("momJexcel"), true);
 
         var data = dataArray;
-        console.log("DataArray>>>", dataArray);
+        // console.log("DataArray>>>", dataArray);
 
         var options = {
             data: data,
@@ -3113,7 +3113,7 @@ export default class BranchTemplate extends Component {
                 var elInstance = el;
                 if (y != null) {
                     // var rowData = elInstance.getRowData(y);
-                    // console.log("this.state.seasonality---", this.state.seasonality);
+                    // // console.log("this.state.seasonality---", this.state.seasonality);
                     // if (this.state.seasonality) {
                     //     if (x == 5) {
                     //         // cell.classList.add('readonly');
@@ -3207,10 +3207,10 @@ export default class BranchTemplate extends Component {
     buildModelingJexcel() {
         var scalingList = this.state.scalingList;
         var nodeTransferDataList = this.state.nodeTransferDataList;
-        console.log("scalingList---", scalingList);
-        console.log("scalingList length---", scalingList.length);
-        console.log("nodeTransferDataList---", nodeTransferDataList);
-        console.log("this.state.maxMonth---", this.state.maxMonth);
+        // console.log("scalingList---", scalingList);
+        // console.log("scalingList length---", scalingList.length);
+        // console.log("nodeTransferDataList---", nodeTransferDataList);
+        // console.log("this.state.maxMonth---", this.state.maxMonth);
         var dataArray = [];
         let count = 0;
 
@@ -3240,7 +3240,7 @@ export default class BranchTemplate extends Component {
             data[1] = scalingList[j].startDateNo
             data[2] = scalingList[j].stopDateNo
             data[3] = scalingList[j].transferNodeDataId + "_T"
-            console.log("modeling type---", scalingList[j].modelingType.id);
+            // console.log("modeling type---", scalingList[j].modelingType.id);
             data[4] = scalingList[j].modelingType.id
             data[5] = scalingList[j].increaseDecrease
             data[6] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(4) : ''
@@ -3268,7 +3268,7 @@ export default class BranchTemplate extends Component {
                 data[1] = nodeTransferDataList[j].startDateNo
                 data[2] = nodeTransferDataList[j].stopDateNo
                 data[3] = nodeTransferDataList[j].transferNodeDataId + "_F"
-                // console.log("modeling type---", scalingList[j].modelingType.id);
+                // // console.log("modeling type---", scalingList[j].modelingType.id);
                 data[4] = nodeTransferDataList[j].modelingType.id
                 data[5] = 1
                 data[6] = nodeTransferDataList[j].modelingType.id != 2 ? parseFloat(nodeTransferDataList[j].dataValue).toFixed(4) : ''
@@ -3296,7 +3296,7 @@ export default class BranchTemplate extends Component {
         jexcel.destroy(document.getElementById("modelingJexcel"), true);
 
         var data = dataArray;
-        console.log("DataArray>>>", dataArray);
+        // console.log("DataArray>>>", dataArray);
 
         var options = {
             data: data,
@@ -3566,7 +3566,7 @@ export default class BranchTemplate extends Component {
             modelingEl: modelingEl
         }, () => {
             // var curDate = moment(Date.now()).utcOffset('-0500').startOf('month').format('YYYY-MM-DD');
-            // console.log("curDate---", curDate)
+            // // console.log("curDate---", curDate)
             this.filterScalingDataByMonth(this.state.monthId);
         }
         );
@@ -3578,7 +3578,7 @@ export default class BranchTemplate extends Component {
         // var asterisk = document.getElementsByClassName("resizable")[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
-        console.log("tr.children[9]---", tr.children[9]);
+        // console.log("tr.children[9]---", tr.children[9]);
         tr.children[4].classList.add('InfoTr');
         tr.children[5].classList.add('InfoTr');
         tr.children[9].classList.add('InfoTr');
@@ -3594,7 +3594,7 @@ export default class BranchTemplate extends Component {
 
     filterSameLeveleUnitList = function (instance, cell, c, r, source) {
         var sameLevelNodeList = this.state.sameLevelNodeList1;
-        console.log("mylist--------->32", sameLevelNodeList);
+        // console.log("mylist--------->32", sameLevelNodeList);
         return sameLevelNodeList;
 
     }.bind(this)
@@ -3614,7 +3614,7 @@ export default class BranchTemplate extends Component {
                         currentCalculatorStopDate: '',
                         currentCalculatorStartValue: '',
                     }, () => {
-                        // console.log("x row data===>", this.el.getRowData(x));
+                        // // console.log("x row data===>", this.el.getRowData(x));
                         var startValue = this.getMomValueForDateRange(rowData[1]);
                         this.setState({
                             currentRowIndex: x,
@@ -3654,9 +3654,9 @@ export default class BranchTemplate extends Component {
         //     momJexcelLoader: true
         // }, () => {
         //     setTimeout(() => {
-        //         console.log("hi anchal")
+        //         // console.log("hi anchal")
         //         var json = this.state.momEl.getJson(null, false);
-        //         console.log("momData>>>", json);
+        //         // console.log("momData>>>", json);
         //         var overrideListArray = [];
         //         for (var i = 0; i < json.length; i++) {
         //             var map1 = new Map(Object.entries(json[i]));
@@ -3668,11 +3668,11 @@ export default class BranchTemplate extends Component {
         //                     nodeDataId: map1.get("7"),
         //                     active: true
         //                 }
-        //                 console.log("overrideData>>>", overrideData);
+        //                 // console.log("overrideData>>>", overrideData);
         //                 overrideListArray.push(overrideData);
         //             }
         //         }
-        //         console.log("overRide data list>>>", overrideListArray);
+        //         // console.log("overRide data list>>>", overrideListArray);
         //         let { currentItemConfig } = this.state;
         //         let { treeTemplate } = this.state;
         //         var items = this.state.items;
@@ -3684,7 +3684,7 @@ export default class BranchTemplate extends Component {
         //             this.setState({
         //                 treeTemplate
         //             }, () => {
-        //                 console.log("treeTemplate>>>", treeTemplate);
+        //                 // console.log("treeTemplate>>>", treeTemplate);
         //                 calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
         //             });
 
@@ -3702,7 +3702,7 @@ export default class BranchTemplate extends Component {
         // }, () => {
         //     setTimeout(() => {
         //         var json = this.state.momElPer.getJson(null, false);
-        //         console.log("momData>>>", json);
+        //         // console.log("momData>>>", json);
         //         var overrideListArray = [];
         //         for (var i = 0; i < json.length; i++) {
         //             var map1 = new Map(Object.entries(json[i]));
@@ -3714,23 +3714,23 @@ export default class BranchTemplate extends Component {
         //                     nodeDataId: map1.get("7"),
         //                     active: true
         //                 }
-        //                 console.log("overrideData>>>", overrideData);
+        //                 // console.log("overrideData>>>", overrideData);
         //                 overrideListArray.push(overrideData);
         //             }
         //         }
-        //         console.log("overRide data list>>>", overrideListArray);
+        //         // console.log("overRide data list>>>", overrideListArray);
         //         let { currentItemConfig } = this.state;
         //         let { treeTemplate } = this.state;
         //         var items = this.state.items;
         //         (currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataOverrideList = overrideListArray;
         //         this.setState({ currentItemConfig }, () => {
-        //             // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
+        //             // // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
         //             var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
         //             items[findNodeIndex] = currentItemConfig.context;
         //             treeTemplate.flatList = items; this.setState({
         //                 treeTemplate
         //             }, () => {
-        //                 console.log("treeTemplate>>>", treeTemplate);
+        //                 // console.log("treeTemplate>>>", treeTemplate);
         //                 calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
 
         //             });
@@ -3845,7 +3845,7 @@ export default class BranchTemplate extends Component {
         }
         var elInstance = this.state.modelingEl;
         var rowData = elInstance.getRowData(y);
-        console.log("modelingTypeId-3--", rowData[4])
+        // console.log("modelingTypeId-3--", rowData[4])
         if (rowData[4] != "") {
             var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
             // var monthDifference = moment(stopDate).diff(startDate, 'months', true);
@@ -3951,7 +3951,7 @@ export default class BranchTemplate extends Component {
         jexcel.destroy(document.getElementById("modelingJexcelPercent"), true);
 
         var data = dataArray;
-        console.log("DataArray>>>", dataArray);
+        // console.log("DataArray>>>", dataArray);
 
         var options = {
             data: data,
@@ -4043,9 +4043,9 @@ export default class BranchTemplate extends Component {
     }
 
     getConversionFactor(planningUnitId) {
-        console.log("planningUnitId cf ---", planningUnitId);
+        // console.log("planningUnitId cf ---", planningUnitId);
         var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == planningUnitId))[0];
-        console.log("pu---", pu)
+        // console.log("pu---", pu)
         // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = event.target.value;
         this.setState({
             conversionFactor: pu.multiplier
@@ -4053,18 +4053,18 @@ export default class BranchTemplate extends Component {
     }
 
     getNodeTypeFollowUpList(nodeTypeId) {
-        console.log("get node type follow up list---", nodeTypeId);
+        // console.log("get node type follow up list---", nodeTypeId);
         var nodeType;
         var nodeTypeList = [];
         if (nodeTypeId != 0) {
             nodeType = this.state.nodeTypeList.filter(c => c.id == nodeTypeId)[0];
-            console.log("node type obj--->", nodeType);
+            // console.log("node type obj--->", nodeType);
             for (let i = 0; i < nodeType.allowedChildList.length; i++) {
-                console.log("allowed value---", nodeType.allowedChildList[i]);
+                // console.log("allowed value---", nodeType.allowedChildList[i]);
                 var obj = this.state.nodeTypeList.filter(c => c.id == nodeType.allowedChildList[i])[0];
                 nodeTypeList.push(obj);
             }
-            console.log("final nodeTypeList---", nodeTypeList);
+            // console.log("final nodeTypeList---", nodeTypeList);
         } else {
             nodeTypeList = this.state.nodeTypeList.filter(c => c.id != 5);
             // nodeTypeList.push(nodeType);
@@ -4119,7 +4119,7 @@ export default class BranchTemplate extends Component {
                     nodeTypeList: myResult
                 });
                 for (var i = 0; i < myResult.length; i++) {
-                    console.log("node type--->", myResult[i])
+                    // console.log("node type--->", myResult[i])
 
                 }
 
@@ -4128,25 +4128,25 @@ export default class BranchTemplate extends Component {
     }
 
     duplicateNode(itemConfig) {
-        console.log("duplicate node called 1---", this.state.currentItemConfig);
-        console.log("duplicate node called 2---", itemConfig);
+        // console.log("duplicate node called 1---", this.state.currentItemConfig);
+        // console.log("duplicate node called 2---", itemConfig);
         var items1 = this.state.items;
         const { items } = this.state;
         var maxNodeDataId = this.getMaxNodeDataId();
-        console.log("initial maxNodeDataId---", maxNodeDataId);
+        // console.log("initial maxNodeDataId---", maxNodeDataId);
         var childList = items1.filter(x => x.sortOrder.startsWith(itemConfig.sortOrder));
         var childListArr = [];
         var json;
         var sortOrder = itemConfig.sortOrder;
-        console.log("childList---", childList);
+        // console.log("childList---", childList);
         // var scenarioList = this.state.scenarioList;
         for (let i = 0; i < childList.length; i++) {
             var child = JSON.parse(JSON.stringify(childList[i]));
-            console.log("child before---", child);
+            // console.log("child before---", child);
             var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
-            console.log("maxNodeId---", maxNodeId);
+            // console.log("maxNodeId---", maxNodeId);
             var nodeId = parseInt(maxNodeId + 1);
-            console.log("nodeId---", nodeId);
+            // console.log("nodeId---", nodeId);
             var maxSortOrder;
             if (sortOrder == child.sortOrder) {
                 child.payload.nodeId = nodeId;
@@ -4154,7 +4154,7 @@ export default class BranchTemplate extends Component {
                 var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
                 var childList1 = items.filter(c => c.parent == itemConfig.parent);
                 maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
-                console.log("max sort order2---", maxSortOrder);
+                // console.log("max sort order2---", maxSortOrder);
                 child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
                 json = {
                     oldId: itemConfig.id,
@@ -4164,9 +4164,9 @@ export default class BranchTemplate extends Component {
                 }
                 childListArr.push(json);
             } else {
-                console.log("childListArr---", childListArr + " child.parent---", child.parent);
+                // console.log("childListArr---", childListArr + " child.parent---", child.parent);
                 var parentNode = childListArr.filter(x => x.oldId == child.parent)[0];
-                console.log("parentNode---", parentNode)
+                // console.log("parentNode---", parentNode)
                 child.payload.nodeId = nodeId;
                 var oldId = child.id;
                 var oldSortOrder = child.sortOrder;
@@ -4175,7 +4175,7 @@ export default class BranchTemplate extends Component {
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = items.filter(c => c.parent == parentNode.newId);
                 maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
-                console.log("max sort order2---", maxSortOrder);
+                // console.log("max sort order2---", maxSortOrder);
                 child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
                 json = {
                     oldId: oldId,
@@ -4192,18 +4192,18 @@ export default class BranchTemplate extends Component {
 
             // }
             // }
-            console.log("child after---", child);
+            // console.log("child after---", child);
             items.push(child);
         }
 
 
-        console.log("duplicate button clicked value after update---", items);
+        // console.log("duplicate button clicked value after update---", items);
         this.setState({
             // items: [...items, newItem],
             items,
             cursorItem: nodeId
         }, () => {
-            console.log("on add items-------", this.state.items);
+            // console.log("on add items-------", this.state.items);
             this.calculateMOMData(0, 2);
         });
     }
@@ -4213,21 +4213,21 @@ export default class BranchTemplate extends Component {
 
 
     getPlanningUnitListByFUId(forecastingUnitId) {
-        console.log("getPlanningUnitListByFUId---", forecastingUnitId);
+        // console.log("getPlanningUnitListByFUId---", forecastingUnitId);
         PlanningUnitService.getActivePlanningUnitListByFUId(forecastingUnitId).then(response => {
-            console.log("response---", response.data)
+            // console.log("response---", response.data)
             var listArray = response.data;
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                 var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
-            console.log("planing unit listArray---", listArray);
+            // console.log("planing unit listArray---", listArray);
             this.setState({
                 planningUnitList: response.data,
                 tempPlanningUnitId: response.data.length == 1 ? response.data[0].planningUnitId : "",
             }, () => {
-                console.log("planing unit list from api---", this.state.planningUnitList);
+                // console.log("planing unit list from api---", this.state.planningUnitList);
                 if (this.state.planningUnitList.length == 1) {
                     var { currentItemConfig } = this.state;
                     if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
@@ -4250,7 +4250,7 @@ export default class BranchTemplate extends Component {
                 }
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != "") {
                     var conversionFactor = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id)[0].multiplier;
-                    console.log("pu conversion factor---", conversionFactor);
+                    // console.log("pu conversion factor---", conversionFactor);
                     this.setState({
                         conversionFactor
                     }, () => {
@@ -4260,7 +4260,7 @@ export default class BranchTemplate extends Component {
                         this.getUsageText();
                     });
                 } else {
-                    console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                    // console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
                 }
                 // const { currentItemConfig } = this.state;
                 // (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
@@ -4313,64 +4313,64 @@ export default class BranchTemplate extends Component {
     }
 
     getForecastingUnitUnitByFUId(forecastingUnitId) {
-        console.log("forecastingUnitId---", forecastingUnitId);
+        // console.log("forecastingUnitId---", forecastingUnitId);
         const { currentItemConfig } = this.state;
         var forecastingUnit = (this.state.forecastingUnitList.filter(c => c.forecastingUnitId == forecastingUnitId));
-        console.log("forecastingUnit---", forecastingUnit);
+        // console.log("forecastingUnit---", forecastingUnit);
         if (forecastingUnit.length > 0) {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = forecastingUnit[0].unit.id;
         }
-        console.log("currentItemConfig fu unit---", currentItemConfig);
+        // console.log("currentItemConfig fu unit---", currentItemConfig);
         this.setState({
             currentItemConfig
         });
     }
 
     getNoOfFUPatient() {
-        console.log("no of fu------", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson);
-        console.log("no of person---", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons);
+        // console.log("no of fu------", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson);
+        // console.log("no of person---", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons);
         var noOfFUPatient;
         if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
             noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
         } else {
-            console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+            // console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
             noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
         }
-        console.log("noOfFUPatient---", noOfFUPatient);
+        // console.log("noOfFUPatient---", noOfFUPatient);
         this.setState({
             noOfFUPatient
         }, () => {
-            console.log("state update fu--->", this.state.noOfFUPatient)
+            // console.log("state update fu--->", this.state.noOfFUPatient)
         })
     }
     getNodeUnitOfPrent() {
         var id;
-        console.log("obj------->>>>", this.state.currentItemConfig);
+        // console.log("obj------->>>>", this.state.currentItemConfig);
         if (this.state.currentItemConfig.context.parent != null) {
             id = this.state.currentItemConfig.parentItem.payload.nodeUnit.id;
-            console.log("node unit for test---", id);
+            // console.log("node unit for test---", id);
             // } else {
             //     id = this.state.currentItemConfig.context.payload.nodeUnit.id;
         } else {
             id = this.state.currentItemConfig.context.payload.nodeUnit.id;
-            console.log("node unit for test---", id);
+            // console.log("node unit for test---", id);
         }
         // }
         this.setState({
             usageTypeParent: id
         }, () => {
-            console.log("parent unit id===", this.state.usageTypeParent);
+            // console.log("parent unit id===", this.state.usageTypeParent);
         });
 
     }
     getUsageTemplateList(tcId) {
-        console.log(" get uasge template--------------", this.state.currentItemConfig);
+        // console.log(" get uasge template--------------", this.state.currentItemConfig);
         var tracerCategoryId = tcId;
-        console.log("tracerCategoryId---", tracerCategoryId);
+        // console.log("tracerCategoryId---", tracerCategoryId);
         // var forecastingUnitId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id;
-        // console.log("forecastingUnitId---", forecastingUnitId);
+        // // console.log("forecastingUnitId---", forecastingUnitId);
         // var usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
-        // console.log("usageTypeId---", usageTypeId);
+        // // console.log("usageTypeId---", usageTypeId);
         UsageTemplateService.getUsageTemplateListForTree((tracerCategoryId != "" && tracerCategoryId != null ? tracerCategoryId : 0)).then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
@@ -4382,7 +4382,7 @@ export default class BranchTemplate extends Component {
                 usageTemplateListAll: listArray,
                 usageTemplateList: listArray
             }, () => {
-                console.log(" get uasge template--------------", response.data);
+                // console.log(" get uasge template--------------", response.data);
             })
         })
             .catch(
@@ -4429,7 +4429,7 @@ export default class BranchTemplate extends Component {
 
     copyDataFromUsageTemplate(event) {
         var usageTemplate = (this.state.usageTemplateList.filter(c => c.usageTemplateId == event.target.value))[0];
-        console.log("usageTemplate---", usageTemplate);
+        // console.log("usageTemplate---", usageTemplate);
         const { currentItemConfig } = this.state;
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.lagInMonths = usageTemplate.lagInMonths;
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = usageTemplate.noOfPatients;
@@ -4451,7 +4451,7 @@ export default class BranchTemplate extends Component {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = usageTemplate.oneTimeUsage;
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount = usageTemplate.repeatCount;
             if (!usageTemplate.oneTimeUsage) {
-                console.log("repeat copy template---", currentItemConfig.context.payload.nodeDataMap[0][0].fuNode);
+                // console.log("repeat copy template---", currentItemConfig.context.payload.nodeDataMap[0][0].fuNode);
                 var repeatUsagePeriod = {
                     usagePeriodId: usageTemplate.repeatUsagePeriod != null ? usageTemplate.repeatUsagePeriod.usagePeriodId : ''
                 };
@@ -4462,7 +4462,7 @@ export default class BranchTemplate extends Component {
             currentItemConfig,
             fuValues: { value: usageTemplate.forecastingUnit.id, label: getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) + " | " + usageTemplate.forecastingUnit.id },
         }, () => {
-            console.log("copy from template---", this.state.currentItemConfig);
+            // console.log("copy from template---", this.state.currentItemConfig);
             this.getForecastingUnitListByTracerCategoryId(0, usageTemplate.forecastingUnit.id);
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
@@ -4480,45 +4480,45 @@ export default class BranchTemplate extends Component {
         var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
         if (nodeTypeId == 5) {
             usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id;
-            console.log("usageTypeId---", usageTypeId);
+            // console.log("usageTypeId---", usageTypeId);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage;
             }
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
                 usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
-                console.log("usagePeriodId---", usagePeriodId);
+                // console.log("usagePeriodId---", usagePeriodId);
                 usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
-                console.log("usageFrequency---", usageFrequency);
+                // console.log("usageFrequency---", usageFrequency);
             }
 
         } else {
             usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
-            console.log("usageTypeId---", usageTypeId);
+            // console.log("usageTypeId---", usageTypeId);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage;
             }
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
                 usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
-                console.log("usagePeriodId---", usagePeriodId);
+                // console.log("usagePeriodId---", usagePeriodId);
                 usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
-                console.log("usageFrequency---", usageFrequency);
+                // console.log("usageFrequency---", usageFrequency);
             }
 
         }
-        console.log("usagePeriodId dis---", usagePeriodId);
+        // console.log("usagePeriodId dis---", usagePeriodId);
         var noOfMonthsInUsagePeriod = 0;
         if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
             var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
-            console.log("convertToMonth dis---", convertToMonth);
-            console.log("repeat count---", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount);
-            console.log("no of month dis---", this.getNoOfMonthsInUsagePeriod());
+            // console.log("convertToMonth dis---", convertToMonth);
+            // console.log("repeat count---", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount);
+            // console.log("no of month dis---", this.getNoOfMonthsInUsagePeriod());
 
             if (usageTypeId == 2) {
                 var div = (convertToMonth * usageFrequency);
-                console.log("duv---", div);
+                // console.log("duv---", div);
                 if (div != 0) {
                     noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
-                    console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                    // console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                 }
             } else {
                 // var noOfFUPatient = this.state.noOfFUPatient;
@@ -4527,12 +4527,12 @@ export default class BranchTemplate extends Component {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                     noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
                 } else {
-                    console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+                    // console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
                     noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
                 }
-                console.log("no of fu patient---", noOfFUPatient);
+                // console.log("no of fu patient---", noOfFUPatient);
                 noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
-                console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                // console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
             }
             if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
                 repeatUsagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId;
@@ -4544,10 +4544,10 @@ export default class BranchTemplate extends Component {
             }
             // var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / (convertToMonth * noOfMonthsInUsagePeriod);
             var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
-            console.log("noFURequired---", noFURequired);
+            // console.log("noFURequired---", noFURequired);
 
         } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
-            console.log("inside else if no fu");
+            // console.log("inside else if no fu");
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                 noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
             } else {
@@ -4568,43 +4568,43 @@ export default class BranchTemplate extends Component {
         var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
         if (nodeTypeId == 5) {
             usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id;
-            console.log("usageTypeId---", usageTypeId);
+            // console.log("usageTypeId---", usageTypeId);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage;
             }
-            console.log("oneTimeUsage---", oneTimeUsage);
+            // console.log("oneTimeUsage---", oneTimeUsage);
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
                 usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId != "" ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : "";
-                console.log("usagePeriodId---", usagePeriodId);
-                console.log("usageFrequency before 5---", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency);
+                // console.log("usagePeriodId---", usagePeriodId);
+                // console.log("usageFrequency before 5---", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency);
                 usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
-                console.log("usageFrequency---", usageFrequency);
+                // console.log("usageFrequency---", usageFrequency);
             }
 
         } else {
             usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
-            console.log("usageTypeId---", usageTypeId);
+            // console.log("usageTypeId---", usageTypeId);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage;
             }
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
                 usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId != "" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : "";
-                console.log("usagePeriodId---", usagePeriodId);
+                // console.log("usagePeriodId---", usagePeriodId);
                 usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency != "" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency != null ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
-                console.log("usageFrequency---", usageFrequency);
+                // console.log("usageFrequency---", usageFrequency);
             }
 
         }
         var noOfMonthsInUsagePeriod = 0;
         if (usagePeriodId != null && usagePeriodId != "") {
             var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
-            console.log("convertToMonth---", convertToMonth);
+            // console.log("convertToMonth---", convertToMonth);
             if (usageTypeId == 2) {
                 var div = (convertToMonth * usageFrequency);
-                console.log("duv---", div);
+                // console.log("duv---", div);
                 if (div != 0) {
                     noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
-                    console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                    // console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                 }
             } else {
                 // var noOfFUPatient = this.state.noOfFUPatient;
@@ -4612,22 +4612,22 @@ export default class BranchTemplate extends Component {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                     noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
                 } else {
-                    console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+                    // console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
                     noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
                 }
-                console.log("no of fu patient---", noOfFUPatient);
+                // console.log("no of fu patient---", noOfFUPatient);
                 noOfMonthsInUsagePeriod = oneTimeUsage != "true" && oneTimeUsage != true ? convertToMonth * usageFrequency * noOfFUPatient : noOfFUPatient;
-                console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                // console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
             }
         } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
-            console.log("inside else if")
+            // console.log("inside else if")
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                 noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             } else {
-                console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+                // console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
                 noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             }
-            console.log("inside else if ---", noOfFUPatient)
+            // console.log("inside else if ---", noOfFUPatient)
             noOfMonthsInUsagePeriod = noOfFUPatient;
         }
         this.setState({
@@ -4636,12 +4636,12 @@ export default class BranchTemplate extends Component {
             // if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
             //     this.getUsageText();
             // } else {
-            //     console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+            //     // console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
             // }
         });
     }
     getUsageText() {
-        console.log("this.state.currentItemConfig.context.payload.nodeDataMap[0])[0]----", this.state.currentItemConfig.context.payload.nodeDataMap[0][0]);
+        // console.log("this.state.currentItemConfig.context.payload.nodeDataMap[0])[0]----", this.state.currentItemConfig.context.payload.nodeDataMap[0][0]);
         var usageText = '';
         var noOfPersons = '';
         var noOfForecastingUnitsPerPerson = '';
@@ -4683,7 +4683,7 @@ export default class BranchTemplate extends Component {
 
 
             if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true)) {
-                console.log("usage period Id---", this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId);
+                // console.log("usage period Id---", this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId);
                 selectedText2 = this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
             }
         }
@@ -4703,9 +4703,9 @@ export default class BranchTemplate extends Component {
             }
         } else {
             //PU
-            // console.log("pu>>>", this.state.currentItemConfig);
-            console.log("pu id>>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
-            console.log("pu id>>>", this.state.planningUnitList);
+            // // console.log("pu>>>", this.state.currentItemConfig);
+            // console.log("pu id>>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
+            // console.log("pu id>>>", this.state.planningUnitList);
             if (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != "") {
                 var nodeUnitTxt = this.state.currentItemConfig.parentItem.parent != null ? this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en : this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0].payload.nodeUnit.id)[0].label.label_en;
                 if (this.state.addNodeFlag) {
@@ -4740,16 +4740,16 @@ export default class BranchTemplate extends Component {
         this.setState({
             usageText
         }, () => {
-            console.log("usage text---", this.state.usageText);
+            // console.log("usage text---", this.state.usageText);
         });
 
     }
     getForecastingUnitListByTracerCategoryId(type, isUsageTemplate) {
         var tracerCategoryId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id;
-        console.log("tracerCategoryId new---", tracerCategoryId)
+        // console.log("tracerCategoryId new---", tracerCategoryId)
         if (tracerCategoryId != "" && tracerCategoryId != undefined && tracerCategoryId != 'undefined') {
             ForecastingUnitService.getForcastingUnitListByTracerCategoryId(tracerCategoryId).then(response => {
-                console.log("fu list---", response.data)
+                // console.log("fu list---", response.data)
 
 
                 let forecastingUnitMultiList = response.data.length > 0
@@ -4849,7 +4849,7 @@ export default class BranchTemplate extends Component {
                     }
                 );
         } else {
-            console.log("inside else of tracer category")
+            // console.log("inside else of tracer category")
             this.setState({
                 forecastingUnitMultiList: [],
                 forecastingUnitList: [],
@@ -4861,7 +4861,7 @@ export default class BranchTemplate extends Component {
 
 
     filterPlanningUnitNode(e) {
-        console.log(">>>", e.target.checked);
+        // console.log(">>>", e.target.checked);
         var itemsList = this.state.items;
         var arr = [];
         for (let i = 0; i < itemsList.length; i++) {
@@ -4886,7 +4886,7 @@ export default class BranchTemplate extends Component {
         });
     }
     filterPlanningUnitAndForecastingUnitNodes(e) {
-        console.log(">>>", e.target.checked);
+        // console.log(">>>", e.target.checked);
         var itemsList = this.state.items;
         var arr = [];
         for (let i = 0; i < itemsList.length; i++) {
@@ -4924,7 +4924,7 @@ export default class BranchTemplate extends Component {
     }
     findFirstError(formName, hasError) {
         const form = document.forms[formName]
-        console.log("Form@@@#####", form)
+        // console.log("Form@@@#####", form)
         for (let i = 0; i < form.length; i++) {
             if (hasError(form[i].name)) {
                 form[i].focus()
@@ -4948,7 +4948,7 @@ export default class BranchTemplate extends Component {
             // nodeValue: true
         }
         )
-        console.log("errors---", errors);
+        // console.log("errors---", errors);
         this.validateFormNodeData(errors)
     }
     validateFormNodeData(errors) {
@@ -4967,7 +4967,7 @@ export default class BranchTemplate extends Component {
     }
 
     getNodeValue(nodeTypeId) {
-        console.log("get node value---------------------");
+        // console.log("get node value---------------------");
         if (nodeTypeId == 2 && this.state.currentItemConfig.context.payload.nodeDataMap != null && this.state.currentItemConfig.context.payload.nodeDataMap[0] != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0] != null) {
             return (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue;
         }
@@ -4998,7 +4998,7 @@ export default class BranchTemplate extends Component {
     }
 
     componentDidMount() {
-        console.log("my business functions---", AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE'));
+        // console.log("my business functions---", AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE'));
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
         ForecastMethodService.getActiveForecastMethodList().then(response => {
@@ -5063,17 +5063,17 @@ export default class BranchTemplate extends Component {
             this.setState({
                 nodeUnitList: listArray
             }, () => {
-                console.log("nodeUnitList>>>", this.state.nodeUnitList);
+                // console.log("nodeUnitList>>>", this.state.nodeUnitList);
                 var nodeUnitListPlural = [];
-                console.log("this.state.nodeUnitList---", this.state.nodeUnitList);
+                // console.log("this.state.nodeUnitList---", this.state.nodeUnitList);
                 for (let i = 0; i < this.state.nodeUnitList.length; i++) {
-                    console.log("inside for---")
+                    // console.log("inside for---")
                     var nodeUnit = JSON.parse(JSON.stringify(this.state.nodeUnitList[i]));
-                    console.log("nodeUnit---", nodeUnit)
+                    // console.log("nodeUnit---", nodeUnit)
                     nodeUnit.label.label_en = nodeUnit.label.label_en + "(s)";
                     nodeUnitListPlural.push(nodeUnit);
                 }
-                console.log("nodeUnitListPlural---", nodeUnitListPlural)
+                // console.log("nodeUnitListPlural---", nodeUnitListPlural)
                 this.setState({ nodeUnitListPlural })
             })
         })
@@ -5377,7 +5377,7 @@ export default class BranchTemplate extends Component {
                 }
             );
         // DatasetService.getNodeTypeList().then(response => {
-        //     console.log("node type list---", response.data);
+        //     // console.log("node type list---", response.data);
         //     var listArray = response.data;
         //     listArray.sort((a, b) => {
         //         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -5433,7 +5433,7 @@ export default class BranchTemplate extends Component {
             if (this.props.match.params.templateId != -1 || this.state.treeTemplate.treeTemplateId > 0) {
                 var treeTemplateId = this.props.match.params.templateId != -1 ? this.props.match.params.templateId : this.state.treeTemplate.treeTemplateId;
                 DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
-                    console.log("my tree---", response.data);
+                    // console.log("my tree---", response.data);
                     var items = response.data.flatList;
                     var arr = [];
                     for (let i = 0; i < items.length; i++) {
@@ -5449,7 +5449,7 @@ export default class BranchTemplate extends Component {
                             } else {
                                 var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
                                 var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
-                                console.log("api parent value---", parentValue);
+                                // console.log("api parent value---", parentValue);
 
                                 (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
                                 (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100).toString();
@@ -5465,7 +5465,7 @@ export default class BranchTemplate extends Component {
                                 items[i].isVisible = true;
                             }
                         }
-                        console.log("load---", items[i])
+                        // console.log("load---", items[i])
                         // arr.push(items[i]);
                     }
                     // this.generateMonthList
@@ -5476,15 +5476,15 @@ export default class BranchTemplate extends Component {
                         tempItems: items,
                         loading: true,
                     }, () => {
-                        // console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
-                        console.log("Tree Template---", this.state.items);
+                        // // console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
+                        // console.log("Tree Template---", this.state.items);
                         setTimeout(() => {
                             this.generateMonthList();
                             var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                             var monthList = JSON.parse(JSON.stringify(this.state.monthList));
                             var minMonth = monthList[0].id;
                             var maxMonth = monthList.sort((a, b) => b.id - a.id)[0].id;
-                            console.log("maxMonth on load---", maxMonth);
+                            // console.log("maxMonth on load---", maxMonth);
                             this.setState({
                                 minDate: minMonth,
                                 maxDate: maxMonth
@@ -5770,7 +5770,7 @@ export default class BranchTemplate extends Component {
                         }
                     }]
                 }, () => {
-                    console.log("Tree Template---", this.state.items);
+                    // console.log("Tree Template---", this.state.items);
                     this.generateMonthList();
                 })
             }
@@ -5787,20 +5787,20 @@ export default class BranchTemplate extends Component {
             scenarioDesc: scenario.scenarioDesc,
             active: true
         };
-        // console.log("tab data---", newTabObject);
+        // // console.log("tab data---", newTabObject);
         var tabList1 = [...tabList, newTabObject];
-        // console.log("tabList---", tabList1)
+        // // console.log("tabList---", tabList1)
         this.setState({
             tabList: [...tabList, newTabObject],
             activeTab: parseInt(tabList.length),
             openAddScenarioModal: false
         }, () => {
-            console.log("final tab list---", this.state);
+            // console.log("final tab list---", this.state);
         });
     }
     nodeTypeChange(value) {
         var nodeTypeId = value;
-        console.log("node type value---", nodeTypeId)
+        // console.log("node type value---", nodeTypeId)
         if (nodeTypeId == 1) {
             this.setState({
                 numberNode: false,
@@ -5808,7 +5808,7 @@ export default class BranchTemplate extends Component {
             });
         } else if (nodeTypeId == 2) {
             // Number node
-            console.log("case 2")
+            // console.log("case 2")
             this.setState({
                 numberNode: false,
                 aggregationNode: true
@@ -5834,7 +5834,7 @@ export default class BranchTemplate extends Component {
         var { currentItemConfig } = this.state;
         if ((nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) && this.state.addNodeFlag && currentItemConfig.context.payload.nodeDataMap[0][0].dataValue == "") {
             currentItemConfig.context.payload.nodeDataMap[0][0].dataValue = 100;
-            console.log("parent value template---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].calculatedDataValue);
+            // console.log("parent value template---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].calculatedDataValue);
             // currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((100 * currentItemConfig.parentItem.payload.nodeDataMap[0][0].calculatedDataValue) / 100).toString()
             this.setState({ currentItemConfig }, () => {
                 this.calculateParentValueFromMOM(currentItemConfig.context.payload.nodeDataMap[0][0].monthNo);
@@ -5854,14 +5854,14 @@ export default class BranchTemplate extends Component {
             showCalculatorFields: false
         }, () => {
             var isValid = document.getElementById('isValidError').value;
-            // console.log("isValid 1---", isValid);
+            // // console.log("isValid 1---", isValid);
             this.setState({ isValidError: isValid });
 
             if (this.state.currentItemConfig.context.payload.nodeType.id == 1) {
                 this.showMomData();
             }
             if (tab == 2) {
-                console.log("***>>>", this.state.currentItemConfig);
+                // console.log("***>>>", this.state.currentItemConfig);
                 if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                     var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                     var month = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo;
@@ -5875,10 +5875,10 @@ export default class BranchTemplate extends Component {
                     } else {
                         arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
                     }
-                    console.log("arr---", arr);
+                    // console.log("arr---", arr);
                     var modelingTypeListNew = [];
                     for (var i = 0; i < arr.length; i++) {
-                        console.log("arr[i]---", arr[i]);
+                        // console.log("arr[i]---", arr[i]);
                         modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
                     }
                     this.setState({
@@ -5897,7 +5897,7 @@ export default class BranchTemplate extends Component {
                 }
                 this.setState({ scalingMonth: this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo });
                 // if (this.state.modelingEl != "") {
-                //     console.log("this.state.modelingEl---", this.state.modelingEl)
+                //     // console.log("this.state.modelingEl---", this.state.modelingEl)
                 //     this.state.modelingEl.setHeader(9, i18n.t('static.tree.calculatedChangeForMonth') + " " + this.state.scalingMonth);
                 // }
                 //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
@@ -5916,7 +5916,7 @@ export default class BranchTemplate extends Component {
     dataChange(event) {
         var flag = false;
         // alert("hi");
-        console.log("event---", event);
+        // console.log("event---", event);
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
 
@@ -5926,9 +5926,9 @@ export default class BranchTemplate extends Component {
             var currentCalculatorStartValue = this.getMomValueForDateRange(event.target.value);
             this.setState({ currentCalculatorStartDate: event.target.value, currentCalculatorStartValue }, () => {
                 if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
-                    console.log("Inside if modeling calculator");
+                    // console.log("Inside if modeling calculator");
                 } else {
-                    console.log("Inside else modeling calculator");
+                    // console.log("Inside else modeling calculator");
                     if (!this.state.currentEndValueEdit) {
                         this.calculateMomByEndValue();
                     } else if (!this.state.currentTargetChangePercentageEdit) {
@@ -5943,9 +5943,9 @@ export default class BranchTemplate extends Component {
         if (event.target.name == "calculatorTargetDate") {
             this.setState({ currentCalculatorStopDate: event.target.value }, () => {
                 if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
-                    console.log("Inside if modeling calculator");
+                    // console.log("Inside if modeling calculator");
                 } else {
-                    console.log("Inside else modeling calculator");
+                    // console.log("Inside else modeling calculator");
                     if (!this.state.currentEndValueEdit) {
                         this.calculateMomByEndValue();
                     } else if (!this.state.currentTargetChangePercentageEdit) {
@@ -5971,10 +5971,10 @@ export default class BranchTemplate extends Component {
             else {
                 this.state.currentModelingType = 5
             }
-            // console.log("this.state.currentTargetChangeNumberEdit---", this.state.currentTargetChangeNumberEdit);
-            // console.log("this.state.currentModelingType---", this.state.currentModelingType);
+            // // console.log("this.state.currentTargetChangeNumberEdit---", this.state.currentTargetChangeNumberEdit);
+            // // console.log("this.state.currentModelingType---", this.state.currentModelingType);
             if (!this.state.currentTargetChangeNumberEdit && this.state.currentModelingType != 2) {
-                console.log("inside if calculator radio button");
+                // console.log("inside if calculator radio button");
                 this.setState({
                     currentTargetChangePercentageEdit: false,
                     currentEndValueEdit: false
@@ -5982,9 +5982,9 @@ export default class BranchTemplate extends Component {
             }
 
             // if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
-            //     console.log("Inside if modeling calculator");
+            //     // console.log("Inside if modeling calculator");
             // } else {
-            //     console.log("Inside else modeling calculator");
+            //     // console.log("Inside else modeling calculator");
             //     if (!this.state.currentEndValueEdit) {
             //         this.calculateMomByEndValue();
             //     } else if (!this.state.currentTargetChangePercentageEdit) {
@@ -5996,7 +5996,7 @@ export default class BranchTemplate extends Component {
 
         }
         if (event.target.name == "monthId") {
-            console.log("month id on change value---", event.target.value);
+            // console.log("month id on change value---", event.target.value);
             var monthId = event.target.value;
             this.setState({ monthId }, () => {
                 this.updateTreeData(monthId);
@@ -6052,7 +6052,7 @@ export default class BranchTemplate extends Component {
         }
 
         if (event.target.name === "usageTemplateId") {
-            console.log("usage temp value---", event.target.value);
+            // console.log("usage temp value---", event.target.value);
             this.setState({
                 usageTemplateId: event.target.value
             });
@@ -6080,12 +6080,12 @@ export default class BranchTemplate extends Component {
             currentItemConfig.context.payload.nodeUnit.label = label;
         }
         if (event.target.name === "monthNoFilter") {
-            console.log("event.target.value", event.target.value)
+            // console.log("event.target.value", event.target.value)
             if (!this.state.modelingChanged) {
                 this.filterScalingDataByMonth(event.target.value);
             }
             if (this.state.modelingEl != "") {
-                console.log("this.state.modelingEl---", event.target.value)
+                // console.log("this.state.modelingEl---", event.target.value)
                 this.state.modelingEl.setHeader(9, i18n.t('static.tree.calculatedChangeForMonth') + " " + event.target.value);
             }
             this.setState({ scalingMonth: event.target.value }, () => {
@@ -6104,18 +6104,18 @@ export default class BranchTemplate extends Component {
             //     parentValue1 = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
             // }
 
-            // console.log("parentValue---", parentValue);
+            // // console.log("parentValue---", parentValue);
             // parentValue = parentValue1;
             // (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = (parseInt(parentValue * value) / 100).toString();
             (currentItemConfig.context.payload.nodeDataMap[0])[0].displayDataValue = value.toString();
             this.calculateParentValueFromMOM((currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo);
-            // console.log("calculatedDataValue---", currentItemConfig);
+            // // console.log("calculatedDataValue---", currentItemConfig);
             // this.setState({
             //     parentValue
             // })
         }
         if (event.target.name === "nodeValue") {
-            console.log("inside node value-------");
+            // console.log("inside node value-------");
             var value = (event.target.value).replaceAll(",", "");
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = value;
             (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = value;
@@ -6210,7 +6210,7 @@ export default class BranchTemplate extends Component {
             this.getUsageText();
         }
         if (event.target.name === "usageTypeIdFU") {
-            console.log("usage type data change function ------------------", currentItemConfig.context.payload.nodeDataMap[0][0]);
+            // console.log("usage type data change function ------------------", currentItemConfig.context.payload.nodeDataMap[0][0]);
             if (event.target.value == 2 && currentItemConfig.context.payload.nodeType.id == 4) {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = 1;
             }
@@ -6277,7 +6277,7 @@ export default class BranchTemplate extends Component {
 
 
         this.setState({ currentItemConfig, isChanged: true }, () => {
-            console.log("after state update---", this.state.currentItemConfig);
+            // console.log("after state update---", this.state.currentItemConfig);
             if (flag) {
                 if (event.target.name === "planningUnitId") {
                     this.calculatePUPerVisit(false);
@@ -6291,7 +6291,7 @@ export default class BranchTemplate extends Component {
         });
     }
     createPUNode(itemConfig, parent) {
-        console.log("create PU node---", itemConfig);
+        // console.log("create PU node---", itemConfig);
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var nodeId = parseInt(maxNodeId + 1);
@@ -6325,21 +6325,21 @@ export default class BranchTemplate extends Component {
         treeTemplate.levelList = treeLevelList;
         newItem.level = parseInt(itemConfig.context.level + 1);
         newItem.payload.nodeId = nodeId;
-        console.log("this.state.tempPlanningUnitId---", this.state.tempPlanningUnitId);
-        console.log("this.state.planningUnitList---", this.state.planningUnitList);
+        // console.log("this.state.tempPlanningUnitId---", this.state.tempPlanningUnitId);
+        // console.log("this.state.planningUnitList---", this.state.planningUnitList);
         var pu = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.tempPlanningUnitId)[0];
         newItem.payload.label = pu.label;
         newItem.payload.nodeType.id = 5;
         // var parentSortOrder = items.filter(c => c.id == parent)[0].sortOrder;
         // var childList = items.filter(c => c.parent == parent);
         newItem.sortOrder = itemConfig.context.sortOrder.concat(".").concat(("01").slice(-2));
-        // console.log("pu node month---", (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month);
+        // // console.log("pu node month---", (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month);
         (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
         (newItem.payload.nodeDataMap[0])[0].dataValue = 100;
         (newItem.payload.nodeDataMap[0])[0].displayDataValue = (newItem.payload.nodeDataMap[0])[0].dataValue;
         (newItem.payload.nodeDataMap[0])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[0])[0].calculatedDataValue;
         // (newItem.payload.nodeDataMap[0])[0].month = moment((newItem.payload.nodeDataMap[0])[0].month).startOf('month').format("YYYY-MM-DD")
-        console.log("newItem.payload.nodeDataMap[0])[0]----", newItem.payload.nodeDataMap[0][0]);
+        // console.log("newItem.payload.nodeDataMap[0])[0]----", newItem.payload.nodeDataMap[0][0]);
         (newItem.payload.nodeDataMap[0])[0].puNode.planningUnit.id = this.state.tempPlanningUnitId;
         (newItem.payload.nodeDataMap[0])[0].puNode.planningUnit.label = pu.label;
         try {
@@ -6347,17 +6347,17 @@ export default class BranchTemplate extends Component {
             if (itemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) {
                 var refillMonths = this.round(parseFloat(pu.multiplier / (itemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
                 (newItem.payload.nodeDataMap[0])[0].puNode.refillMonths = refillMonths;
-                console.log("AUTO refillMonths---", refillMonths);
-                // console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
-                console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                // console.log("AUTO refillMonths---", refillMonths);
+                // // console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
+                // console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
                 // puPerVisit = this.round(parseFloat(((itemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
                 puPerVisit = parseFloat(((itemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
             } else {
-                console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+                // console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
                 // puPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                 puPerVisit = this.state.noOfMonthsInUsagePeriod / pu.multiplier;
             }
-            console.log("AUTO puPerVisit---", puPerVisit);
+            // console.log("AUTO puPerVisit---", puPerVisit);
             (newItem.payload.nodeDataMap[0])[0].puNode.puPerVisit = puPerVisit;
         } catch (err) {
             (newItem.payload.nodeDataMap[0])[0].puNode.refillMonths = 1;
@@ -6369,8 +6369,8 @@ export default class BranchTemplate extends Component {
         (newItem.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier = pu.multiplier;
         (newItem.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = pu.unit.id;
 
-        console.log("pu node add button clicked value after update---", newItem);
-        console.log("pu node add button clicked value after update---", newItem.payload.nodeDataMap.length);
+        // console.log("pu node add button clicked value after update---", newItem);
+        // console.log("pu node add button clicked value after update---", newItem.payload.nodeDataMap.length);
         this.setState({
             items: [...items, newItem],
             cursorItem: nodeId,
@@ -6378,7 +6378,7 @@ export default class BranchTemplate extends Component {
             treeTemplate
         }, () => {
 
-            console.log("on add items-------", this.state.items);
+            // console.log("on add items-------", this.state.items);
             if (!itemConfig.context.payload.extrapolation) {
                 this.calculateMOMData(newItem.id, 0);
             } else {
@@ -6391,7 +6391,7 @@ export default class BranchTemplate extends Component {
     }
 
     onAddButtonClick(itemConfig, addNode, data) {
-        console.log("add button clicked---", itemConfig);
+        // console.log("add button clicked---", itemConfig);
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var nodeId = parseInt(maxNodeId + 1);
@@ -6429,7 +6429,7 @@ export default class BranchTemplate extends Component {
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         var maxSortOrder = childList.length > 0 ? Math.max(...childList.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
-        console.log("max sort order1---", maxSortOrder);
+        // console.log("max sort order1---", maxSortOrder);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
         (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
         if (addNode) {
@@ -6449,7 +6449,7 @@ export default class BranchTemplate extends Component {
         } else {
             newItem.isVisible = true;
         }
-        console.log("add button clicked value after update---", newItem);
+        // console.log("add button clicked value after update---", newItem);
         this.setState({
             items: [...items, newItem],
             cursorItem: nodeId,
@@ -6459,7 +6459,7 @@ export default class BranchTemplate extends Component {
             if (itemConfig.context.payload.nodeType.id == 4) {
                 this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
             } else {
-                console.log("on add items-------", this.state.items);
+                // console.log("on add items-------", this.state.items);
                 this.calculateMOMData(newItem.id, 0);
             }
         });
@@ -6467,17 +6467,17 @@ export default class BranchTemplate extends Component {
     }
 
     calculateValuesForAggregateNode(items) {
-        console.log("start>>>", Date.now());
+        // console.log("start>>>", Date.now());
         var getAllAggregationNode = items.filter(c => c.payload.nodeType.id == 1).sort(function (a, b) {
             a = a.id;
             b = b.id;
             return a > b ? -1 : a < b ? 1 : 0;
         }.bind(this));
 
-        console.log(">>>", getAllAggregationNode);
+        // console.log(">>>", getAllAggregationNode);
         for (var i = 0; i < getAllAggregationNode.length; i++) {
             var getChildAggregationNode = items.filter(c => c.parent == getAllAggregationNode[i].id && (c.payload.nodeType.id == 1 || c.payload.nodeType.id == 2))
-            console.log(">>>", getChildAggregationNode);
+            // console.log(">>>", getChildAggregationNode);
             if (getChildAggregationNode.length > 0) {
                 var value = 0;
                 for (var m = 0; m < getChildAggregationNode.length; m++) {
@@ -6493,7 +6493,7 @@ export default class BranchTemplate extends Component {
                     items: items,
                     // openAddNodeModal: false,
                 }, () => {
-                    console.log("updated tree data>>>", this.state);
+                    // console.log("updated tree data>>>", this.state);
                 });
             } else {
                 var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
@@ -6504,33 +6504,33 @@ export default class BranchTemplate extends Component {
                     items: items,
                     // openAddNodeModal: false,
                 }, () => {
-                    console.log("updated tree data>>>", this.state);
+                    // console.log("updated tree data>>>", this.state);
                 });
             }
         }
-        console.log("end>>>", Date.now());
+        // console.log("end>>>", Date.now());
     }
     onRemoveButtonClick(itemConfig) {
         this.setState({ loading: true }, () => {
             var { items } = this.state;
             const ids = items.map(o => o.id)
             const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
-            console.log("delete unique items---", filtered)
+            // console.log("delete unique items---", filtered)
             items = filtered;
             this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
                 setTimeout(() => {
-                    console.log("delete result---", this.getDeletedItems(items, [itemConfig.id]))
+                    // console.log("delete result---", this.getDeletedItems(items, [itemConfig.id]))
                     this.calculateMOMData(0, 2);
                 }, 0);
             });
         });
     }
     onMoveItem(parentid, itemid) {
-        console.log("on move item called");
+        // console.log("on move item called");
         const { items } = this.state;
-        console.log("move item items---", items);
-        console.log("move item parentid---", parentid);
-        console.log("move item itemid---", itemid);
+        // console.log("move item items---", items);
+        // console.log("move item parentid---", parentid);
+        // console.log("move item itemid---", itemid);
         this.setState({
             cursorItem: itemid,
             items: (items.map(item => {
@@ -6613,8 +6613,8 @@ export default class BranchTemplate extends Component {
     onHighlightChanged(event, data) {
         const { context: item } = data;
         const { config } = this.state;
-        // console.log("data1---", item.title);
-        // console.log("data2---", item.id);
+        // // console.log("data1---", item.title);
+        // // console.log("data2---", item.id);
         // item.id
         if (item != null) {
 
@@ -6628,14 +6628,14 @@ export default class BranchTemplate extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id
             }, () => {
-                console.log("highlighted item---", this.state)
+                // console.log("highlighted item---", this.state)
             })
         }
     };
     onCursoChanged(event, data) {
-        console.log("cursor changed called---", data)
+        // console.log("cursor changed called---", data)
         const { context: item } = data;
-        console.log("cursor changed item---", item);
+        // console.log("cursor changed item---", item);
         // const preItem = JSON.parse(JSON.stringify(data.context));
         if (item != null) {
             this.setState({
@@ -6664,11 +6664,11 @@ export default class BranchTemplate extends Component {
                 cursorItem: item.id,
                 usageText: ''
             }, () => {
-                console.log("555>>>", this.state.items);
+                // console.log("555>>>", this.state.items);
                 const ids = this.state.items.map(o => o.id)
                 const filtered = this.state.items.filter(({ id }, index) => !ids.includes(id, index + 1))
-                console.log("edit unique items---", filtered)
-                console.log("highlighted item---", this.state.currentItemConfig.context)
+                // console.log("edit unique items---", filtered)
+                // console.log("highlighted item---", this.state.currentItemConfig.context)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.level != 0) {
                     this.calculateParentValueFromMOM(data.context.payload.nodeDataMap[0][0].monthNo);
@@ -6685,20 +6685,20 @@ export default class BranchTemplate extends Component {
                     // this.getNoOfMonthsInUsagePeriod();
                     this.getNodeUnitOfPrent();
                     this.getNoOfFUPatient();
-                    console.log("on curso nofuchanged---", this.state.noOfFUPatient)
+                    // console.log("on curso nofuchanged---", this.state.noOfFUPatient)
                     this.getNoOfMonthsInUsagePeriod();
                     this.getNoFURequired();
                     this.getUsageTemplateList((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
-                    // console.log("no -----------------");
+                    // // console.log("no -----------------");
                     this.getUsageText();
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.currentItemConfig.context.level == 0 ? this.state.currentItemConfig.context.payload.nodeUnit.id : this.state.currentItemConfig.parentItem.payload.nodeUnit.id;
                 } else if (data.context.payload.nodeType.id == 5) {
 
-                    console.log("hey 1---")
+                    // console.log("hey 1---")
                     setTimeout(() => {
                         this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
 
-                        console.log("hey 2---", this.state.planningUnitList);
+                        // console.log("hey 2---", this.state.planningUnitList);
                         this.getNoOfMonthsInUsagePeriod();
                         // (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
                         // // (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
@@ -6708,12 +6708,12 @@ export default class BranchTemplate extends Component {
                         // }, () => {
 
 
-                        console.log("hey 3")
+                        // console.log("hey 3")
 
-                        console.log("hey 4")
+                        // console.log("hey 4")
                     }, 0);
-                    // console.log("this.state.currentItemConfig.parentItem.parent 1----", this.state.currentItemConfig.parentItem.parent);
-                    // console.log("this.state.currentItemConfig.parentItem.parent 2----", this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent));
+                    // // console.log("this.state.currentItemConfig.parentItem.parent 1----", this.state.currentItemConfig.parentItem.parent);
+                    // // console.log("this.state.currentItemConfig.parentItem.parent 2----", this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent));
                     if (this.state.currentItemConfig.parentItem.parent == null) {
                         this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0].payload.nodeUnit.id;
                     } else {
@@ -6731,7 +6731,7 @@ export default class BranchTemplate extends Component {
     };
 
     updateNodeInfoInJson(currentItemConfig) {
-        console.log("update tree node called------------", currentItemConfig);
+        // console.log("update tree node called------------", currentItemConfig);
         let isNodeChanged = currentItemConfig.context.newTemplateFlag;
         var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
         var nodes = this.state.items;
@@ -6753,12 +6753,12 @@ export default class BranchTemplate extends Component {
         const { treeTemplate } = this.state;
 
         var treeLevelList = treeTemplate.levelList;
-        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@", currentItemConfig.context.level == 0 && treeLevelList != undefined)
-        console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@treeLevelList", treeLevelList)
+        // console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@", currentItemConfig.context.level == 0 && treeLevelList != undefined)
+        // console.log("currentItemConfig.context.level == 0 && treeLevelList != undefined@@@@@@@treeLevelList", treeLevelList)
 
         if (currentItemConfig.context.level == 0 && treeLevelList != undefined) {
             var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
-            console.log("levelListFiltered@@@@@@@@@@", levelListFiltered);
+            // console.log("levelListFiltered@@@@@@@@@@", levelListFiltered);
             if (levelListFiltered != -1) {
                 var unitId = currentItemConfig.context.payload.nodeType.id == 4 && currentItemConfig.context.parent != null ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
                 var label = {}
@@ -6772,14 +6772,14 @@ export default class BranchTemplate extends Component {
 
             }
             treeTemplate.levelList = treeLevelList;
-            console.log("TreeTemplate@@@@@@@", treeTemplate)
+            // console.log("TreeTemplate@@@@@@@", treeTemplate)
         }
         this.setState({
             items: nodes,
             isSubmitClicked: false,
             treeTemplate
         }, () => {
-            console.log("updated tree data+++", this.state);
+            // console.log("updated tree data+++", this.state);
             if (currentItemConfig.context.payload.nodeType.id == 4 && (isNodeChanged == 0 || isNodeChanged == false)) {
                 this.createPUNode(JSON.parse(JSON.stringify(currentItemConfig)), currentItemConfig.context.id);
             } else {
@@ -6843,8 +6843,8 @@ export default class BranchTemplate extends Component {
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
-                        // console.log("tooltipItem---", tooltipItem);
-                        // console.log("tooltipItem data---", data);
+                        // // console.log("tooltipItem---", tooltipItem);
+                        // // console.log("tooltipItem data---", data);
                         // if (tooltipItem.datasetIndex == 1) {
                         let label = data.labels[tooltipItem.index];
                         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
@@ -7004,8 +7004,8 @@ export default class BranchTemplate extends Component {
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
-                        // console.log("tooltipItem---", tooltipItem);
-                        // console.log("tooltipItem data---", data);
+                        // // console.log("tooltipItem---", tooltipItem);
+                        // // console.log("tooltipItem data---", data);
                         if (tooltipItem.datasetIndex == 1) {
                             let label = data.labels[tooltipItem.index];
                             let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
@@ -7102,7 +7102,7 @@ export default class BranchTemplate extends Component {
             };
         }
 
-        console.log("Loader@@@@@@@@@@@", this.state.momJexcelLoader);
+        // console.log("Loader@@@@@@@@@@@", this.state.momJexcelLoader);
 
         return (
             <>
@@ -7123,9 +7123,9 @@ export default class BranchTemplate extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             if (!this.state.isSubmitClicked) {
                                 this.setState({ openAddNodeModal: false, isSubmitClicked: true }, () => {
-                                    console.log("all ok>>>");
+                                    // console.log("all ok>>>");
                                     setTimeout(() => {
-                                        console.log("inside set timeout on submit")
+                                        // console.log("inside set timeout on submit")
                                         if (this.state.addNodeFlag) {
                                             this.onAddButtonClick(this.state.currentItemConfig)
                                         } else {
@@ -7812,14 +7812,14 @@ export default class BranchTemplate extends Component {
                                                         getOptionLabel={(option) => option.label}
                                                         // style={{ width: 1000 }}
                                                         onChange={(event, value) => {
-                                                            console.log("combo 2 ro combo box---", value);
-                                                            // console.log("combo 2 ro combo box---", event.target.value);
+                                                            // console.log("combo 2 ro combo box---", value);
+                                                            // // console.log("combo 2 ro combo box---", event.target.value);
                                                             // if(){
                                                             this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id = value.value;
                                                             if (value != null) {
                                                                 this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en = value.label;
                                                             }
-                                                            console.log("autocomplete data---", this.state.currentItemConfig)
+                                                            // console.log("autocomplete data---", this.state.currentItemConfig)
                                                             this.getForecastingUnitUnitByFUId(value.value);
 
                                                         }} // prints the selected value
@@ -8783,15 +8783,15 @@ export default class BranchTemplate extends Component {
         this.pickAMonth4.current.show()
     }
     handleAMonthChange4 = (year, month) => {
-        // console.log("value>>>", year);
-        // console.log("text>>>", month)
+        // // console.log("value>>>", year);
+        // // console.log("text>>>", month)
         this.setState({ currentCalculatorStartDate: year + "-" + month + "-01" }, () => {
 
         });
 
     }
     handleAMonthDissmis4 = (value) => {
-        // console.log("dismiss>>", value);
+        // // console.log("dismiss>>", value);
         // this.setState({ singleValue2: value, }, () => {
         // this.fetchData();
         // })
@@ -8803,15 +8803,15 @@ export default class BranchTemplate extends Component {
         this.pickAMonth5.current.show()
     }
     handleAMonthChange5 = (year, month) => {
-        // console.log("value>>>", year);
-        // console.log("text>>>", month)
+        // // console.log("value>>>", year);
+        // // console.log("text>>>", month)
         this.setState({ currentCalculatorStopDate: year + "-" + month + "-01" }, () => {
 
         });
 
     }
     handleAMonthDissmis5 = (value) => {
-        // console.log("dismiss>>", value);
+        // // console.log("dismiss>>", value);
         // this.setState({ singleValue2: value, }, () => {
         // this.fetchData();
         // })
@@ -8827,33 +8827,33 @@ export default class BranchTemplate extends Component {
     }
 
     // handleAMonthChange2 = (year, month) => {
-    //     console.log("value>>>", year);
-    //     console.log("text>>>", month)
+    //     // console.log("value>>>", year);
+    //     // console.log("text>>>", month)
     //     var month = parseInt(month) < 10 ? "0" + month : month
     //     var date = year + "-" + month + "-" + "01"
     //     this.filterScalingDataByMonth(date);
     //     // let { currentItemConfig } = this.state;
     //     // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
     //     this.setState({ scalingMonth: date }, () => {
-    //         console.log("after state update---", this.state.currentItemConfig);
+    //         // console.log("after state update---", this.state.currentItemConfig);
     //     });
     // }
     handleAMonthChange1 = (year, month) => {
-        // console.log("value>>>", year);
-        // console.log("text>>>", month)
+        // // console.log("value>>>", year);
+        // // console.log("text>>>", month)
         var month = parseInt(month) < 10 ? "0" + month : month
         var date = year + "-" + month + "-" + "01"
         let { currentItemConfig } = this.state;
         (currentItemConfig.context.payload.nodeDataMap[0])[0].month = date;
         this.setState({ currentItemConfig }, () => {
-            console.log("after state update---", this.state.currentItemConfig);
+            // console.log("after state update---", this.state.currentItemConfig);
         });
         //
         //
     }
 
     // handleAMonthDissmis2 = (value) => {
-    //     console.log("dismiss>>", value);
+    //     // console.log("dismiss>>", value);
     //     // this.setState({ singleValue2: value, }, () => {
     //     // this.fetchData();
     // }
@@ -8861,7 +8861,7 @@ export default class BranchTemplate extends Component {
 
     handleAMonthDissmis1 = (value) => {
         let month = value.year + '-' + value.month + '-01';
-        // console.log("dismiss>>", value);
+        // // console.log("dismiss>>", value);
         this.setState({ singleValue2: value, }, () => {
             // this.fetchData();
             this.calculateParentValueFromMOM(month);
@@ -8870,7 +8870,7 @@ export default class BranchTemplate extends Component {
     }
 
     exportDoc() {
-        console.log("This.state.items +++", this.state.items);
+        // console.log("This.state.items +++", this.state.items);
         var item1 = this.state.items;
         var sortOrderArray = [...new Set(item1.map(ele => (ele.sortOrder)))];
         var sortedArray = sortOrderArray.sort();
@@ -8878,7 +8878,7 @@ export default class BranchTemplate extends Component {
         for (var i = 0; i < sortedArray.length; i++) {
             items.push(item1.filter(c => c.sortOrder == sortedArray[i])[0]);
         }
-        console.log("Items+++", items);
+        // console.log("Items+++", items);
         var dataArray = [];
         dataArray.push(new Paragraph({
             children: [new TextRun({ "text": "Tree Validation", bold: true, size: 30 })],
@@ -9156,7 +9156,7 @@ export default class BranchTemplate extends Component {
                     lineType: LineType.Dotted
                 }));
             }
-            console.log("level json***", treeLevelItems);
+            // console.log("level json***", treeLevelItems);
         }
 
         const config = {
@@ -9203,7 +9203,7 @@ export default class BranchTemplate extends Component {
                 }
                 return <div style={{ ...style, background: titleColor }} onClick={(event) => {
                     event.stopPropagation();
-                    //   console.log("Data@@@1111----------->",data)
+                    //   // console.log("Data@@@1111----------->",data)
                     //   alert(`User clicked on level title ${title}`)
                     this.levelClicked(data)
                 }}>
@@ -9255,15 +9255,15 @@ export default class BranchTemplate extends Component {
                     {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
                         <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
-                                console.log("add button called---------");
+                                // console.log("add button called---------");
                                 event.stopPropagation();
-                                console.log("add node----", itemConfig);
+                                // console.log("add node----", itemConfig);
                                 var getLevelUnit = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList.filter(c => c.levelNo == itemConfig.level + 1) : [];
                                 var levelUnitId = ""
                                 if (getLevelUnit.length > 0) {
                                     levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
                                 }
-                                console.log("level unit id on add button click---", levelUnitId);
+                                // console.log("level unit id on add button click---", levelUnitId);
                                 this.setState({
                                     isValidError: true,
                                     tempPlanningUnitId: '',
@@ -9405,10 +9405,10 @@ export default class BranchTemplate extends Component {
 
                                     }
                                 }, () => {
-                                    console.log("add click config---", this.state.currentItemConfig);
-                                    console.log("add click nodeflag---", this.state.addNodeFlag);
-                                    console.log("item config---", itemConfig);
-                                    console.log("parent value check---", itemConfig.payload.nodeDataMap[0][0].calculatedDataValue);
+                                    // console.log("add click config---", this.state.currentItemConfig);
+                                    // console.log("add click nodeflag---", this.state.addNodeFlag);
+                                    // console.log("item config---", itemConfig);
+                                    // console.log("parent value check---", itemConfig.payload.nodeDataMap[0][0].calculatedDataValue);
                                     this.setState({
                                         orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
                                         // parentValue: itemConfig.payload.nodeDataMap[0][0].calculatedDataValue != null ? itemConfig.payload.nodeDataMap[0][0].calculatedDataValue : 0
@@ -9421,7 +9421,7 @@ export default class BranchTemplate extends Component {
                                         this.getUsageTemplateList(0);
                                     }
                                     else if (itemConfig.payload.nodeType.id == 4) {
-                                        console.log("fu id---", (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                                        // console.log("fu id---", (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                                         this.getNoOfFUPatient();
                                         setTimeout(() => {
                                             this.getNoOfMonthsInUsagePeriod();
@@ -9515,16 +9515,16 @@ export default class BranchTemplate extends Component {
                                         this.setState({
                                             loading: true
                                         })
-                                        console.log("on submit called-----------------");
+                                        // console.log("on submit called-----------------");
                                         var template = this.state.treeTemplate;
-                                        console.log("template---", template);
+                                        // console.log("template---", template);
                                         var items = this.state.items;
-                                        console.log("items---", items);
+                                        // console.log("items---", items);
                                         var flatList = [];
                                         for (var i = 0; i < items.length; i++) {
-                                            console.log("i============", i);
+                                            // console.log("i============", i);
                                             var item = items[i];
-                                            console.log("item---", item);
+                                            // console.log("item---", item);
                                             var json = {
                                                 id: item.id,
                                                 parent: item.parent,
@@ -9564,7 +9564,7 @@ export default class BranchTemplate extends Component {
                                             }
                                             flatList.push(json);
                                         }
-                                        console.log("flatList---", flatList);
+                                        // console.log("flatList---", flatList);
                                         var templateObj = {
                                             treeTemplateId: template.treeTemplateId,
                                             branch: true,
@@ -9581,7 +9581,7 @@ export default class BranchTemplate extends Component {
                                             flatList: flatList,
                                             levelList: template.levelList
                                         }
-                                        console.log("template obj---", templateObj);
+                                        // console.log("template obj---", templateObj);
 
                                         if (template.treeTemplateId == 0) {
                                             if (template.flatList[0].newTemplateFlag == 0) {
@@ -9592,7 +9592,7 @@ export default class BranchTemplate extends Component {
                                             } else {
                                                 DatasetService.addTreeTemplate(templateObj)
                                                     .then(response => {
-                                                        console.log("after adding tree---", response.data);
+                                                        // console.log("after adding tree---", response.data);
                                                         if (response.status == 200) {
                                                             var items = response.data.flatList;
                                                             var arr = [];
@@ -9606,7 +9606,7 @@ export default class BranchTemplate extends Component {
                                                                     } else {
                                                                         var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
                                                                         var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
-                                                                        console.log("api parent value---", parentValue);
+                                                                        // console.log("api parent value---", parentValue);
                                                                         (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
                                                                     }
                                                                     if (this.state.hideFUPUNode) {
@@ -9619,7 +9619,7 @@ export default class BranchTemplate extends Component {
                                                                         items[i].isVisible = true;
                                                                     }
                                                                 }
-                                                                console.log("load---", items[i])
+                                                                // console.log("load---", items[i])
                                                                 // arr.push(items[i]);
                                                             }
                                                             this.setState({
@@ -9686,12 +9686,12 @@ export default class BranchTemplate extends Component {
                                                     );
                                             }
                                         } else {
-                                            console.log("templateObj for update>>>", templateObj);
+                                            // console.log("templateObj for update>>>", templateObj);
                                             DatasetService.updateTreeTemplate(templateObj)
                                                 .then(response => {
-                                                    console.log("after updating tree---", response);
+                                                    // console.log("after updating tree---", response);
                                                     if (response.status == 200) {
-                                                        console.log("message---", i18n.t(response.data.messageCode, { entityname }));
+                                                        // console.log("message---", i18n.t(response.data.messageCode, { entityname }));
                                                         var items = response.data.flatList;
                                                         var arr = [];
                                                         for (let i = 0; i < items.length; i++) {
@@ -9704,15 +9704,15 @@ export default class BranchTemplate extends Component {
                                                                 } else {
                                                                     var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
                                                                     var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
-                                                                    console.log("api parent value---", parentValue);
+                                                                    // console.log("api parent value---", parentValue);
 
                                                                     (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
                                                                 }
                                                             }
-                                                            console.log("load---", items[i])
+                                                            // console.log("load---", items[i])
                                                             // arr.push(items[i]);
                                                         }
-                                                        console.log("message---", i18n.t(response.data.messageCode, { entityname }));
+                                                        // console.log("message---", i18n.t(response.data.messageCode, { entityname }));
                                                         this.setState({
                                                             treeTemplate: response.data,
                                                             items,

@@ -6,7 +6,7 @@ export default class AccessDeniedComponent extends Component {
         super(props);
     }
     componentDidMount() {
-        console.log("Component did mount access denied called");
+        // console.log("Component did mount access denied called");
         if (localStorage.getItem('curUser') == null || localStorage.getItem('curUser') == '') {
             this.props.history.push(`/login/static.accessDenied`)
         }

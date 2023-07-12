@@ -128,7 +128,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ModelingTypeService.getModelingTypeList()
             .then(response => {
-                console.log("response.data----", response.data);
+                // console.log("response.data----", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -232,7 +232,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
                             this.state.modelingType.summary = summaryText_2;
                             this.state.modelingType.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.modelingType).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

@@ -155,7 +155,7 @@ class AddProcurementAgentComponent extends Component {
         this.setState({ displayColorPicker: false })
     };
     handleChangeColor = (color) => {
-        console.log("color---", color);
+        // console.log("color---", color);
         let { procurementAgent } = this.state;
         procurementAgent.colorHtmlCode = color.hex.toUpperCase();
         let rgba = 'rgba(' + color.rgb.r + "," + color.rgb.g + "," + color.rgb.b + "," + color.rgb.a + ')';
@@ -164,7 +164,9 @@ class AddProcurementAgentComponent extends Component {
             rgba,
             procurementAgent
         },
-            () => { console.log("agent--------------", procurementAgent); });
+            () => { 
+                // console.log("agent--------------", procurementAgent); 
+            });
     };
     hideSecondComponent() {
         setTimeout(function () {
@@ -192,10 +194,10 @@ class AddProcurementAgentComponent extends Component {
 
             if (procurementAgentValue.length >= 10) {//minus 2
                 procurementAgentValue = procurementAgentValue.slice(0, 8);
-                console.log("DISPLAYNAME-BEF----->", procurementAgentValue);
+                // console.log("DISPLAYNAME-BEF----->", procurementAgentValue);
                 ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP----->", response);
+                        // console.log("DISPLAYNAME-RESP----->", response);
                         let { procurementAgent } = this.state;
                         procurementAgent.procurementAgentCode = response.data;
                         this.setState({
@@ -245,10 +247,10 @@ class AddProcurementAgentComponent extends Component {
                     );
 
             } else {// not need to minus
-                console.log("DISPLAYNAME-BEF-else----->", procurementAgentValue);
+                // console.log("DISPLAYNAME-BEF-else----->", procurementAgentValue);
                 ProcurementAgentService.getProcurementAgentDisplayName(realmId, procurementAgentValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        // console.log("DISPLAYNAME-RESP-else----->", response);
                         let { procurementAgent } = this.state;
                         procurementAgent.procurementAgentCode = response.data;
                         this.setState({
@@ -417,7 +419,7 @@ class AddProcurementAgentComponent extends Component {
                             var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
-                        console.log("listArray", listArray)
+                        // console.log("listArray", listArray)
                         this.setState({
                             programList: listArray,
                             loading: false
@@ -557,7 +559,7 @@ class AddProcurementAgentComponent extends Component {
                 procurementAgent
             },
                 () => {
-                    console.log("listArray", realmId)
+                    // console.log("listArray", realmId)
                     this.getProgramByRealmId(realmId)
                 })
         }
@@ -704,7 +706,7 @@ class AddProcurementAgentComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("on submit---", this.state.procurementAgent)
+                                    // console.log("on submit---", this.state.procurementAgent)
                                     var pAgent = this.state.procurementAgent;
                                     for (var i = 0; i < pAgent.programList.length; i++) {
                                         if (pAgent.programList[i].id == 0) {
