@@ -127,13 +127,13 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         let count = 0;
 
         let tempArray = tableJson;
-        console.log('hasDuplicate------', tempArray);
+        // console.log('hasDuplicate------', tempArray);
 
         var hasDuplicate = false;
         tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {
             if (a === b) hasDuplicate = true
         })
-        console.log('hasDuplicate', hasDuplicate);
+        // console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
                 message: i18n.t('static.procurementUnit.duplicateProcurementUnit'),
@@ -161,11 +161,11 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 loading: false
             })
             var json = this.el.getJson(null, false);
-            console.log("Rows on submit", json)
+            // console.log("Rows on submit", json)
             var procurementUnitArray = []
             for (var i = 0; i < json.length; i++) {
                 var map = new Map(Object.entries(json[i]));
-                console.log("D-------------->Map--------", map);
+                // console.log("D-------------->Map--------", map);
                 if (map.get("7") == 1) {
                     if (map.get("6") == "") {
                         var pId = 0;
@@ -189,7 +189,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 }
 
             }
-            console.log("procurementUnitArray----->", procurementUnitArray);
+            // console.log("procurementUnitArray----->", procurementUnitArray);
             // AuthenticationService.setupAxiosInterceptors();
             ProcurementAgentService.addprocurementAgentProcurementUnitMapping(procurementUnitArray)
                 .then(response => {
@@ -247,14 +247,14 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             // var col = ("L").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(7, y);
@@ -262,7 +262,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
 
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -289,7 +289,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                 // var col = ("D").concat(parseInt(y) + 1);
                 // var value = this.el.getValueFromCoords(3, y);
                 // var reg = DECIMAL_NO_REGEX;
-                // // console.log("---------VAL----------", value);
+                // // // console.log("---------VAL----------", value);
                 // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
                 //     this.el.setStyle(col, "background-color", "transparent");
                 //     this.el.setStyle(col, "background-color", "yellow");
@@ -566,7 +566,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         ProcurementAgentService.getProcurementAgentProcurementUnitList(this.state.procurementAgentId)
             .then(response => {
                 if (response.status == 200) {
-                    // console.log("first---->", response.data);
+                    // // console.log("first---->", response.data);
                     let myResponse = response.data;
                     if (myResponse.length > 0) {
                         this.setState({ rows: myResponse });
@@ -574,7 +574,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     // AuthenticationService.setupAxiosInterceptors();
                     ProcurementAgentService.getProcurementAgentListAll().then(response => {
                         if (response.status == "200") {
-                            // console.log("second--->", response.data);
+                            // // console.log("second--->", response.data);
                             this.setState({
                                 procurementAgentList: response.data
                             });
@@ -588,7 +588,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                             // AuthenticationService.setupAxiosInterceptors();
                             ProcurementUnitService.getProcurementUnitList().then(response => {
                                 if (response.status == 200) {
-                                    // console.log("third ffff---->", response.data);
+                                    // // console.log("third ffff---->", response.data);
                                     var listArray = response.data;
                                     listArray.sort((a, b) => {
                                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -631,7 +631,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             productDataArr.push(data);
                                         }
                                     } else {
-                                        console.log("list length is 0.");
+                                        // console.log("list length is 0.");
                                     }
                                     this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                                     // this.el.destroy();

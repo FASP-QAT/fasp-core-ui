@@ -199,7 +199,7 @@ export default class OrganisationTicketComponent extends Component {
         HealthAreaService.getHealthAreaList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response---", response.data);
+                    // console.log("response---", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -283,7 +283,7 @@ export default class OrganisationTicketComponent extends Component {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("TracerCategory------->", response.data)
+                    // console.log("TracerCategory------->", response.data)
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -310,7 +310,7 @@ export default class OrganisationTicketComponent extends Component {
                         // loading: false
                     },
                         () => {
-                            console.log("TracerCategory------->", this.state.tracerCategoryList)
+                            // console.log("TracerCategory------->", this.state.tracerCategoryList)
                             // this.getForecastingUnit();
                             this.getUnitList();
                         })
@@ -368,7 +368,7 @@ export default class OrganisationTicketComponent extends Component {
 
     getUnitList() {
         UnitService.getUnitListAll().then(response => {
-            console.log("response------->" + response.data);
+            // console.log("response------->" + response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -456,7 +456,7 @@ export default class OrganisationTicketComponent extends Component {
     getEquivalancyUnitList() {
         EquivalancyUnitService.getEquivalancyUnitList().then(response => {
             if (response.status == 200) {
-                console.log("EQ1------->", response.data);
+                // console.log("EQ1------->", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -545,7 +545,7 @@ export default class OrganisationTicketComponent extends Component {
     getTypeList() {
         ProgramService.getDataSetList()
             .then(response => {
-                console.log("PROGRAM---------->", response.data)
+                // console.log("PROGRAM---------->", response.data)
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
@@ -649,7 +649,7 @@ export default class OrganisationTicketComponent extends Component {
     getEquivalancyUnitMappingData() {
         EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data);
+                // console.log("response.data---->", response.data);
                 let listArray = response.data;
 
                 listArray.sort((a, b) => {
@@ -749,12 +749,12 @@ export default class OrganisationTicketComponent extends Component {
         let newTracerCategoryIdList = tracerCategoryIdList.concat(tracerCategoryListOfMappingData);
         newTracerCategoryIdList = [... new Set(newTracerCategoryIdList)];
 
-        console.log("response------->123", tracerCategoryIdList);
-        console.log("response------->124", tracerCategoryListOfMappingData);
-        console.log("response------->125", newTracerCategoryIdList);
+        // console.log("response------->123", tracerCategoryIdList);
+        // console.log("response------->124", tracerCategoryListOfMappingData);
+        // console.log("response------->125", newTracerCategoryIdList);
 
         ForecastingUnitService.getForecastingUnitByTracerCategoriesId(newTracerCategoryIdList).then(response => {
-            console.log("response------->126", response.data);
+            // console.log("response------->126", response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -941,9 +941,9 @@ export default class OrganisationTicketComponent extends Component {
                             })
                             this.state.equivalencyUnit.summary = summaryText_2;
                             this.state.equivalencyUnit.userLanguageCode = this.state.lang;
-                            console.log("SUBMIT---------->", this.state.equivalencyUnit);
+                            // console.log("SUBMIT---------->", this.state.equivalencyUnit);
                             JiraTikcetService.addEmailRequestIssue(this.state.equivalencyUnit).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

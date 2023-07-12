@@ -83,18 +83,18 @@ class ProductValidation extends Component {
     }
 
     getDatasetData() {
-        console.log("In get dataset data+++")
+        // console.log("In get dataset data+++")
         this.setState({
             loading: true
         })
         var versionId = this.state.versionId.toString();
-        console.log("In get dataset data+++", versionId);
+        // console.log("In get dataset data+++", versionId);
         if (versionId != "" && versionId.includes("Local")) {
             var actualVersionId = (versionId.split('(')[0]).trim();
             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
             var datasetId = this.state.datasetId + "_v" + actualVersionId + "_uId_" + userId;
-            console.log("DatasetId+++", datasetId);
+            // console.log("DatasetId+++", datasetId);
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -110,7 +110,7 @@ class ProductValidation extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    console.log("MyResult+++", myResult);
+                    // console.log("MyResult+++", myResult);
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                     var datasetJson = JSON.parse(datasetData);
@@ -127,7 +127,7 @@ class ProductValidation extends Component {
             var json = [{ programId: this.state.datasetId, versionId: versionId }]
             DatasetService.getAllDatasetData(json).then(response => {
                 if (response.status == 200) {
-                    console.log("resp--------------------", response.data);
+                    // console.log("resp--------------------", response.data);
                     var responseData = response.data[0];
                     this.setState({
                         datasetData: responseData,
@@ -172,7 +172,7 @@ class ProductValidation extends Component {
     getTreeList() {
         this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
-        console.log("datasetJson+++", datasetJson);
+        // console.log("datasetJson+++", datasetJson);
         var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
         var treeId = "";
         var event = {
@@ -337,15 +337,15 @@ class ProductValidation extends Component {
     }
 
     round(value) {
-        console.log("Round input value---", value);
+        // console.log("Round input value---", value);
         var result = (value - Math.floor(value)).toFixed(4);
-        console.log("Round result---", result);
-        console.log("Round condition---", `${ROUNDING_NUMBER}`);
+        // console.log("Round result---", result);
+        // console.log("Round condition---", `${ROUNDING_NUMBER}`);
         if (result > `${ROUNDING_NUMBER}`) {
-            console.log("Round ceiling---", Math.ceil(value));
+            // console.log("Round ceiling---", Math.ceil(value));
             return Math.ceil(value);
         } else {
-            console.log("Round floor---", Math.floor(value));
+            // console.log("Round floor---", Math.floor(value));
             if (Math.floor(value) == 0) {
                 return Math.ceil(value);
             } else {
@@ -360,7 +360,7 @@ class ProductValidation extends Component {
                 loading: true
             })
             var datasetData = this.state.datasetData;
-            console.log("DatasetData+++", datasetData);
+            // console.log("DatasetData+++", datasetData);
             var treeList = datasetData.treeList;
             var selectedTree = treeList.filter(c => c.treeId == this.state.treeId)[0];
             var flatList = selectedTree.tree.flatList;
@@ -373,62 +373,62 @@ class ProductValidation extends Component {
             var nodeDataList = []
             for (var f = 0; f < items.length; f++) {
                 var nodeDataMap = items[f].payload.nodeDataMap[this.state.scenarioId][0];
-                console.log("NodeDataMap+++", nodeDataMap)
+                // console.log("NodeDataMap+++", nodeDataMap)
                 nodeDataList.push({ nodeDataMap: nodeDataMap, flatItem: items[f] });
             }
             var maxLevel = Math.max.apply(Math, flatList.map(function (o) { return o.level; }))
-            console.log("MaxLevel+++", maxLevel);
+            // console.log("MaxLevel+++", maxLevel);
             var planningUnitList = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 5);
             var fuListThatDoesNotHaveChildren = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 4 && nodeDataList.filter(f => f.flatItem.parent == c.flatItem.id).length == 0);
             planningUnitList = planningUnitList.concat(fuListThatDoesNotHaveChildren);
-            console.log("PlanningUnitList+++", planningUnitList);
-            console.log("fuListThatDoesNotHaveChildren+++", fuListThatDoesNotHaveChildren);
+            // console.log("PlanningUnitList+++", planningUnitList);
+            // console.log("fuListThatDoesNotHaveChildren+++", fuListThatDoesNotHaveChildren);
             var finalData = [];
             for (var i = 0; i < planningUnitList.length; i++) {
                 var parentLabelList = [];
                 if (planningUnitList[i].flatItem.payload.nodeType.id == 5) {
                     var fuNode = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
                     var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
-                    console.log("Node@@@+++", node);
+                    // console.log("Node@@@+++", node);
                     var levelForNode = node.flatItem.level
                     for (var j = 0; j < (levelForNode); j++) {
                         var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
                         if (parentNode != undefined) {
-                            console.log("ParentNode@@@+++", parentNode)
-                            console.log("Node parent@@@+++", node.flatItem.parent)
+                            // console.log("ParentNode@@@+++", parentNode)
+                            // console.log("Node parent@@@+++", node.flatItem.parent)
                             parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
                             node = parentNode;
                         }
                     }
-                    console.log("Parent Label list+++", parentLabelList)
+                    // console.log("Parent Label list+++", parentLabelList)
                     var name = "";
-                    console.log("Length+++", parentLabelList.length)
+                    // console.log("Length+++", parentLabelList.length)
                     for (var p = parentLabelList.length; p > 0; p--) {
-                        console.log("In for+++")
+                        // console.log("In for+++")
                         if (p != 1) {
                             name = name.concat(parentLabelList[p - 1]) + " > "
                         } else {
                             name = name.concat(parentLabelList[p - 1])
                         }
                     }
-                    console.log("Name+++", name);
+                    // console.log("Name+++", name);
                     finalData.push({ name: name, nodeDataMap: planningUnitList[i].nodeDataMap, flatItem: planningUnitList[i].flatItem, parentNodeNodeDataMap: fuNode.nodeDataMap, parentNodeFlatItem: fuNode.flatItem, parent: fuNode.flatItem.parent })
                 } else {
                     var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
-                    console.log("Node@@@+++", node)
+                    // console.log("Node@@@+++", node)
                     var levelForNode = node.flatItem.level
                     parentLabelList.push(getLabelText(node.flatItem.payload.label, this.state.lang));
                     for (var j = 0; j < levelForNode; j++) {
                         var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
-                        console.log("ParentNode@@@+++", parentNode)
-                        console.log("Node parent@@@+++", node.flatItem.parent)
+                        // console.log("ParentNode@@@+++", parentNode)
+                        // console.log("Node parent@@@+++", node.flatItem.parent)
                         parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
                         node = parentNode;
                     }
                     var name = "";
-                    console.log("Length+++", parentLabelList.length)
+                    // console.log("Length+++", parentLabelList.length)
                     for (var p = parentLabelList.length; p > 0; p--) {
-                        console.log("In for+++")
+                        // console.log("In for+++")
                         if (p != 1) {
                             name = name.concat(parentLabelList[p - 1]) + " > "
                         } else {
@@ -438,7 +438,7 @@ class ProductValidation extends Component {
                     finalData.push({ name: name, nodeDataMap: "", flatItem: "", parentNodeNodeDataMap: planningUnitList[i].nodeDataMap, parentNodeFlatItem: planningUnitList[i].flatItem, parent: planningUnitList[i].flatItem.parent })
                 }
             }
-            console.log("FinalData+++", finalData);
+            // console.log("FinalData+++", finalData);
             var dataArray = [];
             var data = [];
             var parentId = 0;
@@ -452,7 +452,7 @@ class ProductValidation extends Component {
                 var selectedText;
                 var selectedText1;
                 var selectedText2;
-                console.log("finalData[i].parentNodeNodeDataMap+++", finalData[i])
+                // console.log("finalData[i].parentNodeNodeDataMap+++", finalData[i])
                 noOfPersons = finalData[i].parentNodeNodeDataMap.fuNode.noOfPersons;
                 noOfForecastingUnitsPerPerson = finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson;
                 usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
@@ -464,7 +464,7 @@ class ProductValidation extends Component {
 
                 }
                 // console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
-                console.log("finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit", finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit);
+                // console.log("finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit", finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit);
                 try {
                     if (finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id.toString().includes("Local")) {
                         selectedText1 = getLabelText(this.state.fuList.filter(c => c.forecastingUnitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id)[0].unit.label, this.state.lang)
@@ -472,12 +472,12 @@ class ProductValidation extends Component {
                         selectedText1 = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang)
                     }
                 } catch (error) {
-                    console.log("error--->", error)
+                    // console.log("error--->", error)
                     selectedText1 = "";
                 }
-                console.log("selectedText1", selectedText1)
+                // console.log("selectedText1", selectedText1)
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
-                    console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
+                    // console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
                     var upListFiltered = this.state.upList.filter(c => finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod != null && c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
                     if (upListFiltered.length > 0) {
                         selectedText2 = getLabelText(upListFiltered[0].label, this.state.lang);
@@ -485,7 +485,7 @@ class ProductValidation extends Component {
                 }
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                     if (finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
-                        console.log("finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod@@@", finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod)
+                        // console.log("finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod@@@", finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod)
                         var selectedText3 = finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod != null && finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod.usagePeriodId != '' ? this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en : '';
                         usageText = i18n.t('static.usageTemplate.every') + " " + noOfPersons + " " + selectedText + " " + i18n.t('static.usageTemplate.requires') + " " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + " " + usageFrequency + " " + i18n.t('static.tree.timesPer') + " " + selectedText2 + " " + i18n.t('static.tree.for') + " " + (finalData[i].parentNodeNodeDataMap.fuNode.repeatCount != null ? finalData[i].parentNodeNodeDataMap.fuNode.repeatCount : '') + " " + selectedText3;
                     } else {
@@ -496,8 +496,8 @@ class ProductValidation extends Component {
                 }
                 var usageTextPU = "";
                 if (finalData[i].nodeDataMap != "") {
-                    console.log("finalData[i]@@@", finalData[i]);
-                    console.log("PlanningUnitList@@@", this.state.datasetData.planningUnitList);
+                    // console.log("finalData[i]@@@", finalData[i]);
+                    // console.log("PlanningUnitList@@@", this.state.datasetData.planningUnitList);
                     var planningUnitObj = this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id);
                     var planningUnit = ""
                     if (planningUnitObj.length > 0) {
@@ -512,16 +512,16 @@ class ProductValidation extends Component {
                     usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
                     var noOfMonthsInUsagePeriod = 0;
                     if (usagePeriodId != null && usagePeriodId != "") {
-                        console.log("finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod@@@", finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod);
+                        // console.log("finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod@@@", finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod);
                         var usagePeriodObj = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
                         var convertToMonth = usagePeriodObj[0].convertToMonth;
-                        console.log("convertToMonth---", convertToMonth);
+                        // console.log("convertToMonth---", convertToMonth);
                         if (usageTypeId == 2) {
                             var div = (convertToMonth * usageFrequency);
-                            console.log("duv---", div);
+                            // console.log("duv---", div);
                             if (div != 0) {
                                 noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
-                                console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                                // console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                             }
                         } else {
                             // var noOfFUPatient = this.state.noOfFUPatient;
@@ -540,11 +540,11 @@ class ProductValidation extends Component {
                         }
                         usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
                     } else {
-                        console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
-                        console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
+                        // console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
+                        // console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
                         // console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
                         var puPerInterval = parseFloat(finalData[i].nodeDataMap.puNode.puPerVisit).toFixed(8);
-                        console.log("puPerInterval###", parseFloat(puPerInterval).toFixed(8));
+                        // console.log("puPerInterval###", parseFloat(puPerInterval).toFixed(8));
 
                         usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommasWith8Decimals((puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + "1" + " " + i18n.t('static.report.month');
                     }
@@ -577,7 +577,7 @@ class ProductValidation extends Component {
                     // }
                     // totalCost += cost;
                 }
-                console.log("selectedPlanningUnit@@@", selectedPlanningUnit);
+                // console.log("selectedPlanningUnit@@@", selectedPlanningUnit);
 
                 if (i > 0 && finalData[i].parent != finalData[i - 1].parent) {
                     data = [];
@@ -608,9 +608,9 @@ class ProductValidation extends Component {
                 data[9] = 0;
                 totalCost += Number(data[8])
                 dataArray.push(data);
-                console.log("i Test", i)
-                console.log("i final data Test", finalData[i])
-                console.log("i-1 Test", finalData[i - 1])
+                // console.log("i Test", i)
+                // console.log("i final data Test", finalData[i])
+                // console.log("i-1 Test", finalData[i - 1])
 
             }
             if (finalData.length > 0) {
@@ -628,7 +628,7 @@ class ProductValidation extends Component {
                 totalCost = 0;
                 dataArray.push(data);
             }
-            console.log("DataArray+++", dataArray)
+            // console.log("DataArray+++", dataArray)
             this.el = jexcel(document.getElementById("tableDiv"), '');
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -728,13 +728,13 @@ class ProductValidation extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var json = instance.worksheets[0].getJson(null, false);
-        console.log("Json@@@@@ Test", json)
+        // console.log("Json@@@@@ Test", json)
         var colArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
         for (var j = 0; j < json.length; j++) {
             if (json[j][9] == 1) {
-                console.log("In j 9 Test")
+                // console.log("In j 9 Test")
                 for (var i = 0; i < colArr.length; i++) {
-                    console.log("colArr[i] + (j + 1) Test", colArr[i] + (j + 1))
+                    // console.log("colArr[i] + (j + 1) Test", colArr[i] + (j + 1))
                     var cell = instance.worksheets[0].getCell(colArr[i] + (j + 1))
                     cell.classList.add('productValidationSubTotalClass');
                     // instance.jexcel.setStyle(colArr[i] + (j + 1), "background-color", "#808080")
@@ -752,8 +752,8 @@ class ProductValidation extends Component {
             loading: true
         })
         var datasetList = this.state.datasetList;
-        console.log("datsetlist+++", datasetList);
-        console.log("this.state.datasetId+++", this.state.datasetId)
+        // console.log("datsetlist+++", datasetList);
+        // console.log("this.state.datasetId+++", this.state.datasetId)
         if (this.state.datasetId > 0) {
             var selectedDataset = datasetList.filter(c => c.id == this.state.datasetId)[0];
             var versionList = [];
@@ -778,7 +778,7 @@ class ProductValidation extends Component {
                     value: ""
                 }
             };
-            console.log("Version List Test@123",versionList)
+            // console.log("Version List Test@123",versionList)
             if (versionList.length == 1) {
                 versionId = versionList[0].versionId;
                 event.target.value = versionList[0].versionId;
@@ -811,7 +811,7 @@ class ProductValidation extends Component {
         this.setState({ loading: true });
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
-                console.log("resp--------------------", response.data);
+                // console.log("resp--------------------", response.data);
                 var responseData = response.data;
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
@@ -908,7 +908,7 @@ class ProductValidation extends Component {
                                     currencyResult.map(item => {
                                         currencyList.push({ id: item.currencyId, name: getLabelText(item.label, this.state.lang), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
                                     })
-                                    console.log("MyResult+++", myResult);
+                                    // console.log("MyResult+++", myResult);
                                     var datasetList = this.state.datasetList;
                                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -920,7 +920,7 @@ class ProductValidation extends Component {
                                             if (index == -1) {
                                                 var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
                                                 var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                                                console.log("programNamelabel+++", programNameLabel);
+                                                // console.log("programNamelabel+++", programNameLabel);
                                                 var programNameJson = JSON.parse(programNameLabel);
                                                 var json = {
                                                     id: myResult[mr].programId,
@@ -931,7 +931,7 @@ class ProductValidation extends Component {
                                                 datasetList.push(json)
                                             } else {
                                                 var existingVersionList = datasetList[index].versionList;
-                                                console.log("existingVersionList+++", datasetList[index].versionList)
+                                                // console.log("existingVersionList+++", datasetList[index].versionList)
                                                 existingVersionList.push({ versionId: myResult[mr].version + "  (Local)",createdDate:programData.currentVersion.createdDate })
                                                 datasetList[index].versionList = existingVersionList
                                             }
@@ -944,7 +944,7 @@ class ProductValidation extends Component {
                                         }
                                     };
                                     if (datasetList.length == 1) {
-                                        console.log("in if%%%", datasetList.length)
+                                        // console.log("in if%%%", datasetList.length)
                                         datasetId = datasetList[0].id;
                                         event.target.value = datasetList[0].id;
                                     } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
@@ -1109,7 +1109,7 @@ class ProductValidation extends Component {
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 5;
-            console.log(y)
+            // console.log(y)
         }
 
         planningText = doc.splitTextToSize((i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text), doc.internal.pageSize.width * 3 / 4);
@@ -1123,7 +1123,7 @@ class ProductValidation extends Component {
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 5;
-            console.log(y)
+            // console.log(y)
         }
         y = y + 5;
         doc.text(i18n.t('static.country.currency') + ': ' + document.getElementById("currencyId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
@@ -1272,6 +1272,7 @@ class ProductValidation extends Component {
             }, this);
 
         const { versionList } = this.state;
+        // console.log("versionList111", versionList)
         let versions = versionList.length > 0
             && versionList.map((item, i) => {
                 return (

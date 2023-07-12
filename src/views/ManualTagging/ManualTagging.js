@@ -162,22 +162,22 @@ export default class ManualTagging extends Component {
     }
 
     versionChange(event) {
-        console.log("Loading 1 Mohit#############")
+        // console.log("Loading 1 Mohit#############")
         this.setState({
             loading: true
         })
         var versionId = event.target.value;
-        console.log("Loading 1 Mohit version Id#############", versionId)
+        // console.log("Loading 1 Mohit version Id#############", versionId)
         localStorage.setItem("sesVersionIdReport", versionId);
         this.setState({
             versionId: versionId,
             hasSelectAll: true
         }, () => {
             if (versionId != -1) {
-                console.log("Loading 1 Mohit in if#############", versionId)
+                // console.log("Loading 1 Mohit in if#############", versionId)
                 this.getPlanningUnitList()
             } else {
-                console.log("Loading 1 Mohit in else#############", versionId)
+                // console.log("Loading 1 Mohit in else#############", versionId)
                 this.setState({
                     outputList: [],
                     planningUnits: [],
@@ -196,9 +196,9 @@ export default class ManualTagging extends Component {
     }
 
     viewBatchData(event, row) {
-        console.log("event---", event);
-        console.log("row---", row.maxFilename);
-        console.log("row length---", row.shipmentList.length);
+        // console.log("event---", event);
+        // console.log("row---", row.maxFilename);
+        // console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
             var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
 
@@ -247,7 +247,7 @@ export default class ManualTagging extends Component {
         }
         var json = [];
         var orderHistory = this.state.artmisHistory.erpOrderList
-        console.log("Order History", this.state.artmisHistory);
+        // console.log("Order History", this.state.artmisHistory);
         var count = 0;
         for (var sb = orderHistory.length - 1; sb >= 0; sb--) {
             var data = [];
@@ -330,7 +330,7 @@ export default class ManualTagging extends Component {
         }
         var json = [];
         var shipmentHistory = this.state.artmisHistory.erpShipmentList
-        console.log("Order History")
+        // console.log("Order History")
         var count1 = 0;
         for (var sb = shipmentHistory.length - 1; sb >= 0; sb--) {
             var data = [];
@@ -424,11 +424,11 @@ export default class ManualTagging extends Component {
     //     try {
     //         var classList = document.getElementsByClassName("FortablewidthMannualtaggingtable3");
     //         var tr = classList[0].firstChild.firstChild.firstChild.firstChild;
-    //         console.log("Tr@@@@@@@", tr);
+    //         // console.log("Tr@@@@@@@", tr);
     //         tr.children[7].title = i18n.t('static.manualTagging.changeOrderOrder');
     //         var classList = document.getElementsByClassName("ShipmentNotificationtable");
     //         var tr = classList[0].firstChild.firstChild.firstChild.firstChild;
-    //         console.log("Tr@@@@@@@", tr);
+    //         // console.log("Tr@@@@@@@", tr);
     //         tr.children[6].title = i18n.t('static.manualTagging.changeOrderShipment');
     //     } catch (err) {
     //         setTimeout(function () {
@@ -571,13 +571,13 @@ export default class ManualTagging extends Component {
 
     }
     displayShipmentData() {
-        console.log("In display shipment Data@@@@@@@@@@@@@@@@Mohit")
+        // console.log("In display shipment Data@@@@@@@@@@@@@@@@Mohit")
         let selectedShipmentId = (this.state.checkboxValue ? parseInt(document.getElementById("notLinkedShipmentId").value) : 0);
         let selectedPlanningUnitId = (!this.state.checkboxValue ? parseInt(document.getElementById("planningUnitId1").value) : 0);
-        console.log("In display shipment Data Shipment Id@@@@@@@@@@@@@@@@Mohit", selectedShipmentId)
-        console.log("In display shipment Data planning Unit Id@@@@@@@@@@@@@@@@Mohit", selectedPlanningUnitId)
-        console.log("In display shipment Data checkbox value@@@@@@@@@@@@@@@@Mohit", this.state.checkboxValue)
-        console.log("notLinkedShipments@@@@@@@@@@@@@@@@Mohit", this.state.notLinkedShipments);
+        // console.log("In display shipment Data Shipment Id@@@@@@@@@@@@@@@@Mohit", selectedShipmentId)
+        // console.log("In display shipment Data planning Unit Id@@@@@@@@@@@@@@@@Mohit", selectedPlanningUnitId)
+        // console.log("In display shipment Data checkbox value@@@@@@@@@@@@@@@@Mohit", this.state.checkboxValue)
+        // console.log("notLinkedShipments@@@@@@@@@@@@@@@@Mohit", this.state.notLinkedShipments);
         let selectedShipment;
         if (selectedShipmentId != null && selectedShipmentId != 0 && this.state.checkboxValue) {
             selectedShipment = this.state.notLinkedShipments.filter(c => (c.shipmentId == selectedShipmentId));
@@ -587,7 +587,7 @@ export default class ManualTagging extends Component {
         for (var ss = 0; ss < selectedShipment.length; ss++) {
             selectedShipment[ss].tempIndex = selectedShipment[ss].shipmentId > 0 ? selectedShipment[ss].shipmentId : selectedShipment[ss].tempShipmentId;
         }
-        console.log("In display shipment Data selectedShipment value@@@@@@@@@@@@@@@@Mohit", selectedShipment)
+        // console.log("In display shipment Data selectedShipment value@@@@@@@@@@@@@@@@Mohit", selectedShipment)
         // if(this.state.checkboxValue){
 
         // }
@@ -605,12 +605,12 @@ export default class ManualTagging extends Component {
     }
     getNotLinkedShipments() {
         let programId1 = this.state.programId1;
-        console.log("programId1@@@@@@@@@@@@@", programId1)
+        // console.log("programId1@@@@@@@@@@@@@", programId1)
         if (programId1 != "") {
             var shipmentList = [];
             var localProgramList = this.state.localProgramList;
             var setOfPlanningUnitsBasedOnTracerCategory = [...new Set(this.state.planningUnitsBasedOnTracerCategory.map(ele => ele.planningUnit.id))]
-            console.log("setOfPlanningUnitsBasedOnTracerCategory@@@@@@@@@@@@@", setOfPlanningUnitsBasedOnTracerCategory)
+            // console.log("setOfPlanningUnitsBasedOnTracerCategory@@@@@@@@@@@@@", setOfPlanningUnitsBasedOnTracerCategory)
             var localProgramListFilter = localProgramList.filter(c => c.id == programId1);
             var planningUnitDataList = localProgramListFilter[0].programData.planningUnitDataList;
             for (var pu = 0; pu < planningUnitDataList.length; pu++) {
@@ -635,7 +635,7 @@ export default class ManualTagging extends Component {
                 var itemLabelB = b.shipmentId;
                 return itemLabelA > itemLabelB ? 1 : -1;
             });
-            console.log("ListArray.lengthMohit@@@@@@@@@@@", listArray.length)
+            // console.log("ListArray.lengthMohit@@@@@@@@@@@", listArray.length)
             this.setState({
                 notLinkedShipments: listArray
             });
@@ -826,7 +826,7 @@ export default class ManualTagging extends Component {
     // -----------start of changed function
 
     changeTab2 = function (instance, cell, x, y, value) {
-        console.log("Y Mohit", y)
+        // console.log("Y Mohit", y)
         if (!this.state.changedDataForTab2) {
             this.setState({
                 changedDataForTab2: true
@@ -948,7 +948,7 @@ export default class ManualTagging extends Component {
             finalShipmentId.map(c => {
                 qty += Number(c.qty)
             })
-            console.log("Final Shipment Ids @@@@@@@@@@@@@@@", finalShipmentId)
+            // console.log("Final Shipment Ids @@@@@@@@@@@@@@@", finalShipmentId)
             this.setState({
                 originalQty: qty,
                 finalShipmentId: finalShipmentId,
@@ -1000,9 +1000,9 @@ export default class ManualTagging extends Component {
                 //     value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 //     var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                 //     var qty = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                //     console.log("x@@@@@@@@@@@@", x)
-                //     console.log("y@@@@@@@@@@@@", y)
-                //     console.log("Value@@@@@@@@@@@@", value)
+                //     // console.log("x@@@@@@@@@@@@", x)
+                //     // console.log("y@@@@@@@@@@@@", y)
+                //     // console.log("Value@@@@@@@@@@@@", value)
                 //     if (value == "") {
                 //         this.el.setStyle(col, "background-color", "transparent");
                 //         this.el.setStyle(col, "background-color", "yellow");
@@ -1021,10 +1021,10 @@ export default class ManualTagging extends Component {
                 //                 this.state.instance.setValueFromCoords(12, y, Math.round(this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, y) * this.state.instance.getValueFromCoords(18, y)), true);
                 //                 this.state.instance.setValueFromCoords(19, y, Math.round(this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "") * this.state.instance.getValueFromCoords(10, y)), true);
                 //                 for (var j = 0; j < json.length; j++) {
-                //                     // console.log("J@@@@@@@@################",j)
-                //                     // console.log("y@@@@@@@@################",y)
-                //                     // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
-                //                     // console.log("jsonvalue@@@@@@@@################",json[j][1])
+                //                     // // console.log("J@@@@@@@@################",j)
+                //                     // // console.log("y@@@@@@@@################",y)
+                //                     // // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
+                //                     // // console.log("jsonvalue@@@@@@@@################",json[j][1])
                 //                     if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
                 //                         if (j != y) {
                 //                             this.state.instance.setValueFromCoords(11, j, value, true);
@@ -1053,8 +1053,8 @@ export default class ManualTagging extends Component {
                         this.state.instance.setStyle(col, "background-color", "transparent");
                         this.state.instance.setComments(col, "");
                         this.state.instance.setComments(col, "");
-                        console.log("this.state.realmCountryPlanningUnitList@@@@@@@@@@@Mohit", this.state.realmCountryPlanningUnitList)
-                        console.log("this.state.Value@@@@@@@@@@@Mohit", this.state.instance.getValueFromCoords(9, y))
+                        // console.log("this.state.realmCountryPlanningUnitList@@@@@@@@@@@Mohit", this.state.realmCountryPlanningUnitList)
+                        // console.log("this.state.Value@@@@@@@@@@@Mohit", this.state.instance.getValueFromCoords(9, y))
                         var rcpuFilter = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
 
                         if (rowData[0].toString() == "true") {
@@ -1062,10 +1062,10 @@ export default class ManualTagging extends Component {
                             this.state.instance.setValueFromCoords(11, y, Number(rcpuFilter.multiplier), true);
                             this.state.instance.setValueFromCoords(19, y, Math.round(this.state.instance.getValueFromCoords(10, y)), true);
                             for (var j = 0; j < json.length; j++) {
-                                // console.log("J@@@@@@@@################",j)
-                                // console.log("y@@@@@@@@################",y)
-                                // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
-                                // console.log("jsonvalue@@@@@@@@################",json[j][1])
+                                // // console.log("J@@@@@@@@################",j)
+                                // // console.log("y@@@@@@@@################",y)
+                                // // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
+                                // // console.log("jsonvalue@@@@@@@@################",json[j][1])
                                 if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
                                     if (j != y) {
                                         this.state.instance.setValueFromCoords(9, j, rcpuFilter.id, true);
@@ -1087,9 +1087,9 @@ export default class ManualTagging extends Component {
                     value = this.state.instance.getValue(`N${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     // var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
                     // var qty = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                    // console.log("x@@@@@@@@@@@@", x)
-                    // console.log("y@@@@@@@@@@@@", y)
-                    // console.log("Value@@@@@@@@@@@@", value)
+                    // // console.log("x@@@@@@@@@@@@", x)
+                    // // console.log("y@@@@@@@@@@@@", y)
+                    // // console.log("Value@@@@@@@@@@@@", value)
                     // if (value == "") {
                     //     this.el.setStyle(col, "background-color", "transparent");
                     //     this.el.setStyle(col, "background-color", "yellow");
@@ -1103,10 +1103,10 @@ export default class ManualTagging extends Component {
                     //     } else {
                     if (rowData[0].toString() == "true") {
                         for (var j = 0; j < json.length; j++) {
-                            // console.log("J@@@@@@@@################",j)
-                            // console.log("y@@@@@@@@################",y)
-                            // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
-                            // console.log("jsonvalue@@@@@@@@################",json[j][1])
+                            // // console.log("J@@@@@@@@################",j)
+                            // // console.log("y@@@@@@@@################",y)
+                            // // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
+                            // // console.log("jsonvalue@@@@@@@@################",json[j][1])
                             if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
                                 if (j != y) {
                                     this.state.instance.setValueFromCoords(13, j, value, true);
@@ -1121,7 +1121,7 @@ export default class ManualTagging extends Component {
                     // this.state.instance.setValueFromCoords(8, y, Math.round(qty * (value != null && value != "" ? value : 1)), true);
                 }
                 // if (x == 0) {
-                //     console.log("check box value----------------", value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
+                //     // console.log("check box value----------------", value = this.el.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
                 // }
 
                 // if (x == 9) {
@@ -1130,25 +1130,25 @@ export default class ManualTagging extends Component {
                 if (x == 0) {
                     var checkboxValue = this.state.instance.getValue(`A${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
 
-                    console.log("Json@@@@@@@@@@@@", json)
-                    console.log("Json@@@@@@@@@@@@", json.length)
+                    // console.log("Json@@@@@@@@@@@@", json)
+                    // console.log("Json@@@@@@@@@@@@", json.length)
                     if (checkboxValue.toString() == "true") {
 
                         for (var j = 0; j < json.length; j++) {
-                            // console.log("J@@@@@@@@################",j)
-                            // console.log("y@@@@@@@@################",y)
-                            // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
-                            // console.log("jsonvalue@@@@@@@@################",json[j][1])
+                            // // console.log("J@@@@@@@@################",j)
+                            // // console.log("y@@@@@@@@################",y)
+                            // // console.log("value@@@@@@@@################",this.state.instance.getValueFromCoords(1, y, true))
+                            // // console.log("jsonvalue@@@@@@@@################",json[j][1])
                             if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
                                 if (j != y) {
                                     this.state.instance.setValueFromCoords(0, j, true, true);
                                 }
                             }
                         }
-                        // console.log("jexcel instance---", this.state.instance);
+                        // // console.log("jexcel instance---", this.state.instance);
                         // this.state.instance.setValueFromCoords(9, y, this.state.tempNotes, true)
                     } else {
-                        console.log("inside else---", checkboxValue);
+                        // console.log("inside else---", checkboxValue);
                         this.state.instance.setValueFromCoords(9, y, "", true);
                         this.state.instance.setValueFromCoords(11, y, "", true);
                         this.state.instance.setValueFromCoords(13, y, "", true);
@@ -1184,15 +1184,15 @@ export default class ManualTagging extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
-            // console.log("RESP---------", parseFloat(rowData[3]));
+            // // console.log("RESP---------", parseFloat(rowData[3]));
             elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
         }
         elInstance.setValueFromCoords(10, y, 1, true);
     }
 
     onPaste(instance, data) {
-        // console.log("DATA------->", data);
-        // // console.log("DATA------->1", parseFloat(data[0].value));
+        // // console.log("DATA------->", data);
+        // // // console.log("DATA------->1", parseFloat(data[0].value));
 
 
         // if (data.length == 1 && Object.keys(data[0])[2] == "value") {
@@ -1256,7 +1256,7 @@ export default class ManualTagging extends Component {
                 active3: false,
                 tempNotes: ''
             }, () => {
-                console.log("localStorage.getItem@@@@@@@@@@@@@@@@@", localStorage.getItem("sesProgramIdReport"));
+                // console.log("localStorage.getItem@@@@@@@@@@@@@@@@@", localStorage.getItem("sesProgramIdReport"));
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined && this.state.programs.filter(c => c.programId == localStorage.getItem("sesProgramIdReport")).length > 0) {
                     this.setState({
                         programId: localStorage.getItem("sesProgramIdReport")
@@ -1407,11 +1407,11 @@ export default class ManualTagging extends Component {
 
     getBudgetListByProgramId = (e) => {
         let programId1 = this.state.programId1.toString().split("_")[0];
-        console.log("this.state.budgetList@@@@@@@@@@", programId1)
+        // console.log("this.state.budgetList@@@@@@@@@@", programId1)
         if (programId1 != "") {
-            console.log("this.state.budgetList@@@@@@@@@@", this.state.budgetList)
+            // console.log("this.state.budgetList@@@@@@@@@@", this.state.budgetList)
             const filteredBudgetList = this.state.budgetList.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(parseInt(programId1)))
-            console.log("this.state.filteredBudgetList@@@@@@@@@@", filteredBudgetList)
+            // console.log("this.state.filteredBudgetList@@@@@@@@@@", filteredBudgetList)
             this.setState({
                 filteredBudgetList,
                 filteredBudgetListByProgram: filteredBudgetList
@@ -1422,7 +1422,7 @@ export default class ManualTagging extends Component {
     getBudgetListByFundingSourceId = (e) => {
         let fundingSourceId = this.state.fundingSourceId;
         const filteredBudgetList = this.state.filteredBudgetListByProgram.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
-        console.log("this.state.filteredBudgetList1@@@@@@@@@@", filteredBudgetList)
+        // console.log("this.state.filteredBudgetList1@@@@@@@@@@", filteredBudgetList)
         this.setState({
             filteredBudgetList
         });
@@ -1602,8 +1602,8 @@ export default class ManualTagging extends Component {
     }
 
     getVersionList() {
-        console.log("VersionList@@@@@@@@@@@@")
-        console.log("Loading 2 Mohit#############")
+        // console.log("VersionList@@@@@@@@@@@@")
+        // console.log("Loading 2 Mohit#############")
         this.setState({
             loading: true
         })
@@ -1650,9 +1650,9 @@ export default class ManualTagging extends Component {
         for (var v = 0; v < newVList.length; v++) {
             finalVersionList.push({ versionId: newVList[v].versionId })
         }
-        console.log("filteredProgramList@@@@@@@@@@@@", versionList)
-        console.log("filteredProgramList@@@@@@@@@@@@", this.state.programs)
-        console.log("filteredProgramList@@@@@@@@@@@@", this.state.programs)
+        // console.log("filteredProgramList@@@@@@@@@@@@", versionList)
+        // console.log("filteredProgramList@@@@@@@@@@@@", this.state.programs)
+        // console.log("filteredProgramList@@@@@@@@@@@@", this.state.programs)
         this.setState({
             versionList: finalVersionList,
             loading: false
@@ -1689,7 +1689,7 @@ export default class ManualTagging extends Component {
     }
 
     getPlanningUnitArray() {
-        console.log("In Array@@@@@@@@@@@@@@@@")
+        // console.log("In Array@@@@@@@@@@@@@@@@")
         let planningUnits = this.state.planningUnits;
         let planningUnitArray = planningUnits.length > 0
             && planningUnits.map((item, i) => {
@@ -1771,7 +1771,7 @@ export default class ManualTagging extends Component {
             }
             else {
                 if (map1.get("0")) {
-                    console.log("value---", Number(this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
+                    // console.log("value---", Number(this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", "")));
                     // qty = Number(qty) + Number(this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                     count++;
                 }
@@ -1780,7 +1780,7 @@ export default class ManualTagging extends Component {
             if (tableJson[i][0] && tableJson[i][14] == 0) {
                 var filterList = tableJson.filter((c) => c[17] == tableJson[i][17]);
                 var getUniqueOrderNoAndPrimeLineNoList = filterList.filter((v, i, a) => a.findIndex(t => (t[16].roNo === v[16].roNo && t[16].roPrimeLineNo === v[16].roPrimeLineNo && t[16].knShipmentNo === v[16].knShipmentNo && t[16].orderNo === v[16].orderNo && t[16].primeLineNo === v[16].primeLineNo)) === i);
-                console.log("getUniqueOrderNoAndPrimeLineNoList@@@@@@@@@@@@@@@", getUniqueOrderNoAndPrimeLineNoList)
+                // console.log("getUniqueOrderNoAndPrimeLineNoList@@@@@@@@@@@@@@@", getUniqueOrderNoAndPrimeLineNoList)
                 for (var uq = 0; uq < getUniqueOrderNoAndPrimeLineNoList.length; uq++) {
                     qty1 = 0;
                     tableJson.filter(c => c[16].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roNo && c[16].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roPrimeLineNo && c[16].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].knShipmentNo && c[16].orderNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo && c[16].primeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo).map(item => {
@@ -1790,7 +1790,7 @@ export default class ManualTagging extends Component {
                 }
             }
         }
-        console.log("qty---", qty);
+        // console.log("qty---", qty);
         if (validation == true) {
 
             this.setState({
@@ -1808,11 +1808,11 @@ export default class ManualTagging extends Component {
     }
 
     delink() {
-        console.log("Loading 3 Mohit#############")
+        // console.log("Loading 3 Mohit#############")
         this.setState({ loading: true })
         var validation = this.checkValidationTab2();
         if (validation == true) {
-            console.log("this.state.languageEl.getJson(null, false)---------------->", this.state.languageEl.getJson(null, false))
+            // console.log("this.state.languageEl.getJson(null, false)---------------->", this.state.languageEl.getJson(null, false))
             var selectedChangedShipment = this.state.languageEl.getJson(null, false).filter(c => c[23] == 1);
             var selectedShipment = this.state.languageEl.getJson(null, false).filter(c => c[0] == false);
             var setOfPlanningUnitIds = [...new Set(selectedChangedShipment.map(ele => ele[17].planningUnit.id))];
@@ -1838,7 +1838,7 @@ export default class ManualTagging extends Component {
                 // Yaha program Id dalna hai actual wala
                 var curUser = AuthenticationService.getLoggedInUserId();
                 var programId = (this.state.programId + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + curUser);
-                console.log("ProgramId@@@@@@@@@@@@", programId)
+                // console.log("ProgramId@@@@@@@@@@@@", programId)
                 var programRequest = programTransaction.get(programId);
                 programRequest.onsuccess = function (event) {
                     var programDataJson = programRequest.result.programData;
@@ -1878,7 +1878,7 @@ export default class ManualTagging extends Component {
                                 supplyPlan: []
                             }
                         }
-                        console.log("ProgramJson&&&&&&&&&&&&&&", programJson)
+                        // console.log("ProgramJson&&&&&&&&&&&&&&", programJson)
 
                         var shipmentList = programJson.shipmentList;
                         var batchInfoList = programJson.batchInfoList;
@@ -1956,9 +1956,9 @@ export default class ManualTagging extends Component {
                         }
                         var modifiedDataFilter = this.state.languageEl.getJson(null, false);
                         for (var mdf = 0; mdf < modifiedDataFilter.length; mdf++) {
-                            console.log("@@@@@@@@@@@@@@@@=====================>Mdf", modifiedDataFilter[mdf]);
+                            // console.log("@@@@@@@@@@@@@@@@=====================>Mdf", modifiedDataFilter[mdf]);
                             if (modifiedDataFilter[mdf][0] == true && modifiedDataFilter[mdf][23] == 1 && modifiedDataFilter[mdf][17].planningUnit.id == planningUnitId) {
-                                console.log("@@@@@@@@@@@@@@@@=====================>in if", modifiedDataFilter[mdf][17]);
+                                // console.log("@@@@@@@@@@@@@@@@=====================>in if", modifiedDataFilter[mdf][17]);
                                 var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => (modifiedDataFilter[mdf][17].shipmentId > 0 ? modifiedDataFilter[mdf][17].shipmentId == c.childShipmentId : modifiedDataFilter[mdf][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
                                 var linkedShipmentsListFilter = linkedShipmentsList.filter(c => (modifiedDataFilter[mdf][17].shipmentId > 0 ? modifiedDataFilter[mdf][17].shipmentId == c.childShipmentId : modifiedDataFilter[mdf][17].tempShipmentId == c.tempChildShipmentId) && c.active.toString() == "true");
                                 linkedShipmentsList[linkedShipmentsListIndex].conversionFactor = 1;
@@ -1967,9 +1967,9 @@ export default class ManualTagging extends Component {
                                 linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
                                 var shipmentIndex = shipmentList.findIndex(c => modifiedDataFilter[mdf][17].shipmentId > 0 ? c.shipmentId == modifiedDataFilter[mdf][17].shipmentId : c.tempShipmentId == modifiedDataFilter[mdf][17].tempShipmentId);
                                 var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.languageEl.getValueFromCoords(8, mdf))[0];
-                                console.log("ARU Mohit", this.state.languageEl.getValueFromCoords(8, mdf))
-                                console.log("RCPU Mohit", rcpu)
-                                console.log("shipmentIndex Mohit", shipmentIndex)
+                                // console.log("ARU Mohit", this.state.languageEl.getValueFromCoords(8, mdf))
+                                // console.log("RCPU Mohit", rcpu)
+                                // console.log("shipmentIndex Mohit", shipmentIndex)
                                 shipmentList[shipmentIndex].notes = this.state.languageEl.getValue(`N${parseInt(mdf) + 1}`, true);
                                 shipmentList[shipmentIndex].shipmentQty = Math.round(Number(Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`K${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""))));
                                 shipmentList[shipmentIndex].shipmentRcpuQty = Math.round(Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
@@ -2009,9 +2009,9 @@ export default class ManualTagging extends Component {
                         })
                         programJson.shipmentList = shipmentList;
                         programJson.batchInfoList = batchInfoList;
-                        console.log("Program Json@@@@@@@@@@@@@@@@=====================>", programJson);
-                        console.log("linkedShipmentsList@@@@@@@@@@@@@@@@=====================>", linkedShipmentsList);
-                        console.log("shipmentList@@@@@@@@@@@@@@@@=====================>", shipmentList);
+                        // console.log("Program Json@@@@@@@@@@@@@@@@=====================>", programJson);
+                        // console.log("linkedShipmentsList@@@@@@@@@@@@@@@@=====================>", linkedShipmentsList);
+                        // console.log("shipmentList@@@@@@@@@@@@@@@@=====================>", shipmentList);
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -2021,7 +2021,7 @@ export default class ManualTagging extends Component {
                     generalProgramJson.actionList = actionList;
                     generalProgramJson.delinkList = delinkList;
                     generalProgramJson.shipmentLinkingList = linkedShipmentsList;
-                    console.log("General Program Json@@@@@@@@@@@@@@@@", generalProgramJson);
+                    // console.log("General Program Json@@@@@@@@@@@@@@@@", generalProgramJson);
                     programDataJson.planningUnitDataList = planningUnitDataList;
 
                     programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
@@ -2031,7 +2031,7 @@ export default class ManualTagging extends Component {
                     putRequest.onerror = function (event) {
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
-                        console.log("in success@@@@@@@@@@@@@@@", thisAsParameter)
+                        // console.log("in success@@@@@@@@@@@@@@@", thisAsParameter)
                         calculateSupplyPlan(programId, 0, 'programData', "erpDelink", thisAsParameter, setOfPlanningUnitIds, moment(minDate).startOf('month').format("YYYY-MM-DD"));
                     }
 
@@ -2050,7 +2050,7 @@ export default class ManualTagging extends Component {
 
     link() {
         this.setState({ loading1: true })
-        console.log("This.state.outputListAfterSerach@@@@@@@@@@@@@@@@@@@@@", this.state.outputListAfterSearch)
+        // console.log("This.state.outputListAfterSerach@@@@@@@@@@@@@@@@@@@@@", this.state.outputListAfterSearch)
         var validation = this.checkValidation();
         let linkedShipmentCount = 0;
         if (validation == true) {
@@ -2129,7 +2129,7 @@ export default class ManualTagging extends Component {
                                     // Yaha program Id dalna hai actual wala
                                     var curUser = AuthenticationService.getLoggedInUserId();
                                     var programId = this.state.active1 ? (this.state.programId + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + curUser) : this.state.programId1;
-                                    console.log("ProgramId@@@@@@@@@@@@", programId)
+                                    // console.log("ProgramId@@@@@@@@@@@@", programId)
                                     var programRequest = programTransaction.get(programId);
                                     programRequest.onsuccess = function (event) {
                                         var programDataJson = programRequest.result.programData;
@@ -2164,13 +2164,13 @@ export default class ManualTagging extends Component {
                                         }
                                         var shipmentList = programJson.shipmentList;
                                         var batchInfoList = programJson.batchInfoList;
-                                        console.log("Shipment List@@@@@@@@@@@@@@@", programJson.shipmentList)
+                                        // console.log("Shipment List@@@@@@@@@@@@@@@", programJson.shipmentList)
                                         if (!this.state.active4) {
                                             var shipmentId = this.state.active1 ? this.state.finalShipmentId[0].shipmentId : this.state.finalShipmentId[0].shipmentId;
                                             var index = this.state.active1 ? this.state.finalShipmentId[0].tempShipmentId : this.state.finalShipmentId[0].tempShipmentId;
                                             var shipmentIndex = shipmentList.findIndex(c => shipmentId > 0 ? (c.shipmentId == shipmentId) : (c.tempShipmentId == index));
 
-                                            // console.log("Shipment Index@@@@@@@@@@@@@@@", shipmentIndex)
+                                            // // console.log("Shipment Index@@@@@@@@@@@@@@@", shipmentIndex)
                                             shipmentList[shipmentIndex].erpFlag = true;
                                             shipmentList[shipmentIndex].active = false;
                                             var minDate = shipmentList[shipmentIndex].receivedDate != "" && shipmentList[shipmentIndex].receivedDate != null && shipmentList[shipmentIndex].receivedDate != undefined && shipmentList[shipmentIndex].receivedDate != "Invalid date" ? shipmentList[shipmentIndex].receivedDate : shipmentList[shipmentIndex].expectedDeliveryDate;
@@ -2179,7 +2179,7 @@ export default class ManualTagging extends Component {
                                                 var index1 = this.state.active1 ? this.state.finalShipmentId[i].tempShipmentId : this.state.finalShipmentId[i].tempShipmentId;
                                                 var shipmentIndex1 = shipmentList.findIndex(c => shipmentId1 > 0 ? (c.shipmentId == shipmentId1) : (c.tempShipmentId == index1));
 
-                                                // console.log("Shipment Index@@@@@@@@@@@@@@@", shipmentIndex)
+                                                // // console.log("Shipment Index@@@@@@@@@@@@@@@", shipmentIndex)
                                                 shipmentList[shipmentIndex1].erpFlag = true;
                                                 shipmentList[shipmentIndex1].active = false;
                                                 shipmentList[shipmentIndex1].parentLinkedShipmentId = this.state.finalShipmentId[0].shipmentId > 0 ? this.state.finalShipmentId[0].shipmentId : null;
@@ -2190,8 +2190,8 @@ export default class ManualTagging extends Component {
                                                 }
                                             }
                                         }
-                                        console.log("ShipmentList@@@@@@@@@@@@@@@@@@@Mohit", shipmentList)
-                                        console.log("MinDate@@@@@@@@@@@@@@@@@@@Mohit", minDate)
+                                        // console.log("ShipmentList@@@@@@@@@@@@@@@@@@@Mohit", shipmentList)
+                                        // console.log("MinDate@@@@@@@@@@@@@@@@@@@Mohit", minDate)
 
                                         var tableJson = this.state.instance.getJson(null, false);
                                         for (var y = 0; y < tableJson.length; y++) {
@@ -2200,9 +2200,9 @@ export default class ManualTagging extends Component {
                                                     minDate = moment(tableJson[y][4]).format("YYYY-MM-DD")
                                                 }
                                                 var filterList = tableJson.filter((c) => c[17] == tableJson[y][17]);
-                                                console.log("FilterList@@@@@@@@@@@@@@@", filterList);
+                                                // console.log("FilterList@@@@@@@@@@@@@@@", filterList);
                                                 var getUniqueOrderNoAndPrimeLineNoList = filterList.filter((v, i, a) => a.findIndex(t => (t[16].roNo === v[16].roNo && t[16].roPrimeLineNo === v[16].roPrimeLineNo && t[16].knShipmentNo === v[16].knShipmentNo && t[16].orderNo === v[16].orderNo && t[16].primeLineNo === v[16].primeLineNo)) === i);
-                                                console.log("getUniqueOrderNoAndPrimeLineNoList@@@@@@@@@@@@@@@", getUniqueOrderNoAndPrimeLineNoList)
+                                                // console.log("getUniqueOrderNoAndPrimeLineNoList@@@@@@@@@@@@@@@", getUniqueOrderNoAndPrimeLineNoList)
                                                 for (var uq = 0; uq < getUniqueOrderNoAndPrimeLineNoList.length; uq++) {
                                                     var shipmentQty = 0;
                                                     var shipmentARUQty = 0;
@@ -2211,7 +2211,7 @@ export default class ManualTagging extends Component {
                                                     var curUser = AuthenticationService.getLoggedInUserId();
                                                     var username = AuthenticationService.getLoggedInUsername();
                                                     tableJson.filter(c => c[16].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roNo && c[16].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roPrimeLineNo && c[16].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].knShipmentNo && c[16].orderNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo && c[16].primeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo).map(item => {
-                                                        console.log("Item@@@@@@@@@@@@@@@@", item)
+                                                        // console.log("Item@@@@@@@@@@@@@@@@", item)
                                                         shipmentQty += Number(item[10]) * Number(this.state.instance.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
                                                         shipmentARUQty += Number(item[10]);
                                                         var batchNo = item[7];
@@ -2317,7 +2317,7 @@ export default class ManualTagging extends Component {
                                                         var minDate = shipmentList[shipmentIndex].receivedDate != "" && shipmentList[shipmentIndex].receivedDate != null && shipmentList[shipmentIndex].receivedDate != undefined && shipmentList[shipmentIndex].receivedDate != "Invalid date" ? shipmentList[shipmentIndex].receivedDate : shipmentList[shipmentIndex].expectedDeliveryDate;
                                                     }
 
-                                                    console.log("ShipmentQty@@@@@@@@@@@@@@@@", shipmentQty);
+                                                    // console.log("ShipmentQty@@@@@@@@@@@@@@@@", shipmentQty);
                                                     linkedShipmentsList.push({
                                                         shipmentLinkingId: 0,
                                                         versionId: this.state.versionId.toString().split(" ")[0],
@@ -2348,8 +2348,8 @@ export default class ManualTagging extends Component {
                                                         },
                                                         lastModifiedDate: curDate,
                                                     })
-                                                    console.log("this.state.instance.getValueFromCoords(10, y)@@@@@@@@@Mohit", this.state.instance.getValueFromCoords(9, y))
-                                                    console.log("this.state.realmCountryPlanningUnitList@@@@@@@", this.state.realmCountryPlanningUnitList)
+                                                    // console.log("this.state.instance.getValueFromCoords(10, y)@@@@@@@@@Mohit", this.state.instance.getValueFromCoords(9, y))
+                                                    // console.log("this.state.realmCountryPlanningUnitList@@@@@@@", this.state.realmCountryPlanningUnitList)
                                                     var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
                                                     shipmentList.push({
                                                         accountFlag: true,
@@ -2435,7 +2435,7 @@ export default class ManualTagging extends Component {
                                         })
                                         programJson.shipmentList = shipmentList;
                                         programJson.batchInfoList = batchInfoList;
-                                        console.log("Program Json@@@@@@@@@@@@@@@@", programJson);
+                                        // console.log("Program Json@@@@@@@@@@@@@@@@", programJson);
                                         if (planningUnitDataIndex != -1) {
                                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                         } else {
@@ -2443,7 +2443,7 @@ export default class ManualTagging extends Component {
                                         }
                                         generalProgramJson.actionList = actionList;
                                         generalProgramJson.shipmentLinkingList = linkedShipmentsList;
-                                        console.log("General Program Json@@@@@@@@@@@@@@@@", generalProgramJson);
+                                        // console.log("General Program Json@@@@@@@@@@@@@@@@", generalProgramJson);
                                         programDataJson.planningUnitDataList = planningUnitDataList;
 
                                         programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
@@ -2453,7 +2453,7 @@ export default class ManualTagging extends Component {
                                         putRequest.onerror = function (event) {
                                         }.bind(this);
                                         putRequest.onsuccess = function (event) {
-                                            console.log("in success@@@@@@@@@@@@@@@", thisAsParameter)
+                                            // console.log("in success@@@@@@@@@@@@@@@", thisAsParameter)
                                             calculateSupplyPlan(programId, planningUnitId, 'programData', "erp", thisAsParameter, [], moment(minDate).startOf('month').format("YYYY-MM-DD"));
                                         }
                                     }.bind(this)
@@ -2504,7 +2504,7 @@ export default class ManualTagging extends Component {
 
     getOrderDetails = (takeFromLocalProgram) => {
         var roNoOrderNo = (this.state.searchedValue != null && this.state.searchedValue != "" ? this.state.searchedValue : "0");
-        console.log("this.state.programId1@@@@@@@@@@", this.state.localProgramList[0])
+        // console.log("this.state.programId1@@@@@@@@@@", this.state.localProgramList[0])
         var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 ? this.state.localProgramList[0].programId : this.state.programId1.split("_")[0]) : document.getElementById("programId").value);
         var versionId = this.state.active1 ? this.state.versionId.toString().split(" ")[0] : 0;
         var erpPlanningUnitId = (this.state.planningUnitIdUpdated != null && this.state.planningUnitIdUpdated != "" ? this.state.planningUnitIdUpdated : 0);
@@ -2513,7 +2513,7 @@ export default class ManualTagging extends Component {
         if (this.state.active1) {
             var localProgramList = this.state.localProgramList;
             var localProgramListFilter = localProgramList.filter(c => c.programId == this.state.programId && c.version == this.state.versionId.split(" ")[0]);
-            console.log("localProgramListFilter@@@@@@@@@@@@@", localProgramListFilter)
+            // console.log("localProgramListFilter@@@@@@@@@@@@@", localProgramListFilter)
             var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
             var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
             var generalProgramJson = JSON.parse(generalProgramData);
@@ -2530,7 +2530,7 @@ export default class ManualTagging extends Component {
                 linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
             })
         } else if (this.state.active3) {
-            console.log("In else if@@@@@@@#########")
+            // console.log("In else if@@@@@@@#########")
             var localProgramList = this.state.localProgramList;
             for (var i = 0; i < localProgramList.length; i++) {
                 var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramList[i].programData.generalData, SECRET_KEY);
@@ -2543,9 +2543,9 @@ export default class ManualTagging extends Component {
                 })
             }
         }
-        console.log("linkedRoNoAndRoPrimeLineNoMohit@@@@@@@@@@@@@", linkedRoNoAndRoPrimeLineNo)
+        // console.log("linkedRoNoAndRoPrimeLineNoMohit@@@@@@@@@@@@@", linkedRoNoAndRoPrimeLineNo)
         var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
-        console.log("erpPlanningUnitIdMohit@@@@@@@@@@@@@@@@@@@", erpPlanningUnitId)
+        // console.log("erpPlanningUnitIdMohit@@@@@@@@@@@@@@@@@@@", erpPlanningUnitId)
         if ((roNoOrderNo != "" && roNoOrderNo != "0") || (erpPlanningUnitId != 0)) {
             // roNoOrderNo, programId, erpPlanningUnitId, (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3)), (this.state.active2 ? this.state.parentShipmentId : 0)
             var json = {
@@ -2557,11 +2557,11 @@ export default class ManualTagging extends Component {
                 realmCountryId: this.state.active1 ? 0 : this.state.countryId,
                 delinkedList: listToExclude
             }
-            console.log("JsonMohit tab 3@@@@@@@@@@@@@@@@@@@", json)
-            console.log("JsonMohit tab 3 delink list@@@@@@@@@@@@@@@@@@@", listToExclude)
+            // console.log("JsonMohit tab 3@@@@@@@@@@@@@@@@@@@", json)
+            // console.log("JsonMohit tab 3 delink list@@@@@@@@@@@@@@@@@@@", listToExclude)
             ManualTaggingService.getOrderDetails(json)
                 .then(response => {
-                    console.log("response.data------", response.data)
+                    // console.log("response.data------", response.data)
                     this.setState({
                         artmisList: response.data.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo) && (this.state.roPrimeLineNoForTab3 != "" ? c.roPrimeLineNo == this.state.roPrimeLineNoForTab3 : true)),
                         displayButton: false
@@ -2759,7 +2759,7 @@ export default class ManualTagging extends Component {
         var countryId = this.state.countryId;
 
         // if (countryId != -1) {
-        console.log("Loading 4 Mohit#############")
+        // console.log("Loading 4 Mohit#############")
         this.setState({
             loading: true,
             programId1: -1,
@@ -2769,21 +2769,21 @@ export default class ManualTagging extends Component {
         if ((this.state.productCategoryValues.length > 0) || (this.state.planningUnitValues.length > 0)) {
             let productCategoryIdList = this.state.productCategoryValues.length == this.state.productCategories.length && this.state.productCategoryValues.length != 0 ? [] : (this.state.productCategoryValues.length == 0 ? null : this.state.productCategoryValues.map(ele => (ele.value).toString()))
             let planningUnitIdList = (this.state.planningUnitValues.length == 0 ? null : this.state.planningUnitValues.map(ele => (ele.value).toString()))
-            console.log("this.state.productCategories@@@@@@@@@@@@@", this.state.productCategories)
-            console.log("this.state.productCategoryValues[0].value@@@@@@@@@@@@@@", productCategoryIdList);
+            // console.log("this.state.productCategories@@@@@@@@@@@@@", this.state.productCategories)
+            // console.log("this.state.productCategoryValues[0].value@@@@@@@@@@@@@@", productCategoryIdList);
             var productCategorySortOrder = this.state.productCategories.filter(c => productCategoryIdList.includes(c.payload.productCategoryId.toString()));
             var sortOrderList = [];
             productCategorySortOrder.map(ele => sortOrderList.push(ele.sortOrder))
-            console.log("Sort@@@@@@@@@@@@@@", sortOrderList);
+            // console.log("Sort@@@@@@@@@@@@@@", sortOrderList);
             var json = {
                 realmCountryId: countryId,
                 productCategorySortOrder: sortOrderList,
                 planningUnitIds: planningUnitIdList,
                 // linkingType: (this.state.active1 ? 1 : (this.state.active2 ? 2 : 3))
             }
-            console.log("length1---", this.state.planningUnitValues.length);
-            console.log("length2---", this.state.planningUnits1.length);
-            console.log("json---", json);
+            // console.log("length1---", this.state.planningUnitValues.length);
+            // console.log("length2---", this.state.planningUnits1.length);
+            // console.log("json---", json);
             var localProgramList = this.state.localProgramList;
             var linkedRoNoAndRoPrimeLineNo = [];
             for (var i = 0; i < localProgramList.length; i++) {
@@ -2791,17 +2791,17 @@ export default class ManualTagging extends Component {
                 var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                 var generalProgramJson = JSON.parse(generalProgramData);
                 var linkedShipmentsList = generalProgramJson.shipmentLinkingList != null ? generalProgramJson.shipmentLinkingList : [];
-                console.log("linkedShipmentsList@@@@@@@@@@@@@@@", linkedShipmentsList);
+                // console.log("linkedShipmentsList@@@@@@@@@@@@@@@", linkedShipmentsList);
                 linkedShipmentsList.filter(c => c.shipmentLinkingId == 0 && c.active == true).map(c => {
-                    console.log("In if@@@@@@@@@@@@@@@")
+                    // console.log("In if@@@@@@@@@@@@@@@")
                     linkedRoNoAndRoPrimeLineNo.push(c.roNo + "|" + c.roPrimeLineNo)
                 })
             }
-            console.log("linkedRoNoAndRoPrimeLineNo@@@@@@@@@@@@@@@@@@@@@@@", linkedRoNoAndRoPrimeLineNo)
+            // console.log("linkedRoNoAndRoPrimeLineNo@@@@@@@@@@@@@@@@@@@@@@@", linkedRoNoAndRoPrimeLineNo)
             ManualTaggingService.getShipmentListForTab3(json)
                 .then(response => {
                     var outputList = response.data;
-                    console.log("output list@@@@@@@@@@@@@@@", outputList)
+                    // console.log("output list@@@@@@@@@@@@@@@", outputList)
                     var filterOnLinkedData = outputList.filter(c => !linkedRoNoAndRoPrimeLineNo.includes(c.roNo + "|" + c.roPrimeLineNo));
                     let resultTrue = Object.values(filterOnLinkedData.reduce((a, { roNo, roPrimeLineNo, knShipmentNo, erpQty, orderNo, primeLineNo, erpShipmentStatus, expectedDeliveryDate, batchNo, expiryDate, erpPlanningUnit, price, shippingCost, shipBy, qatEquivalentShipmentStatus, parentShipmentId, childShipmentId, notes, qatPlanningUnit, tracerCategoryId }) => {
                         if (!a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo])
@@ -2810,7 +2810,7 @@ export default class ManualTagging extends Component {
                             a[roNo + "|" + roPrimeLineNo + "|" + orderNo + "|" + primeLineNo + "|" + knShipmentNo].erpQty += erpQty;
                         return a;
                     }, {}));
-                    console.log("ResultTrue@@@@@@@@@@@@@@@", resultTrue);
+                    // console.log("ResultTrue@@@@@@@@@@@@@@@", resultTrue);
                     this.setState({
                         outputList: resultTrue
                     }, () => {
@@ -2878,7 +2878,7 @@ export default class ManualTagging extends Component {
     }
 
     filterData = (planningUnitIds) => {
-        console.log("In filter data@@@@@@@@@@@@@@@")
+        // console.log("In filter data@@@@@@@@@@@@@@@")
         var programId = this.state.programId;
 
         planningUnitIds = planningUnitIds;
@@ -2889,7 +2889,7 @@ export default class ManualTagging extends Component {
         }, () => {
             var versionId = this.state.versionId.toString();
             if (programId != -1 && planningUnitIds != null && planningUnitIds != "") {
-                console.log("Loading 5 Mohit#############")
+                // console.log("Loading 5 Mohit#############")
                 this.setState({
                     loading: true,
                     planningUnitIds
@@ -2964,10 +2964,10 @@ export default class ManualTagging extends Component {
                                 }
                             );
                     } else {
-                        console.log("In eklse@@@@@@@@@@@@@@")
+                        // console.log("In eklse@@@@@@@@@@@@@@")
                         ManualTaggingService.getLinkedQatShipments(this.state.programId, this.state.versionId, this.state.planningUnitValues.map(ele => (ele.value).toString()))
                             .then(response => {
-                                console.log("In eklseresponse.data@@@@@@@@@@@@@@", response.data)
+                                // console.log("In eklseresponse.data@@@@@@@@@@@@@@", response.data)
                                 this.setState({
                                     outputList: response.data
                                 }, () => {
@@ -3038,9 +3038,9 @@ export default class ManualTagging extends Component {
                     var gprogramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
                     var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
                     var gprogramJson = JSON.parse(gprogramData);
-                    console.log("GprogramJson Test@@@123", gprogramJson);
+                    // console.log("GprogramJson Test@@@123", gprogramJson);
                     var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
-                    console.log("Linked Shipments List@@@@@@@@@@@", linkedShipmentsList)
+                    // console.log("Linked Shipments List@@@@@@@@@@@", linkedShipmentsList)
                     for (var pu = 0; pu < planningUnitIds.length; pu++) {
                         var planningUnitData = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIds[pu].value)[0];
                         var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
@@ -3058,7 +3058,7 @@ export default class ManualTagging extends Component {
                                 SHIPMENT_ID_ARR_MANUAL_TAGGING.includes(c.shipmentStatus.id.toString())));
                     } else if (this.state.active2) {
                         shipmentList = shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.procurementAgent.id == PSM_PROCUREMENT_AGENT_ID);
-                        console.log("ShipmentList@@@@@@@@@@@@@@@", shipmentList);
+                        // console.log("ShipmentList@@@@@@@@@@@@@@@", shipmentList);
                         for (var sl = 0; sl < shipmentList.length; sl++) {
                             var arr = [];
                             var list = (fullShipmentList.filter(c => shipmentList[sl].parentShipmentId == 0 ? shipmentList[sl].tempParentShipmentId != null && c.tempParentLinkedShipmentId == shipmentList[sl].tempParentShipmentId : shipmentList[sl].parentShipmentId != null && c.parentLinkedShipmentId == shipmentList[sl].parentShipmentId)).map(item => {
@@ -3077,7 +3077,7 @@ export default class ManualTagging extends Component {
                     }
                     ManualTaggingService.getDataBasedOnRoNoAndRoPrimeLineNo(roPrimeNoList)
                         .then(response => {
-                            console.log("In eklseresponse.data@@@@@@@@@@@@@@", response.data)
+                            // console.log("In eklseresponse.data@@@@@@@@@@@@@@", response.data)
                             this.setState({
                                 outputList: shipmentList,
                                 linkedShipmentsListForTab2: linkedShipmentsList,
@@ -3110,7 +3110,7 @@ export default class ManualTagging extends Component {
                 })
             }
             // else if (programId == -1) {
-            //     console.log("2-programId------>", programId);
+            //     // console.log("2-programId------>", programId);
             //     this.setState({
             //         outputList: [],
             //         message: i18n.t('static.program.validselectprogramtext'),
@@ -3120,7 +3120,7 @@ export default class ManualTagging extends Component {
             //         this.el.destroy();
             //     });
             // } else if (planningUnitIds != null && planningUnitIds != "") {
-            //     console.log("3-programId------>", programId);
+            //     // console.log("3-programId------>", programId);
             //     this.setState({
             //         outputList: [],
             //         message: i18n.t('static.procurementUnit.validPlanningUnitText'),
@@ -3143,7 +3143,7 @@ export default class ManualTagging extends Component {
         if (this.state.active1) {
             var localProgramList = this.state.localProgramList;
             var localProgramListFilter = localProgramList.filter(c => c.programId == this.state.programId && c.version == this.state.versionId.split(" ")[0]);
-            console.log("localProgramListFilter@@@@@@@@@@@@@", localProgramListFilter)
+            // console.log("localProgramListFilter@@@@@@@@@@@@@", localProgramListFilter)
             var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
             var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
             var generalProgramJson = JSON.parse(generalProgramData);
@@ -3156,10 +3156,10 @@ export default class ManualTagging extends Component {
                 }
             })
         }
-        console.log("List To exclude Test@@@123", listToExclude)
+        // console.log("List To exclude Test@@@123", listToExclude)
         ManualTaggingService.autocompletePlanningUnit(this.state.planningUnitId, term.toUpperCase(), programId, listToExclude)
             .then(response => {
-                console.log("Response@@@@@@@@@@@@@@@@@@", response)
+                // console.log("Response@@@@@@@@@@@@@@@@@@", response)
                 var tracercategoryPlanningUnit = [];
                 for (var i = 0; i < response.data.length; i++) {
                     var label = response.data[i].label.label_en + '(' + response.data[i].code + ')';
@@ -3236,12 +3236,12 @@ export default class ManualTagging extends Component {
             var erpPlanningUnitId = this.state.planningUnitIdUpdated;
             var programId = this.state.active1 ? this.state.programId : this.state.programId1.split("_")[0];
             var shipmentPlanningUnitId = this.state.active1 ? this.state.selectedRowPlanningUnit : (this.state.active3 ? ((this.state.active4 || this.state.active5) && !this.state.checkboxValue ? document.getElementById("planningUnitId1").value : (this.state.active4 || this.state.active5) && this.state.checkboxValue ? this.state.selectedShipment.length > 0 ? this.state.selectedShipment[0].planningUnit.id : 0 : 0) : 0)
-            console.log("selectedRowPlanningUnit@@@@@@@@@@@@@@@@", this.state.selectedRowPlanningUnit)
+            // console.log("selectedRowPlanningUnit@@@@@@@@@@@@@@@@", this.state.selectedRowPlanningUnit)
             var listToExclude = [];
             if (this.state.active1) {
                 var localProgramList = this.state.localProgramList;
                 var localProgramListFilter = localProgramList.filter(c => c.programId == this.state.programId && c.version == this.state.versionId.split(" ")[0]);
-                console.log("localProgramListFilter@@@@@@@@@@@@@", localProgramListFilter)
+                // console.log("localProgramListFilter@@@@@@@@@@@@@", localProgramListFilter)
                 var generalProgramDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
                 var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                 var generalProgramJson = JSON.parse(generalProgramData);
@@ -3254,7 +3254,7 @@ export default class ManualTagging extends Component {
                     }
                 })
             }
-            console.log("List To exclude Test@@@123", listToExclude)
+            // console.log("List To exclude Test@@@123", listToExclude)
             var json = {
                 "roPo": term.toUpperCase(),
                 "programId": (programId != null && programId != "" ? programId : 0),
@@ -3262,10 +3262,10 @@ export default class ManualTagging extends Component {
                 "qatPlanningUnitId": shipmentPlanningUnitId,
                 "delinkedList": listToExclude
             }
-            console.log("Json Test@@@123", json)
+            // console.log("Json Test@@@123", json)
             ManualTaggingService.autocompleteDataOrderNo(json)
                 .then(response => {
-                    console.log("Response@@@@@@@@@@@@@@@@@@@@@", response)
+                    // console.log("Response@@@@@@@@@@@@@@@@@@@@@", response)
                     var autocompleteData = [];
                     for (var i = 0; i < response.data.length; i++) {
                         autocompleteData[i] = { value: response.data[i], label: response.data[i] }
@@ -3333,7 +3333,7 @@ export default class ManualTagging extends Component {
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
-                    console.log("listArray",listArray)
+                    // console.log("listArray",listArray)
                     var proList = [];
           for (var i = 0; i < listArray.length; i++) {
             var programJson = {
@@ -3456,7 +3456,7 @@ export default class ManualTagging extends Component {
 
 
                 if (this.state.active1) {
-                    console.log("Final Shipment Id@@@@@@@", this.state.finalShipmentId)
+                    // console.log("Final Shipment Id@@@@@@@", this.state.finalShipmentId)
                     var updatedList = [];
                     updatedList.push(this.state.outputListAfterSearch[0]);
                     updatedList = updatedList.concat(this.state.outputList.filter(c => c.planningUnit.id == this.state.outputListAfterSearch[0].planningUnit.id).filter(d => this.state.outputListAfterSearch[0].shipmentId > 0 ? d.shipmentId != this.state.outputListAfterSearch[0].shipmentId : d.tempShipmentId != this.state.outputListAfterSearch[0].tempShipmentId))
@@ -3473,7 +3473,7 @@ export default class ManualTagging extends Component {
                         });
                     }
                     var list = this.state.showAllShipments ? updatedList : this.state.outputListAfterSearch;
-                    console.log("List@@@@@@@@@Mohit", list)
+                    // console.log("List@@@@@@@@@Mohit", list)
                     var dataArray1 = [];
                     var data1 = [];
                     var finalShipmentId = this.state.showAllShipments ? this.state.finalShipmentId : finalShipmentId;
@@ -3661,7 +3661,7 @@ export default class ManualTagging extends Component {
                 }
                 if (build) {
                     let erpDataList = this.state.artmisList;
-                    console.log('erpDataList****************', erpDataList)
+                    // console.log('erpDataList****************', erpDataList)
                     let erpDataArray = [];
                     let count = 0;
                     let qty = 0;
@@ -3687,7 +3687,7 @@ export default class ManualTagging extends Component {
                         //     data[13] = erpDataList[j].erpPlanningUnit.id;
 
                         // } else {
-                        console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
+                        // console.log("order no ---", erpDataList[j].orderNo + " active---", erpDataList[j].active)
                         data[0] = this.state.active3 ? true : false;//A
                         data[1] = erpDataList[j].roNo + ' - ' + erpDataList[j].roPrimeLineNo + ' | ' + erpDataList[j].orderNo + ' - ' + erpDataList[j].primeLineNo + (erpDataList[j].knShipmentNo != '' && erpDataList[j].knShipmentNo != null ? ' | ' + erpDataList[j].knShipmentNo : "");//B
                         data[2] = erpDataList[j].orderNo + ' | ' + erpDataList[j].primeLineNo;//C
@@ -3733,7 +3733,7 @@ export default class ManualTagging extends Component {
                         displayTotalQty: (qty > 0 ? true : false)
                     });
                     if (document.getElementById("tableDiv1") != null) {
-                        console.log("TableDiv1@@@@@@@@@@@@@@@@@@@@@", document.getElementById("tableDiv1"))
+                        // console.log("TableDiv1@@@@@@@@@@@@@@@@@@@@@", document.getElementById("tableDiv1"))
                         this.el = jexcel(document.getElementById("tableDiv1"), '');
                         // this.el.destroy();
                         jexcel.destroy(document.getElementById("tableDiv1"), true);
@@ -3989,7 +3989,7 @@ export default class ManualTagging extends Component {
     buildJExcel() {
         var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId)
         RealmCountryService.getRealmCountryPlanningUnitByProgramId([programId]).then(response1 => {
-            console.log("Response1.data", response1.data)
+            // console.log("Response1.data", response1.data)
             var rcpuList = [];
 
             response1.data.map(c => {
@@ -4003,7 +4003,7 @@ export default class ManualTagging extends Component {
                 })
             })
             let manualTaggingList = this.state.outputList;
-            console.log("OutputList@@@@", manualTaggingList)
+            // console.log("OutputList@@@@", manualTaggingList)
             let manualTaggingArray = [];
             let count = 0;
             if (this.state.active2) {
@@ -4033,8 +4033,8 @@ export default class ManualTagging extends Component {
                     data = [];
                     let shipmentQty = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].erpQty : manualTaggingList[j].shipmentQty;
                     let linkedShipmentsListForTab2 = this.state.versionId.toString().includes("Local") ? this.state.linkedShipmentsListForTab2.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId) : [manualTaggingList[j]];
-                    console.log("linkedShipmentsListForTab2@@@@@@@@@@@", linkedShipmentsListForTab2)
-                    console.log("manualTaggingList[j]@@@@@@@@@@@@", manualTaggingList[j])
+                    // console.log("linkedShipmentsListForTab2@@@@@@@@@@@", linkedShipmentsListForTab2)
+                    // console.log("manualTaggingList[j]@@@@@@@@@@@@", manualTaggingList[j])
                     data[0] = true;
                     data[1] = (!this.state.versionId.toString().includes("Local") ? (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentLinkedShipmentId != "" && manualTaggingList[j].parentLinkedShipmentId != null ? ", " + manualTaggingList[j].parentLinkedShipmentId : "") : 0) + " (" + manualTaggingList[j].childShipmentId : (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentShipmentIdArr.length > 0 ? ", " + manualTaggingList[j].parentShipmentIdArr.toString() : "") : 0) + " (" + manualTaggingList[j].shipmentId) + ")";
                     data[2] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId
@@ -4076,7 +4076,7 @@ export default class ManualTagging extends Component {
                 }
                 else {
                     // data[0] = manualTaggingList[j].erpOrderId
-                    console.log("manualTaggingList[j]@@@@@@@@@@@@", manualTaggingList[j])
+                    // console.log("manualTaggingList[j]@@@@@@@@@@@@", manualTaggingList[j])
                     data = [];
                     data[0] = (manualTaggingList[j].roNo + " - " + manualTaggingList[j].roPrimeLineNo) + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (manualTaggingList[j].knShipmentNo != "" && manualTaggingList[j].knShipmentNo != null ? " | " + manualTaggingList[j].knShipmentNo : "");
                     data[1] = manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo
@@ -4507,7 +4507,7 @@ export default class ManualTagging extends Component {
                         var elInstance = el;
                         if (y != null) {
                             var rowData = elInstance.getRowData(y);
-                            console.log("RowData@@@@@@@@", rowData)
+                            // console.log("RowData@@@@@@@@", rowData)
                             if (rowData[30] == 1 || !this.state.versionId.toString().includes("Local")) {
                                 var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                                 cell.classList.add('readonly');
@@ -4564,7 +4564,7 @@ export default class ManualTagging extends Component {
                                         let roPrimeLineNo = obj.getValueFromCoords(28, y).toString().trim();
                                         ManualTaggingService.getARTMISHistory(roNo, roPrimeLineNo)
                                             .then(response => {
-                                                console.log("MohitResponse.data@@@@@@@@@@@@@", response.data)
+                                                // console.log("MohitResponse.data@@@@@@@@@@@@@", response.data)
                                                 this.setState({
                                                     artmisHistory: response.data
                                                 }, () => {
@@ -4754,7 +4754,7 @@ export default class ManualTagging extends Component {
     }
 
     loadedERP = function (instance, cell, x, y, value) {
-        console.log("Class List", document.getElementsByClassName("resizable"))
+        // console.log("Class List", document.getElementsByClassName("resizable"))
         if (this.state.active1) {
             jExcelLoadedFunctionForErp(instance, 1);
             var asterisk = document.getElementsByClassName("jss")[2].firstChild.nextSibling;
@@ -4769,13 +4769,13 @@ export default class ManualTagging extends Component {
 
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
-            console.log("x$$$$$$$$$$$$$$$$", x);
-            console.log("y$$$$$$$$$$$$$$$$", y);
-            console.log("value$$$$$$$$$$$$$$$$", value);
+            // console.log("x$$$$$$$$$$$$$$$$", x);
+            // console.log("y$$$$$$$$$$$$$$$$", y);
+            // console.log("value$$$$$$$$$$$$$$$$", value);
             if ((x == 0 && value != 0) || (y == 0 && value != 0)) {
-                // console.log("HEADER SELECTION--------------------------");
+                // // console.log("HEADER SELECTION--------------------------");
             } else {
-                console.log("Loading 6 Mohit#############")
+                // console.log("Loading 6 Mohit#############")
                 this.setState({
                     loading: true
                 })
@@ -4788,7 +4788,7 @@ export default class ManualTagging extends Component {
                 ) {
                     row = this.state.outputList.filter(c => (this.el.getValueFromCoords(0, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(0, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
                     outputListAfterSearch.push(row);
-                    console.log("outputListAfterSearch@@@@@@@@@@@@@@@@", outputListAfterSearch);
+                    // console.log("outputListAfterSearch@@@@@@@@@@@@@@@@", outputListAfterSearch);
                     var finalShipmentId = []
                     if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
                         json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
@@ -4853,9 +4853,9 @@ export default class ManualTagging extends Component {
                     })
                 }
                 // outputListAfterSearch.push(row);
-                // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
+                // // console.log("1------------------------------>>>>", outputListAfterSearch[0].erpPlanningUnit.id)
                 if (this.state.active3) {
-                    console.log("In function To open popup@@@@@@@@@@@@@@@@@@@@@@@))))))))))))))))")
+                    // console.log("In function To open popup@@@@@@@@@@@@@@@@@@@@@@@))))))))))))))))")
                     this.setState({
                         planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
                         shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
@@ -4869,13 +4869,13 @@ export default class ManualTagging extends Component {
     }.bind(this);
 
     getShipmentsForTab2 = (shipmentId, tempShipmentId, roNo, roPrimeLineNo) => {
-        console.log("MohitShipmentId*****************", shipmentId);
-        console.log("MohitParentShipmentId*****************", tempShipmentId);
-        console.log("MohitRoNo*****************", roNo);
-        console.log("MohitRoPrimeLineNo*****************", roPrimeLineNo);
+        // console.log("MohitShipmentId*****************", shipmentId);
+        // console.log("MohitParentShipmentId*****************", tempShipmentId);
+        // console.log("MohitRoNo*****************", roNo);
+        // console.log("MohitRoPrimeLineNo*****************", roPrimeLineNo);
         var linkedShipmentsListForTab2 = this.state.linkedShipmentsListForTab2;
         var filterOnRoNoAndRoPrimeLineNo = linkedShipmentsListForTab2.filter(c => c.roNo.toString().trim() == roNo.toString().trim() && c.roPrimeLineNo.toString().trim() == roPrimeLineNo.toString().trim());
-        console.log("filterOnRoNoAndRoPrimeLineNo@@@@@@@@@@@", filterOnRoNoAndRoPrimeLineNo)
+        // console.log("filterOnRoNoAndRoPrimeLineNo@@@@@@@@@@@", filterOnRoNoAndRoPrimeLineNo)
         this.setState({
             artmisList: filterOnRoNoAndRoPrimeLineNo,
             displayButton: false
@@ -4949,15 +4949,15 @@ export default class ManualTagging extends Component {
     getPlanningUnitListBasedOnTracerCategory() {
         var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId);
         var versionId = this.state.versionId.toString();
-        console.log("Condition@@@@@@@@@@@@@", programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1")));
+        // console.log("Condition@@@@@@@@@@@@@", programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1")));
         if (programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1"))) {
             // if (!versionId.includes("Local")) {
-            console.log("programId@@@@@@@@@@@@@Mohit", programId)
-            console.log("[this.state.outputListAfterSearch[0].tracerCategoryId]@@@@@@@@@@@@@Mohit", [this.state.outputListAfterSearch[0].tracerCategoryId])
+            // console.log("programId@@@@@@@@@@@@@Mohit", programId)
+            // console.log("[this.state.outputListAfterSearch[0].tracerCategoryId]@@@@@@@@@@@@@Mohit", [this.state.outputListAfterSearch[0].tracerCategoryId])
             ProgramService.getPlanningUnitByProgramTracerCategory(programId, [this.state.outputListAfterSearch[0].tracerCategoryId])
                 .then(response => {
                     if (response.status == 200) {
-                        console.log("Response.data@@@@@@@@@@@@@Mohit", response.data)
+                        // console.log("Response.data@@@@@@@@@@@@@Mohit", response.data)
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -4967,7 +4967,7 @@ export default class ManualTagging extends Component {
 
                         listArray = listArray.filter(c => (c.active == true))
                         RealmCountryService.getRealmCountryPlanningUnitByProgramId([programId]).then(response1 => {
-                            console.log("Response1.data", response1.data)
+                            // console.log("Response1.data", response1.data)
                             var rcpuList = [];
 
                             response1.data.map(c => {
@@ -4980,8 +4980,8 @@ export default class ManualTagging extends Component {
                                     planningUnit: c.planningUnit
                                 })
                             })
-                            console.log("List Array Test", listArray)
-                            console.log("Test planning unit Id", listArray.filter(c => c.planningUnit.id == document.getElementById("planningUnitId1").value).length)
+                            // console.log("List Array Test", listArray)
+                            // console.log("Test planning unit Id", listArray.filter(c => c.planningUnit.id == document.getElementById("planningUnitId1").value).length)
                             if (listArray.filter(c => c.planningUnit.id == document.getElementById("planningUnitId1").value).length == 0) {
                                 document.getElementById("planningUnitId1").value = -1;
                             }
@@ -5069,7 +5069,7 @@ export default class ManualTagging extends Component {
             //     var programDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
             //     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             //     var programJson = JSON.parse(programData);
-            //     console.log("ProgramJson@@@@@@@@@@@",programJson)
+            //     // console.log("ProgramJson@@@@@@@@@@@",programJson)
             //     var listArray = programJson.planningUnitList;
             //     var list = []
             //     for (var l = 0; l < listArray.length; l++) {
@@ -5114,21 +5114,21 @@ export default class ManualTagging extends Component {
     }
 
     getPlanningUnitList() {
-        console.log("Loading 1 Mohit in planning unit list#############")
+        // console.log("Loading 1 Mohit in planning unit list#############")
         var programId = (this.state.active3 ? this.state.programId1.toString().split("_")[0] : this.state.programId);
         var versionId = this.state.versionId.toString();
-        console.log("Loading 1 Mohit programId#############", programId)
-        console.log("Loading 1 Mohit active 3#############", this.state.active3)
-        console.log("Loading 1 Mohit active 1#############", this.state.active1)
-        console.log("Loading 1 Mohit active 2#############", this.state.active2)
-        console.log("Loading 1 Mohit version Id#############", versionId)
+        // console.log("Loading 1 Mohit programId#############", programId)
+        // console.log("Loading 1 Mohit active 3#############", this.state.active3)
+        // console.log("Loading 1 Mohit active 1#############", this.state.active1)
+        // console.log("Loading 1 Mohit active 2#############", this.state.active2)
+        // console.log("Loading 1 Mohit version Id#############", versionId)
         if (programId != -1 && programId != null && programId != "" && (this.state.active3 || ((this.state.active1 || this.state.active2) && versionId != "-1"))) {
-            console.log("Loading 1 Mohit in before api call#############")
+            // console.log("Loading 1 Mohit in before api call#############")
             // if (!versionId.includes("Local")) {
             ProgramService.getProgramPlaningUnitListByProgramId(programId)
                 .then(response => {
                     if (response.status == 200) {
-                        console.log("Loading 1 Mohit in if#############")
+                        // console.log("Loading 1 Mohit in if#############")
                         var listArray = response.data;
                         listArray.sort((a, b) => {
                             var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -5150,7 +5150,7 @@ export default class ManualTagging extends Component {
                         })
                     }
                     else {
-                        console.log("Loading 1 Mohit in else#############")
+                        // console.log("Loading 1 Mohit in else#############")
                         this.setState({
                             message: response.data.messageCode,
                             loading: false,
@@ -5162,7 +5162,7 @@ export default class ManualTagging extends Component {
                     }
                 }).catch(
                     error => {
-                        console.log("Loading 1 Mohit in catch#############", error)
+                        // console.log("Loading 1 Mohit in catch#############", error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 // message: 'static.unkownError',
@@ -5216,7 +5216,7 @@ export default class ManualTagging extends Component {
             //     var programDataBytes = CryptoJS.AES.decrypt(localProgramListFilter[0].programData.generalData, SECRET_KEY);
             //     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             //     var programJson = JSON.parse(programData);
-            //     console.log("ProgramJson@@@@@@@@@@@",programJson)
+            //     // console.log("ProgramJson@@@@@@@@@@@",programJson)
             //     var listArray = programJson.planningUnitList;
             //     var list = []
             //     for (var l = 0; l < listArray.length; l++) {
@@ -5265,7 +5265,7 @@ export default class ManualTagging extends Component {
 
     formatLabel(cell, row) {
         if (cell != null && cell != "") {
-            console.log("cell----", cell)
+            // console.log("cell----", cell)
             return getLabelText(cell, this.state.lang);
         } else {
             return "";
@@ -5274,7 +5274,7 @@ export default class ManualTagging extends Component {
 
     formatLabelHistory(cell, row) {
         if (cell != null && cell != "") {
-            console.log("cell----", cell)
+            // console.log("cell----", cell)
             return getLabelText(cell.label, this.state.lang);
         } else {
             return "";
@@ -5295,7 +5295,7 @@ export default class ManualTagging extends Component {
 
     toggleLarge() {
         // this.getPlanningUnitListByTracerCategory(this.state.planningUnitId, this.state.procurementAgentId);
-        console.log("In selected row planning unit@@@@@@@@@@@", this.state.planningUnitId);
+        // console.log("In selected row planning unit@@@@@@@@@@@", this.state.planningUnitId);
         this.setState({
             displaySubmitButton: false,
             displayTotalQty: false,
@@ -5384,12 +5384,12 @@ export default class ManualTagging extends Component {
                 headerAlign: 'center'
 
                 // align:  function callback(cell, row, rowIndex, colIndex) { 
-                //     console.log("my row----------------------")
+                //     // console.log("my row----------------------")
                 //     return "center" }
             },
             onSelect: (row, isSelect, rowIndex, e) => {
-                console.log("my row---", row);
-                console.log("is select---", isSelect);
+                // console.log("my row---", row);
+                // console.log("is select---", isSelect);
                 var finalShipmentId = this.state.finalShipmentId;
                 // var tempShipmentId=this.state.tempShipmentId;
                 if (isSelect) {
@@ -5401,7 +5401,7 @@ export default class ManualTagging extends Component {
                 finalShipmentId.map(c => {
                     qty += Number(c.qty)
                 })
-                console.log("Final Shipment Ids @@@@@@@@@@@@@@@", finalShipmentId)
+                // console.log("Final Shipment Ids @@@@@@@@@@@@@@@", finalShipmentId)
                 this.setState({
                     originalQty: qty,
                     finalShipmentId: finalShipmentId,
@@ -6300,7 +6300,7 @@ export default class ManualTagging extends Component {
                                                                     style={{ width: 450, backgroundColor: this.state.active3 ? "#cfcdc9" : "transparent" }}
                                                                     disabled={this.state.active3 ? true : false}
                                                                     onChange={(event, value) => {
-                                                                        // console.log("demo2 value---", value);
+                                                                        // // console.log("demo2 value---", value);
                                                                         if (value != null) {
                                                                             this.setState({
                                                                                 erpPlanningUnitId: value.value,
@@ -6340,7 +6340,7 @@ export default class ManualTagging extends Component {
                                                                     disabled={this.state.active3 ? true : false}
                                                                     style={{ width: 450, backgroundColor: this.state.active3 ? "#cfcdc9" : "transparent" }}
                                                                     onChange={(event, value) => {
-                                                                        // console.log("combo 2 ro combo box---", value)
+                                                                        // // console.log("combo 2 ro combo box---", value)
                                                                         if (value != null) {
                                                                             this.setState({
                                                                                 searchedValue: value.label

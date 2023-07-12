@@ -209,9 +209,13 @@ class Budgets extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             DropdownService.getFundingSourceDropdownList()
                 .then(response => {
-                    console.log("json===>", JSON.stringify(response.data))
+                    // console.log("json===>", JSON.stringify(response.data))
                     this.setState({
-                        fundingSources: response.data, loading: false
+                        fundingSources: response.data.sort(function (a, b) {
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }), loading: false
                     }, () => {
                         // this.consolidatedFundingSourceList()
                     })
@@ -246,7 +250,7 @@ class Budgets extends Component {
                 );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             // this.consolidatedFundingSourceList()
             this.setState({ loading: false })
         }
@@ -281,7 +285,7 @@ class Budgets extends Component {
     //                 for (var k = 0; k < this.state.fundingSources.length; k++) {
     //                     if (this.state.fundingSources[k].id == myResult[i].fundingSourceId) {
     //                         f = 1;
-    //                         console.log('already exist')
+    //                         // console.log('already exist')
     //                     }
     //                 }
     //                 var programData = {
@@ -486,7 +490,7 @@ class Budgets extends Component {
         // let versionId = document.getElementById('versionId').value
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
 
-        // console.log('programIds.length', programIds.length)
+        // // console.log('programIds.length', programIds.length)
         if (this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0) {
             // localStorage.setItem("sesVersionIdReport", versionId);
             // if (versionId.includes('Local')) {
@@ -520,16 +524,16 @@ class Budgets extends Component {
             //         budgetRequest.onsuccess = function (event) {
             //             var budgetResult = [];
             //             budgetResult = budgetRequest.result;
-            //             console.log('B*******', budgetResult)
+            //             // console.log('B*******', budgetResult)
             //             for (var k = 0, j = 0; k < budgetResult.length; k++) {
-            //                 console.log("B** funding source ---", this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId));
-            //                 console.log("B** moment ---", moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)'))
+            //                 // console.log("B** funding source ---", this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId));
+            //                 // console.log("B** moment ---", moment(budgetResult[k].startDate).isBetween(startDate, endDate, null, '[)'))
             //                 // if (budgetResult[k].program.id == programId && moment().range(startDate, endDate)  moment(budgetResult[k].startDate).isBetween(startDate, endDate) && (this.state.fundingSourceValues.filter(c=>c.value==budgetResult[k].fundingSource.fundingSourceId)).length>0 )
             //                 if (budgetResult[k].programs[0].id == programId && ((budgetResult[k].startDate >= startDate && budgetResult[k].startDate <= endDate) || (budgetResult[k].stopDate >= startDate && budgetResult[k].stopDate <= endDate) || (startDate >= budgetResult[k].startDate && startDate <= budgetResult[k].stopDate)) && (this.state.fundingSourceValues.filter(c => c.value == budgetResult[k].fundingSource.fundingSourceId)).length > 0)
             //                     budgetList[j++] = budgetResult[k]
             //             }
-            //             console.log("budgetList---", budgetList);
-            //             console.log("B** budget 1 ---", budgetList);
+            //             // console.log("budgetList---", budgetList);
+            //             // console.log("B** budget 1 ---", budgetList);
             //             var transaction = db1.transaction(['programData'], 'readwrite');
             //             var programTransaction = transaction.objectStore('programData');
             //             var version = (versionId.split('(')[0]).trim()
@@ -565,13 +569,13 @@ class Budgets extends Component {
             //                 //         shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
             //                 //         var plannedShipmentbudget = 0;
             //                 //         (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
-            //                 //             console.log(ele)
+            //                 //             // console.log(ele)
             //                 //             plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
             //                 //         });
             //                 //         var OrderedShipmentbudget = 0;
             //                 //         var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
             //                 //         shiplist.map(ele => {
-            //                 //             console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
+            //                 //             // console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
             //                 //             OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
             //                 //         });
             //                 //         oldShipmentbudget = ((plannedShipmentbudget / budgetList[l].currency.conversionRateToUsd) + (OrderedShipmentbudget / budgetList[l].currency.conversionRateToUsd))
@@ -589,29 +593,29 @@ class Budgets extends Component {
             //                     var sList = programJson.shipmentList;
             //                     shipmentList = shipmentList.concat(sList);
             //                 }
-            //                 console.log("B** program json ---", programJson);
+            //                 // console.log("B** program json ---", programJson);
             //                 for (var l = 0; l < budgetList.length; l++) {
             //                     shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
             //                     shipmentList = shipmentList.filter(s => s.budget.id == budgetList[l].budgetId);
-            //                     console.log("B** shipment list ---", shipmentList);
+            //                     // console.log("B** shipment list ---", shipmentList);
             //                     var plannedShipmentbudget = 0;
             //                     (shipmentList.filter(s => s.shipmentStatus.id == 1)).map(ele => {
             //                         plannedShipmentbudget = plannedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
             //                     });
-            //                     console.log("B** planned shipment budget ---", plannedShipmentbudget);
+            //                     // console.log("B** planned shipment budget ---", plannedShipmentbudget);
             //                     var OrderedShipmentbudget = 0;
             //                     var shiplist = (shipmentList.filter(s => (s.shipmentStatus.id == 3 || s.shipmentStatus.id == 4 || s.shipmentStatus.id == 5 || s.shipmentStatus.id == 6 || s.shipmentStatus.id == 7 || s.shipmentStatus.id == 9)))
-            //                     console.log("B** shiplist ---", shiplist);
+            //                     // console.log("B** shiplist ---", shiplist);
             //                     shiplist.map(ele => {
-            //                         console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
+            //                         // console.log(OrderedShipmentbudget, '+', ele.productCost + ele.freightCost)
             //                         OrderedShipmentbudget = OrderedShipmentbudget + (Number(ele.productCost) + Number(ele.freightCost)) * Number(ele.currency.conversionRateToUsd)
             //                     });
 
             //                     var remainingbudget = Math.floor(budgetList[l].budgetAmt - (OrderedShipmentbudget + plannedShipmentbudget))
 
 
-            //                     console.log("B** order shipment budget ---", remainingbudget);
-            //                     console.log("B** budget list l ==>", budgetList[l]);
+            //                     // console.log("B** order shipment budget ---", remainingbudget);
+            //                     // console.log("B** budget list l ==>", budgetList[l]);
             //                     var json = {
             //                         budget: { id: budgetList[l].budgetId, label: budgetList[l].label, code: budgetList[l].budgetCode },
             //                         program: { id: budgetList[l].programs.id, label: budgetList[l].programs.label, code: programJson.programCode },
@@ -629,9 +633,9 @@ class Budgets extends Component {
             //                     }
 
             //                     data.push(json)
-            //                     console.log("B** json ---", json);
+            //                     // console.log("B** json ---", json);
             //                 }
-            //                 console.log("B** data ---", data);
+            //                 // console.log("B** data ---", data);
 
             //                 data.sort(function (a, b) {
             //                     var keyA = new Date(a.startDate),
@@ -654,7 +658,7 @@ class Budgets extends Component {
             //                     return 0;
             //                 });
 
-            //                 console.log("data---->", data);
+            //                 // console.log("data---->", data);
             //                 this.setState({
             //                     selBudget: data,
             //                     message: '',
@@ -675,11 +679,11 @@ class Budgets extends Component {
             this.setState({ loading: true })
             // var inputjson = { "programId": programId, "versionId": versionId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
             var inputjson = { "programIds": programId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
-            console.log("Input Json Test@123", inputjson)
+            // console.log("Input Json Test@123", inputjson)
             // AuthenticationService.setupAxiosInterceptors();
             ReportService.budgetReport(inputjson)
                 .then(response => {
-                    console.log("BudgetData--------", response.data);
+                    // console.log("BudgetData--------", response.data);
                     this.setState({
                         selBudget: response.data, message: '', loading: false
                     }, () => {
@@ -799,7 +803,11 @@ class Budgets extends Component {
                         proList[i] = programJson
                     }
                     this.setState({
-                        programs: proList, loading: false
+                        programs: proList.sort(function (a, b) {
+                            a = a.programCode.toLowerCase();
+                            b = b.programCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }), loading: false
                     }, () => { this.filterData() })
                 }).catch(
                     error => {
@@ -872,7 +880,7 @@ class Budgets extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             // this.consolidatedProgramList()
             this.setState({ loading: false })
         }
@@ -906,13 +914,13 @@ class Budgets extends Component {
     //                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
     //                     var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
     //                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-    //                     console.log(programNameLabel)
+    //                     // console.log(programNameLabel)
 
     //                     var f = 0
     //                     for (var k = 0; k < this.state.programs.length; k++) {
     //                         if (this.state.programs[k].programId == programData.programId) {
     //                             f = 1;
-    //                             console.log('already exist')
+    //                             // console.log('already exist')
     //                         }
     //                     }
     //                     if (f == 0) {
@@ -957,7 +965,7 @@ class Budgets extends Component {
 
     roundNStr = num => {
         var roundNum = Number(Math.round((num / 1000000) * Math.pow(10, 4)) / Math.pow(10, 4)).toFixed(4);
-        console.log('num ' + num + 'roundNum ', roundNum)
+        // console.log('num ' + num + 'roundNum ', roundNum)
         if (roundNum != 0) {
             return roundNum + ' ' + i18n.t('static.common.million')
         } else {
@@ -976,12 +984,12 @@ class Budgets extends Component {
 
     //         // localStorage.setItem("sesProgramIdReport", programId);
     //         const program = this.state.programs.filter(c => c.programId == programId)
-    //         console.log(program)
+    //         // console.log(program)
     //         if (program.length == 1) {
     //             if (isSiteOnline()) {
     //                 DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
     //                     .then(response => {
-    //                         console.log("response===>", response.data)
+    //                         // console.log("response===>", response.data)
     //                         this.setState({
     //                             versions: []
     //                         }, () => {
@@ -1093,7 +1101,7 @@ class Budgets extends Component {
 
     //             }
 
-    //             console.log(verList)
+    //             // console.log(verList)
     //             let versionList = verList.filter(function (x, i, a) {
     //                 return a.indexOf(x) === i;
     //             });
@@ -1180,19 +1188,19 @@ class Budgets extends Component {
     rowClassNameFormat(row, rowIdx) {
         // row is whole row object
         // rowIdx is index of row
-        // console.log('in rowClassNameFormat')
-        // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
+        // // console.log('in rowClassNameFormat')
+        // // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
         return new Date(row.stopDate) < new Date() || (row.budgetAmt - row.usedUsdAmt) <= 0 ? 'background-red' : '';
     }
     formatLabel(cell, row) {
-        // console.log("celll----", cell);
+        // // console.log("celll----", cell);
         if (cell != null && cell != "") {
             return getLabelText(cell, this.state.lang);
         }
     }
 
     addCommas(cell, row) {
-        console.log("row---------->", row);
+        // console.log("row---------->", row);
         //  var currencyCode = row.currency.currencyCode;
         cell += '';
         var x = cell.split('.');
@@ -1264,11 +1272,11 @@ class Budgets extends Component {
         //             </option>
         //         )
         //     }, this);
-        console.log('budget list', this.state.selBudget)
+        // console.log('budget list', this.state.selBudget)
         var budgets = this.state.selBudget.map((item, index) => (item.budget))
         const { fundingSources } = this.state;
         const { rangeValue } = this.state
-        console.log('budgets', budgets)
+        // console.log('budgets', budgets)
 
 
         let data1 = []
@@ -1277,7 +1285,7 @@ class Budgets extends Component {
         let data4 = []
 
         for (var i = 0; i < budgets.length; i++) {
-            console.log("data3===", this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
+            // console.log("data3===", this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
             // data1 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.orderedBudgetAmt)))
             // data2 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.plannedBudgetAmt)))
             // data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => this.roundN(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))))
@@ -1287,7 +1295,7 @@ class Budgets extends Component {
             data3 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt)) > 0 ? (Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))) : 0))
             data4 = (this.state.selBudget.filter(c => c.budget.id = budgets[i].id).map(ele => Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt)) < 0 ? (Math.floor(ele.budgetAmt - (ele.orderedBudgetAmt + ele.plannedBudgetAmt))) : 0))
         }
-        console.log("data3==", data3, "===", data4)
+        // console.log("data3==", data3, "===", data4)
 
         const bar = {
 
@@ -1348,7 +1356,7 @@ class Budgets extends Component {
 
         }
 
-        console.log('datasets', bar)
+        // console.log('datasets', bar)
         const { SearchBar, ClearSearchButton } = Search;
         const { fundingSourceList } = this.state;
 
@@ -1674,7 +1682,7 @@ class Budgets extends Component {
                                                             // pagination={paginationFactory(options)}
                                                             rowEvents={{
                                                                 onClick: (e, row, rowIndex) => {
-                                                                    console.log("***row", row);
+                                                                    // console.log("***row", row);
                                                                     window.open(window.location.origin + `/#/report/shipmentSummery/${row.budget.id}/${row.budget.code}`);
                                                                 }
                                                             }}

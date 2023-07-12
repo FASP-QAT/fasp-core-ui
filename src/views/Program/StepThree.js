@@ -173,7 +173,7 @@ export default class StepThree extends Component {
                     initialValues={initialValuesThree}
                     validate={validateThree(validationSchemaThree)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        console.log("in success--");
+                        // console.log("in success--");
                         this.props.finishedStepThree && this.props.finishedStepThree();
 
                     }}

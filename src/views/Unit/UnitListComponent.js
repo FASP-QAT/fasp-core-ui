@@ -465,7 +465,7 @@ export default class UnitListComponent extends Component {
 
     buildJExcel() {
         let unitList = this.state.selSource;
-        console.log("unit---->", unitList);
+        // console.log("unit---->", unitList);
         let unitListArray = [];
         let count = 0;
 
@@ -710,7 +710,7 @@ export default class UnitListComponent extends Component {
 
         UnitService.getUnitListAll()
             .then(response => {
-                console.log("Unit--->", response.data);
+                // console.log("Unit--->", response.data);
 
                 this.setState({
                     unitList: response.data,

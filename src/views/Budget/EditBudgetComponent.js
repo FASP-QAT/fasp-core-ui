@@ -215,9 +215,9 @@ class EditBudgetComponent extends Component {
 
 
     addMonths(date, months) {
-        console.log("add months date 1---" + date);
+        // console.log("add months date 1---" + date);
         date.setMonth(date.getMonth() + months);
-        console.log("add months date 2---" + date);
+        // console.log("add months date 2---" + date);
         return date;
     }
 
@@ -320,8 +320,8 @@ class EditBudgetComponent extends Component {
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("(response.data.startDate)--", new Date(response.data.startDate));
-                    console.log("Response data Test",response.data)
+                    // console.log("(response.data.startDate)--", new Date(response.data.startDate));
+                    // console.log("Response data Test",response.data)
                     // if (response.data.startDate != null && response.data.startDate != "") {
                     //     response.data.startDate = new Date(response.data.startDate);
                     // }
@@ -335,8 +335,8 @@ class EditBudgetComponent extends Component {
                     var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
                     let budgetObj = response.data;
                     budgetObj.budgetAmt = (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                    console.log("AMT------>", (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
-                    console.log("Budget Obj Test",budgetObj)
+                    // console.log("AMT------>", (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
+                    // console.log("Budget Obj Test",budgetObj)
                     for (var i = 0; i < budgetObj.programs.length; i++) {
                         if (budgetObj.programs[i].id != 0) {
                             proramListArray[i] = { value: budgetObj.programs[i].id, label: getLabelText(budgetObj.programs[i].label, this.state.lang) }
@@ -506,7 +506,9 @@ class EditBudgetComponent extends Component {
         this.setState({
             budget
         },
-            () => { console.log(this.state) });
+            () => { 
+                // console.log(this.state) 
+            });
     };
 
     touchAll(setTouched, errors) {
@@ -606,9 +608,9 @@ class EditBudgetComponent extends Component {
 
                                     // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
                                     // budget.stopDate = new Date(stopDateString);
-                                    console.log("check----->1", budget.budgetAmt);
+                                    // console.log("check----->1", budget.budgetAmt);
                                     budget.budgetAmt = budget.budgetAmt.replace(/,/g, '');
-                                    console.log("check----->2", budget.budgetAmt);
+                                    // console.log("check----->2", budget.budgetAmt);
                                     BudgetService.editBudget(budget)
                                         .then(response => {
                                             if (response.status == "200") {
@@ -630,7 +632,7 @@ class EditBudgetComponent extends Component {
                                                         loading: false
                                                     });
                                                 } else {
-                                                    console.log("ERROR------->", error.response);
+                                                    // console.log("ERROR------->", error.response);
                                                     switch (error.response ? error.response.status : "") {
 
                                                         case 401:
@@ -934,7 +936,7 @@ class EditBudgetComponent extends Component {
     resetClicked() {
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
-                console.log("Response data Test",response.data)
+                // console.log("Response data Test",response.data)
 
                 // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                 // response.data.budgetAmt = getBudgetAmount;

@@ -260,7 +260,7 @@ export default class TracerCategoryTicketComponent extends Component {
                             this.state.tracerCategory.summary = summaryText_2;
                             this.state.tracerCategory.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.tracerCategory).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

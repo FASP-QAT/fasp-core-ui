@@ -606,7 +606,7 @@ export default class DataSourceTypeListComponent extends Component {
 
         DataSourceTypeService.getDataSourceTypeList().then(response => {
             if (response.status == 200) {
-                console.log(response.data)
+                // console.log(response.data)
                 this.setState({
                     dataSourceList: response.data,
                     selSource: response.data,
@@ -671,7 +671,7 @@ export default class DataSourceTypeListComponent extends Component {
 
     editDataSourceType(dataSourceType) {
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE_TYPE')) {
-            console.log(dataSourceType)
+            // console.log(dataSourceType)
             this.props.history.push({
                 pathname: `/dataSourceType/editDataSourceType/${dataSourceType.dataSourceTypeId}`,
                 // state: { dataSourceType: dataSourceType }

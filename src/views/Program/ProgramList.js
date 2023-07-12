@@ -450,10 +450,10 @@ export default class ProgramList extends Component {
       : localStorage.getItem("SPSelStatus") == ""
       ? ""
       : "true";
-    console.log("countryId--------->", countryId);
-    console.log("selStatus--------->", selStatus);
+    // console.log("countryId--------->", countryId);
+    // console.log("selStatus--------->", selStatus);
     if (countryId != 0 && selStatus != "") {
-      console.log("1------------");
+      // console.log("1------------");
       let tempSelStatus = selStatus == "true" ? true : false;
       // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
       const selProgram = this.state.programList.filter(
@@ -468,7 +468,7 @@ export default class ProgramList extends Component {
         }
       );
     } else if (countryId != 0) {
-      console.log("2------------");
+      // console.log("2------------");
       // const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
       const selProgram = this.state.programList.filter(
         (c) => c.realmCountry.id == countryId
@@ -482,7 +482,7 @@ export default class ProgramList extends Component {
         }
       );
     } else if (selStatus != "") {
-      console.log("3------------");
+      // console.log("3------------");
       let tempSelStatus = selStatus == "true" ? true : false;
       const selProgram = this.state.programList.filter(
         (c) => c.active == tempSelStatus
@@ -496,7 +496,7 @@ export default class ProgramList extends Component {
         }
       );
     } else {
-      console.log("4------------");
+      // console.log("4------------");
       this.setState(
         {
           selProgram: this.state.programList,
@@ -750,7 +750,7 @@ export default class ProgramList extends Component {
   };
 
   componentDidMount() {
-    console.log("props--------------------", this.props);
+    // console.log("props--------------------", this.props);
     // AuthenticationService.setupAxiosInterceptors();
     this.hideFirstComponent();
     // ProgramService.getProgramList().then(response => {
@@ -761,7 +761,7 @@ export default class ProgramList extends Component {
     )
       .then((response) => {
         if (response.status == 200) {
-          console.log("resp--------------------", response.data);
+          // console.log("resp--------------------", response.data);
           this.setState(
             {
               programList: response.data,
@@ -843,7 +843,7 @@ export default class ProgramList extends Component {
     let realmId = AuthenticationService.getRealmId();
     DropdownService.getRealmCountryDropdownList(realmId)
       .then((response) => {
-        console.log("RealmCountryService---->", response.data);
+        // console.log("RealmCountryService---->", response.data);
         if (response.status == 200) {
           var listArray = response.data;
           listArray.sort((a, b) => {

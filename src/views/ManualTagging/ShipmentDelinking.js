@@ -44,10 +44,10 @@
 //     }
 //     delinkShipment(event, row) {
 //         event.stopPropagation();
-//         console.log("shipment id row---"+row.shipmentId);
+//         // console.log("shipment id row---"+row.shipmentId);
 //         ManualTaggingService.delinkShipment(row.shipmentId)
 //             .then(response => {
-//                 console.log("link response===", response);
+//                 // console.log("link response===", response);
 //                 this.setState({
 //                     message : i18n.t('static.shipment.delinkingsuccess')
 //                 })
@@ -74,7 +74,7 @@
 //         var planningUnitId = document.getElementById("planningUnitId").value;
 //         ManualTaggingService.getShipmentListForDelinking(programId, planningUnitId)
 //             .then(response => {
-//                 console.log("manual tagging response===", response);
+//                 // console.log("manual tagging response===", response);
 //                 this.setState({
 //                     outputList: response.data
 //                 })
@@ -138,7 +138,7 @@
 //     }
 
 //     addCommas(cell, row) {
-//         console.log("row---------->", row);
+//         // console.log("row---------->", row);
 //         cell += '';
 //         var x = cell.split('.');
 //         var x1 = x[0];
@@ -443,7 +443,7 @@ export default class ShipmentDelinking extends Component {
         });
     }
     dataChange(val) {
-        console.log("val---------------------------%%%%%%%%%%%%%", val)
+        // console.log("val---------------------------%%%%%%%%%%%%%", val)
         if (val === "no") {
             this.toggleLarge();
         }
@@ -460,7 +460,7 @@ export default class ShipmentDelinking extends Component {
             this.setState({ loading: true })
             ManualTaggingService.delinkShipment(this.state.shipmentId, notes, programId)
                 .then(response => {
-                    console.log("link response===", response);
+                    // console.log("link response===", response);
                     this.setState({
                         message: i18n.t('static.shipment.delinkingsuccess'),
                         color: 'green',
@@ -538,7 +538,7 @@ export default class ShipmentDelinking extends Component {
 
     buildJExcel() {
         let outputList = this.state.outputList;
-        // console.log("outputList---->", outputList);
+        // // console.log("outputList---->", outputList);
         let outputArray = [];
         let count = 0;
 
@@ -560,7 +560,7 @@ export default class ShipmentDelinking extends Component {
         //     data = [];
         //     outputArray[0] = data;
         // }
-        // console.log("outputArray---->", outputArray);
+        // // console.log("outputArray---->", outputArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -658,7 +658,7 @@ export default class ShipmentDelinking extends Component {
             //                     this.setState({ loading: true })
             //                     ManualTaggingService.delinkShipment(`${this.el.getValueFromCoords(0, y)}`)
             //                         .then(response => {
-            //                             console.log("link response===", response);
+            //                             // console.log("link response===", response);
             //                             this.setState({
             //                                 message: i18n.t('static.shipment.delinkingsuccess'),
             //                                 color: 'green',
@@ -735,7 +735,7 @@ export default class ShipmentDelinking extends Component {
         if (e.buttons == 1) {
 
             if ((x == 0 && value != 0) || (y == 0)) {
-                console.log("HEADER SELECTION--------------------------");
+                // console.log("HEADER SELECTION--------------------------");
             } else {
                 this.setState({
                     shipmentId: `${this.el.getValueFromCoords(0, x)}`
@@ -775,7 +775,7 @@ export default class ShipmentDelinking extends Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
         if (programId != -1 && planningUnitId != 0) {
             this.setState({ loading: true })
-            console.log("HASLINKED------->", this.state.haslink);
+            // console.log("HASLINKED------->", this.state.haslink);
             if (this.state.haslink) {
                 this.setState({ haslink: false })
             } else {
@@ -783,7 +783,7 @@ export default class ShipmentDelinking extends Component {
             }
             ManualTaggingService.getShipmentListForDelinking(programId, planningUnitId)
                 .then(response => {
-                    console.log("manual tagging response===", response);
+                    // console.log("manual tagging response===", response);
                     this.setState({
                         outputList: response.data,
                         // message: ''
@@ -832,7 +832,7 @@ export default class ShipmentDelinking extends Component {
                     }
                 );
         } else if (programId == -1) {
-            console.log("2-programId------>", programId);
+            // console.log("2-programId------>", programId);
             this.setState({
                 outputList: [],
                 message: i18n.t('static.program.validselectprogramtext'),
@@ -844,7 +844,7 @@ export default class ShipmentDelinking extends Component {
 
             });
         } else if (planningUnitId == 0) {
-            console.log("3-programId------>", programId);
+            // console.log("3-programId------>", programId);
             this.setState({
                 outputList: [],
                 message: i18n.t('static.procurementUnit.validPlanningUnitText'),
@@ -1032,7 +1032,7 @@ export default class ShipmentDelinking extends Component {
     }
 
     addCommas(cell, row) {
-        console.log("row---------->", row);
+        // console.log("row---------->", row);
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];

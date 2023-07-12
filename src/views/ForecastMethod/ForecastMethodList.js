@@ -84,7 +84,7 @@ class forecastMethod extends Component {
     buildJexcel() {
 
         const { realms } = this.state;
-        console.log("REALM------>2", realms);
+        // console.log("REALM------>2", realms);
         let realmList = [];
         if (realms.length > 0) {
             for (var i = 0; i < realms.length; i++) {
@@ -97,7 +97,7 @@ class forecastMethod extends Component {
             }
         }
 
-        console.log("REALM------>3", realmList);
+        // console.log("REALM------>3", realmList);
 
         var papuList = this.state.selSource;
         var data = [];
@@ -233,7 +233,7 @@ class forecastMethod extends Component {
                     var rowData = elInstance.getRowData(y);
                     // var productCategoryId = rowData[0];
                     var forecastMethodId = rowData[6];
-                    // console.log("updateTable------>", rowData[6]);
+                    // // console.log("updateTable------>", rowData[6]);
                     if (forecastMethodId == 0) {
                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
@@ -253,7 +253,7 @@ class forecastMethod extends Component {
                     }
 
                     var addRowId = rowData[8];
-                    console.log("addRowId------>", addRowId);
+                    // console.log("addRowId------>", addRowId);
                     if (addRowId == 1) {//active grade out
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
@@ -330,7 +330,7 @@ class forecastMethod extends Component {
     getForecastMethodTypeList() {
         ForecastMethodService.getForecastMethodTypeList().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data)
+                // console.log("response.data---->", response.data)
 
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -431,7 +431,7 @@ class forecastMethod extends Component {
                 this.setState({
                     realms: listArray
                 }, () => {
-                    console.log("REALM------>1", this.state.realms);
+                    // console.log("REALM------>1", this.state.realms);
                     this.buildJexcel();
                 });
 
@@ -486,7 +486,7 @@ class forecastMethod extends Component {
         this.hideSecondComponent();
         ForecastMethodService.getForecastMethodList().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data)
+                // console.log("response.data---->", response.data)
 
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -745,7 +745,7 @@ class forecastMethod extends Component {
         var rowData = elInstance.getRowData(y);
 
         // if (x == 2 && !isNaN(rowData[2]) && rowData[2].toString().indexOf('.') != -1) {
-        //     // console.log("RESP---------", parseFloat(rowData[2]));
+        //     // // console.log("RESP---------", parseFloat(rowData[2]));
         //     elInstance.setValueFromCoords(2, y, parseFloat(rowData[2]), true);
         // }
         this.el.setValueFromCoords(7, y, 1, true);
@@ -792,11 +792,11 @@ class forecastMethod extends Component {
         if (validation == true) {
             this.setState({ loading: true })
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("7 map---" + map1.get("7"))
+                // console.log("7 map---" + map1.get("7"))
                 if (parseInt(map1.get("7")) === 1) {
                     let json = {
                         forecastMethodId: parseInt(map1.get("0")),
@@ -819,12 +819,12 @@ class forecastMethod extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             ForecastMethodService.addUpdateForecastMethod(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         this.setState({
                             message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged: false
@@ -893,7 +893,7 @@ class forecastMethod extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -960,7 +960,7 @@ class forecastMethod extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
             if (parseInt(value) == 1) {
@@ -968,7 +968,7 @@ class forecastMethod extends Component {
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");

@@ -5,16 +5,16 @@ import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 
 export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, seasonality, page, regionId, planningUnitId) {
-    console.log("inputData@@@@@@", inputData);
-    console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
+    // console.log("inputData@@@@@@", inputData);
+    // console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
     var startMonth = moment(minStartDate).format("M");
     var decimal = (startMonth - 1) / 12;
     var startParam = Number(Number(startYear) + Number(decimal));
-    console.log("StartYear@@@@@@", startYear);
-    console.log("StartMonth@@@@@@", startMonth);
-    console.log("Decimal@@@@@@", decimal);
-    console.log("StartParam@@@@@@", startParam);
+    // console.log("StartYear@@@@@@", startYear);
+    // console.log("StartMonth@@@@@@", startMonth);
+    // console.log("Decimal@@@@@@", decimal);
+    // console.log("StartParam@@@@@@", startParam);
     // var date = minStartDate;
     var data = []
     for (var i = 0; i < inputData.length; i++) {
@@ -31,11 +31,11 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
         "seasonality": seasonality,
         "level": Number(confidenceLevel)
     }
-    console.log("JsonArima@@@@@@", json);
+    // console.log("JsonArima@@@@@@", json);
     ExtrapolationService.arima(json)
         .then(response => {
             if (response.status == 200) {
-                console.log("response.statusArima@@@@@@", response.data);
+                // console.log("response.statusArima@@@@@@", response.data);
                 var responseData = response.data;
                 var output = [];
                 var count = 0;
@@ -54,17 +54,17 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                     var arimaData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
                     props.updateArimaData(arimaData);
                 } else {
-                    console.log("OutPutArima@@@@@@@@@@@@@@@@@@@@@@", output)
+                    // console.log("OutPutArima@@@@@@@@@@@@@@@@@@@@@@", output)
                     // calculateCI(output, Number(confidenceLevel), "arimaData", props)
                     props.updateState("arimaData", output);
                     calculateError(output, "arimaError", props)
                 }
             }
         }).catch(error => {
-            console.log("ErrorArima@@@@@@", error)
+            // console.log("ErrorArima@@@@@@", error)
             // if (!isTreeExtrapolation) {
-            console.log("ErrorArima@@@@@@", error.status)
-            console.log("ErrorArima@@@@@@1", error.response.status == 500)
+            // console.log("ErrorArima@@@@@@", error.status)
+            // console.log("ErrorArima@@@@@@1", error.response.status == 500)
             if (page == "DataEntry") {
                 var arimaData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                 props.updateArimaData(arimaData);

@@ -27,13 +27,13 @@ class ProcurementAgentService {
     }
 
     addprocurementAgentPlanningUnitMapping(json) {
-        console.log("json papu---", json);
+        // console.log("json papu---", json);
         return axios.put(`${API_URL}/api/procurementAgent/planningUnit/`, json, {}
         );
     }
 
     savePlanningUnitProgramPriceForProcurementAgent(json) {
-        console.log("json papu---", json);
+        // console.log("json papu---", json);
         return axios.put(`${API_URL}/api/program/planningingUnit/procurementAgent/`, json, {}
         );
     }
@@ -44,7 +44,7 @@ class ProcurementAgentService {
     }
 
     addprocurementAgentProcurementUnitMapping(json) {
-        console.log("Json", json);
+        // console.log("Json", json);
         return axios.put(`${API_URL}/api/procurementAgent/procurementUnit/`, json, {}
         );
     }

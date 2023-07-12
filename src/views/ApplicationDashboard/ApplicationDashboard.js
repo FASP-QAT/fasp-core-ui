@@ -459,12 +459,12 @@ class ApplicationDashboard extends Component {
     });
   }
   checkNewerVersions(programs) {
-    console.log("T***going to call check newer versions dashboard---", programs)
+    // console.log("T***going to call check newer versions dashboard---", programs)
     if (localStorage.getItem('sessionType') === 'Online') {
       // AuthenticationService.setupAxiosInterceptors()
       ProgramService.checkNewerVersions(programs)
         .then(response => {
-          console.log("T***dashboard program response.data---", response.data);
+          // console.log("T***dashboard program response.data---", response.data);
           localStorage.removeItem("sesLatestProgram");
           localStorage.setItem("sesLatestProgram", response.data);
         })
@@ -472,12 +472,12 @@ class ApplicationDashboard extends Component {
   }
 
   checkNewerVersionsDataset(programs) {
-    console.log("T***going to call check newer versions dashboard---", programs)
+    // console.log("T***going to call check newer versions dashboard---", programs)
     if (localStorage.getItem('sessionType') === 'Online') {
       // AuthenticationService.setupAxiosInterceptors()
       ProgramService.checkNewerVersions(programs)
         .then(response => {
-          console.log("T***dashboard program response.data---", response.data);
+          // console.log("T***dashboard program response.data---", response.data);
           localStorage.removeItem("sesLatestDataset");
           localStorage.setItem("sesLatestDataset", response.data);
         })
@@ -612,7 +612,7 @@ class ApplicationDashboard extends Component {
           });
           // }
         }
-        console.log("DATSET-------->", datasetList);
+        // console.log("DATSET-------->", datasetList);
         this.setState({
           datasetList: datasetList
         })
@@ -633,14 +633,14 @@ class ApplicationDashboard extends Component {
       if (this.state.id == 1) {
         DashboardService.applicationLevelDashboard()
           .then(response => {
-            console.log("dashboard response===", response);
+            // console.log("dashboard response===", response);
             this.setState({
               dashboard: response.data
             })
           })
         DashboardService.applicationLevelDashboardUserList()
           .then(response => {
-            console.log("users response===", response);
+            // console.log("users response===", response);
             this.setState({
               users: response.data
             })
@@ -649,14 +649,14 @@ class ApplicationDashboard extends Component {
       if (this.state.id == 2) {
         DashboardService.realmLevelDashboard(this.state.realmId)
           .then(response => {
-            console.log("dashboard response===", response);
+            // console.log("dashboard response===", response);
             this.setState({
               dashboard: response.data
             })
           })
         DashboardService.realmLevelDashboardUserList(this.state.realmId)
           .then(response => {
-            console.log("users response===", response);
+            // console.log("users response===", response);
             this.setState({
               users: response.data
             })
@@ -680,7 +680,7 @@ class ApplicationDashboard extends Component {
       if (roleArray.includes('ROLE_SUPPLY_PLAN_REVIEWER') && this.state.id != 2) {
         DashboardService.supplyPlanReviewerLevelDashboard()
           .then(response => {
-            console.log("supplyPlanReviewerLevelDashboard===", response.data);
+            // console.log("supplyPlanReviewerLevelDashboard===", response.data);
             this.setState({
               supplyPlanReviewCount: response.data
             })
@@ -693,14 +693,14 @@ class ApplicationDashboard extends Component {
     this.getDataSetList();
     DashboardService.openIssues()
       .then(response => {
-        console.log("Customer Open Issues===", response);
+        // console.log("Customer Open Issues===", response);
         this.setState({
           openIssues: response.data.openIssues,
           addressedIssues: response.data.addressedIssues
         })
       })
     this.hideFirstComponent();
-    console.log("====== in application dasboard =======");
+    // console.log("====== in application dasboard =======");
 
     // var db1;
     // var storeOS;
@@ -822,7 +822,7 @@ class ApplicationDashboard extends Component {
   }
 
   addMapping(event, cell) {
-    console.log("-----cell------>>", cell);
+    // console.log("-----cell------>>", cell);
     event.stopPropagation();
     this.props.history.push({
       // pathname: `/programProduct/addProgramProduct/${cell}`,
@@ -839,10 +839,10 @@ class ApplicationDashboard extends Component {
     //   pathname: `/report/editProblem/${problem.problemReportId}/ ${this.state.programId}/${problem.problemActionIndex}/${problemStatusId}/${problemTypeId}`,
     //   // state: { language }
     // });
-    console.log("problem====>", problem);
+    // console.log("problem====>", problem);
     // 3_v2_uId_1
     var programId = problem.program.id + "_v" + problem.versionId + "_uId_1";
-    console.log("programId=====>", programId);
+    // console.log("programId=====>", programId);
 
     this.props.history.push({
       pathname: `/report/editProblem/${problem.problemReportId}/ ${programId}/${problem.problemActionIndex}/${problem.problemStatus.id}/${problem.problemType.id}`,
@@ -890,7 +890,7 @@ class ApplicationDashboard extends Component {
   }
 
   updateState(key, value) {
-    console.log("key+++", key, "value+++", value);
+    // console.log("key+++", key, "value+++", value);
     var programList = this.state.programList;
     var index = programList.findIndex(c => c.id == key);
     programList[index].loading = value;
@@ -920,22 +920,22 @@ class ApplicationDashboard extends Component {
 
   render() {
     const checkOnline = localStorage.getItem('sessionType');
-    console.log("AuthenticationService.getLoggedInUserRoleBusinessFunctionArray()@@@@@@@@", AuthenticationService.getLoggedInUserRoleBusinessFunctionArray())
+    // console.log("AuthenticationService.getLoggedInUserRoleBusinessFunctionArray()@@@@@@@@", AuthenticationService.getLoggedInUserRoleBusinessFunctionArray())
     let defaultModuleId;
     if(localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != ""){
       defaultModuleId = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)).defaultModuleId;
     }
     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE')) {
-      console.log("In if@@@@@@@@")
+      // console.log("In if@@@@@@@@")
       defaultModuleId = defaultModuleId != undefined ? defaultModuleId : 1;
     } else if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE')) {
-      console.log("In else if@@@@@@@@")
+      // console.log("In else if@@@@@@@@")
       defaultModuleId = 2;
     } else {
-      console.log("In else else@@@@@@@@")
+      // console.log("In else else@@@@@@@@")
       defaultModuleId = 1;
     }
-    console.log("Default Module Id@@@@@@@@", defaultModuleId)
+    // console.log("Default Module Id@@@@@@@@", defaultModuleId)
     const activeTab1 = defaultModuleId;
     const { activeIndex } = this.state;
     const { activeIndexProgram } = this.state;

@@ -115,7 +115,7 @@ export default class EditHealthAreaComponent extends Component {
         //     realmId: this.state.healthArea.realm.realmId
         // }
 
-        console.log("state---", this.state);
+        // console.log("state---", this.state);
     }
 
     changeMessage(message) {
@@ -133,8 +133,8 @@ export default class EditHealthAreaComponent extends Component {
 
     dataChange(event) {
         let { healthArea } = this.state
-        console.log(event.target.name);
-        console.log(event.target.value);
+        // console.log(event.target.name);
+        // console.log(event.target.value);
         if (event.target.name === "healthAreaName") {
             healthArea.label.label_en = event.target.value
         } else if (event.target.name === "realmId") {
@@ -148,7 +148,7 @@ export default class EditHealthAreaComponent extends Component {
             healthArea
         }, (
         ) => {
-            console.log("state after update---", this.state.healthArea)
+            // console.log("state after update---", this.state.healthArea)
         })
     }
 
@@ -206,7 +206,7 @@ export default class EditHealthAreaComponent extends Component {
 
             UserService.getRealmList()
                 .then(response => {
-                    console.log("realm list---", response.data);
+                    // console.log("realm list---", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -261,7 +261,7 @@ export default class EditHealthAreaComponent extends Component {
             // HealthAreaService.getRealmCountryList(this.state.healthArea.realm.id)
             DropdownService.getRealmCountryDropdownList(this.state.healthArea.realm.id)
                 .then(response => {
-                    console.log("Realm Country List -------list---", response.data);
+                    // console.log("Realm Country List -------list---", response.data);
                     if (response.status == 200) {
                         var json = response.data;
                         // json = json.filter(c => c.active)
@@ -376,13 +376,13 @@ export default class EditHealthAreaComponent extends Component {
             selectedArray.push(value[p].value);
         }
         if (selectedArray.includes("-1")) {
-            // console.log("------->2 in if");
+            // // console.log("------->2 in if");
             this.setState({ realmCountryId: [] });
             var list = this.state.realmCountryList.filter(c => c.value != -1)
             this.setState({ realmCountryId: list });
             var realmCountryId = list;
         } else {
-            // console.log("------->3 in else");
+            // // console.log("------->3 in else");
             this.setState({ realmCountryId: value });
             var realmCountryId = value;
         }
@@ -445,7 +445,7 @@ export default class EditHealthAreaComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("-------------------->" + this.state.healthArea);
+                                    // console.log("-------------------->" + this.state.healthArea);
                                     HealthAreaService.editHealthArea(this.state.healthArea)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -682,7 +682,7 @@ export default class EditHealthAreaComponent extends Component {
 
             UserService.getRealmList()
                 .then(response => {
-                    console.log("realm list---", response.data);
+                    // console.log("realm list---", response.data);
                     this.setState({
                         realms: response.data
                     })
@@ -730,7 +730,7 @@ export default class EditHealthAreaComponent extends Component {
 
             HealthAreaService.getRealmCountryList(this.state.healthArea.realm.id)
                 .then(response => {
-                    console.log("Realm Country List -------list---", response.data);
+                    // console.log("Realm Country List -------list---", response.data);
                     if (response.status == 200) {
                         var json = response.data;
                         json = json.filter(c => c.active)

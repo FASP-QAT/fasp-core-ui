@@ -48,12 +48,12 @@ const validationSchemaCreateTree = function (values) {
         forecastMethodId: Yup.string()
             .test('forecastMethodId', i18n.t('static.validation.selectForecastMethod'),
                 function (value) {
-                    console.log("@@@ 4", document.getElementById("forecastMethodId").value);
+                    // console.log("@@@ 4", document.getElementById("forecastMethodId").value);
                     if (document.getElementById("forecastMethodId").value == "") {
-                        console.log("fm false");
+                        // console.log("fm false");
                         return false;
                     } else {
-                        console.log("fm true");
+                        // console.log("fm true");
                         return true;
                     }
                 }),
@@ -203,7 +203,7 @@ export default class ListTreeTemplate extends Component {
 
     getTreeTemplateList() {
         DatasetService.getTreeTemplateList().then(response => {
-            console.log("tree template list---", response.data)
+            // console.log("tree template list---", response.data)
             var treeTemplateList = response.data.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                 var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -233,7 +233,7 @@ export default class ListTreeTemplate extends Component {
             datasetRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
-                console.log("myResult===============2", myResult)
+                // console.log("myResult===============2", myResult)
                 this.setState({
                     forecastMethodList: myResult.filter(x => x.forecastMethodTypeId == 1),
                     programList:programRequest.result.filter(c=>c.userId==userId),
@@ -277,7 +277,7 @@ export default class ListTreeTemplate extends Component {
         })
             .catch(
                 error => {
-                    console.log("Error Test@123",error)
+                    // console.log("Error Test@123",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             // message: 'static.unkownError',
@@ -386,7 +386,7 @@ export default class ListTreeTemplate extends Component {
     };
 
     getRegionList(datasetId) {
-        console.log("datasetId details---", datasetId);
+        // console.log("datasetId details---", datasetId);
 
         var regionList = [];
         var regionMultiList = [];
@@ -429,22 +429,22 @@ export default class ListTreeTemplate extends Component {
         var missingPUList = [];
         var json;
         var treeTemplate = this.state.treeTemplate;
-        console.log("dataset Id template---", this.state.datasetIdModal);
+        // console.log("dataset Id template---", this.state.datasetIdModal);
         if (this.state.datasetIdModal != "" && this.state.datasetIdModal != null) {
             var dataset = this.state.datasetListJexcel;
-            console.log("dataset---", dataset);
-            console.log("treeTemplate---", treeTemplate);
+            // console.log("dataset---", dataset);
+            // console.log("treeTemplate---", treeTemplate);
             var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
-            console.log("puNodeList---", puNodeList);
-            console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
+            // console.log("puNodeList---", puNodeList);
+            // console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
             var planningUnitList = dataset.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
-            console.log("planningUnitList---", planningUnitList);
-            console.log("planningUnitIdListPUSettings---", planningUnitList.map((x) => x.planningUnit.id).join(', '));
+            // console.log("planningUnitList---", planningUnitList);
+            // console.log("planningUnitIdListPUSettings---", planningUnitList.map((x) => x.planningUnit.id).join(', '));
             for (let i = 0; i < puNodeList.length; i++) {
-                console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
+                // console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
                 if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
                     var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
-                    console.log("parentNodeData---", parentNodeData);
+                    // console.log("parentNodeData---", parentNodeData);
                     json = {
                         productCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory,
                         planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
@@ -453,7 +453,7 @@ export default class ListTreeTemplate extends Component {
                 }
             }
         }
-        console.log("missingPUList---", missingPUList);
+        // console.log("missingPUList---", missingPUList);
         if (missingPUList.length > 0) {
             missingPUList = missingPUList.filter((v, i, a) => a.findIndex(v2 => (v2.planningUnit.id === v.planningUnit.id)) === i)
         }
@@ -466,7 +466,7 @@ export default class ListTreeTemplate extends Component {
 
     buildMissingPUJexcel() {
         var missingPUList = this.state.missingPUList;
-        console.log("missingPUList--->", missingPUList);
+        // console.log("missingPUList--->", missingPUList);
         var dataArray = [];
         let count = 0;
         if (missingPUList.length > 0) {
@@ -484,7 +484,7 @@ export default class ListTreeTemplate extends Component {
         // this.el.destroy();
         jexcel.destroy(document.getElementById("missingPUJexcel"), true);
         var data = dataArray;
-        console.log("DataArray>>>", dataArray);
+        // console.log("DataArray>>>", dataArray);
 
         var options = {
             data: data,
@@ -543,23 +543,23 @@ export default class ListTreeTemplate extends Component {
     }
 
     loadedMissingPU = function (instance, cell, x, y, value) {
-        console.log("loaded 2---", document.getElementsByClassName('jexcel'));
+        // console.log("loaded 2---", document.getElementsByClassName('jexcel'));
         jExcelLoadedFunctionOnlyHideRow(instance, 1);
     }
 
     handleRegionChange = (regionIds) => {
-        console.log("regionIds---", regionIds);
+        // console.log("regionIds---", regionIds);
 
         this.setState({
             regionValues: regionIds.map(ele => ele),
             // regionLabels: regionIds.map(ele => ele.label)
         }, () => {
-            console.log("regionValues---", this.state.regionValues);
+            // console.log("regionValues---", this.state.regionValues);
             // console.log("regionLabels---", this.state.regionLabels);
             // if ((this.state.regionValues).length > 0) {
             var regionList = [];
             var regions = this.state.regionValues;
-            console.log("regions---", regions)
+            // console.log("regions---", regions)
             for (let i = 0; i < regions.length; i++) {
                 var json = {
                     id: regions[i].value,
@@ -569,7 +569,7 @@ export default class ListTreeTemplate extends Component {
                 }
                 regionList.push(json);
             }
-            console.log("final regionList---", regionList);
+            // console.log("final regionList---", regionList);
             this.setState({ regionList });
             // }
         })
@@ -599,13 +599,13 @@ export default class ListTreeTemplate extends Component {
 
     copyDeleteTree(treeTemplateId) {
 
-        console.log("treeTemplateId--------------->", treeTemplateId);
+        // console.log("treeTemplateId--------------->", treeTemplateId);
         var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
         treeTemplate.label.label_en = this.state.treeTemplateName;
 
         DatasetService.addTreeTemplate(treeTemplate)
             .then(response => {
-                console.log("after adding tree---", response.data);
+                // console.log("after adding tree---", response.data);
                 if (response.status == 200) {
                     this.setState({
                         message: i18n.t('static.message.addTreeTemplate'),
@@ -693,7 +693,7 @@ export default class ListTreeTemplate extends Component {
     }
     buildJexcel() {
         let treeTemplateList = this.state.treeTemplateList;
-        console.log("treeTemplateList---->", treeTemplateList);
+        // console.log("treeTemplateList---->", treeTemplateList);
         let treeTemplateArray = [];
         let count = 0;
         var selStatus = document.getElementById("active").value;
@@ -960,10 +960,10 @@ export default class ListTreeTemplate extends Component {
     createTree(){
         // var program = this.state.treeFlag ? (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]) : (this.state.datasetList.filter(x => x.id == programId)[0]);
         var program = this.state.datasetListJexcel;
-        console.log("delete program---", program);
+        // console.log("delete program---", program);
         let tempProgram = JSON.parse(JSON.stringify(program))
         let treeList = program.treeList;
-        console.log("delete treeList---", treeList);
+        // console.log("delete treeList---", treeList);
         var treeTemplateId = '';
         var treeId=""
         var maxTreeId = treeList.length > 0 ? Math.max(...treeList.map(o => o.treeId)) : 0;
@@ -990,14 +990,14 @@ export default class ListTreeTemplate extends Component {
                             // var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
                             // var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
                             var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
-                            console.log("startMonthNoModeling---", startMonthNoModeling);
+                            // console.log("startMonthNoModeling---", startMonthNoModeling);
                             modeling.startDate = moment(curMonth).startOf('month').add(startMonthNoModeling, 'months').format("YYYY-MM-DD");
                             var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
-                            console.log("stopMonthNoModeling---", stopMonthNoModeling);
+                            // console.log("stopMonthNoModeling---", stopMonthNoModeling);
                             modeling.stopDate = moment(curMonth).startOf('month').add(stopMonthNoModeling, 'months').format("YYYY-MM-DD");
 
 
-                            console.log("modeling---", modeling);
+                            // console.log("modeling---", modeling);
                             (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j] = modeling;
                         }
                     }
@@ -1043,7 +1043,7 @@ export default class ListTreeTemplate extends Component {
                 }
                 treeList.push(tempTree);
         // }
-        console.log("TreeList@@@@@@@@@@@@@@", treeList)
+        // console.log("TreeList@@@@@@@@@@@@@@", treeList)
         tempProgram.treeList = treeList;
         var programCopy = JSON.parse(JSON.stringify(tempProgram));
         // var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
@@ -1054,25 +1054,25 @@ export default class ListTreeTemplate extends Component {
     }
 
     updateState(parameterName, value) {
-        console.log("parameterName---", parameterName + " value---", value);
+        // console.log("parameterName---", parameterName + " value---", value);
         // console.log("value---", value);
         if (parameterName != "loading") {
             this.setState({
                 [parameterName]: value
             }, () => {
                 if (parameterName == 'programId' && value != "") {
-                    console.log("tempTreeId---", this.state.tempTreeId)
+                    // console.log("tempTreeId---", this.state.tempTreeId)
                     var programId = this.state.programId;
                     var program = this.state.datasetListJexcel;
-                    console.log("my program---", program);
+                    // console.log("my program---", program);
                     let tempProgram = JSON.parse(JSON.stringify(program))
                     let treeList = tempProgram.treeList;
                     var tree = treeList.filter(x => x.treeId == this.state.tempTreeId)[0];
-                    console.log("my tree---", tree);
+                    // console.log("my tree---", tree);
                     var items = tree.tree.flatList;
-                    console.log("my items---", items);
+                    // console.log("my items---", items);
                     var nodeDataMomList = this.state.nodeDataMomList;
-                    console.log("nodeDataMomList---", nodeDataMomList);
+                    // console.log("nodeDataMomList---", nodeDataMomList);
                     if (nodeDataMomList.length > 0) {
                         for (let i = 0; i < nodeDataMomList.length; i++) {
                             // console.log("nodeDataMomList[i]---", nodeDataMomList[i])
@@ -1091,7 +1091,7 @@ export default class ListTreeTemplate extends Component {
                     }
                     tree.flatList = items;
                     var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);
-                    console.log("findTreeIndex---", findTreeIndex);
+                    // console.log("findTreeIndex---", findTreeIndex);
                     treeList[findTreeIndex] = tree;
                     tempProgram.treeList = treeList;
                     var programCopy = JSON.parse(JSON.stringify(tempProgram));
@@ -1100,7 +1100,7 @@ export default class ListTreeTemplate extends Component {
                     // var treeTemplateId = document.getElementById('templateId').value;
                     this.saveTreeData(3, tempProgram, this.state.treeTemplate.treeTemplateId, programId, this.state.tempTreeId, programCopy);
                 }
-                console.log("returmed list---", this.state.nodeDataMomList);
+                // console.log("returmed list---", this.state.nodeDataMomList);
 
             })
         }
@@ -1139,7 +1139,7 @@ export default class ListTreeTemplate extends Component {
             var programRequest = programTransaction.put(json);
 
             transaction.oncomplete = function (event) {
-                console.log("in side datasetDetails")
+                // console.log("in side datasetDetails")
                 db1 = e.target.result;
                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
@@ -1198,7 +1198,7 @@ export default class ListTreeTemplate extends Component {
                     }
 
                 });
-                console.log("Data update success1");
+                // console.log("Data update success1");
                 // alert("success");
 
 
@@ -1210,7 +1210,7 @@ export default class ListTreeTemplate extends Component {
                 }, () => {
                     this.hideSecondComponent();
                 });
-                console.log("Data update errr");
+                // console.log("Data update errr");
             }.bind(this);
         }.bind(this);
 
@@ -1266,7 +1266,7 @@ export default class ListTreeTemplate extends Component {
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         {/* <div id="loader" className="center"></div> */}
-                        <div className=" pl-0" style={{marginTop:"-35px"}}>
+                        <div className=" pl-0" style={{marginTop:"-20px"}}>
                             <div className="row">
                                 <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>

@@ -809,7 +809,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         ProcurementAgentService.getProcurementAgentPlaningUnitList(this.state.procurementAgentId)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("getProcurementAgentPlaningUnitList--", response.data);
+                    // console.log("getProcurementAgentPlaningUnitList--", response.data);
                     let myResponse = response.data;
                     if (myResponse.length > 0) {
                         this.setState({ rows: myResponse });
@@ -922,14 +922,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             data[11] = papuList[j].procurementAgentPlanningUnitId;
                                                             data[12] = 0;
                                                             papuDataArr[count] = data;
-                                                            console.log("data---", papuList[j].volume)
+                                                            // console.log("data---", papuList[j].volume)
                                                             count++;
 
 
                                                         }
                                                     }
 
-                                                    console.log("papuDataArr.length-->", papuDataArr.length);
+                                                    // console.log("papuDataArr.length-->", papuDataArr.length);
                                                     if (papuDataArr.length == 0) {
                                                         data = [];
                                                         data[0] = this.props.match.params.procurementAgentId;
@@ -1501,7 +1501,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("value ---", this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
+                // console.log("value ---", this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""));
                 if (parseInt(map1.get("12")) === 1) {
                     let json = {
                         planningUnit: {
@@ -1524,12 +1524,12 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             ProcurementAgentService.addprocurementAgentPlanningUnitMapping(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
@@ -1584,7 +1584,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
 
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -1593,13 +1593,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         let count = 0;
 
         let tempArray = tableJson;
-        console.log('hasDuplicate------', tempArray);
+        // console.log('hasDuplicate------', tempArray);
 
         var hasDuplicate = false;
         tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {
             if (a === b) hasDuplicate = true
         })
-        console.log('hasDuplicate', hasDuplicate);
+        // console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
                 message: i18n.t('static.planningUnit.duplicatePlanningUnit'),
@@ -1864,7 +1864,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             // var col = ("L").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(12, y);
@@ -1873,7 +1873,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                 //planning unit
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");

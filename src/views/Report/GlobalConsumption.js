@@ -252,7 +252,7 @@ class GlobalConsumption extends Component {
     this.state.programLabels.map(ele =>
       csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
     // csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    console.log(this.state.planningUnitValues)
+    // console.log(this.state.planningUnitValues)
     csvRow.push('')
     this.state.planningUnitValues.map(ele =>
       csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20') + '"'))
@@ -385,7 +385,7 @@ class GlobalConsumption extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
     planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
     //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
@@ -398,7 +398,7 @@ class GlobalConsumption extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
 
     planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -412,7 +412,7 @@ class GlobalConsumption extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
 
     doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
@@ -434,7 +434,7 @@ class GlobalConsumption extends Component {
     var h1 = 50;
     var aspectwidth1 = (width - h1);
     let startY = y + 10
-    console.log('startY', startY)
+    // console.log('startY', startY)
     let pages = Math.ceil(startY / height)
     for (var j = 1; j < pages; j++) {
       doc.addPage()
@@ -488,7 +488,7 @@ class GlobalConsumption extends Component {
   }
   filterProgram = () => {
     let countryIds = this.state.countryValues.map(ele => ele.value);
-    // console.log('countryIds', countryIds, 'programs', this.state.programs)
+    // // console.log('countryIds', countryIds, 'programs', this.state.programs)
     this.setState({
       programLst: [],
       programValues: [],
@@ -500,11 +500,11 @@ class GlobalConsumption extends Component {
           .then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
               return itemLabelA > itemLabelB ? 1 : -1;
             });
-            console.log('programLst', listArray)
+            // console.log('programLst', listArray)
             if (listArray.length > 0) {
               this.setState({
                 programLst: listArray
@@ -608,7 +608,7 @@ class GlobalConsumption extends Component {
     setTimeout(function () {
       var theSelect = document.getElementById('planningUnitId').length;
 
-      // console.log("INHIDEDIV------------------------------------------------------", theSelect);
+      // // console.log("INHIDEDIV------------------------------------------------------", theSelect);
 
     }, 9000);
 
@@ -626,7 +626,7 @@ class GlobalConsumption extends Component {
     let realmId = AuthenticationService.getRealmId()
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
 
-    console.log("realmId--------->", realmId);
+    // console.log("realmId--------->", realmId);
     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
     if (realmId > 0 && this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0) {
@@ -642,11 +642,11 @@ class GlobalConsumption extends Component {
         "reportView": viewById,
         "useApprovedSupplyPlanOnly": useApprovedVersion
       }
-      console.log('inputJSON***' + inputjson)
+      // console.log('inputJSON***' + inputjson)
 
       ReportService.getGlobalConsumptiondata(inputjson)
         .then(response => {
-          console.log("RESP--->", response.data);
+          // console.log("RESP--->", response.data);
           let tempConsumptionData = response.data;
           var consumptions = [];
 
@@ -660,13 +660,13 @@ class GlobalConsumption extends Component {
                 "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY'),
                 "consumptionDateString1": moment(tempConsumptionData[i].transDate, 'yyyy-MM-dd')
               }
-              console.log("json--->", json);
+              // console.log("json--->", json);
               consumptions.push(json);
             }
 
           }
 
-          console.log("consumptions--->", consumptions);
+          // console.log("consumptions--->", consumptions);
 
           this.setState({
             consumptions: consumptions,
@@ -739,7 +739,7 @@ class GlobalConsumption extends Component {
       // RealmCountryService.getRealmCountryForProgram(realmId)
       DropdownService.getRealmCountryDropdownList(realmId)
         .then(response => {
-          console.log("RealmCountryService---->", response.data)
+          // console.log("RealmCountryService---->", response.data)
           if (response.status == 200) {
             var listArray = response.data;
             listArray.sort((a, b) => {
@@ -877,7 +877,7 @@ class GlobalConsumption extends Component {
   getPlanningUnit() {
     this.setState({ loading: true })
     let programValues = this.state.programValues.map(c => c.value);
-    console.log("programValues----->", programValues);
+    // console.log("programValues----->", programValues);
     this.setState({
       planningUnits: [],
       planningUnitValues: [],
@@ -888,9 +888,9 @@ class GlobalConsumption extends Component {
           tracerCategoryIds: [],
           programIds: programValues
         }
-        console.log('**' + programJson);
+        // console.log('**' + programJson);
         DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
-          console.log('**' + JSON.stringify(response.data));
+          // console.log('**' + JSON.stringify(response.data));
           var listArray = response.data;
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -953,7 +953,7 @@ class GlobalConsumption extends Component {
     this.setState({ loading: true })
     ProgramService.getProgramList()
       .then(response => {
-        console.log(JSON.stringify(response.data))
+        // console.log(JSON.stringify(response.data))
         var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1115,7 +1115,7 @@ class GlobalConsumption extends Component {
     //           break;
     //         default:
     //           this.setState({ message: 'static.unkownError', loading: false });
-    //           console.log("Error code unkown");
+    //           // console.log("Error code unkown");
     //           break;
     //       }
     //     }
@@ -1286,7 +1286,7 @@ class GlobalConsumption extends Component {
       consumptionSummerydata.push(tempdata);
 
     }
-    console.log("consumptionSummerydata---", consumptionSummerydata);
+    // console.log("consumptionSummerydata---", consumptionSummerydata);
 
     const bar = {
       // labels: [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))],

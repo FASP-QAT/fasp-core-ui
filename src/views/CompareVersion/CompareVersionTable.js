@@ -484,7 +484,7 @@ export default class CompareVersion extends Component {
                 var selectedForecastData2 = pu2.length > 0 ? pu2[0].selectedForecastMap : '';
 
 
-                console.log("consumptionExtrapolation", consumptionExtrapolation);
+                // console.log("consumptionExtrapolation", consumptionExtrapolation);
 
                 data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label, this.state.lang) + " | " + pu[0].planningUnit.id : getLabelText(pu1[0].planningUnit.label) + " | " + pu1[0].planningUnit.id;
                 data[1] = rg.length > 0 ? getLabelText(rg[0].label) : getLabelText(rg1[0].label);
@@ -492,7 +492,7 @@ export default class CompareVersion extends Component {
                 // var count = 1;
                 // for (var r = 0; r < regionList.length; r++) {
                 var regionalSelectedForecastData = selectedForecastData[regionSet[k]];
-                console.log("regionalSelectedForecastData", regionalSelectedForecastData);
+                // console.log("regionalSelectedForecastData", regionalSelectedForecastData);
                 var ce = regionalSelectedForecastData != undefined && regionalSelectedForecastData.consumptionExtrapolationId != null ? consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId) : [];
                 var selectedTreeScenario = [];
                 if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null) {
@@ -503,9 +503,9 @@ export default class CompareVersion extends Component {
                     var tsListFilter=datasetData.treeList.filter(c=>c.treeId==regionalSelectedForecastData.treeId);
                     if(tsListFilter.length>0){
                         var flatList = tsListFilter[0].tree.flatList;
-                        console.log("Flat List @@@@@@@ Test", flatList)
+                        // console.log("Flat List @@@@@@@ Test", flatList)
                         var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[regionalSelectedForecastData.scenarioId][0].puNode != null && c.payload.nodeDataMap[regionalSelectedForecastData.scenarioId][0].puNode.planningUnit.id == pu[0].planningUnit.id);
-                        console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
+                        // console.log("Flat List Filter @@@@@@@ Test", flatListFilter)
                         var nodeDataMomList = [];
                         for (var fl = 0; fl < flatListFilter.length; fl++) {
                             nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[regionalSelectedForecastData.scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData.currentVersion.forecastStopDate).format("YYYY-MM")));
@@ -657,7 +657,7 @@ export default class CompareVersion extends Component {
             // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
-            allowManualInsertColumn: false,
+            allowManualInseditabertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
             oneditionend: this.onedit,
@@ -666,7 +666,7 @@ export default class CompareVersion extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            editable: false,
+            // editable: false,
             license: JEXCEL_PRO_KEY,
             // editable: false,
             contextMenu: function (obj, x, y, e) {
@@ -709,7 +709,7 @@ export default class CompareVersion extends Component {
 
     // functions
     showData(data, index) {
-        console.log('inside');
+        // console.log('inside');
         var dataArray = [];
         dataArray.push([data[0], data[1], data[2], data[3], data[4]]);
         dataArray.push([data[0], data[1], data[5], data[6], data[7]]);
@@ -786,8 +786,8 @@ export default class CompareVersion extends Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col1, "background-color", "transparent");
                 } else {
-                    elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-                    elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
+                    elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
+                    elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR, true);
                 }
             }
         }
@@ -804,7 +804,7 @@ export default class CompareVersion extends Component {
 
     acceptIncomingChanges() {
         var elInstance = this.state.dataEl;
-        console.log("this.state.index", this.state.index);
+        // console.log("this.state.index", this.state.index);
         elInstance.options.editable = true;
         elInstance.setValueFromCoords(11, this.state.index, 3, true);
         elInstance.options.editable = false;
@@ -837,33 +837,33 @@ export default class CompareVersion extends Component {
                         } else if (server == downloaded) {
                             var col = (colArr[startPt]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                         } else {
                             //yellow color
                             var col = (colArr[0]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[1]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[2]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[3]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[4]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[5]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[6]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[7]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             // elInstance.setValueFromCoords(11, r, 2, true);
                         }
                     }

@@ -270,7 +270,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         return a;
                                     }, {}));
 
-                                    console.log("finalImportQATData===>", finalImportQATData)
+                                    // console.log("finalImportQATData===>", finalImportQATData)
 
                                     var finalPuList = []
                                     for (var i = 0; i < finalImportQATData.length; i++) {
@@ -643,7 +643,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         if (papuList.length != 0) {
 
             for (var j = 0; j < papuList.length; j++) {
-                console.log("papuList[j].v5", papuList[j].v5, " --papuList[j].v8--", papuList[j].v8)
+                // console.log("papuList[j].v5", papuList[j].v5, " --papuList[j].v8--", papuList[j].v8)
                 data = [];
                 data[0] = papuList[j].v1
                 data[1] = papuList[j].v2

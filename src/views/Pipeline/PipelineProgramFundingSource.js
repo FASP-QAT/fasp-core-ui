@@ -110,8 +110,8 @@ export default class PipelineProgramFundingSource extends Component {
         var list = this.state.fundingSourceList;
         var json = this.el.getJson(null, false);
         var fundingSourceArray = []
-        console.log(json.length)
-        console.log(json)
+        // console.log(json.length)
+        // console.log(json)
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));
             var fundingSourceId = map.get("1");
@@ -181,7 +181,7 @@ export default class PipelineProgramFundingSource extends Component {
 
                                         }
                                     } else {
-                                        console.log("fundingsource list length is 0.");
+                                        // console.log("fundingsource list length is 0.");
                                     }
 
                                     this.el = jexcel(document.getElementById("mapFundingSource"), '');

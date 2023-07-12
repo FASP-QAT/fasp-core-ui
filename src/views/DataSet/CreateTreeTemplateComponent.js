@@ -946,9 +946,26 @@ export default class CreateTreeTemplate extends Component {
         this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this);
         this.filterUsageTemplateList = this.filterUsageTemplateList.bind(this);
         this.generateBranchFromTemplate = this.generateBranchFromTemplate.bind(this);
+        this.cancelNodeDataClicked=this.cancelNodeDataClicked.bind(this);
         this.createTree=this.createTree.bind(this)
         this.modelOpenCloseForCreateTree=this.modelOpenCloseForCreateTree.bind(this)
-        this.cancelNodeDataClicked=this.cancelNodeDataClicked.bind(this);
+    }
+
+    cancelNodeDataClicked(){
+        if(this.state.isChanged == true || this.state.isTemplateChanged == true){
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                this.setState({
+                    openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1')
+                })
+            }else{
+
+            }
+        }else{
+            this.setState({
+                openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1')
+            })
+        }
     }
 
     modelOpenCloseForCreateTree() {
@@ -1174,23 +1191,6 @@ export default class CreateTreeTemplate extends Component {
         })
     }
 
-    cancelNodeDataClicked(){
-        if(this.state.isChanged == true || this.state.isTemplateChanged == true){
-            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
-            if (cf == true) {
-                this.setState({
-                    openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1')
-                })
-            }else{
-
-            }
-        }else{
-            this.setState({
-                openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1')
-            })
-        }
-    }
-    
     filterUsageTemplateList(forecastingUnitId) {
         var usageTemplateList;
         if (forecastingUnitId > 0) {
@@ -9256,6 +9256,7 @@ export default class CreateTreeTemplate extends Component {
                                                             id="planningUnitId"
                                                             name="planningUnitId"
                                                             bsSize="sm"
+                                                            disabled={!this.state.editable}
                                                             className={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].isPUMappingCorrect==0?"redPU":""}
                                                             valid={!errors.planningUnitId && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != '' : !errors.planningUnitId}
                                                             invalid={touched.planningUnitId && !!errors.planningUnitId}
@@ -9487,24 +9488,24 @@ export default class CreateTreeTemplate extends Component {
                                                                 </Input>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-6"></FormGroup>
-{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) &&
-                                                            <FormGroup className="col-md-6">
-                                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# PU / Interval / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
-                                                                <Input type="number"
-                                                                    id="puPerVisit"
-                                                                    name="puPerVisit"
-                                                                    readOnly={!this.state.editable?true:this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
-                                                                    bsSize="sm"
-                                                                    valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit != '' : !errors.puPerVisit}
-                                                                    invalid={touched.puPerVisit && !!errors.puPerVisit}
-                                                                    onBlur={handleBlur}
-                                                                    onChange={(e) => {
-                                                                        handleChange(e);
-                                                                        this.dataChange(e)
-                                                                    }}
-                                                                    value={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false) ?
-                                                                        addCommasWith8Decimals(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit) :
-                                                                        addCommasWith8Decimals(this.state.noFURequired / this.state.conversionFactor) : ''}>
+                                                            {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) &&
+                                                                <FormGroup className="col-md-6">
+                                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# PU / Interval / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
+                                                                    <Input type="number"
+                                                                        id="puPerVisit"
+                                                                        name="puPerVisit"
+                                                                        readOnly={!this.state.editable?true:this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
+                                                                        bsSize="sm"
+                                                                        valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit != '' : !errors.puPerVisit}
+                                                                        invalid={touched.puPerVisit && !!errors.puPerVisit}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => {
+                                                                            handleChange(e);
+                                                                            this.dataChange(e)
+                                                                        }}
+                                                                        value={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false) ?
+                                                                            addCommasWith8Decimals(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit) :
+                                                                            addCommasWith8Decimals(this.state.noFURequired / this.state.conversionFactor) : ''}>
 
                                                                     </Input>
                                                                     <FormFeedback className="red">{errors.puPerVisit}</FormFeedback>

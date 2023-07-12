@@ -195,7 +195,7 @@ class AddLanguageComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("values---", this.state.language)
+                                    // console.log("values---", this.state.language)
                                     LanguageService.addLanguage(this.state.language).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/language/listLanguage/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))

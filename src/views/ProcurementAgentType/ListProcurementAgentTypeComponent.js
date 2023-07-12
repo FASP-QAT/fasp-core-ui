@@ -62,7 +62,7 @@ class ListProcurementAgentComponent extends Component {
     }
     filterData() {
         let realmId = document.getElementById("realmId").value;
-        console.log("!!!!!!!", realmId)
+        // console.log("!!!!!!!", realmId)
         if (realmId != 0) {
             const selProcurementAgentType = this.state.procurementAgentTypeList.filter(c => c.realm.id == realmId)
             this.setState({
@@ -89,7 +89,7 @@ class ListProcurementAgentComponent extends Component {
 
     buildJExcel() {
         let procurementAgentTypeList = this.state.selProcurementAgentType;
-        console.log("procurementAgentList---->", procurementAgentTypeList);
+        // console.log("procurementAgentList---->", procurementAgentTypeList);
         let procurementAgentTypeArray = [];
         let count = 0;
 
@@ -293,7 +293,7 @@ class ListProcurementAgentComponent extends Component {
 
         ProcurementAgentService.getProcurementAgentTypeListAll()
             .then(response => {
-                console.log("response.status", response.data)
+                // console.log("response.status", response.data)
                 if (response.status == 200) {
                     this.setState({
                         procurementAgentTypeList: response.data,

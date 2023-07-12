@@ -61,7 +61,7 @@ class CompareVersion extends Component {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         localStorage.setItem("sesDatasetId", parseInt(localStorage.getItem("sesForecastProgramIdReport")) + '_v' + (versionId).toString().replace('(Local)', '').trim() + '_uId_' + userId);
-        console.log("In datasetId@@@", localStorage.getItem("sesDatasetId"));
+        // console.log("In datasetId@@@", localStorage.getItem("sesDatasetId"));
         this.setState({
             versionId: versionId,
             versionList1: [],
@@ -118,8 +118,8 @@ class CompareVersion extends Component {
             loading: true
         })
         var datasetList = this.state.datasetList;
-        console.log("datsetlist+++", datasetList);
-        console.log("this.state.datasetId+++", this.state.datasetId)
+        // console.log("datsetlist+++", datasetList);
+        // console.log("this.state.datasetId+++", this.state.datasetId)
         if (this.state.datasetId > 0) {
             var selectedDataset = datasetList.filter(c => c.id == this.state.datasetId)[0];
             var versionList = [];
@@ -281,7 +281,7 @@ class CompareVersion extends Component {
         this.setState({ loading: true });
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
-                console.log("resp--------------------", response.data);
+                // console.log("resp--------------------", response.data);
                 var responseData = response.data;
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
@@ -344,7 +344,7 @@ class CompareVersion extends Component {
                         if (index == -1) {
                             var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
                             var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                            console.log("programNamelabel+++", programNameLabel);
+                            // console.log("programNamelabel+++", programNameLabel);
                             var programNameJson = JSON.parse(programNameLabel)
                             var json = {
                                 id: myResult[mr].programId,
@@ -355,7 +355,7 @@ class CompareVersion extends Component {
                             datasetList.push(json)
                         } else {
                             var existingVersionList = datasetList[index].versionList;
-                            console.log("existingVersionList+++", datasetList[index].versionList)
+                            // console.log("existingVersionList+++", datasetList[index].versionList)
                             existingVersionList.push({ versionId: myResult[mr].version + " (Local)",createdDate:programData.currentVersion.createdDate,versionType:programData.currentVersion.versionType })
                             datasetList[index].versionList = existingVersionList
                         }
@@ -391,18 +391,18 @@ class CompareVersion extends Component {
     }
 
     getData() {
-        console.log("In get dataset data+++")
+        // console.log("In get dataset data+++")
         this.setState({
             loading: true
         })
         var versionId = this.state.versionId.toString();
-        console.log("In get dataset data+++", versionId);
+        // console.log("In get dataset data+++", versionId);
         if (versionId != "" && versionId.includes("Local")) {
             var actualVersionId = (versionId.split('(')[0]).trim();
             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
             var datasetId = this.state.datasetId + "_v" + actualVersionId + "_uId_" + userId;
-            console.log("DatasetId+++", datasetId);
+            // console.log("DatasetId+++", datasetId);
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -418,7 +418,7 @@ class CompareVersion extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    console.log("MyResult+++", myResult);
+                    // console.log("MyResult+++", myResult);
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                     var datasetJson = JSON.parse(datasetData);
@@ -492,7 +492,7 @@ class CompareVersion extends Component {
 
                         }
                     }
-                    console.log("List@@@@@Mohit", list)
+                    // console.log("List@@@@@Mohit", list)
                     var json = {
                         currentVersion: {
                             forecastStartDate: datasetJson.currentVersion.forecastStartDate,
@@ -504,7 +504,7 @@ class CompareVersion extends Component {
                         programCode: datasetJson.programCode,
                         label: datasetJson.label
                     }
-                    console.log("Json@@@@@@@@", json);
+                    // console.log("Json@@@@@@@@", json);
                     this.setState({
                         datasetData: json,
                         firstDataSet: 1,
@@ -524,7 +524,7 @@ class CompareVersion extends Component {
             }
             ReportService.forecastSummary(inputJson).then(response => {
                 if (response.status == 200) {
-                    console.log("resp--------------------", response.data);
+                    // console.log("resp--------------------", response.data);
                     var responseData = response.data;
                     var json = {
                         currentVersion: {
@@ -553,7 +553,7 @@ class CompareVersion extends Component {
                 }
             }).catch(
                 error => {
-                    console.log("Error", error)
+                    // console.log("Error", error)
                     this.setState({
                         datasetData: {},
                         firstDataSet: 0,
@@ -571,7 +571,7 @@ class CompareVersion extends Component {
     }
 
     getData1() {
-        console.log("In get dataset data+++")
+        // console.log("In get dataset data+++")
         this.setState({
             loading: true
         })
@@ -596,7 +596,7 @@ class CompareVersion extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    console.log("MyResult+++", myResult);
+                    // console.log("MyResult+++", myResult);
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                     var datasetJson = JSON.parse(datasetData);
@@ -699,7 +699,7 @@ class CompareVersion extends Component {
             }
             ReportService.forecastSummary(inputJson).then(response => {
                 if (response.status == 200) {
-                    console.log("resp--------------------", response.data);
+                    // console.log("resp--------------------", response.data);
                     var responseData = response.data;
                     var json = {
                         currentVersion: {
@@ -774,7 +774,7 @@ class CompareVersion extends Component {
                     </option>
                 )
             }, this);
-        console.log("This.state.loading+++", this.state.loading)
+        // console.log("This.state.loading+++", this.state.loading)
 
         return (
             <div className="animated fadeIn" >

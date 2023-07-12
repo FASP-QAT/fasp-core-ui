@@ -69,8 +69,8 @@ export default class ProgramList extends Component {
         // var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : localStorage.getItem("FMSelStatus") == "" ? "" : "true";
         var selStatus = localStorage.getItem("FMSelStatus") ? localStorage.getItem("FMSelStatus") : -1;
         
-        console.log("countryId--------->", countryId);
-        console.log("selStatus--------->", selStatus);
+        // console.log("countryId--------->", countryId);
+        // console.log("selStatus--------->", selStatus);
         // if (countryId != 0 && selStatus != "") {
         //     console.log("1------------");
         //     let tempSelStatus = (selStatus == "true" ? true : false)
@@ -112,7 +112,7 @@ export default class ProgramList extends Component {
 ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASET,countryId,selStatus)    
         .then(response => {
             if (response.status == 200) {
-                console.log("resp--------------------", response.data);
+                // console.log("resp--------------------", response.data);
                 this.setState({
                     programList: response.data,
                     selProgram: response.data,
@@ -171,7 +171,7 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
         );
     }
     else {
-            console.log("4------------");
+            // console.log("4------------");
             this.setState({
                 selProgram: this.state.programlist
             }, () => {
@@ -196,7 +196,7 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
             var itemLabelB = getLabelText(b.program.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
             return itemLabelA > itemLabelB ? 1 : -1;
         });
-        console.log("programList---->after", programList);
+        // console.log("programList---->after", programList);
         let programArray = [];
         let count = 0;
 
@@ -213,7 +213,7 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
             // regionLabels.map(c => {
             //     reValues.push(' ' + getLabelText(c.label, this.state.lang));
             // })
-            console.log("programList---->reValues", reValues);
+            // console.log("programList---->reValues", reValues);
             
             data = [];
             data[0] = programList[j].program.id
@@ -233,7 +233,7 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
             programArray[count] = data;
             count++;
         }
-        console.log("programArray---->",programArray)
+        // console.log("programArray---->",programArray)
         // if (programList.length == 0) {
         //   data = [];
         //   programArray[0] = data;
@@ -379,7 +379,7 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
 
 
     componentDidMount() {
-        console.log("props--------------------", this.props);
+        // console.log("props--------------------", this.props);
         // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
 
@@ -387,7 +387,7 @@ ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASE
         ReportService.getUpdateProgramInfoDetailsBasedRealmCountryId(PROGRAM_TYPE_DATASET,-1,-1)    
         .then(response => {
             if (response.status == 200) {
-                console.log("resp--------------------", response.data);
+                // console.log("resp--------------------", response.data);
                 this.setState({
                     programList: response.data,
                     selProgram: response.data,

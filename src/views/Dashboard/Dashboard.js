@@ -24,8 +24,8 @@ hideSecondComponent() {
     }, 30000);
 }
   componentDidMount() {
-    console.log("COLOR===",this.props.match.params.color);
-    console.log("MESSAGE===",this.props.match.params.message);
+    // console.log("COLOR===",this.props.match.params.color);
+    // console.log("MESSAGE===",this.props.match.params.message);
     this.hideFirstComponent();
     if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();

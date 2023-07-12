@@ -304,7 +304,7 @@ class Program extends Component {
                         proList.push(programJson);
                     }
                 }
-                console.log("D--------------->ProList", proList);
+                // console.log("D--------------->ProList", proList);
                 this.setState({
                     programList: proList,
                     // loading: false
@@ -346,7 +346,7 @@ class Program extends Component {
                             // getProgramList()
                             .then(response => {
                                 if (response.status == 200) {
-                                    console.log("Program List", response.data);
+                                    // console.log("Program List", response.data);
                                     this.setState({
                                         prgList: response.data.programList,
                                         loading: false
@@ -608,7 +608,7 @@ class Program extends Component {
     loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
     deleteLocalVersion(programId, versionId, changed) {
-        console.log(">>>", changed);
+        // console.log(">>>", changed);
         confirmAlert({
             title: i18n.t('static.program.confirm'),
             message: changed == 1 ? i18n.t('static.loadDelDataset.changesNotSaved') : i18n.t('static.loadDelDataset.deleteThisLocalVersion'),
@@ -674,7 +674,7 @@ class Program extends Component {
     }
 
     render() {
-        console.log("++++", this.state.prgList);
+        // console.log("++++", this.state.prgList);
         const { realmList } = this.state;
         let realms = realmList.length > 0
             && realmList.map((item, i) => {
@@ -772,7 +772,7 @@ class Program extends Component {
                                                                                         <span className="">
                                                                                             <div className="checkbox m-0">
                                                                                                 <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
-                                                                                                {console.log("D------------>this.state.programList", this.state.programList, "Condition------->", this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length)}
+                                                                                                {/* {console.log("D------------>this.state.programList", this.state.programList, "Condition------->", this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length)} */}
                                                                                                 {/* <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label> */}
                                                                                                 {/* <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang) + ' - (' + item2.program.code +')'}<i className="ml-1 fa fa-eye"></i></label> */}
                                                                                                 <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang) + ' - (' + item2.program.code + ')'}</label>
@@ -866,7 +866,7 @@ class Program extends Component {
 
 
     deleteProgramById(id, i, length) {
-        console.log("deleteC---------->4 ", id);
+        // console.log("deleteC---------->4 ", id);
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         // var id = programId + "_v" + versionId + "_uId_" + userId;
@@ -910,14 +910,14 @@ class Program extends Component {
 
     deleteCleanUpIcon(programId) {
 
-        console.log("deleteC---------->1 ", this.state.prgList.filter(c => c.program.id == programId));
-        console.log("deleteC---------->2 ", this.state.programList.filter(c => c.programId == programId));
+        // console.log("deleteC---------->1 ", this.state.prgList.filter(c => c.program.id == programId));
+        // console.log("deleteC---------->2 ", this.state.programList.filter(c => c.programId == programId));
 
         let versionListForSelectedProgram = this.state.prgList.filter(c => c.program.id == programId)[0].versionList;
 
         let versionListRemoveMaxVersionId = versionListForSelectedProgram.filter(c => c.versionId != Math.max.apply(Math, versionListForSelectedProgram.map(a => a.versionId)));
 
-        console.log("deleteC---------->3 ", versionListRemoveMaxVersionId);
+        // console.log("deleteC---------->3 ", versionListRemoveMaxVersionId);
 
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
@@ -1063,7 +1063,7 @@ class Program extends Component {
         //     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
         // }
         else {
-            console.log("Checl boxes checked array", checkboxesChecked)
+            // console.log("Checl boxes checked array", checkboxesChecked)
             var programThenCount = 0;
             // for (var i = 0; i < checkboxesChecked.length; i++) {
             // var version = (checkboxesChecked[i]).versionId;
@@ -1150,7 +1150,7 @@ class Program extends Component {
                             getRequest.onsuccess = function (event) {
                                 var myResult = [];
                                 myResult = getRequest.result;
-                                console.log("myResult---", myResult)
+                                // console.log("myResult---", myResult)
                                 var programAndVersionListLocal = [];
                                 for (var i = 0; i < myResult.length; i++) {
                                     // for (var j = 0; j < json.length; j++) {
@@ -1162,11 +1162,11 @@ class Program extends Component {
                                 }
                                 var isExists = 0;
                                 var downloadProgram = false;
-                                console.log("D------------------>", programAndVersionListLocal);
-                                console.log("D------------------>", programAndVersionList);
+                                // console.log("D------------------>", programAndVersionListLocal);
+                                // console.log("D------------------>", programAndVersionList);
                                 for (var r = 0; r < programAndVersionList.length; r++) {
                                     var filterList = programAndVersionListLocal.filter(c => c.programId == programAndVersionList[r].programId && c.version == programAndVersionList[r].version);
-                                    console.log("D---------------->filterList", filterList)
+                                    // console.log("D---------------->filterList", filterList)
                                     if (filterList.length > 0) {
                                         isExists += 1;
                                     }
@@ -1180,8 +1180,8 @@ class Program extends Component {
                                             {
                                                 label: i18n.t('static.program.yes'),
                                                 onClick: () => {
-                                                    console.log("D-------------------->Yes clicked");
-                                                    console.log("D--------------> in download program")
+                                                    // console.log("D-------------------->Yes clicked");
+                                                    // console.log("D--------------> in download program")
                                                     var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                                     for (var r = 0; r < json.length; r++) {
@@ -1290,7 +1290,7 @@ class Program extends Component {
                                     downloadProgram = true;
                                 }
                                 if (downloadProgram) {
-                                    console.log("D--------------> in download program")
+                                    // console.log("D--------------> in download program")
                                     var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                     var programSaveData = transactionForSavingData.objectStore('programData');
                                     for (var r = 0; r < json.length; r++) {

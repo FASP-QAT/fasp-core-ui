@@ -88,7 +88,7 @@ export default class StepOne extends Component {
     }
 
     componentDidMount() {
-        console.log("-----------------------------------FIRST STEP-------->", this.props.items);
+        // console.log("-----------------------------------FIRST STEP-------->", this.props.items);
         // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {

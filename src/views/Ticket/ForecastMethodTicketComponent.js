@@ -141,7 +141,7 @@ export default class OrganisationTypeTicketComponent extends Component {
     getForecastMethodTypeList() {
         ForecastMethodService.getForecastMethodTypeList().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data)
+                // console.log("response.data---->", response.data)
 
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -274,9 +274,9 @@ export default class OrganisationTypeTicketComponent extends Component {
                             })
                             this.state.forecastMethod.summary = summaryText_2;
                             this.state.forecastMethod.userLanguageCode = this.state.lang;
-                            console.log("SUBMIT------->", this.state.forecastMethod);
+                            // console.log("SUBMIT------->", this.state.forecastMethod);
                             JiraTikcetService.addEmailRequestIssue(this.state.forecastMethod).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

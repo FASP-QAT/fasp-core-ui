@@ -238,7 +238,7 @@ export default class EditDataSourceTicketComponent extends Component {
                             this.state.dataSource.summary = summaryText_2;
                             this.state.dataSource.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.dataSource).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

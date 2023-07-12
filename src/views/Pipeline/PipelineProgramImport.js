@@ -111,8 +111,8 @@ export default class PipelineProgramImport extends Component {
                         this.setState({ loading: true });
                         PipelineService.savePipelineJson(myJson, fileName)
                             .then(response => {
-                                console.log("response--------->", response);
-                                console.log("messageCode-->", response.data.messageCode);
+                                // console.log("response--------->", response);
+                                // console.log("messageCode-->", response.data.messageCode);
 
                                 if (response.status == 200) {
                                     this.props.history.push('/pipeline/pieplineProgramList/' + 'green/' + i18n.t('static.message.pipelineProgramImportSuccess'))
@@ -192,7 +192,7 @@ export default class PipelineProgramImport extends Component {
         // alert(e.target.files[0].name);
         reader.onload = async (e) => {
             const text = (e.target.result)
-            console.log(text)
+            // console.log(text)
             this.setState({ jsonText: text, fileName: fileName });
         };
         reader.readAsText(e.target.files[0])

@@ -254,7 +254,7 @@ class AddProcurementAgentTypeComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("on submit---", this.state.procurementAgentType)
+                                    // console.log("on submit---", this.state.procurementAgentType)
                                     ProcurementAgentService.addProcurementAgentType(this.state.procurementAgentType)
                                         .then(response => {
                                             if (response.status == 200) {

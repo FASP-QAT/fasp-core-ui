@@ -963,7 +963,7 @@ class ListBudgetComponent extends Component {
 
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
-    console.log("INSIDE UPDATE TABLE");
+    // console.log("INSIDE UPDATE TABLE");
     var elInstance = instance.worksheets[0];
     var json = elInstance.getJson();
 
@@ -1008,7 +1008,7 @@ class ListBudgetComponent extends Component {
       .then(response => {
         if (response.status == 200) {
           var listArray = response.data.filter(c=>c.active);
-          console.log("list Array Test@123",listArray)
+          // console.log("list Array Test@123",listArray)
           listArray.sort((a, b) => {
             var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
             var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
@@ -1032,7 +1032,7 @@ class ListBudgetComponent extends Component {
       })
       .catch(
         error => {
-          console.log("Error Test@123",error)
+          // console.log("Error Test@123",error)
           if (error.message === "Network Error") {
             this.setState({
               // message: 'static.unkownError',
@@ -1076,9 +1076,9 @@ class ListBudgetComponent extends Component {
 
     BudgetServcie.getBudgetList()
       .then(response => {
-        console.log(response)
+        // console.log(response)
         if (response.status == 200) {
-          console.log("budget after status 200 new console --- ---->", response.data);
+          // console.log("budget after status 200 new console --- ---->", response.data);
           this.setState({
             budgetList: response.data,
             selBudget: response.data, loading: false
@@ -1139,7 +1139,7 @@ class ListBudgetComponent extends Component {
     FundingSourceService.getFundingSourceListAll()
       .then(response => {
         if (response.status == 200) {
-          console.log("funding source after status 200--->" , response.data)
+          // console.log("funding source after status 200--->" , response.data)
           // this.setState({
           //   fundingSourceList: response.data
           // })
@@ -1211,7 +1211,7 @@ class ListBudgetComponent extends Component {
   }
 
   addCommas(cell, row) {
-    console.log("row---------->", row);
+    // console.log("row---------->", row);
     var currencyCode = row.currency.currencyCode;
     cell += '';
     var x = cell.split('.');

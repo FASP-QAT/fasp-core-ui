@@ -106,7 +106,7 @@
 //         if (this.state.updateRowStatus == 1) {
 //             this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
 //         } else {
-//             console.log(JSON.stringify(this.state.rows[idx]))
+//             // console.log(JSON.stringify(this.state.rows[idx]))
 //             initialValues = {
 //                 planningUnitCapacityId: this.state.rows[idx].planningUnitCapacityId,
 //                 supplierId: this.state.rows[idx].supplier.id,
@@ -157,7 +157,7 @@
 //         var mmChars = mm.split('');
 //         var ddChars = dd.split('');
 //         let date = yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
-//         // console.log("------date", date)
+//         // // console.log("------date", date)
 //         return date;
 //     }
 //     touchAll(setTouched, errors) {
@@ -189,7 +189,7 @@
 
 //     setTextAndValue = (event) => {
 //         // let { budget } = this.state;
-//         console.log(event.target.name, event.target.value)
+//         // console.log(event.target.name, event.target.value)
 //         if (event.target.name === "supplier") {
 //             this.state.supplier.supplierId = event.target.value;
 //             this.state.supplier.label.label_en = event.target[event.target.selectedIndex].text;
@@ -204,7 +204,7 @@
 //         if (event.target.name === "stopDate") {
 //             this.state.stopDate = event.target.value;
 //         }
-//         console.log(JSON.stringify(this.state.supplier))
+//         // console.log(JSON.stringify(this.state.supplier))
 
 //     }
 
@@ -237,9 +237,9 @@
 //     }
 
 //     submitForm() {
-//         console.log(JSON.stringify(this.state))
+//         // console.log(JSON.stringify(this.state))
 //         var planningUnitCapacity = this.state.rows
-//         console.log("planningUnitCapacity------",planningUnitCapacity);
+//         // console.log("planningUnitCapacity------",planningUnitCapacity);
 
 
 //         AuthenticationService.setupAxiosInterceptors();
@@ -285,7 +285,7 @@
 //         AuthenticationService.setupAxiosInterceptors();
 //         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
 //             if (response.status == 200) {
-//                 console.log(response.data);
+//                 // console.log(response.data);
 //                 this.setState({
 //                     planningUnit: response.data,
 //                     //  rows:response.data
@@ -302,7 +302,7 @@
 
 //         }).catch(
 //             error => {
-//                 console.log(JSON.stringify(error))
+//                 // console.log(JSON.stringify(error))
 //                 if (error.message === "Network Error") {
 //                     this.setState({ message: error.message });
 //                 } else {
@@ -316,7 +316,7 @@
 //                             break;
 //                         default:
 //                             this.setState({ message: 'static.unkownError' });
-//                             console.log("Error code unkown");
+//                             // console.log("Error code unkown");
 //                             break;
 //                     }
 //                 }
@@ -324,7 +324,7 @@
 //         );
 //         PlanningUnitService.getPlanningUnitCapacityForId(this.props.match.params.planningUnitId).then(response => {
 //             if (response.status == 200) {
-//                 console.log(response.data);
+//                 // console.log(response.data);
 //                 this.setState({
 //                     planningUnitCapacity: response.data,
 //                     rows: response.data
@@ -353,7 +353,7 @@
 //                             break;
 //                         default:
 //                             this.setState({ message: 'static.unkownError' });
-//                             console.log("Error code unkown");
+//                             // console.log("Error code unkown");
 //                             break;
 //                     }
 //                 }
@@ -362,7 +362,7 @@
 //         SupplierService.getSupplierListAll()
 //             .then(response => {
 //                 if (response.status == 200) {
-//                     console.log(response.data)
+//                     // console.log(response.data)
 //                     this.setState({
 //                         suppliers: response.data
 //                     })
@@ -770,13 +770,13 @@ class PlanningUnitCapacity extends Component {
         var mmChars = mm.split('');
         var ddChars = dd.split('');
         let date = yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
-        // console.log("------date", date)
+        // // console.log("------date", date)
         return date;
     }
 
     submitForm() {
         var validation = this.checkValidation();
-        console.log("validation************", validation);
+        // console.log("validation************", validation);
         if (validation) {
             // var tableJson = this.el.getJson();
             var tableJson = this.el.getJson(null, false);
@@ -807,7 +807,7 @@ class PlanningUnitCapacity extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("changedpapuList----->", changedpapuList);
+            // console.log("changedpapuList----->", changedpapuList);
             // AuthenticationService.setupAxiosInterceptors();
             PlanningUnitService.editPlanningUnitCapacity(changedpapuList)
                 .then(response => {
@@ -866,7 +866,7 @@ class PlanningUnitCapacity extends Component {
                 );
 
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
 
 
@@ -920,7 +920,7 @@ class PlanningUnitCapacity extends Component {
             }
         }
 
-        // console.log("inventory Data Array-->", papuDataArr);
+        // // console.log("inventory Data Array-->", papuDataArr);
         if (papuDataArr.length == 0) {
             data = [];
             // data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
@@ -1197,7 +1197,7 @@ class PlanningUnitCapacity extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[4]));
+            // console.log("RESP---------", parseFloat(rowData[4]));
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
         }
         this.el.setValueFromCoords(7, y, 1, true);
@@ -1223,7 +1223,7 @@ class PlanningUnitCapacity extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             if (response.status == 200) {
-                console.log(response.data);
+                // console.log(response.data);
                 this.setState({
                     planningUnit: response.data,
                     //  rows:response.data
@@ -1231,7 +1231,7 @@ class PlanningUnitCapacity extends Component {
 
                 PlanningUnitService.getPlanningUnitCapacityForId(this.props.match.params.planningUnitId).then(response => {
                     if (response.status == 200) {
-                        console.log(response.data);
+                        // console.log(response.data);
                         this.setState({
                             planningUnitCapacity: response.data,
                             rows: response.data
@@ -1241,7 +1241,7 @@ class PlanningUnitCapacity extends Component {
                         SupplierService.getSupplierListAll()
                             .then(response => {
                                 if (response.status == 200) {
-                                    console.log(response.data)
+                                    // console.log(response.data)
                                     var listArray = response.data;
                                     listArray.sort((a, b) => {
                                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1412,7 +1412,7 @@ class PlanningUnitCapacity extends Component {
 
     addRow = function () {
 
-        console.log("IN addRow");
+        // console.log("IN addRow");
         var data = [];
         data[0] = getLabelText(this.state.planningUnit.label, this.state.lang);
         data[1] = "";
@@ -1483,11 +1483,11 @@ class PlanningUnitCapacity extends Component {
         //validatation for startDate is smaller than endDate
         if (x == 2 || x == 3) {
 
-            // console.log("INNOVA--startDate--> ", this.el.getValueFromCoords(2, y));//startDate
-            // console.log("INNOVA--endDate--> ", this.el.getValueFromCoords(3, y));//endDate
+            // // console.log("INNOVA--startDate--> ", this.el.getValueFromCoords(2, y));//startDate
+            // // console.log("INNOVA--endDate--> ", this.el.getValueFromCoords(3, y));//endDate
 
             if (moment(this.el.getValueFromCoords(2, y)).isSameOrBefore(moment(this.el.getValueFromCoords(3, y)))) {
-                // console.log("IS AFTER");
+                // // console.log("IS AFTER");
                 var col1 = ("C").concat(parseInt(y) + 1);
                 var col2 = ("D").concat(parseInt(y) + 1);
                 this.el.setStyle(col1, "background-color", "transparent");
@@ -1496,7 +1496,7 @@ class PlanningUnitCapacity extends Component {
                 this.el.setComments(col2, "");
 
             } else {
-                // console.log("IS BEFORE");
+                // // console.log("IS BEFORE");
                 var col1 = ("C").concat(parseInt(y) + 1);
                 var col2 = ("D").concat(parseInt(y) + 1);
                 this.el.setStyle(col1, "background-color", "transparent");
@@ -1627,14 +1627,14 @@ class PlanningUnitCapacity extends Component {
                 var col2 = ("D").concat(parseInt(y) + 1);
 
                 if (moment(this.el.getValueFromCoords(2, y)).isSameOrBefore(moment(this.el.getValueFromCoords(3, y)))) {
-                    // console.log("IS AFTER");
+                    // // console.log("IS AFTER");
 
                     this.el.setStyle(col1, "background-color", "transparent");
                     this.el.setComments(col1, "");
                     this.el.setStyle(col2, "background-color", "transparent");
                     this.el.setComments(col2, "");
                 } else {
-                    // console.log("IS BEFORE");
+                    // // console.log("IS BEFORE");
                     this.el.setStyle(col1, "background-color", "transparent");
                     this.el.setStyle(col1, "background-color", "yellow");
                     this.el.setComments(col1, i18n.t('static.common.startdateCompare'));

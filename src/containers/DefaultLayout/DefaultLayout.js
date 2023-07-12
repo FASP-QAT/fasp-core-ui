@@ -841,7 +841,7 @@ class DefaultLayout extends Component {
     // console.log('user is idle', e)
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
-      console.log("user timed out")
+      // console.log("user timed out")
       console.log("Test Logout @@@ Logged Out",this.state.timeout)
       localStorage.setItem("sessionTimedOut", 1);
       this.props.history.push('/logout/static.message.sessionExpired')
@@ -855,7 +855,7 @@ class DefaultLayout extends Component {
   }
 
   displayHeaderTitle = (name, url) => {
-    console.log("displayHeaderTitle activeTab ", this.state.activeTab)
+    // console.log("displayHeaderTitle activeTab ", this.state.activeTab)
 
     if (this.state.name !== name) {
       // if (url=="/ApplicationDashboard/fm/:id"){
@@ -873,7 +873,7 @@ class DefaultLayout extends Component {
         this.props.history.push(`/login/static.message.sessionChange`);
       }
       // var n=this.state.activeTab[0]==='1'?'Supply planning':'Forecasting'
-      console.log("P*** Call indexed db methods0---------------------------")
+      // console.log("P*** Call indexed db methods0---------------------------")
       this.getDatasetData();
       this.getProgramData();
       this.getNotificationCount();
@@ -890,7 +890,7 @@ class DefaultLayout extends Component {
 
   goOffline(e) {
     // localStorage.setItem("loginOnline", false);
-    console.log("window.location", window.location)
+    // console.log("window.location", window.location)
     // var url = window.location.href;
     // if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
     //   // "The specific word exists";
@@ -911,7 +911,7 @@ class DefaultLayout extends Component {
   }
 
   logout(e){
-    console.log("inside customized logout function");
+    // console.log("inside customized logout function");
     this.props.history.push('/login/static.message.sessionExpired')
   }
 
@@ -936,7 +936,7 @@ class DefaultLayout extends Component {
     })
   }
   componentDidMount() {
-    console.log("timeout default layout component did mount---------------")
+    // console.log("timeout default layout component did mount---------------")
     // this.refs.programChangeChild.checkIfLocalProgramVersionChanged()
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     var bfunction = [];
@@ -1068,7 +1068,7 @@ class DefaultLayout extends Component {
       AuthenticationService.setupAxiosInterceptors();
       ManualTaggingService.getNotificationCount()
         .then(response => {
-          console.log("notification response===", response.data);
+          // console.log("notification response===", response.data);
           this.setState({
             notificationCount: response.data
           })
@@ -1082,7 +1082,7 @@ class DefaultLayout extends Component {
     }
   }
   getProgramData() {
-    console.log("P***get programs called");
+    // console.log("P***get programs called");
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1121,16 +1121,16 @@ class DefaultLayout extends Component {
         this.setState({
           programModified: programModified
         })
-        console.log("Program modified@@@", programModified);
+        // console.log("Program modified@@@", programModified);
         if (programModified == 1) {
-          console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+          // console.log("P***d---hurrey local version changed-------------------------------------------------------------");
           localStorage.setItem("sesLocalVersionChange", true);
           this.setState({ changeIcon: true });
-          console.log("P***d--------in if---------------")
+          // console.log("P***d--------in if---------------")
         } else {
           localStorage.setItem("sesLocalVersionChange", false);
           this.setState({ changeIcon: false });
-          console.log("P***d--------in else---------------")
+          // console.log("P***d--------in else---------------")
         }
         // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
         // this.setState({
@@ -1145,7 +1145,7 @@ class DefaultLayout extends Component {
   }
 
   getDatasetData() {
-    console.log("P***get programs called");
+    // console.log("P***get programs called");
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1192,16 +1192,16 @@ class DefaultLayout extends Component {
         this.setState({
           programDatasetChanged: programDatasetChanged
         })
-        console.log("Program modified Final@@@!", programDatasetChanged);
+        // console.log("Program modified Final@@@!", programDatasetChanged);
         if (programDatasetChanged == 1) {
-          console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+          // console.log("P***d---hurrey local version changed-------------------------------------------------------------");
           localStorage.setItem("sesLocalVersionChange", true);
           this.setState({ fuChangeIcon: true });
-          console.log("P***d--------in if---------------")
+          // console.log("P***d--------in if---------------")
         } else {
           localStorage.setItem("sesLocalVersionChange", false);
           this.setState({ fuChangeIcon: false });
-          console.log("P***d--------in else---------------")
+          // console.log("P***d--------in else---------------")
         }
         // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
         // this.setState({

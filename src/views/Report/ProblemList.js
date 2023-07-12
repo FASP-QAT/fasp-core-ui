@@ -370,7 +370,7 @@ export default class ConsumptionDetails extends React.Component {
         mylist = this.state.problemStatusList;
         // console.log(">>>",mylist);
         mylist = hasRole == true ? mylist.filter(c => c.id != 4) : mylist.filter(c => c.id != 2 && c.id != 4);
-        console.log(">>>", mylist);
+        // console.log(">>>", mylist);
         return mylist;
     }.bind(this)
 
@@ -481,15 +481,15 @@ export default class ConsumptionDetails extends React.Component {
                             let problemList = this.state.data;
                             let problemReportListForUpdate = this.state.problemReportListForUpdate;
                             problemList = problemList.filter(c => c.planningUnitActive != false);
-                            console.log("changedProblemsList+++", changedProblemsList);
+                            // console.log("changedProblemsList+++", changedProblemsList);
                             for (var i = 0; i < changedProblemsList.length; i++) {
                                 if ((changedProblemsList[i])[0] != 0) {
-                                    console.log("in if+++");
+                                    // console.log("in if+++");
                                     var indexToUpdate = problemReportListForUpdate.findIndex(c =>
                                         c.problemReportId == (changedProblemsList[i])[0]
                                     );
                                 } else {
-                                    console.log("in else+++", (changedProblemsList[i])[1]);
+                                    // console.log("in else+++", (changedProblemsList[i])[1]);
                                     // var indexToUpdate = problemReportListForUpdate.findIndex(c =>
                                     //     c.problemActionIndex == (changedProblemsList[i])[1]
                                     // );
@@ -599,7 +599,7 @@ export default class ConsumptionDetails extends React.Component {
         problemList = problemList.filter(c => c.planningUnitActive != false && c.regionActive != false);
         // we set this in state becasue we need to use it on modal popup
         this.setState({ problemList: problemList });
-        console.log("problemList", problemList)
+        // console.log("problemList", problemList)
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -1247,7 +1247,7 @@ export default class ConsumptionDetails extends React.Component {
                     programRequest.onsuccess = function (event) {
                         this.setState({ loading: true },
                             () => {
-                                console.log("callback")
+                                // console.log("callback")
                             })
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1259,7 +1259,7 @@ export default class ConsumptionDetails extends React.Component {
                             showProblemDashboard: 1
                         })
                         var problemReportFilterList = problemReportList;
-                        console.log("problemList===========>", problemReportList);
+                        // console.log("problemList===========>", problemReportList);
                         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
                         problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
 
@@ -1325,7 +1325,7 @@ export default class ConsumptionDetails extends React.Component {
     // }
 
     addMannualProblem() {
-        console.log("-------------------addNewProblem--------------------");
+        // console.log("-------------------addNewProblem--------------------");
         this.props.history.push("/report/addProblem");
         // this.props.history.push("/role/addRole");
     }
@@ -1364,7 +1364,7 @@ export default class ConsumptionDetails extends React.Component {
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
         if (transList.length == 0) {
-            console.log("this problem report id do not have trans+++", row.problemReportId);
+            // console.log("this problem report id do not have trans+++", row.problemReportId);
             return ""
         } else {
             var listLength = transList.length;
@@ -1386,7 +1386,7 @@ export default class ConsumptionDetails extends React.Component {
         }
 
         if (cont == true) {
-            console.log('***', event)
+            // console.log('***', event)
             var problemStatusIds = event
             problemStatusIds = problemStatusIds.sort(function (a, b) {
                 return parseInt(a.value) - parseInt(b.value);
@@ -1396,7 +1396,7 @@ export default class ConsumptionDetails extends React.Component {
                 problemStatusLabels: problemStatusIds.map(ele => ele.label),
                 showUpdateButton: false
             }, () => {
-                console.log("problemStatusValues===>", this.state.problemStatusValues);
+                // console.log("problemStatusValues===>", this.state.problemStatusValues);
                 localStorage.setItem("sesProblemStatus", JSON.stringify(this.state.problemStatusValues));
                 this.fetchData()
             })
@@ -1522,7 +1522,7 @@ export default class ConsumptionDetails extends React.Component {
                 formatter: (cell, row) => {
                     if (cell != null && cell != "") {
                         var modifiedDate = moment(cell).format('MMM-YY');
-                        console.log("date===>", modifiedDate);
+                        // console.log("date===>", modifiedDate);
                         return modifiedDate;
                     }
                 }
