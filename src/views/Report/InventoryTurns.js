@@ -81,7 +81,9 @@ export default class InventoryTurns extends Component {
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: true,
             childShowArr: {},
-            childShowArr1: []
+            childShowArr1: [],
+            minCountForMode: '',
+            minPercForMode: ''
         }
         this.formSubmit = this.formSubmit.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -686,6 +688,44 @@ export default class InventoryTurns extends Component {
                 this.formSubmit();
             })    
         
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "#BA0C2F"
+            }, () => {
+                this.hideFirstComponent()
+            })
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['realm'], 'readwrite');
+            var program = transaction.objectStore('realm');
+            var getRequest = program.getAll();
+            var proList = []
+            getRequest.onerror = function (event) {
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var minC;
+                var minP;
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].realmId == AuthenticationService.getRealmId()) {
+                        minC = myResult[i].minCountForMode;
+                        minP = myResult[i].minPercForMode;
+                    }
+                }
+                this.setState({
+                    minCountForMode: minC,
+                    minPercForMode: minP
+                })
+            }.bind(this)
+        }.bind(this)
+
         RealmCountryService.getRealmCountryListAll()
                 .then(response => {
                     console.log("Realm Country List list---", response.data);
@@ -1220,7 +1260,7 @@ export default class InventoryTurns extends Component {
             }
         }
         var mode_per = (maxCount / numbers.length) * 100;
-        if( mode_per < MIN_MODE_PER_REQ || maxCount < MIN_MODE_COUNT_REQ){
+        if( mode_per < this.state.minPercForMode || maxCount < this.state.minCountForMode){
             mode = numbers.filter(arr => arr != null).length > 0 ? numbers.reduce((prev,curr,index) => prev + curr, 0) / (numbers.filter(arr => arr != null).length) : 0;
         }
         
