@@ -3054,5 +3054,6 @@
     "static.forecastValidation.noConsumptionExtrapolationNotesFound":"No se han encontrado notas de extrapolación de consumo",
     "static.forecastValidation.consumptionExtrapolationNotes":"Notas de extrapolación de consumo",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.mt.roNoAndPrimeLineNo": "RO - Línea principal No"
+    "static.mt.roNoAndPrimeLineNo": "RO - Línea principal No",
+    "static.extrapolation.confirmmsg":"Haga clic en 'Extrapolar' primero o perderá sus parámetros actualizados. Cualquier cambio en tus notas se guardará."
 }
