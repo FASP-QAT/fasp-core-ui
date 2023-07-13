@@ -8664,17 +8664,16 @@ export default class BuildTree extends Component {
         var dataArray = [];
         let count = document.getElementById("targetYears").value;
         // moment(this.state.currentCalculatorStopDate).diff(moment(this.state.currentCalculatorStartDate), 'years') + 2;
-        for (var j = 0; j < count; j++) {
+        for (var j = 0; j <= count; j++) {
             let startdate = moment(moment(this.state.currentCalculatorStartDate).subtract(1, "years").add(j, "years")).format("MMM YYYY")
             let stopDate = moment(moment(startdate).add(11, "months")).format("MMM YYYY");
-            // console.log("dates==>1", moment(curdate.add(j, "years")).format("MMM YYYY"), "===", curdate, "====", j);
-            data = [];
+            var data = [];
             data[0] = startdate + " - " + stopDate
-            data[1] = 0
-            data[2] = 0
-            data[3] = 0
-            data[4] = 0
-            data[5] = 0
+            data[1] = ""
+            data[2] = `=((B${parseInt(j) + 1}-B${parseInt(j)})/B${parseInt(j)}*100)`;//(D21-D20)/D20
+            data[3] = "19535"
+            data[4] = `=(D${parseInt(j) + 1}-B${parseInt(j) + 1})`;//F21-D21
+            data[5] = `=((D${parseInt(j) + 1}-B${parseInt(j) + 1})/B${parseInt(j) + 1}*100)`;//(F21-D21)/D21
             dataArray[j] = data;
         }
         console.log("dates==>", dataArray);
@@ -8699,14 +8698,14 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.actualOrTarget'),
                     type: 'numeric',
                     textEditor: true,
-                    mask: '#,##0.0000',
+                    mask: '#,##0',
                 },
                 {
                     title: i18n.t('static.tree.annualChangePer'),
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##0.0000%',
+                    mask: '#,##0.00%',
                     disabledMaskOnEdition: true
                 },
                 {
@@ -8714,7 +8713,7 @@ export default class BuildTree extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##0.0000',
+                    mask: '#,##0',
                     disabledMaskOnEdition: true
                 },
 
@@ -8723,7 +8722,7 @@ export default class BuildTree extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##0.0000',
+                    mask: '#,##0',
                     disabledMaskOnEdition: true
                 },
                 {
@@ -8731,7 +8730,7 @@ export default class BuildTree extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##0.0000%',
+                    mask: '#,##0.00%',
                     disabledMaskOnEdition: true
                 },
             ],
@@ -8755,26 +8754,20 @@ export default class BuildTree extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 var instance = el;
                 if (y != null) {
-                    var rowData = instance.getRowData(y);
-                    // console.log("my row data---",rowData);
-                    // if (instance.worksheets[0].getJson(null, false).length > 0) {
                     var cell = instance.getCell("C1");
                     cell.classList.add('readonly');
-
                     var cell = instance.getCell("D1");
                     cell.classList.add('readonly');
                     var cell = instance.getCell("E1");
                     cell.classList.add('readonly');
                     var cell = instance.getCell("F1");
                     cell.classList.add('readonly');
-                    var cell = instance.getCell("D" + count);
+                    var cell = instance.getCell(("D").concat(parseInt(y) + 1));
                     cell.classList.add('readonly');
-                    var cell = instance.getCell("E" + count);
+                    var cell = instance.getCell(("E").concat(parseInt(y) + 1));
                     cell.classList.add('readonly');
-                    var cell = instance.getCell("F" + count);
+                    var cell = instance.getCell(("F").concat(parseInt(y) + 1));
                     cell.classList.add('readonly');
-                    // }
-
                 }
             }.bind(this),
             oneditionend: this.onedit,
@@ -8808,15 +8801,17 @@ export default class BuildTree extends Component {
     loadedModelingCalculatorJexcel = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         // var asterisk = document.getElementsByClassName("resizable")[0];
+        let count = document.getElementById("targetYears").value;
+
         var elInstance = instance.worksheets[0];
         console.log("elInstance", elInstance)
         elInstance.setValueFromCoords(2, 0, "", true)
         elInstance.setValueFromCoords(3, 0, "", true)
         elInstance.setValueFromCoords(4, 0, "", true)
         elInstance.setValueFromCoords(5, 0, "", true)
-        elInstance.setValueFromCoords(3, 2, "", true)
-        elInstance.setValueFromCoords(4, 2, "", true)
-        elInstance.setValueFromCoords(5, 2, "", true)
+        elInstance.setValueFromCoords(3, count, "", true)
+        elInstance.setValueFromCoords(4, count, "", true)
+        elInstance.setValueFromCoords(5, count, "", true)
 
 
 
@@ -10777,6 +10772,7 @@ export default class BuildTree extends Component {
                                                 id="targetYears"
                                                 name="targetYears"
                                                 bsSize="sm"
+                                                // onChange={this.buildModelingCalculatorJexcel()}
                                                 value={moment(this.state.currentCalculatorStopDate).diff(moment(this.state.currentCalculatorStartDate), 'years') + 2}>
                                             </Input>
                                         </FormGroup>
@@ -10793,7 +10789,7 @@ export default class BuildTree extends Component {
                                             });
                                         }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>
-                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.calculateValues}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button>
+                                        {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.calculateValues}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button> */}
 
 
                                     </FormGroup>
