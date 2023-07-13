@@ -69,6 +69,9 @@ export default class ShipmentLinkingNotifications extends Component {
         this.viewBatchData = this.viewBatchData.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.selectedForNotification = this.selectedForNotification.bind(this)
+        this.loaded = this.loaded.bind(this);
+        this.loaded1 = this.loaded1.bind(this);
+        this.selected = this.selected.bind(this);
     }
 
     viewBatchData(event, row) {
@@ -164,8 +167,7 @@ export default class ShipmentLinkingNotifications extends Component {
                     },
                         () => {
                             this.hideSecondComponent();
-                            this.filterData(this.state.planningUnitIds);
-                            this.getNotificationSummary();
+                            this.getNotificationSummary(0);
                         })
 
                 }).catch(
@@ -395,8 +397,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
     componentDidMount() {
         this.hideFirstComponent();
-        this.getProgramList();
-        this.getNotificationSummary();
+        this.getNotificationSummary(1);
     }
 
     filterData = (planningUnitIds) => {
@@ -1054,11 +1055,11 @@ export default class ShipmentLinkingNotifications extends Component {
             data[0] = getLabelText(notificationSummaryList[j].label);
             data[1] = notificationSummaryList[j].notificationCount;
             data[2] = notificationSummaryList[j].programId;
-            data[3] = this.state.programs.filter(c => c.programId == notificationSummaryList[j].programId).sort((a, b) => {
-                var itemLabelA = a.version;
-                var itemLabelB = b.version
-                return itemLabelA < itemLabelB ? 1 : -1;
-            })[0].value
+            // data[3] = this.state.programs.filter(c => c.programId == notificationSummaryList[j].programId).sort((a, b) => {
+            //     var itemLabelA = a.version;
+            //     var itemLabelB = b.version
+            //     return itemLabelA < itemLabelB ? 1 : -1;
+            // })[0].value
             notificationSummaryArray[count] = data;
             count++;
         }
@@ -1147,59 +1148,22 @@ export default class ShipmentLinkingNotifications extends Component {
         }
     }
 
-    selected = function (instance, x1, y1, x2, y2, origin) {
+    selected = function (instance, cell, x, y, value, e) {
         var instance = (instance).jexcel;
-        // console.log("RESP------>x1", x1);
-        // console.log("RESP------>y1", y1);
-        // console.log("RESP------>x2", x2);
-        // console.log("RESP------>y2", y2);
-        // console.log("RESP------>origin-x1", instance.getValueFromCoords(2, y1));
-
-
-        // if (y1 == 0 && y2 != 0) {
-        //     // console.log("RESP------>Header");
-        // } else {
-        //     // console.log("RESP------>Not");
-        //     this.setState({
-        //         programId: instance.getValueFromCoords(2, y1)
-        //     }, () => {
-        //         document.getElementById("addressed").value = 0;
-        //         this.getPlanningUnitList();
-        //     })
-        // }
-        let typeofColumn = instance.selectedHeader;
-        if (typeof typeofColumn === 'string') {
-            // console.log("RESP------>Header");
-        } else {
-            // console.log("RESP------>not Header");
-            this.setState({
-                programId: instance.getValueFromCoords(3, y1)
-            }, () => {
-                document.getElementById("addressed").value = 0;
-                this.getPlanningUnitList();
-            })
+        if (e.buttons == 1) {
+            if (y != 0) {
+                this.setState({
+                    programId: this.state.programs.filter(c => c.programId == this.state.instance.getValueFromCoords(2, x)).sort((a, b) => {
+                        var itemLabelA = a.version;
+                        var itemLabelB = b.version
+                        return itemLabelA < itemLabelB ? 1 : -1;
+                    })[0].value
+                }, () => {
+                    document.getElementById("addressed").value = 0;
+                    this.getPlanningUnitList();
+                })
+            }
         }
-
-        // if ((x == 0 && value != 0) || (y == 0)) {
-        // // // console.log("HEADER SELECTION--------------------------");
-        // } else {
-        // var instance = (instance).jexcel;
-        // // console.log("selected instance---", instance)
-        // // console.log("selected cell---", cell)
-        // // console.log("selected x---", x)
-        // // console.log("selected y---", y)
-        // // console.log("selected value---", value)
-        // // // console.log("selected program---", this.el);
-        // // console.log("selected program id---", instance.getValueFromCoords(2, x))
-        // if (instance.getValueFromCoords(2, x) != null && instance.getValueFromCoords(2, x) != "") {
-        // this.setState({
-        // programId: instance.getValueFromCoords(2, x)
-        // }, () => {
-        // this.getPlanningUnitList();
-        // })
-        // }
-        // }
-
     }.bind(this)
 
     loaded1 = function (instance, cell, x, y, value) {
@@ -1220,7 +1184,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
 
 
-    getNotificationSummary() {
+    getNotificationSummary(callGetProgram) {
         ManualTaggingService.getNotificationSummary()
             .then(response => {
                 if (response.status == 200) {
@@ -1235,6 +1199,11 @@ export default class ShipmentLinkingNotifications extends Component {
                         notificationSummary: listArray,
                         loading: false
                     }, () => {
+                        if (callGetProgram) {
+                            this.getProgramList();
+                        } else {
+                            this.filterData(this.state.planningUnitIds);
+                        }
                         this.buildNotificationSummaryJExcel();
                     })
 
