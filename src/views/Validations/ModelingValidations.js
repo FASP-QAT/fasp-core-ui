@@ -68,7 +68,8 @@ class ModelingValidation extends Component {
             nodeDataModelingList: [],
             loading: false,
             monthList: [],
-            show: false
+            show: false,
+            xAxisDisplayBy: ""
         };
         this.toggleLevelFeild = this.toggleLevelFeild.bind(this);
         this.setDatasetId = this.setDatasetId.bind(this);
@@ -106,6 +107,17 @@ class ModelingValidation extends Component {
         var displayBy = e.target.value;
         this.setState({
             displayBy: displayBy,
+            loading: false
+        }, () => {
+            this.getData()
+        })
+    }
+
+    setXAxisDisplayBy(e) {
+        this.setState({ loading: true })
+        var displayBy = e.target.value;
+        this.setState({
+            xAxisDisplayBy: displayBy,
             loading: false
         }, () => {
             this.getData()
@@ -1501,9 +1513,10 @@ class ModelingValidation extends Component {
         let levels = levelList.length > 0
             && levelList.map((item, i) => {
                 if (item != -1 && item != -2) {
+                    let tempLevelUnit = this.state.treeListFiltered.levelList != undefined ? getLabelText(this.state.treeListFiltered.levelList.filter(c => c.levelNo == item)[0].unit.label, this.state.lang) : undefined;
                     return (
                         <option key={i} value={item}>
-                            {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) : i18n.t("static.common.level") + " " + item}
+                            {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) + " - " + tempLevelUnit : i18n.t("static.common.level") + " " + item }
                         </option>
                     )
                 } else {
@@ -1639,24 +1652,6 @@ class ModelingValidation extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
-
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        key={JSON.stringify(rangeValue)}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
-                                                </div>
-                                            </FormGroup>
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpenLevelFeild} target="Popover5" trigger="hover" toggle={this.toggleLevelFeild}>
                                                     <PopoverBody>{i18n.t('static.Tooltip.levelModelingValdation')}</PopoverBody>
@@ -1682,7 +1677,7 @@ class ModelingValidation extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
+                                            {/* <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.levelUnit')}</Label>
                                                 <div className="controls">
                                                     <InputGroup>
@@ -1697,7 +1692,7 @@ class ModelingValidation extends Component {
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
-                                            </FormGroup>
+                                            </FormGroup> */}
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.node')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1713,6 +1708,73 @@ class ModelingValidation extends Component {
                                                         labelledBy={i18n.t('static.common.select')}
                                                     />
 
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">X-axis display</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="xAxisDisplayBy"
+                                                            id="xAxisDisplayBy"
+                                                            bsSize="sm"
+                                                            value={this.state.xAxisDisplayBy}
+                                                            onChange={(e) => { this.setXAxisDisplayBy(e); }}
+                                                        >
+                                                            <option value="1">Month</option>
+                                                            <option value="2">Calendar Year</option>
+                                                            <option value="3">Fiscal Year</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <div className="controls edit">
+                                                {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        key={JSON.stringify(rangeValue)}
+                                                        //theme="light"
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
+                                                )}
+                                                {(this.state.xAxisDisplayBy == 2) && (
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        key={JSON.stringify(rangeValue)}
+                                                        //theme="light"
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
+                                                )}
+                                                {(this.state.xAxisDisplayBy == 3) && (
+                                                    <Picker
+                                                        ref="pickRange"
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        key={JSON.stringify(rangeValue)}
+                                                        //theme="light"
+                                                        onChange={this.handleRangeChange}
+                                                        onDismiss={this.handleRangeDissmis}
+                                                    >
+                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                    </Picker>
+                                                )}
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
