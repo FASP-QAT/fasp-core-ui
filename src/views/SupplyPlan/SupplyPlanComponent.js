@@ -3214,7 +3214,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                                         var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label } : { value: "", label: "" };
                                                         // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                                                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
+                                                        var planningUnitDataFilter = this.state.planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
                                                         var programJson = {};
                                                         if (planningUnitDataFilter.length > 0) {
                                                             var planningUnitData = planningUnitDataFilter[0]
@@ -4783,7 +4783,8 @@ export default class SupplyPlanComponent extends React.Component {
         shipmentList = shipmentList.filter(c => 
             (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
             // && c.erpFlag == false 
-            && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value
+            // && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS 
+            && c.planningUnit.id == document.getElementById("planningUnitId").value
             // && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)
         );
         if (document.getElementById("addRowId") != null) {
@@ -5204,7 +5205,8 @@ export default class SupplyPlanComponent extends React.Component {
                 shipmentList = shipmentList.filter(c => 
                     (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
                     // && c.erpFlag == false 
-                    && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value
+                    // && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS 
+                    && c.planningUnit.id == document.getElementById("planningUnitId").value
                     // && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)
                 );
                 if (document.getElementById("addRowId") != null) {
