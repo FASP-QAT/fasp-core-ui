@@ -835,6 +835,7 @@ class VersionSettingsComponent extends Component {
         }.bind(this);
     }
     hideFirstComponent() {
+        document.getElementById('div1').style.display = 'block';
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
@@ -844,6 +845,7 @@ class VersionSettingsComponent extends Component {
     }
 
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);

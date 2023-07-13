@@ -1320,7 +1320,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                     name="countryId"
                                                     id="countryId"
                                                     value={this.state.realmCountryId}
-                                                    onChange={(e) => { this.getPrograms(); this.dataChange(e);this.fetchData() }}
+                                                    onChange={(e) => { this.getPrograms(); this.dataChange(e); }}
                                                 >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                     {countryList}</Input>
                                                 {!!this.props.error &&
