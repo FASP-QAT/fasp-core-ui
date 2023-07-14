@@ -10,6 +10,8 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
 import Picker from 'react-month-picker'
+import { DatePicker } from "antd";
+import "antd/dist/antd.css";
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP, TITLE_FONT, DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS } from '../../Constants.js'
 import moment from "moment";
@@ -30,6 +32,7 @@ import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
 import AuthenticationService from '../Common/AuthenticationService';
 
+const { RangePicker } = DatePicker;
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -69,7 +72,7 @@ class ModelingValidation extends Component {
             loading: false,
             monthList: [],
             show: false,
-            xAxisDisplayBy: ""
+            xAxisDisplayBy: 1
         };
         this.toggleLevelFeild = this.toggleLevelFeild.bind(this);
         this.setDatasetId = this.setDatasetId.bind(this);
@@ -80,6 +83,7 @@ class ModelingValidation extends Component {
         this.getDatasetData = this.getDatasetData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleYearRangeChange = this.handleYearRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.toggledata = this.toggledata.bind(this)
     }
@@ -115,9 +119,36 @@ class ModelingValidation extends Component {
 
     setXAxisDisplayBy(e) {
         this.setState({ loading: true })
-        var displayBy = e.target.value;
+        let displayBy = e.target.value;
+        let val;
+        if(displayBy == 1){
+            val = this.state.rangeValue;
+        }else if(displayBy == 2){
+            val = {
+                from : {
+                    year : this.state.rangeValue.from.year,
+                    month : 1,
+                },
+                to : {
+                    year : this.state.rangeValue.to.year,
+                    month : 12,
+                }
+            }
+        }else{
+            val = {
+                from : {
+                    year : this.state.rangeValue.from.year,
+                    month : (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12,
+                },
+                to : {
+                    year : this.state.rangeValue.to.year,
+                    month : (Number(displayBy) + 3) % 12 == 0 ? 12 : (Number(displayBy) + 3) % 12 ,
+                }
+            }
+        }
         this.setState({
             xAxisDisplayBy: displayBy,
+            rangeValue: val,
             loading: false
         }, () => {
             this.getData()
@@ -922,6 +953,35 @@ class ModelingValidation extends Component {
     handleRangeChange(value, text, listIndex) {
 
     }
+    handleYearRangeChange(value) {
+        let val;
+        if(this.state.xAxisDisplayBy == 2){
+            val = {
+                from : {
+                    year : value[0].year(),
+                    month: 1,
+                },
+                to : {
+                    year : value[1].year(),
+                    month : 12,
+                }
+            }
+        }else{
+            val = {
+                from : {
+                    year : value[0].year(),
+                    month: this.state.rangeValue.from.month,
+                },
+                to : {
+                    year : value[1].year(),
+                    month : this.state.rangeValue.to.month,
+                }
+            }
+        }
+        this.setState({ rangeValue: val }, () => {
+            this.getData()
+        })
+    }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.getData()
@@ -1724,7 +1784,18 @@ class ModelingValidation extends Component {
                                                         >
                                                             <option value="1">Month</option>
                                                             <option value="2">Calendar Year</option>
-                                                            <option value="3">Fiscal Year</option>
+                                                            <option value="3">Fiscal Year (e.g. FY2023 starts in Jul-22)</option>
+                                                            <option value="4">Fiscal Year (e.g. FY2023 starts in Aug-22)</option>
+                                                            <option value="5">Fiscal Year (e.g. FY2023 starts in Sep-22)</option>
+                                                            <option value="6">Fiscal Year (e.g. FY2023 starts in Oct-22)</option>
+                                                            <option value="7">Fiscal Year (e.g. FY2023 starts in Nov-22)</option>
+                                                            <option value="8">Fiscal Year (e.g. FY2023 starts in Dec-22)</option>
+                                                            <option value="9">Fiscal Year (e.g. FY2023 starts in Jan-22)</option>
+                                                            <option value="10">Fiscal Year (e.g. FY2023 starts in Feb-22)</option>
+                                                            <option value="11">Fiscal Year (e.g. FY2023 starts in Mar-22)</option>
+                                                            <option value="12">Fiscal Year (e.g. FY2023 starts in Apr-22)</option>
+                                                            <option value="13">Fiscal Year (e.g. FY2023 starts in May-22)</option>
+                                                            <option value="14">Fiscal Year (e.g. FY2023 starts in Jun-22)</option>
                                                         </Input>
 
                                                     </InputGroup>
@@ -1732,53 +1803,57 @@ class ModelingValidation extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
                                                 {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        key={JSON.stringify(rangeValue)}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            ref="pickRange"
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            value={rangeValue}
+                                                            lang={pickerLang}
+                                                            key={JSON.stringify(rangeValue)}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange}
+                                                            onDismiss={this.handleRangeDissmis}
+                                                        >
+                                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
+                                                    </div>
                                                 )}
                                                 {(this.state.xAxisDisplayBy == 2) && (
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        key={JSON.stringify(rangeValue)}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
+                                                    <div className="controls box">
+                                                        <RangePicker
+                                                            picker="year"
+                                                            allowClear={false}
+                                                            id="date"
+                                                            name="date"
+                                                            //  style={{ width: '450px', marginLeft:'20px'}}
+                                                            onChange={this.handleYearRangeChange}
+                                                            value={[
+                                                                moment(rangeValue.from.year.toString()),
+                                                                moment(rangeValue.to.year.toString()),
+                                                            ]}
+                                                        />
+                                                    </div>
                                                 )}
-                                                {(this.state.xAxisDisplayBy == 3) && (
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        key={JSON.stringify(rangeValue)}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
+                                                {(this.state.xAxisDisplayBy != 1 && this.state.xAxisDisplayBy != 2) && (
+                                                    <div className="controls box">
+                                                        <RangePicker
+                                                            picker="year"
+                                                            allowClear={false}
+                                                            id="date"
+                                                            name="date"
+                                                            //  style={{ width: '450px', marginLeft:'20px'}}
+                                                            onChange={this.handleYearRangeChange}
+                                                            value={[
+                                                                moment(rangeValue.from.year.toString()),
+                                                                moment(rangeValue.to.year.toString()),
+                                                            ]}
+                                                        />
+                                                    </div>
                                                 )}
-                                                </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')}</Label>
+                                                <Label htmlFor="appendedInputButton">Y-axis display</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
