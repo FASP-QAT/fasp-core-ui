@@ -2634,7 +2634,7 @@ class ShipmentSummery extends Component {
                                                     {this.state.shipmentDetailsList.length > 0 && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>}
                                                 </ul>
                                             </FormGroup>
-                                            <div className="consumptionDataEntryTable ShipmentSummeryReportMarginTop" id="mytable2">
+                                            <div className="consumptionDataEntryTable ShipmentSummeryReportMarginTop mytable2" id="mytable2">
                                                 {/* this.props.items is undefined that's why removed this style - Sonal */}
                                                 {/* <div id="shipmentDetailsListTableDiv" style={{ display: this.props.items.loading ? "none" : "block" }} className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} > */}
                                                 <div id="shipmentDetailsListTableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} >
