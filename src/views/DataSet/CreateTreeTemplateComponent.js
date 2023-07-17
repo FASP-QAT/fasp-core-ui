@@ -11974,7 +11974,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         bsSize="sm"
                                                                         readOnly={!this.state.editable}
                                                                         onChange={(e) => { this.dataChange(e) }}
-                                                                        value={this.state.treeTemplate.notes}
+                                                                        value={this.state.treeTemplate.notes!=null && this.state.treeTemplate.notes!=undefined?this.state.treeTemplate.notes:""}
                                                                     >
                                                                     </Input>
                                                                 </FormGroup>
