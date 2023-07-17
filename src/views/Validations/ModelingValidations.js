@@ -1573,10 +1573,11 @@ class ModelingValidation extends Component {
         let levels = levelList.length > 0
             && levelList.map((item, i) => {
                 if (item != -1 && item != -2) {
-                    let tempLevelUnit = this.state.treeListFiltered.levelList != undefined ? getLabelText(this.state.treeListFiltered.levelList.filter(c => c.levelNo == item)[0].unit.label, this.state.lang) : undefined;
+                    var levelListFilter = this.state.treeListFiltered.levelList != undefined ? this.state.treeListFiltered.levelList.filter(c => c.levelNo == item)[0] : undefined;
+                    let levelUnit = levelListFilter != undefined && levelListFilter.unit != null ? " - " + getLabelText(levelListFilter.unit.label, this.state.lang) : "";
                     return (
                         <option key={i} value={item}>
-                            {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) + " - " + tempLevelUnit : i18n.t("static.common.level") + " " + item }
+                            {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) + levelUnit : i18n.t("static.common.level") + " " + item }
                         </option>
                     )
                 } else {
