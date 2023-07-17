@@ -1918,7 +1918,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         </Modal>
                         {/* Consumption modal */}
                         <div className="col-md-12 pl-0">
-                            <div id="tableDiv1" className="jexcelremoveReadonlybackground RowClickable consumptionDataEntryTable">
+                            <div id="tableDiv1" className="jexcelremoveReadonlybackground RowClickable consumptionDataEntryTable TableWidth100">
                             </div>
                         </div>
                         <div className="col-md-12 pl-0">
