@@ -1154,7 +1154,7 @@ class ModelingValidation extends Component {
             y = y + 10;
         }
 
-        planningText = doc.splitTextToSize(i18n.t('static.common.level') + ' : ' + document.getElementById("levelId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        planningText = doc.splitTextToSize(i18n.t('static.common.level') + ' - ' + i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
@@ -1167,18 +1167,18 @@ class ModelingValidation extends Component {
             y = y + 10;
         }
 
-        planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
+        // planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value, doc.internal.pageSize.width * 3 / 4);
+        // // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        // y = y + 10;
+        // for (var i = 0; i < planningText.length; i++) {
+        //     if (y > doc.internal.pageSize.height - 100) {
+        //         doc.addPage();
+        //         y = 80;
 
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
+        //     }
+        //     doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+        //     y = y + 10;
+        // }
 
         planningText = doc.splitTextToSize(i18n.t('static.common.node') + ' : ' + this.state.nodeLabelArr.join('; '), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
@@ -1296,10 +1296,10 @@ class ModelingValidation extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.level') + ' : ' + document.getElementById("levelId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.level') + ' - ' + i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-        csvRow.push('')
+        // csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
+        // csvRow.push('')
         this.state.nodeLabelArr.map(ele =>
             csvRow.push('"' + (i18n.t('static.common.node')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20').replaceAll('#', '%23') + '"'))
         csvRow.push('')
