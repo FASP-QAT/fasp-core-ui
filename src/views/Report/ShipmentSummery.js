@@ -3614,7 +3614,7 @@ class ShipmentSummery extends Component {
                               document
                                 .getElementById("versionId")
                                 .value.includes("Local")
-                              ? "jexcelremoveReadonlybackground RowClickable"
+                              ? "jexcelremoveReadonlybackground RowClickable TableWidth100"
                               : "jexcelremoveReadonlybackground"
                           }
                         ></div>
