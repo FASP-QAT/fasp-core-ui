@@ -682,7 +682,89 @@ class SupplyPlanFormulas extends Component {
                 <ListGroupItemText className="formulastext">
                   <p><b>{i18n.t("static.supplyPlanFormula.inventoryTurns1")}</b><br></br>
                     <p className="ml-3">
-                      <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L1")}</b>{i18n.t("static.supplyPlanFormula.inventoryTurns1L1")}<br></br><br></br>
+                      <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L1")}</b>
+                      {i18n.t("static.supplyPlanFormula.inventoryTurns1L1")}<br></br>
+                      {i18n.t("static.supplyPlanFormula.inventoryTurns1L4")}<br></br>
+                      {i18n.t("static.supplyPlanFormula.inventoryTurns1L5")}<br></br>
+                      {i18n.t("static.supplyPlanFormula.inventoryTurns1L6")}<br></br>
+                      <ol>
+                        <li>
+                        {i18n.t("static.supplyPlanFormula.inventoryTurns1L7")}<br></br>
+                          <ol type="a">
+                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L8")}</li>
+                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L9")}</li>
+                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L10")}</li>
+                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L11")}</li>
+                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L12")}</li>
+                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L13")}</li>
+                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L14")}</li>
+                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L15")}</li>
+                          </ol>
+                        </li>
+                      </ol>
+                      <table border="1" width="100%">
+                        <tr>
+                          <td width= "15%">{i18n.t("static.supplyPlanFormula.inventoryTurns1L16")}</td>
+                          <td>MOS</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L17")}</td>
+                          <td>= (9+3) = 12</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L18")}</td>
+                          <td>= (9+3-1) = 11</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L19")}</td>
+                          <td>= (9+3-2) = 10</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L20")}</td>
+                          <td>= (9+3-3) = 9</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L21")}</td>
+                          <td>= (9+3-4) = 8</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L22")}</td>
+                          <td>= (9+3-5) = 7</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L23")}</td>
+                          <td>= (9+3-6) = 6</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L24")}</td>
+                          <td>= (9+3-7) = 5</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L25")}</td>
+                          <td>= (9+3-8) = 4</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L26")}</td>
+                          <td>12</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L27")}</td>
+                          <td>11</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L28")}</td>
+                          <td>10</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L29")}</td>
+                          <td>8.75</td>
+                        </tr>
+                        <tr>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L30")}</td>
+                          <td>1.4</td>
+                        </tr>
+                      </table>
+                      <br></br><br></br>
                       <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L3")}</b>{i18n.t("static.supplyPlanFormula.inventoryTurns1L2")}<br></br><br></br>
                       <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L9")}</b>{i18n.t("static.supplyPlanFormula.inventoryTurns1L3")}
                     </p>
