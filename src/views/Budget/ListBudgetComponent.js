@@ -1404,6 +1404,7 @@ class ListBudgetComponent extends Component {
         <Card>
           <div className="Card-header-addicon">
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
+            <span className="pl-0">This report uses the latest versions of supply plans. Please commit local supply plans to see shipments tagged to budgets reflected here. </span>
             <div className="card-header-actions">
               <div className="card-header-action">
                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
