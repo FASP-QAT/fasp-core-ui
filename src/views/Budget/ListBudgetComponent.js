@@ -1402,7 +1402,7 @@ class ListBudgetComponent extends Component {
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
-          <div className="Card-header-addicon">
+          <div className="Card-header-addicon BudgetPlusIcon" style={{marginTop:'13px'}}>
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
             <span className="pl-0">This report uses the latest versions of supply plans. Please commit local supply plans to see shipments tagged to budgets reflected here. </span>
             <div className="card-header-actions">
