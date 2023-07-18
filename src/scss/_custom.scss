@@ -12088,3 +12088,15 @@ and (max-width: 1366px)
 .TableWidth100{
   width: 100%!important;
 }
+
+@media (min-width: 768px){
+.SelectdivTree {
+    position: absolute;
+    top: 8px;
+    margin-bottom: 0.5rem;
+    z-index: 1;
+}
+}
+.treeTemplateSearchMarginTop1 {
+  margin-top: -30px;
+}
