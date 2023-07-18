@@ -1288,7 +1288,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 <div className="consumptionDataEntryTable">
 
-                    <div id="mapPlanningUnit" style={{ display: this.props.items.loading ? "none" : "block", width: '100%' }} >
+                    <div id="mapPlanningUnit" className='TableWidth100' style={{ display: this.props.items.loading ? "none" : "block", width: '100%' }} >
                     </div>
                     <FormGroup>
                         <Button color="info" size="md" className="float-right mr-1" id="stepOneBtn" type="submit" onClick={() => this.formSubmit()} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>

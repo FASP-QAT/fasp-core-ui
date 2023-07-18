@@ -210,12 +210,19 @@ class Budgets extends Component {
             DropdownService.getFundingSourceDropdownList()
                 .then(response => {
                     // console.log("json===>", JSON.stringify(response.data))
+                    var fundingSourceValues=[];
+                    var fundingSources=response.data;
+                    fundingSources.map(ele=>{
+                        fundingSourceValues.push({label:ele.code,value:ele.id})
+                    })
                     this.setState({
-                        fundingSources: response.data.sort(function (a, b) {
+                        fundingSources: fundingSources.sort(function (a, b) {
                             a = a.code.toLowerCase();
                             b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
-                        }), loading: false
+                        }), loading: false,
+                        fundingSourceValues:fundingSourceValues,
+                        fundingSourceLabels: fundingSourceValues.map(ele => ele.label)
                     }, () => {
                         // this.consolidatedFundingSourceList()
                     })
@@ -1532,6 +1539,7 @@ class Budgets extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
+                    <span className="pl-0">This report uses the latest versions of supply plans. Please commit local supply plans to see shipments tagged to budgets reflected here. </span>
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
