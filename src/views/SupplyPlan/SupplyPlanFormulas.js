@@ -696,7 +696,8 @@ class SupplyPlanFormulas extends Component {
                           </ol>
                         </li>
                       </ol>
-                      <table border="1" width="100%" textAlign="center">
+                      <div class="table-responsive" style={{marginTop:'10px'}}>
+                      <table className="table" border="1" textAlign="center">
                         <tr>
                           <td textAalign="center">{i18n.t("static.supplyPlanFormula.inventoryTurns1L10")}</td>
                           <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L11")}</td>
@@ -906,6 +907,7 @@ class SupplyPlanFormulas extends Component {
                           <td>12</td>
                         </tr>
                       </table>
+                      </div>
                       <br></br><br></br>
                       <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L3")}</b>{i18n.t("static.supplyPlanFormula.inventoryTurns1L2")}<br></br><br></br>
                       <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L9")}</b>{i18n.t("static.supplyPlanFormula.inventoryTurns1L3")}
