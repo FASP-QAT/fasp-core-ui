@@ -8384,6 +8384,19 @@ legend.scheduler-border {
   /* max-width: 100px; */
   // z-index: 999;
 }
+.Firstcolum1 {
+  // position: sticky;
+  //   left: 0;
+  //   z-index: 999;
+
+  width: 120px;
+  left: 53px!important;
+  z-index: 3;
+  /* width: 100px; */
+   min-width: 63px;
+  max-width: 100px;
+  // z-index: 999;
+}
 
 .Secondcolum {
   // position: sticky;
@@ -8391,8 +8404,8 @@ legend.scheduler-border {
   // left:53px;
   // z-index: 999;
   width: 150px;
-  left: 53px;
-  z-index: 3;
+  left: 112px;
+  z-index: 4;
   min-width: 150px;
   max-width: 150px;
 }
@@ -8402,8 +8415,8 @@ legend.scheduler-border {
   // left: 128px;
   // z-index: 999;
 
-  left: 202px;
-  z-index: 4;
+  left: 251px;
+  z-index: 5;
   /* z-index: 999; */
   width: 200px;
   // position: -webkit-sticky;

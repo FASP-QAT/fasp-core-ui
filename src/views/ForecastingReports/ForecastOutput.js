@@ -3820,7 +3820,7 @@ class ForecastOutput extends Component {
                                                                 <thead>
                                                                     <tr>
                                                                         <th className='whitebg_inforecastOutput sticky-col Firstcolum'>{i18n.t('static.forecastReport.display')}</th>
-                                                                        <th className='whitebg_inforecastOutput sticky-col'>{i18n.t('static.program.region')}</th>
+                                                                        <th className='whitebg_inforecastOutput sticky-col Firstcolum1'>{i18n.t('static.program.region')}</th>
                                                                         <th className='whitebg_inforecastOutput sticky-col Secondcolum'>{this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit')}</th>
                                                                         <th className='whitebg_inforecastOutput sticky-col MonthlyForecastdWidth Thirdcolum'>{i18n.t('static.consumption.forcast')}</th>
                                                                         {this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
@@ -3835,7 +3835,7 @@ class ForecastOutput extends Component {
                                                                     {this.state.xaxis == 2 && this.state.consumptionData.map((item, index) => (
                                                                         <tr>
                                                                             <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id, item.region.regionId)} /></td>
-                                                                            <td className="" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
+                                                                            <td className="sticky-col first-col clone Firstcolum1" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
                                                                             {/* <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.display && <i class="fa fa-circle" style={{ color: backgroundColor[countVar] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td> */}
                                                                             {/* <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td> */}
                                                                             <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
