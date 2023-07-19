@@ -680,7 +680,7 @@
     "static.common.nov": "Nov",
     "static.program.seafreightperctext": "Sea freight percentage",
     "static.quantimed.quantimedForecastConsumptionQty": "Quantimed Forecasted Consumption",
-    "static.problemReport.rejected": "Rejected",
+    "static.problemReport.rejected": "Needs revision",
     "static.commitVersion.shipmentAlreadyLinkedToOtherProgram": "Please see shipment(s) in red text – the program in the ‘server’ column has already linked to the ERP shipment(s) you are trying to link to. Please 1) de-link your shipment(s) or 2) request the other program to de-link their shipment(s).",
     "static.language.french": "French",
     "static.extrapolation.WithoutSeasonality": "At least 13 months historical data required.Without seasonality : At least 2 months historical data required",
