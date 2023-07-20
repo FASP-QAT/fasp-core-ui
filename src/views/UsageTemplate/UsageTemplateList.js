@@ -118,7 +118,10 @@ class usageTemplate extends Component {
             dimensionList: [],
             isChanged1: false,
             dataEl: '',
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            tempTracerCategoryId: '',
+            tracerCategoryLoading: true,
+            tempForecastingUnitList: []
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -472,7 +475,8 @@ class usageTemplate extends Component {
                     },
                         () => {
                             // console.log("dimensionList----------->", this.state.dimensionList);
-                            this.getForecastingUnit();
+                            // this.getForecastingUnit();
+                            this.getUnit();
                         })
                 } else {
                     this.setState({
@@ -799,12 +803,16 @@ class usageTemplate extends Component {
         var papuList = this.state.selSource;
         var data = [];
         var papuDataArr = [];
-
+        let dropdownList = [];
         var count = 0;
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
 
                 data = [];
+                dropdownList.push({
+                    id: papuList[j].forecastingUnit.id,
+                    name : papuList[j].forecastingUnit.label.label_en + " | " + papuList[j].forecastingUnit.id,
+                });
                 data[0] = papuList[j].usageTemplateId
                 data[1] = (papuList[j].program == null ? -1 : papuList[j].program.id) //Type
                 data[2] = getLabelText(papuList[j].label, this.state.lang);//usage name
@@ -868,7 +876,11 @@ class usageTemplate extends Component {
                 count++;
             }
         }
-
+        if(dropdownList.length > 0){
+            dropdownList = [
+                ...new Map(dropdownList.map((item) => [item["id"], item])).values(),
+            ];
+        }
         if (papuDataArr.length == 0) {
             data = [];
             data[0] = 0;
@@ -944,10 +956,31 @@ class usageTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.product.unit1'),
-                    type: 'autocomplete',
+                    type: 'dropdown',
                     width: '130',
-                    source: this.state.forecastingUnitList,
-                    filter: this.filterForecastingUnitBasedOnTracerCategory //4 E
+                    source: dropdownList,
+                    // filter: this.filterForecastingUnitBasedOnTracerCategory, //4 E
+                    options: {
+                        url: `${API_URL}/api/dropdown/forecastingUnit/autocomplete/filter/tracerCategory/searchText/language/tracerCategoryId`,
+                        autocomplete: true,
+                        remoteSearch: true,
+                        onbeforesearch: function(instance, request) {
+                            if(this.state.tracerCategoryLoading == false){
+                                request.method = 'GET';                                
+                                let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                request.beforeSend = (httpRequest) => {
+                                    httpRequest.setRequestHeader('Authorization', 'Bearer '+jwtToken);
+                                }
+                                const searchText = instance.search;
+                                const language = this.state.lang;
+                                const tracerCategoryId = this.state.tempTracerCategoryId;
+                                request.url = request.url.replace("searchText/language/tracerCategoryId", `${searchText}/${language}/${tracerCategoryId}`);
+
+                                return request;
+                            }
+                        }.bind(this),
+                    },
                 },
                 {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
@@ -1216,6 +1249,13 @@ class usageTemplate extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: true,
             onchange: this.changed,
+            oneditionstart: function (instance, cell, x, y, value) {
+                this.setState({ tracerCategoryLoading: true })
+                let tempId = data[y][3]
+                this.setState({ tempTracerCategoryId: tempId }, () => {
+                    this.setState({tracerCategoryLoading: false})
+                })
+            }.bind(this),
             // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
@@ -1600,6 +1640,7 @@ class usageTemplate extends Component {
         dataEL = this.el
         this.setState({
             dataEl: dataEL,
+            tempForecastingUnitList: dropdownList,
             loading: false
         })
     }
