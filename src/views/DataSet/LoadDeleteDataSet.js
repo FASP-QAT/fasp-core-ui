@@ -358,8 +358,14 @@ class LoadDeleteDataSet extends Component {
                 .then(response => {
                     // console.log(">>>", response);
                     if (response.status == 200) {
+                        var lang = this.state.lang;
                         this.setState({
-                            countryList: response.data.realmCountryList,
+                            // countryList: response.data.realmCountryList,
+                            countryList: (response.data.realmCountryList).sort(function (a, b) {
+                                a = getLabelText(a.realmCountry.label, lang).toLowerCase();
+                                b = getLabelText(b.realmCountry.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
                             prgList: response.data.programList,
                             loading: false
                         })
