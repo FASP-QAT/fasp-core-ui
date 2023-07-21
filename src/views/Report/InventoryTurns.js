@@ -281,17 +281,17 @@ export default class InventoryTurns extends Component {
                     
                     doc.setDrawColor(0);
                     doc.setFillColor(186, 12, 47);
-                    doc.rect(doc.internal.pageSize.width / 8 + 390, this.state.CostOfInventoryInput.displayId == 1 ? 200 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 200 + this.state.puId.length*2 + this.state.programId.length*2, 15, 12, 'F');
+                    doc.rect(doc.internal.pageSize.width / 8 + 420, this.state.CostOfInventoryInput.displayId == 1 ? 200 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 200 + this.state.puId.length*2 + this.state.programId.length*2, 15, 12, 'F');
 
-                    doc.text(i18n.t('static.inventoryTurns.months12'), doc.internal.pageSize.width / 8 + 410, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
+                    doc.text(i18n.t('static.inventoryTurns.months12'), doc.internal.pageSize.width / 8 + 440, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
                         align: 'left'
                     })
 
                     doc.setDrawColor(0);
                     doc.setFillColor(0, 0, 0);
-                    doc.rect(doc.internal.pageSize.width / 8 + 540, this.state.CostOfInventoryInput.displayId == 1 ? 200 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 200 + this.state.puId.length*2 + this.state.programId.length*2, 15, 12, 'F');
+                    doc.rect(doc.internal.pageSize.width / 8 + 570, this.state.CostOfInventoryInput.displayId == 1 ? 200 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 200 + this.state.puId.length*2 + this.state.programId.length*2, 15, 12, 'F');
 
-                    doc.text(i18n.t('static.inventoryTurns.months13'), doc.internal.pageSize.width / 8 + 560, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
+                    doc.text(i18n.t('static.inventoryTurns.months13'), doc.internal.pageSize.width / 8 + 590, this.state.CostOfInventoryInput.displayId == 1 ? 210 + this.state.countryId.length*1.5 + this.state.programId.length*2 : 210 + this.state.puId.length*2 + this.state.programId.length*2 , {
                         align: 'left'
                     })
 
@@ -1147,6 +1147,17 @@ export default class InventoryTurns extends Component {
                     }, () => {
                         this.setState({
                         isTableLoaded: this.getTableDiv()
+                        })
+                    });
+                }else{
+                    this.setState({
+                        costOfInventory: [],
+                        costOfCountry: [],
+                        costOfProgram: [],
+                        loading: false
+                    },() => {
+                        this.setState({
+                            isTableLoaded: this.getTableDiv()
                         })
                     });
                 }
