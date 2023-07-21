@@ -10527,6 +10527,19 @@ label.arrow_label:before {
   left: 0;
   z-index: 3;
 }
+.Firstcolum1 {
+  // position: sticky;
+  //   left: 0;
+  //   z-index: 999;
+
+  width: 120px;
+  left: 53px!important;
+  z-index: 3;
+  /* width: 100px; */
+   min-width: 63px;
+  max-width: 100px;
+  // z-index: 999;
+}
 
 .jss_pagination_dropdown {
   color: #fff !important;
