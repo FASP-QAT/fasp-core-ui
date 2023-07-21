@@ -693,77 +693,221 @@ class SupplyPlanFormulas extends Component {
                           <ol type="a">
                             <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L8")}</li>
                             <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L9")}</li>
-                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L10")}</li>
-                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L11")}</li>
-                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L12")}</li>
-                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L13")}</li>
-                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L14")}</li>
-                            <li>{i18n.t("static.supplyPlanFormula.inventoryTurns1L15")}</li>
                           </ol>
                         </li>
                       </ol>
-                      <table border="1" width="100%">
+                      <div class="table-responsive" style={{marginTop:'10px'}}>
+                      <table className="table" border="1" textAlign="center">
                         <tr>
-                          <td width= "15%">{i18n.t("static.supplyPlanFormula.inventoryTurns1L16")}</td>
-                          <td>MOS</td>
-                        </tr>
-                        <tr>
+                          <td textAalign="center">{i18n.t("static.supplyPlanFormula.inventoryTurns1L10")}</td>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L11")}</td>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L12")}</td>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L13")}</td>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L14")}</td>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L15")}</td>
+                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L16")}</td>
                           <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L17")}</td>
-                          <td>= (9+3) = 12</td>
-                        </tr>
-                        <tr>
                           <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L18")}</td>
-                          <td>= (9+3-1) = 11</td>
-                        </tr>
-                        <tr>
                           <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L19")}</td>
-                          <td>= (9+3-2) = 10</td>
-                        </tr>
-                        <tr>
                           <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L20")}</td>
-                          <td>= (9+3-3) = 9</td>
-                        </tr>
-                        <tr>
                           <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L21")}</td>
-                          <td>= (9+3-4) = 8</td>
-                        </tr>
-                        <tr>
                           <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L22")}</td>
-                          <td>= (9+3-5) = 7</td>
-                        </tr>
-                        <tr>
                           <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L23")}</td>
-                          <td>= (9+3-6) = 6</td>
                         </tr>
                         <tr>
-                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L24")}</td>
-                          <td>= (9+3-7) = 5</td>
+                          <td>12</td>
+                          <td>12</td>
+                          <td>11</td>
+                          <td>10</td>
+                          <td>9</td>
+                          <td>8</td>
+                          <td>7</td>
+                          <td>6</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>78</td>
                         </tr>
                         <tr>
-                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L25")}</td>
-                          <td>= (9+3-8) = 4</td>
+                          <td>11</td>
+                          <td>1</td>
+                          <td>11</td>
+                          <td>10</td>
+                          <td>9</td>
+                          <td>8</td>
+                          <td>7</td>
+                          <td>6</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>67</td>
                         </tr>
                         <tr>
-                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L26")}</td>
+                          <td>10</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>10</td>
+                          <td>9</td>
+                          <td>8</td>
+                          <td>7</td>
+                          <td>6</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>58</td>
+                        </tr>
+                        <tr>
+                          <td>9</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>9</td>
+                          <td>8</td>
+                          <td>7</td>
+                          <td>6</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>51</td>
+                        </tr>
+                        <tr>
+                          <td>8</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>8</td>
+                          <td>7</td>
+                          <td>6</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>46</td>
+                        </tr>
+                        <tr>
+                          <td>7</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>7</td>
+                          <td>6</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>43</td>
+                        </tr>
+                        <tr>
+                          <td>6</td>
+                          <td>6</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>6</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>42</td>
+                        </tr>
+                        <tr>
+                          <td>5</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>5</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>33</td>
+                        </tr>
+                        <tr>
+                          <td>4</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>4</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>30</td>
+                        </tr>
+                        <tr>
+                          <td>3</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>3</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>24</td>
+                        </tr>
+                        <tr>
+                          <td>2</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>2</td>
+                          <td>1</td>
+                          <td>18</td>
+                        </tr>
+                        <tr>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
+                          <td>1</td>
                           <td>12</td>
                         </tr>
-                        <tr>
-                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L27")}</td>
-                          <td>11</td>
-                        </tr>
-                        <tr>
-                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L28")}</td>
-                          <td>10</td>
-                        </tr>
-                        <tr>
-                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L29")}</td>
-                          <td>8.75</td>
-                        </tr>
-                        <tr>
-                          <td>{i18n.t("static.supplyPlanFormula.inventoryTurns1L30")}</td>
-                          <td>1.4</td>
-                        </tr>
                       </table>
+                      </div>
                       <br></br><br></br>
                       <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L3")}</b>{i18n.t("static.supplyPlanFormula.inventoryTurns1L2")}<br></br><br></br>
                       <b>{i18n.t("static.supplyPlanFormula.inventoryTurns2L9")}</b>{i18n.t("static.supplyPlanFormula.inventoryTurns1L3")}
