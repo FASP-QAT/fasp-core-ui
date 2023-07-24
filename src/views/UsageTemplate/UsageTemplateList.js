@@ -475,8 +475,8 @@ class usageTemplate extends Component {
                     },
                         () => {
                             // console.log("dimensionList----------->", this.state.dimensionList);
-                            // this.getForecastingUnit();
-                            this.getUnit();
+                            this.getForecastingUnit();
+                            // this.getUnit();
                         })
                 } else {
                     this.setState({
@@ -531,7 +531,8 @@ class usageTemplate extends Component {
     }
 
     getForecastingUnit() {
-        ForecastingUnitService.getForecastingUnitListAll().then(response => {
+        let forecastingUnitIds = this.state.tempForecastingUnitList.map(e => e.id)
+        ForecastingUnitService.getForecastingUnitByIds(forecastingUnitIds).then(response => {
             // console.log("response------->" + response.data);
             if (response.status == 200) {
                 var listArray = response.data;
@@ -614,6 +615,90 @@ class usageTemplate extends Component {
                 }
             }
         );
+
+        // ForecastingUnitService.getForecastingUnitListAll().then(response => {
+        //     // console.log("response------->" + response.data);
+        //     if (response.status == 200) {
+        //         var listArray = response.data;
+        //         listArray.sort((a, b) => {
+        //             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+        //             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+        //             return itemLabelA > itemLabelB ? 1 : -1;
+        //         });
+
+        //         let tempList = [];
+        //         if (listArray.length > 0) {
+        //             for (var i = 0; i < listArray.length; i++) {
+        //                 var paJson = {
+        //                     name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].forecastingUnitId),
+        //                     id: parseInt(listArray[i].forecastingUnitId),
+        //                     active: listArray[i].active,
+        //                     tracerCategoryId: listArray[i].tracerCategory.id,
+        //                     unit: listArray[i].unit
+        //                 }
+        //                 tempList[i] = paJson
+        //             }
+        //         }
+
+        //         this.setState({
+        //             forecastingUnitList: tempList,
+        //             // loading: false
+        //         },
+        //             () => {
+        //                 // this.getDataSet();
+        //                 this.getUnit();
+        //             })
+        //     } else {
+        //         this.setState({
+        //             message: response.data.messageCode, loading: false
+        //         },
+        //             () => {
+        //                 this.hideSecondComponent();
+        //             })
+        //     }
+
+
+        // }).catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({
+        //                 // message: 'static.unkownError',
+        //                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+        //                 loading: false
+        //             });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+
+        //                 case 401:
+        //                     this.props.history.push(`/login/static.message.sessionExpired`)
+        //                     break;
+        //                 case 403:
+        //                     this.props.history.push(`/accessDenied`)
+        //                     break;
+        //                 case 500:
+        //                 case 404:
+        //                 case 406:
+        //                     this.setState({
+        //                         message: error.response.data.messageCode,
+        //                         loading: false
+        //                     });
+        //                     break;
+        //                 case 412:
+        //                     this.setState({
+        //                         message: error.response.data.messageCode,
+        //                         loading: false
+        //                     });
+        //                     break;
+        //                 default:
+        //                     this.setState({
+        //                         message: 'static.unkownError',
+        //                         loading: false
+        //                     });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
 

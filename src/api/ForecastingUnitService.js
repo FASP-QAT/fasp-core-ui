@@ -46,5 +46,10 @@ class ForecastingUnitService {
         return axios.get(`${API_URL}/api/forecastingUnit/programId/${programId}/versionId/${versionId}`, {}
         );
     }
+
+    getForecastingUnitByIds(json){
+        return axios.post(`${API_URL}/api/forecastingUnit/byIds`, json, {}
+        );
+    }
 }
 export default new ForecastingUnitService();
