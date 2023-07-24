@@ -3022,7 +3022,7 @@ export default class BuildTree extends Component {
                 {
                     // 3
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthlyEndNoSeasonality'),
-                    type: 'numeric',
+                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
                     mask: '#,##0.0000', decimal: '.',
                     readOnly: true
                 },
@@ -3404,15 +3404,17 @@ export default class BuildTree extends Component {
                 seasonality: e.target.checked == true ? true : false
             }, () => {
                 if (this.state.momEl != "") {
-                    if (checked) {
-                        this.state.momEl.showColumn(3);
-                        this.state.momEl.showColumn(4);
-                        this.state.momEl.showColumn(5);
-                    } else {
-                        this.state.momEl.hideColumn(3);
-                        this.state.momEl.hideColumn(4);
-                        this.state.momEl.hideColumn(5);
-                    }
+                    this.buildMomJexcel();
+               
+                 //     if (checked) {
+                //         this.state.momEl.showColumn(3);
+                //         this.state.momEl.showColumn(4);
+                //         this.state.momEl.showColumn(5);
+                //     } else {
+                //         this.state.momEl.hideColumn(3);
+                //         this.state.momEl.hideColumn(4);
+                //         this.state.momEl.hideColumn(5);
+                //     }
                 }
                 console.log('seasonality---', this.state.seasonality);
             });
