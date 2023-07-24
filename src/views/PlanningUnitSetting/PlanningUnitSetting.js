@@ -2111,6 +2111,7 @@ export default class PlanningUnitSetting extends Component {
                             }
                         }.bind(this),
                     },
+                    filter: this.filterPlanningUnitList,
                     width: '170',
                     // readOnly: true //1B
                 },
@@ -2419,6 +2420,11 @@ export default class PlanningUnitSetting extends Component {
     //     return mylist;
 
     // }.bind(this)
+
+    filterPlanningUnitList = function (instance, cell, c, r, source) {
+        var mylist = [];
+        return mylist;
+    }.bind(this)
 
     filterPlanningUnitListByProductCategoryId = function (instance, cell, c, r, source) {
         var mylist = [];
