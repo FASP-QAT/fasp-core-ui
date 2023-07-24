@@ -2896,6 +2896,8 @@ export default class syncPage extends Component {
                                               data[34] = shipmentQtyDownloaded;
                                               data[35] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].active == 1 || downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].active == true ? true : false : false;
                                               data[36] = downloadedProgramDataShipmentLinkedFiltered.length > 0 ? downloadedProgramDataShipmentLinkedFiltered[downloadedProgramDataShipmentLinkedFiltered.length - 1].shipmentLinkingId : "";
+                                              data[37] = oldProgramData.programId;
+                                              data[38] = listFromAPIFiltered.length > 0 ? listFromAPIFiltered[0].program.id : latestProgramDataShipmentLinkedFiltered.length > 0 ? latestProgramData.programId : ""
 
                                               // data[8] = mergedShipmentData[cd].dataSource.id;
                                               // data[9] = mergedShipmentData[cd].shipmentMode == "Air" ? 2 : 1;
@@ -2956,7 +2958,7 @@ export default class syncPage extends Component {
                                                 },
                                                 {
                                                   title: i18n.t('static.commit.server'),
-                                                  colspan: '9',
+                                                  colspan: '11',
                                                 },
                                                 ],
 
@@ -3033,6 +3035,8 @@ export default class syncPage extends Component {
                                                 { type: 'hidden', title: 'index' },
                                                 { type: 'hidden', title: 'index' },
                                                 { type: 'hidden', title: 'index' },
+                                                { type: 'hidden', title: 'index' },
+                                                { type: 'hidden', title: 'index' },
                                               ],
                                               pagination: localStorage.getItem("sesRecordCount"),
                                               paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -3076,6 +3080,7 @@ export default class syncPage extends Component {
                                                         //   deletedRowsListServer.push(rowNumber[rn][28])
                                                         // } else if (rowNumber[rn][12] !== "" && rowNumber[rn][5] !== "") {
                                                         obj.setValueFromCoords(9, index, '', true)
+                                                        obj.setValueFromCoords(38, index, '', true)
                                                         obj.setValueFromCoords(10, index, '', true)
                                                         obj.setValueFromCoords(11, index, '', true)
                                                         obj.setValueFromCoords(12, index, '', true)
@@ -3120,6 +3125,7 @@ export default class syncPage extends Component {
                                                         //   deletedRowsListLocal.push(rowNumber[rn][27])
                                                         // } else if (rowNumber[rn][12] !== "" && rowNumber[rn][5] !== "") {
                                                         obj.setValueFromCoords(2, index, '', true)
+                                                        obj.setValueFromCoords(37, index, '', true)
                                                         obj.setValueFromCoords(3, index, '', true)
                                                         obj.setValueFromCoords(4, index, '', true)
                                                         obj.setValueFromCoords(5, index, '', true)
@@ -3726,7 +3732,7 @@ export default class syncPage extends Component {
       elInstance.setStyle(("P").concat(parseInt(c) + 1), "pointer-events", "");
       elInstance.setStyle(("I").concat(parseInt(c) + 1), "pointer-events", "none");
       elInstance.setStyle(("P").concat(parseInt(c) + 1), "pointer-events", "none");
-      if (jsonData[c][2] !== "" && jsonData[c][9] !== "" && jsonData[c][2] !== jsonData[c][9]) {
+      if (jsonData[c][37] !== "" && jsonData[c][38] !== "" && jsonData[c][37] !== jsonData[c][38]) {
         this.setState({
           conflictsCount: this.state.conflictsCount + 1,
           conflictsCountErp: this.state.conflictsCountErp + 1,
