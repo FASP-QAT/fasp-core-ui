@@ -741,6 +741,7 @@ export default class ListTreeTemplate extends Component {
                 {
                     title: i18n.t('static.listTreeTemp.templateName'),
                     type: 'text',
+                    width:200
                     // readOnly: true
                 },
                 {
@@ -750,12 +751,12 @@ export default class ListTreeTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.program.monthsInPast'),
-                    type: 'text',
+                    type: 'hidden',
                     // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.monthsInFuture'),
-                    type: 'text',
+                    type: 'hidden',
                     // readOnly: true
                 },
                 {
@@ -766,7 +767,7 @@ export default class ListTreeTemplate extends Component {
                 {
                     title: i18n.t('static.ManageTree.Notes'),
                     type: 'text',
-                    width:250
+                    width:400
                     // readOnly: true
                 },
                 {
