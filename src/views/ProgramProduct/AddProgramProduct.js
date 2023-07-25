@@ -12,7 +12,8 @@ import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import ProgramService from "../../api/ProgramService";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, PROGRAM_TYPE_SUPPLY_PLAN } from "../../Constants";
+import CryptoJS from 'crypto-js'
+import { API_URL, SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -56,7 +57,6 @@ class AddprogramPlanningUnit extends Component {
             programs: [],
             programId: 0,
             color: ''
-
         }
         // this.addRow = this.addRow.bind(this);
         // this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
@@ -259,12 +259,14 @@ class AddprogramPlanningUnit extends Component {
                                     if (response.data[k].payload.productCategoryId == 0) {
                                         productCategoryJson = {
                                             name: (response.data[k].payload.label.label_en),
-                                            id: -1
+                                            id: -1,
+                                            sortOrder: "00"
                                         }
                                     } else {
                                         productCategoryJson = {
                                             name: (response.data[k].payload.label.label_en),
-                                            id: response.data[k].payload.productCategoryId
+                                            id: response.data[k].payload.productCategoryId,
+                                            sortOrder: response.data[k].sortOrder
                                         }
                                     }
 

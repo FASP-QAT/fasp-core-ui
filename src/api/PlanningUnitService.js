@@ -100,5 +100,10 @@ class PlanningUnitService {
     getPlanningUnitListBasic() {
         return axios.get(`${API_URL}/api/planningUnit/basic`, {});
     }
+
+    getPlanningUnitByIds(json){
+        return axios.post(`${API_URL}/api/planningUnit/byIds`, json, {}
+        );
+    }
 }
 export default new PlanningUnitService();
