@@ -2116,6 +2116,8 @@ class ForecastOutput extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        programData.code=programData.programCode;
+                        programData.id=programData.programId;
                         // console.log(programNameLabel)
 
                         var f = 0
