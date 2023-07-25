@@ -84,6 +84,7 @@ export default class AddInventory extends Component {
         //Add Header Row
 
         worksheet.columns = [
+            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },//D
             { header: i18n.t('static.inventory.inventoryDate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
             { header: i18n.t('static.region.region'), key: 'name', width: 25 },
             { header: i18n.t('static.inventory.dataSource'), key: 'name', width: 40 },
@@ -119,7 +120,7 @@ export default class AddInventory extends Component {
         // });
 
         for (let i = 0; i < 100; i++) {
-            worksheet.getCell('A' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
+            worksheet.getCell('B' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
         }
 
         //2 Dropdown
@@ -132,7 +133,7 @@ export default class AddInventory extends Component {
         for (let i = 0; i < datasourceList.length; i++) {
             dataSourceVar.push(datasourceList[i].name);
         }
-        worksheet.dataValidations.add('C2:C100', {
+        worksheet.dataValidations.add('D2:D100', {
             type: 'list',
             allowBlank: false,
             // formulae: ['"male,female,other"'],
@@ -151,7 +152,7 @@ export default class AddInventory extends Component {
             regionVar.push(regionList[i].name);
         }
 
-        worksheet.dataValidations.add('B2:B100', {
+        worksheet.dataValidations.add('C2:C100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${regionVar.join(",")}"`],
@@ -183,7 +184,7 @@ export default class AddInventory extends Component {
 
         // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let activeDropdown = ["True", "False"];
-        worksheet.dataValidations.add('L2:L100', {
+        worksheet.dataValidations.add('M2:M100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${activeDropdown.join(",")}"`],
@@ -195,7 +196,7 @@ export default class AddInventory extends Component {
 
         //Validations
         if (this.state.inventoryDataType.value == 1) {
-            worksheet.dataValidations.add('G2:G100', {
+            worksheet.dataValidations.add('H2:H100', {
                 type: 'whole',
                 operator: 'greaterThan',
                 showErrorMessage: true,
@@ -206,7 +207,7 @@ export default class AddInventory extends Component {
                 // error: 'Invalid Value'
             });
         } else {
-            worksheet.dataValidations.add('F2:F100', {
+            worksheet.dataValidations.add('G2:G100', {
                 type: 'whole',
                 operator: 'greaterThan',
                 showErrorMessage: true,
@@ -221,7 +222,7 @@ export default class AddInventory extends Component {
 
         //Gray color
         for (let i = 0; i < 100; i++) {
-            worksheet.getCell('E' + (+i + 2)).fill = {
+            worksheet.getCell('F' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
@@ -229,36 +230,36 @@ export default class AddInventory extends Component {
             }
 
             if (this.state.inventoryDataType.value == 1) {
-                worksheet.getCell('F' + (+i + 2)).fill = {
-                    type: 'pattern',
-                    pattern: 'solid',
-                    fgColor: { argb: 'cccccc' },
-                    bgColor: { argb: '96C8FB' }
-                }
-            } else {
                 worksheet.getCell('G' + (+i + 2)).fill = {
                     type: 'pattern',
                     pattern: 'solid',
                     fgColor: { argb: 'cccccc' },
                     bgColor: { argb: '96C8FB' }
                 }
+            } else {
+                worksheet.getCell('H' + (+i + 2)).fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'cccccc' },
+                    bgColor: { argb: '96C8FB' }
+                }
             }
 
 
-            worksheet.getCell('H' + (+i + 2)).fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'cccccc' },
-                bgColor: { argb: '96C8FB' }
-            }
             worksheet.getCell('I' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-
             worksheet.getCell('J' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
+
+            worksheet.getCell('K' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
@@ -292,19 +293,22 @@ export default class AddInventory extends Component {
         worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
+        worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
         if (this.state.inventoryDataType.value == 1) {
-            worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            worksheet.getColumn('H').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
                 cell.protection = { locked: false };
             });
         } else {
-            worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
                 cell.protection = { locked: false };
             });
         }
-        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('M').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
 

@@ -89,6 +89,7 @@ export default class ConsumptionDetails extends React.Component {
         //Add Header Row
 
         worksheet.columns = [
+            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },//D
             { header: i18n.t('static.pipeline.consumptionDate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
             { header: i18n.t('static.region.region'), key: 'name', width: 25 },
             { header: i18n.t('static.consumption.consumptionType'), key: 'name', width: 40 },
@@ -121,7 +122,7 @@ export default class ConsumptionDetails extends React.Component {
             dataSourceVar.push(datasourceList[i].name);
         }
 
-        worksheet.dataValidations.add('D2:D100', {
+        worksheet.dataValidations.add('E2:E100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${dataSourceVar.join(",")}"`],
@@ -137,7 +138,7 @@ export default class ConsumptionDetails extends React.Component {
             regionVar.push(regionList[i].name);
         }
 
-        worksheet.dataValidations.add('B2:B100', {
+        worksheet.dataValidations.add('C2:C100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${regionVar.join(",")}"`],
@@ -147,7 +148,7 @@ export default class ConsumptionDetails extends React.Component {
         });
 
         let consumptionTypeDropdown = [i18n.t('static.consumption.actual'), i18n.t('static.consumption.forcast')];
-        worksheet.dataValidations.add('C2:C100', {
+        worksheet.dataValidations.add('D2:D100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${consumptionTypeDropdown.join(",")}"`],
@@ -178,7 +179,7 @@ export default class ConsumptionDetails extends React.Component {
 
         // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let activeDropdown = ["True", "False"];
-        worksheet.dataValidations.add('K2:K100', {
+        worksheet.dataValidations.add('L2:L100', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${activeDropdown.join(",")}"`],
@@ -202,10 +203,10 @@ export default class ConsumptionDetails extends React.Component {
         // });
 
         for (let i = 0; i < 100; i++) {
-            worksheet.getCell('A' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
+            worksheet.getCell('B' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
         }
 
-        worksheet.dataValidations.add('F2:F100', {
+        worksheet.dataValidations.add('G2:G100', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -215,7 +216,7 @@ export default class ConsumptionDetails extends React.Component {
             // error: 'Invalid Value'
         });
 
-        worksheet.dataValidations.add('I2:I100', {
+        worksheet.dataValidations.add('J2:J100', {
             type: 'whole',
             operator: 'greaterThan',
             showErrorMessage: true,
@@ -227,13 +228,13 @@ export default class ConsumptionDetails extends React.Component {
 
 
         for (let i = 0; i < 100; i++) {
-            worksheet.getCell('G' + (+i + 2)).fill = {
+            worksheet.getCell('H' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-            worksheet.getCell('H' + (+i + 2)).fill = {
+            worksheet.getCell('I' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
@@ -271,13 +272,16 @@ export default class ConsumptionDetails extends React.Component {
         worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-        worksheet.getColumn('I').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+        worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('J').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
         worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
+        worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
 
