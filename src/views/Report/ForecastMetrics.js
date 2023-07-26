@@ -495,8 +495,8 @@ class ForecastMetrics extends Component {
           .then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
               return itemLabelA > itemLabelB ? 1 : -1;
             });
             // console.log('programLst', listArray)

@@ -211,7 +211,11 @@ class Budgets extends Component {
                 .then(response => {
                     // console.log("json===>", JSON.stringify(response.data))
                     this.setState({
-                        fundingSources: response.data, loading: false
+                        fundingSources: response.data.sort(function (a, b) {
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }), loading: false
                     }, () => {
                         // this.consolidatedFundingSourceList()
                     })
@@ -799,7 +803,11 @@ class Budgets extends Component {
                         proList[i] = programJson
                     }
                     this.setState({
-                        programs: proList, loading: false
+                        programs: proList.sort(function (a, b) {
+                            a = a.programCode.toLowerCase();
+                            b = b.programCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }), loading: false
                     }, () => { this.filterData() })
                 }).catch(
                     error => {
