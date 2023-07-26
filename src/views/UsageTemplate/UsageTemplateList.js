@@ -1066,6 +1066,7 @@ class usageTemplate extends Component {
                             }
                         }.bind(this),
                     },
+                    filter: this.filterForecastingUnitList,
                 },
                 {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
@@ -2385,6 +2386,11 @@ class usageTemplate extends Component {
 
     }.bind(this)
 
+    filterForecastingUnitList = function (instance, cell, c, r, source) {
+        var mylist = [];
+        return mylist;
+    }.bind(this)
+
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
         // var value = (instance.jexcel.getJson(null, false)[r])[3];
@@ -3386,75 +3392,157 @@ class usageTemplate extends Component {
 
         if (x == 4 || x == 7 || x == 9 || x == 11 || x == 12 || x == 13 || x == 14 || x == 8) {
 
-            let unitIdValue = this.el.getValueFromCoords(8, y);
-            // console.log("unitIdValue--------->", unitIdValue);
-            let unitName = '';
-            if (unitIdValue != 0) {
-                unitName = this.state.dimensionList.filter(c => c.id == unitIdValue)[0].name;
-            }
+            let forecastingUnitIds = this.state.tempForecastingUnitList.map(e => e.id)
+            ForecastingUnitService.getForecastingUnitByIds(forecastingUnitIds).then(response => {
+                // console.log("response------->" + response.data);
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
 
-            let unitName1 = '';
-            let obj = this.state.forecastingUnitList.filter(c => c.id == this.el.getValueFromCoords(4, y))[0];
-            if (obj != undefined && obj != null) {
-                // this.el.setValueFromCoords(12, y, obj.unit.id, true);
-                let unitId = obj.unit.id;
-                if (unitIdValue != 0) {
-                    unitName1 = this.state.unitList.filter(c => c.id == unitId)[0].name;
+                    let tempList = [];
+                    if (listArray.length > 0) {
+                        for (var i = 0; i < listArray.length; i++) {
+                            var paJson = {
+                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].forecastingUnitId),
+                                id: parseInt(listArray[i].forecastingUnitId),
+                                active: listArray[i].active,
+                                tracerCategoryId: listArray[i].tracerCategory.id,
+                                unit: listArray[i].unit
+                            }
+                            tempList[i] = paJson
+                        }
+                    }
+
+                    this.setState({
+                        forecastingUnitList: tempList,
+                        
+                    },
+                        () => {
+                            let unitIdValue = this.el.getValueFromCoords(8, y);
+                            // console.log("unitIdValue--------->", unitIdValue);
+                            let unitName = '';
+                            if (unitIdValue != 0) {
+                                unitName = this.state.dimensionList.filter(c => c.id == unitIdValue)[0].name;
+                            }
+
+                            let unitName1 = '';
+                            let obj = this.state.forecastingUnitList.filter(c => c.id == this.el.getValueFromCoords(4, y))[0];
+                            if (obj != undefined && obj != null) {
+                                // this.el.setValueFromCoords(12, y, obj.unit.id, true);
+                                let unitId = obj.unit.id;
+                                if (unitIdValue != 0) {
+                                    unitName1 = this.state.unitList.filter(c => c.id == unitId)[0].name;
+                                }
+                            }
+
+
+                            let string = 'Every ' + (this.el.getValue(`H${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`H${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '____' : unitName) + '(s) - requires ' + (this.el.getValue(`J${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`J${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '____' : unitName1 + "(s)");
+
+                            let q1 = '';
+                            // if (this.el.getValueFromCoords(10, y) == false) {
+                            //     q1 = 'time(s) per';
+                            // } else {
+                            //     q1 = '';
+                            // }
+                            // console.log("Test-1--", string)
+                            if (this.el.getValueFromCoords(10, y) == false) {
+                                if (this.el.getValueFromCoords(6, y) == 1) {
+                                    q1 = '';
+                                    if (!this.el.getValueFromCoords(10, y)) {
+                                        q1 = 'time(s) per';
+                                    }
+                                }
+                            } else {
+                                q1 = '';
+                            }
+                            // console.log("Test-2--", string)
+
+                            let t1 = ''
+                            if (this.el.getValueFromCoords(6, y) == 1 && !this.el.getValueFromCoords(10, y)) {
+                                t1 = 'for';
+                            } else {
+                                t1 = '';
+                            }
+
+
+
+
+
+                            // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
+
+                            if (!this.el.getValueFromCoords(10, y)) {//one time usage false
+                                if (this.el.getValueFromCoords(6, y) == 2) {
+                                    string += " Every " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
+                                } else {
+                                    string += " " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (q1 == '' ? '____' : q1) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
+                                }
+                                // console.log("Test-3--", string)
+                                if (this.el.getValueFromCoords(6, y) == 2) {
+                                    string += " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
+                                } else {
+                                    string += " " + (t1 == '' ? '____' : t1) + " " + (this.el.getValue(`N${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`N${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
+                                }
+                            }
+                            // console.log("Test-4--", string)
+
+
+                            this.el.setValueFromCoords(16, y, string, true);
+                        })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
-            }
 
 
-            let string = 'Every ' + (this.el.getValue(`H${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`H${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '____' : unitName) + '(s) - requires ' + (this.el.getValue(`J${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`J${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '____' : unitName1 + "(s)");
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-            let q1 = '';
-            // if (this.el.getValueFromCoords(10, y) == false) {
-            //     q1 = 'time(s) per';
-            // } else {
-            //     q1 = '';
-            // }
-            // console.log("Test-1--", string)
-            if (this.el.getValueFromCoords(10, y) == false) {
-                if (this.el.getValueFromCoords(6, y) == 1) {
-                    q1 = '';
-                    if (!this.el.getValueFromCoords(10, y)) {
-                        q1 = 'time(s) per';
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            } else {
-                q1 = '';
-            }
-            // console.log("Test-2--", string)
-
-            let t1 = ''
-            if (this.el.getValueFromCoords(6, y) == 1 && !this.el.getValueFromCoords(10, y)) {
-                t1 = 'for';
-            } else {
-                t1 = '';
-            }
-
-
-
-
-
-            // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
-
-            if (!this.el.getValueFromCoords(10, y)) {//one time usage false
-                if (this.el.getValueFromCoords(6, y) == 2) {
-                    string += " Every " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
-                } else {
-                    string += " " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (q1 == '' ? '____' : q1) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
-                }
-                // console.log("Test-3--", string)
-                if (this.el.getValueFromCoords(6, y) == 2) {
-                    string += " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
-                } else {
-                    string += " " + (t1 == '' ? '____' : t1) + " " + (this.el.getValue(`N${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`N${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
-                }
-            }
-            // console.log("Test-4--", string)
-
-
-            this.el.setValueFromCoords(16, y, string, true);
+            );
         }
 
         //-----------------------------------------------------------
