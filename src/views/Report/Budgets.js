@@ -802,12 +802,14 @@ class Budgets extends Component {
                 .then(response => {
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
+                        if(response.data[i].active==true){
                         var programJson = {
                             programId: response.data[i].id,
                             label: response.data[i].label,
                             programCode: response.data[i].code
                         }
-                        proList[i] = programJson
+                        proList.push(programJson)
+                    }
                     }
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -1260,6 +1262,16 @@ class Budgets extends Component {
 
     }
 
+    filterOptions = async (options, filter) => {
+        if (filter) {
+          return options.filter((i) =>
+            i.label.toLowerCase().includes(filter.toLowerCase())
+          );
+        } else {
+          return options;
+        }
+      };
+
 
     render() {
 
@@ -1538,8 +1550,8 @@ class Budgets extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
-                    <div className="Card-header-reporticon">
-                    <span className="pl-0">This report uses the latest versions of supply plans. Please commit local supply plans to see shipments tagged to budgets reflected here. </span>
+                    <div className="Card-header-reporticon" style={{"marginBottom":"13px","marginTop":"7px"}}>
+                    <span className="pl-0 pb-lg-2">This report uses the latest versions of supply plans. Please commit local supply plans to see shipments tagged to budgets reflected here. </span>
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -1581,7 +1593,7 @@ class Budgets extends Component {
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls ">
                                         <MultiSelect
-
+                                            filterOptions={this.filterOptions}
                                             bsSize="sm"
                                             name="programIds"
                                             id="programIds"
@@ -1620,6 +1632,7 @@ class Budgets extends Component {
                                             name="fundingSourceId"
                                             id="fundingSourceId"
                                             bsSize="md"
+                                            filterOptions={this.filterOptions}
                                             value={this.state.fundingSourceValues}
                                             onChange={(e) => { this.handleFundingSourceChange(e) }}
                                             options={fundingSources.length > 0
