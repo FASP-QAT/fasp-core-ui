@@ -3,7 +3,7 @@ export const API_URL = 'http://localhost:8084'
 // export const API_URL = 'http://localhost:8081'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
 
-// export const API_URL = 'https://uat-api.quantificationanalytics.org'
+//export const API_URL = 'https://uat-api.quantificationanalytics.org'
 // export const API_URL = 'https://api.quantificationanalytics.org'
 // export const API_URL = 'https://demo-api.quantificationanalytics.org'
 
@@ -164,5 +164,7 @@ export const QAT_SUGGESTED_DATA_SOURCE_ID = 28
 export const SHIPMENT_ID_ARR_MANUAL_TAGGING = ["3", "4", "5", "6", "7", "9"]
 export const DATE_FORMAT_CAP_FOUR_DIGITS = "DD-MMM-YYYY"
 export const DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS = "MMM-YYYY"
+export const MIN_MODE_PER_REQ = 20
+export const MIN_MODE_COUNT_REQ = 3
 export const PROGRAM_TYPE_SUPPLY_PLAN = 1
 export const PROGRAM_TYPE_DATASET = 2;
