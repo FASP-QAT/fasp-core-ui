@@ -10697,7 +10697,7 @@ export default class BuildTree extends Component {
                         </div>
                         {this.state.showCalculatorFields &&
                             <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                <fieldset className="scheduler-border">
+                                <fieldset style={{width: '100%'}} className="scheduler-border">
                                     <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool')}</legend>
                                     <div className="row">
                                         <FormGroup className="col-md-6">
@@ -10935,7 +10935,7 @@ export default class BuildTree extends Component {
                     </div>
                     {this.state.showMomData &&
                         <div className="row pl-lg-2 pr-lg-2">
-                            <fieldset className="scheduler-border">
+                            <fieldset style={{width: '100%'}} className="scheduler-border">
                                 <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
@@ -11027,7 +11027,7 @@ export default class BuildTree extends Component {
                     }
                     {this.state.showMomDataPercent &&
                         <div className="row pl-lg-2 pr-lg-2">
-                            <fieldset className="scheduler-border">
+                            <fieldset style={{width: '100%'}} className="scheduler-border">
                                 <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
@@ -11413,7 +11413,7 @@ export default class BuildTree extends Component {
     
                 </div>
                 :
-                <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
+                <div className={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect==0?"ContactTemplate boxContactTemplate contactTemplateBorderRed":"ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
                     <div className={itemConfig.payload.nodeType.id == 5
                         || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                         (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
@@ -11699,7 +11699,7 @@ export default class BuildTree extends Component {
                         {itemConfig.parent != null &&
     
                             <>
-                                {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                                {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
     
                                     <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
@@ -11709,7 +11709,7 @@ export default class BuildTree extends Component {
                                         <i class="fa fa-clone" aria-hidden="true"></i>
                                     </button>
                                 }
-                                {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                                {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                     <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
@@ -11734,7 +11734,7 @@ export default class BuildTree extends Component {
                                     </button>}
     
                             </>}
-                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
     
                             <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
@@ -11745,7 +11745,7 @@ export default class BuildTree extends Component {
                                 <i class="fa fa-sitemap" aria-hidden="true"></i>
                             </button>
                         }
-                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     console.log("add button called---------");
@@ -11800,7 +11800,7 @@ export default class BuildTree extends Component {
                                                     multiplier: ''
                                                 },
                                                 refillMonths: '',
-                                                sharePlanningUnit: "false"
+                                                sharePlanningUnit: "true"
                                             }
                                         };
                                         tempArray.push(tempJson);

@@ -10208,7 +10208,7 @@ export default class CreateTreeTemplate extends Component {
 
                         {this.state.showCalculatorFields &&
                             <div className="col-md-12 pl-lg-0 pr-lg-0">
-                                <fieldset className="scheduler-border">
+                                <fieldset style={{width: '100%'}} className="scheduler-border">
                                     <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool')}</legend>
                                     <div className="row">
                                         {/* <div className="row"> */}
@@ -10465,7 +10465,7 @@ export default class CreateTreeTemplate extends Component {
                     </div>
                     {this.state.showMomData &&
                         <div className="row pl-lg-2 pr-lg-2">
-                            <fieldset className="scheduler-border">
+                            <fieldset style={{width: '100%'}} className="scheduler-border">
                                 <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
@@ -10552,7 +10552,7 @@ export default class CreateTreeTemplate extends Component {
                     }
                     {this.state.showMomDataPercent &&
                         <div className="row pl-lg-2 pr-lg-2">
-                            <fieldset className="scheduler-border">
+                            <fieldset style={{width: '100%'}} className="scheduler-border">
                                 <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
@@ -10924,7 +10924,7 @@ export default class CreateTreeTemplate extends Component {
         
                 </div>
                 :
-                <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[0][0].notes}>
+                <div className={itemConfig.payload.nodeDataMap[0] != undefined && itemConfig.payload.nodeDataMap[0][0].isPUMappingCorrect==0?"ContactTemplate boxContactTemplate contactTemplateBorderRed":"ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[0][0].notes}>
                     <div className={itemConfig.payload.nodeType.id == 5
                         || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                         (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
@@ -11178,7 +11178,7 @@ export default class CreateTreeTemplate extends Component {
                     return <>
                         {itemConfig.parent != null &&
                             <>
-                                {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                                {this.state.editable &&
                                     <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
@@ -11187,7 +11187,7 @@ export default class CreateTreeTemplate extends Component {
                                         <i class="fa fa-clone" aria-hidden="true"></i>
                                     </button>
                                 }
-                                {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                                {this.state.editable &&
                                     <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
@@ -11210,7 +11210,7 @@ export default class CreateTreeTemplate extends Component {
                                         <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                     </button>}
                             </>}
-                        {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') &&
+                        {parseInt(itemConfig.payload.nodeType.id) != 5 && this.state.editable &&
     
                             <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
@@ -11222,7 +11222,7 @@ export default class CreateTreeTemplate extends Component {
                             </button>
                         }
     
-                        {parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES') &&
+                        {parseInt(itemConfig.payload.nodeType.id) != 5 && this.state.editable &&
                             <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     console.log("add button called---------");
@@ -11271,7 +11271,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 nodeDataModelingList: [],
                                                                 nodeDataOverrideList: [],
                                                                 nodeDataMomList: [],
-                                                                monthNo: 1,
+                                                                monthNo: this.state.monthList.length > 0 ? this.state.monthList[0].id : -1,
                                                                 dataValue: '',
                                                                 calculatedDataValue: '',
                                                                 notes: '',
@@ -11309,7 +11309,7 @@ export default class CreateTreeTemplate extends Component {
                                                                         multiplier: ''
                                                                     },
                                                                     refillMonths: '',
-                                                                    sharePlanningUnit: "false"
+                                                                    sharePlanningUnit: "true"
                                                                 }
                                                             }
                                                         ]
