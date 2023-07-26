@@ -1553,54 +1553,20 @@ class ModelingValidation extends Component {
         if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
             var elInstance = this.state.dataEl;
             if (elInstance != undefined && this.state.dataEl != "") {
-                // if(this.state.xAxisDisplayBy == 1){
-                    var colourCount = 0;
-                    var nodeValSet = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
-                    nodeValSet.map((item, count) => {
-                        if (colourCount > 10) {
-                            colourCount = 0;
-                        }
-                        datasetListForGraph.push({
-                            label: item,
-                            data: this.state.displayBy == 1 ? elInstance.getColumnData([count + 1]) : elInstance.getColumnData([count + nodeValSet.length + 1 + 1]),
-                            backgroundColor: colourArray[colourCount],
-                            stack: 1,
-                        })
-                        colourCount++;
+                var colourCount = 0;
+                var nodeValSet = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
+                nodeValSet.map((item, count) => {
+                    if (colourCount > 10) {
+                        colourCount = 0;
+                    }
+                    datasetListForGraph.push({
+                        label: item,
+                        data: this.state.displayBy == 1 ? elInstance.getColumnData([count + 1]) : elInstance.getColumnData([count + nodeValSet.length + 1 + 1]),
+                        backgroundColor: colourArray[colourCount],
+                        stack: 1,
                     })
-                // }else{
-                //     var colourCount = 0;
-                //     var nodeValSet = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
-                //     nodeValSet.map((item, count) => {
-                //         if (colourCount > 10) {
-                //             colourCount = 0;
-                //         }
-                //         let tempData = [];
-                //         let val = [];
-                //         if( this.state.displayBy == 1){
-                //             val = elInstance.getColumnData([count + 1]);
-                //             for (let i = 0; i < val.length; i += 12) {
-                //                 const group = val.slice(i, i + 12);
-                //                 const sum = group.reduce((accumulator, currentValue) => currentValue == "" ? accumulator : accumulator + currentValue, 0);
-                //                 tempData.push(sum);
-                //             }
-                //         }else{
-                //             val = elInstance.getColumnData([count + nodeValSet.length + 1 + 1]);
-                //             for (let i = 0; i < val.length; i += 12) {
-                //                 const group = val.slice(i, i + 12);
-                //                 const sum = group.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-                //                 tempData.push(sum/12);
-                //             }
-                //         }
-                //         datasetListForGraph.push({
-                //             label: item,
-                //             data: tempData,
-                //             backgroundColor: colourArray[colourCount],
-                //             stack: 1,
-                //         })
-                //         colourCount++;
-                //     })
-                // }
+                    colourCount++;
+                })
             }
         }
         // var aggregatedData = [];
