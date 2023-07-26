@@ -147,7 +147,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
                             var tcList = [];
                             flList.filter(function (item) {
-                                var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
+                                var i = tcList.findIndex(x => x.id == item.tracerCategory.id);
                                 if (i <= -1 && item.tracerCategory.id != 0) {
                                     tcList.push({ id: item.tracerCategory.id, label: item.tracerCategory.label });
                                 }
