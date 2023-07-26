@@ -1543,7 +1543,7 @@ class Budgets extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon" style={{"marginBottom":"13px","marginTop":"7px"}}>
-                    <span className="pl-0 pb-lg-2">This report uses the latest versions of supply plans. Please commit local supply plans to see shipments tagged to budgets reflected here. </span>
+                    <span className="pl-0 pb-lg-2">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
