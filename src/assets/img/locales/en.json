@@ -3155,5 +3155,21 @@
     "static.supplyPlanFormula.inventoryTurns1L20": "Month 10",
     "static.supplyPlanFormula.inventoryTurns1L21": "Month 11",
     "static.supplyPlanFormula.inventoryTurns1L22": "Month 12",
-    "static.supplyPlanFormula.inventoryTurns1L23": "Total Months"
+    "static.supplyPlanFormula.inventoryTurns1L23": "Total Months",
+    "static.modelingValidation.xAxisDisplay": "X-axis display",
+    "static.modelingValidation.yAxisDisplay": "Y-axis display",
+    "static.modelingValidation.levelUnit1": "Level (Unit)",
+    "static.modelingValidation.calendarYear": "Calendar Year",
+    "static.modelingValidation.fyJul": "Fiscal Year (e.g. FY2023 starts in Jul-22)",
+    "static.modelingValidation.fyAug": "Fiscal Year (e.g. FY2023 starts in Aug-22)",
+    "static.modelingValidation.fySep": "Fiscal Year (e.g. FY2023 starts in Sep-22)",
+    "static.modelingValidation.fyOct": "Fiscal Year (e.g. FY2023 starts in Oct-22)",
+    "static.modelingValidation.fyNov": "Fiscal Year (e.g. FY2023 starts in Nov-22)",
+    "static.modelingValidation.fyDec": "Fiscal Year (e.g. FY2023 starts in Dec-22)",
+    "static.modelingValidation.fyJan": "Fiscal Year (e.g. FY2023 starts in Jan-23)",
+    "static.modelingValidation.fyFeb": "Fiscal Year (e.g. FY2023 starts in Feb-23)",
+    "static.modelingValidation.fyMar": "Fiscal Year (e.g. FY2023 starts in Mar-23)",
+    "static.modelingValidation.fyApr": "Fiscal Year (e.g. FY2023 starts in Apr-23)",
+    "static.modelingValidation.fyMay": "Fiscal Year (e.g. FY2023 starts in May-23)",
+    "static.modelingValidation.fyJun": "Fiscal Year (e.g. FY2023 starts in Jun-23)"
 }
