@@ -3172,5 +3172,6 @@
     "static.modelingValidation.fyApr": "Fiscal Year (e.g. FY2023 starts in Apr-23)",
     "static.modelingValidation.fyMay": "Fiscal Year (e.g. FY2023 starts in May-23)",
     "static.modelingValidation.fyJun": "Fiscal Year (e.g. FY2023 starts in Jun-23)",
-    "static.shipment.selectValidBudget":"Please select valid budget"
+    "static.shipment.selectValidBudget":"Please select valid budget",
+    "static.budget.budgetNoteForCommitingLocalVersion":"This report uses the latest versions of supply plans. Please commit local supply plans to see shipments tagged to budgets reflected here."
 }
