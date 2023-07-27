@@ -12155,6 +12155,38 @@ and (max-width: 1366px)
   background-color: transparent !important;
   z-index: 8;
 }
+  
+  .tableDivjss_contentDisplay .jtabs-content .jss_content{
+    display: initial !important;
+  }
+  .tableDivjss_contentDisplay .jtabs-content .jss_content .jss{
+    table-layout: inherit!important;
+  }
+  .tableDivjss_contentDisplay .jtabs-content .jss_content .jss_worksheet{
+    table-layout: inherit!important;
+  }
+  .tableDivjss_contentDisplay  .jss_table{
+    
+    display: inherit !important;
+  }
+  .tableDivjss_contentDisplay.jss_container{
+    
+    display: inherit !important;
+  }
+  .tableDivjss_contentDisplay .jtabs-content .jss_worksheet .jss_table_container .jss_table .jss_content table>thead>tr>td{
+    resize: horizontal;
+  }
+  .tableDivjss_contentDisplay .jtabs-content .jss_worksheet .jss_table_container .jss_table .jss_content .jss_border_main{
+    border: 0 !important;
+    background-color: transparent !important;
+  }
+  .tableDivjss_contentDisplay .jtabs-content .jss_worksheet .jss_table_container .jss_table .jss_content .jss_corner{
+    border: 0 !important;
+    background-color: transparent !important;
+  }
+.MarginTopCustformonth{
+  margin-top: 50px;
+}
 .inventoryTurnsTableZindex .clone1 {
   left: 0;
   z-index: 3;
@@ -12196,4 +12228,11 @@ and (max-width: 1366px)
 
 .BudgetPlusIcon .card-header-action{
   margin-top: -4px!important;
+}
+.was-validated .form-control:valid, .form-control.is-valid, .form-control.is-invalid {
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem !important;
+}
+
+.MarginTopCustformonthDatacheckbtn{
+  padding-top: 24px;
 }
