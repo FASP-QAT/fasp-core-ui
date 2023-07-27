@@ -42,6 +42,7 @@ import BudgetService from '../../api/BudgetService';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import CryptoJS from 'crypto-js'
 import { confirmAlert } from 'react-confirm-alert'; // Import
+import DropdownService from '../../api/DropdownService';
 
 const entityname = i18n.t('static.report.problem');
 
@@ -1011,20 +1012,20 @@ class EditSupplyPlanStatus extends Component {
                                         fundingSourceList: fsList
                                     })
 
-                                    BudgetService.getBudgetList().then(response4 => {
+                                    DropdownService.getBudgetDropdownBasedOnProgram(this.props.match.params.programId).then(response4 => {
                                         var bList = [];
                                         response4.data.map(c => {
                                             bList.push({
-                                                name: c.budgetCode,
-                                                id: c.budgetId,
-                                                fundingSource: c.fundingSource,
-                                                currency: c.currency,
-                                                budgetAmt: c.budgetAmt,
-                                                active: c.active,
-                                                programId: c.program.id,
+                                                name: c.code,
+                                                id: c.id,
+                                                // fundingSource: c.fundingSource,
+                                                // currency: c.currency,
+                                                // budgetAmt: c.budgetAmt,
+                                                active: true,
+                                                // programs: c.programs,
                                                 label: c.label,
-                                                startDate: c.startDate,
-                                                stopDate: c.stopDate
+                                                // startDate: c.startDate,
+                                                // stopDate: c.stopDate
                                             })
                                         })
                                         this.setState({
