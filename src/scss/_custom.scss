@@ -3095,6 +3095,12 @@ h6 {
   margin: 2px;
 }
 
+.legendcolorIcon {
+  float: left;
+  width: 10px;
+  height: 14px;
+}
+
 /* your colors */
 .legendcommitversion .lightpinklegend {
   background-color: yellow;
@@ -8947,8 +8953,7 @@ legend.scheduler-border {
 
 @media (min-width: 1920px) {
   .TreeTemplateHeight {
-    min-height: calc(100vh - 427px) !important;
-
+    min-height: calc(100vh - 270px) !important;
   }
 
   .CreateTreeTemplateHeight {
@@ -10387,3 +10392,99 @@ and (max-width: 1605px)
 .redPU{
   color:#BA0C2F !important;
 }
+.TableWidth100{
+  width: 100%!important;
+}
+
+@media (min-width: 768px){
+.SelectdivTree {
+    position: absolute;
+    top: 8px;
+    margin-bottom: 0.5rem;
+    z-index: 1;
+}
+}
+.treeTemplateSearchMarginTop1 {
+  margin-top: -30px;
+}
+
+.z-index1000{
+  z-index: 1000 !important;
+}
+
+.z-index1001{
+  z-index: 1001;
+}
+
+.z-index1002{
+  z-index: 1002;
+}
+
+// .inventoryTurnsTable th {
+//   width: 120px !important;
+//   white-space: normal !important;
+// }
+
+// .inventoryTurnsTable th:first-child,
+// .inventoryTurnsTable th:nth-child(2) {
+//   width: auto !important;
+//   overflow: auto !important;
+//   white-space: nowrap !important;
+// }
+.zIndexField1 .Select.bg-light {
+  background-color: transparent !important;
+  z-index: 10;
+}
+.zIndexField2 .Select.bg-light {
+  background-color: transparent !important;
+  z-index: 9;
+}
+.zIndexField3 .Select.bg-light {
+  background-color: transparent !important;
+  z-index: 8;
+}
+.inventoryTurnsTableZindex .clone1 {
+  left: 0;
+  z-index: 3;
+}
+.ZindexInventory .clone{
+  z-index: 4;
+}
+.TableWidthCoumn .FixedWdthcolumn .table-scroll th, .table-scroll td {
+  padding: 5px 10px;
+  white-space: inherit!important;
+  max-width: 200px!important;
+  vertical-align: top;
+}
+
+.TableWidthCoumnBorder .DataEntryTable .table thead tr th {
+  position: sticky;
+  top: 0px !important;
+  padding: 6px 20px 5px 20px !important;
+  background: #fff;
+  //border-top: 1px solid #c8ced3;
+}
+.supplyplanTdWidthInventry {
+  overflow: hidden !important;
+  min-width: 280px !important;
+  word-wrap: break-word !important;
+  z-index: 1;
+  border-left: 0px !important;
+  border-top: 0px !important;
+}
+
+.TableWidthCoumnBorder .fixTableHeadSupplyPlan .FirstcolumInventry{
+  border-top: 0px!important;
+  border-right: 0px !important;
+  border-left: 0px !important;
+}
+.DataEntryTable .PaddingLeftIndent {
+  padding-left: 55px !important;
+}
+.borderNoneInventry{
+  border-bottom: 0px!important;
+}
+.DataEntryTable .borderNoneInventry1{
+border-top: 1px solid #c8ced3 !important;
+}
+

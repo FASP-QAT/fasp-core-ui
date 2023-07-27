@@ -368,9 +368,12 @@ export default class ReactListComponent extends Component {
                             data[10] = realmList[j].forecastConsumptionMonthsInPast;
                             data[11] = realmList[j].inventoryMonthsInPast;
 
-                            data[12] = realmList[j].lastModifiedBy.username;
-                            data[13] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-                            data[14] = realmList[j].active;
+                            data[12] = realmList[j].minCountForMode;
+                            data[13] = realmList[j].minPercForMode;
+
+                            data[14] = realmList[j].lastModifiedBy.username;
+                            data[15] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+                            data[16] = realmList[j].active;
 
                             realmArray[count] = data;
                             count++;
@@ -395,6 +398,9 @@ export default class ReactListComponent extends Component {
                                 {
                                     title: 'realmId',
                                     type: 'hidden',
+                                    // title: 'A',
+                                    // type: 'text',
+                                    // visible: false
                                 },
                                 {
                                     title: i18n.t('static.realm.realmName'),
@@ -450,6 +456,14 @@ export default class ReactListComponent extends Component {
                                     title: i18n.t('static.realm.restrictionInventory'),
                                     type: 'numeric', mask: '#,##',
                                     // readOnly: true
+                                },
+                                {
+                                    title: i18n.t('static.realm.minCountForMode'),
+                                    type: 'numeric'
+                                },
+                                {
+                                    title: i18n.t('static.realm.minPercForMode'),
+                                    type: 'numeric', mask: '#,##.00', decimal: '.'
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedBy'),
@@ -692,5 +706,3 @@ export default class ReactListComponent extends Component {
         );
     }
 }
-
-

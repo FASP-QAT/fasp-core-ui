@@ -5880,7 +5880,7 @@ export default class ManualTagging extends Component {
                                 </Row>
 
                                 <div className="ReportSearchMarginTop">
-                                    <div id="tableDiv" className={!this.state.active2 ? "jexcelremoveReadonlybackground RowClickable" : "RowClickable"}>
+                                    <div id="tableDiv" style={{width:'100%'}} className={!this.state.active2 ? "jexcelremoveReadonlybackground RowClickable" : "RowClickable"}>
                                     </div>
                                 </div>
 
