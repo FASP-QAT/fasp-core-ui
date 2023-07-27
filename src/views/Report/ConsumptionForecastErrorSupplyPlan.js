@@ -688,7 +688,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         regionIds = regionIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         });
-
+        console.log('***regionIds.map(ele => ele)', regionIds.map(ele => ele))
+        
         this.setState({
             regionValues: regionIds.map(ele => ele),
             regionLabels: regionIds.map(ele => ele.label),
@@ -1313,7 +1314,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             dataList.push({
                                                 month: moment(curDate).format("YYYY-MM-DD"),
                                                 regionData: regionData,
-                                                actualQty: consumptionAdjForStockOutId ? isNaN(PUadjustedActualConsumption) ? 0:PUadjustedActualConsumption :isNaN(PUActualConsumption)?0:PUActualConsumption,
+                                                actualQty: consumptionAdjForStockOutId ? isNaN(PUadjustedActualConsumption) ? '':PUadjustedActualConsumption :isNaN(PUActualConsumption)?'':PUActualConsumption,
                                                 forecastQty: isNaN(PUforecastedConsumption)?0:PUforecastedConsumption,
                                                 errorPerc: PUActualConsumption>0?isNaN(PUError)?0:PUError:""
                                             });
@@ -1506,7 +1507,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     dataList.push({
                                         month: moment(curDate).format("YYYY-MM-DD"),
                                         regionData: regionData,
-                                        actualQty: consumptionAdjForStockOutId ? isNaN(regionTotalAdjustedActualQty) ? 0:regionTotalAdjustedActualQty :isNaN(regionTotalActualQty)?0:regionTotalActualQty,
+                                        actualQty: consumptionAdjForStockOutId ? isNaN(regionTotalAdjustedActualQty) ? '':regionTotalAdjustedActualQty :isNaN(regionTotalActualQty)?'':regionTotalActualQty,
                                         forecastQty: isNaN(regionTotalForecastQty)?0:regionTotalForecastQty,
                                         errorPerc: regionTotalActualQty>0?isNaN(regionTotalError)?0:regionTotalError:""
                                     });
@@ -1693,55 +1694,54 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         console.log("this.state.dataList===========>",this.state.dataList)
 
 // Region Error        
-        this.state.regions.map(r => {
+        this.state.regionValues.map(r => {
             var datacsv = [];
             var totalErrorRegion = 0;
             var totalErrorRegionCount = 0;
-            datacsv.push((getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
+            datacsv.push(((r.label)).replaceAll(' ', '%20'))
             {
                 this.state.monthArray.map((item1, count) => {
-                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalErrorRegion += data[0].regionData[0].actualQty > 0 ? isNaN(data[0].regionData[0].errorPerc) ? 0 :data[0].regionData[0].errorPerc == null || data[0].regionData[0].errorPerc == 'Infinity' ? 0 :  data[0].regionData[0].errorPerc : 0;
-                    totalErrorRegionCount += data[0].regionData[0].actualQty > 0 ? 1 : 0;
-                    datacsv.push(data[0].regionData[0].actualQty > 0 ? isNaN(data[0].regionData[0].errorPerc) ? 0 :(data[0].regionData[0].errorPerc == null || data[0].regionData[0].errorPerc == 'Infinity') ? 0 :  this.PercentageFormatter(data[0].errorPerc*100):"No Actual data")
+                    let errorData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                    let errorDataRegionData=(errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));  
+                    totalErrorRegion += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc==''||errorDataRegionData[0].errorPerc==null) ? 0 : errorDataRegionData[0].errorPerc*100:0;
+                    totalErrorRegionCount += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc==''||errorDataRegionData[0].errorPerc==null) ? 0 : 1:0;
+                    datacsv.push(errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc == null || errorDataRegionData[0].errorPerc == '') ? '' :  this.PercentageFormatter(errorDataRegionData[0].errorPerc*100):"No Actual data")
                 })
             }
             datacsv.push(this.PercentageFormatter(totalErrorRegion / totalErrorRegionCount));
             A.push(this.addDoubleQuoteToRowContent(datacsv))
-        });
-
 // Region Actual        
-        this.state.regions.map(r => {
+            this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{ 
             var datacsv = [];
             var totalRegion = 0;
             var totalRegionCount = 0;
-            datacsv.push('>> Actual '.replaceAll(' ', '%20'))
+            this.state.consumptionAdjForStockOutId ?datacsv.push('>> Adjusted Actual '.replaceAll(' ', '%20')):datacsv.push('>> Actual '.replaceAll(' ', '%20'));
             {
                 this.state.monthArray.map((item1, count) => {
-                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalRegion += Number(isNaN(data[0].regionData[0].actualQty) ? 0 :data[0].regionData[0].actualQty == null || data[0].regionData[0].actualQty == 'Infinity' ? 0 : data[0].regionData[0].actualQty);
-                    totalRegionCount += 1;
-                    
-                    datacsv.push(Number(isNaN(data[0].regionData[0].actualQty) ? 0 : (data[0].regionData[0].actualQty == null || data[0].regionData[0].actualQty == 'Infinity') ? 0 : data[0].regionData[0].actualQty).toFixed(2))
+                    let acData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                    let auDataRegionData=(acData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));  
+                    totalRegion += (isNaN(auDataRegionData[0].actualQty) || auDataRegionData[0].actualQty=='' || auDataRegionData[0].actualQty==null) ? 0 : Number(auDataRegionData[0].actualQty);
+                    totalRegionCount += 1;                
+                    datacsv.push((isNaN(auDataRegionData[0].actualQty) || auDataRegionData[0].actualQty == null || auDataRegionData[0].actualQty == '') ? '' : Number(auDataRegionData[0].actualQty).toFixed(2))
                 })
-            }console.log("totalRegion----",totalRegion)
-            console.log("totalRegion-totalRegionCount---",totalRegionCount)
+            }
             datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
             A.push(this.addDoubleQuoteToRowContent(datacsv))
         });        
 
 // Region forecast     
-        this.state.regions.map(r => {
+        this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{ 
             var datacsv = [];
             var totalRegion = 0;
             var totalRegionCount = 0;
             datacsv.push('>> Forecast '.replaceAll(' ', '%20'))
             {
                 this.state.monthArray.map((item1, count) => {
-                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalRegion += Number(isNaN(data[0].regionData[0].forecastQty) ? 0 :data[0].regionData[0].forecastQty == null || data[0].regionData[0].forecastQty == 'Infinity' ? 0 : data[0].regionData[0].forecastQty);
-                    totalRegionCount += 1;
-                    datacsv.push(Number(isNaN(data[0].regionData[0].forecastQty) ? 0 : (data[0].regionData[0].forecastQty == null || data[0].regionData[0].forecastQty == 'Infinity') ? 0 : data[0].regionData[0].forecastQty).toFixed(2))
+                    let fuData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                    let fuDataRegionData=(fuData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));
+                    totalRegion += (isNaN(fuDataRegionData[0].forecastQty) || fuDataRegionData[0].forecastQty==''|| fuDataRegionData[0].forecastQty==null) ? 0 : Number(fuDataRegionData[0].forecastQty);
+                    totalRegionCount += 1;        
+                    datacsv.push((isNaN(fuDataRegionData[0].forecastQty) || fuDataRegionData[0].forecastQty == null || fuDataRegionData[0].forecastQty == '') ? '' : Number(fuDataRegionData[0].forecastQty).toFixed(2))
                 })
             }
             datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
@@ -1749,40 +1749,43 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         }); 
 
 // Region daysOfStockOut     
-       this.state.consumptionAdjForStockOutId && this.state.regions.map(r => {
+        this.state.consumptionAdjForStockOutId && 
+        this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{ 
             var datacsv = [];
             var totalRegion = 0;
             var totalRegionCount = 0;
             datacsv.push('>> DaysOfStockOut '.replaceAll(' ', '%20'))
             {
                 this.state.monthArray.map((item1, count) => {
-                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalRegion += Number(isNaN(data[0].regionData[0].daysOfStockOut) ? 0 :data[0].regionData[0].daysOfStockOut == null || data[0].regionData[0].daysOfStockOut == 'Infinity' ? 0 : data[0].regionData[0].daysOfStockOut);
-                    totalRegionCount += 1;
-                    datacsv.push(Number(isNaN(data[0].regionData[0].daysOfStockOut) ? 0 : (data[0].regionData[0].daysOfStockOut == null || data[0].regionData[0].daysOfStockOut == 'Infinity') ? 0 : data[0].regionData[0].daysOfStockOut).toFixed(2))
+                let daysOfStockOutData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                let daysOfStockOutDataRegionData=(daysOfStockOutData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));  
+                totalRegion += (isNaN(daysOfStockOutDataRegionData[0].daysOfStockOut)||daysOfStockOutDataRegionData[0].daysOfStockOut==''||daysOfStockOutDataRegionData[0].daysOfStockOut==null) ? 0 : Number(daysOfStockOutDataRegionData[0].daysOfStockOut);
+                totalRegionCount += 1;
+                    datacsv.push((isNaN(daysOfStockOutDataRegionData[0].daysOfStockOut)|| daysOfStockOutDataRegionData[0].daysOfStockOut == null || daysOfStockOutDataRegionData[0].daysOfStockOut == '') ? '' : Number(daysOfStockOutDataRegionData[0].daysOfStockOut).toFixed(2))
                 })
             }
             datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
             A.push(this.addDoubleQuoteToRowContent(datacsv))
         }); 
         
-
 // Region Difference        
-        this.state.regions.map(r => {
+        this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{ 
             var datacsv = [];
             var totalRegion = 0;
             var totalRegionCount = 0;
             datacsv.push('>> Difference'.replaceAll(' ', '%20'))
             {
                 this.state.monthArray.map((item1, count) => {
-                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                    totalRegion += (isNaN(data[0].regionData[0].actualQty) ? 0 :data[0].regionData[0].actualQty == null || data[0].regionData[0].actualQty == 'Infinity' ? 0 :data[0].regionData[0].actualQty) - (isNaN(data[0].regionData[0].forecastQty) ? 0 :data[0].regionData[0].forecastQty == null || data[0].regionData[0].forecastQty == 'Infinity' ? 0 :data[0].regionData[0].forecastQty);
+                    let differenceData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                    let differenceRegionData=(differenceData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));  
+                    totalRegion += isNaN(Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty)) ? 0 : Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty);
                     totalRegionCount += 1;
-                    datacsv.push(Number(((isNaN(data[0].regionData[0].actualQty) ? 0 : (data[0].regionData[0].actualQty == null || data[0].regionData[0].actualQty == 'Infinity') ? 0 :data[0].regionData[0].actualQty) -(isNaN(data[0].regionData[0].forecastQty) ? 0 : (data[0].regionData[0].forecastQty == null || data[0].regionData[0].forecastQty == 'Infinity') ? 0 :data[0].regionData[0].forecastQty))).toFixed(2))
+                    datacsv.push(Number(((isNaN(differenceRegionData[0].actualQty)|| differenceRegionData[0].actualQty == null || differenceRegionData[0].actualQty == '') ? 0 :differenceRegionData[0].actualQty)-((isNaN(differenceRegionData[0].forecastQty) || differenceRegionData[0].forecastQty == null || differenceRegionData[0].forecastQty == '') ? 0 :differenceRegionData[0].forecastQty)).toFixed(2))
                 })
             }
             datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
             A.push(this.addDoubleQuoteToRowContent(datacsv))
+        });
         });
 
 //Total Error
@@ -1790,21 +1793,21 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         datacsv.push([(('Error').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalError += data[0].actualQty > 0 ? isNaN(data[0].errorPerc) ? 0 : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? 0 : parseFloat(data[0].errorPerc*100):0;
+            totalError += data[0].actualQty > 0 ? (isNaN(data[0].errorPerc)|| data[0].errorPerc == null || data[0].errorPerc == '') ? 0 : parseFloat(data[0].errorPerc*100):0;
             countError += data[0].actualQty > 0 ? 1 : 0;
-            datacsv.push(data[0].actualQty > 0 ? isNaN(data[0].errorPerc) ? '' : data[0].errorPerc == null || data[0].errorPerc == 'Infinity' ? '' : this.PercentageFormatter(data[0].errorPerc*100):"No Actual data")
+            datacsv.push(data[0].actualQty > 0 ? (isNaN(data[0].errorPerc)|| data[0].errorPerc == null || data[0].errorPerc == '') ? '' : this.PercentageFormatter(data[0].errorPerc*100):"No Actual data")
         })
         datacsv.push(this.PercentageFormatter(totalError / countError));
         A.push(this.addDoubleQuoteToRowContent(datacsv))
 
 //Total Actual        
         datacsv = [];
-        datacsv.push([(('Actual').replaceAll(',', ' ')).replaceAll(' ', '%20')])
+        this.state.consumptionAdjForStockOutId ?datacsv.push('Adjusted Actual '.replaceAll(' ', '%20')):datacsv.push('Actual '.replaceAll(' ', '%20'));
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalActual += isNaN(data[0].actualQty) ? 0 : (data[0].actualQty == null || data[0].actualQty == 'Infinity') ? 0 :  data[0].actualQty;
+            totalActual += (isNaN(data[0].actualQty)||data[0].actualQty == null || data[0].actualQty == '') ? 0 :  data[0].actualQty;
             countActual += 1;
-            datacsv.push((isNaN(data[0].actualQty) ? 0 : (data[0].actualQty == null || data[0].actualQty == 'Infinity') ? 0 :  data[0].actualQty).toFixed(2))
+            datacsv.push((isNaN(data[0].actualQty)|| data[0].actualQty == null || data[0].actualQty == '') ? '' : Number(data[0].actualQty).toFixed(2))
         })
         datacsv.push(Number(totalActual / countActual).toFixed(2));
         A.push(this.addDoubleQuoteToRowContent(datacsv))
@@ -1814,9 +1817,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         datacsv.push([(('Forecast').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalForcaste += isNaN(data[0].forecastQty) ? 0 : (data[0].forecastQty == null || data[0].forecastQty == 'Infinity') ? 0 : data[0].forecastQty;
+            totalForcaste += (isNaN(data[0].forecastQty)|| data[0].forecastQty == null || data[0].forecastQty == '') ? 0 : data[0].forecastQty;
             countForcaste += 1;
-            datacsv.push((isNaN(data[0].forecastQty)? 0 : (data[0].forecastQty == null || data[0].forecastQty == 'Infinity') ? 0 : data[0].forecastQty).toFixed(2))
+            datacsv.push((isNaN(data[0].forecastQty)|| data[0].forecastQty == null || data[0].forecastQty == '') ? 0 : Number(data[0].forecastQty).toFixed(2))
         })
         datacsv.push(Number(totalForcaste / countForcaste).toFixed(2));
         A.push(this.addDoubleQuoteToRowContent(datacsv))
@@ -1826,9 +1829,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         datacsv.push([(('Difference').replaceAll(',', ' ')).replaceAll(' ', '%20')])
         this.state.monthArray.map((item1, count) => {
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-            totalDifference += (isNaN(data[0].actualQty) ? 0 :data[0].actualQty == null || data[0].actualQty == 'Infinity' ? 0 : data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 :data[0].forecastQty == null || data[0].forecastQty == 'Infinity' ? 0 :data[0].forecastQty);
+            totalDifference += ((isNaN(data[0].actualQty)|| data[0].actualQty == null || data[0].actualQty == '' ? 0 : data[0].actualQty) - (isNaN(data[0].forecastQty)||data[0].forecastQty == null || data[0].forecastQty == '' ? 0 :data[0].forecastQty));
             countDifference += 1;
-            datacsv.push(((isNaN(data[0].actualQty) ? 0 : (data[0].actualQty == null || data[0].actualQty == 'Infinity') ? 0 :  data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : (data[0].forecastQty == null || data[0].forecastQty == 'Infinity') ? 0 : data[0].forecastQty)).toFixed(2))
+            datacsv.push(Number(((isNaN(data[0].actualQty)|| data[0].actualQty == null || data[0].actualQty == '') ? 0 :  data[0].actualQty) -((isNaN(data[0].forecastQty)||data[0].forecastQty == null || data[0].forecastQty == '') ? 0 : data[0].forecastQty)).toFixed(2))
         })
         datacsv.push(Number(totalDifference / countDifference).toFixed(2));
         A.push(this.addDoubleQuoteToRowContent(datacsv))
@@ -1944,7 +1947,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         var h1 = 100;
         var aspectwidth1 = (width - h1);
 
-        doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
+        // doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 10, 280, 825, 220, 'CANVAS');
 
         //table start
         const headers = [];
@@ -1961,79 +1965,83 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         // let t1 = [];
 
 //Region Error
-        A = [];
         {
-            this.state.regions.map(r => {
+            this.state.regionValues.map(r => {
+                A = [];
                 var totalRegion = 0;
                 var totalRegionCount = 0;
-                A.push("Error")
+                A.push(""+(r.label))
                 {
                     this.state.monthArray.map((item1, count) => {
-                        var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                        totalRegion += datavalue[0].regionData[0].actualQty > 0 ? isNaN(datavalue[0].regionData[0].errorPerc)? 0 :(datavalue[0].regionData[0].errorPerc == null || datavalue[0].regionData[0].errorPerc == 'Infinity') ? 0 : datavalue[0].regionData[0].errorPerc*100:0;
-                        totalRegionCount +=  datavalue[0].regionData[0].actualQty > 0 ? 1 : 0;
-                        A.push(datavalue[0].regionData[0].actualQty > 0 ? (isNaN(datavalue[0].regionData[0].errorPerc) ? 0 : (datavalue[0].regionData[0].errorPerc == null || datavalue[0].regionData[0].errorPerc == 'Infinity') ? 0 :this.PercentageFormatter(datavalue[0].errorPerc*100)):"No Actual Data")
+                        let errorData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                        let errorDataRegionData=(errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));  
+                        totalRegion += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc==''||errorDataRegionData[0].errorPerc==null) ? 0 : errorDataRegionData[0].errorPerc*100:0;
+                        totalRegionCount += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc==''||errorDataRegionData[0].errorPerc==null) ? 0 : 1:0;
+                        A.push(errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc==''||errorDataRegionData[0].errorPerc==null)? "" :this.PercentageFormatter(errorDataRegionData[0].errorPerc*100):"No Actual Data")
                     })
                 }
-                A.push(this.PercentageFormatter(totalRegion / totalRegionCount))
-            })
-        }
+                console.log("totalRegion----",totalRegion)
+                console.log("totalRegionCount----",totalRegionCount)
+                A.push((totalRegion / totalRegionCount)==NaN? 0 : this.PercentageFormatter(totalRegion / totalRegionCount))
         data.push(A);
-
 // Region Actual
         A = [];
         {
-            this.state.regions.map(r => {
+            this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{ 
                 var totalRegion = 0;
                 var totalRegionCount = 0;
-                A.push('Actual')
+                (this.state.consumptionAdjForStockOutId)? A.push(' Adjusted Actual') : A.push(' Actual')
                 {
                     this.state.monthArray.map((item1, count) => {
-                        var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                        totalRegion += Number(isNaN(datavalue[0].regionData[0].actualQty) ? 0 : (datavalue[0].regionData[0].actualQty == null || datavalue[0].regionData[0].actualQty == 'Infinity') ? 0 : datavalue[0].regionData[0].actualQty);
+                        let acData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                        let auDataRegionData=(acData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));  
+                        totalRegion += (isNaN(auDataRegionData[0].actualQty) || auDataRegionData[0].actualQty=='' || auDataRegionData[0].actualQty==null) ? 0 : Number(auDataRegionData[0].actualQty);
                         totalRegionCount += 1;
-                        A.push((Number(isNaN(datavalue[0].regionData[0].actualQty) ? 0 : (datavalue[0].regionData[0].actualQty == null || datavalue[0].regionData[0].actualQty == 'Infinity') ? 0 : datavalue[0].regionData[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
-                    })
+                        A.push((isNaN(auDataRegionData[0].actualQty) || auDataRegionData[0].actualQty == null || auDataRegionData[0].actualQty == '') ? '' : Number(auDataRegionData[0].actualQty).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
+                        })
                 }
                 A.push(((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
-        }
         data.push(A);
-
+        }
+        
 // Region Forecast         
         A = [];
         {
-            this.state.regions.map(r => {
+           {this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{
                 var totalRegion = 0;
                 var totalRegionCount = 0;
-                A.push('Forecast')
+                A.push(' Forecast')
                 {
                     this.state.monthArray.map((item1, count) => {
-                        var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                        totalRegion += Number(isNaN(datavalue[0].regionData[0].forecastQty)? 0 :(datavalue[0].regionData[0].forecastQty == null || datavalue[0].regionData[0].forecastQty == 'Infinity') ? 0 : datavalue[0].regionData[0].forecastQty);
-                        totalRegionCount += 1;
-                        A.push((Number(isNaN(datavalue[0].regionData[0].forecastQty) ? 0 :(datavalue[0].regionData[0].forecastQty == null || datavalue[0].regionData[0].forecastQty == 'Infinity') ? 0 : datavalue[0].regionData[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                        let fuData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                        let fuDataRegionData=(fuData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));
+                        totalRegion += (isNaN(fuDataRegionData[0].forecastQty) || fuDataRegionData[0].forecastQty==''|| fuDataRegionData[0].forecastQty==null) ? 0 : Number(fuDataRegionData[0].forecastQty);
+                        totalRegionCount += 1;        
+                        A.push((isNaN(fuDataRegionData[0].forecastQty) || fuDataRegionData[0].forecastQty==''|| fuDataRegionData[0].forecastQty==null) ? '' : Number(fuDataRegionData[0].forecastQty).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                     })
                 }
                 A.push(((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
         }
         data.push(A);
+        }
 
 // Region daysOfStockOut         
         if(this.state.consumptionAdjForStockOutId){
                 A = [];
                 {
-                    this.state.regions.map(r => {
+                    this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{
                         var totalRegion = 0;
                         var totalRegionCount = 0;
-                        A.push('DaysOfStockOut')
+                        A.push(' DaysOfStockOut')
                         {
                             this.state.monthArray.map((item1, count) => {
-                                var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                totalRegion += Number(isNaN(datavalue[0].regionData[0].daysOfStockOut)? 0 :(datavalue[0].regionData[0].daysOfStockOut == null || datavalue[0].regionData[0].daysOfStockOut == 'Infinity') ? 0 : datavalue[0].regionData[0].daysOfStockOut);
-                                totalRegionCount += 1;
-                                A.push((Number(isNaN(datavalue[0].regionData[0].daysOfStockOut) ? 0 :(datavalue[0].regionData[0].daysOfStockOut == null || datavalue[0].regionData[0].daysOfStockOut == 'Infinity') ? 0 : datavalue[0].regionData[0].daysOfStockOut).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                            let daysOfStockOutData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                            let daysOfStockOutDataRegionData=(daysOfStockOutData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));  
+                            totalRegion += (isNaN(daysOfStockOutDataRegionData[0].daysOfStockOut)||daysOfStockOutDataRegionData[0].daysOfStockOut==''||daysOfStockOutDataRegionData[0].daysOfStockOut==null) ? 0 : Number(daysOfStockOutDataRegionData[0].daysOfStockOut);
+                            totalRegionCount += 1;
+                            A.push((isNaN(daysOfStockOutDataRegionData[0].daysOfStockOut)||daysOfStockOutDataRegionData[0].daysOfStockOut==''||daysOfStockOutDataRegionData[0].daysOfStockOut==null) ? '' : Number(daysOfStockOutDataRegionData[0].daysOfStockOut).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                             })
                         }
                         A.push(((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
@@ -2041,27 +2049,31 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 }
                 data.push(A);
         }
-// Region Difference        
+
+        // Region Difference        
         A = [];
         {
-            this.state.regions.map(r => {
+            this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{
                 var totalRegion = 0;
                 var totalRegionCount = 0;
-                A.push('Difference')
+                A.push(' Difference')
                 {
                     this.state.monthArray.map((item1, count) => {
-                        var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                        totalRegion += (isNaN(datavalue[0].regionData[0].actualQty) ? 0 :(datavalue[0].regionData[0].actualQty == null || datavalue[0].regionData[0].actualQty == 'Infinity') ? 0 : datavalue[0].regionData[0].actualQty) - (isNaN(datavalue[0].regionData[0].forecastQty) ? 0 :(datavalue[0].regionData[0].forecastQty == null || datavalue[0].regionData[0].forecastQty == 'Infinity') ? 0 :datavalue[0].regionData[0].forecastQty);       
+                        let differenceData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                        let differenceRegionData=(differenceData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));  
+                        totalRegion += isNaN(Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty)) ? 0 : Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty);
                         totalRegionCount += 1;
-                        A.push((Number(((isNaN(datavalue[0].regionData[0].actualQty) ? 0 : (datavalue[0].regionData[0].actualQty == null || datavalue[0].regionData[0].actualQty == 'Infinity') ? 0 : datavalue[0].regionData[0].actualQty) - (isNaN(datavalue[0].regionData[0].forecastQty) ? 0 :(datavalue[0].regionData[0].forecastQty == null || datavalue[0].regionData[0].forecastQty == 'Infinity') ? 0 :datavalue[0].regionData[0].forecastQty))).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                        A.push(Number(((isNaN(differenceRegionData[0].actualQty)|| differenceRegionData[0].actualQty == null || differenceRegionData[0].actualQty == '') ? 0 :differenceRegionData[0].actualQty)-((isNaN(differenceRegionData[0].forecastQty) || differenceRegionData[0].forecastQty == null || differenceRegionData[0].forecastQty == '') ? 0 :differenceRegionData[0].forecastQty)).toFixed(2))
                     })
                 }
                 A.push((Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
+            data.push(A);
         }
-        data.push(A);
-
-
+        
+    })  
+}
+   
 // Total Error        
         A = [];        
         A.push('Error')
@@ -2070,9 +2082,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countError = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalError += datavalue[0].actualQty > 0 ? isNaN(datavalue[0].errorPerc) ? 0 : (datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity') ? 0 : datavalue[0].errorPerc*100 : 0;
+                totalError += datavalue[0].actualQty > 0 ? (isNaN(datavalue[0].errorPerc) || datavalue[0].errorPerc == null || datavalue[0].errorPerc == '') ? 0 : datavalue[0].errorPerc*100 : 0;
                 countError += datavalue[0].actualQty > 0 ? 1 : 0;
-                A.push(datavalue[0].actualQty > 0 ? isNaN(datavalue[0].errorPerc) ? '' : (datavalue[0].errorPerc == null || datavalue[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(datavalue[0].errorPerc*100):"No Actual Data")
+                A.push(datavalue[0].actualQty > 0 ? (isNaN(datavalue[0].errorPerc) || datavalue[0].errorPerc == null || datavalue[0].errorPerc == '') ? '' : this.PercentageFormatter(datavalue[0].errorPerc*100):"No Actual Data")
             })
             A.push(this.PercentageFormatter(totalError / countError))
         }
@@ -2080,15 +2092,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
 // Total Actual
         A = [];
-        A.push('Actual')
+        (this.state.consumptionAdjForStockOutId)? A.push('Adjusted Actual') : A.push('Actual')
         {
             var totalActal = 0;
             var countActal = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalActal += isNaN(datavalue[0].actualQty) ? 0 : (datavalue[0].actualQty == null || datavalue[0].actualQty == 'Infinity') ? 0 : datavalue[0].actualQty;
+                totalActal += (isNaN(datavalue[0].actualQty) || datavalue[0].actualQty == null || datavalue[0].actualQty == '') ? 0 : datavalue[0].actualQty;
                 countActal += 1;
-                A.push(((isNaN(datavalue[0].actualQty) ? 0 : (datavalue[0].actualQty == null || datavalue[0].actualQty == 'Infinity') ? 0 : datavalue[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push((isNaN(datavalue[0].actualQty) || datavalue[0].actualQty == null || datavalue[0].actualQty == '') ? '' : Number(datavalue[0].actualQty).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
             A.push(((totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
         }
@@ -2102,9 +2114,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countForecast = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalForecast += isNaN(datavalue[0].forecastQty)? 0 :(datavalue[0].forecastQty == null || datavalue[0].forecastQty == 'Infinity') ? 0 : datavalue[0].forecastQty;
+                totalForecast += (isNaN(datavalue[0].forecastQty) || datavalue[0].forecastQty == null || datavalue[0].forecastQty == '') ? 0 : datavalue[0].forecastQty;
                 countForecast += 1;
-                A.push(((isNaN(datavalue[0].forecastQty) ? 0 :(datavalue[0].forecastQty == null || datavalue[0].forecastQty == 'Infinity') ? 0 : datavalue[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push((isNaN(datavalue[0].forecastQty) || datavalue[0].forecastQty == null || datavalue[0].forecastQty == '') ? '' : Number(datavalue[0].forecastQty).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
             A.push(((totalForecast / countForecast).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
         }
@@ -2118,14 +2130,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             var countDiff = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalDiff += (isNaN(datavalue[0].actualQty) ? 0 : (datavalue[0].actualQty == null || datavalue[0].actualQty == 'Infinity') ? 0 : datavalue[0].actualQty) - (isNaN(datavalue[0].forecastQty) ? 0 : (datavalue[0].forecastQty == null || datavalue[0].forecastQty == 'Infinity') ? 0 :datavalue[0].forecastQty);
+                totalDiff += ((isNaN(datavalue[0].actualQty) || datavalue[0].actualQty == null || datavalue[0].actualQty == '') ? 0 : datavalue[0].actualQty) - ((isNaN(datavalue[0].forecastQty)|| datavalue[0].forecastQty == null || datavalue[0].forecastQty == '') ? 0 :datavalue[0].forecastQty);
                 countDiff += 1;
-                A.push(((((isNaN(datavalue[0].actualQty) ? 0 : (datavalue[0].actualQty == null || datavalue[0].actualQty == 'Infinity') ? 0 : datavalue[0].actualQty) - (isNaN(datavalue[0].forecastQty) ? 0 : (datavalue[0].forecastQty == null || datavalue[0].forecastQty == 'Infinity') ? 0 : datavalue[0].forecastQty))).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push((((isNaN(datavalue[0].actualQty) || datavalue[0].actualQty == null || datavalue[0].actualQty == '') ? 0 : datavalue[0].actualQty) - 
+                       ((isNaN(datavalue[0].forecastQty) || datavalue[0].forecastQty == null || datavalue[0].forecastQty == '') ? 0 : datavalue[0].forecastQty)).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
             A.push(((totalDiff / countDiff).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
         }
         data.push(A);
-
+        let flag =false;
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: height,
@@ -2141,15 +2154,21 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 { halign: "left" },
             ],
             didParseCell: function (data) {
-            if(this.state.consumptionAdjForStockOutId){
-                if(data.row.index == 0 || data.row.index == 5|| data.row.index == 6|| data.row.index == 7 || data.row.index == 8){
-                    data.cell.styles.fontStyle = 'bold';
-                  }    
-            }else{
-                if(data.row.index == 0 || data.row.index == 4|| data.row.index == 5 || data.row.index == 6 || data.row.index == 7 || data.row.index == 8){
-                    data.cell.styles.fontStyle = 'bold';
-                  }
-            }    
+                  if(data.section=="body" && data.column.index == 0){
+                    if(data.cell.raw[0]!=" "){
+                        data.cell.styles.fontStyle = 'bold';    
+                        flag=false;
+                    }else{
+                    flag=true;
+                    data.cell.styles.fontStyle = 'normal';
+                    }
+                }else{
+                    if(flag==true){
+                    data.cell.styles.fontStyle = 'normal';
+                    }else{
+                        data.cell.styles.fontStyle = 'bold';    
+                    }
+                }   
               if(data.cell.raw.toString().replaceAll(",","")<0){
                 data.cell.styles.textColor = [255,0,0];    
               }    
@@ -2556,12 +2575,31 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 </div>
 
                                             </FormGroup>
+                                            <FormGroup className="col-md-3" id="equivelencyUnitDiv">
+                                                <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="yaxisEquUnit"
+                                                            id="yaxisEquUnit"
+                                                            bsSize="sm"
+                                                            value={this.state.yaxisEquUnit}
+                                                            onChange={(e) => { this.setYaxisEquUnitId(e); }}
+                                                        // onChange={(e) => { this.yAxisChange(e); }}
+                                                        // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                        >
+                                                             <option value="0">{i18n.t('static.program.no')}</option>
+                                                            {equivalencyUnitList1}
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label className="P-absltRadio" htmlFor="appendedInputButton">Show in:</Label>
                                                 <FormGroup check inline>
                                                     <Input
-                                                        className="form-check-input"
                                                         type="radio"
                                                         id="viewById"
                                                         name="viewById"
@@ -2579,7 +2617,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 </FormGroup>
                                                 <FormGroup check inline>
                                                     <Input
-                                                        className="form-check-input"
                                                         type="radio"
                                                         id="viewById"
                                                         name="viewById"
@@ -2595,10 +2632,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         {i18n.t('static.dashboard.forecastingunit')}
                                                     </Label>
                                                 </FormGroup>
-                                            </FormGroup>
-
-                                            <FormGroup className="col-md-3" id="forecastingUnitDiv" style={{ display: "none" }}>
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
+                                                <FormGroup id="forecastingUnitDiv" style={{ display: "none" }}>
                                                 <div className="controls">
                                                     <InputGroup>
                                                         <Input
@@ -2623,10 +2657,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-
-
-                                            <FormGroup className="col-md-3" id="planningUnitDiv">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                            <FormGroup id="planningUnitDiv">
                                                 <div className="controls">
                                                     <InputGroup>
                                                         <Input
@@ -2651,6 +2682,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
+                                            </FormGroup>
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
@@ -2690,28 +2722,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                     </Label>
                                                 </div>
                                             </FormGroup> */}
-
-                                            <FormGroup className="col-md-3" id="equivelencyUnitDiv">
-                                                <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="yaxisEquUnit"
-                                                            id="yaxisEquUnit"
-                                                            bsSize="sm"
-                                                            value={this.state.yaxisEquUnit}
-                                                            onChange={(e) => { this.setYaxisEquUnitId(e); }}
-                                                        // onChange={(e) => { this.yAxisChange(e); }}
-                                                        // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
-                                                        >
-                                                             <option value="0">{i18n.t('static.program.no')}</option>
-                                                            {equivalencyUnitList1}
-                                                        </Input>
-
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
                                         </div>
                                     </div>
                                 </Form>
@@ -2742,150 +2752,143 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                        {this.state.regionValues.map(r => {
                                                         {/* Error */}
-                                                        {this.state.regions.map(r => {
                                                                 var regionErrorTotal = 0;
                                                                 var regionErrorTotalCount = 0;
-                                                                return (<tr className="hoverTd">
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
-                                                                    {this.state.consumptionUnitShowArr.includes(0) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                                return (<><tr className="hoverTd">
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(r.value)}>
+                                                                    {this.state.consumptionUnitShowArr.includes(r.value) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                                     </td>
-                                                                    <td className="sticky-col first-col clone hoverTd" align="left"><b>{"   " + getLabelText(r.label, this.state.lang)}</b></td>
+                                                                    <td className="sticky-col first-col clone hoverTd" align="left"><b>{"   " + r.label}</b></td>
                                                                     {this.state.monthArray.map((item1, count) => {
-                                                                        var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                        regionErrorTotal += data[0].regionData[0].actualQty > 0 ? isNaN(data[0].regionData[0].errorPerc) ? 0 : (data[0].regionData[0].errorPerc == null || data[0].regionData[0].errorPerc == 'Infinity') ? 0 : data[0].regionData[0].errorPerc*100:0;
-                                                                        regionErrorTotalCount += data[0].regionData[0].actualQty > 0 ? isNaN(data[0].regionData[0].errorPerc) ? 0 : (data[0].regionData[0].errorPerc == null || data[0].regionData[0].errorPerc == 'Infinity') ? 0 : 1:0;
-                                                                        return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].regionData[0].actualQty > 0 ?isNaN(data[0].regionData[0].errorPerc) ? '' : (data[0].regionData[0].errorPerc == null || data[0].regionData[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].regionData[0].errorPerc*100):"No Actual Data"}</b></td>)
+                                                                    let errorData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                                                                    let errorDataRegionData=(errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));  
+                                                                        regionErrorTotal += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc==''||errorDataRegionData[0].errorPerc==null) ? 0 : errorDataRegionData[0].errorPerc*100:0;
+                                                                        regionErrorTotalCount += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc==''||errorDataRegionData[0].errorPerc==null) ? 0 : 1:0;
+                                                                       console.log("regionErrorTotal / regionErrorTotalCount",(regionErrorTotal / regionErrorTotalCount))
+                                                                        return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{errorDataRegionData[0].actualQty > 0 ?(isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc==''||errorDataRegionData[0].errorPerc==null) ? '' : (errorDataRegionData[0].errorPerc == null || errorDataRegionData[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(errorDataRegionData[0].errorPerc*100):"No Actual Data"}</b></td>)              
                                                                     })}
-                                                                    <td className="sticky-col first-col clone hoverTd" align="left"><b>{this.PercentageFormatter(regionErrorTotal / regionErrorTotalCount)}</b></td>
-                                                                </tr>)
-                                                            })}
-                                                        {/* Actual */}    
-                                                        {this.state.regions.map(r => {
-                                                                var regionActualTotal = 0;
-                                                                var regionActualTotalCount = 0;
-                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(0) ? "" : "none" }}>
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   Actual"}</td>
-                                                                    {this.state.monthArray.map((item1, count) => {
-                                                                        var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                        regionActualTotal += isNaN(data[0].regionData[0].actualQty) ? 0 : Number(data[0].regionData[0].actualQty);
-                                                                        regionActualTotalCount += 1;
-                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].regionData[0].actualQty) ? '' : (Number(data[0].regionData[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    <td className="sticky-col first-col clone hoverTd" align="left"><b>{(regionErrorTotal / regionErrorTotalCount)=="NaN" ? 0 : this.PercentageFormatter(regionErrorTotal / regionErrorTotalCount)}</b></td>
+                                                                    </tr>
+                                                                 {/* actual */}
+                                                               {this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{ 
+                                                                 var regionActualTotal = 0;
+                                                                 var regionActualTotalCount = 0;             
+                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(r.value) ? "" : "none" }}>
+                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{this.state.consumptionAdjForStockOutId?"  Adjusted Actual":"   Actual"}</td>
+                                                                {this.state.monthArray.map((item1, count) => {
+                                                                    let acData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                                                                    let auDataRegionData=(acData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));  
+                                                                    regionActualTotal += (isNaN(auDataRegionData[0].actualQty) || auDataRegionData[0].actualQty=='' || auDataRegionData[0].actualQty==null) ? 0 : Number(auDataRegionData[0].actualQty);
+                                                                    regionActualTotalCount += 1;
+                                                                    return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(isNaN(auDataRegionData[0].actualQty) || auDataRegionData[0].actualQty=='' || auDataRegionData[0].actualQty==null) ?'': (Number(auDataRegionData[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)    
                                                                     })}          
-                                                                    <td className="sticky-col first-col clone text-left">{(Number(regionActualTotal / regionActualTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                </tr>)
-                                                            })}    
-                                                        {/* Forecast */}    
-                                                        {this.state.regions.map(r => {
+                                                                <td className="sticky-col first-col clone text-left">{(Number(regionActualTotal / regionActualTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                            </tr>)})}
+                                                            {/* Forecast */}    
+                                                            {this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{
                                                                 var regionForecastTotal = 0;
                                                                 var regionForecastTotalCount = 0;
-                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(0) ? "" : "none" }}>
+                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(r.value) ? "" : "none" }}>
                                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                     <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   Forecast"}</td>
                                                                     {this.state.monthArray.map((item1, count) => {
-                                                                        var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                        regionForecastTotal += isNaN(data[0].regionData[0].forecastQty) ? 0 : Number(data[0].regionData[0].forecastQty);
+                                                                        let fuData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                                                                        let fuDataRegionData=(fuData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));
+                                                                        regionForecastTotal += (isNaN(fuDataRegionData[0].forecastQty) || fuDataRegionData[0].forecastQty==''|| fuDataRegionData[0].forecastQty==null) ? 0 : Number(fuDataRegionData[0].forecastQty);
                                                                         regionForecastTotalCount += 1;
-                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].regionData[0].forecastQty) ? '' : (Number(data[0].regionData[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(isNaN(fuDataRegionData[0].forecastQty) || fuDataRegionData[0].forecastQty==''|| fuDataRegionData[0].forecastQty==null) ? '' : (Number(fuDataRegionData[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)    
                                                                     })}
                                                                     <td className="sticky-col first-col clone text-left">{(Number(regionForecastTotal / regionForecastTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                 </tr>
                                                                 )
                                                             })}
                                                         {/* DaysOfStockOut */}    
-                                                        {this.state.consumptionAdjForStockOutId && this.state.regions.map(r => {
+                                                        {this.state.consumptionAdjForStockOutId && this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{
                                                                 var regionDaysOfStockOutTotal = 0;
                                                                 var regionDaysOfStockOutTotalCount = 0;
-                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(0) ? "" : "none" }}>
+                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(r.value) ? "" : "none" }}>
                                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                     <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   Days Of StockOut"}</td>
                                                                     {this.state.monthArray.map((item1, count) => {
-                                                                        var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                        regionDaysOfStockOutTotal += isNaN(data[0].regionData[0].daysOfStockOut) ? 0 :(data[0].regionData[0].daysOfStockOut == null || data[0].regionData[0].daysOfStockOut == 'Infinity') ? 0 : Number(data[0].regionData[0].daysOfStockOut);
+                                                                        let daysOfStockOutData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                                                                        let daysOfStockOutDataRegionData=(daysOfStockOutData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));  
+                                                                        regionDaysOfStockOutTotal += (isNaN(daysOfStockOutDataRegionData[0].daysOfStockOut)||daysOfStockOutDataRegionData[0].daysOfStockOut==''||daysOfStockOutDataRegionData[0].daysOfStockOut==null) ? 0 : Number(daysOfStockOutDataRegionData[0].daysOfStockOut);
                                                                         regionDaysOfStockOutTotalCount += 1;
-                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{isNaN(data[0].regionData[0].daysOfStockOut) ? '' : (Number(data[0].regionData[0].daysOfStockOut).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                        return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(isNaN(daysOfStockOutDataRegionData[0].daysOfStockOut)||daysOfStockOutDataRegionData[0].daysOfStockOut==''||daysOfStockOutDataRegionData[0].daysOfStockOut==null) ? '' : (Number(daysOfStockOutDataRegionData[0].daysOfStockOut).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                     })}
                                                                     
                                                                     <td className="sticky-col first-col clone text-left">{(Number(regionDaysOfStockOutTotal / regionDaysOfStockOutTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                 </tr>)
                                                             })}
                                                         {/* Difference */}        
-                                                        {this.state.regions.map(r => {
+                                                        {this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{
                                                                 var regionDifferenceTotal = 0;
                                                                 var regionDifferenceTotalCount = 0;
-                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(0) ? "" : "none" }}>
+                                                                return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(r.value) ? "" : "none" }}>
                                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                     <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   Difference"}</td>
                                                                     {this.state.monthArray.map((item1, count) => {
-                                                                        var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.regionData[0].region.id == r.regionId)
-                                                                        regionDifferenceTotal += isNaN(Number(data[0].regionData[0].actualQty - data[0].regionData[0].forecastQty)) ? 0 : Number(data[0].regionData[0].actualQty - data[0].regionData[0].forecastQty);
+                                                                        let differenceData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
+                                                                        let differenceRegionData=(differenceData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));  
+                                                                        regionDifferenceTotal += isNaN(Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty)) ? 0 : Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty);
                                                                         regionDifferenceTotalCount += 1;
-                                                                        return (<td style={{ color: ((isNaN(data[0].regionData[0].actualQty) ? 0 : data[0].regionData[0].actualQty) - (isNaN(data[0].regionData[0].forecastQty) ? 0 : data[0].regionData[0].forecastQty)) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number((isNaN(data[0].regionData[0].actualQty) ? 0 : data[0].regionData[0].actualQty) - (isNaN(data[0].regionData[0].forecastQty) ? 0 : data[0].regionData[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                        return (<td style={{ color: ((isNaN(differenceRegionData[0].actualQty) ? 0 : differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number((isNaN(differenceRegionData[0].actualQty) ? 0 : differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)                                                     
                                                                     })}
                                                                     <td className="sticky-col first-col clone text-left" style={{ color: (regionDifferenceTotal / regionDifferenceTotalCount) < 0 ? 'red' : 'black' }}>{(Number(regionDifferenceTotal / regionDifferenceTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                 </tr>)
                                                             })}
-                                                        {/* Error */}
-                                                        <tr className="hoverTd">
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Error</b></td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    totalError += data[0].actualQty > 0 ?isNaN(data[0].errorPerc) ? 0 : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? 0 : data[0].errorPerc*100:0;
-                                                                    countError += data[0].actualQty > 0 ? 1 : 0;
-                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].actualQty > 0?isNaN(data[0].errorPerc) ? '' : (data[0].errorPerc == null || data[0].errorPerc == 'Infinity') ? '' : this.PercentageFormatter(data[0].errorPerc*100):"No Actual Data"}</b></td>)
-                                                                })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{this.PercentageFormatter(totalError / countError)}</b></td>
-                                                        </tr>
-                                                        {/* Actual */}
-                                                        <tr className="hoverTd">
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Actual</b></td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    totalActual += isNaN(data[0].actualQty) ? 0 : Number(data[0].actualQty);
-                                                                    countActual += 1;
-                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} /> {isNaN(data[0].actualQty) ? '' : (Number(data[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
-                                                                })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalActual / countActual).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                        </tr>
-                                                        {/* Forecast */}    
-                                                        <tr className="hoverTd">
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Forecast</b></td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    totalForcaste += isNaN(data[0].forecastQty) ? 0 : Number(data[0].forecastQty);
-                                                                    countForcaste += 1;
-                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} /> {isNaN(data[0].forecastQty) ? '' : (Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
-                                                                })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                        </tr>     
-                                                        {/* DaysOfStockOut */}
-                                                        {/* {this.state.consumptionAdjForStockOutId && 
-                                                        <tr className="hoverTd">
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Days Of Stock Out</b></td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    totalDaysOfStockOut += isNaN(data[0].daysOfStockOut) ? 0 : Number(data[0].daysOfStockOut);
-                                                                    countDaysOfStockOut += 1;
-                                                                    return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} /> {isNaN(data[0].daysOfStockOut) ? '' : (Number(data[0].daysOfStockOut).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
-                                                                })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalDaysOfStockOut / countDaysOfStockOut).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                        </tr> }    */}
-                                                        {/* Difference */}        
-                                                        <tr className="hoverTd">
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"><b>Difference</b></td>
-                                                                {this.state.monthArray.map((item1, count) => {
-                                                                    var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                                                    return (<td style={{ color: ((isNaN(data[0].actualQty) ? 0 : data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)) < 0 ? 'red' : 'black' }}><b><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number((isNaN(data[0].actualQty) ? 0 : data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
-                                                                })}
-                                                                <td className="sticky-col first-col clone hoverTd" align="left" style={{ color: ((totalActual / countActual) - (totalForcaste / countForcaste)) < 0 ? 'red' : 'black' }} ><b>{(Number((totalActual / countActual) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                            </tr>
-                                                        </tbody>
+                                                    </>)
+                                                })}
+                                                {/* Error */}
+                                                <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>Error</b></td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            totalError += data[0].actualQty > 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc==''||data[0].errorPerc==null) ? 0 : data[0].errorPerc*100:0;
+                                                            countError += data[0].actualQty > 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc==''||data[0].errorPerc==null) ? 0 : 1:0;                                         
+                                                            return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].actualQty > 0? (isNaN(data[0].errorPerc) || data[0].errorPerc==''||data[0].errorPerc==null) ? '' : this.PercentageFormatter(data[0].errorPerc*100):"No Actual Data"}</b></td>)
+                                                        })}
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>{this.PercentageFormatter(totalError / countError)}</b></td>
+                                                </tr>
+                                                {/* Actual */}
+                                                <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>{this.state.consumptionAdjForStockOutId?"  Adjusted Actual":"   Actual"}</b></td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            totalActual += (isNaN(data[0].actualQty) || data[0].actualQty=='' || data[0].actualQty==null) ? 0 : Number(data[0].actualQty);
+                                                            countActual += 1;
+                                                            return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} /> {(isNaN(data[0].actualQty) || data[0].actualQty=='' || data[0].actualQty==null) ? '' :(Number(data[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
+                                                        })}
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalActual / countActual).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                </tr>
+                                                {/* Forecast */}    
+                                                <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>Forecast</b></td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            totalForcaste += (isNaN(data[0].forecastQty) || data[0].forecastQty==''|| data[0].forecastQty==null) ? 0 : Number(data[0].forecastQty);
+                                                            countForcaste += 1;
+                                                            return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} /> {(isNaN(data[0].forecastQty) || data[0].forecastQty==''|| data[0].forecastQty==null) ? '' : (Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
+                                                        })}
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                </tr>     
+                                                {/* Difference */}        
+                                                <tr className="hoverTd">
+                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>Difference</b></td>
+                                                        {this.state.monthArray.map((item1, count) => {
+                                                            var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
+                                                            return (<td style={{ color: ((isNaN(data[0].actualQty) ? 0 : data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)) < 0 ? 'red' : 'black' }}><b><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number((isNaN(data[0].actualQty) ? 0 : data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
+                                                        })}
+                                                        <td className="sticky-col first-col clone hoverTd" align="left" style={{ color: ((totalActual / countActual) - (totalForcaste / countForcaste)) < 0 ? 'red' : 'black' }} ><b>{(Number((totalActual / countActual) - (totalForcaste / countForcaste)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                    </tr>
+                                                </tbody>
                                                     </Table>
                                                 </div>   
                                             </div>

@@ -11412,7 +11412,6 @@ export default class BuildTree extends Component {
                 // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
                 (itemConfig.expanded ?                     
                 <div style={{background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed" , width: "8px", height: "8px", borderRadius: "8px"}}>
-
                 </div>
                 :
                 <div className={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect==0?"ContactTemplate boxContactTemplate contactTemplateBorderRed":"ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
@@ -11478,11 +11477,12 @@ export default class BuildTree extends Component {
                             <div title={itemConfig.payload.label.label_en} className="NodeTitletext">
                                 {itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
-                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeType.id == 2 && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 <b style={{ color: '#212721', float: 'right' }}>
+                                    {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeType.id == 4) ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}
                                     {itemConfig.payload.nodeType.id == 2 ?
                                         <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
                                         (itemConfig.payload.nodeType.id == 3 ?
@@ -11506,6 +11506,7 @@ export default class BuildTree extends Component {
                 </div>
             )
         }
+
 
 
         const NodeDragSource = DragSource(
@@ -11660,7 +11661,6 @@ export default class BuildTree extends Component {
             defaultTemplateName: "contactTemplate",
             linesColor: Colors.Black,
             annotations: treeLevelItems,
-            
             
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
