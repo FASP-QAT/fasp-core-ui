@@ -23,7 +23,7 @@ import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
-import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions';
+import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero, isJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import { calculateModelingData } from '../DataSet/ModelingDataCalculations.js';
 import ProgramService from '../../api/ProgramService';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
@@ -1168,21 +1168,16 @@ export default class SyncMasterData extends Component {
 
                                                     .then(response => {
                                                         if (response.status == 200) {
-                                                            
-                                                            // console.log("M sync Response", response.data)
-                                                            const compressedData = atob(response.data);
-
-                                                            // convert the compressed data to a byte array
-                                                            const byteArray = new Uint8Array(compressedData.length);
-                                                            for (let i = 0; i < compressedData.length; i++) {
-                                                            byteArray[i] = compressedData.charCodeAt(i);
+                                                            if(!isJson(response.data)){
+                                                                const compressedData = atob(response.data);
+                                                                const byteArray = new Uint8Array(compressedData.length);
+                                                                for (let i = 0; i < compressedData.length; i++) {
+                                                                    byteArray[i] = compressedData.charCodeAt(i);
+                                                                }
+                                                                const decompressedData = pako.inflate(byteArray, { to: 'string' });
+                                                                var json = JSON.parse(decompressedData);
+                                                                response.data = json;
                                                             }
-
-                                                            // decompress the byte array using pako
-                                                            const decompressedData = pako.inflate(byteArray, { to: 'string' });
-                                                            console.log("decompressed 1 Test@@@123", decompressedData)
-                                                            var json = JSON.parse(decompressedData);
-                                                            response.data = json;
                                                             var response = response.data;
 
                                                             var cC = db1.transaction(['country'], 'readwrite');

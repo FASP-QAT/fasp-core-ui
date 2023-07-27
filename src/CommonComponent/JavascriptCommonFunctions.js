@@ -73,3 +73,13 @@ export function isSiteOnline() {
     return false;
   }
 }
+
+export function isJson(str) {
+  let value = typeof str !== "string" ? JSON.stringify(str) : str;
+  try {
+      JSON.parse(value);
+  } catch (e) {
+      return false;
+  }
+  return true;
+}
