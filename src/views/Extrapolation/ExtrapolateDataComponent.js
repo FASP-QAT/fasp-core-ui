@@ -3434,7 +3434,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 " " + i18n.t('static.common.and') + " "}<b>{this.state.regionId > 0 && document.getElementById("regionId").selectedOptions[0].text + (" ")}</b> {this.state.regionId > 0 && i18n.t('static.extrpolate.selectYourExtrapolationParameters')}
                                         </h5>
                                     </FormGroup>
-                                        <FormGroup className="col-md-4">
+                                        <FormGroup className="col-md-5">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
                                             <div className="controls edit">
                                                 <Picker
@@ -3452,17 +3452,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Picker>
                                             </div>
                                         </FormGroup>
-                                        <div className="MarginTopCustformonth">
+                                        <FormGroup style={{paddingTop:'31px'}}>
+                                        <div>
+                                        {/* <Label style={{visibility:'hidden'}}>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label> */}
                                             <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
-                                        </div></>}
+                                        </div></FormGroup></>}
 
                                         <FormGroup className="MarginTopCustformonthDatacheckbtn pl-lg-3">
                             {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                             {/* {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>} */}
                             {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                             {/* {this.state.showData && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>} */}
-
-                            &nbsp;
                         </FormGroup>
                                 </div>
                             </div>
