@@ -980,6 +980,10 @@ class SupplyPlanFormulas extends Component {
                   <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormula4')}</p>
                   <p>{i18n.t("static.report.wapeFormulaNote")}</p>
                 </ListGroupItemText>
+                <ListGroupItemHeading className="formulasheading">{i18n.t("static.report.stockoutConsumptionAdjustment")}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+                  <p>{i18n.t('static.report.stockoutConsumptionAdjustmentFormula')}</p>
+                </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>
           </ModalBody>

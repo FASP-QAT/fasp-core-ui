@@ -706,5 +706,3 @@ export default class ReactListComponent extends Component {
         );
     }
 }
-
-

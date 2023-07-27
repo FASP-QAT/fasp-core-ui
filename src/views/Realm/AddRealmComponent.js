@@ -297,7 +297,6 @@ export default class AddRealmComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader> */}
                             <Formik
-                                initialValues={initialValues}
                                 enableReinitialize={true}
                                 initialValues={{
                                     realmCode: this.state.realm.realmCode,
@@ -312,6 +311,8 @@ export default class AddRealmComponent extends Component {
                                     actualConsumptionMonthsInPast: this.state.realm.actualConsumptionMonthsInPast,
                                     forecastConsumptionMonthsInPast: this.state.realm.forecastConsumptionMonthsInPast,
                                     inventoryMonthsInPast: this.state.realm.inventoryMonthsInPast,
+                                    minCountForMode: this.state.realm.minCountForMode,
+                                    minPercForMode: this.state.realm.minPercForMode,
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
