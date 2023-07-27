@@ -410,10 +410,12 @@ export default class InventoryTurns extends Component {
                     }
                 }
                 if(data.section=="body" && (data.column.index == 7 || data.column.index == 8)){
-                    if(data.cell.raw[0] == " "){
-                        data.cell.styles.textColor = [0, 0, 0];
-                        if(data.cell.raw[1] == undefined){
-                            data.cell.text = "!";
+                    if(data.cell.raw){
+                        if(data.cell.raw[0] == " " || data.cell.raw[0] == undefined){
+                            data.cell.styles.textColor = [0, 0, 0];
+                            if(data.cell.raw[1] == undefined){
+                                data.cell.text = "!";
+                            }
                         }
                     }
                 }
