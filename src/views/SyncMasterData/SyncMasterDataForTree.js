@@ -27,6 +27,7 @@ import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero } from '../..
 import { calculateModelingData } from '../DataSet/ModelingDataCalculations.js';
 import ProgramService from '../../api/ProgramService';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
+import pako from 'pako';
 
 export default class SyncMasterDataForTree extends Component {
 
@@ -212,6 +213,19 @@ export default class SyncMasterDataForTree extends Component {
                                 // console.log("Response data Test@@@123",response.data)
                                 if (response.status == 200) {
                                     // console.log("M sync Response", response.data)
+                                    const compressedData = atob(response.data);
+
+                                    // convert the compressed data to a byte array
+                                    const byteArray = new Uint8Array(compressedData.length);
+                                    for (let i = 0; i < compressedData.length; i++) {
+                                        byteArray[i] = compressedData.charCodeAt(i);
+                                    }
+
+                                    // decompress the byte array using pako
+                                    const decompressedData = pako.inflate(byteArray, { to: 'string' });
+                                    console.log("decompressed 1 Test@@@123", decompressedData)
+                                    var json = JSON.parse(decompressedData);
+                                    response.data = json;
                                     var response = response.data;
 
                                     // country
