@@ -429,7 +429,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     datasetList.push(json);
                 }
                 this.setState({
-                    datasetList: datasetList,
+                    datasetList: datasetList.sort(function (a, b) {
+                        a = a.programCode.toLowerCase();
+                        b = b.programCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                      }),
                     loading: false
                 }, () => {
                     this.props.updateStepOneData("datasetList", datasetList);
@@ -1153,7 +1157,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.setState({
             forecastProgramId: e.target.value,
             versionId: '',
-            programListFilter: programListFilter,
+            programListFilter: programListFilter.sort(function (a, b) {
+                a = a.programCode.toLowerCase();
+                b = b.programCode.toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+              }),
 
         }, () => {
             this.filterVersion();

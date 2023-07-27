@@ -532,8 +532,8 @@ class SupplyPlanVersionAndReview extends Component {
                     .then(response => {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -1320,7 +1320,7 @@ class SupplyPlanVersionAndReview extends Component {
                                                     name="countryId"
                                                     id="countryId"
                                                     value={this.state.realmCountryId}
-                                                    onChange={(e) => { this.getPrograms(); this.fetchData() }}
+                                                    onChange={(e) => { this.getPrograms(); this.dataChange(e); }}
                                                 >  <option value="-1">{i18n.t('static.common.all')}</option>
                                                     {countryList}</Input>
                                                 {!!this.props.error &&
@@ -1383,7 +1383,7 @@ class SupplyPlanVersionAndReview extends Component {
                             </Form>
                         </div>
                         <div className="ReportSearchMarginTop consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable">
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable TableWidth100">
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

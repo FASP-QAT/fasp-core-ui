@@ -147,7 +147,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
                             var tcList = [];
                             flList.filter(function (item) {
-                                var i = tcList.findIndex(x => x.tracerCategoryId == item.tracerCategory.id);
+                                var i = tcList.findIndex(x => x.id == item.tracerCategory.id);
                                 if (i <= -1 && item.tracerCategory.id != 0) {
                                     tcList.push({ id: item.tracerCategory.id, label: item.tracerCategory.label });
                                 }
@@ -516,8 +516,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = a.programCode.toLowerCase();
+                            b = b.programCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         programId: localStorage.getItem("sesProgramIdReport")
@@ -527,8 +527,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                 } else {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = a.programCode.toLowerCase();
+                            b = b.programCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     })
@@ -1852,7 +1852,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                         </ToolkitProvider>}
  */}
                         <div className="ReportSearchMarginTop consumptionDataEntryTable" >
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground " style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground TableWidth100" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
