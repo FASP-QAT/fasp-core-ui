@@ -163,7 +163,7 @@ export default class UpdateCurrencyComponent extends Component {
 
     componentDidMount() {
         CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
-            console.log(JSON.stringify(response.data))
+            // console.log(JSON.stringify(response.data))
             if (response.status == 200) {
                 this.setState({
                     currency: response.data, loading: false

@@ -222,10 +222,10 @@ class AddSupplierComponent extends Component {
                   this.setState({
                     loading: true
                   })
-                  console.log("Submit clicked");
+                  // console.log("Submit clicked");
                   SupplierService.addSupplier(this.state.supplier)
                     .then(response => {
-                      console.log("Response->", response);
+                      // console.log("Response->", response);
                       if (response.status == 200) {
                         this.props.history.push(`/supplier/listSupplier/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                       } else {

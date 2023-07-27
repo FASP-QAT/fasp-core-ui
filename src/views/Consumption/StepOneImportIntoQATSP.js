@@ -233,7 +233,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 active: true,
                                 forecastingUnit: []
                             });
-                            console.log("tempList===>", tempList)
+                            // console.log("tempList===>", tempList)
 
                             this.setState({
                                 planningUnitList: myResult,
@@ -266,7 +266,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     getTracerCategoryList() {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
-                console.log("response.data----", response.data);
+                // console.log("response.data----", response.data);
                 this.setState({
                     tracerCategoryList: response.data,
                 },
@@ -396,7 +396,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     componentDidMount() {
-        console.log("inside compinen")
+        // console.log("inside compinen")
         document.getElementById("stepOneBtn").disabled = true;
         this.getProgramDetails();
     }
@@ -408,7 +408,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
 
-                    console.log("getDatasetList-------->", responseData[rd].currentVersion);
+                    // console.log("getDatasetList-------->", responseData[rd].currentVersion);
 
                     var json = {
                         programCode: responseData[rd].programCode,
@@ -429,7 +429,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     datasetList.push(json);
                 }
                 this.setState({
-                    datasetList: datasetList,
+                    datasetList: datasetList.sort(function (a, b) {
+                        a = a.programCode.toLowerCase();
+                        b = b.programCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                      }),
                     loading: false
                 }, () => {
                     this.props.updateStepOneData("datasetList", datasetList);
@@ -467,7 +471,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                console.log("DATASET----------->", myResult);
+                // console.log("DATASET----------->", myResult);
                 // this.setState({
                 //     programs: myResult
                 // });
@@ -491,7 +495,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         loading: false,
                     });
                 }
-                console.log("DATASET-------->", programs);
+                // console.log("DATASET-------->", programs);
                 this.setState({
                     programs: programs,
                     loading: false
@@ -531,7 +535,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 programRequest1.onsuccess = function (e) {
                     var myResult = [];
                     myResult = programRequest1.result;
-                    console.log("myResult--->", myResult)
+                    // console.log("myResult--->", myResult)
 
                     this.setState({
                         programObj: myResult,
@@ -715,7 +719,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
     buildJexcel() {
         var papuList = this.state.selSource;
-        console.log("response.data,,,,", papuList)
+        // console.log("response.data,,,,", papuList)
 
         var data = [];
         var papuDataArr = [];
@@ -734,7 +738,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 let isForecastBlank = (!check && totalForecast == 0)
 
-                console.log("response.data,check,", isForecastBlank)
+                // console.log("response.data,check,", isForecastBlank)
 
                 data = [];
                 data[0] = getLabelText(papuList[j].planningUnit.forecastingUnit.tracerCategory.label, this.state.lang)
@@ -940,10 +944,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
         // var value = (instance.jexcel.getJson(null, false)[r])[5];
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[5];
 
-        console.log("value--------->100", value);
+        // console.log("value--------->100", value);
 
         var mylist = this.state.planningUnitListJexcel;
-        console.log("mylist--------->100", mylist);
+        // console.log("mylist--------->100", mylist);
         if (value > 0) {
             mylist = mylist.filter(c => (c.id == -1 ? c : c.tracerCategoryId == value && c.active.toString() == "true"));
         }
@@ -989,7 +993,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     versions: (forecastProgram[0].versionList.filter(function (x, i, a) {
                         let forecastStartDate = x.forecastStartDate;
                         let forecastStopDate = x.forecastStopDate;
-                        console.log("forecastStartDate", forecastStartDate)
+                        // console.log("forecastStartDate", forecastStartDate)
                         if (!(formattedDate > forecastStartDate && formattedDate < forecastStopDate)) {
                             isForecastOver = true;
                         }
@@ -1049,7 +1053,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var formattedDate = addMonths(new Date(), -5);
 
         if ((new Date() > forecastStartDate && new Date() < forecastStopDate)) {
-            console.log('✅ date is between the 2 dates');
+            // console.log('✅ date is between the 2 dates');
             isForecastAlreadyStarted = true;
             isForecastOver = false;
             isWithinLast6Months = false;
@@ -1057,20 +1061,20 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         } else {
             if ((formattedDate > forecastStartDate && formattedDate < forecastStopDate)) {
-                console.log('✅ formattedDate is between the 2 dates');
+                // console.log('✅ formattedDate is between the 2 dates');
                 isForecastAlreadyStarted = false;
                 isForecastOver = false;
                 isWithinLast6Months = true;
                 isFutureForecast = false;
             } else if (monthsDiff < FORECAST_DATEPICKER_MONTH_DIFF) {
-                console.log('✅ future forecast is between the 2 dates');
+                // console.log('✅ future forecast is between the 2 dates');
                 isForecastAlreadyStarted = false;
                 isForecastOver = false;
                 isWithinLast6Months = false;
                 isFutureForecast = true;
             }
             else {
-                console.log('⛔️ date is not in the range');
+                // console.log('⛔️ date is not in the range');
                 isForecastAlreadyStarted = false;
                 isForecastOver = true;
                 isWithinLast6Months = false;
@@ -1153,7 +1157,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.setState({
             forecastProgramId: e.target.value,
             versionId: '',
-            programListFilter: programListFilter,
+            programListFilter: programListFilter.sort(function (a, b) {
+                a = a.programCode.toLowerCase();
+                b = b.programCode.toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+              }),
 
         }, () => {
             this.filterVersion();
@@ -1171,7 +1179,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1278,9 +1286,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.props.updateStepOneData("selSource1", tableJson);
 
 
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
         // this.props.finishedStepOne();
     }

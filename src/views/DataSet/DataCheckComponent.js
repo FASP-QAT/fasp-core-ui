@@ -25,8 +25,8 @@ export function dataCheck(props, datasetJson) {
             for (var dpu = 0; dpu < datasetPlanningUnit.length; dpu++) {
                 for (var drl = 0; drl < datasetRegionList.length; drl++) {
                     var regionId = datasetRegionList[drl].regionId;
-                    console.log("props.state.includeOnlySelectedForecasts@@@@@@@@@@@@", props.state.includeOnlySelectedForecasts);
-                    console.log("props.state.includeOnlySelectedForecasts 1@@@@@@@@@@@@", datasetPlanningUnit[dpu].selectedForecastMap);
+                    // console.log("props.state.includeOnlySelectedForecasts@@@@@@@@@@@@", props.state.includeOnlySelectedForecasts);
+                    // console.log("props.state.includeOnlySelectedForecasts 1@@@@@@@@@@@@", datasetPlanningUnit[dpu].selectedForecastMap);
                     if ((props.state.includeOnlySelectedForecasts && datasetPlanningUnit[dpu].selectedForecastMap != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId] != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].scenarioId == scenarioList[ndm].id && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeId == PgmTreeList[tl].treeId) || (!props.state.includeOnlySelectedForecasts)) {
                         if (treeScenarioNotes.findIndex(c => c.treeId == PgmTreeList[tl].treeId && c.scenarioId == scenarioList[ndm].id) == -1) {
                             treeScenarioNotes.push({
@@ -279,7 +279,7 @@ export function dataCheck(props, datasetJson) {
         }
         //No Forecast selected
         var selectedForecast = datasetPlanningUnit[dpu].selectedForecastMap;
-        console.log("selectedForecast$$$$%%%%", selectedForecast);
+        // console.log("selectedForecast$$$$%%%%", selectedForecast);
         var regionArray = [];
         for (var drl = 0; drl < datasetRegionList.length; drl++) {
             if (selectedForecast[datasetRegionList[drl].regionId] == undefined || (selectedForecast[datasetRegionList[drl].regionId].scenarioId == null && selectedForecast[datasetRegionList[drl].regionId].consumptionExtrapolationId == null)) {
@@ -312,7 +312,7 @@ export function dataCheck(props, datasetJson) {
 export function buildJxl1(props) {
     props.updateState("loading", true)
     var treeScenarioList = props.state.treeScenarioList;
-    console.log("TreeScenarioList@@@", treeScenarioList)
+    // console.log("TreeScenarioList@@@", treeScenarioList)
     var treeScenarioListFilter = treeScenarioList;
     var treeScenarioListNotHaving100PerChild = [];
     for (var tsl = 0; tsl < treeScenarioListFilter.length; tsl++) {
@@ -373,7 +373,7 @@ export function buildJxl1(props) {
 export function buildJxl(props) {
     props.updateState("loading", true)
     var treeScenarioList = props.state.treeScenarioList;
-    console.log("TreeScenarioList@@@", treeScenarioList)
+    // console.log("TreeScenarioList@@@", treeScenarioList)
     var treeScenarioListFilter = treeScenarioList;
     var treeScenarioListNotHaving100PerChild = [];
     for (var tsl = 0; tsl < treeScenarioListFilter.length; tsl++) {
@@ -837,10 +837,10 @@ export function exportPDF(props) {
     }
 
     {
-        console.log("props.state.missingBranchesList@@@", props.state.missingBranchesList)
+        // console.log("props.state.missingBranchesList@@@", props.state.missingBranchesList)
         if (props.state.missingBranchesList.length > 0) {
             props.state.missingBranchesList.map((item, i) => {
-                console.log("In map 2nd time")
+                // console.log("In map 2nd time")
                 doc.setFont('helvetica', 'normal')
                 planningText = doc.splitTextToSize(getLabelText(item.treeLabel, props.state.lang), doc.internal.pageSize.width * 3 / 4);
                 // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
@@ -854,7 +854,7 @@ export function exportPDF(props) {
                     doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
                     y = y + 10;
                 }
-                console.log("item.flatList%%%", item.flatList)
+                // console.log("item.flatList%%%", item.flatList)
                 item.flatList.length > 0 && item.flatList.map((item1, j) => {
                     doc.setFont('helvetica', 'normal')
                     // if (item1.payload.nodeType.id == 4) {

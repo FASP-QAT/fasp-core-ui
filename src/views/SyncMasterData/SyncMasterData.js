@@ -192,19 +192,19 @@ export default class SyncMasterData extends Component {
                 .then(commitRequestResponse => {
                     if (commitRequestResponse.status == 200) {
                         var commitRequestResponseData = commitRequestResponse.data;
-                        console.log("commitRequestResponseData=++", commitRequestResponseData)
-                        console.log("commitRequestData=++", datasetDetailsList)
+                        // console.log("commitRequestResponseData=++", commitRequestResponseData)
+                        // console.log("commitRequestData=++", datasetDetailsList)
                         for (var cr = 0; cr < commitRequestResponseData.length; cr++) {
                             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                             var userId = userBytes.toString(CryptoJS.enc.Utf8);
                             var prgQPLDetails = datasetDetailsList.filter(c => c.programId == commitRequestResponseData[cr].program.id && c.version == commitRequestResponseData[cr].committedVersionId && c.userId == userId)[0];
-                            console.log("prgQPLDetails=++", prgQPLDetails)
+                            // console.log("prgQPLDetails=++", prgQPLDetails)
                             if (prgQPLDetails != undefined) {
                                 var checkIfReadonly = commitRequestResponseData.filter(c => c.program.id == prgQPLDetails.programId && c.committedVersionId == prgQPLDetails.version);
-                                console.log("checkIfReadonly=++", checkIfReadonly);
+                                // console.log("checkIfReadonly=++", checkIfReadonly);
                                 var readonly = checkIfReadonly.length > 0 ? 0 : prgQPLDetails.readonly;
                                 prgQPLDetails.readonly = readonly;
-                                console.log("readonly=++", readonly);
+                                // console.log("readonly=++", readonly);
                                 var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
                                 var programQPLDetailsRequest = programQPLDetailsOs.put(prgQPLDetails);
@@ -221,7 +221,7 @@ export default class SyncMasterData extends Component {
     }
 
     syncProgramData(date, programList, programQPLDetailsList, readonlyProgramIds, programPlanningUnitList, procurementAgentPlanningUnitList) {
-        console.log("Date Last sync date above", date);
+        // console.log("Date Last sync date above", date);
         // console.log('Program List', programList);
         var valid = true;
         var jsonForNewShipmentSync = [];
@@ -229,7 +229,7 @@ export default class SyncMasterData extends Component {
             var generalDataBytes = CryptoJS.AES.decrypt(programList[pl].programData.generalData, SECRET_KEY);
             var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
             var generalJson = JSON.parse(generalData);
-            console.log("GeneralJson@@@@@@@@@@@@@@", generalJson)
+            // console.log("GeneralJson@@@@@@@@@@@@@@", generalJson)
             var programQPLListFilter = programQPLDetailsList.filter(c => c.id == programList[pl].id);
             var linkedShipmentsList = generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList : [];
             var listOfRoNoAndRoPrimeLineNo = [];
@@ -253,7 +253,7 @@ export default class SyncMasterData extends Component {
                 lastSyncDate: moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")
             })
         }
-        console.log("jsonForNewShipmentSync@@@@@@@@@@@@@@@@", jsonForNewShipmentSync)
+        // console.log("jsonForNewShipmentSync@@@@@@@@@@@@@@@@", jsonForNewShipmentSync)
 
         let startDate = '2021-01-01';
         let stopDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD");
@@ -268,7 +268,7 @@ export default class SyncMasterData extends Component {
                 if (commitRequestResponse.status == 200) {
                     var commitRequestResponseData = commitRequestResponse.data;
                     MasterSyncService.getNewShipmentSyncApi(jsonForNewShipmentSync).then(shipmentSyncResponse => {
-                        console.log("Response from api Test", shipmentSyncResponse)
+                        // console.log("Response from api Test", shipmentSyncResponse)
                         for (var i = 0; i < programList.length; i++) {
                             AuthenticationService.setupAxiosInterceptors();
                             // this.refs.problemListChild.qatProblemActions(programList[i].id);
@@ -276,7 +276,7 @@ export default class SyncMasterData extends Component {
                                 //Code to Sync Country list
                                 MasterSyncService.syncProgram(programList[i].programId, programList[i].version, programList[i].userId, date)
                                     .then(response => {
-                                        console.log("Response Mohit", response);
+                                        // console.log("Response Mohit", response);
                                         if (response.status == 200) {
                                             // console.log("Response=========================>", response.data);
                                             // console.log("i", i);
@@ -303,7 +303,7 @@ export default class SyncMasterData extends Component {
                                             // console.log("Batch Info list", batchInfoList);
                                             var shipArray = shipmentSyncResponse.data[response.data.programId].filter(c => c.shipmentActive == true && c.orderActive == true);
                                             var minDateForPPLModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? generalJson.currentVersion.createdDate : date;
-                                            console.log("Min Date for PPL Modify Test@123",minDateForPPLModify)
+                                            // console.log("Min Date for PPL Modify Test@123",minDateForPPLModify)
                                             var pplModified = programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") >= moment(minDateForPPLModify).format("YYYY-MM-DD HH:mm:ss") && c.program.id == response.data.programId);
 
                                             var rebuild = false;
@@ -320,6 +320,7 @@ export default class SyncMasterData extends Component {
                                             // console.log("Min Date in sync", minDate);
                                             var batchArray = [];
                                             var roNoAndRoPrimeLineNoSetFromAPI = [...new Set(shipArray.map(ele => ele.roNo + "|" + ele.roPrimeLineNo))];
+                                            // console.log("Ro No Set Test@123",roNoAndRoPrimeLineNoSetFromAPI)
 
                                             var planningUnitList = [];
                                             // for (var j = 0; j < shipArray.length; j++) {
@@ -328,17 +329,17 @@ export default class SyncMasterData extends Component {
                                             //     }
                                             // }
                                             var linkedShipmentsList = generalJson.shipmentLinkingList != null ? generalJson.shipmentLinkingList.filter(c => c.active == true) : [];
-                                            console.log("Linked Shipment list from loaded program Test", linkedShipmentsList)
-                                            console.log("LinkedShipmentsList=========================>", linkedShipmentsList)
+                                            // console.log("Linked Shipment list from loaded program Test", linkedShipmentsList)
+                                            // console.log("LinkedShipmentsList=========================>", linkedShipmentsList)
                                             var linkedShipmentsListFilter = linkedShipmentsList.filter(c => roNoAndRoPrimeLineNoSetFromAPI.includes(c.roNo + "|" + c.roPrimeLineNo));
-                                            console.log("Linked Shipments List filter from api Test", linkedShipmentsListFilter)
+                                            // console.log("Linked Shipments List filter from api Test", linkedShipmentsListFilter)
                                             planningUnitList = [...new Set(linkedShipmentsListFilter).map(ele => ele.qatPlanningUnitId)];
                                             for (var ppl = 0; ppl < pplModified.length; ppl++) {
                                                 if (!planningUnitList.includes(pplModified[ppl].planningUnit.id)) {
                                                     planningUnitList.push(pplModified[ppl].planningUnit.id);
                                                 }
                                             }
-                                            console.log("planningUnitList Test", planningUnitList);
+                                            // console.log("planningUnitList Test", planningUnitList);
                                             for (var pu = 0; pu < planningUnitList.length; pu++) {
                                                 var ppuObject = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitList[pu] && c.program.id == response.data.programId)[0];
                                                 var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitList[pu]);
@@ -361,20 +362,20 @@ export default class SyncMasterData extends Component {
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var batchInfoList = programJson.batchInfoList;
                                                 var shipArrayForPlanningUnit = linkedShipmentsListFilter.filter(c => c.qatPlanningUnitId == planningUnitList[pu]);
-                                                console.log("Ship array from planning Unit Test", shipArrayForPlanningUnit)
+                                                // console.log("Ship array from planning Unit Test", shipArrayForPlanningUnit)
                                                 var uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId = [...new Set(shipArrayForPlanningUnit).map(ele => ele.roNo + "|" + ele.roPrimeLineNo)];
-                                                console.log("Unique Ro and Ro Prime Line No Test", uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId);
+                                                // console.log("Unique Ro and Ro Prime Line No Test", uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId);
                                                 for (var j = 0; j < uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId.length; j++) {
-                                                    console.log("Ship Array filter Test=========================>", shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]))
+                                                    // console.log("Ship Array filter Test=========================>", shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]))
                                                     var uniqueKnShipmentNo = [...new Set(shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j])).map(ele => ele.orderNo + "|" + ele.primeLineNo + "|" + ele.knShipmentNo)];
                                                     var knShipmentNoThatExistsInLinkedShipmentsList = linkedShipmentsListFilter.filter(x => x.roNo + "|" + x.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && !uniqueKnShipmentNo.includes(x.orderNo + "|" + x.primeLineNo + "|" + x.knShipmentNo));
 
-                                                    console.log("knShipmentNoThatExistsInLinkedShipmentsList Test=========================>", knShipmentNoThatExistsInLinkedShipmentsList);
-                                                    console.log("uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId Test=========================>", uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]);
-                                                    console.log("UniqueKnShipmentNo=========================>", uniqueKnShipmentNo);
+                                                    // console.log("knShipmentNoThatExistsInLinkedShipmentsList Test=========================>", knShipmentNoThatExistsInLinkedShipmentsList);
+                                                    // console.log("uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId Test=========================>", uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]);
+                                                    // console.log("UniqueKnShipmentNo=========================>", uniqueKnShipmentNo);
                                                     for (var u = 0; u < uniqueKnShipmentNo.length; u++) {
                                                         var checkIfAlreadyExists = linkedShipmentsList.findIndex(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo + "|" + c.primeLineNo + "|" + c.knShipmentNo == uniqueKnShipmentNo[u]);
-                                                        console.log("checkIfAlreadyExists Test=========================>", checkIfAlreadyExists)
+                                                        // console.log("checkIfAlreadyExists Test=========================>", checkIfAlreadyExists)
                                                         if (checkIfAlreadyExists == -1) {
                                                             var linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo = linkedShipmentsList.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j]);
                                                             var index = shipmentDataList.findIndex(c => linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].childShipmentId > 0 ? linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].childShipmentId == c.shipmentId : linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].tempChildShipmentId == c.tempShipmentId);
@@ -388,7 +389,7 @@ export default class SyncMasterData extends Component {
                                                                 var curUser = AuthenticationService.getLoggedInUserId();
                                                                 var username = AuthenticationService.getLoggedInUsername();
                                                                 shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo.map(item => {
-                                                                    console.log("Item@@@@@@@@@@@@@@@@", item)
+                                                                    // console.log("Item@@@@@@@@@@@@@@@@", item)
                                                                     shipmentQty += Number(item.erpQty) * Number(linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].conversionFactor) * shipmentDataList[index].realmCountryPlanningUnit.multiplier;
                                                                     shipmentARUQty += Number(item.erpQty) * Number(linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].conversionFactor);
                                                                     var batchNo = item.batchNo;
@@ -398,8 +399,8 @@ export default class SyncMasterData extends Component {
                                                                     // if (batchNo.toString() == "-99" || batchNo=="") {
                                                                     var programId1 = paddingZero(response.data.programId, 0, 6);
                                                                     var planningUnitId1 = paddingZero(planningUnitList[pu], 0, 8);
-                                                                    autoGenerated = (batchNo.toString() == "-99" || batchNo == "") ? true : autoGenerated;
-                                                                    batchNo = (batchNo.toString() == "-99" || batchNo == "") ? (BATCH_PREFIX).concat(programId1).concat(planningUnitId1).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3)) : batchNo;
+                                                                    autoGenerated = (batchNo==null || batchNo.toString() == "-99" || batchNo == "") ? true : autoGenerated;
+                                                                    batchNo = (batchNo==null || batchNo.toString() == "-99" || batchNo == "") ? (BATCH_PREFIX).concat(programId1).concat(planningUnitId1).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3)) : batchNo;
                                                                     expiryDate = expiryDate == "" || expiryDate == null ? moment(item.expectedDeliveryDate).add(shelfLife, 'months').startOf('month').format("YYYY-MM-DD") : expiryDate;
 
                                                                     // }
@@ -431,7 +432,7 @@ export default class SyncMasterData extends Component {
                                                                     shipmentRcpuQty: Math.round(shipmentARUQty),
                                                                     rate: Number(Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price/shipmentDataList[index].realmCountryPlanningUnit).toFixed(6)),//Price per planning unit
                                                                     shipmentId: 0,
-                                                                    shipmentMode: (shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Land" || shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Ship" ? "Sea" : shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0] == "Air" ? "Air" : "Sea"),//Yeh
+                                                                    shipmentMode: (shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Land"?"Road": shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0] == "Air" ? "Air" : "Sea"),//Yeh
                                                                     shipmentStatus: shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].qatEquivalentShipmentStatus,
                                                                     suggestedQty: 0,
                                                                     budget: shipmentDataList[index].budget,
@@ -522,7 +523,7 @@ export default class SyncMasterData extends Component {
                                                         } else {
                                                             var index = shipmentDataList.findIndex(c => linkedShipmentsList[checkIfAlreadyExists].childShipmentId > 0 ? linkedShipmentsList[checkIfAlreadyExists].childShipmentId == c.shipmentId : linkedShipmentsList[checkIfAlreadyExists].tempChildShipmentId == c.tempShipmentId);
                                                             var shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo = shipArray.filter(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo + "|" + c.primeLineNo + "|" + c.knShipmentNo == uniqueKnShipmentNo[u])
-                                                            console.log("Ship Array based on ro and ro prime line no Test", shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo)
+                                                            // console.log("Ship Array based on ro and ro prime line no Test", shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo)
                                                             var linkedShipmentsListIndex = linkedShipmentsList.findIndex(c => c.roNo + "|" + c.roPrimeLineNo == uniqueRoNoAndRoPrimeLineNoBasedOnPlanningUnitId[j] && c.orderNo + "|" + c.primeLineNo + "|" + c.knShipmentNo == uniqueKnShipmentNo[u]);
                                                             var shipmentQty = 0;
                                                             var shipmentARUQty = 0;
@@ -531,7 +532,7 @@ export default class SyncMasterData extends Component {
                                                             var curUser = AuthenticationService.getLoggedInUserId();
                                                             var username = AuthenticationService.getLoggedInUsername();
                                                             shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo.map(item => {
-                                                                console.log("Item@@@@@@@@@@@@@@@@Test", item)
+                                                                // console.log("Item@@@@@@@@@@@@@@@@Test", item)
                                                                 shipmentQty += Number(item.erpQty) * Number(linkedShipmentsList[checkIfAlreadyExists].conversionFactor) * Number(shipmentDataList[index].realmCountryPlanningUnit.multiplier);
                                                                 shipmentARUQty += Number(item.erpQty) * Number(linkedShipmentsList[checkIfAlreadyExists].conversionFactor);
                                                                 var batchNo = item.batchNo;
@@ -541,8 +542,8 @@ export default class SyncMasterData extends Component {
                                                                 // if (batchNo.toString() == "-99" || batchNo=="") {
                                                                 var programId1 = paddingZero(response.data.programId, 0, 6);
                                                                 var planningUnitId1 = paddingZero(planningUnitList[pu], 0, 8);
-                                                                autoGenerated = (batchNo.toString() == "-99" || batchNo == "") ? true : autoGenerated;
-                                                                batchNo = (batchNo.toString() == "-99" || batchNo == "") ? (BATCH_PREFIX).concat(programId1).concat(planningUnitId1).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3)) : batchNo;
+                                                                autoGenerated = (batchNo==null || batchNo.toString() == "-99" || batchNo == "") ? true : autoGenerated;
+                                                                batchNo = (batchNo== null || batchNo.toString() == "-99" || batchNo == "") ? (BATCH_PREFIX).concat(programId1).concat(planningUnitId1).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3)) : batchNo;
                                                                 expiryDate = expiryDate == "" || expiryDate == null ? moment(item.expectedDeliveryDate).add(shelfLife, 'months').startOf('month').format("YYYY-MM-DD") : expiryDate;
 
                                                                 // }
@@ -558,6 +559,8 @@ export default class SyncMasterData extends Component {
                                                                     shipmentQty: Number(item.erpQty) * Number(linkedShipmentsList[checkIfAlreadyExists].conversionFactor)
                                                                 })
                                                             })
+                                                            // console.log("Test@123 1",shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy);
+                                                            // console.log("Test@123 2",(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Land"?"Road": shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0] == "Air" ? "Air" : "Sea"))
                                                             linkedShipmentsList[linkedShipmentsListIndex].erpShipmentStatus = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].erpShipmentStatus;
                                                             linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.userId = curUser;
                                                             linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
@@ -567,7 +570,7 @@ export default class SyncMasterData extends Component {
                                                             shipmentDataList[index].freightCost = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shippingCost;
                                                             shipmentDataList[index].productCost = Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price/shipmentDataList[index].realmCountryPlanningUnit.multiplier).toFixed(6) * shipmentQty;
                                                             shipmentDataList[index].rate = Number(Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price/shipmentDataList[index].realmCountryPlanningUnit.multiplier).toFixed(6));
-                                                            shipmentDataList[index].shipmentMode = (shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Land" || shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Ship" ? "Sea" : shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0] == "Air" ? "Air" : "Sea");
+                                                            shipmentDataList[index].shipmentMode = (shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shipBy == "Land"?"Road": shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0] == "Air" ? "Air" : "Sea");
                                                             shipmentDataList[index].shipmentStatus = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].qatEquivalentShipmentStatus;
                                                             shipmentDataList[index].expectedDeliveryDate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate;
                                                             shipmentDataList[index].receivedDate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].qatEquivalentShipmentStatus.id == DELIVERED_SHIPMENT_STATUS ? shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate : null
@@ -714,7 +717,7 @@ export default class SyncMasterData extends Component {
                                             var planningUnitListsFromProcurementAgentPlanningUnit = [...new Set(procurementAgentPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD")).map(ele => ele.planningUnit.id))];
                                             var programPlanningUnitUpdated = [...new Set(programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(date).format("YYYY-MM-DD")).map(ele => ele.planningUnit.id))];
                                             var overallList = [...new Set(changedPlanningUnits.concat(planningUnitListsFromProcurementAgentPlanningUnit).concat(programPlanningUnitUpdated)).map(ele => ele)]
-                                            console.log("OverallList@@@@@@@@@@@Mohit", overallList)
+                                            // console.log("OverallList@@@@@@@@@@@Mohit", overallList)
                                             var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                             var curUser = AuthenticationService.getLoggedInUserId();
                                             var username = AuthenticationService.getLoggedInUsername();
@@ -755,7 +758,7 @@ export default class SyncMasterData extends Component {
                                                     shipmentDataList[shipmentIndex].rate = Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2)
                                                     var productCost = Math.round(Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2) * shipmentDataList[shipmentIndex].shipmentQty)
                                                     shipmentDataList[shipmentIndex].productCost = productCost;
-                                                    shipmentDataList[shipmentIndex].freightCost = shipmentDataList[shipmentIndex].shipmentMode == "Air" ? Number(Number(productCost) * (Number(Number(generalJson.airFreightPerc) / 100))).toFixed(2) : Number(Number(productCost) * (Number(Number(generalJson.seaFreightPerc) / 100))).toFixed(2)
+                                                    shipmentDataList[shipmentIndex].freightCost = shipmentDataList[shipmentIndex].shipmentMode == "Air" ? Number(Number(productCost) * (Number(Number(generalJson.airFreightPerc) / 100))).toFixed(2) : shipmentDataList[shipmentIndex].shipmentMode == "Road"?Number(Number(productCost) * (Number(Number(generalJson.roadFreightPerc) / 100))).toFixed(2):Number(Number(productCost) * (Number(Number(generalJson.seaFreightPerc) / 100))).toFixed(2)
                                                     shipmentDataList[shipmentIndex].lastModifiedBy.userId = curUser;
                                                     shipmentDataList[shipmentIndex].lastModifiedBy.username = username;
                                                     shipmentDataList[shipmentIndex].lastModifiedDate = curDate;
@@ -961,15 +964,15 @@ export default class SyncMasterData extends Component {
     }
 
     fetchData(hasPrograms, programId) {
-        console.log("In fetch data+++", this.state.syncedMasters)
+        // console.log("In fetch data+++", this.state.syncedMasters)
         // console.log("In fetch data @@@", this.state.syncedMasters)
         // console.log("HasPrograms@@@", hasPrograms);
         var realmId = AuthenticationService.getRealmId();
-        console.log("ProgramId###", programId);
-        console.log("hasPrograms###", hasPrograms);
+        // console.log("ProgramId###", programId);
+        // console.log("hasPrograms###", hasPrograms);
         if (hasPrograms != 0) {
             var programSynced = this.state.programSynced;
-            console.log("ProgramSYnced###", programSynced);
+            // console.log("ProgramSYnced###", programSynced);
             var indexForProgram = -1;
             if (programId != 1) {
                 indexForProgram = programSynced.findIndex(c => c == programId);
@@ -977,7 +980,7 @@ export default class SyncMasterData extends Component {
             var syncCount = TOTAL_NO_OF_MASTERS_IN_SYNC;
             if (indexForProgram == -1) {
                 programSynced.push(programId);
-                console.log("####programSynced.length", programSynced.length);
+                // console.log("####programSynced.length", programSynced.length);
                 syncCount = syncCount + programSynced.length;
             }
             this.setState({
@@ -1074,7 +1077,7 @@ export default class SyncMasterData extends Component {
                         lastSyncDateRealm = '2020-01-01 00:00:00'
                     }
                     lastSyncDateRealm=moment(lastSyncDateRealm).subtract('1','days').format("YYYY-MM-DD HH:mm:ss")
-                    console.log("Last sync date above", lastSyncDateRealm);
+                    // console.log("Last sync date above", lastSyncDateRealm);
                     var transaction = db1.transaction(['programData'], 'readwrite');
                     var program = transaction.objectStore('programData');
                     var pGetRequest = program.getAll();
@@ -1121,7 +1124,7 @@ export default class SyncMasterData extends Component {
                                         readonlyDatasetIds.push(datasetDetailsList[rp].programId);
                                     }
                                     var datasetList = datasetRequest.result;
-                                    console.log("###DatasetList+++", datasetList)
+                                    // console.log("###DatasetList+++", datasetList)
                                     var datasetListFiltered = [];
                                     if (this.props.location.state != undefined && this.props.location.state.programIds!=undefined) {
                                         datasetListFiltered = datasetList.filter(c => (this.props.location.state.programIds).includes(c.id));
@@ -1164,7 +1167,7 @@ export default class SyncMasterData extends Component {
 
                                                     .then(response => {
                                                         if (response.status == 200) {
-                                                            console.log("M sync Response", response.data)
+                                                            // console.log("M sync Response", response.data)
                                                             var response = response.data;
 
                                                             var cC = db1.transaction(['country'], 'readwrite');
@@ -1404,11 +1407,11 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                         var equivalencyUnitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
                                                                                                                                                                                                         // console.log("M sync equivalencyUnit transaction start")
                                                                                                                                                                                                         var equivalencyUnitObjectStore = equivalencyUnitTransaction.objectStore('equivalencyUnit');
-                                                                                                                                                                                                        console.log("****response.equivalencyUnitMappingList", response.equivalencyUnitMappingList)
+                                                                                                                                                                                                        // console.log("****response.equivalencyUnitMappingList", response.equivalencyUnitMappingList)
                                                                                                                                                                                                         var json = (response.equivalencyUnitMappingList);
-                                                                                                                                                                                                        console.log("****Json", json);
+                                                                                                                                                                                                        // console.log("****Json", json);
                                                                                                                                                                                                         for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                            console.log("**** in for loop")
+                                                                                                                                                                                                            // console.log("**** in for loop")
                                                                                                                                                                                                             equivalencyUnitObjectStore.put(json[i]);
                                                                                                                                                                                                         }
                                                                                                                                                                                                         // console.log("after equivalencyUnit set statue 1", this.state.syncedMasters);
@@ -1422,11 +1425,11 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                 var extrapolationMethodTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
                                                                                                                                                                                                                 // console.log("M sync extrapolationMethod transaction start")
                                                                                                                                                                                                                 var extrapolationMethodObjectStore = extrapolationMethodTransaction.objectStore('extrapolationMethod');
-                                                                                                                                                                                                                console.log("****response.extrapolationMethodMappingList", response.extrapolationMethodMappingList)
+                                                                                                                                                                                                                // console.log("****response.extrapolationMethodMappingList", response.extrapolationMethodMappingList)
                                                                                                                                                                                                                 var json = (response.extrapolationMethodList);
-                                                                                                                                                                                                                console.log("****Json", json);
+                                                                                                                                                                                                                // console.log("****Json", json);
                                                                                                                                                                                                                 for (var i = 0; i < json.length; i++) {
-                                                                                                                                                                                                                    console.log("**** in for loop")
+                                                                                                                                                                                                                    // console.log("**** in for loop")
                                                                                                                                                                                                                     extrapolationMethodObjectStore.put(json[i]);
                                                                                                                                                                                                                 }
                                                                                                                                                                                                                 // console.log("after extrapolationMethod set statue 1", this.state.syncedMasters);
@@ -1750,7 +1753,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                                                                                                                                                                 }
                                                                                                                                                                                                                                                                                                                                                                                                 // console.log("after forecastMethodType set statue 1", this.state.syncedMasters);
                                                                                                                                                                                                                                                                                                                                                                                                 forecastMethodTypeTransaction.oncomplete = function (event) {
-                                                                                                                                                                                                                                                                                                                                                                                                    console.log("****in forecast method complete");
+                                                                                                                                                                                                                                                                                                                                                                                                    // console.log("****in forecast method complete");
                                                                                                                                                                                                                                                                                                                                                                                                     this.setState({
                                                                                                                                                                                                                                                                                                                                                                                                         syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                                                                                                                                                                                         syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
@@ -1759,7 +1762,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                                                                                                                                                                         var usagePeriodTransaction = db1.transaction(['usagePeriod'], 'readwrite');
                                                                                                                                                                                                                                                                                                                                                                                                         // console.log("M sync usagePeriod transaction start")
                                                                                                                                                                                                                                                                                                                                                                                                         var usagePeriodObjectStore = usagePeriodTransaction.objectStore('usagePeriod');
-                                                                                                                                                                                                                                                                                                                                                                                                        console.log("Usp****")
+                                                                                                                                                                                                                                                                                                                                                                                                        // console.log("Usp****")
                                                                                                                                                                                                                                                                                                                                                                                                         var json = (response.usagePeriodList);
                                                                                                                                                                                                                                                                                                                                                                                                         for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                                                                                                                                                                                                                             usagePeriodObjectStore.put(json[i]);

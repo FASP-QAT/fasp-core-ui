@@ -4,7 +4,7 @@ import i18n from '../../i18n.js';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 import { calculateCI } from './CalculateCI.js';
 export function calculateLinearRegression(inputData, confidence, noOfProjectionMonths, props, isTreeExtrapolation, page, regionId, planningUnitId) {
-    console.log("InputData@@@", inputData)
+    // console.log("InputData@@@", inputData)
 
     //     // const noOfMonthsForProjection = noOfProjectionMonths;
     //     // let actualMonths = data[data.length - 1].month;
@@ -272,7 +272,7 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
             output.push({ month:(x + 1),actual:inputData[x].actual, forecast:y == 'NA' ? null : y > 0 ? y : 0,ci:null})
         }
     }
-    console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
+    // console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
     
         if (page == "DataEntry") {
             var linearRegressionData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }

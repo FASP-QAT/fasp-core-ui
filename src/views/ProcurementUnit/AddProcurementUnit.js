@@ -687,6 +687,7 @@ import SupplierService from "../../api/SupplierService"
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { API_URL } from "../../Constants";
+import DropdownService from "../../api/DropdownService";
 
 const entityname = i18n.t('static.procurementUnit.procurementUnit');
 let initialValues = {
@@ -887,7 +888,7 @@ export default class AddProcurementUnit extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        PlanningUnitService.getActivePlanningUnitList()
+        DropdownService.getPlanningUnitDropDownList()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
@@ -1188,7 +1189,7 @@ export default class AddProcurementUnit extends Component {
         let planningUnits = planningUnitList.length > 0
             && planningUnitList.map((item, i) => {
                 return (
-                    <option key={i} value={item.planningUnitId}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )

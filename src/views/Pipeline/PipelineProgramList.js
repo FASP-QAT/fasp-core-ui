@@ -289,7 +289,7 @@ export default class PipelineProgramList extends Component {
 
     buildJExcel() {
         let pipelineProgramList = this.state.pipelineProgramList;;
-        // console.log("pipelineProgramList---->", pipelineProgramList);
+        // // console.log("pipelineProgramList---->", pipelineProgramList);
         let pipelineProgramArray = [];
         let count = 0;
 
@@ -307,7 +307,7 @@ export default class PipelineProgramList extends Component {
         //     data = [];
         //     pipelineProgramArray[0] = data;
         // }
-        // console.log("pipelineProgramArray---->", pipelineProgramArray);
+        // // console.log("pipelineProgramArray---->", pipelineProgramArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -380,8 +380,8 @@ export default class PipelineProgramList extends Component {
     }
 
     selected = function (instance, x1, y1, x2, y2, value) {
-        console.log("Original Value---->>>>>", x1, "---------->", x2);
-        console.log("Original Value---->>>>>", y1, "---------->", y2);
+        // console.log("Original Value---->>>>>", x1, "---------->", x2);
+        // console.log("Original Value---->>>>>", y1, "---------->", y2);
         if (y1 == y2) {
             this.props.history.push({
                 pathname: `/pipeline/pieplineProgramSetup/${this.el.getValueFromCoords(0, y1)}`,

@@ -672,7 +672,7 @@ export default class WhatIfReportComponent extends React.Component {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields2").style.display = "contents";
-                console.log("this.state.generalProgramJson@@@@@@@@@@@@@@@", this.state.generalProgramJson)
+                // console.log("this.state.generalProgramJson@@@@@@@@@@@@@@@", this.state.generalProgramJson)
                 var localProcurementLeadTime = ((this.state.programPlanningUnitList).filter(p => p.program.id == this.state.generalProgramJson.programId && p.planningUnit.id == this.state.planningUnitId))[0].localProcurementLeadTime;
                 var dt = new Date();
                 dt.setMonth(dt.getMonth() + localProcurementLeadTime);
@@ -955,6 +955,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                    }else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                                     } else {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                     }
@@ -1029,6 +1031,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                    }else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                                     } else {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                     }
@@ -1104,6 +1108,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                    } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                                     } else {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                                     }
@@ -1543,6 +1549,8 @@ export default class WhatIfReportComponent extends React.Component {
                             var shippedToArrivedLeadTime = ""
                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                            }else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                             } else {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                             }
@@ -1653,6 +1661,8 @@ export default class WhatIfReportComponent extends React.Component {
                             var shippedToArrivedLeadTime = ""
                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                            }else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                             } else {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                             }
@@ -1764,6 +1774,8 @@ export default class WhatIfReportComponent extends React.Component {
                             var shippedToArrivedLeadTime = ""
                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                            }else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
                             } else {
                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
                             }
@@ -2722,7 +2734,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
                                                 var planningUnit = proList.filter(c => c.value == planningUnitIdProp).length > 0 ? { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label } : { value: "", label: "" };
                                                 // var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                                                var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
+                                                var planningUnitDataFilter = this.state.planningUnitDataList.filter(c => c.planningUnitId == planningUnitIdProp);
                                                 var programJson = {};
                                                 if (planningUnitDataFilter.length > 0) {
                                                     var planningUnitData = planningUnitDataFilter[0]
@@ -3013,7 +3025,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var bRequest = bOs.getAll();
                                     bRequest.onsuccess = function (event) {
                                         var bResult = [];
-                                        bResult = bRequest.result.filter(c => c.program.id == generalProgramJson.programId);
+                                        bResult = bRequest.result.filter(c => [...new Set(c.programs.map(ele => ele.id))].includes(parseInt(generalProgramJson.programId)));
                                         this.setState({
                                             budgetListForWhatIf: bResult
                                         })
@@ -3544,8 +3556,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                     var compare = (m[n].startDate >= currentMonth);
                                                     // var stockInHand = jsonList[0].closingBalance;
                                                     var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(this.state.distributionLeadTime, 'months').format("YYYY-MM"));
-                                                    console.log("Spd1@@@@@@@@@@@", spd1)
-                                                    console.log("Spd1@@@@@@@@@@@mn.startDate", m[n].startDate)
+                                                    // console.log("Spd1@@@@@@@@@@@", spd1)
+                                                    // console.log("Spd1@@@@@@@@@@@mn.startDate", m[n].startDate)
                                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                                     var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                                     var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
@@ -4066,7 +4078,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountShipments: monthCountShipments
         })
-        console.log("Mohit form submit 30")
+        // console.log("Mohit form submit 30")
         this.formSubmit(this.state.planningUnit, monthCountShipments)
     }
 
@@ -4075,7 +4087,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCountShipments: monthCountShipments
         })
-        console.log("Mohit form submit 31")
+        // console.log("Mohit form submit 31")
         this.formSubmit(this.state.planningUnit, monthCountShipments);
     }
 
@@ -4341,7 +4353,8 @@ export default class WhatIfReportComponent extends React.Component {
         shipmentList = shipmentList.filter(c => 
             (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
             // && c.erpFlag == false 
-            && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value
+            // && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS 
+            && c.planningUnit.id == document.getElementById("planningUnitId").value
             // && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)
         );
         if (document.getElementById("addRowId") != null) {
@@ -4364,7 +4377,7 @@ export default class WhatIfReportComponent extends React.Component {
                 multiplier: rcpuFilter[0].multiplier
             }
         }
-        console.log("rcpuObject Mohit", rcpuObject);
+        // console.log("rcpuObject Mohit", rcpuObject);
         var json = {
             shipmentQty: suggestedShipmentList[0].suggestedOrderQty,
             shipmentRcpuQty: rcpuFilter.length == 1 ? suggestedShipmentList[0].suggestedOrderQty / rcpuObject.multiplier : suggestedShipmentList[0].suggestedOrderQty,
@@ -6512,7 +6525,7 @@ export default class WhatIfReportComponent extends React.Component {
             //         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
             //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = this.state.programJson;
-            console.log("ProgramJson###", programJson);
+            // console.log("ProgramJson###", programJson);
             var planningUnitId = document.getElementById("planningUnitId").value;
             var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id == planningUnitId))[0];
             var shipmentListUnFiltered = programJson.shipmentList;
@@ -6520,7 +6533,7 @@ export default class WhatIfReportComponent extends React.Component {
                 shipmentListUnFiltered: shipmentListUnFiltered
             })
             var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
-            console.log("SupplyPlanType###", supplyPlanType);
+            // console.log("SupplyPlanType###", supplyPlanType);
             // var tableEditableBasedOnSupplyPlan = true;
             if (supplyPlanType == 'deliveredShipments') {
                 shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
@@ -6537,12 +6550,12 @@ export default class WhatIfReportComponent extends React.Component {
                     document.getElementById("addRowId").style.display = "block"
                 }
             } else if (supplyPlanType == 'orderedShipments') {
-                console.log("In else if###", shipmentList);
-                console.log("In else if###", startDate);
+                // console.log("In else if###", shipmentList);
+                // console.log("In else if###", startDate);
                 shipmentList = shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate
                     // && c.erpFlag == false 
                     && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == APPROVED_SHIPMENT_STATUS || c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                console.log("In else if###", shipmentList);
+                // console.log("In else if###", shipmentList);
                 if (document.getElementById("addRowId") != null) {
                     document.getElementById("addRowId").style.display = "block"
                 }

@@ -167,7 +167,7 @@ class AddRegionComponent extends Component {
   }
 
   Capitalize(str) {
-    // console.log("in method");
+    // // console.log("in method");
     this.state.region.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
     // return str.charAt(0).toUpperCase() + str.slice(1);
   }
@@ -195,10 +195,10 @@ class AddRegionComponent extends Component {
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                  console.log("Submit clicked-----------", this.state.region);
+                  // console.log("Submit clicked-----------", this.state.region);
                   RegionService.addRegion(this.state.region)
                     .then(response => {
-                      console.log("Response->", response);
+                      // console.log("Response->", response);
                       if (response.status == 200) {
                         this.props.history.push(`/region/listRegion/` + i18n.t(response.data.messageCode, { entityname }))
                       } else {

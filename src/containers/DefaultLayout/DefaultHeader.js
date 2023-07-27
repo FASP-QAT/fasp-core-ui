@@ -70,7 +70,7 @@ class DefaultHeader extends Component {
             <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
     </NavItem>*/}
           <NavItem className="px-3">
-            {console.log("Inside header called---", this.props.activeModule)}
+            {/* {console.log("Inside header called---", this.props.activeModule)} */}
             <NavLink to="#" onClick={this.refreshPage} className={this.props.activeModule == 2 ? "nav-link titleColorModule1" : "nav-link titleColorModule2"} ><b>{this.props.activeModule == 2 ? i18n.t('static.module.supplyPlanningModule') : i18n.t('static.module.forecastingModule')}</b><br></br><b>{this.props.title}</b></NavLink>
           </NavItem>
         </Nav>
@@ -130,7 +130,7 @@ class DefaultHeader extends Component {
           {checkOnline === 'Online'  && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
+                {/* {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)} */}
 
                 {this.props.changeIcon &&
                   // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
@@ -166,7 +166,7 @@ class DefaultHeader extends Component {
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_DATASET') && this.props.activeModule == 1 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.fuChangeIcon)}
+                {/* {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.fuChangeIcon)} */}
 
                 {this.props.fuChangeIcon &&
                   // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />

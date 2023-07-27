@@ -14,6 +14,7 @@ import { stringify } from 'querystring';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { API_URL, SPACE_REGEX } from '../../Constants.js';
+import DropdownService from '../../api/DropdownService';
 
 let initialValues = {
     realmId: [],
@@ -273,9 +274,11 @@ export default class AddForecastingUnitComponent extends Component {
                 }
             );
 
-        TracerCategoryService.getTracerCategoryListAll()
+        // TracerCategoryService.getTracerCategoryListAll()
+        DropdownService.getTracerCategoryDropdownList()
             .then(response => {
-                var listArray = response.data.filter(c => c.active);
+                // console.log("getTracerCategoryDropdownList",response.data)
+                var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -365,11 +368,11 @@ export default class AddForecastingUnitComponent extends Component {
         if (realmId != "") {
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
-                    console.log("productCategory------>", response.data.slice(1))
+                    // console.log("productCategory------>", response.data.slice(1))
                     var listArray = response.data.slice(1);
-                    console.log("RESPO----->1", listArray.length);
+                    // console.log("RESPO----->1", listArray.length);
                     listArray = listArray.filter(c => c.payload.active.toString() == "true");
-                    console.log("RESPO----->2", listArray.length);
+                    // console.log("RESPO----->2", listArray.length);
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -450,7 +453,7 @@ export default class AddForecastingUnitComponent extends Component {
         let tracerCategoryList = tracerCategories.length > 0
             && tracerCategories.map((item, i) => {
                 return (
-                    <option key={i} value={item.tracerCategoryId}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -482,7 +485,7 @@ export default class AddForecastingUnitComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log(stringify(this.state.forecastingUnit))
+                                    // console.log(stringify(this.state.forecastingUnit))
                                     ForecastingUnitService.addForecastingUnit(this.state.forecastingUnit)
                                         .then(response => {
                                             if (response.status == 200) {

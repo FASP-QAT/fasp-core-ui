@@ -128,7 +128,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ForecastMethodService.getForecastMethodList()
             .then(response => {
-                console.log("response.data----", response.data);
+                // console.log("response.data----", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -232,7 +232,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
                             this.state.forecastMethod.summary = summaryText_2;
                             this.state.forecastMethod.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.forecastMethod).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

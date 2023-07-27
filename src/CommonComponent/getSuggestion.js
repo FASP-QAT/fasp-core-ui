@@ -80,7 +80,7 @@ export default function getSuggestion(row, lang) {
     if (row.realmProblem.problem.problemId == 3) {
         // Please update the Shipment status for Shipment Id <%SHIPMENT_ID%>, it should have been Received by now
         // Please check to make sure shipment id <%SHIPMENT_ID%>  for product <%PLANNING_UNIT%> was received, and update either the receive date or the shipment status.
-        console.log("===", row.data5);
+        // console.log("===", row.data5);
         if (row.data5 != "") {
             var obj = JSON.parse(row.data5);
         }
@@ -110,7 +110,7 @@ export default function getSuggestion(row, lang) {
     if (row.realmProblem.problem.problemId == 4) {
         // Please update the Shipment status for Shipment Id <%SHIPMENT_ID%>, it should have been Submitted by now
         // Please check to make sure shipment id <%SHIPMENT_ID%>   for product <%PLANNING_UNIT%> was submitted, and update either the receive date or the shipment status.
-        console.log("===", row.data5);
+        // console.log("===", row.data5);
         if (row.data5 != "") {
             var obj = JSON.parse(row.data5);
         }
@@ -355,7 +355,7 @@ export default function getSuggestion(row, lang) {
         //     const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang));
         //     label.label_pr = result_pr;
         // }
-        console.log("row.data5", row.data5.suggession)
+        // console.log("row.data5", row.data5.suggession)
         var label = row.data5.suggession;
 
         return label;
@@ -682,7 +682,7 @@ export default function getSuggestion(row, lang) {
         return getLabelText(label, lang);
     }
     if (row.realmProblem.problem.problemId == 26 || row.realmProblem.problem.problemId == 27 || row.realmProblem.problem.problemId == 28) {
-        console.log("row.data5==suggession==>", row.data5);
+        // console.log("row.data5==suggession==>", row.data5);
         const regex = /(?:\r\n|\r|\n)/g;
         var obj = JSON.parse(row.data5.toString().replaceAll(regex, '<br/>'));
         //  var obj = JSON.parse(row.data5);

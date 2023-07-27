@@ -534,7 +534,7 @@ class ModelingValidation extends Component {
             var data = [];
             var dataArr = [];
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
-            console.log("flatList###", flatList)
+            // console.log("flatList###", flatList)
             for (var j = 0; j < monthList.length; j++) {
                 data = [];
                 data[0] = moment(monthList[j]).format("YYYY-MM-DD");
@@ -791,7 +791,7 @@ class ModelingValidation extends Component {
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
-                console.log("responseData------->", responseData);
+                // console.log("responseData------->", responseData);
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
                     var json = {
@@ -1767,7 +1767,7 @@ class ModelingValidation extends Component {
 
                                     {/* {this.state.show && */}
                                     <div className="row">
-                                        <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin">
+                                        <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
 
                                             {/* // <div className="table-scroll">
                                                     // <div className="table-wrap table-responsive"> */}

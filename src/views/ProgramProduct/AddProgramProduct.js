@@ -12,10 +12,11 @@ import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import ProgramService from "../../api/ProgramService";
 import getLabelText from '../../CommonComponent/getLabelText';
 import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions";
-import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC } from "../../Constants";
+import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, PROGRAM_TYPE_SUPPLY_PLAN } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import DropdownService from '../../api/DropdownService';
 
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
@@ -82,7 +83,7 @@ class AddprogramPlanningUnit extends Component {
         var value = (this.state.mapPlanningUnitEl.getJson(null, false)[r])[c - 1];
         var puList = []
         if (value != -1) {
-            console.log("in if=====>");
+            // console.log("in if=====>");
             var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
             var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
             var pcIdArray = [];
@@ -91,7 +92,7 @@ class AddprogramPlanningUnit extends Component {
             }
             puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id));
         } else {
-            console.log("in else=====>");
+            // console.log("in else=====>");
             puList = this.state.planningUnitList
         }
 
@@ -120,10 +121,12 @@ class AddprogramPlanningUnit extends Component {
 
     componentDidMount() {
         this.hideFirstComponent();
-        ProgramService.getProgramForDropDown(1)//supply plan programs
+        let realmId = AuthenticationService.getRealmId();
+
+        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response.data", response.data)
+                    // console.log("response.data", response.data)
                     let myReasponse = response.data.sort((a, b) => {
                         var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
@@ -195,7 +198,7 @@ class AddprogramPlanningUnit extends Component {
             },
                 () => {
                     if (programId != 0 && programId != '' && programId != null) {
-                        console.log("CONSOLE-------->1", programId);
+                        // console.log("CONSOLE-------->1", programId);
                         this.buildJexcel();
                     }
                 })
@@ -219,7 +222,7 @@ class AddprogramPlanningUnit extends Component {
         var programObj;
         // var programId = document.getElementById("programId").value;
         let programId = this.state.programId;
-        console.log("CONSOLE-------->2", programId);
+        // console.log("CONSOLE-------->2", programId);
         this.setState({
             programId: programId,
             loading: true
@@ -232,15 +235,15 @@ class AddprogramPlanningUnit extends Component {
                 if (response.status == 200) {
                     programObj = response.data;
                     var realmId = programObj.realmCountry.realm.realmId
-                    console.log("problemObj====>", programObj, "realmId======", realmId);
+                    // console.log("problemObj====>", programObj, "realmId======", realmId);
                     ProductCategoryServcie.getProductCategoryListByRealmId(realmId)
                         .then(response => {
 
                             if (response.status == 200) {
-                                console.log("productCategory response----->", response.data);
+                                // console.log("productCategory response----->", response.data);
                                 for (var k = 0; k < (response.data).length; k++) {
                                     var spaceCount = response.data[k].sortOrder.split(".").length;
-                                    console.log("spaceCOunt--->", spaceCount);
+                                    // console.log("spaceCOunt--->", spaceCount);
                                     var indendent = "";
                                     for (var p = 1; p <= spaceCount - 1; p++) {
                                         if (p == 1) {
@@ -249,8 +252,8 @@ class AddprogramPlanningUnit extends Component {
                                             indendent = indendent.concat("_");
                                         }
                                     }
-                                    console.log("ind", indendent);
-                                    console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
+                                    // console.log("ind", indendent);
+                                    // console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
 
                                     var productCategoryJson = {};
                                     if (response.data[k].payload.productCategoryId == 0) {
@@ -268,13 +271,13 @@ class AddprogramPlanningUnit extends Component {
                                     productCategoryListNew.push(productCategoryJson);
 
                                 }
-                                console.log("constant product category list====>", productCategoryListNew);
+                                // console.log("constant product category list====>", productCategoryListNew);
                                 this.setState({ productCategoryList: response.data });
 
                                 // PlanningUnitService.getAllPlanningUnitList()
                                 PlanningUnitService.getPlanningUnitListBasic()
                                     .then(response => {
-                                        console.log("PlanningUnitResponse------->", response.data);
+                                        // console.log("PlanningUnitResponse------->", response.data);
                                         if (response.status == 200) {
                                             this.setState({
                                                 planningUnitList: response.data
@@ -307,7 +310,7 @@ class AddprogramPlanningUnit extends Component {
                                                         var data = [];
                                                         if (myReasponse.length != 0) {
                                                             for (var j = 0; j < myReasponse.length; j++) {
-                                                                console.log("myReasponse[j]---", myReasponse[j]);
+                                                                // console.log("myReasponse[j]---", myReasponse[j]);
                                                                 data = [];
                                                                 data[0] = myReasponse[j].productCategory.id;
                                                                 data[1] = myReasponse[j].planningUnit.id;
@@ -734,26 +737,26 @@ class AddprogramPlanningUnit extends Component {
                                                                     //wr
                                                                     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
                                                                         let cordsValue = `${this.el.getValueFromCoords(12, y)}`;
-                                                                        // console.log("CHECK--------->", cordsValue);
+                                                                        // // console.log("CHECK--------->", cordsValue);
                                                                         // if (cordsValue.length != 0) {
-                                                                        //     console.log("CHECK--------->not empty", cordsValue);
+                                                                        //     // console.log("CHECK--------->not empty", cordsValue);
                                                                         // } else {
-                                                                        //     console.log("CHECK--------->empty", cordsValue);
+                                                                        //     // console.log("CHECK--------->empty", cordsValue);
                                                                         // }
                                                                         if (obj.options.allowInsertRow == true) {
                                                                             if (cordsValue.length != 0) {
                                                                                 items.push({
                                                                                     title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
                                                                                     onclick: function () {
-                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
-                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
-                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
-                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
-                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
-                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
-                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
-                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
-                                                                                        // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
+                                                                                        // // console.log("onclick------>", this.el.getValueFromCoords(0, y));                      
                                                                                         this.props.history.push({
                                                                                             pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(12, y)}/${programId}`,
                                                                                         });
@@ -1020,7 +1023,7 @@ class AddprogramPlanningUnit extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[3]));
+            // console.log("RESP---------", parseFloat(rowData[3]));
             elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
         } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
@@ -1063,12 +1066,12 @@ class AddprogramPlanningUnit extends Component {
 
             var value = this.el.getValueFromCoords(14, y);
             if (parseInt(value) == 1) {
-                // console.log("PROBLEM");
+                // // console.log("PROBLEM");
 
 
                 var col = ("A").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(0, y);
-                // console.log("value-----", value);
+                // // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1081,8 +1084,8 @@ class AddprogramPlanningUnit extends Component {
 
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getRowData(parseInt(y))[1];
-                console.log("Vlaue------>", value);
-                // console.log("value-----", value);
+                // console.log("Vlaue------>", value);
+                // // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1123,7 +1126,7 @@ class AddprogramPlanningUnit extends Component {
                 value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
-                // console.log("value-----", value);
+                // // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1146,7 +1149,7 @@ class AddprogramPlanningUnit extends Component {
                 value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
-                // console.log("value-----", value);
+                // // console.log("value-----", value);
                 if (json[y][2] == 1 && value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1169,7 +1172,7 @@ class AddprogramPlanningUnit extends Component {
                 value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
-                // console.log("value-----", value);
+                // // console.log("value-----", value);
                 if (json[y][2] == 2 && value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1191,7 +1194,7 @@ class AddprogramPlanningUnit extends Component {
                 value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
-                // console.log("value-----", value);
+                // // console.log("value-----", value);
                 if (json[y][2] == 2 && value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1214,7 +1217,7 @@ class AddprogramPlanningUnit extends Component {
                 value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
-                // console.log("value-----", value);
+                // // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1237,7 +1240,7 @@ class AddprogramPlanningUnit extends Component {
                 value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
-                // console.log("value-----", value);
+                // // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1260,7 +1263,7 @@ class AddprogramPlanningUnit extends Component {
                 value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
                 var reg = JEXCEL_DECIMAL_LEAD_TIME
-                // console.log("value-----", value);
+                // // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1285,7 +1288,7 @@ class AddprogramPlanningUnit extends Component {
                 value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
-                // console.log("value-----", value);
+                // // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1310,7 +1313,7 @@ class AddprogramPlanningUnit extends Component {
                 // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
                 // var reg = DECIMAL_NO_REGEX;
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE
-                // console.log("value-----", value);
+                // // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1338,29 +1341,29 @@ class AddprogramPlanningUnit extends Component {
     changed = function (instance, cell, x, y, value) {
         var valid = true;
         //Product category
-        console.log("changed 1");
+        // console.log("changed 1");
         var rowData = this.el.getRowData(y);
         if (x == 0) {
-            console.log("changed 3");
+            // console.log("changed 3");
             var col = ("A").concat(parseInt(y) + 1);
             // alert("value--->",value);
-            console.log("value--->", rowData[0]);
-            console.log("rowData===>", this.el.getRowData(y));
+            // console.log("value--->", rowData[0]);
+            // console.log("rowData===>", this.el.getRowData(y));
             if (rowData[0] == "") {
-                console.log("============in if when category is changed ");
+                // console.log("============in if when category is changed ");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.el.setValueFromCoords(14, y, 1, true);
                 valid = false;
             } else {
-                console.log("============in else when category is changed ");
+                // console.log("============in else when category is changed ");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
                 this.el.setValueFromCoords(14, y, 1, true);
                 valid = true;
             }
-            console.log("test11111", jexcel);
+            // console.log("test11111", jexcel);
 
             // var columnName = jexcel.getColumnNameFromId([parseInt(x) + 1, y]);
             // instance.worksheets[0].setValue(columnName, '');
@@ -1368,7 +1371,7 @@ class AddprogramPlanningUnit extends Component {
 
         //Planning Unit
         if (x == 1) {
-            console.log("changed 4");
+            // console.log("changed 4");
             var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1378,15 +1381,15 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setValueFromCoords(14, y, 1, true);
                 valid = false;
             } else {
-                console.log("json.length", json.length);
+                // console.log("json.length", json.length);
                 var jsonLength = parseInt(json.length) - 1;
-                console.log("jsonLength", jsonLength);
+                // console.log("jsonLength", jsonLength);
                 for (var i = jsonLength; i >= 0; i--) {
-                    console.log("i=---------->", i, "y----------->", y);
+                    // console.log("i=---------->", i, "y----------->", y);
                     var map = new Map(Object.entries(json[i]));
                     var planningUnitValue = map.get("1");
-                    console.log("Planning Unit value in change", map.get("1"));
-                    console.log("Value----->", value);
+                    // console.log("Planning Unit value in change", map.get("1"));
+                    // console.log("Value----->", value);
                     if (planningUnitValue == value && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
@@ -1422,7 +1425,7 @@ class AddprogramPlanningUnit extends Component {
                 this.el.setComments(col, "");
                 this.el.setValueFromCoords(14, y, 1, true);
                 valid = true;
-                console.log("changed 7");
+                // console.log("changed 7");
                 value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // var reg = /^[0-9\b]+$/;
                 var reg = JEXCEL_INTEGER_REGEX
@@ -1512,7 +1515,7 @@ class AddprogramPlanningUnit extends Component {
         }
         //Reorder frequency
         if (x == 3) {
-            console.log("changed 6");
+            // console.log("changed 6");
             // var reg = /^[0-9\b]+$/;
             value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
@@ -1540,7 +1543,7 @@ class AddprogramPlanningUnit extends Component {
         }
         //Min months of stock
         if (x == 4) {
-            console.log("changed 7");
+            // console.log("changed 7");
             value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
@@ -1571,7 +1574,7 @@ class AddprogramPlanningUnit extends Component {
         }
         //Min Qty
         if (x == 5) {
-            console.log("changed 7");
+            // console.log("changed 7");
             value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
@@ -1603,7 +1606,7 @@ class AddprogramPlanningUnit extends Component {
 
         //Distribution Lead Time
         if (x == 9) {
-            console.log("changed 7");
+            // console.log("changed 7");
             value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
@@ -1634,7 +1637,7 @@ class AddprogramPlanningUnit extends Component {
         }
         //Months in future for AMC
         if (x == 6) {
-            console.log("changed 8");
+            // console.log("changed 8");
             value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
@@ -1662,7 +1665,7 @@ class AddprogramPlanningUnit extends Component {
         }
         //Months in past for AMC
         if (x == 7) {
-            console.log("changed 10");
+            // console.log("changed 10");
             value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
@@ -1690,7 +1693,7 @@ class AddprogramPlanningUnit extends Component {
         }
         //Local procurement lead time
         if (x == 8) {
-            console.log("changed 11");
+            // console.log("changed 11");
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_LEAD_TIME
@@ -1719,7 +1722,7 @@ class AddprogramPlanningUnit extends Component {
         }
         //Shelf life
         if (x == 10) {
-            console.log("changed 12");
+            // console.log("changed 12");
             value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX
@@ -1747,7 +1750,7 @@ class AddprogramPlanningUnit extends Component {
         }
         //Catalog price
         if (x == 11) {
-            console.log("changed 13");
+            // console.log("changed 13");
             // var reg = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
             value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
@@ -1790,15 +1793,15 @@ class AddprogramPlanningUnit extends Component {
         // var validation = this.state.isValidData;
         if (validation == true) {
             this.setState({ loading: true })
-            // console.log("validation---true-->");
+            // // console.log("validation---true-->");
 
             var json = this.el.getJson(null, false);
-            console.log("Rows on submit", json)
+            // console.log("Rows on submit", json)
             var planningUnitArray = []
-            console.log("json.length---" + json.length);
+            // console.log("json.length---" + json.length);
             for (var i = 0; i < json.length; i++) {
                 var map = new Map(Object.entries(json[i]));
-                console.log("(map.get(14)---" + map.get("14"));
+                // console.log("(map.get(14)---" + map.get("14"));
                 if (map.get("14") == 1) {
                     if (map.get("12") == "") {
                         var pId = 0;
@@ -1830,7 +1833,7 @@ class AddprogramPlanningUnit extends Component {
 
             }
             // AuthenticationService.setupAxiosInterceptors();
-            console.log("SUBMIT----", planningUnitArray);
+            // console.log("SUBMIT----", planningUnitArray);
             ProgramService.addprogramPlanningUnitMapping(planningUnitArray)
                 .then(response => {
                     if (response.status == "200") {
@@ -1903,7 +1906,7 @@ class AddprogramPlanningUnit extends Component {
                 );
 
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
