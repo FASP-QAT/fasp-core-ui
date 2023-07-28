@@ -24,7 +24,7 @@ import StepFour from './StepFour.js';
 import StepFive from './StepFive';
 import StepSix from './StepSix.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED, API_URL } from "../../Constants";
+import { PLANNED_TO_SUBMITTED, SUBMITTED_TO_APPROVED, APPROVED_TO_SHIPPED, SHIPPED_TO_ARRIVED_AIR, SHIPPED_TO_ARRIVED_SEA, ARRIVED_TO_RECEIVED, API_URL, SHIPPED_TO_ARRIVED_ROAD, ROAD_FREIGHT_PERC } from "../../Constants";
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramOnboarding extends Component {
     constructor(props) {
@@ -61,19 +61,21 @@ export default class ProgramOnboarding extends Component {
                 },
                 airFreightPerc: '',
                 seaFreightPerc: '',
+                roadFreightPerc: '',
                 // deliveredToReceivedLeadTime: '',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
-                submittedToApprovedLeadTime: SUBMITTED_TO_APPROVED,
-                approvedToShippedLeadTime: APPROVED_TO_SHIPPED,
+                submittedToApprovedLeadTime: '',
+                approvedToShippedLeadTime: '',
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
 
-                shippedToArrivedByAirLeadTime: SHIPPED_TO_ARRIVED_AIR,
-                shippedToArrivedBySeaLeadTime: SHIPPED_TO_ARRIVED_SEA,
-                arrivedToDeliveredLeadTime: ARRIVED_TO_RECEIVED,
+                shippedToArrivedByAirLeadTime: '',
+                shippedToArrivedBySeaLeadTime: '',
+                shippedToArrivedByRoadLeadTime: '',
+                arrivedToDeliveredLeadTime: '',
 
-                plannedToSubmittedLeadTime: PLANNED_TO_SUBMITTED,
+                plannedToSubmittedLeadTime: '',
 
                 // healthArea: {
                 //     id: ''
@@ -149,7 +151,7 @@ export default class ProgramOnboarding extends Component {
             document.getElementById('realmId').disabled = true;
 
         } else {
-            console.log("in else");
+            // console.log("in else");
             document.getElementById('realmId').disabled = false;
         }
 
@@ -288,16 +290,16 @@ export default class ProgramOnboarding extends Component {
         program.programPlanningUnits = j;
         this.setState({ program }, () => { });
 
-        console.log("validation status----", validation)
-        console.log("planningUnit ----------------", j);
-        console.log("program-----------", this.state.program);
+        // console.log("validation status----", validation)
+        // console.log("planningUnit ----------------", j);
+        // console.log("program-----------", this.state.program);
 
         if (validation == true) {
             this.setState({ loading: true });
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.programInitialize(this.state.program).then(response => {
                 if (response.status == "200") {
-                    console.log("in success--------");
+                    // console.log("in success--------");
                     this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
@@ -377,7 +379,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         let { program } = this.state;
         program.healthArea.id = '';
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => { 
+            // console.log(this.state) 
+        })
     }
 
     previousToStepThree() {
@@ -391,7 +395,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         let { program } = this.state;
         program.organisation.id = '';
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => { 
+            // console.log(this.state) 
+        })
     }
 
     previousToStepFour() {
@@ -405,7 +411,9 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSeven').style.display = 'none';
         let { program } = this.state;
         program.regionArray = [];
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => { 
+            // console.log(this.state) 
+        })
     }
     previousToStepFive() {
         this.setState({ progressPer: 68 });
@@ -483,6 +491,9 @@ export default class ProgramOnboarding extends Component {
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
         }
+        if (event.target.name == 'roadFreightPerc') {
+            program.roadFreightPerc = event.target.value;
+        }
         if (event.target.name == 'uniqueCode') {
             var dname = this.state.program.programCode;
             var email_array = dname.split('-');
@@ -523,6 +534,9 @@ export default class ProgramOnboarding extends Component {
         if (event.target.name == 'shippedToArrivedBySeaLeadTime') {
             program.shippedToArrivedBySeaLeadTime = event.target.value;
         }
+        if (event.target.name == 'shippedToArrivedByRoadLeadTime') {
+            program.shippedToArrivedByRoadLeadTime = event.target.value;
+        }
         if (event.target.name == 'arrivedToDeliveredLeadTime') {
             program.arrivedToDeliveredLeadTime = event.target.value;
         }
@@ -530,7 +544,9 @@ export default class ProgramOnboarding extends Component {
             program.programNotes = event.target.value;
         }
 
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => { 
+            // console.log(this.state)
+         })
 
     }
 

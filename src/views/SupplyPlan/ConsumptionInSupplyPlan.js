@@ -43,11 +43,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     onPaste(instance, data) {
-        console.log("+++in paste", data);
+        // console.log("+++in paste", data);
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                console.log("+++in data[i and z not equal", data[i].y, "Z------------>", z);
+                // console.log("+++in data[i and z not equal", data[i].y, "Z------------>", z);
                 (instance).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
                 var index = (instance).getValue(`M${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
@@ -125,7 +125,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        console.log("instance@@#################", instance)
+        // console.log("instance@@#################", instance)
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
 
@@ -277,7 +277,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         if (consumptionList[j].actualFlag == false) {
                             consumptionFlag = 2;
                         }
-                        console.log("consumptionList[j].realmCountryPlanningUnit.id+++", consumptionList[j].realmCountryPlanningUnit.id)
+                        // console.log("consumptionList[j].realmCountryPlanningUnit.id+++", consumptionList[j].realmCountryPlanningUnit.id)
                         data[0] = consumptionList[j].consumptionDate; //A
                         data[1] = consumptionList[j].region.id; //B                        
                         data[2] = consumptionFlag;
@@ -877,7 +877,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     filterDataSourceBasedOnConsumptionType = function (instance, cell, c, r, source, conf) {
-        console.log("instance@@@@@@@@@@@############", instance)
+        // console.log("instance@@@@@@@@@@@############", instance)
         var mylist = [];
         var value = (this.state.consumptionEl.getJson(null, false)[r])[2];
         if (value == 1) {
@@ -1384,7 +1384,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         // var adjustmentsQty = 0;
         // var openingBalance = 0;
         // var consumptionQty = 0;
-        console.log("A--------------------> JSON----------")
+        // console.log("A--------------------> JSON----------")
         var consumptionDataList = this.props.items.consumptionListUnFiltered;
         var coList = [];
         for (var y = 0; y < json.length; y++) {
@@ -1459,7 +1459,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 this.props.hideSecondComponent();
             } else {
                 var rowData = elInstance.getRowData(y);
-                console.log("A--------------------> Row Data", rowData[12]);
+                // console.log("A--------------------> Row Data", rowData[12]);
                 if (rowData[12] !== "" && rowData[12] != undefined) {
                     var lastEditableDate = "";
                     if (rowData[2] == 1) {
@@ -1478,19 +1478,19 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
                         var rowData = elInstance.getRowData(y);
                         var validation = checkValidtion("dateWithInvalidDataEntry", "A", y, rowData[0], elInstance, "", "", "", 0);
-                        console.log("A-------------------->", validation);
+                        // console.log("A-------------------->", validation);
                         if (validation == false) {
-                            console.log("A--------------------> in if");
+                            // console.log("A--------------------> in if");
                             valid = false;
                             elInstance.setValueFromCoords(14, y, 1, true);
                         } else {
-                            console.log("A--------------------> in else");
+                            // console.log("A--------------------> in else");
                             if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM") && rowData[10].toString() == "true") {
-                                console.log("A--------------------> in else if 1");
+                                // console.log("A--------------------> in else if 1");
                                 inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                                 valid = false;
                             } else {
-                                console.log("A--------------------> in else else 2");
+                                // console.log("A--------------------> in else else 2");
                                 positiveValidation("C", y, elInstance);
                             }
                         }
@@ -1571,19 +1571,19 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         // }
 
                         validation = checkValidtion("text", "C", y, rowData[2], elInstance);
-                        console.log("A--------------------> Validation 2", validation);
+                        // console.log("A--------------------> Validation 2", validation);
                         if (validation == false) {
-                            console.log("A--------------------> in if 2");
+                            // console.log("A--------------------> in if 2");
                             valid = false;
                             elInstance.setValueFromCoords(14, y, 1, true);
                         } else {
-                            console.log("A--------------------> in else 2");
+                            // console.log("A--------------------> in else 2");
                             if (rowData[2] != "" && rowData[2] != undefined && rowData[2] == ACTUAL_CONSUMPTION_TYPE && moment(rowData[0]).format("YYYY-MM") > moment(Date.now()).format("YYYY-MM") && rowData[10].toString() == "true") {
-                                console.log("A--------------------> in else if 2");
+                                // console.log("A--------------------> in else if 2");
                                 inValid("C", y, i18n.t('static.supplyPlan.noActualConsumptionForFuture'), elInstance);
                                 valid = false;
                             } else {
-                                console.log("A--------------------> in else else 2");
+                                // console.log("A--------------------> in else else 2");
                                 positiveValidation("C", y, elInstance);
                             }
                         }
@@ -1597,7 +1597,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
 
     // Save consumptions
     saveConsumption() {
-        console.log("###Started with save", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
+        // console.log("###Started with save", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
         // this.showOnlyErrors();
         this.props.updateState("consumptionError", "");
         this.props.updateState("loading", true);
@@ -1706,21 +1706,21 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         let dataSourceLabel = '';
                         if (map.get("3") == "14;15") {
                             if (map.get("2") == 1) { //actual
-                                console.log("RESP------4 if actual");
+                                // console.log("RESP------4 if actual");
                                 dataSourceId = 14;
                                 dataSourceLabel = (this.state.dataSourceList).filter(c => c.id == 14)[0].label
                             } else { //forecast
-                                console.log("RESP------4 else forecast");
+                                // console.log("RESP------4 else forecast");
                                 dataSourceId = 15;
                                 dataSourceLabel = (this.state.dataSourceList).filter(c => c.id == 15)[0].label
                             }
                         } else {
-                            console.log("RESP------4 else");
+                            // console.log("RESP------4 else");
                             dataSourceId = map.get("3");
                             dataSourceLabel = (this.state.dataSourceList).filter(c => c.id == map.get("3"))[0].label
                         }
-                        console.log("RESP------ dataSourceId", dataSourceId);
-                        console.log("RESP------2 dataSourceLabel", dataSourceLabel);
+                        // console.log("RESP------ dataSourceId", dataSourceId);
+                        // console.log("RESP------2 dataSourceLabel", dataSourceLabel);
                         if (parseInt(map.get("12")) != -1) {
                             consumptionDataList[parseInt(map.get("12"))].consumptionDate = moment(map.get("0")).startOf('month').format("YYYY-MM-DD");
                             consumptionDataList[parseInt(map.get("12"))].region.id = map.get("1");

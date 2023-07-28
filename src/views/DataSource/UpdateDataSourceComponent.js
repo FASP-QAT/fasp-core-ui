@@ -167,7 +167,7 @@ export default class UpdateDataSourceComponent extends Component {
 
         DataSourceService.getDataSourceById(this.props.match.params.dataSourceId).then(response => {
             if (response.status == 200) {
-                console.log("getDataSourceById----->", response.data);
+                // console.log("getDataSourceById----->", response.data);
                 this.setState({
                     dataSource: response.data, loading: false
                 });

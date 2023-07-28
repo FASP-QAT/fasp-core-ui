@@ -2,9 +2,9 @@ import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, props, page, regionId,planningUnitId) {
 
     const data = inputData;
-    console.log("InputData mv@@@", inputData)
-    console.log("noOfMonths@@@", noOfMonths)
-    console.log("noOfProjectionMonths@@@", noOfProjectionMonths)
+    // console.log("InputData mv@@@", inputData)
+    // console.log("noOfMonths@@@", noOfMonths)
+    // console.log("noOfProjectionMonths@@@", noOfProjectionMonths)
 
     const monthsForMovingAverage = noOfMonths;
     const noOfMonthsForProjection = noOfProjectionMonths;
@@ -29,7 +29,7 @@ export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, 
         props.updateMovingAvgData(movingAvgData);
     } else {
         calculateError(data, "movingAvgError", props);
-        console.log("mvg data---", data)
+        // console.log("mvg data---", data)
         props.updateState("movingAvgData", data);
         // for (let y=1; y<=actualMonths+noOfMonthsForProjection; y++) {
         //     console.log(y+" = "+data[y-1].forecast);
@@ -39,7 +39,7 @@ export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, 
 }
 
 function getMovingAverage(month, monthsForMovingAverage, actualMonths, data) {
-    console.log("month=" + month);
+    // console.log("month=" + month);
     let startMonth = month - monthsForMovingAverage;
     if (startMonth < 1) {
         startMonth = 1;
@@ -48,7 +48,7 @@ function getMovingAverage(month, monthsForMovingAverage, actualMonths, data) {
     if (endMonth < 1) {
         return null;
     }
-    console.log("startMonth=" + startMonth + ", endMonth=" + endMonth);
+    // console.log("startMonth=" + startMonth + ", endMonth=" + endMonth);
     let sum = 0;
     let count = 0;
     for (let x = startMonth; x <= endMonth; x++) {
@@ -60,7 +60,7 @@ function getMovingAverage(month, monthsForMovingAverage, actualMonths, data) {
             count++;
         }
     }
-    console.log("sum=" + sum + ", count=" + count);
+    // console.log("sum=" + sum + ", count=" + count);
     if (count == 0) {
         return null;
     } else {

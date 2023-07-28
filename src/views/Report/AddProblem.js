@@ -167,7 +167,7 @@ class AddRoleComponent extends Component {
           var probList = [];
           probList = getRequestP.result;
           var filteredList = probList.filter(c => c.problemType.id != 1)
-          // console.log("problemList====>", filteredList);
+          // // console.log("problemList====>", filteredList);
           this.setState({ problemList: filteredList });
 
         }.bind(this);
@@ -218,11 +218,11 @@ class AddRoleComponent extends Component {
         planningunitRequestAll.onsuccess = function (e) {
           // var myResultAll = [];
           planningUnitListAll = planningunitRequestAll.result;
-          // console.log("myResult", myResult);
+          // // console.log("myResult", myResult);
           // alert((document.getElementById("programId").value).split("_")[0]);
           var programId = (document.getElementById("programId").value).split("_")[0];
-          // console.log('programId----->>>', programId)
-          // console.log(myResult);
+          // // console.log('programId----->>>', programId)
+          // // console.log(myResult);
           var proList = []
           for (var i = 0; i < myResult.length; i++) {
             var pu = planningUnitListAll.filter(c => c.planningUnitId == myResult[i].planningUnit.id)[0];
@@ -235,7 +235,7 @@ class AddRoleComponent extends Component {
               proList[i] = productJson
             }
           }
-          // console.log("planningUnitList---" + proList);
+          // // console.log("planningUnitList---" + proList);
           this.setState({
             planningUnitList: proList
           })
@@ -279,7 +279,7 @@ class AddRoleComponent extends Component {
                 regionList.push(regionJson);
 
               }
-              // console.log("regionList---->", regionList);
+              // // console.log("regionList---->", regionList);
               this.setState({
                 regionList: regionList
               })
@@ -347,7 +347,7 @@ class AddRoleComponent extends Component {
         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
         var programJson = JSON.parse(programData);
-        // console.log("programJson===>", programJson);
+        // // console.log("programJson===>", programJson);
 
         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
@@ -365,9 +365,9 @@ class AddRoleComponent extends Component {
           var planningUnitResult = [];
           planningUnitResult = planningunitRequest.result;
           planningUnitList = planningUnitResult.filter(c => c.program.id == programId.split("_")[0]);
-          // console.log("planing Unit List===>", planningUnitList);
+          // // console.log("planing Unit List===>", planningUnitList);
           var regionList = programJson.regionList;
-          // console.log("regionList===>", regionList);
+          // // console.log("regionList===>", regionList);
 
           var transactionP = db1.transaction(['problem'], 'readwrite');
           var problem = transactionP.objectStore('problem');
@@ -384,7 +384,7 @@ class AddRoleComponent extends Component {
           getRequestP.onsuccess = function (event) {
             var probList = [];
             probList = getRequestP.result;
-            // console.log("problemList====>", probList);
+            // // console.log("problemList====>", probList);
             var programObj = programJson;
             var planningUnitObj = planningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0];
             var regionObj = { id: 0 };
@@ -397,11 +397,11 @@ class AddRoleComponent extends Component {
             var problemActionList = programJson.problemReportList;
 
             if (problemId == 13) {
-              // console.log("programObj====>", programObj);
-              // console.log("planningUnitObj====>", planningUnitObj);
-              // console.log("regionObj====>", regionObj);
-              console.log("problemObj====>", problemObj);
-              // console.log("problemActionList====>", problemActionList);
+              // // console.log("programObj====>", programObj);
+              // // console.log("planningUnitObj====>", planningUnitObj);
+              // // console.log("regionObj====>", regionObj);
+              // console.log("problemObj====>", problemObj);
+              // // console.log("problemActionList====>", problemActionList);
               problemActionIndex = problemActionList.length;
 
               var index = problemActionList.findIndex(
@@ -491,7 +491,7 @@ class AddRoleComponent extends Component {
 
                 }
                 problemActionList.push(json);
-                console.log("problemActionList===>", problemActionList);
+                // console.log("problemActionList===>", problemActionList);
 
 
                 var problemTransaction = db1.transaction(['programData'], 'readwrite');
@@ -520,7 +520,7 @@ class AddRoleComponent extends Component {
               } else {
                 this.props.history.push(`/report/addProblem/` + 'red/' + i18n.t('static.problem.allreadyExist'));
                 this.hideSecondComponent();
-                // console.log("in else============>");
+                // // console.log("in else============>");
 
               }
 

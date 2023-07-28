@@ -52,8 +52,8 @@ export default class DatabaseTranslations extends React.Component {
                             labelList: json,
                             languageList: languageList
                         })
-                        console.log("json+++", json);
-                        console.log("LanguageList+++", languageList);
+                        // console.log("json+++", json);
+                        // console.log("LanguageList+++", languageList);
                         var data = [];
                         var label = [];
                         for (var i = 0; i < json.length; i++) {
@@ -112,9 +112,9 @@ export default class DatabaseTranslations extends React.Component {
                             }.bind(this),
                             // tableHeight: '500px',
                         };
-                        console.log("optionsss===1", options)
+                        // console.log("optionsss===1", options)
                         this.el = jexcel(document.getElementById("labelTranslationTable"), options);
-                        console.log("optionsss===2", options)
+                        // console.log("optionsss===2", options)
 
                         this.setState({
                             loading: false
@@ -131,7 +131,7 @@ export default class DatabaseTranslations extends React.Component {
                     }
                 }).catch(
                     error => {
-                        console.log("Error+++", error)
+                        // console.log("Error+++", error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 // message: 'static.unkownError',
@@ -187,7 +187,7 @@ export default class DatabaseTranslations extends React.Component {
             }
         }).catch(
             error => {
-                console.log("Error1+++", error)
+                // console.log("Error1+++", error)
                 if (error.message === "Network Error") {
                     this.setState({
                         // message: 'static.unkownError',
@@ -253,7 +253,7 @@ export default class DatabaseTranslations extends React.Component {
         var listToUpdate = [];
         for (var j = 0; j < tableJson.length; j++) {
             if ((tableJson[j])[2] == 1) {
-                console.log("changed------------------");
+                // console.log("changed------------------");
                 var staticLabelJsonIndex = labelList.findIndex(c => c.staticLabelId == (tableJson[j])[0]);
                 var staticLabelLanguagesList = [];
                 var k = 3;
@@ -396,7 +396,7 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     changed = function (instance, cell, x, y, value) {
-        console.log("changed function called----------------");
+        // console.log("changed function called----------------");
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {

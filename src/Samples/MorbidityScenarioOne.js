@@ -173,11 +173,11 @@ export default class MorbidityScenarioOne extends Component {
     }
 
     levelClicked(i) {
-        console.log("level onclick function called----" + i);
+        // console.log("level onclick function called----" + i);
     }
 
     deleteScenario(scenarioId, scenarioName, index) {
-        console.log("scenarioId---", scenarioId);
+        // console.log("scenarioId---", scenarioId);
         confirmAlert({
             message: "Are you sure you want to delete the scenario - " + scenarioName,
             buttons: [
@@ -224,7 +224,7 @@ export default class MorbidityScenarioOne extends Component {
             activeTab: parseInt(tabList.length),
             openAddScenarioModal: false
         }, () => {
-            console.log("final tab list---", this.state);
+            // console.log("final tab list---", this.state);
         });
     }
     // toggle(tabPane, tab) {
@@ -236,7 +236,7 @@ export default class MorbidityScenarioOne extends Component {
     // }
 
     toggle(e, tab) {
-        console.log("event type---", e.button);
+        // console.log("event type---", e.button);
         if (this.state.activeTab !== tab.i) {
             this.setState({
                 activeTab: tab.i
@@ -280,11 +280,11 @@ export default class MorbidityScenarioOne extends Component {
 
     nodeTypeChange(event) {
         var nodeTypeId = event.target.value;
-        console.log("node type value---", nodeTypeId)
+        // console.log("node type value---", nodeTypeId)
         if (nodeTypeId == 1) {
 
         } else if (nodeTypeId == 2) {
-            console.log("case 2")
+            // console.log("case 2")
             this.setState({
                 displayParentData: true
             });
@@ -449,14 +449,14 @@ export default class MorbidityScenarioOne extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id
             }, () => {
-                console.log("highlighted item---", this.state)
+                // console.log("highlighted item---", this.state)
             })
         }
     };
     onCursorChanged(event, data) {
         const { context: item } = data;
         const { config } = this.state;
-        console.log("Node clicked-------------------");
+        // console.log("Node clicked-------------------");
         // console.log("data2---", item.id);
         // item.id
         this.setState({ openAddNodeModal: true })
@@ -472,7 +472,7 @@ export default class MorbidityScenarioOne extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id
             }, () => {
-                console.log("highlighted item---", this.state)
+                // console.log("highlighted item---", this.state)
             })
         }
     };
@@ -486,7 +486,7 @@ export default class MorbidityScenarioOne extends Component {
             items: nodes,
             openAddNodeModal: false,
         }, () => {
-            console.log("updated tree data+++", this.state);
+            // console.log("updated tree data+++", this.state);
         });
     }
 
@@ -543,7 +543,7 @@ export default class MorbidityScenarioOne extends Component {
             //     console.log("level clicked---------------");
             // });
             // treeLevelItems[i].onclick = function () { console.log("anchal-----------------"); };
-            console.log("level json***");
+            // console.log("level json***");
         }
         const config = {
             ...this.state,

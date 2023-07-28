@@ -26,7 +26,7 @@ let initialValues = {
 }
 
 const validationSchema = function (values, t) {
-    console.log("made by us schema--->", values)
+    // console.log("made by us schema--->", values)
     return Yup.object().shape({
         productCategory: Yup.string()
             .required(i18n.t('static.productCategoryName.productCategoryNameRequired'))
@@ -96,7 +96,7 @@ export default class ProductCategoryTree extends Component {
     }
 
     setTreeData(treeData) {
-        console.log("treeData----->", treeData);
+        // console.log("treeData----->", treeData);
     }
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
@@ -124,7 +124,7 @@ export default class ProductCategoryTree extends Component {
                         loading: false
                     })
                     let realmId = AuthenticationService.getRealmId();
-                    // console.log("realmId----->",realmId);
+                    // // console.log("realmId----->",realmId);
                     if (realmId != -1) {
                         document.getElementById("realmId").value = realmId
                         document.getElementById("realmId").disabled = true;
@@ -213,14 +213,14 @@ export default class ProductCategoryTree extends Component {
             ProductCategoryService.getProductCategoryListByRealmId(this.state.realmId)
 
                 .then(response => {
-                    console.log("response product category list ====>", response.data);
+                    // console.log("response product category list ====>", response.data);
                     if (response.status == 200) {
                         this.setState({
                             productCategoryList: response.data,
                             loading: false,
                         });
 
-                        console.log("this.state.productCategoryList====>", this.state.productCategoryList);
+                        // console.log("this.state.productCategoryList====>", this.state.productCategoryList);
                         var treeData = getTreeFromFlatData({
                             flatData: this.state.productCategoryList.map(
                                 node => ({ ...node, title: node.payload.label.label_en, name: node.payload.label.label_en, expanded: node.payload.expanded, isNew: false })),
@@ -228,7 +228,7 @@ export default class ProductCategoryTree extends Component {
                             getParentKey: node => node.parentId, // resolve a node's parent's key
                             rootKey: null // The value of the parent key when there is no parent (i.e., at root level)
                         });
-                        console.log("treeData------>", treeData);
+                        // console.log("treeData------>", treeData);
 
 
                         this.state.productCategoryList.map(item => {
@@ -293,10 +293,10 @@ export default class ProductCategoryTree extends Component {
 
     }
     addNewNode() {
-        console.log("this.state.treeData===>", this.state.treeData);
+        // console.log("this.state.treeData===>", this.state.treeData);
         let children = this.state.treeData[0].children;
         let duplicate = 0;
-        console.log("children--------->", children);
+        // console.log("children--------->", children);
         let unsortedFlatTreeData = getFlatDataFromTree({
             treeData: this.state.treeData,
             getNodeKey: ({ node }) => node.id,
@@ -305,14 +305,14 @@ export default class ProductCategoryTree extends Component {
         if (children != undefined) {
             // for (let i = 0; i < children.length; i++) {
             //     if (this.state.nodename.localeCompare(children[i].payload.label.label_en) == 0) {//same
-            //         // console.log("Children Duplicate");
+            //         // // console.log("Children Duplicate");
             //         duplicate = 1;
             //     }
             // }
 
             for (let i = 0; i < unsortedFlatTreeData.length; i++) {
                 if (this.state.nodename.localeCompare(unsortedFlatTreeData[i].node.payload.label.label_en) == 0) {//same
-                    // console.log("Children Duplicate");
+                    // // console.log("Children Duplicate");
                     duplicate = 1;
                 }
             }
@@ -359,7 +359,7 @@ export default class ProductCategoryTree extends Component {
 
     }
     disableNode(rowInfo) {
-        // console.log("disable node row info---->", rowInfo);
+        // // console.log("disable node row info---->", rowInfo);
         const changeNode = {
             id: rowInfo.node.id,
             parentId: rowInfo.parentNode.id,
@@ -385,13 +385,13 @@ export default class ProductCategoryTree extends Component {
             getNodeKey: ({ node }) => node.id
         });
         this.setState({ treeData: disabledNode });
-        // console.log("disabledNode--->", disabledNode);
+        // // console.log("disabledNode--->", disabledNode);
         let disableChideNodes = getFlatDataFromTree({
             treeData: disabledNode,
             getNodeKey: ({ node }) => node.id,
             ignoreCollapsed: false
         });
-        // console.log("before--->", disableChideNodes)
+        // // console.log("before--->", disableChideNodes)
         var disabledChildNode = disabledNode;
 
         var currentDisabledNodeId = '';
@@ -515,12 +515,12 @@ export default class ProductCategoryTree extends Component {
             submitJson.push(json);
         }
         )
-        console.log("submit json---->", submitJson);
-        console.log("submit json---->", JSON.stringify(submitJson));
+        // console.log("submit json---->", submitJson);
+        // console.log("submit json---->", JSON.stringify(submitJson));
         ProductCategoryService.addProductCategory(submitJson)
             .then(response => {
                 if (response.status == 200) {
-                    // console.log("success-------------------------.");
+                    // // console.log("success-------------------------.");
                     // this.props.history.push(`/dashboard/` + i18n.t('static.productCategory.success'))
                     // this.props.history.push(`/dashboard/` + 'green/' + i18n.t('static.productCategory.success'))
                     this.props.history.push(`/productCategory/productCategoryTree/` + 'green/' + i18n.t('static.productCategory.success'))
@@ -797,7 +797,7 @@ export default class ProductCategoryTree extends Component {
                                                 })
                                             }
                                             generateNodeProps={rowInfo => {
-                                                // console.log(rowInfo);
+                                                // // console.log(rowInfo);
                                                 // if (rowInfo.node.payload.active == true && (rowInfo.parentNode != null && rowInfo.parentNode.id != 1)) {
                                                 if (rowInfo.node.payload.active == true && (rowInfo.parentNode != null)) {
                                                     let nodeprops = {

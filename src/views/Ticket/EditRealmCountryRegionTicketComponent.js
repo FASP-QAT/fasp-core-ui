@@ -141,7 +141,7 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
                         realmCountryRegionList: listArray,
                         loading: false
                     }, () => {
-                        console.log("realmCountryRegionList", this.state.realmCountryRegionList)
+                        // console.log("realmCountryRegionList", this.state.realmCountryRegionList)
                     });
                 } else {
                     this.setState({
@@ -220,7 +220,7 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
 
     render() {
         const { realmCountryRegionList } = this.state;
-        console.log("realmCountryRegionList", this.state.realmCountryRegionList)
+        // console.log("realmCountryRegionList", this.state.realmCountryRegionList)
 
         let realmCountryRegions = realmCountryRegionList.length > 0
             && realmCountryRegionList.map((item, i) => {
@@ -247,7 +247,7 @@ export default class EditRealmCountryRegionTicketComponent extends Component {
                             this.state.realmCountryRegion.summary = summaryText_2;
                             this.state.realmCountryRegion.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.realmCountryRegion).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

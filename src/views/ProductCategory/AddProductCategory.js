@@ -184,7 +184,7 @@ export default class AddProductCategory extends React.Component {
 
 
     getSortedFaltTreeData() {
-        console.log("---------", this.state.treeData);
+        // console.log("---------", this.state.treeData);
         let unsortedFlatTreeData = getFlatDataFromTree({
             treeData: this.state.treeData,
             getNodeKey: ({ node }) => node.id,
@@ -235,7 +235,7 @@ export default class AddProductCategory extends React.Component {
             this.state.finalJson.push(json);
 
         });
-        console.log("input for add product category api---->", this.state.finalJson);
+        // console.log("input for add product category api---->", this.state.finalJson);
     }
     render() {
         return (
@@ -264,7 +264,7 @@ export default class AddProductCategory extends React.Component {
                                             getNodeKey={({ node }) => node.id}
                                             treeData={this.state.treeData}
                                             generateNodeProps={rowInfo => {
-                                                console.log(rowInfo);
+                                                // console.log(rowInfo);
                                                 if (rowInfo.node.active == true) {
                                                     let nodeprops = {
                                                         buttons: [

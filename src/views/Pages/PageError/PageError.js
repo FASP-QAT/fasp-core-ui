@@ -42,7 +42,7 @@ class PageError extends Component {
   submitBug(e){
     let userComments= document.getElementById("userComments").value;
     let desc = "\nUser Comments - "+userComments+"\nError Page - "+e.location.state.errorPage+"\nError Stack - "+e.location.state.errorStack;
-    console.log("userComments",userComments)
+    // console.log("userComments",userComments)
     let { bugReport } = this.state;
         bugReport.summary = e.location.state.errorMessage;
         bugReport.description = desc;
@@ -54,7 +54,7 @@ class PageError extends Component {
             () => { });
 
       JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => {
-        console.log("Response :", response.status, ":", JSON.stringify(response.data));
+        // console.log("Response :", response.status, ":", JSON.stringify(response.data));
         if (response.status == 200 || response.status == 201) {
             var msg = response.data.key;
             JiraTikcetService.addIssueAttachment(this.state.bugReport, response.data.id).then(response => {

@@ -522,8 +522,9 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from 'moment';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, API_URL } from '../../Constants';
+import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 
 
 const entityname = i18n.t('static.datasource.datasource');
@@ -575,9 +576,8 @@ export default class DataSourceListComponent extends Component {
         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
             realmId = document.getElementById("realmId").value;
         }
-        console.log(dataSourceTypeId);
-        console.log(realmId);
-        console.log(programId);
+        // console.log("==>", dataSourceTypeId);
+        // console.log("==>", realmId);
         // if (dataSourceTypeId != 0) {
         //     const selSource = this.state.dataSourceList.filter(c => c.dataSourceType.id == dataSourceTypeId)
         //     this.setState({
@@ -591,6 +591,7 @@ export default class DataSourceListComponent extends Component {
 
         if (realmId != 0 && dataSourceTypeId != 0 && programId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId && c.program.id == programId)
+
             this.setState({
                 selSource
             },
@@ -628,11 +629,15 @@ export default class DataSourceListComponent extends Component {
                 () => { this.buildJexcel() });
         } else if (programId != 0) {
             const selSource = this.state.dataSourceList.filter(c => c.program.id == programId)
+            // console.log("==>", selSource);
+    
             this.setState({
                 selSource
             },
                 () => { this.buildJexcel() });
         } else {
+            // console.log("==>this.state.dataSourceList", this.state.dataSourceList);
+
             this.setState({
                 selSource: this.state.dataSourceList
             },
@@ -764,10 +769,21 @@ export default class DataSourceListComponent extends Component {
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
         this.hideFirstComponent();
-        ProgramService.getProgramList()
+        let realmId = AuthenticationService.getRealmId();
+
+        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
             .then(response => {
                 if (response.status == 200) {
-                    var listArray = response.data;
+                    var proList = []
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            programId: response.data[i].id,
+                            label: response.data[i].label,
+                            programCode: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
+                    var listArray = proList;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -890,7 +906,7 @@ export default class DataSourceListComponent extends Component {
             );
 
         DataSourceTypeService.getDataSourceTypeList().then(response => {
-            console.log(response.data)
+            // console.log(response.data)
             var listArray = response.data;
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -949,7 +965,7 @@ export default class DataSourceListComponent extends Component {
             //     dataSourceList: response.data,
             //     selSource: response.data
             // })
-            console.log("Datasource----------->", response.data);
+            // console.log("Datasource----------->", response.data);
             this.setState({
                 dataSourceList: response.data, selSource: response.data, loading: false
             }, () => { this.buildJexcel() })
@@ -1013,9 +1029,9 @@ export default class DataSourceListComponent extends Component {
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
 
-            console.log("selected x--->", x);
-            console.log("selected y--->", y);
-            console.log("selected value--->", value);
+            // console.log("selected x--->", x);
+            // console.log("selected y--->", y);
+            // console.log("selected value--->", value);
             if ((x == 0 && value != 0) || (y == 0)) {
                 // console.log("HEADER SELECTION--------------------------");
             } else {

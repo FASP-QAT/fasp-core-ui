@@ -183,10 +183,10 @@ export default class OrganisationTicketComponent extends Component {
 
             if (organisationValue.length >= 4) {//minus 2
                 organisationValue = organisationValue.slice(0, 2);
-                console.log("DISPLAYNAME-BEF----->", organisationValue);
+                // console.log("DISPLAYNAME-BEF----->", organisationValue);
                 OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP----->", response);
+                        // console.log("DISPLAYNAME-RESP----->", response);
                         let { organisation } = this.state
                         organisation.organisationCode = response.data;
                         this.setState({
@@ -236,10 +236,10 @@ export default class OrganisationTicketComponent extends Component {
                     );
 
             } else {// not need to minus
-                console.log("DISPLAYNAME-BEF-else----->", organisationValue);
+                // console.log("DISPLAYNAME-BEF-else----->", organisationValue);
                 OrganisationService.getOrganisationDisplayName(realmId, organisationValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        // console.log("DISPLAYNAME-RESP-else----->", response);
                         let { organisation } = this.state
                         organisation.organisationCode = response.data;
                         this.setState({
@@ -439,7 +439,7 @@ export default class OrganisationTicketComponent extends Component {
         if (realmId != "") {
             OrganisationTypeService.getOrganisationTypeByRealmId(realmId)
                 .then(response => {
-                    console.log("OrganisationType list------>", response.data);
+                    // console.log("OrganisationType list------>", response.data);
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -663,9 +663,9 @@ export default class OrganisationTicketComponent extends Component {
                             })
                             this.state.organisation.summary = summaryText_2;
                             this.state.organisation.userLanguageCode = this.state.lang;
-                            console.log("SUBMIT---------->", this.state.organisation);
+                            // console.log("SUBMIT---------->", this.state.organisation);
                             JiraTikcetService.addEmailRequestIssue(this.state.organisation).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

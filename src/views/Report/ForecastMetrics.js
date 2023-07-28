@@ -46,7 +46,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, API_URL } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -66,6 +66,7 @@ import { contrast, isSiteOnline } from "../../CommonComponent/JavascriptCommonFu
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import DropdownService from '../../api/DropdownService';
 
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
@@ -195,14 +196,14 @@ class ForecastMetrics extends Component {
     return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
   }
   formatLabel(cell, row) {
-    // console.log("celll----", cell);
+    // // console.log("celll----", cell);
     if (cell != null && cell != "") {
       return getLabelText(cell, this.state.lang);
     }
   }
 
   formatValue(cell, row) {
-    console.log("cell----", cell);
+    // console.log("cell----", cell);
     if (cell != null && cell != "") {
       return this.roundN(cell) + '%';
     } else if ((cell == "0" && row.months == 0)) {
@@ -251,7 +252,7 @@ class ForecastMetrics extends Component {
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
-      console.log(re[item].planningUnit)
+      // console.log(re[item].planningUnit)
       A.push([this.addDoubleQuoteToRowContent([(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id, re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label)).replaceAll(' ', '%20'),
       // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
       re[item].message != null ? (i18n.t(re[item].message)).replaceAll(' ', '%20') : this.roundN(re[item].forecastError) + '%', re[item].monthCount])])
@@ -345,7 +346,7 @@ class ForecastMetrics extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
     planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
     //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
@@ -358,7 +359,7 @@ class ForecastMetrics extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
 
     planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -372,7 +373,7 @@ class ForecastMetrics extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
 
 
@@ -387,7 +388,7 @@ class ForecastMetrics extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, tracerCategoryText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
 
 
@@ -399,7 +400,7 @@ class ForecastMetrics extends Component {
     var height = doc.internal.pageSize.height;
     var h1 = 50;
     let startY = y + 20
-    console.log('startY', startY)
+    // console.log('startY', startY)
     let pages = Math.ceil(startY / height)
     for (var j = 1; j < pages; j++) {
       doc.addPage()
@@ -482,33 +483,82 @@ class ForecastMetrics extends Component {
 
   filterProgram = () => {
     let countryIds = this.state.countryValues.map(ele => ele.value);
-    console.log('countryIds', countryIds, 'programs', this.state.programs)
+    // // console.log('countryIds', countryIds, 'programs', this.state.programs)
     this.setState({
       programLst: [],
       programValues: [],
       programLabels: []
     }, () => {
       if (countryIds.length != 0) {
-        let programLst = [];
-        for (var i = 0; i < countryIds.length; i++) {
-          programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-        }
+        let newCountryList = [... new Set(countryIds)];
+        DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+          .then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            // console.log('programLst', listArray)
+            if (listArray.length > 0) {
+              this.setState({
+                programLst: listArray
+              }, () => {
+                this.filterData()
+              });
+            } else {
+              this.setState({
+                programLst: []
+              }, () => {
+                this.filterData()
+              });
+            }
+          }).catch(
+            error => {
+              this.setState({
+                programLst: [], loading: false
+              })
+              if (error.message === "Network Error") {
+                this.setState({
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
 
-        console.log('programLst', programLst)
-        if (programLst.length > 0) {
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
 
-          this.setState({
-            programLst: programLst
-          }, () => {
-            this.filterData()
-          });
-        } else {
-          this.setState({
-            programLst: []
-          }, () => {
-            this.filterData()
-          });
-        }
+
       } else {
         this.setState({
           programLst: []
@@ -535,7 +585,6 @@ class ForecastMetrics extends Component {
     }, () => {
       this.filterTracerCategory(programIds);
       this.getPlanningUnit();
-      this.filterData()
     })
 
   }
@@ -552,11 +601,11 @@ class ForecastMetrics extends Component {
         for (var i = 0; i < programIds.length; i++) {
           programIdsValue.push(programIds[i].value);
         }
-        // console.log("programids=====>", programIdsValue);
+        // // console.log("programids=====>", programIdsValue);
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
-        TracerCategoryService.getTracerCategoryByProgramIds(realmId,programIdsValue)
+        TracerCategoryService.getTracerCategoryByProgramIds(realmId, programIdsValue)
           .then(response => {
-            console.log("tc respons==>", response.data);
+            // console.log("tc respons==>", response.data);
             var listArray = response.data;
             listArray.sort((a, b) => {
               var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -633,7 +682,7 @@ class ForecastMetrics extends Component {
   }
 
   handlePlanningUnitChange(planningUnitIds) {
-    console.log(planningUnitIds)
+    // console.log(planningUnitIds)
     planningUnitIds = planningUnitIds.sort(function (a, b) {
       return parseInt(a.value) - parseInt(b.value);
     })
@@ -648,7 +697,7 @@ class ForecastMetrics extends Component {
 
   buildJExcel() {
     let consumptions = this.state.consumptions;
-    // console.log("consumptions---->", consumptions);
+    // // console.log("consumptions---->", consumptions);
     let consumptionArray = [];
     let count = 0;
 
@@ -668,7 +717,7 @@ class ForecastMetrics extends Component {
     //   data = [];
     //   consumptionArray[0] = data;
     // }
-    // console.log("consumptionArray---->", consumptionArray);
+    // // console.log("consumptionArray---->", consumptionArray);
     this.el = jexcel(document.getElementById("tableDiv"), '');
     // this.el.destroy();
     jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -770,7 +819,7 @@ class ForecastMetrics extends Component {
 
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunction(instance);
-    console.log("INSIDE UPDATE TABLE");
+    // console.log("INSIDE UPDATE TABLE");
 
     var elInstance = instance.worksheets[0];
     var json = elInstance.getJson();
@@ -780,7 +829,7 @@ class ForecastMetrics extends Component {
 
 
       var rowData = elInstance.getRowData(j);
-      // console.log("elInstance---->", elInstance);
+      // // console.log("elInstance---->", elInstance);
 
       var forecastError = rowData[4];
       if (forecastError > 50) {
@@ -806,7 +855,7 @@ class ForecastMetrics extends Component {
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
     let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
     let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());//document.getElementById('tracerCategoryId').value
-    let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+    let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
     let monthInCalc = document.getElementById("viewById").value;
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
@@ -817,10 +866,10 @@ class ForecastMetrics extends Component {
 
       }
       // AuthenticationService.setupAxiosInterceptors();
-      console.log("report json---", inputjson);
+      // console.log("report json---", inputjson);
       ReportService.getForecastError(inputjson)
         .then(response => {
-          console.log(JSON.stringify(response.data));
+          // console.log(JSON.stringify(response.data));
           this.setState({
             consumptions: response.data,
             message: ''
@@ -964,9 +1013,9 @@ class ForecastMetrics extends Component {
     if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
       let realmId = AuthenticationService.getRealmId();
-      RealmCountryService.getRealmCountryForProgram(realmId)
+      DropdownService.getRealmCountryDropdownList(realmId)
         .then(response => {
-          var listArray = response.data.map(ele => ele.realmCountry);
+          var listArray = response.data;
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -1107,69 +1156,68 @@ class ForecastMetrics extends Component {
             tracerCategoryIds: this.state.tracerCategoryValues.map(ele => (ele.value).toString()),
             programIds: programValues.map(ele => (ele.value))
           }
-          PlanningUnitService.getPlanningUnitByProgramIdsAndTracerCategorieIds(inputjson)
-            .then(response => {
-              var listArray = response.data;
-              listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                return itemLabelA > itemLabelB ? 1 : -1;
-              });
-              console.log("resp---->", listArray);
-              this.setState({
-                planningUnits: listArray,
-                planningUnitValues: listArray.map((item, i) => {
-                  return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+          DropdownService.getProgramPlanningUnitDropdownList(inputjson).then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            // console.log("resp---->", listArray);
+            this.setState({
+              planningUnits: listArray,
+              planningUnitValues: listArray.map((item, i) => {
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
-                }, this),
-                planningUnitLabels: listArray.map((item, i) => {
-                  return (getLabelText(item.label, this.state.lang))
-                }, this),
-                message: ''
-              }, () => {
-                this.filterData();
-              })
-            }).catch(
-              error => {
-                if (error.message === "Network Error") {
-                  this.setState({
-                    // message: 'static.unkownError',
-                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                    loading: false
-                  });
-                } else {
-                  switch (error.response ? error.response.status : "") {
+              }, this),
+              planningUnitLabels: listArray.map((item, i) => {
+                return (getLabelText(item.label, this.state.lang))
+              }, this),
+              message: ''
+            }, () => {
+              this.filterData();
+            })
+          }).catch(
+            error => {
+              if (error.message === "Network Error") {
+                this.setState({
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
 
-                    case 401:
-                      this.props.history.push(`/login/static.message.sessionExpired`)
-                      break;
-                    case 403:
-                      this.props.history.push(`/accessDenied`)
-                      break;
-                    case 500:
-                    case 404:
-                    case 406:
-                      this.setState({
-                        message: error.response.data.messageCode,
-                        loading: false
-                      });
-                      break;
-                    case 412:
-                      this.setState({
-                        message: error.response.data.messageCode,
-                        loading: false
-                      });
-                      break;
-                    default:
-                      this.setState({
-                        message: 'static.unkownError',
-                        loading: false
-                      });
-                      break;
-                  }
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: error.response.data.messageCode,
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
                 }
               }
-            );
+            }
+          );
         }
       })
     } else {
@@ -1182,7 +1230,7 @@ class ForecastMetrics extends Component {
     //let realmId = AuthenticationService.getRealmId();
     ProgramService.getProgramList()
       .then(response => {
-        console.log(JSON.stringify(response.data))
+        // console.log(JSON.stringify(response.data))
         var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1266,7 +1314,7 @@ class ForecastMetrics extends Component {
     let realmId = AuthenticationService.getRealmId();
     ProductService.getProductCategoryList(realmId)
       .then(response => {
-        console.log(response.data)
+        // console.log(response.data)
         var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1348,7 +1396,7 @@ class ForecastMetrics extends Component {
   }
   componentDidMount() {
     // AuthenticationService.setupAxiosInterceptors();
-    this.getPrograms()
+    // this.getPrograms()
     this.getCountrys();
 
   }
@@ -1426,14 +1474,14 @@ class ForecastMetrics extends Component {
         return (
 
           // { label: getLabelText(item.label, this.state.lang), value: item.programId }
-          { label: item.programCode, value: item.programId }
+          { label: item.code, value: item.id }
 
         )
       }, this);
     const { countrys } = this.state;
-    // console.log(JSON.stringify(countrys))
+    // // console.log(JSON.stringify(countrys))
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
-      console.log(JSON.stringify(item))
+      // // console.log(JSON.stringify(item))
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
     const { productCategories } = this.state;

@@ -31,7 +31,7 @@ export default class MapPlanningUnits extends Component {
     }
 
     addRow = function () {
-        console.log("add row called");
+        // console.log("add row called");
         var data = [];
         data[0] = "-1";
         data[1] = "";
@@ -52,7 +52,7 @@ export default class MapPlanningUnits extends Component {
             data, 0, 1
         );
         // this.el.insertRow();
-        console.log("insert row called");
+        // console.log("insert row called");
         var json = this.el.getJson(null, false)
     }
 
@@ -77,7 +77,7 @@ export default class MapPlanningUnits extends Component {
             }
             var col = ("B").concat(parseInt(y) + 1);
             var value = this.el.getRowData(parseInt(y))[1];
-            console.log("Vlaue------>", value);
+            // console.log("Vlaue------>", value);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -327,15 +327,15 @@ export default class MapPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                console.log("json.length", json.length);
+                // console.log("json.length", json.length);
                 var jsonLength = parseInt(json.length) - 1;
-                console.log("jsonLength", jsonLength);
+                // console.log("jsonLength", jsonLength);
                 for (var i = jsonLength; i >= 0; i--) {
-                    console.log("i=---------->", i, "y----------->", y);
+                    // console.log("i=---------->", i, "y----------->", y);
                     var map = new Map(Object.entries(json[i]));
                     var planningUnitValue = map.get("1");
-                    console.log("Planning Unit value in change", map.get("1"));
-                    console.log("Value----->", value);
+                    // console.log("Planning Unit value in change", map.get("1"));
+                    // console.log("Value----->", value);
                     if (planningUnitValue == value && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
@@ -630,14 +630,14 @@ export default class MapPlanningUnits extends Component {
         // PlanningUnitService.getActivePlanningUnitList()
         //     .then(response => {
         //         if (response.status == 200) {
-        // console.log("for my list response---", response.data);
+        // // console.log("for my list response---", response.data);
         // this.setState({
         //     planningUnitList: response.data
         // });
 
         var puList = []
         if (value != -1) {
-            console.log("in if=====>");
+            // console.log("in if=====>");
             var pc = this.state.productCategoryList.filter(c => c.payload.productCategoryId == value)[0]
             var pcList = this.state.productCategoryList.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
             var pcIdArray = [];
@@ -646,7 +646,7 @@ export default class MapPlanningUnits extends Component {
             }
             puList = (this.state.planningUnitList).filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id) && c.active.toString() == "true");
         } else {
-            console.log("in else=====>");
+            // console.log("in else=====>");
             puList = this.state.planningUnitList
         }
 
@@ -667,17 +667,17 @@ export default class MapPlanningUnits extends Component {
         var list = [];
         var productCategoryList = [];
         var realmId = this.props.items.program.realm.realmId;
-        console.log("in mapping page---->", realmId);
-        console.log("in mapping page---->", this.props.items);
+        // console.log("in mapping page---->", realmId);
+        // console.log("in mapping page---->", this.props.items);
         // AuthenticationService.setupAxiosInterceptors();
         ProductCategoryServcie.getProductCategoryListByRealmId(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("productCategory response----->", response.data);
+                    // console.log("productCategory response----->", response.data);
                     for (var k = 0; k < (response.data).length; k++) {
 
                         var spaceCount = response.data[k].sortOrder.split(".").length;
-                        console.log("spaceCOunt--->", spaceCount);
+                        // console.log("spaceCOunt--->", spaceCount);
                         var indendent = "";
                         for (var p = 1; p <= spaceCount - 1; p++) {
                             if (p == 1) {
@@ -686,8 +686,8 @@ export default class MapPlanningUnits extends Component {
                                 indendent = indendent.concat("_");
                             }
                         }
-                        console.log("ind", indendent);
-                        console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
+                        // console.log("ind", indendent);
+                        // console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
 
 
 
@@ -898,7 +898,7 @@ export default class MapPlanningUnits extends Component {
 
                                     ],
                                     updateTable: function (el, cell, x, y, source, value, id) {
-                                        console.log("In update table@@@@@@@@@@@@@")
+                                        // console.log("In update table@@@@@@@@@@@@@")
                                         var elInstance = el;
                                         var rowData = elInstance.getRowData(y);
                                         // var productCategoryId = rowData[0];
@@ -1221,7 +1221,7 @@ export default class MapPlanningUnits extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[3]));
+            // console.log("RESP---------", parseFloat(rowData[3]));
             elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
         } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
@@ -1240,7 +1240,7 @@ export default class MapPlanningUnits extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        console.log("In loaded@@@@@@@@@@")
+        // console.log("In loaded@@@@@@@@@@")
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
 
         var tr = asterisk.firstChild;
@@ -1264,7 +1264,7 @@ export default class MapPlanningUnits extends Component {
         cell1.classList.add('readonly');
         var cell1 = instance.worksheets[0].getCell(`E1`)
         cell1.classList.remove('readonly');
-        console.log("Tr@@@@@@@@", tr)
+        // console.log("Tr@@@@@@@@", tr)
         jExcelLoadedFunctionWithoutPagination(instance);
 
         // var asterisk = document.getElementsByClassName("resizable")[0];

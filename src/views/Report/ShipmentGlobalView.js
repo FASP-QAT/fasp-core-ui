@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -57,6 +57,7 @@ import FundingSourceService from '../../api/FundingSourceService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { MultiSelect } from 'react-multi-select-component';
+import DropdownService from '../../api/DropdownService';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -560,7 +561,7 @@ class ShipmentGlobalView extends Component {
 
 
     // handleChange(countrysId) {
-    //     console.log('==>', countrysId)
+    //     // console.log('==>', countrysId)
     //     countrysId = countrysId.sort(function (a, b) {
     //         return parseInt(a.value) - parseInt(b.value);
     //     })
@@ -573,7 +574,7 @@ class ShipmentGlobalView extends Component {
     //     })
     // }
     handleChangeProgram(programIds) {
-        this.getProcurementAgent(programIds);
+        this.getProcurementAgent(programIds.map(ele => ele.value));
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
@@ -606,9 +607,10 @@ class ShipmentGlobalView extends Component {
         })
         // AuthenticationService.setupAxiosInterceptors();
         let realmId = AuthenticationService.getRealmId();//document.getElementById('realmId').value
-        RealmCountryService.getRealmCountryForProgram(realmId)
+        DropdownService.getRealmCountryDropdownList(realmId)
             .then(response => {
-                var listArray = response.data.map(ele => ele.realmCountry);
+                // console.log("RealmCountryService---->", response.data)
+                var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -617,7 +619,7 @@ class ShipmentGlobalView extends Component {
                 this.setState({
                     // countrys: response.data.map(ele => ele.realmCountry)
                     countrys: listArray, loading: false
-                }, () => { this.getPrograms(); })
+                })
             }).catch(
                 error => {
                     this.setState({
@@ -812,11 +814,11 @@ class ShipmentGlobalView extends Component {
         })
         ProgramService.getProgramList()
             .then(response => {
-                console.log(JSON.stringify(response.data))
+                // console.log(JSON.stringify(response.data))
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = a.programCode.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.programCode.toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -942,7 +944,7 @@ class ShipmentGlobalView extends Component {
         //                     break;
         //                 default:
         //                     this.setState({ message: 'static.unkownError', loading: false });
-        //                     console.log("Error code unkown");
+        //                     // console.log("Error code unkown");
         //                     break;
         //             }
         //         }
@@ -953,33 +955,18 @@ class ShipmentGlobalView extends Component {
     getProcurementAgent = (programIds) => {
         this.setState({ loading: true })
         // AuthenticationService.setupAxiosInterceptors();
-        ProcurementAgentService.getProcurementAgentListAll()
+        var programJson = programIds
+        DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programJson)
             .then(response => {
-                // console.log(JSON.stringify(response.data))
+                // console.log("getProcurementAgent==>", JSON.stringify(response.data))
                 var listArray = response.data;
-                var listArray1 = [];
-                for (var k = 0; k < programIds.length; k++) {
-                    for (var i = 0; i < listArray.length; i++) {
-
-                        for (var j = 0; j < listArray[i].programList.length; j++) {
-                            if (listArray[i].programList[j].id === programIds[k].value) {
-                                listArray1.push(listArray[i]);
-                            }
-                        }
-                    }
-                }
-                let uniqueChars = listArray1.filter((c, index) => {
-                    return listArray1.indexOf(c) === index;
-                });
-
-                console.log("uniqueChars--->", uniqueChars);
-                uniqueChars.sort((a, b) => {
-                    var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    procurementAgents: uniqueChars, loading: false
+                    procurementAgents: listArray, loading: false
                 })
             }).catch(
                 error => {
@@ -1021,7 +1008,7 @@ class ShipmentGlobalView extends Component {
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
-                console.log("listArray", listArray)
+                // console.log("listArray", listArray)
                 this.setState({
                     procurementAgentTypes: listArray.filter(c => c.active == true && realmId == c.realm.id), loading: false,
                 }, () => { this.fetchData(); })
@@ -1055,12 +1042,12 @@ class ShipmentGlobalView extends Component {
     }
 
     getFundingSource = () => {
-        console.log("==>>inside funding src")
+        // console.log("==>>inside funding src")
         this.setState({ loading: true })
         // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
-                // console.log(JSON.stringify(response.data))
+                // // console.log(JSON.stringify(response.data))
                 var listArray = response.data;
                 listArray.sort((a, b) => {
                     var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
@@ -1147,7 +1134,7 @@ class ShipmentGlobalView extends Component {
         let realmId = AuthenticationService.getRealmId();
         ProductService.getProductCategoryList(realmId)
             .then(response => {
-                // console.log(response.data)
+                // // console.log(response.data)
                 // var list = response.data.slice(1);
                 var list = response.data;
                 list.sort((a, b) => {
@@ -1264,7 +1251,7 @@ class ShipmentGlobalView extends Component {
     }
 
     fetchData = () => {
-        console.log("==>>inside fetch data")
+        // console.log("==>>inside fetch data")
         let viewby = document.getElementById("viewById").value;
         let realmId = AuthenticationService.getRealmId()
         let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
@@ -1274,7 +1261,7 @@ class ShipmentGlobalView extends Component {
         let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
         let useApprovedVersion = document.getElementById("includeApprovedVersions").value
         let includePlanningShipments = document.getElementById("includePlanningShipments").value
-        let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+        let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
 
         let planningUnitId = document.getElementById("planningUnitId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -1288,17 +1275,17 @@ class ShipmentGlobalView extends Component {
             fundingSourceProcurementAgentIds = procurementAgentTypeIds;
 
         }
-        // console.log("planningUnitId-------", planningUnitId);
-        // console.log("productCategoryId------", productCategoryId);
-        // console.log("CountryIds-----", CountryIds);
-        // console.log("procurementAgentIds----", procurementAgentIds);
-        // console.log("viewby-----", viewby);
-        // console.log("startDate-----", startDate);
-        // console.log("endDate-----", endDate);
+        // // console.log("planningUnitId-------", planningUnitId);
+        // // console.log("productCategoryId------", productCategoryId);
+        // // console.log("CountryIds-----", CountryIds);
+        // // console.log("procurementAgentIds----", procurementAgentIds);
+        // // console.log("viewby-----", viewby);
+        // // console.log("startDate-----", startDate);
+        // // console.log("endDate-----", endDate);
 
         if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && this.state.programValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 3 && this.state.procurementAgentTypeValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0))) {
             let planningUnitUnit = this.state.planningUnits.filter(c => c.planningUnitId == planningUnitId)[0].unit;
-            console.log("planningUnitUnit------>", planningUnitUnit);
+            // console.log("planningUnitUnit------>", planningUnitUnit);
             this.setState({
                 message: '',
                 loading: true,
@@ -1317,11 +1304,11 @@ class ShipmentGlobalView extends Component {
                 , useApprovedSupplyPlanOnly: useApprovedVersion,
                 includePlannedShipments: includePlanningShipments
             }
-            console.log("INPUTJSON--------->", inputjson);
+            // console.log("INPUTJSON--------->", inputjson);
             // AuthenticationService.setupAxiosInterceptors();
             ReportService.ShipmentGlobalView(inputjson)
                 .then(response => {
-                    console.log("RESP------", response.data);
+                    // console.log("RESP------", response.data);
                     if (response.data.countrySplitList.length != 0) {
                         var table1Headers = [];
                         var lab = [];
@@ -1363,15 +1350,15 @@ class ShipmentGlobalView extends Component {
                             val: val,
                             loading: false
                         }, () => {
-                            console.log("shipmentList-----", this.state.shipmentList);
-                            console.log("dateSplitList-----", this.state.dateSplitList);
-                            console.log("countrySplitList-----", this.state.countrySplitList);
-                            console.log("countryShipmentSplitList-----", this.state.countryShipmentSplitList);
+                            // console.log("shipmentList-----", this.state.shipmentList);
+                            // console.log("dateSplitList-----", this.state.dateSplitList);
+                            // console.log("countrySplitList-----", this.state.countrySplitList);
+                            // console.log("countryShipmentSplitList-----", this.state.countryShipmentSplitList);
 
-                            // console.log("labels---", this.state.labels);
-                            // console.log("values---", this.state.values);
-                            // console.log("DATA--1---", this.state.table1Headers);
-                            // console.log("DATA---2--", this.state.table1Body);
+                            // // console.log("labels---", this.state.labels);
+                            // // console.log("values---", this.state.values);
+                            // // console.log("DATA--1---", this.state.table1Headers);
+                            // // console.log("DATA---2--", this.state.table1Body);
                         })
                     }
                     else {
@@ -1654,7 +1641,7 @@ class ShipmentGlobalView extends Component {
 
     filterProgram = () => {
         let countryIds = this.state.countryValues.map(ele => ele.value);
-        console.log('countryIds', countryIds, 'programs', this.state.programs)
+        // console.log('countryIds', countryIds, 'programLst', this.state.programLst)
         this.setState({
             programLst: [],
             programValues: [],
@@ -1665,26 +1652,74 @@ class ShipmentGlobalView extends Component {
             // procurementAgentTypes: []
         }, () => {
             if (countryIds.length != 0) {
-                let programLst = [];
-                for (var i = 0; i < countryIds.length; i++) {
-                    programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-                }
+                let newCountryList = [... new Set(countryIds)];
+                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+                    .then(response => {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        // console.log('programLst', listArray)
+                        if (listArray.length > 0) {
+                            this.setState({
+                                programLst: listArray
+                            }, () => {
+                                this.getProductCategories();
+                                // this.fetchData()
+                            });
+                        } else {
+                            this.setState({
+                                programLst: []
+                            }, () => {
+                                this.getProductCategories()
+                            });
+                        }
+                    }).catch(
+                        error => {
+                            this.setState({
+                                programLst: [], loading: false
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
 
-                console.log('programLst', programLst)
-                if (programLst.length > 0) {
-
-                    this.setState({
-                        programLst: programLst
-                    }, () => {
-                        this.fetchData()
-                    });
-                } else {
-                    this.setState({
-                        programLst: []
-                    }, () => {
-                        this.fetchData()
-                    });
-                }
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
             } else {
                 this.setState({
                     programLst: []
@@ -1742,7 +1777,7 @@ class ShipmentGlobalView extends Component {
             && procurementAgents.map((item, i) => {
                 return (
 
-                    { label: item.procurementAgentCode, value: item.procurementAgentId }
+                    { label: item.code, value: item.id }
 
                 )
             }, this);
@@ -1751,7 +1786,7 @@ class ShipmentGlobalView extends Component {
         let procurementAgentTypeList = [];
         procurementAgentTypeList = procurementAgentTypes.length > 0
             && procurementAgentTypes.map((item, i) => {
-                console.log("procurementAgentTypes", procurementAgentTypes)
+                // console.log("procurementAgentTypes", procurementAgentTypes)
                 return (
 
                     { label: item.procurementAgentTypeCode, value: item.procurementAgentTypeId }
@@ -1772,7 +1807,6 @@ class ShipmentGlobalView extends Component {
 
         const { countrys } = this.state;
         let countryList = countrys.length > 0 && countrys.map((item, i) => {
-            console.log(JSON.stringify(item))
             return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
 
@@ -1796,7 +1830,7 @@ class ShipmentGlobalView extends Component {
                 return (
 
                     // { label: getLabelText(item.label, this.state.lang), value: item.programId }
-                    { label: (item.programCode), value: item.programId }
+                    { label: (item.code), value: item.id }
 
                 )
             }, this);
@@ -2080,16 +2114,16 @@ class ShipmentGlobalView extends Component {
         // }
         // displaylabel = displaylabel[0];
         let displaylabel = (this.state.dateSplitList.length > 0 ? Object.keys(this.state.dateSplitList[0].amount) : []);
-        console.log("displaylabel------->>>>", displaylabel);
+        // console.log("displaylabel------->>>>", displaylabel);
         let dateSplitList = this.state.dateSplitList;
         let displayObject = [];
 
         // for (var j = 0; j < dateSplitList.length; j++) {
-        //     console.log("NODE------", dateSplitList[j].amount);
+        //     // console.log("NODE------", dateSplitList[j].amount);
         // }
 
         for (var i = 0; i < displaylabel.length; i++) {
-            // console.log("DDD------", displaylabel[i]);
+            // // console.log("DDD------", displaylabel[i]);
             let holdArray = [];
             for (var j = 0; j < dateSplitList.length; j++) {
                 let subArraylab = Object.keys(dateSplitList[j].amount);
@@ -2103,7 +2137,7 @@ class ShipmentGlobalView extends Component {
             }
             displayObject.push(holdArray);
         }
-        console.log("displayObject------", displayObject);
+        // console.log("displayObject------", displayObject);
 
 
 
@@ -2121,7 +2155,7 @@ class ShipmentGlobalView extends Component {
             datasets: dataSet
 
         }
-        console.log(bar1)
+        // console.log(bar1)
         let viewby = this.state.viewby;
 
 
@@ -2411,7 +2445,7 @@ class ShipmentGlobalView extends Component {
                                         {this.state.dateSplitList.length > 0 &&
                                             <div className="col-md-6">
                                                 <div className="chart-wrapper chart-graph-report">
-                                                    {console.log(bar1)/* <Bar id="cool-canvas" data={bar} options={options} /> */}
+                                                    {/* <Bar id="cool-canvas" data={bar} options={options} /> */}
                                                     <Bar id="cool-canvas2" data={bar1} options={this.state.viewby == 1 ? options1 : this.state.viewby == 2 ? options2 : options3} />
                                                 </div>
                                             </div>
