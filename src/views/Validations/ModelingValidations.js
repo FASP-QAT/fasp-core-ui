@@ -549,6 +549,9 @@ class ModelingValidation extends Component {
             if(this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9){
                 startDate = rangeValue.from.year - 1  + '-' + rangeValue.from.month + '-01';
                 stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            }else if(this.state.xAxisDisplayBy > 8){
+                startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                stopDate = rangeValue.to.year + 1 + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
             }else{
                 startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                 stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
@@ -587,55 +590,60 @@ class ModelingValidation extends Component {
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             // console.log("flatList###", flatList)
             if(this.state.xAxisDisplayBy == 1){
-            for (var j = 0; j < monthList.length; j++) {
-                data = [];
-                data[0] = moment(monthList[j]).format("YYYY-MM-DD");
-                // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
-                var total = 0;
-                var totalPer = 0;
-                for (var k = 0; k < nodeVal.length; k++) {
-                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
-                    var calculatedValueTotal = 0;
-                    for (var fl = 0; fl < flatListFiltered.length; fl++) {
-                        var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                        var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
-                        var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
-                        if (cvList.length > 0) {
-                            calculatedValueTotal += (checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue);
-                        } else {
-                        }
-                    }
-                    data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
-                    total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
-                }
-                data[nodeVal.length + 1] = Number(total).toFixed(2);
-
-                for (var k = 0; k < nodeVal.length; k++) {
-                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
-                    var calculatedValueTotal = 0;
-                    for (var fl = 0; fl < flatListFiltered.length; fl++) {
-                        var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                        var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
-                        var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
-                        if (cvList.length > 0) {
-                            calculatedValueTotal += checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue;
-                        } else {
-                        }
-                    }
-                    var val = ""
-                    if (calculatedValueTotal != "") {
-                        val = (Number(calculatedValueTotal) / Number(total)) * 100;
-                    }
-                    data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
-                    totalPer += calculatedValueTotal != "" ? val : 0;
-                }
-                data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
-                dataArr.push(data);
-            }
-            }else{
-                for (var j = 0; j < monthList.length; j+=12) {
+                for (var j = 0; j < monthList.length; j++) {
                     data = [];
                     data[0] = moment(monthList[j]).format("YYYY-MM-DD");
+                    // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                    var total = 0;
+                    var totalPer = 0;
+                    for (var k = 0; k < nodeVal.length; k++) {
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
+                        var calculatedValueTotal = 0;
+                        for (var fl = 0; fl < flatListFiltered.length; fl++) {
+                            var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                            var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
+                            var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
+                            if (cvList.length > 0) {
+                                calculatedValueTotal += (checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue);
+                            } else {
+                            }
+                        }
+                        data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
+                        total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
+                    }
+                    data[nodeVal.length + 1] = Number(total).toFixed(2);
+
+                    for (var k = 0; k < nodeVal.length; k++) {
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                        var calculatedValueTotal = 0;
+                        for (var fl = 0; fl < flatListFiltered.length; fl++) {
+                            var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                            var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
+                            var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
+                            if (cvList.length > 0) {
+                                calculatedValueTotal += checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue;
+                            } else {
+                            }
+                        }
+                        var val = ""
+                        if (calculatedValueTotal != "") {
+                            val = (Number(calculatedValueTotal) / Number(total)) * 100;
+                        }
+                        data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
+                        totalPer += calculatedValueTotal != "" ? val : 0;
+                    }
+                    data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
+                    dataArr.push(data);
+                }
+            }else{
+                let mL = this.state.xAxisDisplayBy == 9 ? monthList.length-12 : monthList.length; 
+                for (var j = 0; j < mL; j+=12) {
+                    data = [];
+                    if(this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9){
+                        data[0] = moment(monthList[j]).add(12, "months").format("YYYY-MM-DD");
+                    }else{
+                        data[0] = moment(monthList[j]).format("YYYY-MM-DD");
+                    }
                     // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                     var total = 0;
                     var totalPer = 0;
@@ -1602,6 +1610,13 @@ class ModelingValidation extends Component {
                         labels: arr,
                         datasets: datasetListForGraph
                     };
+                }else if(this.state.xAxisDisplayBy > 8){
+                    let arr = [...new Set(this.state.monthList.map(ele => moment(ele).format("YYYY")))];
+                    arr.pop();
+                    bar = {
+                        labels: arr,
+                        datasets: datasetListForGraph
+                    };
                 }else{
                     bar = {
                         labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("YYYY")))],
@@ -1883,17 +1898,17 @@ class ModelingValidation extends Component {
                                                             <option value="1">{i18n.t('static.ManageTree.Month')}</option>
                                                             <option value="2">{i18n.t('static.modelingValidation.calendarYear')}</option>
                                                             <option value="3">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="4">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="5">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="6">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="7">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="8">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="9">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="10">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="11">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="12">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="13">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="14">{i18n.t('static.modelingValidation.fyJul')}</option>
+                                                            <option value="4">{i18n.t('static.modelingValidation.fyAug')}</option>
+                                                            <option value="5">{i18n.t('static.modelingValidation.fySep')}</option>
+                                                            <option value="6">{i18n.t('static.modelingValidation.fyOct')}</option>
+                                                            <option value="7">{i18n.t('static.modelingValidation.fyNov')}</option>
+                                                            <option value="8">{i18n.t('static.modelingValidation.fyDec')}</option>
+                                                            <option value="9">{i18n.t('static.modelingValidation.fyJan')}</option>
+                                                            <option value="10">{i18n.t('static.modelingValidation.fyFeb')}</option>
+                                                            <option value="11">{i18n.t('static.modelingValidation.fyMar')}</option>
+                                                            <option value="12">{i18n.t('static.modelingValidation.fyApr')}</option>
+                                                            <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
+                                                            <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
                                                         </Input>
 
                                                     </InputGroup>
