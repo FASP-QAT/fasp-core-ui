@@ -15,6 +15,7 @@ import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
 import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import csvicon from '../../assets/img/csv.png';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import moment from "moment"
@@ -283,6 +284,7 @@ export default class CommitTreeComponent extends React.Component {
                     }
                     DatasetService.getAllDatasetData(programVersionJson)
                         .then(response => {
+                            response.data = compressJson(response.data);
                             // console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
                             this.setState({
                                 programDataServer: response.data[0],
@@ -427,6 +429,7 @@ export default class CommitTreeComponent extends React.Component {
         }
         DatasetService.getAllDatasetData(checkboxesChecked)
             .then(response => {
+                response.data = compressJson(response.data);
                 var json = response.data;
                 var db1;
                 getDatabase();

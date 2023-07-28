@@ -23,7 +23,7 @@ import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
-import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero, isJson } from '../../CommonComponent/JavascriptCommonFunctions';
+import { generateRandomAplhaNumericCode, isSiteOnline, paddingZero, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import { calculateModelingData } from '../DataSet/ModelingDataCalculations.js';
 import ProgramService from '../../api/ProgramService';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
@@ -212,16 +212,7 @@ export default class SyncMasterDataForTree extends Component {
                             .then(response => {
                                 // console.log("Response data Test@@@123",response.data)
                                 if (response.status == 200) {
-                                    if(!isJson(response.data)){
-                                        const compressedData = atob(response.data);
-                                        const byteArray = new Uint8Array(compressedData.length);
-                                        for (let i = 0; i < compressedData.length; i++) {
-                                            byteArray[i] = compressedData.charCodeAt(i);
-                                        }
-                                        const decompressedData = pako.inflate(byteArray, { to: 'string' });
-                                        var json = JSON.parse(decompressedData);
-                                        response.data = json;
-                                    }
+                                    response.data = compressJson(response.data);
                                     var response = response.data;
 
                                     // country

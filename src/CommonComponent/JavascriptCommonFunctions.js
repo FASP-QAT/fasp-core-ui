@@ -1,4 +1,5 @@
 import { APPLICATION_STATUS_URL } from "../Constants";
+import pako from 'pako';
 
 export function paddingZero(string, padStr, len) {
   var str = string.toString();
@@ -74,12 +75,23 @@ export function isSiteOnline() {
   }
 }
 
-export function isJson(str) {
+export function compressJson(str) {
   let value = typeof str !== "string" ? JSON.stringify(str) : str;
   try {
       JSON.parse(value);
   } catch (e) {
-      return false;
+      // const size = new TextEncoder().encode(JSON.stringify(str)).length
+      // const kiloBytes = size / 1000;
+      // const megaBytes = kiloBytes / 1000;
+      // console.log("Size of obj ======= ",megaBytes);
+      const compressedData = atob(str);
+      const byteArray = new Uint8Array(compressedData.length);
+      for (let i = 0; i < compressedData.length; i++) {
+        byteArray[i] = compressedData.charCodeAt(i);
+      }
+      const decompressedData = pako.inflate(byteArray, { to: 'string' });
+      var json = JSON.parse(decompressedData);
+      return json;
   }
-  return true;
+  return str;
 }

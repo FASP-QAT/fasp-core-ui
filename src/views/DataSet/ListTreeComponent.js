@@ -14,7 +14,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import ProgramService from '../../api/ProgramService';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { isSiteOnline, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import '../Forms/ValidationForms/ValidationForms.css';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
@@ -1922,6 +1922,7 @@ export default class ListTreeComponent extends Component {
         DatasetService.getAllDatasetData(checkboxesChecked)
             .then(response => {
                 // console.log("response>>>", response.data);
+                response.data = compressJson(response.data);
                 var json = response.data;
                 for (var r = 0; r < json.length; r++) {
                     json[r].actionList = [];
