@@ -1284,7 +1284,7 @@ export default class BuildTree extends Component {
                 // console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson);
                 // this.getNoOfMonthsInUsagePeriod();
                 if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                    var refillMonths = 1;
+                    var refillMonths = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths : this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
                     // console.log("refillMonths qat cal---", refillMonths)
                     // console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
                     // qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
@@ -1450,7 +1450,7 @@ export default class BuildTree extends Component {
         var puPerVisit = "";
         console.log("PUPERVISIT conversionFactor---", conversionFactor);
         if (parentScenario.fuNode.usageType.id == 2) {
-            var refillMonths = 1;
+            var refillMonths = isRefillMonth && currentScenario.puNode.refillMonths != "" ? currentScenario.puNode.refillMonths : this.round(parseFloat(conversionFactor / (parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
             console.log("PUPERVISIT refillMonths---", refillMonths);
             console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
             // console.log("PUPERVISIT noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
@@ -2704,7 +2704,7 @@ export default class BuildTree extends Component {
         var grandParentMomList = [];
         var noOfBottlesInOneVisit = 0;
         if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
-            monthsPerVisit = 1;
+            monthsPerVisit = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths;
             var parent = (this.state.currentItemConfig.context.parent);
             var parentFiltered = (this.state.items.filter(c => c.id == parent))[0];
 
@@ -6597,7 +6597,7 @@ export default class BuildTree extends Component {
 
                         var puPerInterval = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit;
                         console.log("puPerInterval---==>", puPerInterval);
-                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommasWith8Decimals(puPerInterval) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + "1" + " " + i18n.t('static.report.month');
+                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommasWith8Decimals(puPerInterval) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + this.state.currentScenario.puNode.refillMonths + " " + i18n.t('static.report.month');
                     }
                 } else {
                     usageText = "";
@@ -7961,7 +7961,7 @@ export default class BuildTree extends Component {
             this.getUsageText();
         }
         if (event.target.name === "refillMonths") {
-            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = 1;
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = event.target.value;
             flag = true;
             // this.getUsageText();
         }
@@ -8250,7 +8250,7 @@ export default class BuildTree extends Component {
         try {
             var puPerVisit = "";
             if (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                var refillMonths = 1;
+                var refillMonths = this.round(parseFloat(pu.multiplier / (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
                 (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = refillMonths;
                 console.log("AUTO refillMonths---", refillMonths);
                 console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
@@ -8768,7 +8768,7 @@ export default class BuildTree extends Component {
                 var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
                 var puNode = nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode;
                 if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                    var refillMonths = 1;
+                    var refillMonths = this.round(parseFloat(pu.multiplier / (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
                     console.log("AUTO refillMonths---", refillMonths);
                     console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
                     puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
@@ -9864,22 +9864,22 @@ export default class BuildTree extends Component {
 
                                                     {this.state.parentScenario.fuNode.usageType.id == 2 &&
                                                         <>
-                                                            <div style={{display:'none'}}><div>
+                                                            <div>
                                                                 <Popover placement="top" isOpen={this.state.popoverOpenQATEstimateForInterval} target="Popover15" trigger="hover" toggle={this.toggleQATEstimateForInterval}>
                                                                     <PopoverBody>{i18n.t('static.tooltip.QATEstimateForInterval')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId">Consumption Interval (Reference)<i class="fa fa-info-circle icons pl-lg-2" id="Popover15" onClick={this.toggleQATEstimateForInterval} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                                <Input type="hidden"
+                                                                <Input type="text"
                                                                     id="interval"
                                                                     name="interval"
                                                                     bsSize="sm"
                                                                     readOnly={true}
-                                                                    value={1}>
+                                                                    value={addCommas(this.round(this.state.conversionFactor / (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)))}>
                                                                     {/* value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 2 ? this.state.currentScenario.puNode.refillMonths : "")}> */}
                                                                 </Input>
-                                                            </FormGroup></div>
+                                                            </FormGroup>
 
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId"># PU / Interval / {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en} (Reference)</Label>
@@ -9894,7 +9894,7 @@ export default class BuildTree extends Component {
                                                                 </Input>
                                                             </FormGroup>
 
-                                                            <div style={{display:'none'}}><div>
+                                                            <div>
                                                                 <Popover placement="top" isOpen={this.state.popoverOpenConsumptionIntervalEveryXMonths} target="Popover16" trigger="hover" toggle={this.toggleConsumptionIntervalEveryXMonths}>
                                                                     <PopoverBody>{i18n.t('static.tooltip.ConsumptionIntervalEveryXMonths')}</PopoverBody>
                                                                 </Popover>
@@ -9902,7 +9902,7 @@ export default class BuildTree extends Component {
 
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionIntervalEveryXMonths')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover16" onClick={this.toggleConsumptionIntervalEveryXMonths} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                                <Input type="hidden"
+                                                                <Input type="number"
                                                                     id="refillMonths"
                                                                     name="refillMonths"
                                                                     valid={!errors.refillMonths && this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 2 ? this.state.currentScenario.puNode.refillMonths != '' : !errors.refillMonths}
@@ -9913,11 +9913,11 @@ export default class BuildTree extends Component {
                                                                         this.dataChange(e)
                                                                     }}
                                                                     bsSize="sm"
-                                                                    value={1}>
+                                                                    value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 2 ? this.state.currentScenario.puNode.refillMonths : "")}>
 
                                                                 </Input>
                                                                 <FormFeedback className="red">{errors.refillMonths}</FormFeedback>
-                                                            </FormGroup></div>
+                                                            </FormGroup>
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU / Interval / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
                                                                 <Input type="number"
