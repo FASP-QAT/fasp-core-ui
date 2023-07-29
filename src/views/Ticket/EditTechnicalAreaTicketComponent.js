@@ -135,7 +135,7 @@ export default class EditTechnicalAreaTicketComponent extends Component {
         HealthAreaService.getHealthAreaList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response---", response.data);
+                    // console.log("response---", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -254,7 +254,7 @@ export default class EditTechnicalAreaTicketComponent extends Component {
                             this.state.technicalArea.summary = summaryText_2;
                             this.state.technicalArea.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.technicalArea).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

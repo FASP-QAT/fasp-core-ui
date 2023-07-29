@@ -274,10 +274,10 @@ export default class FundingSourceTicketComponent extends Component {
 
             if (fundingSourceValue.length >= 7) {//minus 2
                 fundingSourceValue = fundingSourceValue.slice(0, 5);
-                console.log("DISPLAYNAME-BEF----->", fundingSourceValue);
+                // console.log("DISPLAYNAME-BEF----->", fundingSourceValue);
                 FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP----->", response);
+                        // console.log("DISPLAYNAME-RESP----->", response);
                         let { fundingSource } = this.state;
                         fundingSource.fundingSourceCode = response.data;
                         this.setState({
@@ -327,10 +327,10 @@ export default class FundingSourceTicketComponent extends Component {
                     );
 
             } else {// not need to minus
-                console.log("DISPLAYNAME-BEF-else----->", fundingSourceValue);
+                // console.log("DISPLAYNAME-BEF-else----->", fundingSourceValue);
                 FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
                     .then(response => {
-                        console.log("DISPLAYNAME-RESP-else----->", response);
+                        // console.log("DISPLAYNAME-RESP-else----->", response);
                         let { fundingSource } = this.state;
                         fundingSource.fundingSourceCode = response.data;
                         this.setState({
@@ -418,7 +418,7 @@ export default class FundingSourceTicketComponent extends Component {
                             this.state.fundingSource.summary = summaryText_2;
                             this.state.fundingSource.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.fundingSource).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

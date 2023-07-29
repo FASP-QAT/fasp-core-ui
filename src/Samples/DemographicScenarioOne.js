@@ -278,7 +278,7 @@ export default class DemographicScenarioOne extends Component {
     }
 
     getRealmCountryList(realmId) {
-        console.log("in get realmCOuntry list----->", realmId);
+        // console.log("in get realmCOuntry list----->", realmId);
         ProgramService.getRealmCountryList(realmId)
             .then(response => {
                 if (response.status == 200) {
@@ -405,25 +405,25 @@ export default class DemographicScenarioOne extends Component {
         ProgramService.getHealthAreaListByRealmCountryId(realmCountryId)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response------>0", response.data);
+                    // console.log("response------>0", response.data);
                     var json = (response.data).filter(c => c.active == true);
                     var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
                     for (var i = 0; i < json.length; i++) {
                         regList[i + 1] = { value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
                     }
-                    console.log("response------>1", regList);
+                    // console.log("response------>1", regList);
                     var listArray = regList;
                     listArray.sort((a, b) => {
                         var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
-                    console.log("response------>2", listArray);
+                    // console.log("response------>2", listArray);
                     this.setState({
                         healthAreaList: listArray
                     }, (
                     ) => {
-                        console.log("healthAreaList>>>>>>>", this.state.healthAreaList);
+                        // console.log("healthAreaList>>>>>>>", this.state.healthAreaList);
                     })
                 } else {
                     this.setState({

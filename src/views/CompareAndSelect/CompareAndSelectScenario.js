@@ -253,7 +253,7 @@ class CompareAndSelectScenario extends Component {
                             a[month].calculatedMmdValue += calculatedMmdValue;
                         return a;
                     }, {}));
-                    console.log("resultTrue@@@@@@@@@@@@@@", resultTrue);
+                    // console.log("resultTrue@@@@@@@@@@@@@@", resultTrue);
                     treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: resultTrue, readonly: readonly });
                     colourArrayCount += 1;
                     count += 1;
@@ -1188,7 +1188,7 @@ class CompareAndSelectScenario extends Component {
         //     "",
         //     "",
         //     ""])
-        console.log("this.state.finalData%%%", this.state.finalData)
+        // console.log("this.state.finalData%%%", this.state.finalData)
         this.state.finalData.map(ele =>
             dataArr3.push([ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'), ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
             ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang),

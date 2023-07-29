@@ -268,6 +268,7 @@ import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import DropdownService from '../../api/DropdownService';
 
 
 const entityname = i18n.t('static.dashboad.planningunitcapacity');
@@ -421,7 +422,7 @@ export default class PlanningUnitCapacityList extends Component {
 
     filterData() {
         let planningUnitId = document.getElementById("planningUnitId").value;
-        console.log("planningUnitId---" + planningUnitId);
+        // console.log("planningUnitId---" + planningUnitId);
         // AuthenticationService.setupAxiosInterceptors();
         if (planningUnitId != 0) {
             const planningUnitCapacityList = this.state.selSource.filter(c => c.planningUnit.id == planningUnitId)
@@ -441,7 +442,7 @@ export default class PlanningUnitCapacityList extends Component {
 
     componentDidMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        PlanningUnitService.getAllPlanningUnitList().then(response => {
+        DropdownService.getPlanningUnitDropDownList().then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -493,7 +494,7 @@ export default class PlanningUnitCapacityList extends Component {
             }
         );
         PlanningUnitCapacityService.getPlanningUnitCapacityList().then(response => {
-            console.log("response.data---", response.data);
+            // console.log("response.data---", response.data);
             this.setState({
                 planningUnitCapacityList: response.data,
                 selSource: response.data
@@ -560,8 +561,8 @@ export default class PlanningUnitCapacityList extends Component {
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
                 return (
-                    <option key={i} value={item.planningUnitId}>
-                        {getLabelText(item.label, this.state.lang) + ' | ' + item.planningUnitId}
+                    <option key={i} value={item.id}>
+                        {getLabelText(item.label, this.state.lang) + ' | ' + item.id}
                     </option>
                 )
             }, this);

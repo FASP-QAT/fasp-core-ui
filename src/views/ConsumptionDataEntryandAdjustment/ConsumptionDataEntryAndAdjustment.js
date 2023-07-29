@@ -261,7 +261,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }, () => {
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
         var consumptionList = isInterpolate == 1 ? this.state.tempConsumptionList : this.state.consumptionList;
-        console.log("consumptionList All--->", this.state.tempConsumptionList)
+        // console.log("consumptionList All--->", this.state.tempConsumptionList)
         var consumptionUnit = {};
         var consumptionNotes = "";
         if (consumptionUnitId > 0) {
@@ -315,7 +315,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
         }
         consumptionList = consumptionList.filter(c => c.planningUnit.id == consumptionUnitId);
-        console.log("consumptionList---->", consumptionList);
+        // console.log("consumptionList---->", consumptionList);
         var monthArray = this.state.monthArray;
         var regionList = this.state.regionList;
         let dataArray = [];
@@ -390,7 +390,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data[0] = i18n.t('static.dataentry.convertedToPlanningUnit')
           for (var j = 0; j < monthArray.length; j++) {
             // data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "0"},0)`;
-            console.log("Multiplier 1@@@@@@@@@@@@@@@", multiplier1);
+            // console.log("Multiplier 1@@@@@@@@@@@@@@@", multiplier1);
             data[j + 1] = `=IF(ISBLANK(${colArr[j + 1]}${parseInt(dataArray.length - 4)}),'',ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "1"},0))`;
           }
           data[monthArray.length + 1] = multiplier;
@@ -498,11 +498,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   //.................................................................. Extrapolate..................................
   ExtrapolatedParameters() {
-    console.log("datasetJson--------> inside Test", this.state.selectedConsumptionUnitId);
+    // console.log("datasetJson--------> inside Test", this.state.selectedConsumptionUnitId);
     if (this.state.selectedConsumptionUnitId > 0) {
       this.setState({ loading: true })
       var datasetJson = this.state.datasetJson;
-      console.log("datasetJson********** Test", datasetJson)
+      // console.log("datasetJson********** Test", datasetJson)
       // Need to filter
       var regionList = this.state.regionList;
       var count = 0;
@@ -518,14 +518,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var inputDataTes = [];
           var inputDataArima = [];
 
-          console.log("minDate Test", moment(minDate).format("YYYY-MM"));
-          console.log("maxDate Test", moment(maxDate).format("YYYY-MM"));
+          // console.log("minDate Test", moment(minDate).format("YYYY-MM"));
+          // console.log("maxDate Test", moment(maxDate).format("YYYY-MM"));
           for (var j = 0; moment(curDate).format("YYYY-MM") < moment(maxDate).format("YYYY-MM"); j++) {
             curDate = moment(minDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
-            console.log("curdate", curDate)
+            // console.log("curdate", curDate)
             var consumptionData = actualConsumptionListForPlanningUnitAndRegion.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
-            console.log("consumptionData--->", consumptionData)
-            console.log("Value@@@@@@@@@@@", consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null);
+            // console.log("consumptionData--->", consumptionData)
+            // console.log("Value@@@@@@@@@@@", consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null);
             inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
             inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
             inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
@@ -570,30 +570,30 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
     var jsonDataMovingAvg = this.state.jsonDataMovingAvg;
     jsonDataMovingAvg.push(data);
-    console.log("jsonDataMovingAvg--->", jsonDataMovingAvg)
+    // console.log("jsonDataMovingAvg--->", jsonDataMovingAvg)
     var countR = this.state.countRecived
-    console.log("countR--->", countR)
+    // console.log("countR--->", countR)
 
     this.setState({
       jsonDataMovingAvg: jsonDataMovingAvg,
       countRecived: countR + 1
     }, () => {
-      console.log("countRecivedMov Test", this.state.countRecived)
-      console.log("countMov Test", this.state.count)
+      // console.log("countRecivedMov Test", this.state.countRecived)
+      // console.log("countMov Test", this.state.count)
 
-      console.log("outSide**** Test", (this.state.jsonDataMovingAvg.length
-        + this.state.jsonDataSemiAverage.length
-        + this.state.jsonDataLinearRegression.length
-        + this.state.jsonDataTes.length
-        + this.state.jsonDataArima.length
-        == this.state.count))
+      // console.log("outSide**** Test", (this.state.jsonDataMovingAvg.length
+      //   + this.state.jsonDataSemiAverage.length
+      //   + this.state.jsonDataLinearRegression.length
+      //   + this.state.jsonDataTes.length
+      //   + this.state.jsonDataArima.length
+      //   == this.state.count))
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
         + this.state.jsonDataTes.length
         + this.state.jsonDataArima.length
         == this.state.count) {
-        console.log("inside if Test")
+        // console.log("inside if Test")
         this.saveForecastConsumptionExtrapolation();
       }
     })
@@ -602,22 +602,22 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   updateSemiAveragesData(data) {
     var jsonDataSemiAverage = this.state.jsonDataSemiAverage;
     jsonDataSemiAverage.push(data);
-    console.log("jsonDataSemiAverage---> Test", jsonDataSemiAverage)
+    // console.log("jsonDataSemiAverage---> Test", jsonDataSemiAverage)
     var countR = this.state.countRecived
-    console.log("countR--->", countR)
+    // console.log("countR--->", countR)
 
     this.setState({
       jsonDataSemiAverage: jsonDataSemiAverage,
       countRecived: countR + 1
     }, () => {
-      console.log("countRecivedSemi Test", this.state.countRecived)
-      console.log("countSemi Test", this.state.count)
-      console.log("Semi outside if Test", this.state.jsonDataMovingAvg.length
-        + this.state.jsonDataSemiAverage.length
-        + this.state.jsonDataLinearRegression.length
-        + this.state.jsonDataTes.length
-        + this.state.jsonDataArima.length
-        == this.state.count)
+      // console.log("countRecivedSemi Test", this.state.countRecived)
+      // console.log("countSemi Test", this.state.count)
+      // console.log("Semi outside if Test", this.state.jsonDataMovingAvg.length
+      //   + this.state.jsonDataSemiAverage.length
+      //   + this.state.jsonDataLinearRegression.length
+      //   + this.state.jsonDataTes.length
+      //   + this.state.jsonDataArima.length
+      //   == this.state.count)
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
@@ -632,19 +632,19 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   updateLinearRegressionData(data) {
     var jsonDataLinearRegression = this.state.jsonDataLinearRegression;
     jsonDataLinearRegression.push(data);
-    console.log("jsonDataLinearRegression---> Test", jsonDataLinearRegression)
+    // console.log("jsonDataLinearRegression---> Test", jsonDataLinearRegression)
     this.setState({
       jsonDataLinearRegression: jsonDataLinearRegression,
       countRecived: this.state.countRecived++
     }, () => {
-      console.log("countRecivedL Test", this.state.countRecived)
-      console.log("countL Test", this.state.count)
-      console.log("linear outside*** Test", this.state.jsonDataMovingAvg.length
-        + this.state.jsonDataSemiAverage.length
-        + this.state.jsonDataLinearRegression.length
-        + this.state.jsonDataTes.length
-        + this.state.jsonDataArima.length
-        == this.state.count)
+      // console.log("countRecivedL Test", this.state.countRecived)
+      // console.log("countL Test", this.state.count)
+      // console.log("linear outside*** Test", this.state.jsonDataMovingAvg.length
+      //   + this.state.jsonDataSemiAverage.length
+      //   + this.state.jsonDataLinearRegression.length
+      //   + this.state.jsonDataTes.length
+      //   + this.state.jsonDataArima.length
+      //   == this.state.count)
 
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
@@ -660,19 +660,19 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   updateTESData(data) {
     var jsonDataTes = this.state.jsonDataTes;
     jsonDataTes.push(data);
-    console.log("jsonDataTes--->", jsonDataTes)
+    // console.log("jsonDataTes--->", jsonDataTes)
     this.setState({
       jsonDataTes: jsonDataTes,
       countRecived: this.state.countRecived++
     }, () => {
-      console.log("countRecivedT Test", this.state.countRecived)
-      console.log("countT Test", this.state.count)
-      console.log("TES Test", this.state.jsonDataMovingAvg.length
-        + this.state.jsonDataSemiAverage.length
-        + this.state.jsonDataLinearRegression.length
-        + this.state.jsonDataTes.length
-        + this.state.jsonDataArima.length
-        == this.state.count)
+      // console.log("countRecivedT Test", this.state.countRecived)
+      // console.log("countT Test", this.state.count)
+      // console.log("TES Test", this.state.jsonDataMovingAvg.length
+      //   + this.state.jsonDataSemiAverage.length
+      //   + this.state.jsonDataLinearRegression.length
+      //   + this.state.jsonDataTes.length
+      //   + this.state.jsonDataArima.length
+      //   == this.state.count)
 
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
@@ -688,19 +688,19 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   updateArimaData(data) {
     var jsonDataArima = this.state.jsonDataArima;
     jsonDataArima.push(data);
-    console.log("jsonDataArima---> Test", jsonDataArima)
+    // console.log("jsonDataArima---> Test", jsonDataArima)
     this.setState({
       jsonDataArima: jsonDataArima,
       countRecived: this.state.countRecived++
     }, () => {
-      console.log("countRecivedA Test", this.state.countRecived)
-      console.log("countA Test", this.state.count)
-      console.log("Arima Test", this.state.jsonDataMovingAvg.length
-        + this.state.jsonDataSemiAverage.length
-        + this.state.jsonDataLinearRegression.length
-        + this.state.jsonDataTes.length
-        + this.state.jsonDataArima.length
-        == this.state.count)
+      // console.log("countRecivedA Test", this.state.countRecived)
+      // console.log("countA Test", this.state.count)
+      // console.log("Arima Test", this.state.jsonDataMovingAvg.length
+      //   + this.state.jsonDataSemiAverage.length
+      //   + this.state.jsonDataLinearRegression.length
+      //   + this.state.jsonDataTes.length
+      //   + this.state.jsonDataArima.length
+      //   == this.state.count)
       if (this.state.jsonDataMovingAvg.length
         + this.state.jsonDataSemiAverage.length
         + this.state.jsonDataLinearRegression.length
@@ -713,7 +713,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   saveForecastConsumptionExtrapolation() {
-    console.log("inside saveForecastConsumptionExtrapolation Test")
+    // console.log("inside saveForecastConsumptionExtrapolation Test")
     this.setState({
       loading: true
     })
@@ -736,7 +736,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       extrapolationMethodRequest.onsuccess = function (event) {
         var transaction = db1.transaction(['datasetData'], 'readwrite');
         var datasetTransaction = transaction.objectStore('datasetData');
-        console.log("dataset", this.state.datasetId)
+        // console.log("dataset", this.state.datasetId)
         var datasetRequest = datasetTransaction.get(this.state.datasetId);
         datasetRequest.onerror = function (event) {
         }.bind(this);
@@ -747,17 +747,17 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
           var datasetJson = JSON.parse(datasetData);
           var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
-          console.log("consumptionExtrapolationDataUnFiltered@@@@@@@@@@ Test", consumptionExtrapolationDataUnFiltered);
-          console.log("this.state.planningUnitId@@@@@@@@@@ Test", this.state.planningUnitId);
+          // console.log("consumptionExtrapolationDataUnFiltered@@@@@@@@@@ Test", consumptionExtrapolationDataUnFiltered);
+          // console.log("this.state.planningUnitId@@@@@@@@@@ Test", this.state.planningUnitId);
           var regionList = this.state.regionList;
           for (var r = 0; r < regionList.length; r++) {
             var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId || (c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id != regionList[r].regionId));
-            console.log("consumptionExtrapolationList@@@@@@@@@@ Test", consumptionExtrapolationList);
+            // console.log("consumptionExtrapolationList@@@@@@@@@@ Test", consumptionExtrapolationList);
             var consumptionExtrapolationData = -1//Semi Averages
             var consumptionExtrapolationMovingData = -1//Moving averages
             var consumptionExtrapolationRegression = -1//Linear Regression
             var consumptionExtrapolationTESL = -1//TES L
-            console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
+            // console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
             var consumptionExtrapolationTESM = -1//TES M
             var consumptionExtrapolationTESH = -1//TES H
             //----------------------------
@@ -768,14 +768,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var inputDataFilter = this.state.jsonDataSemiAverage;
             var inputDataAverageFilter = this.state.movingAvgData;
             var inputDataRegressionFilter = this.state.linearRegressionData;
-            console.log("consumptionExtrapolationData", consumptionExtrapolationData);
-            console.log("inputDataFilter", inputDataFilter);
+            // console.log("consumptionExtrapolationData", consumptionExtrapolationData);
+            // console.log("inputDataFilter", inputDataFilter);
             var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
             var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId)[0].planningUnit;
-            console.log("this.state.regionList", this.state.regionList);
+            // console.log("this.state.regionList", this.state.regionList);
             var regionObj = this.state.regionList.filter(c => c.regionId == regionList[r].regionId)[0];
-            console.log("Planning Unit Obj****", planningUnitObj);
-            console.log("Region Obj****", regionObj);
+            // console.log("Planning Unit Obj****", planningUnitObj);
+            // console.log("Region Obj****", regionObj);
             var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
             var curUser = AuthenticationService.getLoggedInUserId();
             var datasetJson = this.state.datasetJson;
@@ -784,16 +784,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
 
             //Semi - averages
-            console.log("this.state.jsonDataSemiAverage----------->", this.state.jsonDataSemiAverage);
+            // console.log("this.state.jsonDataSemiAverage----------->", this.state.jsonDataSemiAverage);
             var jsonDataSemiAvgFilter = this.state.jsonDataSemiAverage.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
             if (jsonDataSemiAvgFilter.length > 0) {
               var jsonSemi = jsonDataSemiAvgFilter[0].data;
-              console.log("this.state.jsonDataSemiAverage--json--------->", jsonSemi);
+              // console.log("this.state.jsonDataSemiAverage--json--------->", jsonSemi);
               var data = [];
               for (var i = 0; i < jsonSemi.length; i++) {
                 data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(2) : null, ci: null })
               }
-              console.log("data--------->", data);
+              // console.log("data--------->", data);
 
               consumptionExtrapolationList.push(
                 {
@@ -816,13 +816,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 })
               id += 1;
             }
-            console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
+            // console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
             //Moving Averages
             var data = [];
             var jsonDataMovingFilter = this.state.jsonDataMovingAvg.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
             if (jsonDataMovingFilter.length > 0) {
               var jsonDataMoving = jsonDataMovingFilter[0].data;
-              console.log("this.state.jsonDataMovingAvg--json--------->", jsonDataMoving);
+              // console.log("this.state.jsonDataMovingAvg--json--------->", jsonDataMoving);
               for (var i = 0; i < jsonDataMoving.length; i++) {
                 data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(2) : null, ci: null })
               }
@@ -853,7 +853,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
             if (jsonDataLinearFilter.length > 0) {
               var jsonDataLinear = jsonDataLinearFilter[0].data;
-              console.log("this.state.jsonDataLinear--json--------->", jsonDataLinear);
+              // console.log("this.state.jsonDataLinear--json--------->", jsonDataLinear);
               for (var i = 0; i < jsonDataLinear.length; i++) {
                 data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(2) : null, ci: (jsonDataLinear[i].ci) })
               }
@@ -881,12 +881,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             }
             //TES L
             //TES M
-            console.log("in if2")
+            // console.log("in if2")
             var data = [];
             var jsonDataTesFilter = this.state.jsonDataTes.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
             if (jsonDataTesFilter.length > 0) {
               var jsonDataTes = jsonDataTesFilter[0].data;
-              console.log("this.state.jsonDataTes--json--------->", jsonDataTes);
+              // console.log("this.state.jsonDataTes--json--------->", jsonDataTes);
 
               for (var i = 0; i < jsonDataTes.length; i++) {
                 data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(2) : null, ci: (jsonDataTes[i].ci) })
@@ -919,12 +919,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             }
             //Arima L
             //TES M
-            console.log("in if2")
+            // console.log("in if2")
             var data = [];
             var jsonDataArimaFilter = this.state.jsonDataArima.filter(c => c.PlanningUnitId == this.state.selectedConsumptionUnitId && c.regionId == regionList[r].regionId)
             if (jsonDataArimaFilter.length > 0) {
               var jsonDataArima = jsonDataArimaFilter[0].data;
-              console.log("this.state.jsonDataArima--json--------->", jsonDataArima);
+              // console.log("this.state.jsonDataArima--json--------->", jsonDataArima);
               for (var i = 0; i < jsonDataArima.length; i++) {
                 data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(2) : null, ci: (jsonDataArima[i].ci) })
               }
@@ -955,10 +955,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               id += 1;
             }
           }
-          console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
+          // console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
           datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
-          console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
-          console.log("Test DatasetJson@@", datasetJson)
+          // console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
+          // console.log("Test DatasetJson@@", datasetJson)
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
@@ -968,7 +968,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           putRequest.onerror = function (event) {
           }.bind(this);
           putRequest.onsuccess = function (event) {
-            console.log("save");
+            // console.log("save");
             // let id = AuthenticationService.displayDashboardBasedOnRole();
             // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
             this.setState({
@@ -1028,7 +1028,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       stockDayStart += 8;
       adjustedConsumption += 8;
     }
-    console.log("possibleStockDayY===", possibleStockDayY)
+    // console.log("possibleStockDayY===", possibleStockDayY)
 
     var elInstance = this.state.dataEl;
     if (possibleActualConsumptionY.includes(y.toString())) {
@@ -1100,7 +1100,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
       value = value.replaceAll(',', '');
       var stockOutdays = elInstance.getColumnData(x)[0];
-      console.log("Actual consumption value@@@@@@@@", elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true))
+      // console.log("Actual consumption value@@@@@@@@", elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true))
       if (value == "") {
       } else if (elInstance.getValue(`${colArr[x]}${parseInt(y) + 1 - 2}`, true) >= 0 && value == stockOutdays) {
         var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -1240,7 +1240,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }
 
         if (possibleReportRateY.includes(y.toString())) {
-          console.log("possibleReportRateY--", y.toString());
+          // console.log("possibleReportRateY--", y.toString());
           if (value == "") {
 
           }
@@ -1268,7 +1268,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
 
-            console.log("possibleReportRateY--Col esle  ", col);
+            // console.log("possibleReportRateY--Col esle  ", col);
 
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
@@ -1307,7 +1307,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }
       }
     }
-    console.log("valid--", valid)
+    // console.log("valid--", valid)
     return valid;
   }
 
@@ -1322,7 +1322,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
       var consumptionUnit = this.state.selectedConsumptionUnitObject;
       var rangeValue = this.state.singleValue2;
-      console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
+      // console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
       var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
       var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
       var fullConsumptionList = this.state.tempConsumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
@@ -1336,7 +1336,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var puAmountCount = 7;
 
         for (var r = 0; r < regionList.length; r++) {
-          console.log("&&&&&&&&&&MonthList", monthArray[i]);
+          // console.log("&&&&&&&&&&MonthList", monthArray[i]);
           var index = 0;
           index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
           var actualConsumptionValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount) + 1}`, true).replaceAll(",", "");
@@ -1344,7 +1344,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var daysOfStockOutValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(daysOfStockOutCount) + 1}`, true);
           var adjustedAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(adjustedAmountCount) + 1}`, true).replaceAll(",", "");;
           var puAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(puAmountCount) + 1}`, true).replaceAll(",", "");;
-          console.log("&&&&&&&&&&ActualConsumptionValue", actualConsumptionValue);
+          // console.log("&&&&&&&&&&ActualConsumptionValue", actualConsumptionValue);
           if (actualConsumptionValue !== "") {
             if (index != -1) {
               fullConsumptionList[index].amount = actualConsumptionValue;
@@ -1506,16 +1506,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var curUser = AuthenticationService.getLoggedInUserId();
           var consumptionUnit = this.state.selectedConsumptionUnitObject;
           var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
-          console.log("this.state.consumptionList", this.state.consumptionList);
+          // console.log("this.state.consumptionList", this.state.consumptionList);
           // var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
           var rangeValue = this.state.singleValue2;
-          console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
+          // console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
           var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
           // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
           var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
 
           var fullConsumptionList = this.state.consumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
-          console.log("Full ConsumptionList @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", fullConsumptionList)
+          // console.log("Full ConsumptionList @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", fullConsumptionList)
           var monthArray = this.state.monthArray;
           var regionList = this.state.regionList;
           for (var i = 0; i < monthArray.length; i++) {
@@ -1528,7 +1528,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var puAmountCount = 7;
 
             for (var r = 0; r < regionList.length; r++) {
-              console.log("&&&&&&&&&&MonthList", monthArray[i]);
+              // console.log("&&&&&&&&&&MonthList", monthArray[i]);
               var index = 0;
               index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
               var actualConsumptionValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount) + 1}`, true).replaceAll(",", "");
@@ -1536,7 +1536,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var daysOfStockOutValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(daysOfStockOutCount) + 1}`, true);
               var adjustedAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(adjustedAmountCount) + 1}`, true).replaceAll(",", "");
               var puAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(puAmountCount) + 1}`, true).replaceAll(",", "");
-              console.log("&&&&&&&&&&ActualConsumptionValue", actualConsumptionValue);
+              // console.log("&&&&&&&&&&ActualConsumptionValue", actualConsumptionValue);
               if (actualConsumptionValue !== "") {
                 if (index != -1) {
                   fullConsumptionList[index].amount = actualConsumptionValue;
@@ -1599,7 +1599,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           datasetJson.actualConsumptionList = fullConsumptionList;
           datasetJson.planningUnitList = planningUnitList;
           // datasetJson.consumptionExtrapolation = [];
-          console.log("datasetJson----------->925", datasetJson);
+          // console.log("datasetJson----------->925", datasetJson);
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
@@ -1625,7 +1625,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             //this.el.destroy();
             //this.el = jexcel(document.getElementById("smallTableDiv"), '');
             //this.el.destroy();
-            console.log("in side datasetDetails")
+            // console.log("in side datasetDetails")
             db1 = e.target.result;
             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
@@ -1648,7 +1648,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               consumptionChanged: false,
               datasetJson: datasetJson
             }, () => {
-              console.log("Above extrapolated parameteres Test")
+              // console.log("Above extrapolated parameteres Test")
               this.ExtrapolatedParameters();
             })
           }.bind(this)
@@ -1972,9 +1972,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
     }
     var planningUnitList = this.state.planningUnitList.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId);
-    console.log("PlanningUnitList@@@@@@@@@@@", planningUnitList)
+    // console.log("PlanningUnitList@@@@@@@@@@@", planningUnitList)
     for (var pul = 0; pul < planningUnitList.length; pul++) {
-      console.log("In loop@@@@@@@@@")
+      // console.log("In loop@@@@@@@@@")
       // if (planningUnitList[i].planningUnit.id != this.state.selectedConsumptionUnitId) {
       var consumptionList = this.state.consumptionList.filter(c => c.planningUnit.id == planningUnitList[pul].planningUnit.id);
       csvRow.push('')
@@ -2034,7 +2034,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         for (var j = 0; j < monthArray.length; j++) {
           var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
           var percentage = consumptionData.length > 0 && consumptionData[0].daysOfStockOut > 0 ? Math.round((consumptionData[0].daysOfStockOut / monthArray[j].noOfDays) * 100) : 0;
-          console.log("Percentage@@@@@@@@@@@@@@@@@@@", percentage)
+          // console.log("Percentage@@@@@@@@@@@@@@@@@@@", percentage)
           B.push(percentage.toString().replaceAll("\,", ""))
         }
         C.push(this.addDoubleQuoteToRowContent(B));
@@ -2094,7 +2094,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
-        console.log("")
+        // console.log("")
         var datasetList = [];
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -2236,7 +2236,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
               var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
               var datasetJson = JSON.parse(datasetData);
-              console.log("datasetJson@@@@@@@@@@@@@@", datasetJson);
+              // console.log("datasetJson@@@@@@@@@@@@@@", datasetJson);
               var consumptionList = datasetJson.actualConsumptionList;
               var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active);
               planningUnitList.sort((a, b) => {
@@ -2251,12 +2251,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 return itemLabelA > itemLabelB ? 1 : -1;
               });
               var rangeValue = this.state.singleValue2;
-              console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
+              // console.log("RangeValuie@@@@@@@@@@@@", rangeValue);
               var startDate = moment(rangeValue.year + '-' + (rangeValue.month<=9?"0"+rangeValue.month:rangeValue.month) + '-01').format("YYYY-MM-DD");
               // var stopDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM-DD");
               var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
 
-              console.log("stopDate@@@@@@@@@@@@", stopDate);
+              // console.log("stopDate@@@@@@@@@@@@", stopDate);
               var daysInMonth = datasetJson.currentVersion.daysInMonth;
               var monthArray = [];
               var curDate = startDate;
@@ -2280,9 +2280,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     var reportingRate = "";
                     var actualConsumption = "";
                     var daysOfStockOut = ""
-                    console.log("consumptionDataForMonth--------->", consumptionDataForMonth)
+                    // console.log("consumptionDataForMonth--------->", consumptionDataForMonth)
                     if (consumptionDataForMonth.length > 0) {
-                      console.log("consumptionDataForMonth--------->", consumptionDataForMonth)
+                      // console.log("consumptionDataForMonth--------->", consumptionDataForMonth)
 
                       var c = consumptionDataForMonth[0];
                       reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
@@ -2312,15 +2312,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       qtyInPU = ""
                     }
                     planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Math.round(qty) : "", qtyInPU: qty !== "" ? Math.round(qtyInPU) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
-                    console.log("planningUnitTotalListRegion-->", planningUnitTotalListRegion);
+                    // console.log("planningUnitTotalListRegion-->", planningUnitTotalListRegion);
                     if (qty !== "") {
                       totalQty = Number(totalQty) + Number(qty);
                       totalQtyPU = Number(totalQtyPU) + Number(qtyInPU);
                     }
                   }
-                  console.log("&&totalQty--->", totalQty)
+                  // console.log("&&totalQty--->", totalQty)
                   planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQtyPU !== "" ? Math.round(totalQtyPU) : "" })
-                  console.log("&&planningUnitTotalList------>", planningUnitTotalList)
+                  // console.log("&&planningUnitTotalList------>", planningUnitTotalList)
                   totalPlanningUnit += totalQty;
                   totalPlanningUnitPU += totalQtyPU;
                 }
@@ -2331,7 +2331,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var forecastingUnitList = fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
               var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
               var allPlanningUnitList = puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
-              console.log("&&planningUnitList------>", planningUnitList)
+              // console.log("&&planningUnitList------>", planningUnitList)
 
               this.setState({
                 consumptionList: consumptionList,
@@ -2353,7 +2353,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 this.setState({
                   isTableLoaded: this.getTableDiv()
                 })
-                console.log("this.props.match.params.planningUnitId+++", this.props.match.params.planningUnitId)
+                // console.log("this.props.match.params.planningUnitId+++", this.props.match.params.planningUnitId)
                 if (this.props.match.params.planningUnitId > 0) {
                   this.buildDataJexcel(this.props.match.params.planningUnitId, 0)
                 }
@@ -2632,7 +2632,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     } else {
       cont = true;
     }
-    console.log("Value@@@@@@@@@@@@@@@", value)
+    // console.log("Value@@@@@@@@@@@@@@@", value)
     // let startDate = moment(value.from.year + '-' + value.from.month + '-01').format("YYYY-MM");
     // let endDate = moment(value.to.year + '-' + value.to.month + '-' + new Date(value.to.year, value.to.month, 0).getDate()).format("YYYY-MM");
     // console.log("startDate-->", startDate);
@@ -2912,7 +2912,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         </li>
       )
     }, this);
-    console.log("PlanningUnitList@@@@@@@@@@@@@@", this.state.planningUnitList);
+    // console.log("PlanningUnitList@@@@@@@@@@@@@@", this.state.planningUnitList);
     return (
       <div className="animated fadeIn">
         <Prompt

@@ -108,14 +108,14 @@ class RealmCountry extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryrealmIdById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
-                console.log("getRealmCountryrealmIdById---", response.data);
+                // console.log("getRealmCountryrealmIdById---", response.data);
                 let myResponse = response.data;
                 if (myResponse.length > 0) {
                     this.setState({ rows: myResponse });
                 }
                 RealmService.getRealmById(this.props.match.params.realmId).then(response => {
                     if (response.status == 200) {
-                        console.log(response.data);
+                        // console.log(response.data);
                         this.setState({
                             realm: response.data,
                             //  rows:response.data
@@ -123,7 +123,7 @@ class RealmCountry extends Component {
                         CountryService.getCountryListAll()
                             .then(response => {
                                 if (response.status == 200) {
-                                    console.log("CountryService--------", response.data)
+                                    // console.log("CountryService--------", response.data)
                                     var listArray = response.data;
                                     listArray.sort((a, b) => {
                                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -725,11 +725,11 @@ class RealmCountry extends Component {
         var validation = this.checkValidation();
         if (validation == true && duplicateValidation == true) {
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("6 map---" + map1.get("6"))
+                // console.log("6 map---" + map1.get("6"))
                 if (parseInt(map1.get("6")) === 1) {
                     let json = {
                         country: {
@@ -747,12 +747,12 @@ class RealmCountry extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             RealmCountryService.addRealmCountry(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         this.props.history.push(`/realm/listRealm/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
@@ -807,7 +807,7 @@ class RealmCountry extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
     checkDuplicateCountry = function () {
@@ -815,13 +815,13 @@ class RealmCountry extends Component {
         let count = 0;
 
         let tempArray = tableJson;
-        console.log('hasDuplicate------', tempArray);
+        // console.log('hasDuplicate------', tempArray);
 
         var hasDuplicate = false;
         tempArray.map(v => v[Object.keys(v)[1]]).sort().sort((a, b) => {
             if (a === b) hasDuplicate = true
         })
-        console.log('hasDuplicate', hasDuplicate);
+        // console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
                 message: i18n.t('static.country.duplicateCountry'),
@@ -848,11 +848,11 @@ class RealmCountry extends Component {
     }
 
     blur = function (instance) {
-        console.log('on blur called');
+        // console.log('on blur called');
     }
 
     focus = function (instance) {
-        console.log('on focus called');
+        // console.log('on focus called');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
@@ -892,14 +892,14 @@ class RealmCountry extends Component {
     // -----end of changed function
 
     onedit = function (instance, cell, x, y, value) {
-        console.log("------------onedit called")
+        // console.log("------------onedit called")
         this.el.setValueFromCoords(6, y, 1, true);
     }.bind(this);
 
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(6, y);
             if (parseInt(value) == 1) {
@@ -907,7 +907,7 @@ class RealmCountry extends Component {
                 //Country
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");

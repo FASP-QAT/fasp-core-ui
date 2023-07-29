@@ -150,7 +150,7 @@ export default class OrganisationTicketComponent extends Component {
         HealthAreaService.getHealthAreaList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response---", response.data);
+                    // console.log("response---", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -271,9 +271,9 @@ export default class OrganisationTicketComponent extends Component {
                             })
                             this.state.equivalencyUnit.summary = summaryText_2;
                             this.state.equivalencyUnit.userLanguageCode = this.state.lang;
-                            console.log("SUBMIT---------->", this.state.equivalencyUnit);
+                            // console.log("SUBMIT---------->", this.state.equivalencyUnit);
                             JiraTikcetService.addEmailRequestIssue(this.state.equivalencyUnit).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

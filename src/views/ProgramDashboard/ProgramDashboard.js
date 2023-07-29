@@ -71,7 +71,7 @@ const bar = {
 };
 
 var dataset = bar.datasets[0];
-console.log('dataset'+dataset.backgroundColor);
+// console.log('dataset'+dataset.backgroundColor);
 for (var i = 0; i < dataset.data.length; i++) {
   if (dataset.data[i] < 30) {
     dataset.backgroundColor[i] = chartColors.color1;
@@ -84,7 +84,7 @@ for (var i = 0; i < dataset.data.length; i++) {
   }
  
 }
-console.log('dataset'+bar.datasets[0].backgroundColor);
+// console.log('dataset'+bar.datasets[0].backgroundColor);
 bar.datasets[0]=dataset;
 
 

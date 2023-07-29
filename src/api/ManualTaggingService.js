@@ -33,12 +33,12 @@ class ManualTaggingSerice {
         });
     }
     getOrderDetailsByOrderNoAndPrimeLineNo(roNoOrderNo, programId, erpPlanningUnitId, linkingType, parentShipmentId) {
-        console.log("parentShipmentId----", parentShipmentId);
+        // console.log("parentShipmentId----", parentShipmentId);
         return axios.get(`${API_URL}/api/orderDetails/${roNoOrderNo}/${programId}/${erpPlanningUnitId}/${linkingType}/${parentShipmentId}`, {
         });
     }
     linkShipmentWithARTMIS(json) {
-        console.log("my json------", json);
+        // console.log("my json------", json);
         return axios.post(`${API_URL}/api/linkShipmentWithARTMIS/`, json, {}
         );
     }
@@ -66,13 +66,13 @@ class ManualTaggingSerice {
     }
 
     getNotLinkedQatShipments(programId, versionId, json) {
-        console.log('Json@@@@@@@@@', json)
+        // console.log('Json@@@@@@@@@', json)
         return axios.post(`${API_URL}/api/erpLinking/notLinkedQatShipments/programId/${programId}/versionId/${versionId}`, json, {
         });
     }
 
     autocompleteDataOrderNo(json) {
-        console.log("Json Test@@@123",json)
+        // console.log("Json Test@@@123",json)
         return axios.post(`${API_URL}/api/erpLinking/autoCompleteOrder`,json, {
         });
     }
@@ -84,7 +84,7 @@ class ManualTaggingSerice {
             programId:programId,
             delinkedList:listToExclude
         }
-        console.log("Planning Unit @@@@@@@@@@@@@@@@",json)
+        // console.log("Planning Unit @@@@@@@@@@@@@@@@",json)
         return axios.post(`${API_URL}/api/erpLinking/autoCompletePu`, json,{
         });
     }
@@ -100,7 +100,7 @@ class ManualTaggingSerice {
     }
 
     getLinkedQatShipments(programId, versionId, json) {
-        console.log('Json@@@@@@@@@', json)
+        // console.log('Json@@@@@@@@@', json)
         return axios.post(`${API_URL}/api/erpLinking/linkedShipments/programId/${programId}/versionId/${versionId}`, json, {
         });
     }

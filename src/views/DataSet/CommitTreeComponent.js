@@ -219,7 +219,7 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     setProgramId(e) {
-        console.log("In set program Id@@@@@@@@@@@%%%%%%%%%%%%%")
+        // console.log("In set program Id@@@@@@@@@@@%%%%%%%%%%%%%")
         var programId = e.target.value;
         this.setState({
             loading: true,
@@ -283,7 +283,7 @@ export default class CommitTreeComponent extends React.Component {
                     }
                     DatasetService.getAllDatasetData(programVersionJson)
                         .then(response => {
-                            console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
+                            // console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
                             this.setState({
                                 programDataServer: response.data[0],
                                 programDataDownloaded: response.data.length > 1 ? response.data[1] : response.data[0],
@@ -309,9 +309,9 @@ export default class CommitTreeComponent extends React.Component {
 
 
     updateState(parameterName, value) {
-        console.log("In update state@@@@@@@@@@@%%%%%%%%%%%%%")
-        console.log("ParameterName$$$", parameterName)
-        console.log("Value$$$", value)
+        // console.log("In update state@@@@@@@@@@@%%%%%%%%%%%%%")
+        // console.log("ParameterName$$$", parameterName)
+        // console.log("Value$$$", value)
         this.setState({
             [parameterName]: value
         }, () => {
@@ -617,30 +617,30 @@ export default class CommitTreeComponent extends React.Component {
                                 var programJson = datasetJson;
                                 programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
                                 programJson.currentVersion.notes = document.getElementById("notes").value;;
-                                console.log("ProgramJson+++", programJson);
-                                console.log("this.state.comparedLatestVersion----", this.state.comparedLatestVersion);
+                                // console.log("ProgramJson+++", programJson);
+                                // console.log("this.state.comparedLatestVersion----", this.state.comparedLatestVersion);
                                 var treeList = programJson.treeList;
                                 for (var tl = 0; tl < treeList.length; tl++) {
                                     var tree = treeList[tl];
                                     var scenarioList = tree.scenarioList;
                                     var scenarioIdsSet = [...new Set(scenarioList.map(ele => Number(ele.id)))];
-                                    console.log("Scenario Ids Set Test@123", scenarioIdsSet);
+                                    // console.log("Scenario Ids Set Test@123", scenarioIdsSet);
                                     var completeFlatList = (tree.tree).flatList;
                                     for (let i = 0; i < completeFlatList.length; i++) {
                                         var node = completeFlatList[i];
                                         var scenarioKeys = Object.keys(node.payload.nodeDataMap);
                                         for (var sk = 0; sk < scenarioKeys.length; sk++) {
-                                            console.log("scenarioKeys[sk] Test@123", scenarioKeys[sk])
+                                            // console.log("scenarioKeys[sk] Test@123", scenarioKeys[sk])
                                             if (!(scenarioIdsSet.includes(Number(scenarioKeys[sk])))) {
                                                 delete node.payload.nodeDataMap[scenarioKeys[sk]];
                                             }
                                         }
                                     }
                                     for (var ndm = 0; ndm < scenarioList.length; ndm++) {
-                                        console.log("commit*** completeFlatList before---", completeFlatList);
+                                        // console.log("commit*** completeFlatList before---", completeFlatList);
                                         for (let i = 0; i < completeFlatList.length; i++) {
                                             var node = completeFlatList[i];
-                                            console.log("commit*** node before---", node);
+                                            // console.log("commit*** node before---", node);
                                             if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
@@ -660,24 +660,24 @@ export default class CommitTreeComponent extends React.Component {
                                                 }
                                             }
                                             node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList = nodeDataModelingListUpdated;
-                                            console.log("commit*** node after---", node);
+                                            // console.log("commit*** node after---", node);
                                             var findNodeIndex = completeFlatList.findIndex(n => n.id == node.id);
-                                            console.log("commit*** findNodeIndex1---", findNodeIndex);
+                                            // console.log("commit*** findNodeIndex1---", findNodeIndex);
                                             completeFlatList[findNodeIndex] = node;
-                                            console.log("commit*** completeFlatList after---", completeFlatList);
+                                            // console.log("commit*** completeFlatList after---", completeFlatList);
                                         }
                                     }
                                     tree.tree.flatList = completeFlatList;
-                                    console.log("commit*** tree---", tree);
+                                    // console.log("commit*** tree---", tree);
                                     var findTreeIndex = treeList.findIndex(n => n.treeId == tree.treeId);
-                                    console.log("commit*** findTreeIndex---", findTreeIndex);
+                                    // console.log("commit*** findTreeIndex---", findTreeIndex);
                                     treeList[findTreeIndex] = tree;
-                                    console.log("commit*** treeList---", treeList);
+                                    // console.log("commit*** treeList---", treeList);
                                 }
                                 var consumptionExtrapolationToUpdate = programJson.consumptionExtrapolation;
                                 for (var ce = 0; ce < consumptionExtrapolationToUpdate.length; ce++) {
                                     var cel = consumptionExtrapolationToUpdate[ce].extrapolationDataList;
-                                    console.log("Cel Test123", cel)
+                                    // console.log("Cel Test123", cel)
                                     for (var c = 0; c < cel.length; c++) {
                                         cel[c].amount = cel[c].amount < 0 ? 0 : cel[c].amount;
                                     }
@@ -685,7 +685,7 @@ export default class CommitTreeComponent extends React.Component {
                                 }
                                 programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
                                 programJson.treeList = treeList;
-                                console.log("commit*** final programJson---", programJson);
+                                // console.log("commit*** final programJson---", programJson);
 
                                 //create saveDatasetData in ProgramService
                                 DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
@@ -842,7 +842,7 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     render() {
-        console.log("In render@@@@@@@@@@@%%%%%%%%%%%%%", this.state.loading);
+        // console.log("In render@@@@@@@@@@@%%%%%%%%%%%%%", this.state.loading);
         const { programList } = this.state;
         let programs = programList.length > 0 && programList.map((item, i) => {
             return (
@@ -1080,7 +1080,7 @@ export default class CommitTreeComponent extends React.Component {
                                         <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
                                         <div className='ForecastSummaryTable'>
                                             <div className="RemoveStriped commitversionTable CommitTableMarginTop consumptionDataEntryTable">
-                                                <div id="tableDiv" />
+                                                <div id="tableDiv" className="TableWidth100"/>
                                             </div>
                                         </div>
                                     </>

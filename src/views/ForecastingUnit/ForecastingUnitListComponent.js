@@ -69,7 +69,7 @@
 //         let realmId = document.getElementById("realmId").value;
 //         ForecastingUnitService.getForcastingUnitByRealmId(realmId).then(response => {
 //             if (response.status == 200) {
-//                 console.log("response------->" + response);
+//                 // console.log("response------->" + response);
 //                 this.setState({
 //                     forecastingUnitList: response.data,
 //                     selSource: response.data
@@ -126,9 +126,9 @@
 //         //     });
 //         // } 
 //         else if (productCategoryId != 0) {
-//             console.log("productCategoryId---"+productCategoryId);
+//             // console.log("productCategoryId---"+productCategoryId);
 //             const selSource = this.state.forecastingUnitList.filter(c => c.productCategory.id == productCategoryId)
-//             console.log("selSource---",selSource);
+//             // console.log("selSource---",selSource);
 //             this.setState({
 //                 selSource
 //             });
@@ -148,7 +148,7 @@
 //         let realmId = document.getElementById("realmId").value;
 //         ProductService.getProductCategoryList(realmId)
 //             .then(response => {
-//                 console.log("product category list---",JSON.stringify(response.data))
+//                 // console.log("product category list---",JSON.stringify(response.data))
 
 
 //                 this.setState({
@@ -169,14 +169,14 @@
 //                     })
 //                     this.getProductCategories();
 //                     ForecastingUnitService.getForcastingUnitByRealmId(this.state.realmId).then(response => {
-//                         // console.log("response------->" + response);
+//                         // // console.log("response------->" + response);
 //                         if (response.status == 200) {
 //                             this.setState({
 //                                 forecastingUnitList: response.data,
 //                                 selSource: response.data
 //                             },
 //                             () => {
-//                                 console.log("responsedata------->" + this.state.forecastingUnitList);
+//                                 // console.log("responsedata------->" + this.state.forecastingUnitList);
 //                             })
 //                         } else {
 //                             this.setState({
@@ -220,7 +220,7 @@
 //             })
 
 //         ForecastingUnitService.getForecastingUnitListAll().then(response => {
-//             console.log("response------->" + response);
+//             // console.log("response------->" + response);
 //             if (response.status == 200) {
 //                 this.setState({
 //                     forecastingUnitList: response.data,
@@ -279,7 +279,7 @@
 //         const { productCategories } = this.state;
 //         let productCategoryList = productCategories.length > 0
 //             && productCategories.map((item, i) => {
-//                 console.log(JSON.stringify("----------",item))
+//                 // console.log(JSON.stringify("----------",item))
 //                 return (
 //                     <option key={i} value={item.payload.productCategoryId}>
 //                         {getLabelText(item.payload.label, this.state.lang)}
@@ -530,7 +530,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, API_URL } from '../../Constants';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
-
+import DropdownService from '../../api/DropdownService';
 
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
 export default class ForecastingUnitListComponent extends Component {
@@ -562,7 +562,7 @@ export default class ForecastingUnitListComponent extends Component {
     }
     buildJexcel() {
         let forecastingUnitList = this.state.selSource;
-        // console.log("forecastingUnitList---->", forecastingUnitList);
+        // // console.log("forecastingUnitList---->", forecastingUnitList);
         let forecastingUnitListArray = [];
         let count = 0;
 
@@ -586,7 +586,7 @@ export default class ForecastingUnitListComponent extends Component {
         //     data = [];
         //     forecastingUnitListArray[0] = data;
         // }
-        // console.log("forecastingUnitListArray---->", forecastingUnitListArray);
+        // // console.log("forecastingUnitListArray---->", forecastingUnitListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -715,11 +715,11 @@ export default class ForecastingUnitListComponent extends Component {
     filterDataForRealm() {
         this.setState({ loading: true })
         let realmId = document.getElementById("realmId").value;
-        console.log("realmId---", realmId)
+        // console.log("realmId---", realmId)
         this.getProductCategories();
         ForecastingUnitService.getForcastingUnitByRealmId(realmId).then(response => {
             if (response.status == 200) {
-                console.log("response------->" + response);
+                // console.log("response------->" + response);
                 this.setState({
                     forecastingUnitList: response.data,
                     selSource: response.data,
@@ -810,14 +810,14 @@ export default class ForecastingUnitListComponent extends Component {
         if (productCategoryId != 0 && tracerCategoryId != 0) {
             // productCategories
             var pc = this.state.productCategories.filter(c => c.payload.productCategoryId == productCategoryId)[0]
-            console.log("Pc---------->", pc);
+            // console.log("Pc---------->", pc);
             var pcList = this.state.productCategories.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
-            console.log("PcList", pcList);
+            // console.log("PcList", pcList);
             var pcIdArray = [];
             for (var pcu = 0; pcu < pcList.length; pcu++) {
                 pcIdArray.push(pcList[pcu].payload.productCategoryId);
             }
-            console.log("pcIdArray", pcIdArray);
+            // console.log("pcIdArray", pcIdArray);
             this.setState({ loading: true })
             const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId && pcIdArray.includes(c.productCategory.id))
             this.setState({
@@ -836,17 +836,17 @@ export default class ForecastingUnitListComponent extends Component {
         // } 
         else if (productCategoryId != 0) {
             var pc = this.state.productCategories.filter(c => c.payload.productCategoryId == productCategoryId)[0]
-            console.log("Pc---------->", pc);
+            // console.log("Pc---------->", pc);
             var pcList = this.state.productCategories.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
-            console.log("PcList", pcList);
+            // console.log("PcList", pcList);
             var pcIdArray = [];
             for (var pcu = 0; pcu < pcList.length; pcu++) {
                 pcIdArray.push(pcList[pcu].payload.productCategoryId);
             }
-            console.log("pcIdArray", pcIdArray);
-            console.log("productCategoryId---" + productCategoryId);
+            // console.log("pcIdArray", pcIdArray);
+            // console.log("productCategoryId---" + productCategoryId);
             const selSource = this.state.forecastingUnitList.filter(c => pcIdArray.includes(c.productCategory.id));
-            console.log("selSource---", selSource);
+            // console.log("selSource---", selSource);
             this.setState({
                 selSource
             },
@@ -875,7 +875,7 @@ export default class ForecastingUnitListComponent extends Component {
         let realmId = document.getElementById("realmId").value;
         ProductService.getProductCategoryList(realmId)
             .then(response => {
-                console.log("product category list---", JSON.stringify(response.data))
+                // console.log("product category list---", JSON.stringify(response.data))
                 this.setState({
                     productCategories: response.data
                 })
@@ -930,7 +930,7 @@ export default class ForecastingUnitListComponent extends Component {
             let realmId = AuthenticationService.getRealmId();
             ProductService.getProductCategoryList(realmId)
                 .then(response => {
-                    console.log("product category list---", response.data)
+                    // console.log("product category list---", response.data)
                     var listArray = response.data.filter(c => c.payload.active);
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1000,7 +1000,7 @@ export default class ForecastingUnitListComponent extends Component {
                     })
                     // this.getProductCategories();
                     // ForecastingUnitService.getForcastingUnitByRealmId(this.state.realmId).then(response => {
-                    //     console.log("response------->" + response);
+                    //     // console.log("response------->" + response);
                     //     if (response.status == 200) {
                     //         this.setState({
                     //             forecastingUnitList: response.data,
@@ -1068,11 +1068,12 @@ export default class ForecastingUnitListComponent extends Component {
                     }
                 }
             );
-
-        TracerCategoryService.getTracerCategoryListAll()
+        DropdownService.getTracerCategoryDropdownList()
+        // TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
+                // console.log("response.data--->",response.data)
                 if (response.status == 200) {
-                    var listArray = response.data.filter(c => c.active);
+                    var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -1134,7 +1135,7 @@ export default class ForecastingUnitListComponent extends Component {
             );
 
         ForecastingUnitService.getForecastingUnitListAll().then(response => {
-            console.log("response------->" + response);
+            // console.log("response------->" + response);
             if (response.status == 200) {
                 this.setState({
                     forecastingUnitList: response.data,
@@ -1214,7 +1215,7 @@ export default class ForecastingUnitListComponent extends Component {
         if (e.buttons == 1) {
 
             if ((x == 0 && value != 0) || (y == 0)) {
-                // console.log("HEADER SELECTION--------------------------");
+                // // console.log("HEADER SELECTION--------------------------");
             } else {
                 if (this.state.selSource.length != 0) {
                     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECASTING_UNIT')) {
@@ -1255,7 +1256,7 @@ export default class ForecastingUnitListComponent extends Component {
         let tracercategoryList = tracerCategories.length > 0
             && tracerCategories.map((item, i) => {
                 return (
-                    <option key={i} value={item.tracerCategoryId}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -1263,7 +1264,7 @@ export default class ForecastingUnitListComponent extends Component {
         const { productCategories } = this.state;
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
-                console.log(JSON.stringify("----------", item))
+                // console.log(JSON.stringify("----------", item))
                 return (
                     <option key={i} value={item.payload.productCategoryId}>
                         {getLabelText(item.payload.label, this.state.lang)}

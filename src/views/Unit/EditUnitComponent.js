@@ -234,7 +234,7 @@ export default class EditUnitComponent extends Component {
                                     })
                                     // AuthenticationService.setupAxiosInterceptors();
                                     UnitService.updateUnit(this.state.unit).then(response => {
-                                        console.log(response)
+                                        // console.log(response)
                                         if (response.status == 200) {
                                             this.props.history.push(`/unit/listUnit/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {

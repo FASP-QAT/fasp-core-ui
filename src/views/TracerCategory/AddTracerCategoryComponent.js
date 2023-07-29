@@ -315,6 +315,8 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { API_URL, BUDGET_NAME_REGEX } from '../../Constants.js';
+import DropdownService from '../../api/DropdownService';
+
 const entityname = i18n.t('static.tracercategory.tracercategory');
 
 
@@ -531,10 +533,12 @@ class AddTracerCategoryComponent extends Component {
                 })
         }
 
-        HealthAreaService.getHealthAreaList()
+        // HealthAreaService.getHealthAreaList()
+        DropdownService.getHealthAreaDropdownList(realmId)
             .then(response => {
                 if (response.status == 200) {
-                    var listArray = response.data;
+                    // console.log("OUTPUT-----",response.data)
+                    var listArray = response.data;     
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -611,13 +615,13 @@ class AddTracerCategoryComponent extends Component {
         const { healthAreas } = this.state;
         let healthAreaList = healthAreas.length > 0
             && healthAreas.map((item, i) => {
-                if(item.active==true){
+                // if(item.active==true){
                 return (
-                    <option key={i} value={item.healthAreaId}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
-                }
+                // }
             }, this);
         return (
             <div className="animated fadeIn">
@@ -638,7 +642,7 @@ class AddTracerCategoryComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("this.state.tracerCategory---", this.state.tracerCategory);
+                                    // console.log("this.state.tracerCategory---", this.state.tracerCategory);
                                     TracerCategoryService.addTracerCategory(this.state.tracerCategory)
                                         .then(response => {
                                             if (response.status == 200) {

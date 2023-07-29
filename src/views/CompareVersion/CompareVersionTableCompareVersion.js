@@ -314,8 +314,8 @@ export default class CompareVersionTableCompareVersion extends Component {
     }
 
     componentDidMount() {
-        console.log("DatasetData+++", this.props.datasetData);
-        console.log("DatasetData1+++", this.props.datasetData1);
+        // console.log("DatasetData+++", this.props.datasetData);
+        // console.log("DatasetData1+++", this.props.datasetData1);
         this.props.updateState("loading", true);
         var datasetData = this.props.datasetData;// local working copy
         var datasetData1 = this.props.datasetData1;//server latest version
@@ -571,7 +571,7 @@ export default class CompareVersionTableCompareVersion extends Component {
 
     // functions
     showData(data, index) {
-        console.log('inside');
+        // console.log('inside');
         var dataArray = [];
         dataArray.push([data[0], data[1], data[2], data[3], data[4]]);
         dataArray.push([data[0], data[1], data[5], data[6], data[7]]);
@@ -666,7 +666,7 @@ export default class CompareVersionTableCompareVersion extends Component {
 
     acceptIncomingChanges() {
         var elInstance = this.state.dataEl;
-        console.log("this.state.index", this.state.index);
+        // console.log("this.state.index", this.state.index);
         elInstance.options.editable = true;
         elInstance.setValueFromCoords(11, this.state.index, 3, true);
         elInstance.options.editable = false;
@@ -738,7 +738,7 @@ export default class CompareVersionTableCompareVersion extends Component {
             var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
             // var tr = asterisk.firstChild;
             var tr = asterisk.firstChild.nextSibling;
-            console.log("asterisk", asterisk.firstChild.nextSibling)
+            // console.log("asterisk", asterisk.firstChild.nextSibling)
 
             tr.children[3].classList.add('InfoTr');
             tr.children[4].classList.add('InfoTr');

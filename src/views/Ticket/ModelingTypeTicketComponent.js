@@ -168,9 +168,9 @@ export default class OrganisationTypeTicketComponent extends Component {
                             })
                             this.state.modelingType.summary = summaryText_2;
                             this.state.modelingType.userLanguageCode = this.state.lang;
-                            console.log("SUBMIT------->", this.state.modelingType);
+                            // console.log("SUBMIT------->", this.state.modelingType);
                             JiraTikcetService.addEmailRequestIssue(this.state.modelingType).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

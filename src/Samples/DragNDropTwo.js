@@ -50,7 +50,7 @@ export default class ContainerTwo extends Component {
         }
         if (event.target.name === "nodeValueType") {
             var skillsSelect = document.getElementById("nodeValueType");
-            console.log("skillsSelect---",skillsSelect)
+            // console.log("skillsSelect---",skillsSelect)
             var selectedText = skillsSelect.options[skillsSelect.selectedIndex].text;
             newItemConfig.valueTypeId = event.target.value;
             newItemConfig.valueTypeDesc = selectedText;
@@ -188,7 +188,7 @@ export default class ContainerTwo extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id
             }, () => {
-                console.log("highlighted item---", this.state)
+                // console.log("highlighted item---", this.state)
             })
         }
     };
@@ -210,7 +210,7 @@ export default class ContainerTwo extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id
             }, () => {
-                console.log("highlighted item---", this.state)
+                // console.log("highlighted item---", this.state)
             })
         }
     };
@@ -218,7 +218,7 @@ export default class ContainerTwo extends Component {
     addNode(currentItemConfig) {
         const { items } = this.state;
         const { newItemConfig } = this.state;
-        console.log("newItemConfig---", newItemConfig)
+        // console.log("newItemConfig---", newItemConfig)
         var newItem = {
             id: parseInt(items.length + 1),
             parent: currentItemConfig.id,
@@ -248,14 +248,14 @@ export default class ContainerTwo extends Component {
         this.setState({
             items: nodes
         }, () => {
-            console.log("updated tree data+++", this.state);
+            // console.log("updated tree data+++", this.state);
             this.toggleModal();
         });
     }
 
 
     render() {
-        console.log("this.state+++", this.state);
+        // console.log("this.state+++", this.state);
         const ItemTypes = {
             NODE: 'node'
         }
