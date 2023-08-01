@@ -9363,12 +9363,12 @@ export default class CreateTreeTemplate extends Component {
                                                                 <Label htmlFor="currencyId"># PU / Interval / {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-10">
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="puPerVisitQATCalculated"
                                                                     name="puPerVisitQATCalculated"
                                                                     readOnly={true}
                                                                     bsSize="sm"
-                                                                    value={this.state.qatCalculatedPUPerVisit}>
+                                                                    value={addCommasWith8Decimals(this.state.qatCalculatedPUPerVisit)}>
                                                                     {/* value={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false) ? */}
                                                                     {/* addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit) : */}
                                                                     {/* addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ''}> */}
@@ -9497,12 +9497,12 @@ export default class CreateTreeTemplate extends Component {
 
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId"># PU / {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s) (Calculated)</Label>
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="puPerVisitQATCalculated"
                                                                     name="puPerVisitQATCalculated"
                                                                     readOnly={true}
                                                                     bsSize="sm"
-                                                                    value={this.state.qatCalculatedPUPerVisit}>
+                                                                    value={addCommasWith8Decimals(this.state.qatCalculatedPUPerVisit)}>
                                                                     {/* value={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false) ? */}
                                                                     {/* addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit) : */}
                                                                     {/* addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ''}> */}

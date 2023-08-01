@@ -9881,12 +9881,12 @@ export default class BuildTree extends Component {
 
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId"># PU / Interval / {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en} (Reference)</Label>
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="puPerVisitQATCalculated"
                                                                     name="puPerVisitQATCalculated"
                                                                     readOnly={true}
                                                                     bsSize="sm"
-                                                                    value={this.state.qatCalculatedPUPerVisit}
+                                                                    value={addCommasWith8Decimals(this.state.qatCalculatedPUPerVisit)}
                                                                 // value={this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null ? (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
                                                                 >
                                                                 </Input>
@@ -10012,12 +10012,12 @@ export default class BuildTree extends Component {
                                                             <FormGroup className="col-md-6"></FormGroup>
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId"># PU / {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s) (Calculated)</Label>
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="puPerVisitQATCalculated"
                                                                     name="puPerVisitQATCalculated"
                                                                     readOnly={true}
                                                                     bsSize="sm"
-                                                                    value={this.state.qatCalculatedPUPerVisit}
+                                                                    value={addCommasWith8Decimals(this.state.qatCalculatedPUPerVisit)}
                                                                 // value={this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null ? (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
                                                                 >
                                                                 </Input>
