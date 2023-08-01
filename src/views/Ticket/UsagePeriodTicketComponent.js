@@ -180,9 +180,9 @@ export default class OrganisationTypeTicketComponent extends Component {
                             })
                             this.state.usagePeriod.summary = summaryText_2;
                             this.state.usagePeriod.userLanguageCode = this.state.lang;
-                            console.log("SUBMIT------->", this.state.usagePeriod);
+                            // console.log("SUBMIT------->", this.state.usagePeriod);
                             JiraTikcetService.addEmailRequestIssue(this.state.usagePeriod).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

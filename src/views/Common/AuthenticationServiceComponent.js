@@ -32,12 +32,12 @@ export default class AuthenticationServiceComponent extends Component {
     //     this.props.history.push(`/login/${message != "" ? message : "static.logoutSuccess"}`)
     // }
     componentDidMount = () => {
-        console.log("Common component component did mount called-------------");
+        // console.log("Common component component did mount called-------------");
         var result = AuthenticationService.validateRequest();
-        console.log("result----" + result);
+        // console.log("result----" + result);
         if (result != "") {
             if (result == '/login/static.message.sessionChange' && localStorage.getItem("isOfflinePage") == 1) {
-                console.log("offline 6---------------")
+                // console.log("offline 6---------------")
             } else {
                 this.props.history.push(result)
             }
@@ -50,16 +50,16 @@ export default class AuthenticationServiceComponent extends Component {
 
             // Add a request interceptor
             axios.interceptors.request.use((config) => {
-                console.log("common request axios interceptors--->", config);
+                // console.log("common request axios interceptors--->", config);
                 // Do something before request is sent
                 var result1 = AuthenticationService.validateRequest();
-                console.log("result1----" + result1);
+                // console.log("result1----" + result1);
                 let url = config.url;
                 // console.log("url---", url);
                 
                 if (result1 != null && result1 != "") {
                     if (result1 == '/login/static.message.sessionChange' && localStorage.getItem("isOfflinePage") == 1) {
-                        console.log("offline 7---------------")
+                        // console.log("offline 7---------------")
                     }
                     else if (!url.includes("api/sync/language") && !url.includes("/actuator/info/") && !url.includes("/authenticate") && !url.includes("/api/updateExpiredPassword/") && !url.includes("/api/forgotPassword/") && !url.includes("/api/confirmForgotPasswordToken/") && !url.includes("/api/updatePassword/")) {
                         this.props.history.push(result1)
@@ -68,7 +68,7 @@ export default class AuthenticationServiceComponent extends Component {
                 }
                 return config;
             }, (error) => {
-                console.log("common request axios interceptors error--->", error);
+                // console.log("common request axios interceptors error--->", error);
                 // Do something with request error
                 return Promise.reject(error);
             });

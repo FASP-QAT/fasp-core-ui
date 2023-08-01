@@ -40,7 +40,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -51,6 +51,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -141,7 +142,7 @@ class Consumption extends Component {
   }
 
   toggleView() {
-    console.log("In toggle view");
+    // console.log("In toggle view");
     var tempConsumptionList = [];
     var tempConsumptionList1 = [];
     var multiplier = this.state.multiplier;
@@ -177,7 +178,7 @@ class Consumption extends Component {
               })
 
               PlanningUnitService.getPlanningUnitById(productId).then(response => {
-                console.log("RESP-----", response.data)
+                // console.log("RESP-----", response.data)
                 this.setState({
                   multiplier: response.data.multiplier,
                   planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text,
@@ -185,7 +186,7 @@ class Consumption extends Component {
                 },
                   () => {
                     this.filterData()
-                    console.log("MULTIPLIER----", this.state.multiplier);
+                    // console.log("MULTIPLIER----", this.state.multiplier);
                   })
               }).catch(
                 error => {
@@ -305,7 +306,7 @@ class Consumption extends Component {
             },
               () => {
                 this.filterData()
-                console.log("MULTIPLIER----", this.state.multiplier);
+                // console.log("MULTIPLIER----", this.state.multiplier);
               })
           }.bind(this);
         }.bind(this)
@@ -337,7 +338,7 @@ class Consumption extends Component {
     }
   }
   addDoubleQuoteToRowContent = (arr) => {
-    console.log(arr)
+    // console.log(arr)
     return arr.map(ele => '"' + ele + '"')
   }
 
@@ -561,11 +562,11 @@ class Consumption extends Component {
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-    console.log('values =>', planningUnitId, programId, versionId);
+    // console.log('values =>', planningUnitId, programId, versionId);
     if (planningUnitId > 0 && programId > 0 && versionId != 0) {
       if (versionId.includes('Local')) {
         this.setState({ loading: true })
-        console.log("------------OFFLINE PART------------");
+        // console.log("------------OFFLINE PART------------");
         var db1;
         var storeOS;
         getDatabase();
@@ -590,7 +591,7 @@ class Consumption extends Component {
           db1 = e.target.result;
           var programDataTransaction = db1.transaction(['programData'], 'readwrite');
           var programDataOs = programDataTransaction.objectStore('programData');
-          // console.log(program)
+          // // console.log(program)
           var programRequest = programDataOs.get(program);
           programRequest.onerror = function (event) {
             this.setState({
@@ -619,7 +620,7 @@ class Consumption extends Component {
                 supplyPlan: []
               }
             }
-            console.log("consumptionList----*********----", (programJson.consumptionList));
+            // console.log("consumptionList----*********----", (programJson.consumptionList));
 
             var offlineConsumptionList = (programJson.consumptionList);
 
@@ -628,12 +629,12 @@ class Consumption extends Component {
             const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
             const dateFilter = planningUnitFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
 
-            console.log("dateFilter------->>>", dateFilter);
+            // console.log("dateFilter------->>>", dateFilter);
 
             const flagTrue = dateFilter.filter(c => c.actualFlag == true);
-            console.log("flagTrue---->", flagTrue);
+            // console.log("flagTrue---->", flagTrue);
             const flagFalse = dateFilter.filter(c => c.actualFlag == false);
-            console.log("flagFalse---->", flagFalse);
+            // console.log("flagFalse---->", flagFalse);
             //logic for add same date data
             //True
             let resultTrue = Object.values(flagTrue.reduce((a, { consumptionId, consumptionDate, actualFlag, consumptionQty }) => {
@@ -643,7 +644,7 @@ class Consumption extends Component {
                 a[consumptionDate].consumptionQty += Number(consumptionQty);
               return a;
             }, {}));
-            console.log("resultTrue---->", resultTrue);
+            // console.log("resultTrue---->", resultTrue);
 
 
             //Flase
@@ -654,19 +655,19 @@ class Consumption extends Component {
                 a[consumptionDate].consumptionQty += Number(consumptionQty);
               return a;
             }, {}));
-            console.log("resultFalse---->", resultFalse);
+            // console.log("resultFalse---->", resultFalse);
 
 
             let result = resultTrue.concat(resultFalse);
-            console.log("result------->>>", result);
+            // console.log("result------->>>", result);
             const sorted = result.sort((a, b) => {
               var dateA = new Date(a.consumptionDate).getTime();
               var dateB = new Date(b.consumptionDate).getTime();
               return dateA > dateB ? 1 : -1;
             });
-            console.log("sorted------->>>", sorted);
+            // console.log("sorted------->>>", sorted);
 
-            // console.log("CHECK----->>", dateFilter.filter(c => c.consumptionQty == 1800));
+            // // console.log("CHECK----->>", dateFilter.filter(c => c.consumptionQty == 1800));
 
             let dateArray = [...new Set(sorted.map(ele => (moment(ele.consumptionDate, 'YYYY-MM-dd').format('MM-YYYY'))))]
             let finalOfflineConsumption = [];
@@ -704,7 +705,7 @@ class Consumption extends Component {
 
 
 
-            console.log("final consumption---", finalOfflineConsumption);
+            // console.log("final consumption---", finalOfflineConsumption);
             this.setState({
               offlineConsumptionList: finalOfflineConsumption,
               consumptions: finalOfflineConsumption,
@@ -732,10 +733,10 @@ class Consumption extends Component {
           planningUnitId: planningUnitId,
           reportView: viewById
         }
-        console.log("JSON INPUT---------->", inputjson);
+        // console.log("JSON INPUT---------->", inputjson);
         ProductService.getConsumptionData(inputjson)
           .then(response => {
-            console.log("RESP---------->", response.data);
+            // console.log("RESP---------->", response.data);
             this.setState({
               consumptions: response.data,
               message: '',
@@ -803,12 +804,21 @@ class Consumption extends Component {
 
   getPrograms() {
     if (isSiteOnline()) {
-      // AuthenticationService.setupAxiosInterceptors();
-      ProgramService.getProgramList()
+      let realmId = AuthenticationService.getRealmId();
+
+      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then(response => {
-          console.log(JSON.stringify(response.data))
+          var proList = []
+          for (var i = 0; i < response.data.length; i++) {
+            var programJson = {
+              programId: response.data[i].id,
+              label: response.data[i].label,
+              programCode: response.data[i].code
+            }
+            proList[i] = programJson
+          }
           this.setState({
-            programs: response.data, loading: false
+            programs: proList, loading: false
           }, () => { this.consolidatedProgramList() })
         }).catch(
           error => {
@@ -912,13 +922,13 @@ class Consumption extends Component {
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-            console.log(programNameLabel)
+            // console.log(programNameLabel)
 
             var f = 0
             for (var k = 0; k < this.state.programs.length; k++) {
               if (this.state.programs[k].programId == programData.programId) {
                 f = 1;
-                console.log('already exist')
+                // console.log('already exist')
               }
             }
             if (f == 0) {
@@ -933,8 +943,8 @@ class Consumption extends Component {
         if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             }),
             programId: localStorage.getItem("sesProgramIdReport")
@@ -944,8 +954,8 @@ class Consumption extends Component {
         } else {
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             }),
           })
@@ -994,19 +1004,19 @@ class Consumption extends Component {
               myResult = planningunitRequest.result;
               var programId = (document.getElementById("programId").value).split("_")[0];
               var proList = []
-              console.log("myResult===============", myResult)
+              // console.log("myResult===============", myResult)
               for (var i = 0; i < myResult.length; i++) {
                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
-                  proList[i] = myResult[i]
+                  proList[i] = myResult[i].planningUnit
                 }
               }
               var lang = this.state.lang;
               this.setState({
                 planningUnits: proList, message: '',
                 offlinePlanningUnitList: proList.sort(function (a, b) {
-                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                  a = getLabelText(a.label, lang).toLowerCase();
+                  b = getLabelText(b.label, lang).toLowerCase();
                   return a < b ? -1 : a > b ? 1 : 0;
                 }),
               }, () => {
@@ -1020,12 +1030,17 @@ class Consumption extends Component {
         else {
           // AuthenticationService.setupAxiosInterceptors();
 
-          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-            console.log('**' + JSON.stringify(response.data))
+          var programJson = {
+            tracerCategoryIds: [],
+            programIds: [programId]
+          }
+          // console.log('**' + programJson);
+          DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+            // console.log('**' + JSON.stringify(response.data));
             var listArray = response.data;
             listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
               return itemLabelA > itemLabelB ? 1 : -1;
             });
             this.setState({
@@ -1114,7 +1129,7 @@ class Consumption extends Component {
 
       localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
-      console.log(program)
+      // console.log(program)
       if (program.length == 1) {
         if (isSiteOnline()) {
           this.setState({
@@ -1123,11 +1138,62 @@ class Consumption extends Component {
             planningUnitValues: [],
             planningUnitLabels: []
           }, () => {
-            this.setState({
-              versions: program[0].versionList.filter(function (x, i, a) {
-                return a.indexOf(x) === i;
-              })
-            }, () => { this.consolidatedVersionList(programId) });
+            DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+              .then(response => {
+                // console.log("response===>", response.data)
+                this.setState({
+                  versions: []
+                }, () => {
+                  this.setState({
+                    versions: response.data
+                  }, () => {
+                    this.consolidatedVersionList(programId)
+                  });
+                });
+              }).catch(
+                error => {
+                  this.setState({
+                    programs: [], loading: false
+                  })
+                  if (error.message === "Network Error") {
+                    this.setState({
+                      // message: 'static.unkownError',
+                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                      loading: false
+                    });
+                  } else {
+                    switch (error.response ? error.response.status : "") {
+
+                      case 401:
+                        this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                      case 403:
+                        this.props.history.push(`/accessDenied`)
+                        break;
+                      case 500:
+                      case 404:
+                      case 406:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                          loading: false
+                        });
+                        break;
+                      case 412:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                          loading: false
+                        });
+                        break;
+                      default:
+                        this.setState({
+                          message: 'static.unkownError',
+                          loading: false
+                        });
+                        break;
+                    }
+                  }
+                }
+              );
           });
 
 
@@ -1195,7 +1261,7 @@ class Consumption extends Component {
           }
         }
 
-        console.log(verList)
+        // console.log(verList)
         var versionList = verList.filter(function (x, i, a) {
           return a.indexOf(x) === i;
         })
@@ -1660,8 +1726,8 @@ class Consumption extends Component {
                                 {planningUnits.length > 0
                                   && planningUnits.map((item, i) => {
                                     return (
-                                      <option key={i} value={item.planningUnit.id}>
-                                        {getLabelText(item.planningUnit.label, this.state.lang)}
+                                      <option key={i} value={item.id}>
+                                        {getLabelText(item.label, this.state.lang)}
                                       </option>
                                     )
                                   }, this)}
@@ -1687,8 +1753,8 @@ class Consumption extends Component {
                                 {offlinePlanningUnitList.length > 0
                                   && offlinePlanningUnitList.map((item, i) => {
                                     return (
-                                      <option key={i} value={item.planningUnit.id}>
-                                        {getLabelText(item.planningUnit.label, this.state.lang)}
+                                      <option key={i} value={item.id}>
+                                        {getLabelText(item.label, this.state.lang)}
                                       </option>
                                     )
                                   }, this)}

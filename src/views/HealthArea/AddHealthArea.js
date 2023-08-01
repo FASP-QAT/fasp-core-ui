@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
 import { SPECIAL_CHARECTER_WITH_NUM, ALPHABET_NUMBER_REGEX, SPACE_REGEX, API_URL } from '../../Constants.js';
-
+import DropdownService from '../../api/DropdownService';
 const entityname = i18n.t('static.healtharea.healtharea');
 
 let initialValues = {
@@ -116,10 +116,10 @@ export default class AddHealthAreaComponent extends Component {
 
       if (healthAreaValue.length >= 6) {//minus 2
         healthAreaValue = healthAreaValue.slice(0, 4);
-        console.log("DISPLAYNAME-BEF----->", healthAreaValue);
+        // console.log("DISPLAYNAME-BEF----->", healthAreaValue);
         HealthAreaService.getHealthAreaDisplayName(realmId, healthAreaValue)
           .then(response => {
-            console.log("DISPLAYNAME-RESP----->", response);
+            // console.log("DISPLAYNAME-RESP----->", response);
             let { healthArea } = this.state
             healthArea.healthAreaCode = response.data;
             this.setState({
@@ -169,10 +169,10 @@ export default class AddHealthAreaComponent extends Component {
           );
 
       } else {// not need to minus
-        console.log("DISPLAYNAME-BEF-else----->", healthAreaValue);
+        // console.log("DISPLAYNAME-BEF-else----->", healthAreaValue);
         HealthAreaService.getHealthAreaDisplayName(realmId, healthAreaValue)
           .then(response => {
-            console.log("DISPLAYNAME-RESP-else----->", response);
+            // console.log("DISPLAYNAME-RESP-else----->", response);
             let { healthArea } = this.state
             healthArea.healthAreaCode = response.data;
             this.setState({
@@ -228,8 +228,8 @@ export default class AddHealthAreaComponent extends Component {
 
   dataChange(event) {
     let { healthArea } = this.state
-    console.log(event.target.name)
-    console.log(event.target.value)
+    // console.log(event.target.name)
+    // console.log(event.target.value)
     if (event.target.name === "healthAreaName") {
       healthArea.label.label_en = event.target.value
     } else if (event.target.name === "realmId") {
@@ -241,7 +241,7 @@ export default class AddHealthAreaComponent extends Component {
       healthArea
     }, (
     ) => {
-      console.log("state after update---", this.state.healthArea)
+      // console.log("state after update---", this.state.healthArea)
     })
   }
 
@@ -272,7 +272,7 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   componentDidMount() {
-    // console.log("check---" + AuthenticationService.checkTypeOfSession());
+    // // console.log("check---" + AuthenticationService.checkTypeOfSession());
     // if (!AuthenticationService.checkTypeOfSession()) {
     //   alert("You can't change your session from online to offline or vice versa.");
     //   this.props.history.push(`/`)
@@ -281,7 +281,7 @@ export default class AddHealthAreaComponent extends Component {
     CountryService.getCountryListAll()
       .then(response => {
         if (response.status == 200) {
-          console.log("country list---", response.data);
+          // console.log("country list---", response.data);
           this.setState({
             countries: response.data, loading: false
           })
@@ -340,7 +340,7 @@ export default class AddHealthAreaComponent extends Component {
 
     UserService.getRealmList()
       .then(response => {
-        console.log("realm list---", response.data);
+        // console.log("realm list---", response.data);
         var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -418,19 +418,19 @@ export default class AddHealthAreaComponent extends Component {
   }
 
   updateFieldData(value) {
-    // console.log("------->1", value);
+    // // console.log("------->1", value);
     var selectedArray = [];
     for (var p = 0; p < value.length; p++) {
       selectedArray.push(value[p].value);
     }
     if (selectedArray.includes("-1")) {
-      // console.log("------->2 in if");
+      // // console.log("------->2 in if");
       this.setState({ realmCountryId: [] });
       var list = this.state.realmCountryList.filter(c => c.value != -1)
       this.setState({ realmCountryId: list });
       var realmCountryId = list;
     } else {
-      // console.log("------->3 in else");
+      // // console.log("------->3 in else");
       this.setState({ realmCountryId: value });
       var realmCountryId = value;
 
@@ -448,15 +448,16 @@ export default class AddHealthAreaComponent extends Component {
   getRealmCountryList(e) {
     let realmId = this.state.healthArea.realm.id;
     if (realmId != "") {
-      HealthAreaService.getRealmCountryList(realmId)
+      // HealthAreaService.getRealmCountryList(realmId)
+      DropdownService.getRealmCountryDropdownList(realmId)
         .then(response => {
-          console.log("Realm Country List list---", response.data);
+          // console.log("Realm Country List list---", response.data);
           if (response.status == 200) {
             var json = response.data;
-            json = json.filter(c => c.active)
+            // json = json.filter(c => c.active)
             var regList = [{ value: "-1", label: i18n.t("static.common.all") }];
             for (var i = 0; i < json.length; i++) {
-              regList[i + 1] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+              regList[i + 1] = { value: json[i].id, label: json[i].label.label_en }
             }
             var listArray = regList;
             listArray.sort((a, b) => {
@@ -570,7 +571,7 @@ export default class AddHealthAreaComponent extends Component {
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                  console.log("-------------------->" + this.state.healthArea);
+                  // console.log("-------------------->" + this.state.healthArea);
                   if (this.state.healthArea.label.label_en != '') {
                     this.setState({
                       loading: true
@@ -783,7 +784,7 @@ export default class AddHealthAreaComponent extends Component {
       healthArea
     }, (
     ) => {
-      console.log("state after update---", this.state.healthArea)
+      // console.log("state after update---", this.state.healthArea)
     })
 
   }

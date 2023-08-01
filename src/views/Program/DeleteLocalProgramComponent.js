@@ -40,7 +40,7 @@ class DeleteLocalProgramComponent extends Component {
   }
   checkNewerVersions(programs) {
     if (isSiteOnline()) {
-      console.log("T***going to call check newer versions")
+      // console.log("T***going to call check newer versions")
       if (isSiteOnline()) {
         AuthenticationService.setupAxiosInterceptors()
         ProgramService.checkNewerVersions(programs)
@@ -179,7 +179,7 @@ class DeleteLocalProgramComponent extends Component {
           var myResult = [];
           myResult = getRequest.result;
 
-          console.log("myResult---", myResult);
+          // console.log("myResult---", myResult);
           this.setState({
             message: i18n.t('static.program.deleteLocalProgramSuccess'),
             loading: false,
@@ -226,7 +226,7 @@ class DeleteLocalProgramComponent extends Component {
           var myResult = [];
           myResult = getRequest.result;
 
-          console.log("myResult---", myResult);
+          // console.log("myResult---", myResult);
           this.setState({
             message: i18n.t('static.program.deleteLocalProgramSuccess'),
             loading: false,

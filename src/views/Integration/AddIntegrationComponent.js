@@ -349,7 +349,7 @@ export default class AddDimensionComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("Submit------->", this.state);
+                                    // console.log("Submit------->", this.state);
                                     IntegrationService.addIntegration(this.state).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/integration/listIntegration/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))

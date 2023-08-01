@@ -42,7 +42,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, DATE_FORMAT_CAP, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -57,6 +57,7 @@ import 'chartjs-plugin-annotation';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { MultiSelect } from "react-multi-select-component";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -251,7 +252,7 @@ class GlobalConsumption extends Component {
     this.state.programLabels.map(ele =>
       csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
     // csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    console.log(this.state.planningUnitValues)
+    // console.log(this.state.planningUnitValues)
     csvRow.push('')
     this.state.planningUnitValues.map(ele =>
       csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20') + '"'))
@@ -384,7 +385,7 @@ class GlobalConsumption extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
     planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
     //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
@@ -397,7 +398,7 @@ class GlobalConsumption extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
 
     planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -411,7 +412,7 @@ class GlobalConsumption extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
-      console.log(y)
+      // console.log(y)
     }
 
     doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
@@ -433,7 +434,7 @@ class GlobalConsumption extends Component {
     var h1 = 50;
     var aspectwidth1 = (width - h1);
     let startY = y + 10
-    console.log('startY', startY)
+    // console.log('startY', startY)
     let pages = Math.ceil(startY / height)
     for (var j = 1; j < pages; j++) {
       doc.addPage()
@@ -487,33 +488,80 @@ class GlobalConsumption extends Component {
   }
   filterProgram = () => {
     let countryIds = this.state.countryValues.map(ele => ele.value);
-    console.log('countryIds', countryIds, 'programs', this.state.programs)
+    // // console.log('countryIds', countryIds, 'programs', this.state.programs)
     this.setState({
       programLst: [],
       programValues: [],
       programLabels: []
     }, () => {
       if (countryIds.length != 0) {
-        let programLst = [];
-        for (var i = 0; i < countryIds.length; i++) {
-          programLst = [...programLst, ...this.state.programs.filter(c => c.realmCountry.realmCountryId == countryIds[i])]
-        }
+        let newCountryList = [... new Set(countryIds)];
+        DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+          .then(response => {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = a.code.toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = b.code.toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            // console.log('programLst', listArray)
+            if (listArray.length > 0) {
+              this.setState({
+                programLst: listArray
+              }, () => {
+                this.filterData(this.state.rangeValue)
+              });
+            } else {
+              this.setState({
+                programLst: []
+              }, () => {
+                this.filterData(this.state.rangeValue)
+              });
+            }
+          }).catch(
+            error => {
+              this.setState({
+                programLst: [], loading: false
+              })
+              if (error.message === "Network Error") {
+                this.setState({
+                  // message: 'static.unkownError',
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                  loading: false
+                });
+              } else {
+                switch (error.response ? error.response.status : "") {
 
-        console.log('programLst', programLst)
-        if (programLst.length > 0) {
-
-          this.setState({
-            programLst: programLst
-          }, () => {
-            this.filterData(this.state.rangeValue)
-          });
-        } else {
-          this.setState({
-            programLst: []
-          }, () => {
-            this.filterData(this.state.rangeValue)
-          });
-        }
+                  case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 403:
+                    this.props.history.push(`/accessDenied`)
+                    break;
+                  case 500:
+                  case 404:
+                  case 406:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
+                  case 412:
+                    this.setState({
+                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                      loading: false
+                    });
+                    break;
+                  default:
+                    this.setState({
+                      message: 'static.unkownError',
+                      loading: false
+                    });
+                    break;
+                }
+              }
+            }
+          );
       } else {
         this.setState({
           programLst: []
@@ -560,7 +608,7 @@ class GlobalConsumption extends Component {
     setTimeout(function () {
       var theSelect = document.getElementById('planningUnitId').length;
 
-      // console.log("INHIDEDIV------------------------------------------------------", theSelect);
+      // // console.log("INHIDEDIV------------------------------------------------------", theSelect);
 
     }, 9000);
 
@@ -573,12 +621,12 @@ class GlobalConsumption extends Component {
     // let productCategoryId = document.getElementById("productCategoryId").value;
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
     let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-    let programIds = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+    let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     let viewById = document.getElementById("viewById").value;
     let realmId = AuthenticationService.getRealmId()
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
 
-    console.log("realmId--------->", realmId);
+    // console.log("realmId--------->", realmId);
     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
     if (realmId > 0 && this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0) {
@@ -594,11 +642,11 @@ class GlobalConsumption extends Component {
         "reportView": viewById,
         "useApprovedSupplyPlanOnly": useApprovedVersion
       }
-      console.log('inputJSON***' + inputjson)
+      // console.log('inputJSON***' + inputjson)
 
       ReportService.getGlobalConsumptiondata(inputjson)
         .then(response => {
-          console.log("RESP--->", response.data);
+          // console.log("RESP--->", response.data);
           let tempConsumptionData = response.data;
           var consumptions = [];
 
@@ -612,13 +660,13 @@ class GlobalConsumption extends Component {
                 "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY'),
                 "consumptionDateString1": moment(tempConsumptionData[i].transDate, 'yyyy-MM-dd')
               }
-              console.log("json--->", json);
+              // console.log("json--->", json);
               consumptions.push(json);
             }
 
           }
 
-          console.log("consumptions--->", consumptions);
+          // console.log("consumptions--->", consumptions);
 
           this.setState({
             consumptions: consumptions,
@@ -688,21 +736,28 @@ class GlobalConsumption extends Component {
     if (isSiteOnline()) {
 
       let realmId = AuthenticationService.getRealmId();
-      // let realmId = document.getElementById('realmId').value
-      RealmCountryService.getRealmCountryForProgram(realmId)
+      // RealmCountryService.getRealmCountryForProgram(realmId)
+      DropdownService.getRealmCountryDropdownList(realmId)
         .then(response => {
-          var listArray = response.data.map(ele => ele.realmCountry);
-          listArray.sort((a, b) => {
-            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-            return itemLabelA > itemLabelB ? 1 : -1;
-          });
-          this.setState({
-            // countrys: response.data.map(ele => ele.realmCountry)
-            countrys: listArray,
-            loading: false
-          })
-        }).catch(
+          // console.log("RealmCountryService---->", response.data)
+          if (response.status == 200) {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+              // realmCountryList: response.data.map(ele => ele.realmCountry)
+              countrys: listArray,
+              loading: false
+            }, () => { })
+          } else {
+            this.setState({ message: response.data.messageCode, loading: false },
+              () => { this.hideSecondComponent(); })
+          }
+        })
+        .catch(
           error => {
             this.setState({
               countrys: []
@@ -821,7 +876,7 @@ class GlobalConsumption extends Component {
 
   getPlanningUnit() {
     this.setState({ loading: true })
-    let programValues = this.state.programValues;
+    let programValues = this.state.programValues.map(c => c.value);
     // console.log("programValues----->", programValues);
     this.setState({
       planningUnits: [],
@@ -829,61 +884,66 @@ class GlobalConsumption extends Component {
       planningUnitLabels: []
     }, () => {
       if (programValues.length > 0) {
-        PlanningUnitService.getPlanningUnitByProgramIds(programValues.map(ele => (ele.value)))
-          .then(response => {
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-              return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            this.setState({
-              planningUnits: listArray, loading: false
-            }, () => {
-              this.filterData(this.state.rangeValue)
+        var programJson = {
+          tracerCategoryIds: [],
+          programIds: programValues
+        }
+        // console.log('**' + programJson);
+        DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+          // console.log('**' + JSON.stringify(response.data));
+          var listArray = response.data;
+          listArray.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
+          this.setState({
+            planningUnits: listArray, loading: false
+          }, () => {
+            this.filterData(this.state.rangeValue)
 
-            })
-          }).catch(
-            error => {
-              if (error.message === "Network Error") {
-                this.setState({
-                  // message: 'static.unkownError',
-                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                  loading: false
-                });
-              } else {
-                switch (error.response ? error.response.status : "") {
+          })
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({
+                // message: 'static.unkownError',
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
 
-                  case 401:
-                    this.props.history.push(`/login/static.message.sessionExpired`)
-                    break;
-                  case 403:
-                    this.props.history.push(`/accessDenied`)
-                    break;
-                  case 500:
-                  case 404:
-                  case 406:
-                    this.setState({
-                      message: error.response.data.messageCode,
-                      loading: false
-                    });
-                    break;
-                  case 412:
-                    this.setState({
-                      message: error.response.data.messageCode,
-                      loading: false
-                    });
-                    break;
-                  default:
-                    this.setState({
-                      message: 'static.unkownError',
-                      loading: false
-                    });
-                    break;
-                }
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
               }
             }
-          );
+          }
+        );
       }
     })
 
@@ -893,7 +953,7 @@ class GlobalConsumption extends Component {
     this.setState({ loading: true })
     ProgramService.getProgramList()
       .then(response => {
-        console.log(JSON.stringify(response.data))
+        // console.log(JSON.stringify(response.data))
         var listArray = response.data;
         listArray.sort((a, b) => {
           var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -978,8 +1038,8 @@ class GlobalConsumption extends Component {
   componentDidMount() {
 
     // this.getPrograms()
-    // this.getCountrys();
-    this.getRelamList();
+    this.getCountrys();
+    // this.getRelamList();
     // this.getProductCategories()
   }
 
@@ -1055,7 +1115,7 @@ class GlobalConsumption extends Component {
     //           break;
     //         default:
     //           this.setState({ message: 'static.unkownError', loading: false });
-    //           console.log("Error code unkown");
+    //           // console.log("Error code unkown");
     //           break;
     //       }
     //     }
@@ -1125,13 +1185,13 @@ class GlobalConsumption extends Component {
 
   filterOptions = async (options, filter) => {
     if (filter) {
-        return options.filter((i) =>
-            i.label.toLowerCase().includes(filter.toLowerCase())
-        );
+      return options.filter((i) =>
+        i.label.toLowerCase().includes(filter.toLowerCase())
+      );
     } else {
-        return options;
+      return options;
     }
-};
+  };
 
   render() {
     const { planningUnits } = this.state;
@@ -1151,7 +1211,7 @@ class GlobalConsumption extends Component {
         return (
 
           // { label: getLabelText(item.label, this.state.lang), value: item.programId }
-          { label: item.programCode, value: item.programId }
+          { label: item.code, value: item.id }
 
         )
       }, this);
@@ -1226,7 +1286,7 @@ class GlobalConsumption extends Component {
       consumptionSummerydata.push(tempdata);
 
     }
-    console.log("consumptionSummerydata---", consumptionSummerydata);
+    // console.log("consumptionSummerydata---", consumptionSummerydata);
 
     const bar = {
       // labels: [...new Set(this.state.consumptions.map(ele => (ele.consumptionDateString)))],

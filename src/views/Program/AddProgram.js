@@ -258,7 +258,7 @@ export default class AddProgram extends Component {
         if (e.target.value != 0) {
             ProgramService.getProgramManagerList(e.target.value)
                 .then(response => {
-                    console.log("manager list---", response.data);
+                    // console.log("manager list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             programManagerList: response.data
@@ -312,7 +312,7 @@ export default class AddProgram extends Component {
 
             ProgramService.getRealmCountryList(e.target.value)
                 .then(response => {
-                    console.log("realm list---", response.data);
+                    // console.log("realm list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             realmCountryList: response.data
@@ -365,7 +365,7 @@ export default class AddProgram extends Component {
                 );
             ProgramService.getOrganisationList(e.target.value)
                 .then(response => {
-                    console.log("organisation list---", response.data);
+                    // console.log("organisation list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             organisationList: response.data
@@ -419,7 +419,7 @@ export default class AddProgram extends Component {
 
             ProgramService.getHealthAreaList(e.target.value)
                 .then(response => {
-                    console.log("health area list---", response.data);
+                    // console.log("health area list---", response.data);
                     if (response.status == 200) {
                         this.setState({
                             healthAreaList: response.data
@@ -484,7 +484,7 @@ export default class AddProgram extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(e.target.value)
             .then(response => {
-                console.log("health area list---", response.data);
+                // console.log("health area list---", response.data);
                 if (response.status == 200) {
                     var json = response.data;
                     var regList = [];

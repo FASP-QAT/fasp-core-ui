@@ -72,6 +72,7 @@ import showguidanceModelingTransferEn from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferFr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferFr.html'
 import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferSp.html'
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
+import ConsumptionInSupplyPlanComponent from '../SupplyPlan/ConsumptionInSupplyPlan';
 
 // const ref = React.createRef();
 const entityname = 'Tree';
@@ -376,7 +377,7 @@ const validationSchemaNodeData = function (values) {
                 function (value) {
                     // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value));
                     if ((document.getElementById("nodeTypeId").value == 5)) {
-                        var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
+                        var testNumber = (/^\d{0,12}(\.\d{1,8})?$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
                         if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("puPerVisit").type!="hidden" && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
                             return false;
                         } else {
@@ -534,6 +535,23 @@ const getErrorsFromValidationErrorLevel = (validationError) => {
             [error.path]: error.errors[FIRST_ERROR],
         }
     }, {})
+}
+
+function addCommasWith8Decimals(cell1, row) {
+    if (cell1 != null && cell1 != "") {
+        cell1 += '';
+        var x = cell1.replaceAll(",", "").split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+        // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    } else {
+        return "";
+    }
 }
 
 function addCommas(cell1, row) {
@@ -918,7 +936,9 @@ export default class BuildTree extends Component {
             missingPUList: [],
             autoCalculate: localStorage.getItem('sesAutoCalculate') != "" && localStorage.getItem('sesAutoCalculate') != undefined ? (localStorage.getItem('sesAutoCalculate').toString() == "true" ? true : false) : true,
             hideActionButtons: false,
-            programDataListForPuCheck:[]
+            programDataListForPuCheck:[],
+            toggleArray: [],
+            collapseState: false
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -1194,7 +1214,7 @@ export default class BuildTree extends Component {
         var startValue = 0;
         var items = this.state.items;
         var item = items.filter(x => x.id == this.state.currentItemConfig.context.id);
-        console.log("***MOM item---", item);
+        if(item.length>0){
         var momList = item[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList;
         console.log("***MOM momList---", momList);
         if (momList.length > 0) {
@@ -1208,6 +1228,9 @@ export default class BuildTree extends Component {
             }
         }
         console.log("***MOM startValue---", startValue);
+        }else{
+            startValue=this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue
+        }
         return startValue;
 
     }
@@ -1265,7 +1288,7 @@ export default class BuildTree extends Component {
                     // console.log("refillMonths qat cal---", refillMonths)
                     // console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
                     // qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
-                    qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
+                    qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
                 } else {
                     // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
                     //     qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
@@ -1273,7 +1296,7 @@ export default class BuildTree extends Component {
                     //     qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                     // }
                     // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-                    qatCalculatedPUPerVisit = addCommas(this.state.noFURequired / pu.multiplier);
+                    qatCalculatedPUPerVisit = addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
                     // } else {
                     // qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                     // }
@@ -1403,7 +1426,7 @@ export default class BuildTree extends Component {
             levelModal: false,
             curTreeObj,
         }, () => {
-            this.saveTreeData(false)
+            this.saveTreeData(false, false)
             // console.log("final tab list---", this.state.items);
             // if (type == 1) {
             //     var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
@@ -1432,11 +1455,11 @@ export default class BuildTree extends Component {
             console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
             // console.log("PUPERVISIT noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
             // puPerVisit = this.round(parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(4));
-            puPerVisit = parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(4);
+            puPerVisit = parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(8);
             console.log("PUPERVISIT puPerVisit---", puPerVisit);
         } else if (parentScenario.fuNode.usageType.id == 1) {
             // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-            puPerVisit = addCommas(this.state.noFURequired / conversionFactor);
+            puPerVisit = addCommasWith8Decimals(this.state.noFURequired / conversionFactor);
             // } else {
             // puPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / conversionFactor);
             // }
@@ -1946,7 +1969,7 @@ export default class BuildTree extends Component {
                     console.log("node id for update state 3----", items);
                     this.setState({ items }, () => {
                         console.log("node id for update state 4----", this.state.items);
-                        this.saveTreeData(true);
+                        this.saveTreeData(true, false);
                     })
                 }
             }
@@ -2002,7 +2025,7 @@ export default class BuildTree extends Component {
 
             }
             if (parameterName != 'currentItemConfig') {
-                this.saveTreeData(false);
+                this.saveTreeData(false, false);
             }
             console.log("returmed list---", this.state.nodeDataMomList);
 
@@ -2021,9 +2044,9 @@ export default class BuildTree extends Component {
             items,
         })
     }
-    saveTreeData(flag) {
+    saveTreeData(flag, collapseFlag) {
         console.log("saving tree data for calculation>>>");
-        this.setState({ loading: true }, () => {
+        this.setState({ loading: collapseFlag ? false : true }, () => {
             var curTreeObj = this.state.curTreeObj;
             curTreeObj.generateMom = 0;
             let { treeData } = this.state;
@@ -2816,7 +2839,7 @@ export default class BuildTree extends Component {
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.0000%', decimal: '.',
-                    readOnly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') ? false : true,
+                    readOnly: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') ? false : true,
 
                 },
                 {
@@ -3002,7 +3025,7 @@ export default class BuildTree extends Component {
                 {
                     // 3
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthlyEndNoSeasonality'),
-                    type: 'numeric',
+                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
                     mask: '#,##0.0000', decimal: '.',
                     readOnly: true
                 },
@@ -3199,6 +3222,28 @@ export default class BuildTree extends Component {
                 console.log("program min date--->", this.state.minDate);
                 console.log("program max date--->", this.state.maxDate);
                 this.fetchTracerCategoryList(programData);
+                if(this.state.treeData.length==1){
+                    var event={
+                        target:{
+                            value:this.state.treeData[0].treeId,
+                            name:"treeId"
+                        }
+                    }
+                    this.dataChange(event)
+                } else if(this.state.treeId!="" && this.state.treeData.filter(c=>c.treeId==this.state.treeId).length>0){
+                    var event={
+                        target:{
+                            value:this.state.treeId,
+                            name:"treeId"
+                        }
+                    }
+                    this.dataChange(event)
+                }else{
+                    this.setState({
+                        treeId:"",
+                        scenarioId:""
+                    })
+                }
                 // if (proList.length == 1) {
                 //     var treeId = proList[0].treeId;
                 //     this.setState({
@@ -3362,15 +3407,17 @@ export default class BuildTree extends Component {
                 seasonality: e.target.checked == true ? true : false
             }, () => {
                 if (this.state.momEl != "") {
-                    if (checked) {
-                        this.state.momEl.showColumn(3);
-                        this.state.momEl.showColumn(4);
-                        this.state.momEl.showColumn(5);
-                    } else {
-                        this.state.momEl.hideColumn(3);
-                        this.state.momEl.hideColumn(4);
-                        this.state.momEl.hideColumn(5);
-                    }
+                    this.buildMomJexcel();
+               
+                 //     if (checked) {
+                //         this.state.momEl.showColumn(3);
+                //         this.state.momEl.showColumn(4);
+                //         this.state.momEl.showColumn(5);
+                //     } else {
+                //         this.state.momEl.hideColumn(3);
+                //         this.state.momEl.hideColumn(4);
+                //         this.state.momEl.hideColumn(5);
+                //     }
                 }
                 console.log('seasonality---', this.state.seasonality);
             });
@@ -4456,7 +4503,7 @@ export default class BuildTree extends Component {
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
 
-            if (y == 8 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2) {
+            if (y == 8 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
                 if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
@@ -4492,6 +4539,7 @@ export default class BuildTree extends Component {
                     })
 
                 } else if (rowData[4] == "" || rowData[4] == null) {
+                    if(this.state.aggregationNode){
                     this.setState({
                         currentRowIndex: '',
                         currentTransferData: '',
@@ -4522,6 +4570,9 @@ export default class BuildTree extends Component {
                             // this.calculateMOMData(0, 3);
                         });
                     })
+                }else{
+                    alert(i18n.t('static.tree.pleaseSelectNodeType'));
+                }
                 }
                 else if (rowData[1] == "" || rowData[1] == null) {
                     alert("Please select start date before proceeding.");
@@ -5474,6 +5525,7 @@ export default class BuildTree extends Component {
             e.result2 = this.getPayloadData(items1[i], 5)//Link
             var text = this.getPayloadData(items1[i], 3)
             e.text = text;
+            delete e.templateName;
             newItems.push(e)
         }
         console.log("newItems---", newItems);
@@ -5568,6 +5620,24 @@ export default class BuildTree extends Component {
             }.bind(this));
         } else {
             alert('Error: Failed to create file stream.');
+        }
+        newItems = [];
+        for (var i = 0; i < items1.length; i++) {
+            var e = items1[i];
+            e.scenarioId = this.state.selectedScenario
+            e.showModelingValidation = this.state.showModelingValidation
+            console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
+            console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
+            e.result = this.getPayloadData(items1[i], 4)//Up
+            e.result1 = this.getPayloadData(items1[i], 6)//Down
+            e.result2 = this.getPayloadData(items1[i], 5)//Link
+            var text = this.getPayloadData(items1[i], 3)
+            e.text = text;
+            if(items1[i].expanded)
+                e.templateName = "contactTemplateMin";
+            else
+                e.templateName = "contactTemplate";
+            newItems.push(e)
         }
 
     }
@@ -5723,6 +5793,31 @@ export default class BuildTree extends Component {
 
             }, this);
             console.log("regionValues--->>>>", regionValues);
+            var tempToggleObject = [];
+            if (curTreeObj.tree.flatList.length > 0) {
+                tempToggleObject = curTreeObj.tree.flatList.filter(item => 
+                    (item.payload.collapsed == true) 
+                );
+            }
+            let tempToggleList = tempToggleObject.map(item => item.id);
+                  
+            var curTreeObj1 = curTreeObj.tree.flatList.map(item => {
+                if(tempToggleList.includes(item.id))
+                    return {...item, templateName: "contactTemplateMin", expanded: true} 
+                return {...item, templateName: "contactTemplate", expanded: false} 
+            })
+            if(Array.from(new Set(tempToggleList)).length + 1 >= curTreeObj.tree.flatList.length){
+                var parentNode = curTreeObj.tree.flatList.filter(item => 
+                    (item.parent == null) 
+                );
+                tempToggleList.push(parentNode[0].id)
+                this.setState({ collapseState: true })
+            }else{
+                this.setState({ collapseState: false })
+            }
+            this.setState({toggleArray: tempToggleList});
+            curTreeObj.tree.flatList = curTreeObj1; 
+                
             this.setState({
                 curTreeObj,
                 scenarioList: curTreeObj.scenarioList.filter(x => x.active == true),
@@ -5838,6 +5933,13 @@ export default class BuildTree extends Component {
                     }
                 }
                 console.log("pro list---", proList);
+                var tempToggleObject = [];
+                if (proList.length > 0) {
+                    tempToggleObject = proList[0].tree.flatList.filter(item => 
+                        (item.payload.collapsed == true) 
+                    );
+                }
+                let tempToggleList = tempToggleObject.map(item => item.id);
                 if (proList.length > 0) {
                     proList.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -5845,10 +5947,20 @@ export default class BuildTree extends Component {
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                 }
+                let proList1 = [];
+                if (proList.length > 0) {
+                    proList1 = proList[0].tree.flatList.map(item => {
+                        if(tempToggleList.includes(item.id))
+                            return {...item, templateName: "contactTemplateMin", expanded: true} 
+                        return {...item, templateName: "contactTemplate"} 
+                    })
+                    proList[0].tree.flatList = proList1; 
+                }                
                 this.setState({
                     realmCountryId,
                     treeData: proList,
-                    programDataListForPuCheck:programDataListForPuCheck
+                    programDataListForPuCheck:programDataListForPuCheck,
+                    toggleArray: tempToggleList
                 }, () => {
                     console.log("tree data --->", this.state.treeData);
                     if (this.state.treeId != "" && this.state.treeId != 0) {
@@ -6076,6 +6188,7 @@ export default class BuildTree extends Component {
                     console.log("pl 4---");
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.unit.id = this.state.planningUnitList[0].unit.id;
                     console.log("pl 5---");
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].displayCalculatedDataValue=currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue;
                     if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
                         console.log("pl 6---");
                         currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(this.state.planningUnitList[0].label));
@@ -6476,13 +6589,13 @@ export default class BuildTree extends Component {
                         // } else {
                         //     sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
                         // }
-                        console.log("sharePu---", sharePu);
-                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommas(sharePu) + " " + planningUnit;
+                        console.log("sharePu---===>", sharePu);
+                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommasWith8Decimals(sharePu) + " " + planningUnit;
                     } else {
 
                         var puPerInterval = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit;
-                        console.log("puPerInterval---", puPerInterval);
-                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommas(puPerInterval) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + this.state.currentScenario.puNode.refillMonths + " " + i18n.t('static.report.month');
+                        console.log("puPerInterval---==>", puPerInterval);
+                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommasWith8Decimals(puPerInterval) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + this.state.currentScenario.puNode.refillMonths + " " + i18n.t('static.report.month');
                     }
                 } else {
                     usageText = "";
@@ -6692,6 +6805,30 @@ export default class BuildTree extends Component {
             items: arr,
             hideFUPUNode: e.target.checked
         });
+    }
+
+    expandCollapse(e){
+        var updatedItems = this.state.items;
+        var tempToggleArray = this.state.toggleArray;
+        if(e.target.checked){
+            this.setState({collapseState: true})
+            updatedItems = updatedItems.map(item => {
+                tempToggleArray.push(item.id);
+                if(item.parent != null){
+                    return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };  
+                }
+                return item;
+            });
+            this.setState({toggleArray: tempToggleArray})
+        }else{
+            this.setState({collapseState: false})
+            updatedItems = updatedItems.map(item => {
+                tempToggleArray = tempToggleArray.filter((e) => e != item.id)
+                return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
+            });
+            this.setState({toggleArray: tempToggleArray})
+        }
+        this.setState({ items: updatedItems }, () => { this.saveTreeData(false, true) })
     }
 
     touchAllScenario(setTouched, errors) {
@@ -7451,7 +7588,7 @@ export default class BuildTree extends Component {
                     this.callAfterScenarioChange(scenarioId);
                     // this.updateTreeData();
                 }
-                this.saveTreeData(false);
+                this.saveTreeData(false, false);
             });
         } else {
             alert(i18n.t('static.tree.duplicateScenarioName'));
@@ -7881,7 +8018,7 @@ export default class BuildTree extends Component {
             this.calculateParentValueFromMOM((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month);
         }
         if (event.target.name === "nodeValue") {
-            console.log("$$$$-----", (event.target.value).replaceAll(",", ""));
+            console.log("$$$$-----==>", (event.target.value).replaceAll(",", ""));
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = (event.target.value).replaceAll(",", "");
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value).replaceAll(",", "");
         }
@@ -8115,10 +8252,10 @@ export default class BuildTree extends Component {
                 (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = refillMonths;
                 console.log("AUTO refillMonths---", refillMonths);
                 console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                puPerVisit = parseFloat(((itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
+                puPerVisit = parseFloat(((itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
             } else {
                 console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                puPerVisit = this.state.noFURequired / pu.multiplier;
+                puPerVisit = addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
             }
 
             console.log("AUTO puPerVisit---", puPerVisit);
@@ -8488,7 +8625,7 @@ export default class BuildTree extends Component {
                 showMomData: false,
                 showMomDataPercent: false,
                 addNodeFlag: false,
-                openAddNodeModal: true,
+                openAddNodeModal: data.context.templateName ? data.context.templateName == "contactTemplateMin" ? false : true : true ,
                 orgCurrentItemConfig: JSON.parse(JSON.stringify(data.context)),
                 currentItemConfig: JSON.parse(JSON.stringify(data)),
                 level0: (data.context.level == 0 ? false : true),
@@ -8500,6 +8637,46 @@ export default class BuildTree extends Component {
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0],
 
             }, () => {
+
+                if(data.context.templateName ? data.context.templateName == "contactTemplateMin" ? true : false : false){
+                    var itemConfig = data.context;
+                    var items = this.state.items;
+                    var updatedItems = items;
+                    // this.setState(prevState => ({
+                    //     toggleArray: [...prevState.toggleArray, itemConfig.id]
+                    // }))
+                    if(this.state.toggleArray.includes(itemConfig.id)){
+
+                        var parentId = itemConfig.payload.parentNodeId;
+                        var parentNode = items.filter(e => e.id == parentId);
+                        
+                        var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
+                        if(parentNode[0].templateName ? parentNode[0].templateName == "contactTemplateMin" ? false : true : true){
+                            tempToggleArray = tempToggleArray.filter((e) => e != parentId)
+                        }
+                        updatedItems = updatedItems.map(item => {
+                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString())) {
+                                tempToggleArray = tempToggleArray.filter((e) => e != item.id)
+                                return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
+                            }
+                            return item;
+                        });
+                        this.setState({toggleArray: tempToggleArray})
+                    }else{
+                        var tempToggleArray = this.state.toggleArray;
+                        tempToggleArray.push(itemConfig.id);
+                        updatedItems = updatedItems.map(item => {
+                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString())) {
+                                tempToggleArray.push(item.id);
+                                return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };
+                            }
+                            return item;
+                        });
+                        this.setState({toggleArray: tempToggleArray})
+                    }
+                    this.setState({ collapseState: false })               
+                    this.setState({ items: updatedItems }, () => { this.saveTreeData(false, true) })
+                }
                 console.log("555>>>", this.state.items);
                 // const ids = this.state.items.map(o => o.id)
                 // const filtered = this.state.items.filter(({ id }, index) => !ids.includes(id, index + 1))
@@ -8592,12 +8769,12 @@ export default class BuildTree extends Component {
                     var refillMonths = this.round(parseFloat(pu.multiplier / (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
                     console.log("AUTO refillMonths---", refillMonths);
                     console.log("AUTO 1 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                    puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4);
+                    puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
                     puNode.refillMonths = refillMonths;
                     puNode.puPerVisit = puPerVisit;
                 } else {
                     console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                    puPerVisit = this.state.noFURequired / pu.multiplier;
+                    puPerVisit = addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
                     puNode.puPerVisit = puPerVisit;
                 }
 
@@ -9483,7 +9660,7 @@ export default class BuildTree extends Component {
                                                                 id="nodeValue"
                                                                 name="nodeValue"
                                                                 bsSize="sm"
-                                                                valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
+                                                                valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.displayCalculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
                                                                 invalid={touched.nodeValue && !!errors.nodeValue}
                                                                 onBlur={handleBlur}
                                                                 readOnly={this.state.numberNode || this.state.currentScenario.extrapolation ? true : false}
@@ -9491,7 +9668,7 @@ export default class BuildTree extends Component {
                                                                     handleChange(e);
                                                                     this.dataChange(e)
                                                                 }}
-                                                                value={(this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(this.state.currentScenario.calculatedDataValue) : addCommasNodeValue(this.state.currentScenario.dataValue)) + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
+                                                                value={(this.state.numberNode ? this.state.currentScenario.displayCalculatedDataValue == 0 ? "0" : addCommasNodeValue(this.state.currentScenario.displayCalculatedDataValue) : addCommasNodeValue(this.state.currentScenario.dataValue)) + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en}
                                                             ></Input>
                                                             <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                         </FormGroup>
@@ -9657,7 +9834,7 @@ export default class BuildTree extends Component {
                                                                 bsSize="sm"
                                                                 className="mr-2"
                                                                 readOnly={true}
-                                                                value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? parseFloat((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor).toFixed(4) : (this.state.noFURequired / this.state.conversionFactor))}>
+                                                                value={addCommasWith8Decimals(this.state.parentScenario.fuNode.usageType.id == 2 ? parseFloat((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor).toFixed(8) : (this.state.noFURequired / this.state.conversionFactor))}>
 
                                                             </Input>
                                                             {/* </FormGroup>
@@ -9756,7 +9933,7 @@ export default class BuildTree extends Component {
                                                                     value={this.state.currentItemConfig.parentItem != null
                                                                         && this.state.parentScenario.fuNode != null ?
                                                                         (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
-                                                                            addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noFURequired / this.state.conversionFactor) : ""}
+                                                                            addCommasWith8Decimals(this.state.currentScenario.puNode.puPerVisit) : addCommasWith8Decimals(this.state.noFURequired / this.state.conversionFactor) : ""}
                                                                 // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
                                                                 //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
                                                                 >
@@ -9864,7 +10041,7 @@ export default class BuildTree extends Component {
                                                                     value={this.state.currentItemConfig.parentItem != null
                                                                         && this.state.parentScenario.fuNode != null ?
                                                                         (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ?
-                                                                            addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noFURequired / this.state.conversionFactor) : ""}
+                                                                            addCommasWith8Decimals(this.state.currentScenario.puNode.puPerVisit) : addCommasWith8Decimals(this.state.noFURequired / this.state.conversionFactor) : ""}
                                                                 // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
                                                                 //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
                                                                 >
@@ -10397,7 +10574,7 @@ export default class BuildTree extends Component {
                                     <FormGroup className="pb-lg-3">
                                         {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, isChanged: false, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {(!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
@@ -10514,13 +10691,13 @@ export default class BuildTree extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.aggregationNode && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>
                         {this.state.showCalculatorFields &&
                             <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                <fieldset className="scheduler-border">
+                                <fieldset style={{width: '100%'}} className="scheduler-border">
                                     <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool')}</legend>
                                     <div className="row">
                                         <FormGroup className="col-md-6">
@@ -10758,7 +10935,7 @@ export default class BuildTree extends Component {
                     </div>
                     {this.state.showMomData &&
                         <div className="row pl-lg-2 pr-lg-2">
-                            <fieldset className="scheduler-border">
+                            <fieldset style={{width: '100%'}} className="scheduler-border">
                                 <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
@@ -10838,7 +11015,7 @@ export default class BuildTree extends Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
@@ -10850,7 +11027,7 @@ export default class BuildTree extends Component {
                     }
                     {this.state.showMomDataPercent &&
                         <div className="row pl-lg-2 pr-lg-2">
-                            <fieldset className="scheduler-border">
+                            <fieldset style={{width: '100%'}} className="scheduler-border">
                                 <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
                                 {/* <div className="row pl-lg-2 pr-lg-2"> */}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
@@ -10918,7 +11095,7 @@ export default class BuildTree extends Component {
                                             showMomDataPercent: false
                                         });
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
 
                                 </div>
@@ -11231,7 +11408,11 @@ export default class BuildTree extends Component {
 
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-
+                (itemConfig.expanded ?                     
+                <div style={{background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed" , width: "8px", height: "8px", borderRadius: "8px"}}>
+    
+                </div>
+                :
                 <div className={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect==0?"ContactTemplate boxContactTemplate contactTemplateBorderRed":"ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
                     <div className={itemConfig.payload.nodeType.id == 5
                         || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
@@ -11271,9 +11452,60 @@ export default class BuildTree extends Component {
                         <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{this.getPayloadData(itemConfig, 2)}</p></div>
                         {this.state.showModelingValidation && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? i18n.t('static.ManageTree.SumofChildren') + ": " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
                     </div>
-                </div>
+                </div>)
             ))
         }
+
+        const HighlightNode = ({ itemConfig }) => {
+            let itemTitleColor = Colors.RoyalBlue;
+            
+
+            return (
+                // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+                
+                <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''} style={{height: "88px", width: "200px", zIndex: "1"}}>
+                    <div className={itemConfig.payload.nodeType.id == 5
+                        || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
+                        (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
+                    >
+                        <div className={itemConfig.payload.nodeType.id == 5 ||
+                            itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
+                            "ContactTitle TitleColor"}>
+                            {/* <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '128px', float: 'left', fontWeight: 'bold', }}>
+                                {itemConfig.payload.label.label_en}</div> */}
+                            <div title={itemConfig.payload.label.label_en} className="NodeTitletext">
+                                {itemConfig.payload.label.label_en}</div>
+                            <div style={{ float: 'right' }}>
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeType.id == 2 && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                <b style={{ color: '#212721', float: 'right' }}>
+                                    {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeType.id == 4) ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}
+                                    {itemConfig.payload.nodeType.id == 2 ?
+                                        <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
+                                        (itemConfig.payload.nodeType.id == 3 ?
+                                            <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
+                                            (itemConfig.payload.nodeType.id == 4 ?
+                                                <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                                (itemConfig.payload.nodeType.id == 5 ?
+                                                    <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                                    (itemConfig.payload.nodeType.id == 1 ?
+                                                        // <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b>
+                                                        <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div className="ContactPhone ContactPhoneValue">
+                        <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
+                        <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}>{this.getPayloadData(itemConfig, 2)}</p></div>
+                        {this.state.showModelingValidation && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? i18n.t('static.ManageTree.SumofChildren') + ": " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
+                    </div>
+                </div>
+            )
+        }
+
 
 
         const NodeDragSource = DragSource(
@@ -11422,325 +11654,18 @@ export default class BuildTree extends Component {
             pageFitMode: PageFitMode.None,
             // highlightItem: 0,
             hasSelectorCheckbox: Enabled.False,
-            hasButtons: Enabled.True,
+            // hasButtons: Enabled.True,
             buttonsPanelSize: 40,
             orientationType: OrientationType.Top,
             defaultTemplateName: "contactTemplate",
             linesColor: Colors.Black,
             annotations: treeLevelItems,
-            onLevelTitleRender: ((data) => {
-                var { context, width, height } = data;
-                var { title, titleColor } = context;
-                var style = {
-                    position: "absolute",
-                    fontSize: "12px",
-                    fontFamily: "Trebuchet MS, Tahoma, Verdana, Arial, sans-serif",
-                    WebkitTapHighlightColor: "rgba(0,0,0,0)",
-                    WebkitUserSelect: "none",
-                    WebkitTouchCallout: "none",
-                    KhtmlUserSelect: "none",
-                    MozUserSelect: "none",
-                    msUserSelect: "none",
-                    userSelect: "none",
-                    boxSizing: "content-box",
-
-                    MozBorderRadius: "4px",
-                    WebkitBorderRadius: "4px",
-                    KhtmlBorderRadius: "4px",
-                    BorderRadius: "4px",
-
-                    background: "royalblue",
-                    borderWidth: 0,
-                    color: "white",
-                    padding: 0,
-                    width: "100%",
-                    height: "100%",
-                    left: "-1px",
-                    top: "-1px"
-                }
-                return <div style={{ ...style, background: titleColor }} onClick={(event) => {
-                    event.stopPropagation();
-                    //   console.log("Data@@@1111----------->",data)
-                    //   alert(`User clicked on level title ${title}`)
-                    this.levelClicked(data)
-                }}>
-                    <RotatedText
-                        width={width}
-                        height={height}
-                        orientation={'RotateRight'}
-                        horizontalAlignment={'center'}
-                        verticalAlignment={'middle'}
-                    >{title}</RotatedText>
-                </div>
-            }),
-            onButtonsRender: (({ context: itemConfig }) => {
-                return <>
-                    {itemConfig.parent != null &&
-
-                        <>
-                            {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
-
-                                <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
-                                    onClick={(event) => {
-                                        event.stopPropagation();
-                                        this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
-                                    }}>
-                                    <i class="fa fa-clone" aria-hidden="true"></i>
-                                </button>
-                            }
-                            {!this.state.hideActionButtons && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
-                                <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
-                                    onClick={(event) => {
-                                        event.stopPropagation();
-                                        confirmAlert({
-                                            message: "Are you sure you want to delete this node.",
-                                            buttons: [
-                                                {
-                                                    label: i18n.t('static.program.yes'),
-                                                    onClick: () => {
-                                                        console.log("delete itemConfig---", itemConfig);
-                                                        this.onRemoveButtonClick(itemConfig);
-                                                    }
-                                                },
-                                                {
-                                                    label: i18n.t('static.program.no')
-                                                }
-                                            ]
-                                        });
-                                    }}>
-                                    {/* <FontAwesomeIcon icon={faTrash} /> */}
-                                    <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
-                                </button>}
-
-                        </>}
-                    {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
-
-                        <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                this.getBranchTemplateList(itemConfig);
-                                // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
-                            }}>
-                            <i class="fa fa-sitemap" aria-hidden="true"></i>
-                        </button>
-                    }
-                    {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
-                        <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
-                            onClick={(event) => {
-                                console.log("add button called---------");
-                                event.stopPropagation();
-                                console.log("add node----", itemConfig);
-                                if (itemConfig.level == 0 && itemConfig.newTree) {
-                                    alert("Please update the details of the current node.");
-                                } else {
-                                    var nodeDataMap = {};
-                                    var tempArray = [];
-                                    var tempJson = {
-                                        notes: '',
-                                        month: moment(this.state.forecastStartDate).startOf('month').subtract(1, 'months').format("YYYY-MM-DD"),
-                                        dataValue: "",
-                                        calculatedDataValue: "",
-                                        nodeDataModelingList: [],
-                                        nodeDataOverrideList: [],
-                                        nodeDataMomList: [],
-                                        fuNode: {
-                                            oneTimeUsage: "false",
-                                            lagInMonths: 0,
-                                            noOfForecastingUnitsPerPerson: '',
-                                            usageFrequency: '',
-                                            forecastingUnit: {
-                                                label: {
-                                                    label_en: ''
-                                                },
-                                                tracerCategory: {
-
-                                                },
-                                                unit: {
-                                                    id: ''
-                                                }
-                                            },
-                                            usageType: {
-                                                id: ''
-                                            },
-                                            usagePeriod: {
-                                                usagePeriodId: 1
-                                            },
-                                            repeatUsagePeriod: {
-                                                usagePeriodId: 1
-                                            },
-                                            noOfPersons: ''
-                                        },
-                                        puNode: {
-                                            planningUnit: {
-                                                id: '',
-                                                unit: {
-                                                    id: ''
-                                                },
-                                                multiplier: ''
-                                            },
-                                            refillMonths: '',
-                                            sharePlanningUnit: "true"
-                                        }
-                                    };
-                                    tempArray.push(tempJson);
-                                    nodeDataMap[this.state.selectedScenario] = tempArray;
-                                    console.log("itemConfig.level@@@@@@@@@@@@#################@@@@@@@@@@@@", itemConfig.level);
-                                    var getLevelUnit = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList.filter(c => c.levelNo == itemConfig.level + 1) : [];
-                                    var levelUnitId = ""
-                                    if (getLevelUnit.length > 0) {
-                                        levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
-                                    }
-                                    console.log("level unit id on add button click---", levelUnitId);
-                                    // tempArray.push(nodeDataMap);
-                                    this.setState({
-                                        isValidError: true,
-                                        showMomDataPercent: false,
-                                        showMomData: false,
-                                        viewMonthlyData: true,
-                                        tempPlanningUnitId: '',
-                                        parentValue: "",
-                                        fuValues: [],
-                                        fuLabels: [],
-                                        // showFUValidation : true,
-                                        usageTemplateId: '',
-                                        conversionFactor: '',
-                                        parentScenario: itemConfig.level != 0 ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0] : {},
-                                        usageText: '',
-                                        currentScenario: {
-                                            notes: '',
-                                            extrapolation: false,
-                                            dataValue: '',
-                                            month: moment(this.state.forecastStartDate).startOf('month').format("YYYY-MM-DD"),
-                                            fuNode: {
-                                                noOfForecastingUnitsPerPerson: '',
-                                                usageFrequency: '',
-                                                nodeDataModelingList: [],
-                                                nodeDataOverrideList: [],
-                                                nodeDataMomList: [],
-                                                forecastingUnit: {
-                                                    label: {
-                                                        label_en: ''
-                                                    },
-                                                    tracerCategory: {
-
-                                                    },
-                                                    unit: {
-                                                        id: ''
-                                                    }
-                                                },
-                                                usageType: {
-                                                    id: ''
-                                                },
-                                                usagePeriod: {
-                                                    usagePeriodId: ''
-                                                },
-                                                repeatUsagePeriod: {
-                                                    usagePeriodId: ''
-                                                },
-                                                noOfPersons: ''
-                                            },
-                                            puNode: {
-                                                planningUnit: {
-                                                    id: '',
-                                                    unit: {
-
-                                                    },
-                                                    multiplier: ''
-                                                },
-                                                refillMonths: ''
-                                            },
-                                            nodeDataExtrapolationOptionList: []
-                                        },
-                                        level0: true,
-                                        numberNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2 ? false : true),
-                                        aggregationNode: (itemConfig.payload.nodeType.id == 1 ? false : true),
-                                        addNodeFlag: true,
-                                        openAddNodeModal: true,
-                                        currentItemConfig: {
-                                            context: {
-                                                isVisible: '',
-                                                level: itemConfig.level,
-                                                parent: itemConfig.id,
-                                                payload: {
-                                                    nodeId: '',
-                                                    label: {
-                                                        label_en: ''
-                                                    },
-                                                    nodeType: {
-                                                        id: ''
-                                                    },
-                                                    nodeUnit: {
-                                                        id: levelUnitId
-                                                    },
-                                                    nodeDataMap: nodeDataMap
-                                                }
-                                            },
-                                            parentItem: {
-                                                parent: itemConfig.parent,
-                                                payload: {
-                                                    nodeType: {
-                                                        id: itemConfig.payload.nodeType.id
-                                                    },
-                                                    label: {
-                                                        label_en: itemConfig.payload.label.label_en
-                                                    },
-                                                    nodeUnit: {
-                                                        id: itemConfig.payload.nodeUnit.id,
-                                                        label: itemConfig.payload.nodeUnit.label
-                                                    },
-                                                    nodeDataMap: itemConfig.payload.nodeDataMap
-                                                }
-                                            }
-
-                                        }
-                                    }, () => {
-                                        console.log("add click config---", this.state.currentItemConfig);
-                                        console.log("add click nodeflag---", this.state.addNodeFlag);
-                                        console.log("add click number node flag---", this.state.numberNode);
-                                        this.setState({
-                                            orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context))
-                                            // parentValue: itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue
-                                        }, () => {
-                                            this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
-                                            this.calculateParentValueFromMOM(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].month);
-                                        });
-
-                                        if (itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) {
-                                            var tracerCategoryId = "";
-                                            if (this.state.tracerCategoryList.length == 1) {
-                                                this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.tracerCategory.id = this.state.tracerCategoryList[0].tracerCategoryId;
-                                                this.state.currentScenario = this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0];
-                                                tracerCategoryId = this.state.tracerCategoryList[0].tracerCategoryId;
-
-                                            }
-                                            this.filterUsageTemplateList(tracerCategoryId);
-                                            this.getForecastingUnitListByTracerCategoryId(0, 0);
-                                        }
-                                        else if (itemConfig.payload.nodeType.id == 4) {
-                                            this.getNoOfFUPatient();
-                                            setTimeout(() => {
-                                                this.getNoOfMonthsInUsagePeriod();
-                                                this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id);
-                                            }, 0);
-                                            this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeUnit.id;
-                                        } else {
-
-                                        }
-                                    });
-                                    // this.onAddButtonClick(itemConfig);
-                                }
-                            }}>
-                            {/* <FontAwesomeIcon icon={faPlus} /> */}
-                            <i class="fa fa-plus-square-o" aria-hidden="true"></i>
-                        </button>}
-
-
-                </>
-            }),
+            
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
+                hasButtons: Enabled.True,
                 name: "contactTemplate",
-                itemSize: { width: 200, height: 88 },
+                itemSize: { width: 200, height: 100 },
                 minimizedItemSize: { width: 2, height: 2 },
                 highlightPadding: { left: 1, top: 1, right: 1, bottom: 1 },
                 highlightBorderWidth: 1,
@@ -11767,7 +11692,346 @@ export default class BuildTree extends Component {
                     // canDropItem={this.canDropItem}
                     // onMoveItem={this.onMoveItem}
                     />;
-                }
+                },
+
+                onButtonsRender: (({ context: itemConfig }) => {
+                    return <>
+                        {itemConfig.parent != null &&
+    
+                            <>
+                                {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+    
+                                    <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
+                                        }}>
+                                        <i class="fa fa-clone" aria-hidden="true"></i>
+                                    </button>
+                                }
+                                {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                    <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            confirmAlert({
+                                                message: "Are you sure you want to delete this node.",
+                                                buttons: [
+                                                    {
+                                                        label: i18n.t('static.program.yes'),
+                                                        onClick: () => {
+                                                            console.log("delete itemConfig---", itemConfig);
+                                                            this.onRemoveButtonClick(itemConfig);
+                                                        }
+                                                    },
+                                                    {
+                                                        label: i18n.t('static.program.no')
+                                                    }
+                                                ]
+                                            });
+                                        }}>
+                                        {/* <FontAwesomeIcon icon={faTrash} /> */}
+                                        <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
+                                    </button>}
+    
+                            </>}
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+    
+                            <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    this.getBranchTemplateList(itemConfig);
+                                    // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
+                                }}>
+                                <i class="fa fa-sitemap" aria-hidden="true"></i>
+                            </button>
+                        }
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                            <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
+                                onClick={(event) => {
+                                    console.log("add button called---------");
+                                    event.stopPropagation();
+                                    console.log("add node----", itemConfig);
+                                    if (itemConfig.level == 0 && itemConfig.newTree) {
+                                        alert("Please update the details of the current node.");
+                                    } else {
+                                        var nodeDataMap = {};
+                                        var tempArray = [];
+                                        var tempJson = {
+                                            notes: '',
+                                            month: moment(this.state.forecastStartDate).startOf('month').subtract(1, 'months').format("YYYY-MM-DD"),
+                                            dataValue: "",
+                                            calculatedDataValue: "",
+                                            nodeDataModelingList: [],
+                                            nodeDataOverrideList: [],
+                                            nodeDataMomList: [],
+                                            fuNode: {
+                                                oneTimeUsage: "false",
+                                                lagInMonths: 0,
+                                                noOfForecastingUnitsPerPerson: '',
+                                                usageFrequency: '',
+                                                forecastingUnit: {
+                                                    label: {
+                                                        label_en: ''
+                                                    },
+                                                    tracerCategory: {
+    
+                                                    },
+                                                    unit: {
+                                                        id: ''
+                                                    }
+                                                },
+                                                usageType: {
+                                                    id: ''
+                                                },
+                                                usagePeriod: {
+                                                    usagePeriodId: 1
+                                                },
+                                                repeatUsagePeriod: {
+                                                    usagePeriodId: 1
+                                                },
+                                                noOfPersons: ''
+                                            },
+                                            puNode: {
+                                                planningUnit: {
+                                                    id: '',
+                                                    unit: {
+                                                        id: ''
+                                                    },
+                                                    multiplier: ''
+                                                },
+                                                refillMonths: '',
+                                                sharePlanningUnit: "true"
+                                            }
+                                        };
+                                        tempArray.push(tempJson);
+                                        nodeDataMap[this.state.selectedScenario] = tempArray;
+                                        console.log("itemConfig.level@@@@@@@@@@@@#################@@@@@@@@@@@@", itemConfig.level);
+                                        var getLevelUnit = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList.filter(c => c.levelNo == itemConfig.level + 1) : [];
+                                        var levelUnitId = ""
+                                        if (getLevelUnit.length > 0) {
+                                            levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
+                                        }
+                                        console.log("level unit id on add button click---", levelUnitId);
+                                        // tempArray.push(nodeDataMap);
+                                        this.setState({
+                                            isValidError: true,
+                                            showMomDataPercent: false,
+                                            showMomData: false,
+                                            viewMonthlyData: true,
+                                            tempPlanningUnitId: '',
+                                            parentValue: "",
+                                            fuValues: [],
+                                            fuLabels: [],
+                                            // showFUValidation : true,
+                                            usageTemplateId: '',
+                                            conversionFactor: '',
+                                            parentScenario: itemConfig.level != 0 ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0] : {},
+                                            usageText: '',
+                                            currentScenario: {
+                                                notes: '',
+                                                extrapolation: false,
+                                                dataValue: '',
+                                                month: moment(this.state.forecastStartDate).startOf('month').format("YYYY-MM-DD"),
+                                                fuNode: {
+                                                    noOfForecastingUnitsPerPerson: '',
+                                                    usageFrequency: '',
+                                                    nodeDataModelingList: [],
+                                                    nodeDataOverrideList: [],
+                                                    nodeDataMomList: [],
+                                                    forecastingUnit: {
+                                                        label: {
+                                                            label_en: ''
+                                                        },
+                                                        tracerCategory: {
+    
+                                                        },
+                                                        unit: {
+                                                            id: ''
+                                                        }
+                                                    },
+                                                    usageType: {
+                                                        id: ''
+                                                    },
+                                                    usagePeriod: {
+                                                        usagePeriodId: ''
+                                                    },
+                                                    repeatUsagePeriod: {
+                                                        usagePeriodId: ''
+                                                    },
+                                                    noOfPersons: ''
+                                                },
+                                                puNode: {
+                                                    planningUnit: {
+                                                        id: '',
+                                                        unit: {
+    
+                                                        },
+                                                        multiplier: ''
+                                                    },
+                                                    refillMonths: ''
+                                                },
+                                                nodeDataExtrapolationOptionList: []
+                                            },
+                                            level0: true,
+                                            numberNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2 ? false : true),
+                                            aggregationNode: (itemConfig.payload.nodeType.id == 1 ? false : true),
+                                            addNodeFlag: true,
+                                            openAddNodeModal: true,
+                                            currentItemConfig: {
+                                                context: {
+                                                    isVisible: '',
+                                                    level: itemConfig.level,
+                                                    parent: itemConfig.id,
+                                                    payload: {
+                                                        nodeId: '',
+                                                        label: {
+                                                            label_en: ''
+                                                        },
+                                                        nodeType: {
+                                                            id: ''
+                                                        },
+                                                        nodeUnit: {
+                                                            id: levelUnitId
+                                                        },
+                                                        nodeDataMap: nodeDataMap
+                                                    }
+                                                },
+                                                parentItem: {
+                                                    parent: itemConfig.parent,
+                                                    payload: {
+                                                        nodeType: {
+                                                            id: itemConfig.payload.nodeType.id
+                                                        },
+                                                        label: {
+                                                            label_en: itemConfig.payload.label.label_en
+                                                        },
+                                                        nodeUnit: {
+                                                            id: itemConfig.payload.nodeUnit.id,
+                                                            label: itemConfig.payload.nodeUnit.label
+                                                        },
+                                                        nodeDataMap: itemConfig.payload.nodeDataMap
+                                                    }
+                                                }
+    
+                                            }
+                                        }, () => {
+                                            console.log("add click config---", this.state.currentItemConfig);
+                                            console.log("add click nodeflag---", this.state.addNodeFlag);
+                                            console.log("add click number node flag---", this.state.numberNode);
+                                            this.setState({
+                                                orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context))
+                                                // parentValue: itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue
+                                            }, () => {
+                                                this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
+                                                this.calculateParentValueFromMOM(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].month);
+                                            });
+    
+                                            if (itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) {
+                                                var tracerCategoryId = "";
+                                                if (this.state.tracerCategoryList.length == 1) {
+                                                    this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.tracerCategory.id = this.state.tracerCategoryList[0].tracerCategoryId;
+                                                    this.state.currentScenario = this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0];
+                                                    tracerCategoryId = this.state.tracerCategoryList[0].tracerCategoryId;
+    
+                                                }
+                                                this.filterUsageTemplateList(tracerCategoryId);
+                                                this.getForecastingUnitListByTracerCategoryId(0, 0);
+                                            }
+                                            else if (itemConfig.payload.nodeType.id == 4) {
+                                                this.getNoOfFUPatient();
+                                                setTimeout(() => {
+                                                    this.getNoOfMonthsInUsagePeriod();
+                                                    this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id);
+                                                }, 0);
+                                                this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeUnit.id;
+                                            } else {
+    
+                                            }
+                                        });
+                                        // this.onAddButtonClick(itemConfig);
+                                    }
+                                }}>
+                                {/* <FontAwesomeIcon icon={faPlus} /> */}
+                                <i class="fa fa-plus" aria-hidden="true"></i>
+                            </button>}
+                        {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && 
+                            <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
+                                onClick={(event) => {
+        
+                                    var items = this.state.items;
+                                    event.stopPropagation();
+                                    var updatedItems = items;
+                                    // this.setState(prevState => ({
+                                    //     toggleArray: [...prevState.toggleArray, itemConfig.id]
+                                    // }))
+                                    if(this.state.toggleArray.includes(itemConfig.id)){
+                                        var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
+                                        updatedItems = updatedItems.map(item => {
+                                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.sortOrder.toString() != itemConfig.sortOrder.toString()) {
+                                                tempToggleArray = tempToggleArray.filter((e) => e != item.id)
+                                                return { ...item, templateName: "contactTemplate", expanded: false, payload: {...item.payload, collapsed: false } };                                        
+                                            }
+                                            return item;
+                                        });
+                                        if(Array.from(new Set(tempToggleArray)).length >= items.length){
+                                            this.setState({ collapseState: true })
+                                        }else{
+                                            this.setState({ collapseState: false })
+                                        }
+                                        this.setState({toggleArray: tempToggleArray})
+                                    }else{
+                                        var parentId = itemConfig.payload.parentNodeId;
+                                        var parentNode = items.filter(e => e.id == parentId);
+                                        var tempToggleArray = this.state.toggleArray;
+                                        tempToggleArray.push(itemConfig.id);
+                                        if(parentId){
+                                            if(parentNode[0].payload.parentNodeId == null){
+                                                tempToggleArray.push(itemConfig.payload.parentNodeId);
+                                            }
+                                        }
+                                        updatedItems = updatedItems.map(item => {
+                                            if (item.sortOrder.toString().startsWith(itemConfig.sortOrder.toString()) && item.parent != null) {
+                                                tempToggleArray.push(item.id);
+                                                return { ...item, templateName: "contactTemplateMin", expanded: true, payload: {...item.payload, collapsed: true } };
+                                            }
+                                            return item;
+                                        });
+                                        if(Array.from(new Set(tempToggleArray)).length >= items.length){
+                                            this.setState({ collapseState: true })
+                                        }else{
+                                            this.setState({ collapseState: false })
+                                        }
+                                        this.setState({toggleArray: tempToggleArray})
+                                    }
+                                    
+                                    this.setState({ items: updatedItems }, () => { this.saveTreeData(false, true) })
+        
+                                }}>
+                                {this.state.toggleArray.includes(itemConfig.id) ? <i class="fa fa-caret-square-o-left" aria-hidden="true"></i> : <i class="fa fa-caret-square-o-down" aria-hidden="true"></i> }    
+                            </button>
+                        }
+    
+                    </>
+                }),
+            },
+            {
+                name: "contactTemplateMin",
+                itemSize: { width: 8, height: 8 },
+                minimizedItemSize: { width: 2, height: 2 },
+                onItemRender: ({ context: itemConfig }) => {
+                    return <NodeDragDropSource
+                        itemConfig={itemConfig}
+                        onRemoveItem={this.onRemoveItem}
+                    // canDropItem={this.canDropItem}
+                    // onMoveItem={this.onMoveItem}
+                    />;
+                },
+                onHighlightRender: ({ context: itemConfig }) => {
+                    return <HighlightNode
+                    itemConfig={itemConfig}
+                    onRemoveItem={this.onRemoveItem}
+                    />;
+                },
             }]
         }
         return <div className="">
@@ -11913,7 +12177,7 @@ export default class BuildTree extends Component {
                                                                 {scenarios}
                                                             </Input>
 
-                                                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 &&
+                                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                                                 <InputGroupAddon addonType="append" onClick={this.toggleDropdown}>
                                                                     {/* <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.openScenarioModal} title=""></i></InputGroupText> */}
                                                                     <InputGroupText className='SettingIcon'>
@@ -12058,7 +12322,7 @@ export default class BuildTree extends Component {
                                                 }}
                                                 validate={validate(validationSchema)}
                                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                                    this.saveTreeData(false);
+                                                    this.saveTreeData(false, false);
                                                     // this.createOrUpdateTree();
                                                 }}
                                                 render={
@@ -12196,7 +12460,7 @@ export default class BuildTree extends Component {
                                                                 <FormGroup className="col-md-3 pt-lg-4">
 
                                                                     {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                                                    {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                                 </FormGroup>
                                                             </Row>
                                                         </Form>
@@ -12282,6 +12546,25 @@ export default class BuildTree extends Component {
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                             <b>{i18n.t('static.tree.autoCalculate')}</b><i class="fa fa-info-circle icons pl-lg-2" id="PopoverAuto" onClick={this.toggleTooltipAuto} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                        </Label>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-2" >
+                                                <div className="check inline  pl-lg-0 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="active9"
+                                                            name="active9"
+                                                            checked={ this.state.collapseState }
+                                                            onClick={(e) => { this.expandCollapse(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.tree.collapseTree')}</b>
                                                         </Label>
                                                     </div>
                                                 </div>

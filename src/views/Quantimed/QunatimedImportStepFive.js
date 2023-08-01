@@ -101,7 +101,7 @@ export default class QunatimedImportStepFive extends Component {
 
     loaded_four = function (instance, cell, x, y, value) {
 
-        jExcelLoadedFunctionQuantimed(instance);
+        jExcelLoadedFunctionQuantimed(instance,1);
 
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -399,8 +399,8 @@ export default class QunatimedImportStepFive extends Component {
         jexcel.destroy(document.getElementById("recordsDiv"), true);
 
         var json = this.props.items.importData.records;
-        console.log("Json+++", json);
-        console.log("Json+++", this.props.items);
+        // console.log("Json+++", json);
+        // console.log("Json+++", this.props.items);
 
         let startDate = this.props.items.program.rangeValue.from.year + '-' + this.props.items.program.rangeValue.from.month + '-01';
         let endDate = this.props.items.program.rangeValue.to.year + '-' + this.props.items.program.rangeValue.to.month + '-' + new Date(this.props.items.program.rangeValue.to.year, this.props.items.program.rangeValue.to.month, 0).getDate();
@@ -451,7 +451,7 @@ export default class QunatimedImportStepFive extends Component {
                         finalQATPlanningList.push(parseInt(finalImportQATData[i].product.programPlanningUnitId))
                     }
                 }
-                console.log("FinalQatPlanningUnitList+++", finalQATPlanningList);
+                // console.log("FinalQatPlanningUnitList+++", finalQATPlanningList);
                 var planningUnitDataList = (programRequest.result).programData.planningUnitDataList;
                 var finalList = [];
                 for (var fqpl = 0; fqpl < finalQATPlanningList.length; fqpl++) {

@@ -129,7 +129,7 @@ export default class ConsumptionDetails extends React.Component {
                 // console.log("myResult", myResult);
                 var programId = (document.getElementById("programId").value).split("_")[0];
                 // console.log('programId----->>>', programId)
-                console.log(myResult);
+                // console.log(myResult);
                 var proList = []
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].program.id == programId) {

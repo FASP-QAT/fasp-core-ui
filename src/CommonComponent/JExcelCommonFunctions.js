@@ -16,7 +16,9 @@ export function jExcelLoadedFunction(instance, number) {
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jss_search_container')[number];
     var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
+    try{
     searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
+    }catch(error){}
     document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
     // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
@@ -92,7 +94,9 @@ export function jExcelLoadedFunctionForErp(instance, number) {
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jss_search_container')[2];
     var searchDiv = (document.getElementsByClassName('jss_search_container')[2]).childNodes[1];
+    try{
     searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[2]).childNodes[1]).childNodes[0]);
+    }catch(error){}
     document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
     // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
@@ -249,7 +253,9 @@ export function jExcelLoadedFunctionPipeline(instance, number) {
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
     var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
+    try{
     searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
+    }catch(error){}
     document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
@@ -298,7 +304,9 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
     elInstance.hideIndex(0);
     var searchContainer = document.getElementsByClassName('jss_search_container')[number];
     var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
+    try{
     searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
+    }catch(error){}
     document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
     // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
@@ -319,7 +327,7 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
 
 export function jExcelLoadedFunctionOnlyHideRow(instance) {
     var elInstance = instance.worksheets[0];
-    console.log("elisn===>", instance)
+    // console.log("elisn===>", instance)
     elInstance.hideIndex(0);
 }
 
@@ -335,7 +343,9 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jss_search_container')[number];
     var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
+    try{
     searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
+    }catch(error){}
     document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
     // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
@@ -377,10 +387,10 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
     jexcel_pagination.firstChild.classList.add('pl-0');
     // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
     // document.getElementsByClassName('jexcel_pagination')[number].value = 25
-    var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[number];
+    var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[0];
     pageSelect.options[3].innerHTML = "All";
 
-    pageSelect.addEventListener("change", () => paginationChange(number));
+    pageSelect.addEventListener("change", () => paginationChange(0));
 
     var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
@@ -463,8 +473,8 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             }
         }
     } else if (type == "dateWithInvalidDataEntry") {
-        console.log("Value$####", moment(value).format("YYYY-MM-DD"))
-        console.log("Condition###", moment(value).format("YYYY-MM") > moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM"));
+        // console.log("Value$####", moment(value).format("YYYY-MM-DD"))
+        // console.log("Condition###", moment(value).format("YYYY-MM") > moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM"));
         var col = (colName).concat(parseInt(rowNo) + 1);
         if (value == "") {
             elInstance.setStyle(col, "background-color", "transparent");
@@ -602,7 +612,9 @@ export function jExcelLoadedFunctionOld(instance, number) {
     pagignation.classList.add('row');
     var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
     var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
+    try{
     searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
+    }catch(error){}
     document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
     // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');

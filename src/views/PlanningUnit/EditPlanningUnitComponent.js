@@ -169,7 +169,7 @@ export default class EditPlanningUnitComponent extends Component {
     }
     componentWillMount() {
         // AuthenticationService.setupAxiosInterceptors();
-        console.log(this.props.match.params.planningUnitId)
+        // console.log(this.props.match.params.planningUnitId)
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -253,7 +253,7 @@ export default class EditPlanningUnitComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log(JSON.stringify(this.state.planningUnit))
+                                    // console.log(JSON.stringify(this.state.planningUnit))
                                     // AuthenticationService.setupAxiosInterceptors();
                                     PlanningUnitService.editPlanningUnit(this.state.planningUnit)
                                         .then(response => {
@@ -463,7 +463,7 @@ export default class EditPlanningUnitComponent extends Component {
 
     resetClicked() {
         // AuthenticationService.setupAxiosInterceptors();
-        console.log(this.props.match.params.planningUnitId)
+        // console.log(this.props.match.params.planningUnitId)
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             this.setState({
                 planningUnit: response.data

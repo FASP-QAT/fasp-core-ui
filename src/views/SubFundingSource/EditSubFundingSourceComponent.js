@@ -189,7 +189,7 @@ class EditSubFundingSourceComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
-                                            console.log("my response---", response);
+                                            // console.log("my response---", response);
                                             if (response.status == 200) {
                                                 this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
                                             }

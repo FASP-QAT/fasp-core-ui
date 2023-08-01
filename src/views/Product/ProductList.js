@@ -41,7 +41,7 @@ class ProductList extends Component {
   }
 
   editProduct(product) {
-    console.log(product);
+    // console.log(product);
     var productId = product.productId;
     this.props.history.push({
       pathname: `/product/editProduct/${productId}`,
@@ -60,7 +60,7 @@ class ProductList extends Component {
     ProductService.getProductList()
       .then(response => {
         if (response.status == 200) {
-          console.log(response.data);
+          // console.log(response.data);
           this.setState({
             table: response.data
           })

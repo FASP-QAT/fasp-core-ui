@@ -85,7 +85,7 @@ export default class ExportDataset extends Component {
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
-            console.log("in success");
+            // console.log("in success");
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var program = transaction.objectStore('datasetData');
@@ -95,19 +95,19 @@ export default class ExportDataset extends Component {
                 // Handle errors!
             };
             getRequest.onsuccess = function (event) {
-                console.log("in success")
+                // console.log("in success")
                 var json = getRequest.result;
-                console.log("Json Test123",json);
+                // console.log("Json Test123",json);
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < json.length; i++) {
                     var bytes = CryptoJS.AES.decrypt(json[i].programName, SECRET_KEY);
                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                    console.log("ProgramNameLabel", programNameLabel);
+                    // console.log("ProgramNameLabel", programNameLabel);
                     var bytes1 = CryptoJS.AES.decrypt(json[i].programData, SECRET_KEY);
                     var programData = bytes1.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-                    console.log("Program Json Test123",programJson);
+                    // console.log("Program Json Test123",programJson);
                     if (json[i].userId == userId) {
                         // if (programNameLabel != "") {
                         //     prgList.push({ value: json[i].id, label: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + json[i].version })
@@ -119,7 +119,7 @@ export default class ExportDataset extends Component {
                 }
             }.bind(this)
             transaction.oncomplete = function (event) {
-                console.log("ProgramList", prgList)
+                // console.log("ProgramList", prgList)
                 this.setState({
                     programList: prgList.sort(function (a, b) {
                         a = a.label.toLowerCase();
@@ -128,7 +128,7 @@ export default class ExportDataset extends Component {
                     }),
                     loading: false
                 })
-                console.log("ProgramList", this.state.programList);
+                // console.log("ProgramList", this.state.programList);
             }.bind(this)
         }.bind(this)
     }
@@ -137,7 +137,7 @@ export default class ExportDataset extends Component {
         this.setState({ loading: true });
         var zip = new JSZip();
         var programId = this.state.programId;
-        console.log("ProgramId", programId)
+        // console.log("ProgramId", programId)
         if (programId != "" && programId != undefined) {
             this.setState({
                 selectProgramMessage: ""
@@ -157,7 +157,7 @@ export default class ExportDataset extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    console.log("MyResult+++", myResult);
+                    // console.log("MyResult+++", myResult);
                     // var dTransaction = db1.transaction(['downloadedDatasetData'], 'readwrite');
                     // var dProgram = dTransaction.objectStore('downloadedDatasetData');
                     // var dGetRequest = dProgram.getAll();
@@ -179,7 +179,7 @@ export default class ExportDataset extends Component {
                             countryRequest.onsuccess = function (event) {
                                 var countryList = [];
                                 countryList = countryRequest.result;
-                                console.log("Country List--------------->", countryList);
+                                // console.log("Country List--------------->", countryList);
                                 var forecastingUnitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
                                 var forecastingUnitOs = forecastingUnitTransaction.objectStore('forecastingUnit');
                                 var forecastingUnitRequest = forecastingUnitOs.getAll();
@@ -263,7 +263,7 @@ export default class ExportDataset extends Component {
 
                                                                                     var isUnEncrepted = false;
                                                                                     var checkboxValue = document.getElementById('isExportData').checked;
-                                                                                    console.log("checkboxValue-----------> ", checkboxValue);
+                                                                                    // console.log("checkboxValue-----------> ", checkboxValue);
                                                                                     if (checkboxValue) {
                                                                                         isUnEncrepted = true;
                                                                                     } else {
@@ -308,8 +308,8 @@ export default class ExportDataset extends Component {
                                                                                                     // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                                                                     var labelName = (programId[j].label).replaceAll("/", "-")
                                                                                                     // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
-                                                                                                    console.log("Txt ", txt);
-                                                                                                    console.log("Txt 1", txt1);
+                                                                                                    // console.log("Txt ", txt);
+                                                                                                    // console.log("Txt 1", txt1);
 
                                                                                                     zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
 
@@ -348,8 +348,8 @@ export default class ExportDataset extends Component {
                                                                                                     // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                                                                     var labelName = (programId[j].label).replaceAll("/", "-")
                                                                                                     // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
-                                                                                                    console.log("Txt-unencrept data ", txt);
-                                                                                                    console.log("Txt 1-unencrept data", txt1);
+                                                                                                    // console.log("Txt-unencrept data ", txt);
+                                                                                                    // console.log("Txt 1-unencrept data", txt1);
 
                                                                                                     zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
 
@@ -410,7 +410,7 @@ export default class ExportDataset extends Component {
                 }.bind(this)
             // }.bind(this)
         } else {
-            console.log("in ekse")
+            // console.log("in ekse")
             this.setState({
                 selectProgramMessage: i18n.t('static.program.validselectprogramtext')
             })
@@ -452,7 +452,7 @@ export default class ExportDataset extends Component {
                 selectProgramMessage: i18n.t('static.program.validselectprogramtext')
             })
         }
-        console.log("Value", value);
+        // console.log("Value", value);
         // console.log(event.value)
         this.setState({ programId: value });
     }

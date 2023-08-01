@@ -534,7 +534,7 @@ class ModelingValidation extends Component {
             var data = [];
             var dataArr = [];
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
-            console.log("flatList###", flatList)
+            // console.log("flatList###", flatList)
             for (var j = 0; j < monthList.length; j++) {
                 data = [];
                 data[0] = moment(monthList[j]).format("YYYY-MM-DD");
@@ -737,7 +737,7 @@ class ModelingValidation extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push(newVList[v].versionId)
+                versionList.push({versionId:newVList[v].versionId,createdDate:newVList[v].createdDate})
             }
             var versionId = "";
             var event = {
@@ -746,9 +746,9 @@ class ModelingValidation extends Component {
                 }
             };
             if (versionList.length == 1) {
-                versionId = versionList[0];
-                event.target.value = versionList[0];
-            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetVersionId")).length > 0) {
+                versionId = versionList[0].versionId;
+                event.target.value = versionList[0].versionId;
+            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c.versionId == localStorage.getItem("sesDatasetVersionId")).length > 0) {
                 versionId = localStorage.getItem("sesDatasetVersionId");
                 event.target.value = localStorage.getItem("sesDatasetVersionId");
             }
@@ -791,7 +791,7 @@ class ModelingValidation extends Component {
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
-                console.log("responseData------->", responseData);
+                // console.log("responseData------->", responseData);
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
                     var json = {
@@ -856,6 +856,8 @@ class ModelingValidation extends Component {
                     for (var mr = 0; mr < myResult.length; mr++) {
                         if (myResult[mr].userId == userId) {
                             var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                            var databytes = CryptoJS.AES.decrypt(myResult[mr].programData, SECRET_KEY);
+                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                             if (index == -1) {
                                 var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
                                 var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
@@ -864,12 +866,12 @@ class ModelingValidation extends Component {
                                     id: myResult[mr].programId,
                                     name: getLabelText(programNameJson, this.state.lang),
                                     code: myResult[mr].programCode,
-                                    versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                                    versionList: [{ versionId: myResult[mr].version + "  (Local)",createdDate:programData.currentVersion.createdDate }]
                                 }
                                 datasetList.push(json)
                             } else {
                                 var existingVersionList = datasetList[index].versionList;
-                                existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                                existingVersionList.push({ versionId: myResult[mr].version + "  (Local)",createdDate:programData.currentVersion.createdDate })
                                 datasetList[index].versionList = existingVersionList
                             }
                         }
@@ -1468,8 +1470,8 @@ class ModelingValidation extends Component {
         let versions = versionList.length > 0
             && versionList.map((item, i) => {
                 return (
-                    <option key={i} value={item}>
-                        {item} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+                    <option key={i} value={item.versionId}>
+                        {item.versionId} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
@@ -1765,7 +1767,7 @@ class ModelingValidation extends Component {
 
                                     {/* {this.state.show && */}
                                     <div className="row">
-                                        <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin">
+                                        <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
 
                                             {/* // <div className="table-scroll">
                                                     // <div className="table-wrap table-responsive"> */}

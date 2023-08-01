@@ -4,7 +4,7 @@ import { Enabled, PageFitMode } from 'basicprimitives';
 
 class Sample extends Component {
   componentDidMount(){
-    console.log("Sample component called-----------");
+    // console.log("Sample component called-----------");
   }
   render() {
     var photos = {

@@ -23,6 +23,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
 import CryptoJS from 'crypto-js'
+import DropdownService from '../../api/DropdownService.js';
 
 
 const entityname = i18n.t('static.mt.shipmentLinkingNotification');
@@ -68,12 +69,15 @@ export default class ShipmentLinkingNotifications extends Component {
         this.viewBatchData = this.viewBatchData.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.selectedForNotification = this.selectedForNotification.bind(this)
+        this.loaded = this.loaded.bind(this);
+        this.loaded1 = this.loaded1.bind(this);
+        this.selected = this.selected.bind(this);
     }
 
     viewBatchData(event, row) {
-        console.log("event---", event);
-        console.log("row---", row);
-        console.log("row length---", row.shipmentList.length);
+        // console.log("event---", event);
+        // console.log("row---", row);
+        // console.log("row length---", row.shipmentList.length);
         if (row.shipmentList.length > 1 || (row.shipmentList.length == 1 && row.shipmentList[0].batchNo != null)) {
             var batchDetails = row.shipmentList.filter(c => (c.fileName === row.maxFilename));
 
@@ -97,7 +101,7 @@ export default class ShipmentLinkingNotifications extends Component {
         let planningUnits = this.state.planningUnits;
         let planningUnitArray = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 
@@ -150,7 +154,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 }
                 changedmtList.push(json);
             }
-            console.log("FINAL SUBMIT changedmtList---", changedmtList);
+            // console.log("FINAL SUBMIT changedmtList---", changedmtList);
             ManualTaggingService.updateNotification(changedmtList)
                 .then(response => {
                     // document.getElementById('div2').style.display = 'block';
@@ -163,13 +167,12 @@ export default class ShipmentLinkingNotifications extends Component {
                     },
                         () => {
                             this.hideSecondComponent();
-                            this.filterData(this.state.planningUnitIds);
-                            this.getNotificationSummary();
+                            this.getNotificationSummary(0);
                         })
 
                 }).catch(
                     error => {
-                        console.log("Error@@@@@@@@@@", error)
+                        // console.log("Error@@@@@@@@@@", error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 // message: 'static.unkownError',
@@ -247,7 +250,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                        console.log("------------------1----------------------")
+                        // console.log("------------------1----------------------")
                         valid = false;
                     } else {
                         // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
@@ -255,19 +258,19 @@ export default class ShipmentLinkingNotifications extends Component {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                            console.log("------------------2----------------------")
+                            // console.log("------------------2----------------------")
                             valid = false;
                         } else {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setComments(col, "");
-                            console.log("------------------3----------------------")
+                            // console.log("------------------3----------------------")
                         }
 
                     }
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    console.log("------------------4----------------------")
+                    // console.log("------------------4----------------------")
                 }
 
             }
@@ -286,18 +289,18 @@ export default class ShipmentLinkingNotifications extends Component {
         //         this.el.setStyle(col, "background-color", "transparent");
         //         this.el.setStyle(col, "background-color", "yellow");
         //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-        //         console.log("------------------5----------------------")
+        //         // console.log("------------------5----------------------")
         //     } else {
         //         // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
         //         if (!(reg.test(value))) {
         //             this.el.setStyle(col, "background-color", "transparent");
         //             this.el.setStyle(col, "background-color", "yellow");
         //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-        //             console.log("------------------6----------------------")
+        //             // console.log("------------------6----------------------")
         //         } else {
         //             this.el.setStyle(col, "background-color", "transparent");
         //             this.el.setComments(col, "");
-        //             console.log("------------------7----------------------")
+        //             // console.log("------------------7----------------------")
 
         //         }
 
@@ -322,7 +325,7 @@ export default class ShipmentLinkingNotifications extends Component {
         //             this.el.setValueFromCoords(11, y, Math.round(qty), true);
         //             this.el.setStyle(("K").concat(parseInt(y) + 1), "background-color", "transparent");
         //             this.el.setComments(("K").concat(parseInt(y) + 1), "");
-        //             console.log("------------------8----------------------")
+        //             // console.log("------------------8----------------------")
         //         }
         //     }
         // }
@@ -344,7 +347,7 @@ export default class ShipmentLinkingNotifications extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
-            // console.log("RESP---------", parseFloat(rowData[3]));
+            // // console.log("RESP---------", parseFloat(rowData[3]));
             elInstance.setValueFromCoords(10, y, parseFloat(rowData[10]), true);
         }
         elInstance.setValueFromCoords(13, y, 1, true);
@@ -394,8 +397,7 @@ export default class ShipmentLinkingNotifications extends Component {
 
     componentDidMount() {
         this.hideFirstComponent();
-        this.getProgramList();
-        this.getNotificationSummary();
+        this.getNotificationSummary(1);
     }
 
     filterData = (planningUnitIds) => {
@@ -422,9 +424,9 @@ export default class ShipmentLinkingNotifications extends Component {
                 ManualTaggingService.getShipmentLinkingNotification(this.state.programDataJson.programId, this.state.programDataJson.version)
                     .then(response => {
                         let list = (addressed != -1 ? response.data.filter(c => (c.addressed == (addressed == 1 ? true : false))) : response.data);
-                        console.log("List@@@@@@@", list)
+                        // console.log("List@@@@@@@", list)
                         var programDataJson = this.state.programDataJson;
-                        console.log("programDataJson@@@@@@@@@@@", programDataJson)
+                        // console.log("programDataJson@@@@@@@@@@@", programDataJson)
                         var shipmentList = [];
                         var roPrimeNoList = [];
                         var planningUnitDataList = programDataJson.programData.planningUnitDataList;
@@ -432,7 +434,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
                         var gprogramJson = JSON.parse(gprogramData);
                         var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
-                        console.log("linkedShipmentsList@@@@@@@@@", linkedShipmentsList);
+                        // console.log("linkedShipmentsList@@@@@@@@@", linkedShipmentsList);
                         for (var pu = 0; pu < planningUnitIds.length; pu++) {
                             var planningUnitData = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIds[pu].value)[0];
                             var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
@@ -466,7 +468,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                 shipmentLinkingId: list[l].shipmentLinkingId,
                                 realmCountryPlanningUnit: shipmentListFilter[0].realmCountryPlanningUnit
                             }
-                            console.log("Json@@@@@@@@", json)
+                            // console.log("Json@@@@@@@@", json)
                             outputList.push(json);
                         }
 
@@ -479,7 +481,7 @@ export default class ShipmentLinkingNotifications extends Component {
                         }
                         ManualTaggingService.getDataBasedOnRoNoAndRoPrimeLineNo(roPrimeNoList)
                             .then(response => {
-                                console.log("In eklseresponse.data@@@@@@@@@@@@@@", response.data)
+                                // console.log("In eklseresponse.data@@@@@@@@@@@@@@", response.data)
                                 this.setState({
                                     outputList: outputList,
                                     roPrimeNoListOriginal: response.data
@@ -492,7 +494,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             );
                     }).catch(
                         error => {
-                            console.log("Error@@@@@@@@@@", error)
+                            // console.log("Error@@@@@@@@@@", error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     // message: 'static.unkownError',
@@ -558,7 +560,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 })
             }
             // else if (programId == -1) {
-            //     console.log("2-programId------>", programId);
+            //     // console.log("2-programId------>", programId);
             //     this.setState({
             //         outputList: [],
             //         message: i18n.t('static.program.validselectprogramtext'),
@@ -568,7 +570,7 @@ export default class ShipmentLinkingNotifications extends Component {
             //         this.el.destroy();
             //     });
             // } else if (planningUnitIds != null && planningUnitIds != "") {
-            //     console.log("3-programId------>", programId);
+            //     // console.log("3-programId------>", programId);
             //     this.setState({
             //         outputList: [],
             //         message: i18n.t('static.procurementUnit.validPlanningUnitText'),
@@ -616,10 +618,14 @@ export default class ShipmentLinkingNotifications extends Component {
                         proList.push(programJson)
                     }
                 }
-                console.log("proList.length@@@@@@@@@@", proList.length)
+                // console.log("proList.length@@@@@@@@@@", proList.length)
                 if (proList.length == 1) {
                     this.setState({
-                        programs: proList,
+                        programs: proList.sort(function (a, b) {
+                            a = a.label.toLowerCase();
+                            b = b.label.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                          }),
                         loading: false,
                         programId: proList[0].value
                     }, () => {
@@ -628,7 +634,11 @@ export default class ShipmentLinkingNotifications extends Component {
                 } else {
                     if (localStorage.getItem("sesProgramId") != '' && localStorage.getItem("sesProgramId") != undefined) {
                         this.setState({
-                            programs: proList,
+                            programs: proList.sort(function (a, b) {
+                                a = a.label.toLowerCase();
+                                b = b.label.toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                              }),
                             loading: false,
                             programId: localStorage.getItem("sesProgramId")
                         }, () => {
@@ -636,7 +646,11 @@ export default class ShipmentLinkingNotifications extends Component {
                         });
                     } else {
                         this.setState({
-                            programs: proList,
+                            programs: proList.sort(function (a, b) {
+                                a = a.label.toLowerCase();
+                                b = b.label.toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                              }),
                             loading: false
                         })
                     }
@@ -924,7 +938,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 // var elInstance = el.jexcel;
                 // if (y != null) {
                 //     var rowData = elInstance.getRowData(y);
-                //     console.log("RowData@@@@@@@@", rowData)
+                //     // console.log("RowData@@@@@@@@", rowData)
                 //     if (rowData[20] == 1) {
                 //         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                 //         cell.classList.add('readonly');
@@ -978,7 +992,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                         });
                                     }).catch(
                                         error => {
-                                            console.log("Error@@@@@@@@@@", error)
+                                            // console.log("Error@@@@@@@@@@", error)
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     // message: 'static.unkownError',
@@ -1053,11 +1067,11 @@ export default class ShipmentLinkingNotifications extends Component {
             data[0] = getLabelText(notificationSummaryList[j].label);
             data[1] = notificationSummaryList[j].notificationCount;
             data[2] = notificationSummaryList[j].programId;
-            data[3] = this.state.programs.filter(c => c.programId == notificationSummaryList[j].programId).sort((a, b) => {
-                var itemLabelA = a.version;
-                var itemLabelB = b.version
-                return itemLabelA < itemLabelB ? 1 : -1;
-            })[0].value
+            // data[3] = this.state.programs.filter(c => c.programId == notificationSummaryList[j].programId).sort((a, b) => {
+            //     var itemLabelA = a.version;
+            //     var itemLabelB = b.version
+            //     return itemLabelA < itemLabelB ? 1 : -1;
+            // })[0].value
             notificationSummaryArray[count] = data;
             count++;
         }
@@ -1136,8 +1150,8 @@ export default class ShipmentLinkingNotifications extends Component {
     selectedForNotification = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if (y != 0) {
-                console.log("ProgramId@@@@@@@", this.state.programId.split("_")[0]);
-                console.log("VersionId@@@@@@@", this.state.programId.split("_")[1].substring(1) + "  (Local)");
+                // console.log("ProgramId@@@@@@@", this.state.programId.split("_")[0]);
+                // console.log("VersionId@@@@@@@", this.state.programId.split("_")[1].substring(1) + "  (Local)");
                 localStorage.setItem("sesProgramIdReport", this.state.programId.split("_")[0]);
                 localStorage.setItem("sesVersionIdReport", this.state.programId.split("_")[1].substring(1) + "  (Local)");
 
@@ -1146,59 +1160,22 @@ export default class ShipmentLinkingNotifications extends Component {
         }
     }
 
-    selected = function (instance, x1, y1, x2, y2, origin) {
+    selected = function (instance, cell, x, y, value, e) {
         var instance = (instance).jexcel;
-        console.log("RESP------>x1", x1);
-        console.log("RESP------>y1", y1);
-        console.log("RESP------>x2", x2);
-        console.log("RESP------>y2", y2);
-        console.log("RESP------>origin-x1", instance.getValueFromCoords(2, y1));
-
-
-        // if (y1 == 0 && y2 != 0) {
-        //     console.log("RESP------>Header");
-        // } else {
-        //     console.log("RESP------>Not");
-        //     this.setState({
-        //         programId: instance.getValueFromCoords(2, y1)
-        //     }, () => {
-        //         document.getElementById("addressed").value = 0;
-        //         this.getPlanningUnitList();
-        //     })
-        // }
-        let typeofColumn = instance.selectedHeader;
-        if (typeof typeofColumn === 'string') {
-            console.log("RESP------>Header");
-        } else {
-            console.log("RESP------>not Header");
-            this.setState({
-                programId: instance.getValueFromCoords(3, y1)
-            }, () => {
-                document.getElementById("addressed").value = 0;
-                this.getPlanningUnitList();
-            })
+        if (e.buttons == 1) {
+            if (y != 0) {
+                this.setState({
+                    programId: this.state.programs.filter(c => c.programId == this.state.instance.getValueFromCoords(2, x)).sort((a, b) => {
+                        var itemLabelA = a.version;
+                        var itemLabelB = b.version
+                        return itemLabelA < itemLabelB ? 1 : -1;
+                    })[0].value
+                }, () => {
+                    document.getElementById("addressed").value = 0;
+                    this.getPlanningUnitList();
+                })
+            }
         }
-
-        // if ((x == 0 && value != 0) || (y == 0)) {
-        // // console.log("HEADER SELECTION--------------------------");
-        // } else {
-        // var instance = (instance).jexcel;
-        // console.log("selected instance---", instance)
-        // console.log("selected cell---", cell)
-        // console.log("selected x---", x)
-        // console.log("selected y---", y)
-        // console.log("selected value---", value)
-        // // console.log("selected program---", this.el);
-        // console.log("selected program id---", instance.getValueFromCoords(2, x))
-        // if (instance.getValueFromCoords(2, x) != null && instance.getValueFromCoords(2, x) != "") {
-        // this.setState({
-        // programId: instance.getValueFromCoords(2, x)
-        // }, () => {
-        // this.getPlanningUnitList();
-        // })
-        // }
-        // }
-
     }.bind(this)
 
     loaded1 = function (instance, cell, x, y, value) {
@@ -1206,9 +1183,9 @@ export default class ShipmentLinkingNotifications extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        // console.log("asterisk---", document.getElementsByClassName("resizable")[2])
+        // // console.log("asterisk---", document.getElementsByClassName("resizable")[2])
         // var asterisk = document.getElementsByClassName("resizable")[2];
-        // console.log("asterisk---", document.getElementsByClassName("jss")[2].firstChild.nextSibling)
+        // // console.log("asterisk---", document.getElementsByClassName("jss")[2].firstChild.nextSibling)
 
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
 
@@ -1219,11 +1196,11 @@ export default class ShipmentLinkingNotifications extends Component {
 
 
 
-    getNotificationSummary() {
+    getNotificationSummary(callGetProgram) {
         ManualTaggingService.getNotificationSummary()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("notification summary---", response.data);
+                    // console.log("notification summary---", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1234,6 +1211,11 @@ export default class ShipmentLinkingNotifications extends Component {
                         notificationSummary: listArray,
                         loading: false
                     }, () => {
+                        if (callGetProgram) {
+                            this.getProgramList();
+                        } else {
+                            this.filterData(this.state.planningUnitIds);
+                        }
                         this.buildNotificationSummaryJExcel();
                     })
 
@@ -1251,7 +1233,7 @@ export default class ShipmentLinkingNotifications extends Component {
                 }
             }).catch(
                 error => {
-                    console.log("Error@@@@@@@@@@@", error)
+                    // console.log("Error@@@@@@@@@@@", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             // message: 'static.unkownError',
@@ -1337,7 +1319,7 @@ export default class ShipmentLinkingNotifications extends Component {
             var itemLabelB = moment(b.dataReceivedOn);
             return itemLabelA < itemLabelB ? 1 : -1;
         })
-        console.log("Order History", this.state.artmisHistory);
+        // console.log("Order History", this.state.artmisHistory);
         for (var sb = 0; sb < orderHistory.length; sb++) {
             var data = [];
             data[0] = orderHistory[sb].procurementAgentOrderNo;
@@ -1417,7 +1399,7 @@ export default class ShipmentLinkingNotifications extends Component {
             var itemLabelB = moment(b.dataReceivedOn);
             return itemLabelA < itemLabelB ? 1 : -1;
         })
-        console.log("Order History")
+        // console.log("Order History")
         for (var sb = 0; sb < shipmentHistory.length; sb++) {
             var data = [];
             data[0] = shipmentHistory[sb].procurementAgentShipmentNo;
@@ -1485,9 +1467,9 @@ export default class ShipmentLinkingNotifications extends Component {
     loadedOrderHistory(instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         // var asterisk = document.getElementsByClassName("resizable")[4];
-        console.log("document.getElementsByClassName@Mohit", document.getElementsByClassName("jss"))
+        // console.log("document.getElementsByClassName@Mohit", document.getElementsByClassName("jss"))
         var asterisk = document.getElementsByClassName("jss")[2].firstChild.nextSibling;
-        // console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
+        // // console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
         var tr = asterisk.firstChild;
         tr.children[8].title = i18n.t('static.manualTagging.changeOrderOrder');
     }
@@ -1497,120 +1479,125 @@ export default class ShipmentLinkingNotifications extends Component {
         // var asterisk = document.getElementsByClassName("resizable")[6];
         var asterisk = document.getElementsByClassName("jss")[3].firstChild.nextSibling;
 
-        // console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
+        // // console.log("Astrisk Mohit@@@@@@@@@", document.getElementsByClassName("resizable"))
         var tr = asterisk.firstChild;
         tr.children[7].title = i18n.t('static.manualTagging.changeOrderShipment');
     }
 
     getPlanningUnitList() {
-        console.log("this.state.programId.split@@@@", this.state.programId);
+        // console.log("this.state.programId.split@@@@", this.state.programId);
         var programId = this.state.programId != -1 && this.state.programId != undefined ? this.state.programId.toString().split("_")[0] : -1;
         if (programId != -1) {
-            ProgramService.getProgramPlaningUnitListByProgramId(programId)
-                .then(response => {
-                    if (response.status == 200) {
-                        var listArray = response.data;
-                        listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
-                        var db1;
-                        var storeOS;
-                        getDatabase();
-                        var thisAsParameter = this;
-                        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        openRequest.onerror = function (event) {
-                            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                            this.props.updateState("color", "#BA0C2F");
-                            this.props.hideFirstComponent();
-                        }.bind(this);
-                        openRequest.onsuccess = function (e) {
-                            db1 = e.target.result;
-                            var transaction;
-                            var programTransaction;
-                            transaction = db1.transaction(['programData'], 'readwrite');
-                            programTransaction = transaction.objectStore('programData');
-                            // Yaha program Id dalna hai actual wala
-                            var curUser = AuthenticationService.getLoggedInUserId();
-                            var programId = (this.state.programId);
-                            console.log("ProgramId@@@@@@@@@@@@", programId)
-                            var programRequest = programTransaction.get(programId);
-                            programRequest.onsuccess = function (event) {
-                                var programDataJson = programRequest.result;
-                                this.setState({
-                                    planningUnits: listArray,
-                                    programDataJson: programDataJson
-                                }, () => {
-                                    this.getPlanningUnitArray();
-                                })
-                            }.bind(this)
-                        }.bind(this)
-                    }
-                    else {
-
-                        this.setState({
-                            message: response.data.messageCode,
-                            color: '#BA0C2F'
-                        },
-                            () => {
-                                this.hideSecondComponent();
-                            })
-                    }
-                }).catch(
-                    error => {
-                        console.log("Error@@@@@@@@@@", error)
-                        if (error.message === "Network Error") {
+            var programJson = {
+                tracerCategoryIds: [],
+                programIds: [programId]
+            }
+            // console.log('**' + programJson);
+            DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+                if (response.status == 200) {
+                    // console.log('**' + JSON.stringify(response.data));
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var thisAsParameter = this;
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onerror = function (event) {
+                        this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                        this.props.updateState("color", "#BA0C2F");
+                        this.props.hideFirstComponent();
+                    }.bind(this);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var transaction;
+                        var programTransaction;
+                        transaction = db1.transaction(['programData'], 'readwrite');
+                        programTransaction = transaction.objectStore('programData');
+                        // Yaha program Id dalna hai actual wala
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        var programId = (this.state.programId);
+                        // console.log("ProgramId@@@@@@@@@@@@", programId)
+                        var programRequest = programTransaction.get(programId);
+                        programRequest.onsuccess = function (event) {
+                            var programDataJson = programRequest.result;
                             this.setState({
-                                // message: 'static.unkownError',
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                color: '#BA0C2F',
-                                loading: false
+                                planningUnits: listArray,
+                                programDataJson: programDataJson
                             }, () => {
-                                this.hideSecondComponent();
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
+                                this.getPlanningUnitArray();
+                            })
+                        }.bind(this)
+                    }.bind(this)
+                }
+                else {
 
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        color: '#BA0C2F',
-                                        loading: false
-                                    }, () => {
-                                        this.hideSecondComponent();
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        color: '#BA0C2F',
-                                        loading: false
-                                    }, () => {
-                                        this.hideSecondComponent();
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        color: '#BA0C2F',
-                                        loading: false
-                                    }, () => {
-                                        this.hideSecondComponent();
-                                    });
-                                    break;
-                            }
+                    this.setState({
+                        message: response.data.messageCode,
+                        color: '#BA0C2F'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    // console.log("Error@@@@@@@@@@", error)
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            color: '#BA0C2F',
+                            loading: false
+                        }, () => {
+                            this.hideSecondComponent();
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    color: '#BA0C2F',
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    color: '#BA0C2F',
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    color: '#BA0C2F',
+                                    loading: false
+                                }, () => {
+                                    this.hideSecondComponent();
+                                });
+                                break;
                         }
                     }
-                );
+                }
+            );
         } else {
             this.setState({
                 outputList: [],
@@ -1852,7 +1839,7 @@ export default class ShipmentLinkingNotifications extends Component {
         const { planningUnits } = this.state;
         let planningUnitMultiList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 

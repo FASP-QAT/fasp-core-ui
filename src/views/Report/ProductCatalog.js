@@ -19,7 +19,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Online, Offline } from 'react-detect-offline';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling, API_URL } from '../../Constants.js';
+import { SECRET_KEY, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, DRAFT_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, polling, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -38,6 +38,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { act } from 'react-test-renderer';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import DropdownService from '../../api/DropdownService';
 
 
 // const { getToggledOptions } = utils;
@@ -245,10 +246,9 @@ class ProductCatalog extends Component {
 
 
             // AuthenticationService.setupAxiosInterceptors();
-            let realmId = AuthenticationService.getRealmId();
             if (isSiteOnline()) {
-                TracerCategoryService.getTracerCategoryByProgramId(realmId,programId).then(response => {
-
+                // // console.log("programids=====>", programIdsValue);
+                DropdownService.getTracerCategoryForMultipleProgramsDropdownList([programId]).then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -348,7 +348,7 @@ class ProductCatalog extends Component {
                                 proList.push(myResult[i].planningUnit)
                             }
                         }
-                        console.log('proList', proList)
+                        // console.log('proList', proList)
                         var planningunitTransaction1 = db1.transaction(['planningUnit'], 'readwrite');
                         var planningunitOs1 = planningunitTransaction1.objectStore('planningUnit');
                         var planningunitRequest1 = planningunitOs1.getAll();
@@ -360,18 +360,18 @@ class ProductCatalog extends Component {
                             var myResult = [];
                             myResult = planningunitRequest1.result;
                             var flList = []
-                            console.log(myResult)
+                            // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
                                 for (var j = 0; j < proList.length; j++) {
                                     if (myResult[i].planningUnitId == proList[j].id) {
-                                        console.log(myResult[i].planningUnitId, proList[j].id)
+                                        // console.log(myResult[i].planningUnitId, proList[j].id)
 
                                         flList.push(myResult[i].forecastingUnit)
                                         planningList.push(myResult[i])
                                     }
                                 }
                             }
-                            console.log('flList', flList)
+                            // console.log('flList', flList)
 
                             var tcList = [];
                             flList.filter(function (item) {
@@ -382,7 +382,7 @@ class ProductCatalog extends Component {
                                 return null;
                             });
 
-                            console.log('tcList', tcList)
+                            // console.log('tcList', tcList)
                             var lang = this.state.lang;
                             this.setState({
                                 tracerCategories: tcList.sort(function (a, b) {
@@ -418,19 +418,27 @@ class ProductCatalog extends Component {
         let realmId = AuthenticationService.getRealmId();
         // ProgramService.getProgramByRealmId(realmId)
         if (isSiteOnline()) {
-            ProgramService.getProgramList()
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
-                    console.log("sesProgramIdReport----->", localStorage.getItem("sesProgramIdReport"));
+                    // console.log("sesProgramIdReport----->", localStorage.getItem("sesProgramIdReport"));
                     var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var proList = []
+                    for (var i = 0; i < listArray.length; i++) {
+                        var programJson = {
+                            programId: listArray[i].id,
+                            label: listArray[i].label,
+                            programCode: listArray[i].code
+                        }
+                        proList[i] = programJson
+                    }
+                    proList.sort((a, b) => {
+                        var itemLabelA = a.programCode.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.programCode.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                         this.setState({
-                            programs: listArray, loading: false,
+                            programs: proList, loading: false,
                             programId: localStorage.getItem("sesProgramIdReport")
                         }, () => {
                             this.fetchData();
@@ -511,7 +519,7 @@ class ProductCatalog extends Component {
             //     }
             // );
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
             this.setState({ loading: false })
         }
@@ -545,13 +553,13 @@ class ProductCatalog extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -565,8 +573,8 @@ class ProductCatalog extends Component {
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = a.programCode.toLowerCase();
+                            b = b.programCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         programId: localStorage.getItem("sesProgramIdReport")
@@ -578,8 +586,8 @@ class ProductCatalog extends Component {
                 } else {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = a.programCode.toLowerCase();
+                            b = b.programCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     })
@@ -599,7 +607,7 @@ class ProductCatalog extends Component {
 
 
         let programId = document.getElementById("programId").value
-        console.log(programId)
+        // console.log(programId)
         if (programId > 0) {
 
             // AuthenticationService.setupAxiosInterceptors();
@@ -607,7 +615,7 @@ class ProductCatalog extends Component {
             if (isSiteOnline()) {
                 ProductService.getProductCategoryListByProgram(realmId, programId)
                     .then(response => {
-                        console.log(response.data);
+                        // console.log(response.data);
                         // var list = response.data.slice(1);
                         var list = response.data;
                         list.sort((a, b) => {
@@ -615,7 +623,7 @@ class ProductCatalog extends Component {
                             var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
-                        console.log("my list=======", list);
+                        // console.log("my list=======", list);
 
                         this.setState({
                             productCategories: list
@@ -677,14 +685,14 @@ class ProductCatalog extends Component {
                     ppuRequest.onsuccess = function (e) {
                         var result3 = ppuRequest.result;
                         result3 = result3.filter(c => c.program.id == programId);
-                        console.log("4------>", result3);
+                        // console.log("4------>", result3);
 
                         var outPutList = [];
                         var json;
                         for (var i = 0; i < result3.length; i++) {
-                            console.log("product category id---", result3[i]);
-                            console.log("product category id---", result3[i].productCategory.id);
-                            console.log("product category label---", result3[i].productCategory.label.label_en);
+                            // console.log("product category id---", result3[i]);
+                            // console.log("product category id---", result3[i].productCategory.id);
+                            // console.log("product category label---", result3[i].productCategory.label.label_en);
                             json = {
                                 id: result3[i].productCategory.id,
                                 label: getLabelText(result3[i].productCategory.label, this.state.lang)
@@ -692,12 +700,12 @@ class ProductCatalog extends Component {
                             outPutList = outPutList.concat(json);
                             // outPutList.push(json);
                         }
-                        console.log("outPutList-----------", outPutList);
+                        // console.log("outPutList-----------", outPutList);
                         // const data = [ /* any list of objects */ ];
                         const set = new Set(outPutList.map(item => JSON.stringify(item)));
                         const dedup = [...set].map(item => JSON.parse(item));
-                        console.log(`Removed ${outPutList.length - dedup.length} elements`);
-                        console.log("dedup----------------", dedup);
+                        // console.log(`Removed ${outPutList.length - dedup.length} elements`);
+                        // console.log("dedup----------------", dedup);
                         var lang = this.state.lang;
                         this.setState({
                             loading: false,
@@ -723,7 +731,7 @@ class ProductCatalog extends Component {
     buildJexcel() {
 
         let outPutList = this.state.outPutList;
-        // console.log("outPutList---->", outPutList);
+        // // console.log("outPutList---->", outPutList);
         let outPutArray = [];
         let count = 0;
 
@@ -749,7 +757,7 @@ class ProductCatalog extends Component {
         //     data = [];
         //     outPutArray[0] = data;
         // }
-        // console.log("outPutArray---->", outPutArray);
+        // // console.log("outPutArray---->", outPutArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -882,11 +890,11 @@ class ProductCatalog extends Component {
             if (isSiteOnline()) {
 
                 this.setState({ loading: true })
-                console.log("json---", json);
+                // console.log("json---", json);
                 // AuthenticationService.setupAxiosInterceptors();
                 ReportService.programProductCatalog(json)
                     .then(response => {
-                        console.log("-----response", JSON.stringify(response.data));
+                        // console.log("-----response", JSON.stringify(response.data));
                         var outPutList = response.data;
                         // var responseData = response.data;
                         this.setState({
@@ -1004,7 +1012,7 @@ class ProductCatalog extends Component {
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
                         var result = programRequest.result;
-                        console.log("1------>", result);
+                        // console.log("1------>", result);
 
                         var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
                         var fuOs = fuTransaction.objectStore('forecastingUnit');
@@ -1022,7 +1030,7 @@ class ProductCatalog extends Component {
                         }.bind(this);
                         fuRequest.onsuccess = function (e) {
                             var result1 = fuRequest.result;
-                            console.log("2------>", result1);
+                            // console.log("2------>", result1);
 
                             var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
                             var puOs = puTransaction.objectStore('planningUnit');
@@ -1040,7 +1048,7 @@ class ProductCatalog extends Component {
                             }.bind(this);
                             puRequest.onsuccess = function (e) {
                                 var result2 = puRequest.result;
-                                console.log("3------>", result2);
+                                // console.log("3------>", result2);
 
                                 var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                                 var ppuOs = ppuTransaction.objectStore('programPlanningUnit');
@@ -1060,12 +1068,12 @@ class ProductCatalog extends Component {
                                     // this.setState({ loading: true })
                                     var result3 = ppuRequest.result;
                                     result3 = result3.filter(c => c.program.id == programId);
-                                    console.log("4------>", result3);
+                                    // console.log("4------>", result3);
 
                                     var outPutList = [];
                                     for (var i = 0; i < result3.length; i++) {
                                         var filteredList = result2.filter(c => c.planningUnitId == result3[i].planningUnit.id);
-                                        console.log("5---->", filteredList);
+                                        // console.log("5---->", filteredList);
                                         var program = result3[i].program;
                                         var planningUnit = result3[i].planningUnit;
                                         var minMonthOfStock = result3[i].minMonthsOfStock;
@@ -1102,20 +1110,20 @@ class ProductCatalog extends Component {
                                     }
 
                                     if (productCategoryId > 0) {
-                                        // console.log("hiiiii1",productCategoryId);
+                                        // // console.log("hiiiii1",productCategoryId);
                                         var filteredPc = outPutList.filter(c => c.productCategory.id == productCategoryId);
                                         outPutList = filteredPc;
                                     } else {
                                         outPutList = outPutList;
                                     }
                                     if (tracerCategoryId > 0) {
-                                        // console.log("hiiiii2",tracerCategoryId);
+                                        // // console.log("hiiiii2",tracerCategoryId);
                                         var filteredTc = outPutList.filter(c => c.tracerCategory.id == tracerCategoryId);
                                         outPutList = filteredTc;
                                     } else {
                                         outPutList = outPutList;
                                     }
-                                    console.log("outPutList------>", outPutList);
+                                    // console.log("outPutList------>", outPutList);
                                     this.setState({ outPutList: outPutList, message: '' },
                                         () => { this.buildJexcel() });
 
@@ -1176,7 +1184,7 @@ class ProductCatalog extends Component {
         const { tracerCategories } = this.state;
         const { productCategoriesOffline } = this.state;
 
-        console.log("productCategoriesOffline---", productCategoriesOffline)
+        // console.log("productCategoriesOffline---", productCategoriesOffline)
 
         const columns = [
 
@@ -1477,7 +1485,7 @@ class ProductCatalog extends Component {
                                                 {tracerCategories.length > 0
                                                     && tracerCategories.map((item, i) => {
                                                         return (
-                                                            <option key={i} value={item.tracerCategoryId}>
+                                                            <option key={i} value={item.id}>
                                                                 {getLabelText(item.label, this.state.lang)}
                                                             </option>
                                                         )
@@ -1492,7 +1500,7 @@ class ProductCatalog extends Component {
                         </Col>
 
                         <div>
-                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable TableWidth100" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

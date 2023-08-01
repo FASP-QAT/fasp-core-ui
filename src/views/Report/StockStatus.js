@@ -1,4 +1,3 @@
-
 import React, { Component, lazy, Suspense, DatePicker } from 'react';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
@@ -145,7 +144,7 @@ class StockStatus extends Component {
       programId: event.target.value,
       versionId: ''
     }, () => {
-      console.log("ProgramId-------->1", this.state.programId);
+      // console.log("ProgramId-------->1", this.state.programId);
       localStorage.setItem("sesVersionIdReport", '');
       this.filterVersion();
     })
@@ -261,7 +260,7 @@ class StockStatus extends Component {
     // i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
     // i18n.t('static.report.actual').replaceAll(' ', '%20'),
     // i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
-    // (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20') + " | " + (i18n.t('static.report.procurementAgentName')),
+    // (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')),
     // i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
     // i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
     // i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
@@ -271,22 +270,36 @@ class StockStatus extends Component {
     //   // i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]
     // ])];
 
-    var A = "";
+    var A = ""
     // this.state.stockStatusList.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
     // (ele.shipmentInfo.map(item => {
     //   return (
-    //     item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code
-    //   )
+    //     item.shipmentQty + " | " + item.fundingSource.code + " | " + getLabelText(item.shipmentStatus.label, this.state.lang) + " | " + item.procurementAgent.code + 
+    //     (item.orderNo == null &&
+    //       item.primeLineNo == null &&
+    //       item.roNo == null &&
+    //       item.roPrimeLineNo == null
+    //         ? " | N/A"
+    //         : (item.roNo == null && item.roPrimeLineNo == null
+    //             ? ""
+    //             : " | " + item.roNo + "-" + item.roPrimeLineNo) +
+    //           (item.orderNo == null && item.primeLineNo == null
+    //             ? ""
+    //             : item.orderNo == null
+    //             ? ""
+    //             : " | " + item.orderNo) +
+    //           (item.primeLineNo == null ? "" : "-" + item.primeLineNo))
+    //     );
     // }).join(' \n')).replaceAll(' ', '%20')
     //   , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? ele.mos != null ? this.roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na") : ele.maxStock != null ? this.roundN(ele.maxStock) : "", ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
 
 
-    // for (var i = 0; i < A.length; i++) {
-    //   // console.log(A[i])
-    //   csvRow.push(A[i].join(","))
+    for (var i = 0; i < A.length; i++) {
+      // // console.log(A[i])
+      csvRow.push(A[i].join(","))
 
-    // }
-    var list = this.state.PlanningUnitDataForExport;
+    }
+    var list = this.state.PlanningUnitDataForExport.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
     list.map(
       (item, index) => {
         csvRow.push("")
@@ -295,12 +308,12 @@ class StockStatus extends Component {
         }
         csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"')
         var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
-        csvRow.push('"' + (i18n.t('static.supplyPlan.amcPastOrFuture').replaceAll(' ', '%20') + ' : ' + (ppu.monthsInPastForAmc)+"/"+(ppu.monthsInFutureForAmc) + '"'))
+        csvRow.push('"' + (i18n.t('static.supplyPlan.amcPastOrFuture').replaceAll(' ', '%20') + ' : ' + (ppu.monthsInPastForAmc) + "/" + (ppu.monthsInFutureForAmc) + '"'))
         if (item.data.length > 0 && item.data[0].planBasedOn == 1) {
           csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))
-          } else {
+        } else {
           csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + ' : ' + item.data[0].minStock + '"'))
-          }
+        }
         csvRow.push('"' + (i18n.t('static.report.shelfLife').replaceAll(' ', '%20') + ' : ' + ppu.shelfLife + '"'))
         if (item.data.length > 0 && item.data[0].planBasedOn == 1) {
           csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].maxMos + '"'))
@@ -314,7 +327,7 @@ class StockStatus extends Component {
         i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
         i18n.t('static.report.actual').replaceAll(' ', '%20'),
         i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
-        (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus')).replaceAll(' ', '%20') + " | " + (i18n.t('static.report.procurementAgentName')),
+        (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus').replaceAll(' ', '%20') + " | " + i18n.t('static.report.procurementAgentName') + " | " + i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')),
         i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
         i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
@@ -324,25 +337,41 @@ class StockStatus extends Component {
           // i18n.t('static.report.maxmonth').replaceAll(' ', '%20')]
         ])];
         A = headers
-        console.log(' item.data', item.data)
+        // console.log(' item.data', item.data)
         item.data.map(ele => A.push(this.addDoubleQuoteToRowContent([this.dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
         (ele.shipmentInfo.map(item1 => {
           return (
-            item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code
+            item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code +
+            (item1.orderNo == null &&
+              item1.primeLineNo == null &&
+              item1.roNo == null &&
+              item1.roPrimeLineNo == null
+                ? " | N/A"
+                : (item1.roNo == null && item1.roPrimeLineNo == null
+                    ? ""
+                    : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+                  (item1.orderNo == null && item1.primeLineNo == null
+                    ? ""
+                    : item1.orderNo == null
+                    ? ""
+                    : " | " + item1.orderNo) +
+                  (item1.primeLineNo == null
+                    ? ""
+                    : "-" + item1.primeLineNo))
           )
         }).join(' \n')).replaceAll(' ', '%20')
           , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.formatAmc(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundN(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
 
-        console.log('A===>', A)
+        // console.log('A===>', A)
         for (var i = 0; i < A.length; i++) {
-          //  console.log(A1[i])
+          //  // console.log(A1[i])
           csvRow.push(A[i].join(","))
 
         }
 
       })
     var csvString = csvRow.join("%0A")
-    // console.log('csvString' + csvString)
+    // // console.log('csvString' + csvString)
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
@@ -536,7 +565,7 @@ class StockStatus extends Component {
     var height = doc.internal.pageSize.height;
     // var h1 = 100;
     // var aspectwidth1 = (width - h1);
-    // console.log("Document+++", doc.internal)
+    // // console.log("Document+++", doc.internal)
     // doc.setTextColor("#002f6c");
     // doc.addImage(canvasImg, 'png', 50, 150, 750, 300, 'CANVAS');
 
@@ -551,7 +580,7 @@ class StockStatus extends Component {
       i18n.t('static.report.forecasted'),
       i18n.t('static.report.actual'),
       i18n.t('static.supplyPlan.qty'),
-      (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent'))),
+      (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo'))),
       i18n.t('static.supplyPlan.adj'),
       i18n.t('static.supplyplan.exipredStock'),
       i18n.t('static.supplyPlan.endingBalance'),
@@ -741,7 +770,7 @@ class StockStatus extends Component {
     // var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0];
     // pageArray.push({ "startPage": 1, "endPage": lastPage, "planningUnit": document.getElementById("planningUnitId").selectedOptions[0].text, "min": this.state.stockStatusList[0].minMos, "max": this.state.stockStatusList[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc, minStock: ppu.minQty, distributionLeadTime: ppu.distributionLeadTime, planBasedOn: ppu.planBasedOn });
     var list = this.state.PlanningUnitDataForExport
-    console.log("List@@@@@@@@Mohit", list)
+    // console.log("List@@@@@@@@Mohit", list)
     var count = 0;
     list.map(
       (item, itemCount) => {
@@ -751,37 +780,73 @@ class StockStatus extends Component {
         doc.setFontSize(8)
         doc.setTextColor("#002f6c");
         var ppu1 = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
+
         doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
           align: 'left'
-      })
-      doc.text(i18n.t('static.supplyPlan.amcPastOrFuture') + ' : ' + (ppu1.monthsInPastForAmc)+"/"+(ppu1.monthsInFutureForAmc), doc.internal.pageSize.width / 10, 100, {
+        })
+        doc.text(i18n.t('static.supplyPlan.amcPastOrFuture') + ' : ' + (ppu1.monthsInPastForAmc) + "/" + (ppu1.monthsInFutureForAmc), doc.internal.pageSize.width / 10, 100, {
           align: 'left'
-      })
-      doc.text(i18n.t('static.report.shelfLife') + ' : ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, 110, {
+        })
+        doc.text(i18n.t('static.report.shelfLife') + ' : ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, 110, {
           align: 'left'
-      })
-      if (ppu1.planBasedOn == 1) {
+        })
+        if (ppu1.planBasedOn == 1) {
           doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + item.data[0].minMos, doc.internal.pageSize.width / 10, 120, {
-              align: 'left'
+            align: 'left'
           })
-      } else {
+        } else {
           doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(ppu1.minQty), doc.internal.pageSize.width / 10, 120, {
-              align: 'left'
+            align: 'left'
           })
-      }
-      doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, 130, {
+        }
+        doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, 130, {
           align: 'left'
-      })
-      if (ppu1.planBasedOn == 1) {
+        })
+        if (ppu1.planBasedOn == 1) {
           doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, 140, {
-              align: 'left'
+            align: 'left'
           })
-      } else {
+        } else {
           doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(ppu1.distributionLeadTime), doc.internal.pageSize.width / 10, 140, {
-              align: 'left'
+            align: 'left'
           })
-      }         
-      // doc.setTextColor("#000");
+        }
+        // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
+        //   align: 'left'
+        // })
+        // doc.text(i18n.t('static.supplyPlan.amcPast') + ' : ' + ppu1.monthsInPastForAmc, doc.internal.pageSize.width / 10, 100, {
+        //   align: 'left'
+        // })
+        // doc.text(i18n.t('static.supplyPlan.amcFuture') + ' : ' + ppu1.monthsInFutureForAmc, doc.internal.pageSize.width / 10, 110, {
+        //   align: 'left'
+        // })
+        // doc.text(i18n.t('static.report.shelfLife') + ' : ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, 120, {
+        //   align: 'left'
+        // })
+        // if (ppu1.planBasedOn == 1) {
+        //   doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + item.data[0].minMos, doc.internal.pageSize.width / 10, 130, {
+        //     align: 'left'
+        //   })
+        // } else {
+        //   doc.text(i18n.t('static.product.minQuantity') + ' : ' + this.formatter(ppu1.minQty), doc.internal.pageSize.width / 10, 130, {
+        //     align: 'left'
+        //   })
+        // }
+        // doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, 140, {
+        //   align: 'left'
+        // })
+        // if (ppu1.planBasedOn == 1) {
+        //   doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, 150, {
+        //     align: 'left'
+        //   })
+        // } else {
+        //   doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(ppu1.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
+        //     align: 'left'
+        //   })
+        // }
+        // doc.setTextColor("#000");
+        // }         
+        // doc.setTextColor("#000");
         // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
         //   align: 'left'
         // })
@@ -793,9 +858,9 @@ class StockStatus extends Component {
         // })
 
         var canv = document.getElementById("cool-canvas" + count)
-        console.log('canv', canv)
+        // console.log('canv', canv)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
-        //console.log('canvasImg1',canvasImg1)    
+        //// console.log('canvasImg1',canvasImg1)    
         doc.addImage(canvasImg1, 'png', 50, 150, 750, 300, "a" + count, 'CANVAS')
         count++
 
@@ -804,7 +869,20 @@ class StockStatus extends Component {
           item.data.map(ele => [this.dateFormatter(ele.dt), this.formatter(ele.openingBalance), this.formatter(ele.forecastedConsumptionQty), this.formatter(ele.actualConsumptionQty), this.formatter(ele.shipmentQty),
           ele.shipmentInfo.map(item1 => {
             return (
-              item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code)
+              item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + (item1.orderNo == null &&
+                item1.primeLineNo == null &&
+                item1.roNo == null &&
+                item1.roPrimeLineNo == null
+                  ? " | N/A"
+                  : (item1.roNo == null && item1.roPrimeLineNo == null
+                      ? ""
+                      : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+                    (item1.orderNo == null && item1.primeLineNo == null
+                      ? ""
+                      : item1.orderNo == null
+                      ? ""
+                      : " | " + item1.orderNo) +
+                    (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
           }).join(' \n')
             , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.formatAmc(ele.amc)), ele.planBasedOn == 1 ? this.formatter(this.roundN(ele.mos)) : this.formatter(this.roundN(ele.maxStock)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
 
@@ -819,7 +897,7 @@ class StockStatus extends Component {
           i18n.t('static.report.forecasted'),
           i18n.t('static.report.actual'),
           i18n.t('static.supplyPlan.qty'),
-          (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent'))),
+          (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo'))),
           i18n.t('static.supplyPlan.adj'),
           i18n.t('static.supplyplan.exipredStock'),
           i18n.t('static.supplyPlan.endingBalance'),
@@ -1034,7 +1112,7 @@ class StockStatus extends Component {
 
       }
     )
-    console.log("PageArray+++", pageArray);
+    // console.log("PageArray+++", pageArray);
     addHeaders(doc, pageArray)
     addFooters(doc)
     doc.save(i18n.t('static.dashboard.stockstatus') + ".pdf")
@@ -1098,6 +1176,10 @@ class StockStatus extends Component {
             // var programJson = JSON.parse(programData);
 
             var programDataJson = programRequest.result.programData;
+            var gprogramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+            var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
+            var gprogramJson = JSON.parse(gprogramData);
+            var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
             var planningUnitDataList = programDataJson.planningUnitDataList;
             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
             var programJson = {}
@@ -1209,9 +1291,9 @@ class StockStatus extends Component {
 
                     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
                     let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
-                    console.log("EndDate+++", endDate)
+                    // console.log("EndDate+++", endDate)
                     var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
-                    console.log("ShipmentList+++", shipmentList);
+                    // console.log("ShipmentList+++", shipmentList);
                     var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
                     var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
                     var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
@@ -1245,8 +1327,14 @@ class StockStatus extends Component {
                         }
                         shList[idx].dataSource = simpleDsObject;
                       }
+                      for (var l = 0; l < linkedShipmentsList.length; l++) {
+                        if (shList[idx].parentShipmentId == linkedShipmentsList[l].parentShipmentId) {
+                          shList[idx].roNo = linkedShipmentsList[l].roNo
+                          shList[idx].roPrimeLineNo = linkedShipmentsList[l].roPrimeLineNo
+                        }
+                      }
                     })
-                    console.log("ShList+++", shList);
+                    // console.log("ShList+++", shList);
                     this.setState({
                       inList: inList,
                       coList: coList,
@@ -1268,14 +1356,14 @@ class StockStatus extends Component {
                     var monthstartfrom = this.state.rangeValue.from.month
                     for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                       var monthlydata = [];
-                      console.log(programJson)
+                      // console.log(programJson)
                       for (var month = monthstartfrom; month <= 12; month++) {
                         var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
                         var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                        console.log(dtstr, ' ', enddtStr)
+                        // console.log(dtstr, ' ', enddtStr)
                         var dt = dtstr
                         var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
-                        console.log(list)
+                        // console.log(list)
                         if (list.length > 0) {
                           var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
                           var totalShipmentQty = 0;
@@ -1310,12 +1398,14 @@ class StockStatus extends Component {
                           conListAct.map(elt => {
                             totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
-                          console.log(conList)
-                          console.log(totalforecastConsumption)
+                          // console.log(conList)
+                          // console.log(totalforecastConsumption)
+                          // console.log("paResult==>>>", shiplist)
+
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
-                            actualConsumptionQty: list[0].actualFlag?Number(totalActualConsumption):null,
+                            actualConsumptionQty: list[0].actualFlag ? Number(totalActualConsumption) : null,
                             actualConsumption: list[0].actualFlag,
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
@@ -1342,7 +1432,7 @@ class StockStatus extends Component {
                             dt: new Date(from, month - 1),
                             consumptionQty: 0,
                             actualConsumption: false,
-                            actualConsumptionQty:null,
+                            actualConsumptionQty: null,
                             shipmentQty: 0,
                             shipmentInfo: [],
                             adjustment: 0,
@@ -1365,7 +1455,7 @@ class StockStatus extends Component {
                           }
                         }
                         data.push(json)
-                        console.log(json)
+                        // console.log("jsjsjs", json)
                         if (month == this.state.rangeValue.to.month && from == to) {
                           this.setState({
                             stockStatusList: data,
@@ -1443,7 +1533,7 @@ class StockStatus extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ReportService.getStockStatusData(inputjson)
           .then(response => {
-            console.log("Response", JSON.stringify(response.data));
+            // console.log("Response", JSON.stringify(response.data));
             var inventoryList = [];
             var consumptionList = [];
             var shipmentList = [];
@@ -1456,7 +1546,7 @@ class StockStatus extends Component {
               c.shipmentInfo.map(si => shipmentList.push(si))
             }
             );
-            console.log("ConsumptionList+++", filteredResponseData);
+            // console.log("ConsumptionList+++", filteredResponseData);
             this.setState({
               firstMonthRegionCount: responseData.length > 0 ? responseData[0].regionCount : 1,
               firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
@@ -1469,7 +1559,7 @@ class StockStatus extends Component {
             })
           }).catch(
             error => {
-              console.log("Error+++", error);
+              // console.log("Error+++", error);
               this.setState({
                 stockStatusList: [], loading: false
               })
@@ -1647,11 +1737,11 @@ class StockStatus extends Component {
                   var paResult = paRequest.result;
                   // var selectedPlanningUnitdata = {};
                   // var selectedplanningunit = this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0]
-                  // console.log('selectedplanningunit', selectedplanningunit)
+                  // // console.log('selectedplanningunit', selectedplanningunit)
                   // var planningunitList = this.state.planningUnits.filter(c => c.planningUnit.id != document.getElementById("planningUnitId").value)
                   // planningunitList.push(selectedplanningunit)
                   var pcnt = 0
-                  // console.log('planningunitList', planningunitList)
+                  // // console.log('planningunitList', planningunitList)
                   var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
                     a = a.label.toLowerCase();
                     b = b.label.toLowerCase();
@@ -1679,7 +1769,7 @@ class StockStatus extends Component {
                         supplyPlan: []
                       }
                     }
-                    console.log('**pu', pu)
+                    // console.log('**pu', pu)
                     var data = [];
                     var monthstartfrom = this.state.rangeValue.from.month
                     var fromYear = this.state.rangeValue.from.year
@@ -1761,11 +1851,11 @@ class StockStatus extends Component {
                       for (var month = monthstartfrom; month <= 12; month++) {
                         var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
                         var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                        console.log(dtstr, ' ', enddtStr)
+                        // console.log(dtstr, ' ', enddtStr)
                         var dt = dtstr
                         var list = programJson.supplyPlan.filter(c => c.planningUnitId == pu.value && c.transDate == dt)
 
-                        console.log(list)
+                        // console.log(list)
                         if (list.length > 0) {
                           var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
                           var totalShipmentQty = 0;
@@ -1801,12 +1891,12 @@ class StockStatus extends Component {
                           conListAct.map(elt => {
                             totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
-                          console.log(conList)
-                          console.log(totalforecastConsumption)
+                          // console.log(conList)
+                          // console.log(totalforecastConsumption)
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
-                            actualConsumptionQty: totalActualConsumption!=null?Number(totalActualConsumption):null,
+                            actualConsumptionQty: totalActualConsumption != null ? Number(totalActualConsumption) : null,
                             actualConsumption: list[0].actualFlag,
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
@@ -1833,7 +1923,7 @@ class StockStatus extends Component {
                             dt: new Date(from, month - 1),
                             consumptionQty: 0,
                             actualConsumption: false,
-                            actualConsumptionQty:null,
+                            actualConsumptionQty: null,
                             shipmentQty: 0,
                             shipmentInfo: [],
                             adjustment: 0,
@@ -1905,7 +1995,7 @@ class StockStatus extends Component {
                               pointBackgroundColor: '#ba0c2f',
                               pointBorderColor: '#ba0c2f',
                               pointRadius: 3
-                          },
+                            },
                             {
                               label: i18n.t('static.supplyPlan.delivered'),
                               yAxisID: 'A',
@@ -2037,7 +2127,7 @@ class StockStatus extends Component {
                               yValueFormatString: "$#,##0",
                               data: data.map((item, index) => (data[0].planBasedOn == 1 ? item.maxMos : item.maxStock))
                             }
-                            
+
 
                           ];
                           if (data.length > 0 && data[0].planBasedOn == 1) {
@@ -2244,11 +2334,11 @@ class StockStatus extends Component {
                           //   loading: false,
                           //  }, () => {
                           //   this.forceUpdate()
-                          //   console.log('updating data')
+                          //   // console.log('updating data')
                           // })
                           // } else {
                           //   selectedPlanningUnitdata = planningUnitexport
-                          //   console.log('selectedPlanningUnitdata', selectedPlanningUnitdata)
+                          //   // console.log('selectedPlanningUnitdata', selectedPlanningUnitdata)
                           // }
                         }
 
@@ -2263,7 +2353,7 @@ class StockStatus extends Component {
 
 
                     pcnt = pcnt + 1
-                    console.log('pcnt', pcnt, 'PlanningUnitDataForExport', PlanningUnitDataForExport)
+                    // console.log('pcnt', pcnt, 'PlanningUnitDataForExport', PlanningUnitDataForExport)
                     if (pcnt == sortedPlanningUnitData.length) {
                       // PlanningUnitDataForExport.push(selectedPlanningUnitdata)
                       this.setState({
@@ -2298,18 +2388,18 @@ class StockStatus extends Component {
 
     }
     else {
-      console.log('in true')
+      // console.log('in true')
       this.setState({ loading: true })
       var inputjson = {
         "programId": programId,
         "versionId": versionId,
         "startDate": startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
         "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-        "planningUnitIds": [...new Set(this.state.planningUnitIdsExport.map(item=>item.value))],
+        "planningUnitIds": [...new Set(this.state.planningUnitIdsExport.map(item => item.value))],
       }
       ReportService.getStockStatusData(inputjson)
         .then(response => {
-          console.log('response+++=>', response.data);
+          // console.log('response+++=>', response.data);
           var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
             a = a.label.toLowerCase();
             b = b.label.toLowerCase();
@@ -2374,7 +2464,7 @@ class StockStatus extends Component {
                   pointBackgroundColor: '#ba0c2f',
                   pointBorderColor: '#ba0c2f',
                   pointRadius: 3
-              },
+                },
                 {
                   label: i18n.t('static.supplyPlan.delivered'),
                   yAxisID: 'A',
@@ -2655,14 +2745,14 @@ class StockStatus extends Component {
             let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
             var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
             var planningUnit = planningUnitItemFilter[0].planningUnit
-            console.log('planningUnit', planningUnit)
+            // console.log('planningUnit', planningUnit)
             var conList = [];
             var invList = [];
             var shipList = [];
             filteredData.map(c => c.consumptionInfo.map(ci => conList.push(ci)));
             filteredData.map(c => c.inventoryInfo.map(ii => invList.push(ii)));
             filteredData.map(c => c.shipmentInfo.map(si => shipList.push(si)));
-            console.log("Consum:List+++", conList);
+            // console.log("Consum:List+++", conList);
             var planningUnitexport = {
               planningUnit: planningUnit,
               firstMonthRegionCount: data.length > 0 ? data[0].regionCount : 1,
@@ -2681,7 +2771,7 @@ class StockStatus extends Component {
             PlanningUnitDataForExport: PlanningUnitDataForExport,
             message: '', loading: false
           }, () => {
-            console.log('PlanningUnitDataForExport', PlanningUnitDataForExport)
+            // console.log('PlanningUnitDataForExport', PlanningUnitDataForExport)
             setTimeout(() => {
 
               if (report == 1) {
@@ -2697,7 +2787,7 @@ class StockStatus extends Component {
         }
         ).catch(
           error => {
-            console.log("Error+++", error)
+            // console.log("Error+++", error)
             this.setState({
               stockStatusList: [], loading: false
             })
@@ -2748,14 +2838,14 @@ class StockStatus extends Component {
       // AuthenticationService.setupAxiosInterceptors();
       ProgramService.getProgramList()
         .then(response => {
-          console.log(JSON.stringify(response.data))
+          // console.log(JSON.stringify(response.data))
           this.setState({
             programs: response.data, message: '',
             loading: false
           }, () => { this.consolidatedProgramList() })
         }).catch(
           error => {
-            console.log("Error+++", error)
+            // console.log("Error+++", error)
             this.setState({
               programs: [], loading: false
             }, () => { this.consolidatedProgramList() })
@@ -2823,7 +2913,7 @@ class StockStatus extends Component {
       // );
 
     } else {
-      console.log('offline')
+      // console.log('offline')
       this.setState({ loading: false })
       this.consolidatedProgramList()
     }
@@ -2857,13 +2947,13 @@ class StockStatus extends Component {
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
             var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-            console.log(programNameLabel)
+            // console.log(programNameLabel)
 
             var f = 0
             for (var k = 0; k < this.state.programs.length; k++) {
               if (this.state.programs[k].programId == programData.programId) {
                 f = 1;
-                console.log('already exist')
+                // console.log('already exist')
               }
             }
             if (f == 0) {
@@ -2875,11 +2965,11 @@ class StockStatus extends Component {
         }
         var lang = this.state.lang;
         if (proList.length == 1) {
-          console.log("*****1");
+          // console.log("*****1");
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             }),
             programId: proList[0].programId
@@ -2888,11 +2978,11 @@ class StockStatus extends Component {
           })
         } else if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
           //from session
-          console.log("*****2");
+          // console.log("*****2");
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             }),
             programId: localStorage.getItem("sesProgramIdReport")
@@ -2900,11 +2990,11 @@ class StockStatus extends Component {
             this.filterVersion();
           })
         } else {
-          console.log("*****3");
+          // console.log("*****3");
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             })
           })
@@ -2920,14 +3010,14 @@ class StockStatus extends Component {
 
 
   filterVersion = () => {
-    console.log("ProgramId-------->2", this.state.programId);
+    // console.log("ProgramId-------->2", this.state.programId);
     // let programId = document.getElementById("programId").value;
     let programId = this.state.programId;
     if (programId != 0) {
 
       localStorage.setItem("sesProgramIdReport", programId);
       const program = this.state.programs.filter(c => c.programId == programId)
-      console.log(program)
+      // console.log(program)
       if (program.length == 1) {
         if (isSiteOnline()) {
           this.setState({
@@ -2997,7 +3087,7 @@ class StockStatus extends Component {
 
         }
 
-        console.log(verList);
+        // console.log(verList);
         let versionList = verList.filter(function (x, i, a) {
           return a.indexOf(x) === i;
         });
@@ -3057,7 +3147,7 @@ class StockStatus extends Component {
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
     let versionId = document.getElementById("versionId").value;
-    console.log("VERSION-------->", versionId);
+    // console.log("VERSION-------->", versionId);
     this.setState({
       planningUnits: [],
       planningUnitsMulti: [],
@@ -3087,7 +3177,7 @@ class StockStatus extends Component {
               myResult = planningunitRequest.result;
               var programId = (document.getElementById("programId").value).split("_")[0];
               var proList = []
-              console.log(myResult)
+              // console.log(myResult)
               for (var i = 0; i < myResult.length; i++) {
                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -3121,7 +3211,7 @@ class StockStatus extends Component {
           // AuthenticationService.setupAxiosInterceptors();
 
           ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-            console.log('**' + JSON.stringify(response.data))
+            // console.log('**' + JSON.stringify(response.data))
             var listArray = response.data;
             var planningUnitsMulti = []
             listArray.sort((a, b) => {
@@ -3140,7 +3230,7 @@ class StockStatus extends Component {
             })
           }).catch(
             error => {
-              console.log("Error+++", error)
+              // console.log("Error+++", error)
               this.setState({
                 planningUnits: [],
                 planningUnitsMulti: []
@@ -3708,7 +3798,7 @@ class StockStatus extends Component {
         pointBackgroundColor: '#ba0c2f',
         pointBorderColor: '#ba0c2f',
         pointRadius: 3
-    },
+      },
       {
         label: i18n.t('static.supplyPlan.delivered'),
         yAxisID: 'A',
@@ -4022,34 +4112,34 @@ class StockStatus extends Component {
                   </div>
                   {this.state.show && this.state.stockStatusList.length > 0 && ppu!=undefined &&
                     <>
-                      <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px' }} style={{ display: this.state.display }}>
+                      <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                         <ul className="legendcommitversion list-group">
                           {this.state.stockStatusList[0].planBasedOn == 1 ? <>
-                          <li><span className="redlegend "></span> 
-                            <span className="legendcommitversionText">
-                              {i18n.t("static.supplyPlan.amcPastOrFuture")} : {ppu.monthsInPastForAmc}/{ppu.monthsInFutureForAmc}
-                            </span>
-                          </li>
-                          <li><span className="redlegend "></span> 
-                            <span className="legendcommitversionText">
-                              {i18n.t("static.report.shelfLife")} : {ppu.shelfLife}
-                            </span>
-                          </li>
-                          <li><span className="redlegend "></span> 
-                            <span className="legendcommitversionText">
-                              {i18n.t("static.supplyPlan.minStockMos")} : {this.formatter(this.state.stockStatusList[0].minMos)}
-                            </span>
-                          </li>
-                          <li><span className="redlegend "></span> 
-                            <span className="legendcommitversionText">
-                              {i18n.t("static.supplyPlan.reorderInterval")} : {ppu.reorderFrequencyInMonths}
-                            </span>
-                          </li>
-                          <li><span className="redlegend "></span> 
-                            <span className="legendcommitversionText">
-                              {i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}
-                            </span>
-                          </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.supplyPlan.amcPastOrFuture")} : {ppu.monthsInPastForAmc}/{ppu.monthsInFutureForAmc}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.report.shelfLife")} : {ppu.shelfLife}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.supplyPlan.minStockMos")} : {this.formatter(this.state.stockStatusList[0].minMos)}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.supplyPlan.reorderInterval")} : {ppu.reorderFrequencyInMonths}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}
+                              </span>
+                            </li>
                           </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.stockStatusList[0].minStock)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.stockStatusList[0].distributionLeadTime)}</span></li>
                           </>}
                         </ul>
@@ -4084,7 +4174,7 @@ class StockStatus extends Component {
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
                         <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
-                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')))}</th>
+                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')))}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
@@ -4118,7 +4208,31 @@ class StockStatus extends Component {
                             </td>
                             <td align="center"><table >
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code}`}</td></tr>)
+                                return (<tr  ><td padding="0">{this.formatter(item.shipmentQty) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
+                                  item.primeLineNo == null &&
+                                  item.roNo == null &&
+                                  item.roPrimeLineNo == null
+                                    ? " | N/A"
+                                    : `${
+                                        item.roNo == null &&
+                                        item.roPrimeLineNo == null
+                                          ? ""
+                                          : " | " +
+                                            item.roNo +
+                                            "-" +
+                                            item.roPrimeLineNo
+                                      }   ${
+                                        item.orderNo == null &&
+                                        item.primeLineNo == null
+                                          ? ""
+                                          : item.orderNo == null
+                                          ? ""
+                                          : " | " + item.orderNo
+                                      }   ${
+                                        item.primeLineNo == null
+                                          ? ""
+                                          : "-" + item.primeLineNo
+                                      }`}</td></tr>)
                                 //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
                               })}</table>
                             </td>
@@ -4168,7 +4282,7 @@ class StockStatus extends Component {
             <Modal isOpen={this.state.exportModal}
               className={'modal-md'}>
               <ModalHeader toggle={() => this.toggleExport(0)} className="modalHeaderSupplyPlan" id="shipmentModalHeader">
-                <strong>{this.state.type==1?i18n.t("static.supplyPlan.exportAsPDF"):i18n.t("static.supplyPlan.exportAsCsv")}</strong>
+                <strong>{this.state.type == 1 ? i18n.t("static.supplyPlan.exportAsPDF") : i18n.t("static.supplyPlan.exportAsCsv")}</strong>
               </ModalHeader>
               <ModalBody>
                 <>
