@@ -23,7 +23,7 @@ import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
-import { isSiteOnline, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
+import { isSiteOnline, decompressJson, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
 // import ChangeInLocalProgramVersion from '../../CommonComponent/ChangeInLocalProgramVersion'
@@ -427,7 +427,7 @@ export default class SyncProgram extends Component {
                 .then(response => {
                     // console.log(")))) After calling get notification api")
                     // console.log("Resposne+++", response);
-                    response.data = compressJson(response.data);
+                    response.data = decompressJson(response.data);
                     var json = response.data;
                     var updatedJson = json;
                     // for (var r = 0; r < json.length; r++) {
@@ -710,6 +710,7 @@ export default class SyncProgram extends Component {
                 .then(response => {
                     // console.log(")))) After calling get notification api")
                     // console.log("Resposne+++", response);
+                    response.data = decompressJson(response.data);
                     var json = response.data;
                     var updatedJson = [];
                     for (var r = 0; r < json.length; r++) {

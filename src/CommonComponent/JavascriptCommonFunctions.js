@@ -75,7 +75,7 @@ export function isSiteOnline() {
   }
 }
 
-export function compressJson(str) {
+export function decompressJson(str) {
   let value = typeof str !== "string" ? JSON.stringify(str) : str;
   try {
       JSON.parse(value);
@@ -94,4 +94,19 @@ export function compressJson(str) {
       return json;
   }
   return str;
+}
+
+export function compressJson(str) {
+  const jsonStr = JSON.stringify(str);
+      const input = new TextEncoder().encode(jsonStr);
+      const compressedData = pako.gzip(input);
+
+      // Create a base64 string directly from the compressed data (Uint8Array)
+      let base64String = '';
+      const len = compressedData.length;
+      for (let i = 0; i < len; i++) {
+        base64String += String.fromCharCode(compressedData[i]);
+      }
+      base64String = btoa(base64String);
+      return base64String;
 }
