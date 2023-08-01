@@ -19,6 +19,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, jExcelLoadedFunctionOld, jExcelLoadedFunctionOnlyHideRowOld, } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { decompressJson, compressJson, isCompress } from '../../CommonComponent/JavascriptCommonFunctions';
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -1851,19 +1852,7 @@ export default class syncPage extends Component {
           ProgramService.getAllProgramData(programRequestJson)
             .then(response => {
               if (response.status == 200) {
-                const compressedData = atob(response.data);
-
-                // convert the compressed data to a byte array
-                const byteArray = new Uint8Array(compressedData.length);
-                for (let i = 0; i < compressedData.length; i++) {
-                  byteArray[i] = compressedData.charCodeAt(i);
-                }
-
-                // decompress the byte array using pako
-                const decompressedData = pako.inflate(byteArray, { to: 'string' });
-                console.log("decompressed 1 Test@@@123", decompressedData)
-                var json = JSON.parse(decompressedData);
-                response.data = json;
+                response.data = decompressJson(response.data);
                 // console.log("+++Response for latest version success", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
 
                 AuthenticationService.setupAxiosInterceptors();
@@ -5096,7 +5085,17 @@ export default class syncPage extends Component {
               // if (response1.data == false) {
               // console.log("Program Json Final Test@@@123", programJson)
               // console.log("CommitLogs --- 2 Log before sending data to server")
-              ProgramService.saveProgramData(programJson, this.state.comparedLatestVersion).then(response => {
+              delete programJson.actionList;
+              delete programJson.qplLastModifiedDate;
+              programJson.problemReportList.map(e => e.regionActive = undefined)
+              programJson.supplyPlan.map(e => e.manualTotalQty = undefined)
+              programJson.supplyPlan.map(e => e.erpTotalQty = undefined)
+              programJson.supplyPlan.map(e => e.shipmentTotalQty = undefined)
+              programJson.supplyPlan.map(e => e.shipmentTotalQtyWps = undefined)
+              programJson.supplyPlan.map(e => e.expectedStock = undefined)
+              programJson.supplyPlan.map(e => e.expectedStockWps = undefined)
+              const compressedData = isCompress(programJson);
+              ProgramService.saveProgramData(compressedData, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
                   // console.log("CommitLogs --- 3 Log after response 200")
                   // console.log(")))) Commit Request generated successfully");
@@ -5526,18 +5525,8 @@ export default class syncPage extends Component {
         // console.log("CommitLogs --- 18 after getting latest program from server")
         // console.log(")))) After calling get notification api")
         // console.log("Resposne+++", response);
-        const compressedData = atob(response.data);
-
-        // convert the compressed data to a byte array
-        const byteArray = new Uint8Array(compressedData.length);
-        for (let i = 0; i < compressedData.length; i++) {
-          byteArray[i] = compressedData.charCodeAt(i);
-        }
-
-        // decompress the byte array using pako
-        const decompressedData = pako.inflate(byteArray, { to: 'string' });
-        console.log("decompressed 1 Test@@@123", decompressedData)
-        var json = JSON.parse(decompressedData);
+        response.data = decompressJson(response.data);
+        var json = response.data;
         var updatedJson = [];
         for (var r = 0; r < json.length; r++) {
           var planningUnitList = json[r].planningUnitList;
