@@ -1,4 +1,4 @@
-import { APPLICATION_STATUS_URL } from "../Constants";
+import { APPLICATION_STATUS_URL, COMPRESS_LIMIT_SIZE } from "../Constants";
 import pako from 'pako';
 
 export function paddingZero(string, padStr, len) {
@@ -80,10 +80,6 @@ export function decompressJson(str) {
   try {
       JSON.parse(value);
   } catch (e) {
-      // const size = new TextEncoder().encode(JSON.stringify(str)).length
-      // const kiloBytes = size / 1000;
-      // const megaBytes = kiloBytes / 1000;
-      // console.log("Size of obj ======= ",megaBytes);
       const compressedData = atob(str);
       const byteArray = new Uint8Array(compressedData.length);
       for (let i = 0; i < compressedData.length; i++) {
@@ -109,4 +105,17 @@ export function compressJson(str) {
       }
       base64String = btoa(base64String);
       return base64String;
+}
+
+export function sizeOfJson(str) {
+  const size = new TextEncoder().encode(JSON.stringify(str)).length
+  const kiloBytes = size / 1000;
+  const megaBytes = kiloBytes / 1000;
+  return megaBytes;
+}
+
+export function isCompress(str) {
+  if(sizeOfJson(str) > COMPRESS_LIMIT_SIZE)
+    return compressJson(str);
+  return str
 }

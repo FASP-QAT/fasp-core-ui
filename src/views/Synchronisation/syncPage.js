@@ -19,7 +19,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction, jExcelLoadedFunctionOld, jExcelLoadedFunctionOnlyHideRowOld, } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { decompressJson, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decompressJson, compressJson, isCompress } from '../../CommonComponent/JavascriptCommonFunctions';
 import moment from "moment";
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -5063,7 +5063,7 @@ export default class syncPage extends Component {
               programJson.supplyPlan.map(e => e.shipmentTotalQtyWps = undefined)
               programJson.supplyPlan.map(e => e.expectedStock = undefined)
               programJson.supplyPlan.map(e => e.expectedStockWps = undefined)
-              const compressedData = compressJson(programJson);
+              const compressedData = isCompress(programJson);
               ProgramService.saveProgramData(compressedData, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
                   // console.log("CommitLogs --- 3 Log after response 200")

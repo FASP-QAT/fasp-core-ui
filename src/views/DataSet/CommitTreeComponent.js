@@ -15,7 +15,7 @@ import CryptoJS from 'crypto-js'
 import getLabelText from "../../CommonComponent/getLabelText";
 import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { decompressJson, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decompressJson, compressJson, isCompress } from '../../CommonComponent/JavascriptCommonFunctions';
 import csvicon from '../../assets/img/csv.png';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import moment from "moment"
@@ -688,8 +688,8 @@ export default class CommitTreeComponent extends React.Component {
                                 }
                                 programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
                                 programJson.treeList = treeList;
-                                // console.log("commit*** final programJson---", programJson);          
-                                const compressedData = compressJson(programJson);
+                                // console.log("commit*** final programJson---", programJson)
+                                const compressedData = isCompress(programJson);
                                 //create saveDatasetData in ProgramService
                                 DatasetService.saveDatasetData(compressedData, this.state.comparedLatestVersion).then(response => {
                                     if (response.status == 200) {
