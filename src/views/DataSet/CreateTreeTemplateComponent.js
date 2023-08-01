@@ -1577,7 +1577,7 @@ export default class CreateTreeTemplate extends Component {
                 qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / (pu != undefined ? pu.multiplier : 1)).toFixed(8);
             } else {
                 // if (currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == true) {
-                qatCalculatedPUPerVisit = addCommasWith8Decimals(this.state.noFURequired / (pu != undefined ? pu.multiplier : 1));
+                qatCalculatedPUPerVisit = parseFloat(this.state.noFURequired / (pu != undefined ? pu.multiplier : 1)).toFixed(8);
                 // } else {
                 //     qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                 // }
@@ -1618,7 +1618,7 @@ export default class CreateTreeTemplate extends Component {
             console.log("PUPERVISIT puPerVisit---", puPerVisit);
         } else if (parentScenario.fuNode.usageType.id == 1) {
             // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-            puPerVisit = addCommasWith8Decimals(this.state.noFURequired / conversionFactor);
+            puPerVisit = parseFloat(this.state.noFURequired / conversionFactor).toFixed(8);
             // } else {
             // puPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / conversionFactor);
             // }
@@ -9383,7 +9383,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionIntervalEveryXMonths')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={this.toggleConsumptionIntervalEveryXMonths} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-10">
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="refillMonths"
                                                                     name="refillMonths"
                                                                     valid={!errors.refillMonths && this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != '' : !errors.refillMonths}
@@ -9403,7 +9403,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# PU / Interval / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-10">
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="puPerVisit"
                                                                     name="puPerVisit"
                                                                     readOnly={!this.state.editable?true:this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
@@ -9512,7 +9512,7 @@ export default class CreateTreeTemplate extends Component {
                                                             {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) &&
                                                                 <FormGroup className="col-md-6">
                                                                     <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# PU / Interval / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
-                                                                    <Input type="number"
+                                                                    <Input type="text"
                                                                         id="puPerVisit"
                                                                         name="puPerVisit"
                                                                         readOnly={!this.state.editable?true:this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
@@ -10320,7 +10320,7 @@ export default class CreateTreeTemplate extends Component {
                                         <input type="hidden" id="percentForOneMonth" name="percentForOneMonth" value={this.state.percentForOneMonth} />
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="currencyId">{this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover23" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <Input type="number"
+                                            <Input type="text"
                                                 id="currentTargetChangePercentage"
                                                 name="currentTargetChangePercentage"
                                                 bsSize="sm"
