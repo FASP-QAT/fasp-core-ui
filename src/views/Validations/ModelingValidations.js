@@ -1492,6 +1492,11 @@ class ModelingValidation extends Component {
                                 var month = xAxis1.split('-')[0];
                                 return month;
                             }
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: this.state.xAxisDisplayBy == 2 ? i18n.t('static.modelingValidation.calendarYear') : this.state.xAxisDisplayBy == 1 ? "" : i18n.t('static.modelingValidation.fiscalYear'),
+                            fontColor: 'black'
                         }
                     },
                     {
