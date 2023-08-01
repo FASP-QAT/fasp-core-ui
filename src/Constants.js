@@ -168,3 +168,4 @@ export const MIN_MODE_PER_REQ = 20
 export const MIN_MODE_COUNT_REQ = 3
 export const PROGRAM_TYPE_SUPPLY_PLAN = 1
 export const PROGRAM_TYPE_DATASET = 2;
+export const COMPRESS_LIMIT_SIZE = 2;
