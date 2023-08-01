@@ -23,7 +23,7 @@ import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActions from '../../CommonComponent/QatProblemActions';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
 // import GetLatestProgramVersion from '../../CommonComponent/GetLatestProgramVersion'
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { isSiteOnline, decompressJson, compressJson } from '../../CommonComponent/JavascriptCommonFunctions';
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
 import pako from 'pako';
@@ -428,6 +428,7 @@ export default class SyncProgram extends Component {
                 .then(response => {
                     // console.log(")))) After calling get notification api")
                     // console.log("Resposne+++", response);
+                    response.data = decompressJson(response.data);
                     var json = response.data;
                     var updatedJson = json;
                     // for (var r = 0; r < json.length; r++) {
@@ -708,20 +709,10 @@ export default class SyncProgram extends Component {
             // console.log("checkbozes checked+++", checkboxesChecked)
             ProgramService.getAllProgramData(checkboxesChecked)
                 .then(response => {
-                    console.log(")))) After calling get notification api")
-                    console.log("Resposne+++", response);
-                    const compressedData = atob(response.data);
-
-                    // convert the compressed data to a byte array
-                    const byteArray = new Uint8Array(compressedData.length);
-                    for (let i = 0; i < compressedData.length; i++) {
-                        byteArray[i] = compressedData.charCodeAt(i);
-                    }
-
-                    // decompress the byte array using pako
-                    const decompressedData = pako.inflate(byteArray, { to: 'string' });
-                    console.log("decompressed 1 Test@@@123", decompressedData)
-                    var json = JSON.parse(decompressedData);
+                    // console.log(")))) After calling get notification api")
+                    // console.log("Resposne+++", response);
+                    response.data = decompressJson(response.data);
+                    var json = response.data;
                     var updatedJson = [];
                     for (var r = 0; r < json.length; r++) {
                         var planningUnitList = json[r].planningUnitList;

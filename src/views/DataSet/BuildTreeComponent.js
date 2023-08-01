@@ -1296,7 +1296,7 @@ export default class BuildTree extends Component {
                     //     qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                     // }
                     // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-                    qatCalculatedPUPerVisit = addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
+                    qatCalculatedPUPerVisit = parseFloat(this.state.noFURequired / pu.multiplier).toFixed(8);
                     // } else {
                     // qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
                     // }
@@ -1459,7 +1459,7 @@ export default class BuildTree extends Component {
             console.log("PUPERVISIT puPerVisit---", puPerVisit);
         } else if (parentScenario.fuNode.usageType.id == 1) {
             // if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-            puPerVisit = addCommasWith8Decimals(this.state.noFURequired / conversionFactor);
+            puPerVisit = parseFloat(this.state.noFURequired / conversionFactor).toFixed(8);
             // } else {
             // puPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / conversionFactor);
             // }
@@ -8257,7 +8257,7 @@ export default class BuildTree extends Component {
                 puPerVisit = parseFloat(((itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
             } else {
                 console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                puPerVisit = addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
+                puPerVisit = parseFloat(this.state.noFURequired / pu.multiplier).toFixed(8);
             }
 
             console.log("AUTO puPerVisit---", puPerVisit);
@@ -8781,7 +8781,7 @@ export default class BuildTree extends Component {
                     puNode.puPerVisit = puPerVisit;
                 } else {
                     console.log("AUTO 2 noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                    puPerVisit = addCommasWith8Decimals(this.state.noFURequired / pu.multiplier);
+                    puPerVisit = parseFloat(this.state.noFURequired / pu.multiplier).toFixed(8);
                     puNode.puPerVisit = puPerVisit;
                 }
 
@@ -9889,12 +9889,12 @@ export default class BuildTree extends Component {
                                                             </div>
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId"># PU / Interval / {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en} (Reference)</Label>
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="puPerVisitQATCalculated"
                                                                     name="puPerVisitQATCalculated"
                                                                     readOnly={true}
                                                                     bsSize="sm"
-                                                                    value={this.state.qatCalculatedPUPerVisit}
+                                                                    value={addCommasWith8Decimals(this.state.qatCalculatedPUPerVisit)}
                                                                 // value={this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null ? (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
                                                                 >
                                                                 </Input>
@@ -9908,7 +9908,7 @@ export default class BuildTree extends Component {
 
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionIntervalEveryXMonths')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover16" onClick={this.toggleConsumptionIntervalEveryXMonths} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="refillMonths"
                                                                     name="refillMonths"
                                                                     valid={!errors.refillMonths && this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 2 ? this.state.currentScenario.puNode.refillMonths != '' : !errors.refillMonths}
@@ -9927,7 +9927,7 @@ export default class BuildTree extends Component {
                                                             </div>
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU / Interval / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="puPerVisit"
                                                                     name="puPerVisit"
                                                                     readOnly={this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? false : true}
@@ -10021,12 +10021,12 @@ export default class BuildTree extends Component {
                                                             <FormGroup className="col-md-6"></FormGroup>
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId"># PU / {this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s) (Calculated)</Label>
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="puPerVisitQATCalculated"
                                                                     name="puPerVisitQATCalculated"
                                                                     readOnly={true}
                                                                     bsSize="sm"
-                                                                    value={this.state.qatCalculatedPUPerVisit}
+                                                                    value={addCommasWith8Decimals(this.state.qatCalculatedPUPerVisit)}
                                                                 // value={this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null ? (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
                                                                 >
                                                                 </Input>
@@ -10035,7 +10035,7 @@ export default class BuildTree extends Component {
                                                             {this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) &&
                                                             <FormGroup className="col-md-6">
                                                                 <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU / Interval / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
-                                                                <Input type="number"
+                                                                <Input type="text"
                                                                     id="puPerVisit"
                                                                     name="puPerVisit"
                                                                     readOnly={this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? false : true}
@@ -10805,7 +10805,7 @@ export default class BuildTree extends Component {
                                             <Label htmlFor="currencyId">
                                                 {this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}
                                                 <span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <Input type="number"
+                                            <Input type="text"
                                                 id="currentTargetChangePercentage"
                                                 name="currentTargetChangePercentage"
                                                 bsSize="sm"

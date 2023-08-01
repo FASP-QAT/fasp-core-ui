@@ -3175,5 +3175,6 @@
     "static.shipment.selectValidBudget":"Please select valid budget",
     "static.budget.budgetNoteForCommitingLocalVersion":"This report uses the latest versions of supply plans. Please commit local supply plans to see shipments tagged to budgets reflected here.",
     "static.report.stockoutConsumptionAdjustment":"Stockout Consumption Adjustment",
-    "static.report.stockoutConsumptionAdjustmentFormula":"Actual consumption/ (total days in month - stocked out days) * total days in month"
+    "static.report.stockoutConsumptionAdjustmentFormula":"Actual consumption/ (total days in month - stocked out days) * total days in month",
+    "static.modelingValidation.fiscalYear": "Fiscal Year"
 }
