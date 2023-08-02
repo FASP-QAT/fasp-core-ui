@@ -9,7 +9,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY,JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_CATELOG_PRICE } from '../../Constants.js';
 import moment from 'moment';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -21,6 +21,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
 import CryptoJS from 'crypto-js'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
+import PlanningUnitService from '../../api/PlanningUnitService';
 
 const entityname = 'Tree Template';
 const validationSchema = function (values) {
@@ -110,6 +111,8 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
+const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
+
 export default class ListTreeTemplate extends Component {
 
     constructor(props) {
@@ -142,7 +145,12 @@ export default class ListTreeTemplate extends Component {
             programList:[],
             active: true,
             datasetListJexcel:{},
-            treeTemplate:{}
+            treeTemplate:{},
+            allProcurementAgentList: [],
+            planningUnitObjList:[],
+            startDateDisplay: '',
+            endDateDisplay: '',
+            beforeEndDateDisplay: ''
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -152,6 +160,12 @@ export default class ListTreeTemplate extends Component {
         this.modelOpenClose = this.modelOpenClose.bind(this);
         this.getTreeTemplateList = this.getTreeTemplateList.bind(this);
         this.modelOpenCloseCreateTree=this.modelOpenCloseCreateTree.bind(this)
+        this.changed = this.changed.bind(this);  
+        this.getPlanningUnitWithPricesByIds = this.getPlanningUnitWithPricesByIds.bind(this); 
+        this.saveMissingPUs = this.saveMissingPUs.bind(this);
+        this.procurementAgentList = this.procurementAgentList.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
+       
     }
 
     modelOpenCloseCreateTree() {
@@ -429,10 +443,16 @@ export default class ListTreeTemplate extends Component {
         var missingPUList = [];
         var json;
         var treeTemplate = this.state.treeTemplate;
-        // console.log("dataset Id template---", this.state.datasetIdModal);
+        let forecastStartDate;
+        let forecastStopDate;
+        let beforeEndDateDisplay;
         if (this.state.datasetIdModal != "" && this.state.datasetIdModal != null) {
             var dataset = this.state.datasetListJexcel;
-            // console.log("dataset---", dataset);
+            forecastStartDate = dataset.currentVersion.forecastStartDate;
+            forecastStopDate = dataset.currentVersion.forecastStopDate;
+            beforeEndDateDisplay = new Date(forecastStartDate);
+            beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);    
+            console.log("dataset---", dataset);
             // console.log("treeTemplate---", treeTemplate);
             var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
             // console.log("puNodeList---", puNodeList);
@@ -458,13 +478,17 @@ export default class ListTreeTemplate extends Component {
             missingPUList = missingPUList.filter((v, i, a) => a.findIndex(v2 => (v2.planningUnit.id === v.planningUnit.id)) === i)
         }
         this.setState({
-            missingPUList
+            missingPUList,
+            beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
+            startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY"))),
+            endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY"))), 
         }, () => {
             this.buildMissingPUJexcel();
         });
     }
 
     buildMissingPUJexcel() {
+        this.getPlanningUnitWithPricesByIds();
         var missingPUList = this.state.missingPUList;
         // console.log("missingPUList--->", missingPUList);
         var dataArray = [];
@@ -476,6 +500,15 @@ export default class ListTreeTemplate extends Component {
                 // data[1] = missingPUList[j].startValue
                 data[0] = getLabelText(missingPUList[j].productCategory.label, this.state.lang)
                 data[1] = getLabelText(missingPUList[j].planningUnit.label, this.state.lang) + " | " + missingPUList[j].planningUnit.id
+                data[2] = false;
+                data[3] = true;
+                data[4] = "";
+                data[5] = "";
+                data[6] = "";
+                data[7] = "";
+                data[8] = "";
+                data[9] = "";
+                data[10] = missingPUList[j].planningUnit.id
                 dataArray[count] = data;
                 count++;
             }
@@ -489,23 +522,105 @@ export default class ListTreeTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [20, 80],
+            colWidths: [20, 80, 60, 60, 60, 60, 60, 60, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    // 0
+                    // 0A
                     title: i18n.t('static.productCategory.productCategory'),
                     type: 'test',
-                    // readOnly: true
+                    editable: false,
+                    readOnly: true
                 },
                 {
-                    // 1
+                    // 1B
                     title: i18n.t('static.product.product'),
                     type: 'text',
-                    // readOnly: true
-
-                }
-
+                    editable: false,
+                    readOnly: true
+                },
+                {
+                    //2C
+                    title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
+                    type: 'checkbox',
+                    width: '150',
+                    editable: true,
+                    readOnly: false 
+                },
+                {
+                    //3D
+                    title: i18n.t('static.TreeForecast.TreeForecast') + ' ?',
+                    type: 'checkbox',
+                    width: '150',
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //4E
+                    title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')',
+                    type: 'numeric',
+                    textEditor: true,
+                    mask: '#,##',
+                    width: '150',
+                    disabledMaskOnEdition: true,
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //5F
+                    title: i18n.t('static.planningUnitSetting.existingShipments') + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')',
+                    type: 'numeric',
+                    textEditor: true,
+                    mask: '#,##',
+                    width: '150',
+                    disabledMaskOnEdition: true,
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //6G
+                    title: i18n.t('static.planningUnitSetting.desiredMonthsOfStock') + ' ' + this.state.endDateDisplay + ')',
+                    type: 'numeric',
+                    textEditor: true,
+                    mask: '#,##',
+                    disabledMaskOnEdition: true,
+                    width: '150',
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //7H
+                    title: i18n.t('static.forecastReport.priceType'),
+                    type: 'autocomplete',
+                    source: this.state.allProcurementAgentList,
+                    width: '120',
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //8I
+                    title: i18n.t('static.forecastReport.unitPrice'),
+                    type: 'numeric',
+                    textEditor: true,
+                    decimal: '.',
+                    mask: '#,##.00',
+                    width: '120',
+                    disabledMaskOnEdition: true,
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    //9J
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+                    editable: true,
+                    readOnly: false
+                },
+                {
+                    title: 'planningUnitId',
+                    type: 'hidden',
+                    readOnly: true //10J
+                },
             ],
             // text: {
             //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
@@ -513,18 +628,17 @@ export default class ListTreeTemplate extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable: false,
-            onload: this.loadedMissingPU,
             pagination: localStorage.getItem("sesRecordCount"),
             search: false,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             copyCompatibility: true,
             allowExport: false,
+            onload: this.loadedMissingPU,
+            onchange: this.changed,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
@@ -542,9 +656,717 @@ export default class ListTreeTemplate extends Component {
         );
     }
 
+    changed = function (instance, cell, x, y, value) {
+        if (x == 7) {
+            if (value != -1 && value !== null && value !== '') {
+                console.log("Value--------------->IF");
+                let planningUnitId = this.el.getValueFromCoords(10, y);
+                
+                let planningUnitObjList = this.state.planningUnitObjList;
+                let tempPaList = planningUnitObjList.filter(c => c.planningUnitId == planningUnitId)[0];
+
+                console.log("mylist--------->1112", planningUnitId);
+
+                if (tempPaList != undefined) {
+                    let obj = tempPaList.procurementAgentPriceList.filter(c => c.id == value)[0];
+                    console.log("mylist--------->1113", obj);
+                    if (typeof obj != 'undefined') {
+                        this.el.setValueFromCoords(8, y, obj.price, true);
+                    } else {
+                        let q = '';
+                        q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                    }
+                }
+
+            } else {
+                console.log("Value--------------->ELSE");
+                // this.el.setValueFromCoords(8, y, '', true);
+                // let q = '';
+                // q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+            }
+
+        }
+
+        if (x == 0) {
+            let q = '';
+            q = (this.el.getValueFromCoords(1, y) != '' ? this.el.setValueFromCoords(1, y, '', true) : '');
+            q = (this.el.getValueFromCoords(7, y) != '' ? this.el.setValueFromCoords(7, y, '', true) : '');
+            q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+
+            // this.el.setValueFromCoords(1, y, '', true);
+            // this.el.setValueFromCoords(7, y, '', true);
+            // this.el.setValueFromCoords(8, y, '', true);
+        }
+        if (x == 1) {
+            let q = '';
+            q = (this.el.getValueFromCoords(7, y) != '' ? this.el.setValueFromCoords(7, y, '', true) : '');
+            q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+
+            // this.el.setValueFromCoords(7, y, '', true);
+            // this.el.setValueFromCoords(8, y, '', true);
+        }
+
+        //productCategory
+        if (x == 0) {
+            var col = ("A").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //planning unit
+        if (x == 1) {
+            var json = this.el.getJson(null, false);
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                // console.log("json.length", json.length);
+                var jsonLength = parseInt(json.length) - 1;
+                // console.log("jsonLength", jsonLength);
+                for (var i = jsonLength; i >= 0; i--) {
+                    // console.log("i=---------->", i, "y----------->", y);
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    // console.log("Planning Unit value in change", map.get("1"));
+                    // console.log("Value----->", value);
+                    if (planningUnitValue == value && y != i) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        // this.el.setValueFromCoords(10, y, 1, true);
+                        i = -1;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        // this.el.setValueFromCoords(10, y, 1, true);
+                    }
+                }
+            }
+        }
+
+        //stock
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // console.log("Stock------------------->1", value);
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(4, y);
+            }
+            // var reg = /^[0-9\b]+$/;
+            // console.log("Stock------------------->2", value);
+
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+
+            }
+
+        }
+
+        //existing shipments
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(5, y);
+            }
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
+        //desired months of stock
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(6, y);
+            }
+            // var reg = /^[0-9\b]+$/;
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value != "") {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'))
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'))
+                } else if (parseInt(value) > 99) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+               }
+        }
+        if(this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",","")>0 && this.el.getValue(`H${parseInt(y) + 1}`, true)==""){
+            this.el.setValueFromCoords(7,y,-1,true);
+        }
+
+
+        //unit price
+        if (x == 8) {
+            var col = ("I").concat(parseInt(y) + 1);
+            this.el.setValueFromCoords(10, y, 1, true);
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(8, y);
+            }
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'))
+                } else if (Number(value) < 0) {//negative value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'))
+                } else if (!(reg.test(value))) {//regex check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'))
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        this.setState({
+            isChanged1: true,
+        });
+
+        // if (x == 11) {
+        //     this.el.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
+        //     this.el.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
+        //     if (value == 1 || value == "") {
+        //         var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
+        //         cell.classList.remove('readonly');
+        //         var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
+        //         cell.classList.remove('readonly');
+        //     } else {
+        //         var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
+        //         cell.classList.add('readonly');
+        //         var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
+        //         cell.classList.add('readonly');
+        //     }
+        // }
+    }
+
     loadedMissingPU = function (instance, cell, x, y, value) {
         // console.log("loaded 2---", document.getElementsByClassName('jexcel'));
         jExcelLoadedFunctionOnlyHideRow(instance, 1);
+        // jExcelLoadedFunction(instance);
+        console.log("pp instance",instance)
+        var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
+        console.log("pp asterisk",asterisk)
+        
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[8].classList.add('InfoTr');
+
+        tr.children[5].title = i18n.t('static.tooltip.Stock');
+        tr.children[6].title = i18n.t('static.tooltip.ExistingShipments');
+        tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
+        tr.children[8].title = i18n.t('static.tooltip.PriceType');
+    
+    }
+
+    getPlanningUnitWithPricesByIds(){
+        console.log("semma----",this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()));
+        PlanningUnitService.getPlanningUnitWithPricesByIds(this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()))
+          .then(response => {
+              console.log("Output---",response.data)
+              var listArray = response.data;
+              this.setState({
+                  planningUnitObjList:response.data
+              });
+          }).catch(
+              error => {
+                  if (error.message === "Network Error") {
+                      this.setState({
+                          message: 'static.unkownError',
+                          loading: false
+                      });
+                  } else {
+                      switch (error.response ? error.response.status : "") {
+  
+                          // case 401:
+                          //     this.props.history.push(`/login/static.message.sessionExpired`)
+                          //     break;
+                          case 403:
+                              this.props.history.push(`/accessDenied`)
+                              break;
+                          case 500:
+                          case 404:
+                          case 406:
+                              this.setState({
+                                  message: error.response.data.messageCode,
+                                  loading: false
+                              });
+                              break;
+                          case 412:
+                              this.setState({
+                                  message: error.response.data.messageCode,
+                                  loading: false
+                              });
+                              break;
+                          default:
+                              this.setState({
+                                  message: 'static.unkownError',
+                                  loading: false
+                              });
+                              break;
+                      }
+                  }
+              }
+          );
+    }
+
+    procurementAgentList() {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+            var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
+            var procurementAgentRequest = procurementAgentOs.getAll();
+            var planningList = []
+            procurementAgentRequest.onerror = function (event) {
+                // Handle errors!
+                this.setState({
+                    message: 'unknown error occured', loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            };
+            procurementAgentRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = procurementAgentRequest.result;
+                var listArray = myResult;
+                listArray.sort((a, b) => {
+                    var itemLabelA = (a.procurementAgentCode).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = (b.procurementAgentCode).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
+                let tempList = [];
+
+                if (listArray.length > 0) {
+                    for (var i = 0; i < listArray.length; i++) {
+                        var paJson = {
+                            name: listArray[i].procurementAgentCode,
+                            id: parseInt(listArray[i].procurementAgentId),
+                            active: listArray[i].active,
+                            code: listArray[i].procurementAgentCode,
+                            label: listArray[i].label
+                        }
+                        tempList[i] = paJson
+                    }
+                }
+
+                tempList.unshift({
+                    name: 'CUSTOM',
+                    id: -1,
+                    active: true,
+                    code: 'CUSTOM',
+                    label: {}
+                });
+                this.setState({
+                    allProcurementAgentList: tempList,
+                    })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson(null, false);
+        console.log("json.length-------", json);
+        for (var y = 0; y < json.length; y++) {
+            //tracer category
+            var col = ("A").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(0, y);
+            console.log("value-----", value);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            //planning unit
+            var col = ("B").concat(parseInt(y) + 1);
+            var value = this.el.getRowData(parseInt(y))[1];
+            console.log("value-----", value);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                for (var i = (json.length - 1); i >= 0; i--) {
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    if (planningUnitValue == value && y != i && i > y && map.get("16").toString() == "true" && json[y][16].toString() == "true") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        i = -1;
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+            }
+
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(4, y);
+            }
+            var reg = JEXCEL_INTEGER_REGEX;
+            console.log("value------------->E", value);
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(5, y);
+            }
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value == "") {
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(6, y);
+            }
+            // var value = this.el.getValueFromCoords(6, y);
+            var reg = JEXCEL_INTEGER_REGEX;
+            if (value == "") {
+                // this.el.setStyle(col, "background-color", "transparent");
+                // this.el.setStyle(col, "background-color", "yellow");
+                // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                // valid = false;
+            } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.10digitWholeNumber'));
+                    valid = false;
+                } else if (parseInt(value) > 99) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max99MonthAllowed'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            if (value == "") {
+                } else {
+                if (isNaN(parseInt(value))) {//string value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.stringNotAllowed'));
+                    valid = false;
+                } else if (Number(value) < 0) {//negative value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.negativeValueNotAllowed'));
+                    valid = false;
+                } else if (!(reg.test(value))) {//regex check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        return valid;
+    }
+
+    saveMissingPUs(){
+        var validation = this.checkValidation();
+       console.log("validation",validation)
+       let indexVar = 0;
+       if (validation == true) {
+        var tableJson = this.el.getJson(null, false);
+        var planningUnitList = [];
+        var programs = [];
+        var missingPUList = this.state.missingPUList;
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            let procurementAgentObj = "";
+                if (parseInt(map1.get("7")) === -1) {
+                    procurementAgentObj = null
+                } else {
+                    procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                }
+            var planningUnitObj = this.state.planningUnitObjList.filter(c => c.planningUnitId == missingPUList[i].planningUnit.id)[0]         
+            let tempJson = {
+                "programPlanningUnitId": 0,
+                "planningUnit": {
+                    "id": planningUnitObj.planningUnitId,
+                    "label":planningUnitObj.label,
+                    "unit": planningUnitObj.unit,
+                    "multiplier": planningUnitObj.multiplier,
+                    "forecastingUnit": {
+                        "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                        "label": planningUnitObj.forecastingUnit.label,
+                        "unit": planningUnitObj.forecastingUnit.unit,
+                        "productCategory": planningUnitObj.forecastingUnit.productCategory,
+                        "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                        "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                    },
+                    "idString": "" + planningUnitObj.planningUnitId
+                },
+                "consuptionForecast": map1.get("2"),
+                "treeForecast": map1.get("3"),
+                "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "procurementAgent": (procurementAgentObj == null ? null : {
+                    "id": parseInt(map1.get("7")),
+                    "label": procurementAgentObj.label,
+                    "code": procurementAgentObj.code,
+                    "idString": "" + parseInt(map1.get("7"))
+                }),
+                "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                "higherThenConsumptionThreshold": null,
+                "lowerThenConsumptionThreshold": null,
+                "planningUnitNotes": map1.get("9"),
+                "consumptionDataType": 2,
+                "otherUnit": null,
+                "selectedForecastMap": null,
+                "createdBy": null,
+                "createdDate": null,
+                "active": true,
+            }
+            planningUnitList.push(tempJson);
+        }
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+                console.log("this.state.datasetIdModal------",this.state.datasetIdModal);
+                var programId = this.state.datasetIdModal.split("_")[0];
+                var versionId = (this.state.datasetIdModal.split("_")[1]).split("v")[1];
+                console.log("this.state.datasetIdModal------programId",programId);
+                console.log("this.state.datasetIdModal------versionId",versionId.split("v"));
+                
+                var program = (filteredGetRequestList.filter(x => x.programId == programId)).filter(v => v.version == versionId)[0];
+                console.log("this.state.datasetIdModal------program------",program);
+                var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                console.log("this.state.datasetIdModal------programData------",programData);
+                var planningFullList=programData.planningUnitList;
+                console.log("this.state.datasetIdModal------1Aug planningUnitList------",planningUnitList);
+                console.log("this.state.datasetIdModal------1Aug programData------Before",programData.planningUnitList);
+                
+                planningUnitList.forEach(p => {
+                    indexVar=programData.planningUnitList.findIndex(c=>c.planningUnit.id==p.planningUnit.id)
+
+                    console.log("this.state.datasetIdModal------1Aug indexVar------",indexVar);
+                    if(indexVar!=-1){
+                        planningFullList[indexVar] = p;
+                    }else{
+                        planningFullList = planningFullList.concat(p);
+                    }
+                    console.log("this.state.datasetIdModal------1Aug planningFullList------1",planningFullList);
+                })
+                console.log("this.state.datasetIdModal------1Aug planningFullList------",planningFullList);
+                
+            programData.planningUnitList = planningFullList;
+            console.log("this.state.datasetIdModal------1Aug programData------after",programData.planningUnitList);
+            let downloadedProgramData = programData;
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            program.programData = programData;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+            // programs.forEach(program => {
+                programTransaction.put(program);
+            // })
+            
+            transaction.oncomplete = function (event) {
+                db1 = e.target.result;
+                var id = this.state.datasetIdModal;
+                
+                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                var datasetDetailsRequest = datasetDetailsTransaction.get(id);
+                
+                datasetDetailsRequest.onsuccess = function (e) {
+                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                    datasetDetailsRequestJson.changed = 1;
+                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    console.log("Testing Final-------------->downloadedProgramData", downloadedProgramData);
+            
+                    datasetDetailsRequest1.onsuccess = function (event) {
+                        this.setState({
+                            message: i18n.t('static.mt.dataUpdateSuccess'),
+                            color: "green",
+                            missingPUList: [],
+                            downloadedProgramData:[downloadedProgramData],
+                            datasetListJexcel:downloadedProgramData
+                        });
+                    }.bind(this)
+                }.bind(this)
+                }.bind(this);
+                transaction.onerror = function (event) {
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+    }
     }
 
     handleRegionChange = (regionIds) => {
@@ -925,6 +1747,7 @@ export default class ListTreeTemplate extends Component {
     componentDidMount() {
         this.hideFirstComponent();
         this.getTreeTemplateList();
+        this.procurementAgentList();
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -1394,7 +2217,9 @@ export default class ListTreeTemplate extends Component {
                     </Modal>
 
                     <Modal isOpen={this.state.isModalCreateTree}
-                        className={'modal-lg ' + this.props.className}>
+                        // className={'modal-lg ' + this.props.className}>
+                        className={'modal-dialog modal-lg modalWidth'}>
+                   
                         <ModalHeader>
                             <strong>{i18n.t('static.listTree.treeDetails')}</strong>
                             <Button size="md" onClick={this.modelOpenCloseCreateTree} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
@@ -1610,6 +2435,7 @@ export default class ListTreeTemplate extends Component {
                                                     <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        {this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>Save Missing PUs</Button>}
                                                         &nbsp;
 
                                                     </FormGroup>
