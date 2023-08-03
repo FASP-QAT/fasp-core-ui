@@ -10831,6 +10831,11 @@ label.arrow_label:before {
   overflow: scroll !important;
 }
 
+.shipmentDataEntryTable .jss_content {
+  max-height: calc(100vh - 213px) !important;
+  overflow: scroll !important;
+}
+
 .jss {
   white-space: pre-wrap !important;
   margin-right: 0px !important;
