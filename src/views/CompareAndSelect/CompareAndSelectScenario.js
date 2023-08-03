@@ -1439,7 +1439,7 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             loading: true
         })
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         if (x == 1) {
             var treeScenarioList = this.state.treeScenarioList;
             var index = this.state.treeScenarioList.findIndex(c => c.id == elInstance.getRowData(y)[8]);
