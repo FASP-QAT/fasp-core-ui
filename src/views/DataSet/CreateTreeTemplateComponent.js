@@ -8687,7 +8687,7 @@ export default class CreateTreeTemplate extends Component {
                         initialValues={{
                             nodeTitle: this.state.currentItemConfig.context.payload.label.label_en,
                             nodeTypeId: this.state.currentItemConfig.context.payload.nodeType.id,
-                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id,
+                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id!=null?this.state.currentItemConfig.context.payload.nodeUnit.id:"",
                             nodeValue: this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue : this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue,
                             percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue,
                             forecastingUnitId: this.state.fuValues,
@@ -11231,7 +11231,7 @@ export default class CreateTreeTemplate extends Component {
                                     var getLevelUnit = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList.filter(c => c.levelNo == itemConfig.level + 1) : [];
                                     var levelUnitId = ""
                                     if (getLevelUnit.length > 0) {
-                                        levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
+                                        levelUnitId = getLevelUnit[0].unit != null && getLevelUnit[0].unit.id != null ? getLevelUnit[0].unit.id : "";
                                     }
                                     console.log("level unit id on add button click---", levelUnitId);
                                     this.setState({
