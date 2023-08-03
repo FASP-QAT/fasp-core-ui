@@ -5162,7 +5162,7 @@ export default class CreateTreeTemplate extends Component {
         jExcelLoadedFunction(instance);
 
         // var asterisk = document.getElementsByClassName("resizable")[0];
-        var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         console.log("tr.children[9]---", tr.children[9]);
         tr.children[4].classList.add('InfoTr');
