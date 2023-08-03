@@ -577,12 +577,19 @@ export default class ConsumptionDetails extends Component {
 
   loadedModal = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
-    var asterisk =
-      document.getElementsByClassName("jss")[1].firstChild.nextSibling;
-    var tr = asterisk.firstChild;
-    tr.children[1].classList.add("AsteriskTheadtrTd");
-    tr.children[2].classList.add("AsteriskTheadtrTd");
-    tr.children[3].classList.add("AsteriskTheadtrTd");
+    if(document.getElementsByClassName("jss").length>1){
+      var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
+      var tr = asterisk.firstChild;
+      tr.children[1].classList.add("AsteriskTheadtrTd");
+      tr.children[2].classList.add("AsteriskTheadtrTd");
+      tr.children[3].classList.add("AsteriskTheadtrTd");
+    }else{
+      var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+      var tr = asterisk.firstChild;
+      tr.children[1].classList.add("AsteriskTheadtrTd");
+      tr.children[2].classList.add("AsteriskTheadtrTd");
+      tr.children[3].classList.add("AsteriskTheadtrTd");
+    }
   };
 
   filterVersion = function (instance, cell, c, r, source) {
