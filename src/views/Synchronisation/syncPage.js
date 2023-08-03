@@ -294,8 +294,11 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflicts = function (instance) {
+    let target = document.getElementById('resolveConflictsTable');
+    target.classList.add("removeOddColor")
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
+    elInstance.options.editable = true;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     for (var j = 1; j < 13; j++) {
@@ -323,6 +326,7 @@ export default class syncPage extends Component {
       elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
       elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
     }
+    elInstance.options.editable = false;
   }
 
   acceptCurrentChanges() {
@@ -456,7 +460,7 @@ export default class syncPage extends Component {
       allowManualInsertColumn: false,
       allowDeleteRow: false,
       // tableOverflow: false,
-      editable: false,
+      // editable: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
@@ -475,8 +479,11 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsInventory = function (instance) {
+    let target = document.getElementById('resolveConflictsInventoryTable');
+    target.classList.add("removeOddColor")
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
+    elInstance.options.editable=true;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
     for (var j = 1; j < 14; j++) {
@@ -504,6 +511,7 @@ export default class syncPage extends Component {
       elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
       elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
     }
+    elInstance.options.editable=false;
   }
 
   acceptCurrentChangesInventory() {
@@ -654,7 +662,7 @@ export default class syncPage extends Component {
       allowManualInsertColumn: false,
       allowDeleteRow: false,
       // tableOverflow: false,
-      editable: false,
+      // editable: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
@@ -769,7 +777,7 @@ export default class syncPage extends Component {
       allowManualInsertColumn: false,
       allowDeleteRow: false,
       // tableOverflow: false,
-      editable: false,
+      // editable: false,
       filters: false,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
@@ -788,8 +796,11 @@ export default class syncPage extends Component {
   }
 
   loadedResolveConflictsShipment = function (instance) {
+    let target = document.getElementById('resolveConflictsShipmentTable');
+    target.classList.add("removeOddColor")
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
+    elInstance.options.editable=true;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI']
     for (var j = 1; j < 31; j++) {
@@ -817,6 +828,7 @@ export default class syncPage extends Component {
       elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
       elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
     }
+    elInstance.options.editable=false;
   }
 
   acceptCurrentChangesShipment() {
@@ -909,8 +921,11 @@ export default class syncPage extends Component {
 
 
   loadedResolveConflictsProblem = function (instance) {
+    let target = document.getElementById('resolveConflictsProblemTable');
+    target.classList.add("removeOddColor")
     jExcelLoadedFunctionOnlyHideRow(instance);
     var elInstance = instance.worksheets[0];
+    elInstance.options.editable=true;
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
     for (var j = 0; j < 17; j++) {
@@ -928,6 +943,7 @@ export default class syncPage extends Component {
         }
       }
     }
+    elInstance.options.editable=false;
   }
 
   acceptCurrentChangesProblem() {
@@ -2309,7 +2325,7 @@ export default class syncPage extends Component {
                                               allowInsertColumn: false,
                                               allowManualInsertColumn: false,
                                               allowDeleteRow: false,
-                                              editable: false,
+                                              // editable: false,
                                               onload: this.loadedFunctionForMerge,
                                               // text: {
                                               //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -2497,7 +2513,7 @@ export default class syncPage extends Component {
                                               allowInsertColumn: false,
                                               allowManualInsertColumn: false,
                                               allowDeleteRow: false,
-                                              editable: false,
+                                              // editable: false,
                                               onload: this.loadedFunctionForMergeInventory,
                                               // text: {
                                               //   showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -2688,7 +2704,7 @@ export default class syncPage extends Component {
                                               allowInsertColumn: false,
                                               allowManualInsertColumn: false,
                                               allowDeleteRow: false,
-                                              editable: false,
+                                              // editable: false,
                                               onload: this.loadedFunctionForMergeShipment,
                                               filters: true,
                                               license: JEXCEL_PRO_KEY,
@@ -3033,7 +3049,7 @@ export default class syncPage extends Component {
                                               allowInsertColumn: false,
                                               allowManualInsertColumn: false,
                                               allowDeleteRow: false,
-                                              editable: false,
+                                              // editable: false,
                                               onload: this.loadedFunctionForMergeShipmentLinked,
                                               // onchangepage: this.onchangepage,
                                               filters: true,
@@ -3359,6 +3375,8 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMerge = function (instance) {
+    let target = document.getElementById('mergedVersionConsumption');
+    target.classList.add("removeOddColor")
     jExcelLoadedFunction(instance, 0);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -3470,6 +3488,8 @@ export default class syncPage extends Component {
 
 
   loadedFunctionForMergeInventory = function (instance) {
+    let target = document.getElementById('mergedVersionInventory');
+    target.classList.add("removeOddColor")
     jExcelLoadedFunction(instance, 1);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -3969,11 +3989,15 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeShipmentLinked = function (instance) {
+    let target = document.getElementById('mergedVersionShipmentLinked');
+    target.classList.add("removeOddColor")
     jExcelLoadedFunction(instance, 3);
     this.recursiveConflictsForShipmentLinking(instance.worksheets[0])
   }
 
   loadedFunctionForMergeShipment = function (instance) {
+    let target = document.getElementById('mergedVersionShipment');
+    target.classList.add("removeOddColor")
     jExcelLoadedFunction(instance, 2);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -4109,6 +4133,8 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeProblemList = function (instance) {
+    let target = document.getElementById('mergedVersionProblemList');
+    target.classList.add("removeOddColor")
     jExcelLoadedFunction(instance, 4);
     var elInstance = instance.worksheets[0];
     var jsonData = elInstance.getJson();
@@ -5954,7 +5980,7 @@ export default class syncPage extends Component {
           allowInsertColumn: false,
           allowManualInsertColumn: false,
           allowDeleteRow: false,
-          editable: false,
+          // editable: false,
           onload: this.loadedFunctionForMergeProblemList,
           filters: true,
           license: JEXCEL_PRO_KEY,
