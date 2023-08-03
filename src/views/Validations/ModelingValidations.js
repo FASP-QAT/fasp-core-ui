@@ -2254,7 +2254,7 @@ class ModelingValidation extends Component {
 
                                             {/* // <div className="table-scroll">
                                                     // <div className="table-wrap table-responsive"> */}
-                                            <div id="tableDiv2" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.show && !this.state.loading && this.state.xAxisDisplayBy > 1 ? "block" : "none" }}>
+                                            <div id="tableDiv2" className="jexcelremoveReadonlybackground consumptionDataEntryTable TableWidth100" style={{ display: this.state.show && !this.state.loading && this.state.xAxisDisplayBy > 1 ? "block" : "none" }}>
                                             </div>
                                             {/* // </div>
                                                 // </div> */}
