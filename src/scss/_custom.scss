@@ -9712,6 +9712,25 @@ legend.scheduler-border {
 .HighlightFrameTooltip {
   border: 1px solid #ddd;
   margin-top: -14px;
+// .ContactTitleWhite i{
+//   // color: #002f6c!important;
+//   color: #fff !important;
+//   // background: #002f6c!important;
+//   padding: 4px 6px 3px 6px!important;
+//   // margin-top: -1px!important;
+//   // border: 1px solid #002f6c!important;
+//   border-radius: 0px!important;
+//   cursor: pointer;
+}
+.TreeIconStyle {
+  // width: 23px;
+  // height: 23px;
+  color: #002f6c;
+  outline: none !important;
+  border: none !important;
+  background: none;
+  padding-top: 1px;
+  // margin-left: -2px;
 }
 
 .HighlightBadgeBox {
@@ -12245,4 +12264,13 @@ and (max-width: 1366px)
   pointer-events: none;
   opacity: unset!important;
 
+}
+.compareAndSelect.jtabs .jtabs-headers-container {
+  display: flex!important;
+  align-items: center;
+}
+.compareAndSelect.jtabs .jtabs-headers > div.jtabs-selected {
+  background-color: #e8e8e8;
+  color: #000;
+  display: none!important;
 }
