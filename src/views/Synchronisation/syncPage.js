@@ -5111,15 +5111,6 @@ export default class syncPage extends Component {
               // if (response1.data == false) {
               // console.log("Program Json Final Test@@@123", programJson)
               // console.log("CommitLogs --- 2 Log before sending data to server")
-              delete programJson.actionList;
-              delete programJson.qplLastModifiedDate;
-              programJson.problemReportList.map(e => e.regionActive = undefined)
-              programJson.supplyPlan.map(e => e.manualTotalQty = undefined)
-              programJson.supplyPlan.map(e => e.erpTotalQty = undefined)
-              programJson.supplyPlan.map(e => e.shipmentTotalQty = undefined)
-              programJson.supplyPlan.map(e => e.shipmentTotalQtyWps = undefined)
-              programJson.supplyPlan.map(e => e.expectedStock = undefined)
-              programJson.supplyPlan.map(e => e.expectedStockWps = undefined)
               const compressedData = isCompress(programJson);
               ProgramService.saveProgramData(compressedData, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
