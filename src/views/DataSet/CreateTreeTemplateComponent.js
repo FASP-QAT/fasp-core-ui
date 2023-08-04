@@ -1082,16 +1082,58 @@ export default class CreateTreeTemplate extends Component {
             console.log("dataset----beforeEndDateDisplay----",beforeEndDateDisplay)
             
             var puNodeList = treeTemplateForCreateTree.flatList.filter(x => x.payload.nodeType.id == 5);
-            var planningUnitList = dataset.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
+            var planningUnitList = dataset.planningUnitList;
             for (let i = 0; i < puNodeList.length; i++) {
-                if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
+                if (planningUnitList.filter(x => x.treeForecast == true && x.active == true && x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
                     var parentNodeData = treeTemplateForCreateTree.flatList.filter(x => x.id == puNodeList[i].parent)[0];
                     var productCategory=parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory;
-                    json = {
-                        productCategory: productCategory!=undefined?productCategory:{id:"",label:{label_en:""}},
-                        planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
-                    };
-                    missingPUListForCreateTree.push(json);
+                    let existingPU=planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
+                        console.log("existingPU",existingPU)
+                        if(existingPU.length > 0 ){
+                            json ={
+                                productCategory: productCategory!=undefined?productCategory:{id:"",label:{label_en:""}},
+                                planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit,
+                                consuptionForecast: existingPU[0].consuptionForecast,
+                                treeForecast: true,
+                                stock: existingPU[0].stock,
+                                existingShipments: existingPU[0].existingShipments,
+                                monthsOfStock: existingPU[0].monthsOfStock,
+                                procurementAgent: existingPU[0].procurementAgent,
+                                price: existingPU[0].price,
+                                higherThenConsumptionThreshold: existingPU[0].higherThenConsumptionThreshold,
+                                lowerThenConsumptionThreshold: existingPU[0].lowerThenConsumptionThreshold,
+                                planningUnitNotes: existingPU[0].planningUnitNotes,
+                                consumptionDataType: existingPU[0].consumptionDataType,
+                                otherUnit: existingPU[0].otherUnit,
+                                selectedForecastMap: existingPU[0].selectedForecastMap,
+                                programPlanningUnitId: existingPU[0].programPlanningUnitId,
+                                createdBy:existingPU[0].createdBy,
+                                createdDate:existingPU[0].createdDate
+                            }
+                            missingPUListForCreateTree.push(json);    
+                        }else{
+                            json = {
+                                productCategory: productCategory!=undefined?productCategory:{id:"",label:{label_en:""}},
+                                planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit,
+                                consuptionForecast: "",
+                                treeForecast: true,
+                                stock: "",
+                                existingShipments: "",
+                                monthsOfStock: "",
+                                procurementAgent: "",
+                                price: "",
+                                higherThenConsumptionThreshold: "",
+                                lowerThenConsumptionThreshold: "",
+                                planningUnitNotes: "",
+                                consumptionDataType: "",
+                                otherUnit: "",
+                                selectedForecastMap: {},
+                                programPlanningUnitId: 0,
+                                createdBy: null,
+                                createdDate: null
+                            };
+                            missingPUListForCreateTree.push(json);
+                        }    
                 }
             }
         }
@@ -1120,15 +1162,22 @@ export default class CreateTreeTemplate extends Component {
                 // data[1] = missingPUList[j].startValue
                 data[0] = getLabelText(missingPUListForCreateTree[j].productCategory.label, this.state.lang)
                 data[1] = getLabelText(missingPUListForCreateTree[j].planningUnit.label, this.state.lang) + " | " + missingPUListForCreateTree[j].planningUnit.id
-                data[2] = false;
-                data[3] = true;
-                data[4] = "";
-                data[5] = "";
-                data[6] = "";
-                data[7] = "";
-                data[8] = "";
-                data[9] = "";
-                data[10] = missingPUListForCreateTree[j].planningUnit.id
+                data[2] = missingPUListForCreateTree[j].consuptionForecast;
+                data[3] = missingPUListForCreateTree[j].treeForecast;
+                data[4] = missingPUListForCreateTree[j].stock;
+                data[5] = missingPUListForCreateTree[j].existingShipments;
+                data[6] = missingPUListForCreateTree[j].monthsOfStock;
+                data[7] = (missingPUListForCreateTree[j].price==="" || missingPUListForCreateTree[j].price==null || missingPUListForCreateTree[j].price==undefined)?"":(missingPUListForCreateTree[j].procurementAgent == null || missingPUListForCreateTree[j].procurementAgent == undefined ? -1 : missingPUListForCreateTree[j].procurementAgent.id);
+                data[8] = missingPUListForCreateTree[j].price;
+                data[9] = missingPUListForCreateTree[j].planningUnitNotes;
+                data[10] = missingPUListForCreateTree[j].planningUnit.id;
+                data[11] = missingPUListForCreateTree[j].programPlanningUnitId;
+                data[12] = missingPUListForCreateTree[j].higherThenConsumptionThreshold;
+                data[13] = missingPUListForCreateTree[j].lowerThenConsumptionThreshold;
+                data[14] = missingPUListForCreateTree[j].selectedForecastMap;
+                data[15] = missingPUListForCreateTree[j].otherUnit;
+                data[16] = missingPUListForCreateTree[j].createdBy;
+                data[17] = missingPUListForCreateTree[j].createdDate; 
                 dataArray[count] = data;
                 count++;
             }
@@ -1239,8 +1288,43 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: 'planningUnitId',
                     type: 'hidden',
-                    readOnly: true //10J
+                    readOnly: true //10K
                 },
+                {
+                    title: 'programPlanningUnitId',
+                    type: 'hidden',
+                    readOnly: true //11L
+                },
+                {
+                    title: 'higherThenConsumptionThreshold',
+                    type: 'hidden',
+                    readOnly: true //12M
+                },
+                {
+                    title: 'lowerThenConsumptionThreshold',
+                    type: 'hidden',
+                    readOnly: true //13N
+                },
+                {
+                    title: 'selectedForecastMap',
+                    type: 'hidden',
+                    readOnly: true //14O
+                },
+                {
+                    title: 'otherUnit',
+                    type: 'hidden',
+                    readOnly: true //15P
+                },
+                {
+                    title: 'createdBy',
+                    type: 'hidden',
+                    readOnly: true //16P
+                },
+                {
+                    title: 'createdDate',
+                    type: 'hidden',
+                    readOnly: true //17P
+                }
             ],
             // text: {
             //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
@@ -1843,6 +1927,8 @@ export default class CreateTreeTemplate extends Component {
     saveMissingPUs(){
         var validation = this.checkValidationForMissingPUList();
        console.log("validation",validation)
+       var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+       var curUser = AuthenticationService.getLoggedInUserId();                     
        let indexVar = 0;
        if (validation == true) {
         var tableJson = this.el.getJson(null, false);
@@ -1852,14 +1938,14 @@ export default class CreateTreeTemplate extends Component {
         for (var i = 0; i < tableJson.length; i++) {
             var map1 = new Map(Object.entries(tableJson[i]));
             let procurementAgentObj = "";
-                if (parseInt(map1.get("7")) === -1) {
+                if (parseInt(map1.get("7")) === -1 || (map1.get("7")) == "" ) {
                     procurementAgentObj = null
                 } else {
                     procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
                 }
             var planningUnitObj = this.state.planningUnitObjList.filter(c => c.planningUnitId == missingPUListForCreateTree[i].planningUnit.id)[0]         
             let tempJson = {
-                "programPlanningUnitId": 0,
+                "programPlanningUnitId": map1.get("11"),
                 "planningUnit": {
                     "id": planningUnitObj.planningUnitId,
                     "label":planningUnitObj.label,
@@ -1887,15 +1973,18 @@ export default class CreateTreeTemplate extends Component {
                     "idString": "" + parseInt(map1.get("7"))
                 }),
                 "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                "higherThenConsumptionThreshold": null,
-                "lowerThenConsumptionThreshold": null,
+                "higherThenConsumptionThreshold": map1.get("12"),
+                "lowerThenConsumptionThreshold": map1.get("13"),
                 "planningUnitNotes": map1.get("9"),
                 "consumptionDataType": 2,
-                "otherUnit": null,
-                "selectedForecastMap": null,
-                "createdBy": null,
-                "createdDate": null,
-                "active": true,
+                "otherUnit": map1.get("15")==""?null:map1.get("15"),
+                "selectedForecastMap":map1.get("14"),
+                "createdBy":
+                {
+                  "userId": map1.get("16")==""? curUser:map1.get("16"),
+                }, 
+                "createdDate": map1.get("17")==""? curDate:map1.get("17"),
+                "active": true
             }
             planningUnitList.push(tempJson);
         }
@@ -1972,7 +2061,7 @@ export default class CreateTreeTemplate extends Component {
             
                     datasetDetailsRequest1.onsuccess = function (event) {
                         this.setState({
-                            message: i18n.t('static.mt.dataUpdateSuccess'),
+                            // message: i18n.t('static.mt.dataUpdateSuccess'),
                             color: "green",
                             missingPUListForCreateTree: [],
                             datasetListJexcelForCreateTree:downloadedProgramData
@@ -13125,8 +13214,11 @@ export default class CreateTreeTemplate extends Component {
                                                     </div>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenCloseForCreateTree}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>Save Missing PUs</Button>}
+                                                        {this.state.missingPUListForCreateTree.length == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>Create Tree</Button>}
+                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllCreateTree(setTouched, errors)}><i className="fa fa-check"></i>Create Tree Without Adding Planning Units</Button>}
+                                                        {this.state.missingPUListForCreateTree.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>Add Above Planning Units</Button>}
+                                                        {this.state.missingPUListForCreateTree.length == 0 && <strong>All template Planning Units are in the program.</strong>}
+                                                        
                                                         &nbsp;
 
                                                     </FormGroup>
