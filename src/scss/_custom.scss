@@ -7694,7 +7694,7 @@ label.arrow_label:before {
   border: none !important;
   background: none;
   padding-top: 1px;
-  margin-left: -2px;
+  // margin-left: -2px;
 }
 
 .TreeIconStyle i {
@@ -10063,4 +10063,13 @@ legend.scheduler-border {
 }
 .was-validated .form-control:valid, .form-control.is-valid, .form-control.is-invalid {
   padding: 0.25rem 0.25rem 0.25rem 0.5rem !important;
+}
+.compareAndSelect.jtabs .jtabs-headers-container {
+  display: flex!important;
+  align-items: center;
+}
+.compareAndSelect.jtabs .jtabs-headers > div.jtabs-selected {
+  background-color: #e8e8e8;
+  color: #000;
+  display: none!important;
 }
