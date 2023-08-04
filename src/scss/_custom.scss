@@ -12241,3 +12241,8 @@ and (max-width: 1366px)
 .MarginTopCustformonthDatacheckbtn{
   padding-top: 24px;
 }
+.shipmentDataEntryTable .jss>tbody>tr>td.readonly>input[type=checkbox], .jss>tbody>tr>td.readonly>input[type=radio] {
+  pointer-events: none;
+  opacity: unset!important;
+
+}
