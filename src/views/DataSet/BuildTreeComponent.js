@@ -1369,7 +1369,7 @@ export default class BuildTree extends Component {
                 };
                 var label = {}
                 var levelUnit = null;
-                if (this.state.levelUnit != "") {
+                if (this.state.levelUnit != "" && this.state.levelUnit!=null) {
                     label = this.state.nodeUnitList.filter(c => c.unitId == this.state.levelUnit)[0].label;
                     items.map((i, count) => {
                         if (i.level == this.state.levelNo && parseInt(i.payload.nodeType.id) <= 3) {
@@ -1380,7 +1380,7 @@ export default class BuildTree extends Component {
                         }
                     })
                     levelUnit = {
-                        id: parseInt(this.state.levelUnit),
+                        id: this.state.levelUnit!="" && this.state.levelUnit!=null?parseInt(this.state.levelUnit):null,
                         label: label
                     }
                 }
@@ -1392,7 +1392,7 @@ export default class BuildTree extends Component {
             if (this.state.levelName != "") {
                 var label = {}
                 var levelUnit = null;
-                if (this.state.levelUnit != "") {
+                if (this.state.levelUnit != "" && this.state.levelUnit!=null) {
                     label = this.state.nodeUnitList.filter(c => c.unitId == this.state.levelUnit)[0].label;
                     items.map((i, count) => {
                         if (i.level == this.state.levelNo && parseInt(i.payload.nodeType.id) <= 3) {
@@ -1403,7 +1403,7 @@ export default class BuildTree extends Component {
                         }
                     })
                     levelUnit = {
-                        id: parseInt(this.state.levelUnit),
+                        id: this.state.levelUnit!="" && this.state.levelUnit!=null?parseInt(this.state.levelUnit):null,
                         label: label
                     }
                 }
@@ -8209,7 +8209,7 @@ export default class BuildTree extends Component {
         if (levelListFiltered == -1) {
             var label = {}
             var unitId = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id;
-            if (unitId != "") {
+            if (unitId != "" && unitId!=null) {
                 label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
             }
             treeLevelList.push({
@@ -8222,7 +8222,7 @@ export default class BuildTree extends Component {
                     label_fr: ""
                 },
                 unit: {
-                    id: parseInt(unitId),
+                    id: unitId!="" && unitId!=null?parseInt(unitId):null,
                     label: label
                 }
             })
@@ -8322,7 +8322,7 @@ export default class BuildTree extends Component {
         if (levelListFiltered == -1) {
             var label = {}
             var unitId = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id;
-            if (unitId != "") {
+            if (unitId != "" && unitId!=null) {
                 label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
             }
             treeLevelList.push({
@@ -8335,7 +8335,7 @@ export default class BuildTree extends Component {
                     label_fr: ""
                 },
                 unit: {
-                    id: parseInt(unitId),
+                    id: unitId!="" && unitId!=null?parseInt(unitId):null,
                     label: label
                 }
             })
@@ -8790,11 +8790,11 @@ export default class BuildTree extends Component {
             if (levelListFiltered != -1) {
                 var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
                 var label = {}
-                if (unitId != "") {
+                if (unitId != "" && unitId != null) {
                     label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
                 }
                 treeLevelList[levelListFiltered].unit = {
-                    id: parseInt(unitId),
+                    id: unitId!="" && unitId!=null?parseInt(unitId):null,
                     label: label
                 }
 
@@ -9151,7 +9151,7 @@ export default class BuildTree extends Component {
                         initialValues={{
                             nodeTitle: this.state.currentItemConfig.context.payload.label.label_en,
                             nodeTypeId: this.state.currentItemConfig.context.payload.nodeType.id,
-                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id,
+                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id!=null?this.state.currentItemConfig.context.payload.nodeUnit.id:"",
                             forecastingUnitId: this.state.fuValues,
                             tempPlanningUnitId: this.state.tempPlanningUnitId,
                             nodeValue: this.state.numberNode ? this.state.currentScenario.calculatedDataValue == 0 ? "0" : addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue),
@@ -11660,6 +11660,51 @@ export default class BuildTree extends Component {
             defaultTemplateName: "contactTemplate",
             linesColor: Colors.Black,
             annotations: treeLevelItems,
+            onLevelTitleRender: ((data) => {
+                var { context, width, height } = data;
+                var { title, titleColor } = context;
+                var style = {
+                    position: "absolute",
+                    fontSize: "12px",
+                    fontFamily: "Trebuchet MS, Tahoma, Verdana, Arial, sans-serif",
+                    WebkitTapHighlightColor: "rgba(0,0,0,0)",
+                    WebkitUserSelect: "none",
+                    WebkitTouchCallout: "none",
+                    KhtmlUserSelect: "none",
+                    MozUserSelect: "none",
+                    msUserSelect: "none",
+                    userSelect: "none",
+                    boxSizing: "content-box",
+
+                    MozBorderRadius: "4px",
+                    WebkitBorderRadius: "4px",
+                    KhtmlBorderRadius: "4px",
+                    BorderRadius: "4px",
+
+                    background: "royalblue",
+                    borderWidth: 0,
+                    color: "white",
+                    padding: 0,
+                    width: "100%",
+                    height: "100%",
+                    left: "-1px",
+                    top: "-1px"
+                }
+                return <div style={{ ...style, background: titleColor }} onClick={(event) => {
+                    event.stopPropagation();
+                    //   console.log("Data@@@1111----------->",data)
+                    //   alert(`User clicked on level title ${title}`)
+                    this.levelClicked(data)
+                }}>
+                    <RotatedText
+                        width={width}
+                        height={height}
+                        orientation={'RotateRight'}
+                        horizontalAlignment={'center'}
+                        verticalAlignment={'middle'}
+                    >{title}</RotatedText>
+                </div>
+            }),
             
             // itemTitleFirstFontColor: Colors.White,
             templates: [{
@@ -11809,7 +11854,7 @@ export default class BuildTree extends Component {
                                         var getLevelUnit = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList.filter(c => c.levelNo == itemConfig.level + 1) : [];
                                         var levelUnitId = ""
                                         if (getLevelUnit.length > 0) {
-                                            levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
+                                            levelUnitId = getLevelUnit[0].unit != null && getLevelUnit[0].unit.id != null ? getLevelUnit[0].unit.id : "";
                                         }
                                         console.log("level unit id on add button click---", levelUnitId);
                                         // tempArray.push(nodeDataMap);
