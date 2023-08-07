@@ -3402,7 +3402,7 @@ export default class ListTreeComponent extends Component {
                                                         {this.state.missingPUList.length > 0 &&<Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Create Tree Without Adding Planning Units</Button>}
                                                         {isSiteOnline() && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>Add Above Planning Units</Button>}
                                                         {(!isSiteOnline() && this.state.missingPUList.length > 0) && <strong>Note* You should be online to create the missing PUs</strong>}                                                      
-                                                        {this.state.missingPUList.length == 0 && <strong>All template Planning Units are in the program.</strong>}
+                                                        {this.state.missingPUList.length == 0 && (this.state.treeTemplate != "" || this.state.downloadAcrossProgram == 1) && <strong>All template Planning Units are in the program.</strong>}
                                                         &nbsp;
 
                                                     </FormGroup>
