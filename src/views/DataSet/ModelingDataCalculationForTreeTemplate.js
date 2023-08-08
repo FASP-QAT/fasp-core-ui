@@ -579,7 +579,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     var cycle = Math.floor(monthNo / monthsPerVisit);
                                     // console.log("cycle$$$%%%", cycle);
                                     var deltaPatients = 0;
-                                    if (i == 0) {
+                                    if (i == curDate) {
                                         var filter1 = [];
                                         if (flatList[fl].level != 1) {
                                             filter1 = grandParentNodeData.nodeDataMomList.filter(c => c.month == i);
