@@ -1327,6 +1327,7 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             levelModal: false,
             treeTemplate,
+            isTemplateChanged:true
         }, () => {
             // this.saveTreeData(false)
             // console.log("final tab list---", this.state.items);
