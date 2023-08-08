@@ -10403,6 +10403,9 @@ and (max-width: 1605px)
 .redPU{
   color:#BA0C2F !important;
 }
+.removeOddColor .jss_content .jss tbody tr:nth-of-type(odd) {
+  background-color: transparent;
+}
 .BudgetPlusIcon .card-header-action{
   margin-top: -4px!important;
 }
