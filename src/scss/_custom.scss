@@ -10065,7 +10065,7 @@ legend.scheduler-border {
     background-color: transparent !important;
   }
 .MarginTopCustformonth{
-  margin-top: 32px;
+  margin-top: 50px;
 }
 
 .ErrorBg{
@@ -10103,7 +10103,13 @@ legend.scheduler-border {
   font-family: 'latin_modern_roman_slante10Rg';
   src: url('/src/assets/font_formulae/lmromanslant10-regular-webfont.woff') format('woff');
 }
+.was-validated .form-control:valid, .form-control.is-valid, .form-control.is-invalid {
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem !important;
+}
 
+.MarginTopCustformonthDatacheckbtn{
+  padding-top: 24px;
+}
   
 @media only screen   
 and (min-width: 1030px)   

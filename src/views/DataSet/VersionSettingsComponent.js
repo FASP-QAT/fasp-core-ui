@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
 import { Prompt } from 'react-router';
-import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
+import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked,consumptionExtrapolationNotesClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
@@ -90,7 +90,9 @@ class VersionSettingsComponent extends Component {
             isChanged1: false,
             includeOnlySelectedForecasts: true,
             datasetPlanningUnitNotes: [],
-            dataList: []
+            dataList: [],
+            consumptionExtrapolationList:[],
+            consumptionExtrapolationNotes:''
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -1662,6 +1664,34 @@ class VersionSettingsComponent extends Component {
             }
         }, this) : <ul><span>{i18n.t('static.forecastValidation.noNodesHaveChildrenLessThanPerc')}</span><br /></ul>
 
+        //ConsumptionExtrapolationNotes
+        const { consumptionExtrapolationList } = this.state;
+       console.log("consumptionExtrapolationList----",consumptionExtrapolationList)
+        let consumptionExtrapolationNotes = (consumptionExtrapolationList.length > 0)? consumptionExtrapolationList.map((item, i) => {   
+           var flag=true;
+           if(item.notes!=undefined && item.notes!=null && item.notes!=''){
+           if(consumptionExtrapolationList.length==(i+1)){
+                flag=false;
+                return (
+                    <tr key={i} className="hoverTd" onClick={() => consumptionExtrapolationNotesClicked(item.planningUnit.id, this)}>
+                        <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                        <td>{item.notes}</td>
+                    </tr>
+                )    
+            }
+            if(flag){
+                if(consumptionExtrapolationList[i].planningUnit.id!=consumptionExtrapolationList[i+1].planningUnit.id){
+                    return (
+                        <tr key={i} className="hoverTd"  onClick={() => consumptionExtrapolationNotesClicked(item.planningUnit.id, this)}>
+                            <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                            <td>{item.notes}</td>
+                        </tr>
+                    )
+                }
+            }
+        }
+        }, this) : <span>&emsp;&emsp;&emsp;&ensp;{i18n.t('static.forecastValidation.noConsumptionExtrapolationNotesFound')}</span>;
+
         //Consumption Notes
         const { datasetPlanningUnitNotes } = this.state;
         let consumtionNotes = (datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
@@ -1941,7 +1971,22 @@ class VersionSettingsComponent extends Component {
                                     </Table>
                                 </div> : <span>{consumtionNotes}</span>}
                             </div><br />
-                            <span>b. {i18n.t('static.commitTree.treeScenarios')}:</span>
+                            <span>b. {i18n.t('static.forecastValidation.consumptionExtrapolationNotes')}:</span>
+                            <div className="mt-2">
+                                {(consumptionExtrapolationList.length > 0) ?
+                                    <div className="table-wrap table-responsive fixTableHead">
+                                        <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
+                                                    <th style={{ width: '80%' }}><b>{i18n.t('static.program.notes')}</b></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>{consumptionExtrapolationNotes}</tbody>
+                                        </Table>
+                                    </div> : <span>{consumptionExtrapolationNotes}</span>}
+                            </div><br />
+                            <span>c. {i18n.t('static.commitTree.treeScenarios')}:</span>
                             <div className="table-scroll">
                                 {treeScenarioNotes.length > 0 ? <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
@@ -1957,7 +2002,7 @@ class VersionSettingsComponent extends Component {
                                     </Table>
                                 </div> : <span>{scenarioNotes}</span>}
                             </div><br />
-                            <span>c. {i18n.t('static.commitTree.treeNodes')}:</span>
+                            <span>d. {i18n.t('static.commitTree.treeNodes')}:</span>
                             {/* <div className="table-scroll"> */}
                             <div className="">
                                 {treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0 ? <div className="table-wrap table-responsive fixTableHead">
