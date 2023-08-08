@@ -267,7 +267,8 @@ export default class CommitTreeComponent extends React.Component {
                     programNameOriginal: getLabelText(programData[0].datasetJson.label, this.state.lang),
                     forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
                     forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
-                    notes: programData[0].datasetJson.currentVersion.notes
+                    notes: programData[0].datasetJson.currentVersion.notes,
+                    consumptionExtrapolationList:programData[0].datasetJson.consumptionExtrapolation
                 })
                 AuthenticationService.setupAxiosInterceptors();
                 ProgramService.getLatestVersionForProgram((programData[0].datasetJson.programId)).then(response1 => {

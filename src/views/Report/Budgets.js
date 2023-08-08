@@ -216,7 +216,11 @@ class Budgets extends Component {
                         fundingSourceValues.push({label:ele.code,value:ele.id})
                     })
                     this.setState({
-                        fundingSources: fundingSources, loading: false,
+                        fundingSources: fundingSources.sort(function (a, b) {
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }), loading: false,
                         fundingSourceValues:fundingSourceValues,
                         fundingSourceLabels: fundingSourceValues.map(ele => ele.label)
                     }, () => {
