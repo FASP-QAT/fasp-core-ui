@@ -3218,6 +3218,7 @@ export default class BuildTree extends Component {
                 maxDate: { year: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("M")) },
                 showDate: true
             }, () => {
+                this.getDatasetList();
                 console.log("program id after update--->", this.state.programId);
                 console.log("program min date--->", this.state.minDate);
                 console.log("program max date--->", this.state.maxDate);
