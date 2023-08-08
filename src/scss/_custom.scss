@@ -10404,6 +10404,13 @@ and (max-width: 1605px)
   width: 100%!important;
 }
 
+@media screen and (min-width: 768px){
+.pickerRangeBox .month-picker > .rmp-container .rmp-popup.range {
+    width: 17rem !important;
+    padding: 0.6rem;
+    margin-left: -38px!important;
+}
+}
 @media (min-width: 768px){
 .SelectdivTree {
     position: absolute;
