@@ -2024,6 +2024,7 @@ export default class CreateTreeTemplate extends Component {
                     console.log("id to filter list---", this.state.nodeDataMomList)
                     // console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
                     var momList = this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id);
+                    if(momList.length>0){
                     this.setState({ momListPer: momList.length > 0 ? momList[0].nodeDataMomList : [] }, () => {
                         console.log("going to build mom jexcel percent");
                         if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
@@ -2033,6 +2034,7 @@ export default class CreateTreeTemplate extends Component {
                             this.buildMomJexcelPercent();
                         }
                     });
+                }
                 }
 
 
