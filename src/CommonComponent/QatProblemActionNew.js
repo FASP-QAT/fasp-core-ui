@@ -376,7 +376,7 @@ export default class QatProblemActionNew extends Component {
                                                                             var myStartDate = moment(curDate).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
                                                                             var myEndDate = moment(curDate).endOf('month').format("YYYY-MM-DD");
                                                                             var startDateForSixMonthRange = moment(curDate).subtract(numberOfMonthsData2, 'months').startOf('month').format("YYYY-MM-DD");
-                                                                            var endDateForSixMonthRange = moment(curDate).subtract(numberOfMonths + 1, 'months').startOf('month').format("YYYY-MM-DD")
+                                                                            var endDateForSixMonthRange = moment(curDate).subtract(numberOfMonths + 1, 'months').endOf('month').format("YYYY-MM-DD")
                                                                             // console.log("startDateForSixMonthRange+++", startDateForSixMonthRange, "endDateForSixMonthRange+++", endDateForSixMonthRange);
                                                                             var filteredConsumptionList = consumptionList.filter(c =>
                                                                                 moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate
@@ -449,7 +449,7 @@ export default class QatProblemActionNew extends Component {
                                                                             var myStartDateInventory = moment(curDate).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
                                                                             var myEndDateInventory = moment(curDate).endOf('month').format("YYYY-MM-DD");
                                                                             var startDateForSixMonthRange = moment(curDate).subtract(numberOfMonthsInventoryData2, 'months').startOf('month').format("YYYY-MM-DD");
-                                                                            var endDateForSixMonthRange = moment(curDate).subtract(numberOfMonthsInventory + 1, 'months').startOf('month').format("YYYY-MM-DD")
+                                                                            var endDateForSixMonthRange = moment(curDate).subtract(numberOfMonthsInventory + 1, 'months').endOf('month').format("YYYY-MM-DD")
                                                                             var filterInventoryList = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= myStartDateInventory
                                                                                 && moment(c.inventoryDate).format('YYYY-MM-DD') <= myEndDateInventory
                                                                                 && c.active.toString() == "true"

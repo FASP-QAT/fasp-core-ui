@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
 import { Prompt } from 'react-router';
-import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
+import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked,consumptionExtrapolationNotesClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
@@ -90,7 +90,9 @@ class VersionSettingsComponent extends Component {
             isChanged1: false,
             includeOnlySelectedForecasts: true,
             datasetPlanningUnitNotes: [],
-            dataList: []
+            dataList: [],
+            consumptionExtrapolationList:[],
+            consumptionExtrapolationNotes:''
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -552,131 +554,132 @@ class VersionSettingsComponent extends Component {
             }
             if (cont) {
                 this.setState({
-                   loading: true
-               })
-               var tableJson = this.el.getJson(null, false);
-               var programs = [];
-               var count = 0;
-               for (var i = 0; i < tableJson.length; i++) {
-                   var map1 = new Map(Object.entries(tableJson[i]));
-                //    console.log("12 map---" + map1.get("12"))
-                   if (parseInt(map1.get("12")) === 1) {
-                    //    console.log("map1.get(11)---", map1.get("11"));
-                    //    console.log("map1.get(13)---", map1.get("13"));
-                    //    console.log("map1.get(7)---", map1.get("7"));
-                    //    console.log("map1.get(9)---", map1.get("9"));
-                       var notes = map1.get("4");
-                       var startDate = map1.get("7");
-                       var stopDate = map1.get("9");
-                       var id = map1.get("11");
-                       var noOfDaysInMonth = Number(map1.get("13"));
-                    //    console.log("start date ---", startDate);
-                    //    console.log("stop date ---", stopDate);
-                    //    console.log("noOfDaysInMonth ---", noOfDaysInMonth);
-                       var program = (this.state.datasetList.filter(x => x.id == id)[0]);
-                       var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                       var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                       programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
-                       programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
-                       programData.currentVersion.daysInMonth = noOfDaysInMonth;
-                       programData.currentVersion.notes = notes;
-   
-   
-                       programData.currentVersion.freightPerc = this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-                       programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-                       programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-   
-                       programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-                       program.programData = programData;
-                       // var db1;
-                       // getDatabase();
-                       // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                       // openRequest.onerror = function (event) {
-                       //     this.setState({
-                       //         message: i18n.t('static.program.errortext'),
-                       //         color: 'red'
-                       //     })
-                       //     this.hideFirstComponent()
-                       // }.bind(this);
-                       // openRequest.onsuccess = function (e) {
-                       //     db1 = e.target.result;
-                       //     var transaction = db1.transaction(['datasetData'], 'readwrite');
-                       //     var programTransaction = transaction.objectStore('datasetData');
-                       //     var programRequest = programTransaction.put(program);
-                       //     programRequest.onerror = function (e) {
-   
-                       //     }.bind(this);
-                       //     programRequest.onsuccess = function (e) {
-   
-                       //     }.bind(this);
-                       // }.bind(this);
-                       programs.push(program);
-                       count++;
-                   }
-               }
-            //    console.log("programs to update---", programs);
-               if (count > 0) {
-                   var db1;
-                   getDatabase();
-                   var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                   openRequest.onerror = function (event) {
-                       this.setState({
-                           message: i18n.t('static.program.errortext'),
-                           color: 'red'
-                       })
-                       this.hideFirstComponent()
-                   }.bind(this);
-                   openRequest.onsuccess = function (e) {
-                       db1 = e.target.result;
-                       var transaction = db1.transaction(['datasetData'], 'readwrite');
-                       var programTransaction = transaction.objectStore('datasetData');
-                       programs.forEach(program => {
-                           var programRequest = programTransaction.put(program);
-                        //    console.log("---hurrey---");
-                       })
-                       transaction.oncomplete = function (event) {
-                        //    console.log("in side datasetDetails")
-                           db1 = e.target.result;
-                           var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                           var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                           programs.forEach(program => {
-                            var datasetDetailsRequest = datasetDetailsTransaction.get(program.id);
-                            datasetDetailsRequest.onsuccess = function (e) {         
-                                var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                                datasetDetailsRequestJson.changed = 1;
-                                var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                                datasetDetailsRequest1.onsuccess = function (event) {                               
-                                    }}                         
-                            // console.log("---hurrey---");
-                             })
-                        
-                           
+                    loading: true
+                })
+                var tableJson = this.el.getJson(null, false);
+                var programs = [];
+                var count = 0;
+                for (var i = 0; i < tableJson.length; i++) {
+                    var map1 = new Map(Object.entries(tableJson[i]));
+                    console.log("12 map---" + map1.get("12"))
+                    if (parseInt(map1.get("12")) === 1) {
+                        console.log("map1.get(11)---", map1.get("11"));
+                        console.log("map1.get(13)---", map1.get("13"));
+                        console.log("map1.get(7)---", map1.get("7"));
+                        console.log("map1.get(9)---", map1.get("9"));
+                        var notes = map1.get("4");
+                        var startDate = map1.get("7");
+                        var stopDate = map1.get("9");
+                        var id = map1.get("11");
+                        var noOfDaysInMonth = Number(map1.get("13"));
+                        console.log("start date ---", startDate);
+                        console.log("stop date ---", stopDate);
+                        console.log("noOfDaysInMonth ---", noOfDaysInMonth);
+                        var program = (this.state.datasetList.filter(x => x.id == id)[0]);
+                        var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
+                        programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
+                        programData.currentVersion.daysInMonth = noOfDaysInMonth;
+                        programData.currentVersion.notes = notes;
 
-                           
-                           this.setState({
-                               loading: false,
-                               message: i18n.t('static.mt.dataUpdateSuccess'),
-                               color: "green",
-                               isChanged: false
-                           }, () => {
-                               this.hideSecondComponent();
-                               // this.getOnLineDatasetsVersion();
-                           });
-                        //    console.log("Data update success");
-                       }.bind(this);
-                       transaction.onerror = function (event) {
-                           this.setState({
-                               loading: false,
-                               // message: 'Error occured.',
-                               color: "red",
-                           }, () => {
-                               this.hideSecondComponent();
-                           });
-                        //    console.log("Data update errr");
-                       }.bind(this);
-                   }.bind(this);
-               }
-           }
+
+                        programData.currentVersion.freightPerc = this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+                        programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+                        programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+
+                        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                        program.programData = programData;
+                        // var db1;
+                        // getDatabase();
+                        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        // openRequest.onerror = function (event) {
+                        //     this.setState({
+                        //         message: i18n.t('static.program.errortext'),
+                        //         color: 'red'
+                        //     })
+                        //     this.hideFirstComponent()
+                        // }.bind(this);
+                        // openRequest.onsuccess = function (e) {
+                        //     db1 = e.target.result;
+                        //     var transaction = db1.transaction(['datasetData'], 'readwrite');
+                        //     var programTransaction = transaction.objectStore('datasetData');
+                        //     var programRequest = programTransaction.put(program);
+                        //     programRequest.onerror = function (e) {
+
+                        //     }.bind(this);
+                        //     programRequest.onsuccess = function (e) {
+
+                        //     }.bind(this);
+                        // }.bind(this);
+                        programs.push(program);
+                        count++;
+                    }
+                }
+                console.log("programs to update---", programs);
+                if (count > 0) {
+                    var db1;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var transaction = db1.transaction(['datasetData'], 'readwrite');
+                        var programTransaction = transaction.objectStore('datasetData');
+                        programs.forEach(program => {
+                            var programRequest = programTransaction.put(program);
+                            console.log("---hurrey---");
+                        })
+                        transaction.oncomplete = function (event) {
+                            console.log("in side datasetDetails")
+                            db1 = e.target.result;
+                            var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                            var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                            programs.forEach(program => {
+                                var datasetDetailsRequest = datasetDetailsTransaction.get(program.id);
+                                datasetDetailsRequest.onsuccess = function (e) {
+                                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                    datasetDetailsRequestJson.changed = 1;
+                                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                    datasetDetailsRequest1.onsuccess = function (event) {
+                                    }
+                                }
+                                console.log("---hurrey---");
+                            })
+
+
+
+
+                            this.setState({
+                                loading: false,
+                                message: i18n.t('static.mt.dataUpdateSuccess'),
+                                color: "green",
+                                isChanged: false
+                            }, () => {
+                                this.hideSecondComponent();
+                                // this.getOnLineDatasetsVersion();
+                            });
+                            console.log("Data update success");
+                        }.bind(this);
+                        transaction.onerror = function (event) {
+                            this.setState({
+                                loading: false,
+                                // message: 'Error occured.',
+                                color: "red",
+                            }, () => {
+                                this.hideSecondComponent();
+                            });
+                            console.log("Data update errr");
+                        }.bind(this);
+                    }.bind(this);
+                }
+            }
         }
     }
 
@@ -879,7 +882,10 @@ class VersionSettingsComponent extends Component {
             startDate: startDate,
             stopDate: stopDate
         }
-        // console.log("Input Json", inputjson)
+        console.log("Input Json", inputjson)
+        this.setState({
+            loading: true
+        })
         ProgramService.getDatasetVersions(inputjson).then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
@@ -919,7 +925,8 @@ class VersionSettingsComponent extends Component {
                 }
                 // console.log("dataList1---------->", dataList1)
                 this.setState({
-                    dataList: dataList1
+                    dataList: dataList1,
+                    loading: false
                 },
                     () => {
                         this.buildJExcel();
@@ -928,7 +935,8 @@ class VersionSettingsComponent extends Component {
         }).catch(
             error => {
                 this.setState({
-                    dataList: []
+                    dataList: [],
+                    loading: false
                 },
                     () => {
                         this.buildJExcel();
@@ -1662,6 +1670,34 @@ class VersionSettingsComponent extends Component {
             }
         }, this) : <ul><span>{i18n.t('static.forecastValidation.noNodesHaveChildrenLessThanPerc')}</span><br /></ul>
 
+        //ConsumptionExtrapolationNotes
+        const { consumptionExtrapolationList } = this.state;
+       console.log("consumptionExtrapolationList----",consumptionExtrapolationList)
+        let consumptionExtrapolationNotes = (consumptionExtrapolationList.length > 0)? consumptionExtrapolationList.map((item, i) => {   
+           var flag=true;
+           if(item.notes!=undefined && item.notes!=null && item.notes!=''){
+           if(consumptionExtrapolationList.length==(i+1)){
+                flag=false;
+                return (
+                    <tr key={i} className="hoverTd" onClick={() => consumptionExtrapolationNotesClicked(item.planningUnit.id, this)}>
+                        <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                        <td>{item.notes}</td>
+                    </tr>
+                )    
+            }
+            if(flag){
+                if(consumptionExtrapolationList[i].planningUnit.id!=consumptionExtrapolationList[i+1].planningUnit.id){
+                    return (
+                        <tr key={i} className="hoverTd"  onClick={() => consumptionExtrapolationNotesClicked(item.planningUnit.id, this)}>
+                            <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                            <td>{item.notes}</td>
+                        </tr>
+                    )
+                }
+            }
+        }
+        }, this) : <span>&emsp;&emsp;&emsp;&ensp;{i18n.t('static.forecastValidation.noConsumptionExtrapolationNotesFound')}</span>;
+
         //Consumption Notes
         const { datasetPlanningUnitNotes } = this.state;
         let consumtionNotes = (datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
@@ -1819,15 +1855,16 @@ class VersionSettingsComponent extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                    <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceSp :
-                  showguidancePr
-              } } />
+                        <ModalBody className="ModalBodyPadding">
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceSp :
+                                            showguidancePr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
                             </div>
@@ -1915,7 +1952,7 @@ class VersionSettingsComponent extends Component {
                             <ul>{consumption}</ul>
 
                             <span><b>3. {i18n.t('static.commitTree.treeForecast')}: </b>(<a href={"/#/dataSet/buildTree/tree/0/" + this.state.programId} target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
-                            <span>a. {this.state.includeOnlySelectedForecasts?i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree'):i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
+                            <span>a. {this.state.includeOnlySelectedForecasts ? i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree') : i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
                             <ul>{pu}</ul>
 
                             <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}:</span><br />
@@ -1941,7 +1978,22 @@ class VersionSettingsComponent extends Component {
                                     </Table>
                                 </div> : <span>{consumtionNotes}</span>}
                             </div><br />
-                            <span>b. {i18n.t('static.commitTree.treeScenarios')}:</span>
+                            <span>b. {i18n.t('static.forecastValidation.consumptionExtrapolationNotes')}:</span>
+                            <div className="mt-2">
+                                {(consumptionExtrapolationList.length > 0) ?
+                                    <div className="table-wrap table-responsive fixTableHead">
+                                        <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
+                                                    <th style={{ width: '80%' }}><b>{i18n.t('static.program.notes')}</b></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>{consumptionExtrapolationNotes}</tbody>
+                                        </Table>
+                                    </div> : <span>{consumptionExtrapolationNotes}</span>}
+                            </div><br />
+                            <span>c. {i18n.t('static.commitTree.treeScenarios')}:</span>
                             <div className="table-scroll">
                                 {treeScenarioNotes.length > 0 ? <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
@@ -1957,7 +2009,7 @@ class VersionSettingsComponent extends Component {
                                     </Table>
                                 </div> : <span>{scenarioNotes}</span>}
                             </div><br />
-                            <span>c. {i18n.t('static.commitTree.treeNodes')}:</span>
+                            <span>d. {i18n.t('static.commitTree.treeNodes')}:</span>
                             {/* <div className="table-scroll"> */}
                             <div className="">
                                 {treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0 ? <div className="table-wrap table-responsive fixTableHead">

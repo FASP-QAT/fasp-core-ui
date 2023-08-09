@@ -210,12 +210,19 @@ class Budgets extends Component {
             DropdownService.getFundingSourceDropdownList()
                 .then(response => {
                     // console.log("json===>", JSON.stringify(response.data))
+                    var fundingSourceValues=[];
+                    var fundingSources=response.data;
+                    fundingSources.map(ele=>{
+                        fundingSourceValues.push({label:ele.code,value:ele.id})
+                    })
                     this.setState({
-                        fundingSources: response.data.sort(function (a, b) {
+                        fundingSources: fundingSources.sort(function (a, b) {
                             a = a.code.toLowerCase();
                             b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
-                        }), loading: false
+                        }), loading: false,
+                        fundingSourceValues:fundingSourceValues,
+                        fundingSourceLabels: fundingSourceValues.map(ele => ele.label)
                     }, () => {
                         // this.consolidatedFundingSourceList()
                     })
@@ -795,12 +802,14 @@ class Budgets extends Component {
                 .then(response => {
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
+                        if(response.data[i].active==true){
                         var programJson = {
                             programId: response.data[i].id,
                             label: response.data[i].label,
                             programCode: response.data[i].code
                         }
-                        proList[i] = programJson
+                        proList.push(programJson)
+                    }
                     }
                     this.setState({
                         programs: proList.sort(function (a, b) {
@@ -1253,6 +1262,16 @@ class Budgets extends Component {
 
     }
 
+    filterOptions = async (options, filter) => {
+        if (filter) {
+          return options.filter((i) =>
+            i.label.toLowerCase().includes(filter.toLowerCase())
+          );
+        } else {
+          return options;
+        }
+      };
+
 
     render() {
 
@@ -1531,7 +1550,8 @@ class Budgets extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
-                    <div className="Card-header-reporticon">
+                    <div className="Card-header-reporticon" style={{"marginBottom":"13px","marginTop":"7px"}}>
+                    <span className="pl-0 pb-lg-2">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -1573,7 +1593,7 @@ class Budgets extends Component {
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls ">
                                         <MultiSelect
-
+                                            filterOptions={this.filterOptions}
                                             bsSize="sm"
                                             name="programIds"
                                             id="programIds"
@@ -1612,6 +1632,7 @@ class Budgets extends Component {
                                             name="fundingSourceId"
                                             id="fundingSourceId"
                                             bsSize="md"
+                                            filterOptions={this.filterOptions}
                                             value={this.state.fundingSourceValues}
                                             onChange={(e) => { this.handleFundingSourceChange(e) }}
                                             options={fundingSources.length > 0
