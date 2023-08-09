@@ -106,8 +106,10 @@ export default class PlanningUnitSetting extends Component {
             productCategoryListNew: [],
             planningUnitList: [],
             lang: localStorage.getItem('lang'),
-            isPlanningUnitLoaded: false
-
+            isPlanningUnitLoaded: false,
+            tempSortOrder:'',
+            sortOrderLoading: true,
+            tempPlanningUnitList: []
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
         this.changed = this.changed.bind(this);
@@ -184,7 +186,7 @@ export default class PlanningUnitSetting extends Component {
                 for (var i = (json.length - 1); i >= 0; i--) {
                     var map = new Map(Object.entries(json[i]));
                     var planningUnitValue = map.get("1");
-                    if (planningUnitValue == value && y != i && i > y && map.get("16").toString() == "true" && json[y][16].toString() == "true") {
+                    if (planningUnitValue == value && y != i && i > y) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
@@ -640,6 +642,11 @@ export default class PlanningUnitSetting extends Component {
     oneditionend = function (instance, cell, x, y, value) {
         // console.log("oneditionend---------Start");
         var elInstance = instance;
+        this.setState({
+                tempPlanningUnitList: elInstance.getConfig().columns[1].source
+        }, () => {
+            console.log("hello", this.state.tempPlanningUnitList)    
+        })
         var rowData = elInstance.getRowData(y);
         var reg = /^0[0-9].*$/; //any no start with 0;
 
@@ -722,7 +729,7 @@ export default class PlanningUnitSetting extends Component {
                 // // console.log("mylist--------->1111", procurementAgentPlanningUnitList);
 
                 let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
-                let tempPaList = procurementAgentPlanningUnitList.filter(c => c.id == planningUnitId)[0];
+                let tempPaList = procurementAgentPlanningUnitList.filter(c => c.planningUnitId == planningUnitId)[0];
 
                 // console.log("mylist--------->1112", planningUnitId);
 
@@ -1669,9 +1676,9 @@ export default class PlanningUnitSetting extends Component {
                         // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
                         rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
                         // startDateDisplay: (forecastStartDate == '' ? '' : months[new Date(forecastStartDate).getMonth()] + ' ' + new Date(forecastStartDate).getFullYear()),
-                        startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY"))),
+                        startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
                         // endDateDisplay: (forecastStopDate == '' ? '' : months[new Date(forecastStopDate).getMonth()] + ' ' + new Date(forecastStopDate).getFullYear()),
-                        endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY"))),
+                        endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
                         beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
                         forecastProgramId: parseInt(programId),
                         forecastProgramVersionId: parseInt(versionId),
@@ -1999,10 +2006,14 @@ export default class PlanningUnitSetting extends Component {
         let outPutListArray = [];
         let count = 0;
         let indexVar = 1;
+        let dropdownList = [];
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
-
+            dropdownList.push({
+                id: outPutList[j].planningUnit.id,
+                name : outPutList[j].planningUnit.label.label_en + " | " + outPutList[j].planningUnit.id
+            });
             data[0] = outPutList[j].planningUnit.forecastingUnit.productCategory.id
             data[1] = outPutList[j].planningUnit.id
             data[2] = outPutList[j].consuptionForecast
@@ -2079,10 +2090,32 @@ export default class PlanningUnitSetting extends Component {
                 },
                 {
                     title: i18n.t('static.dashboard.planningunitheader'),
-                    type: 'autocomplete',
-                    source: this.state.allPlanningUnitList,
-                    // filter: this.filterPlanningUnitListByTracerCategoryId,
-                    filter: this.filterPlanningUnitListByProductCategoryId,
+                    type: 'dropdown',
+                    source: dropdownList,
+                    options: {
+                        url: `${API_URL}/api/dropdown/planningUnit/autocomplete/filter/productCategory/searchText/language/sortOrder`,
+                        autocomplete: true,
+                        remoteSearch: true,
+                        onbeforesearch: function(instance, request) {
+                            if(this.state.sortOrderLoading == false){
+                                request.method = 'GET';
+                                
+                                // request.data = { productCategorySortOrder: "", searchText: instance.search, language: "en" };
+                                let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                request.beforeSend = (httpRequest) => {
+                                    httpRequest.setRequestHeader('Authorization', 'Bearer '+jwtToken);
+                                }
+                                const searchText = instance.search;
+                                const language = this.state.lang;
+                                const sortOrder = this.state.tempSortOrder;
+                                request.url = request.url.replace("searchText/language/sortOrder", `${searchText}/${language}/${sortOrder}`);
+
+                                return request;
+                            }
+                        }.bind(this),
+                    },
+                    filter: this.filterPlanningUnitList,
                     width: '170',
                     // readOnly: true //1B
                 },
@@ -2290,6 +2323,19 @@ export default class PlanningUnitSetting extends Component {
 
                 return items;
             }.bind(this),
+            oneditionstart: function (instance, cell, x, y, value) {
+                this.setState({ sortOrderLoading: true })
+                let tempId = data[y][0]
+                let sortOrder;
+                if(tempId == -1 || tempId == 0){
+                    sortOrder="00"
+                }else{
+                    sortOrder = this.state.productCategoryList.filter(item => item.payload.productCategoryId == tempId)[0].sortOrder
+                }
+                this.setState({ tempSortOrder: sortOrder }, () => {
+                    this.setState({sortOrderLoading: false})
+                })
+            }.bind(this),
             oneditionend: this.oneditionend,
             copyCompatibility: true,
             allowExport: false,
@@ -2305,7 +2351,7 @@ export default class PlanningUnitSetting extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false, allowAdd: true
+            languageEl: languageEl, loading: false, allowAdd: true, tempPlanningUnitList: dropdownList
         }, () => {
             if (addRowInJexcel) {
                 this.addRow();
@@ -2378,6 +2424,11 @@ export default class PlanningUnitSetting extends Component {
     //     return mylist;
 
     // }.bind(this)
+
+    filterPlanningUnitList = function (instance, cell, c, r, source) {
+        var mylist = [];
+        return mylist;
+    }.bind(this)
 
     filterPlanningUnitListByProductCategoryId = function (instance, cell, c, r, source) {
         var mylist = [];
@@ -2593,246 +2644,305 @@ export default class PlanningUnitSetting extends Component {
 
             let listOfDisablePuNode = [];
             let listOfDisablePuNodeActiveInactive = [];
-
-
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                // console.log("Final-------------->10", parseInt(map1.get("10")));
-
-                // let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
-                let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
-                let procurementAgentObj = "";
-                if (parseInt(map1.get("7")) === -1) {
-                    procurementAgentObj = null
-                } else {
-                    procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
-                }
-
-                if (parseInt(map1.get("11")) == 1) {//new row added
-                    let tempJson = {
-                        "programPlanningUnitId": parseInt(map1.get("9")),
-                        "planningUnit": {
-                            "id": parseInt(map1.get("1")),
-                            "label": planningUnitObj.label,
-                            "unit": planningUnitObj.unit,
-                            "multiplier": planningUnitObj.multiplier,
-                            "forecastingUnit": {
-                                "id": planningUnitObj.forecastingUnit.id,
-                                "label": planningUnitObj.forecastingUnit.label,
-                                "unit": planningUnitObj.forecastingUnit.unit,
-                                "productCategory": planningUnitObj.forecastingUnit.productCategory,
-                                "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                                "idString": "" + planningUnitObj.forecastingUnit.id
-                            },
-                            "idString": "" + parseInt(map1.get("1"))
-                        },
-                        "consuptionForecast": map1.get("2"),
-                        "treeForecast": map1.get("3"),
-                        // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                        // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
-                        "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                        // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                        // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
-                        "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
-                        "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        "procurementAgent": (procurementAgentObj == null ? null : {
-                            "id": parseInt(map1.get("7")),
-                            "label": procurementAgentObj.label,
-                            "code": procurementAgentObj.code,
-                            "idString": "" + parseInt(map1.get("7"))
-                        }),
-                        "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        "higherThenConsumptionThreshold": null,
-                        "lowerThenConsumptionThreshold": null,
-                        "planningUnitNotes": map1.get("15"),
-                        "consumptionDataType": 2,
-                        "otherUnit": null,
-                        "selectedForecastMap": map1.get("12"),
-                        "createdBy": null,
-                        "createdDate": null,
-                        "active": map1.get("16"),
-                    }
-                    planningUnitList.push(tempJson);
-                } else {
-                    indexVar=originalPlanningUnitList.findIndex(c=>c.planningUnit.id==map1.get("1"));
-                    let planningUnitobj1 = originalPlanningUnitList[indexVar];
-                    let tempJson = {
-                        "programPlanningUnitId": parseInt(map1.get("9")),
-                        "planningUnit": planningUnitobj1.planningUnit,
-                        "consuptionForecast": map1.get("2"),
-                        "treeForecast": map1.get("3"),
-                        // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                        // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                        // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                        // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
-                        "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
-                        // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
-                        "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        "procurementAgent": (procurementAgentObj == null ? null : {
-                            "id": parseInt(map1.get("7")),
-                            "label": procurementAgentObj.label,
-                            "code": procurementAgentObj.code,
-                            "idString": "" + parseInt(map1.get("7"))
-                        }),
-                        "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                        "higherThenConsumptionThreshold": planningUnitobj1.higherThenConsumptionThreshold,
-                        "lowerThenConsumptionThreshold": planningUnitobj1.lowerThenConsumptionThreshold,
-                        // "consumptionNotes": planningUnitobj1.consumptionNotes,
-                        "planningUnitNotes": map1.get("15"),
-                        "consumptionDataType": planningUnitobj1.consumptionDataType,
-                        "otherUnit": planningUnitobj1.otherUnit,
-                        "selectedForecastMap": map1.get("12"),
-                        "createdBy": planningUnitobj1.createdBy,
-                        "createdDate": planningUnitobj1.createdDate,
-                        "active": map1.get("16"),
-                    }
-                    planningUnitList.push(tempJson);
-
-
-                    indexVar = indexVar + 1;
-                }
-
-
-                // let tempJson = {
-                //     "programPlanningUnitId": parseInt(map1.get("9")),
-                //     "planningUnit": {
-                //         "id": parseInt(map1.get("1")),
-                //         "label": planningUnitObj.label,
-                //         "forecastingUnit": {
-                //             "id": planningUnitObj.forecastingUnit.forecastingUnitId,
-                //             "label": planningUnitObj.forecastingUnit.label,
-                //             "tracerCategory": {
-                //                 "id": planningUnitObj.forecastingUnit.tracerCategory.id,
-                //                 "label": planningUnitObj.forecastingUnit.tracerCategory.label,
-                //                 "idString": planningUnitObj.forecastingUnit.tracerCategory.idString
-                //             },
-                //             "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
-                //         },
-                //         "idString": "" + parseInt(map1.get("1"))
-                //     },
-                //     "consuptionForecast": map1.get("2"),
-                //     "treeForecast": map1.get("3"),
-                //     "stock": map1.get("4"),
-                //     "existingShipments": map1.get("5"),
-                //     "monthsOfStock": map1.get("6"),
-                //     "procurementAgent": (procurementAgentObj == null ? null : {
-                //         "id": parseInt(map1.get("7")),
-                //         "label": procurementAgentObj.label,
-                //         "code": procurementAgentObj.code,
-                //         "idString": "" + parseInt(map1.get("7"))
-                //     }),
-                //     "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                //     "selectedForecastMap":map1.get("12")
-                // }
-
-                //logic for null PU Node
-                if (map1.get("3") == false && map1.get("14") == true) {
-                    listOfDisablePuNode.push(parseInt(map1.get("1")));
-                }
-
-                if (map1.get("16") == false && map1.get("17") == true) {
-                    listOfDisablePuNode.push(parseInt(map1.get("1")));
-                }
-
-
-
+            let planningUnitIds = [];
+            for(let i=0; i < tableJson.length; i++){
+                planningUnitIds.push(parseInt(tableJson[i][1]));
             }
-
-            // console.log("Final-------------->1111", planningUnitList);
-
-            programData.planningUnitList = planningUnitList;
-
-
-            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-            program.programData = programData;
-
-            programs.push(program);
-
-            // console.log("programs to update---1", programs);
-
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
+            PlanningUnitService.getPlanningUnitByIds(planningUnitIds).then(response => {
                 this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['datasetData'], 'readwrite');
-                var programTransaction = transaction.objectStore('datasetData');
-                programs.forEach(program => {
-                    var programRequest = programTransaction.put(program);
-                    // console.log("---hurrey---");
-                })
-                transaction.oncomplete = function (event) {
-                    // console.log("in side datasetDetails")
-                    db1 = e.target.result;
-                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
-                    datasetDetailsRequest.onsuccess = function (e) {
-                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                        datasetDetailsRequestJson.changed = 1;
-                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                        datasetDetailsRequest1.onsuccess = function (event) {
+                    allPlanningUnitList: response.data,
+                    originalPlanningUnitList: response.data,
+                    planningUnitList: response.data,
+                }, () => {
+                    for (var i = 0; i < tableJson.length; i++) {
+                        var map1 = new Map(Object.entries(tableJson[i]));
+        
+                        // let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
+                        let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.planningUnitId == parseInt(map1.get("1")))[0];
+                        let procurementAgentObj = "";
+                        if (parseInt(map1.get("7")) === -1) {
+                            procurementAgentObj = null
+                        } else {
+                            procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                        }
+        
+                        if (parseInt(map1.get("11")) == 1) {//new row added
+                            let tempJson = {
+                                "programPlanningUnitId": parseInt(map1.get("9")),
+                                "planningUnit": {
+                                    "id": parseInt(map1.get("1")),
+                                    "label": planningUnitObj.label,
+                                    "unit": planningUnitObj.unit,
+                                    "multiplier": planningUnitObj.multiplier,
+                                    "forecastingUnit": {
+                                        "id": planningUnitObj.forecastingUnit.id,
+                                        "label": planningUnitObj.forecastingUnit.label,
+                                        "unit": planningUnitObj.forecastingUnit.unit,
+                                        "productCategory": planningUnitObj.forecastingUnit.productCategory,
+                                        "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                                        "idString": "" + planningUnitObj.forecastingUnit.id
+                                    },
+                                    "idString": "" + parseInt(map1.get("1"))
+                                },
+                                "consuptionForecast": map1.get("2"),
+                                "treeForecast": map1.get("3"),
+                                // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
+                                "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
+                                "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
+                                "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                "procurementAgent": (procurementAgentObj == null ? null : {
+                                    "id": parseInt(map1.get("7")),
+                                    "label": procurementAgentObj.label,
+                                    "code": procurementAgentObj.code,
+                                    "idString": "" + parseInt(map1.get("7"))
+                                }),
+                                "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                "higherThenConsumptionThreshold": null,
+                                "lowerThenConsumptionThreshold": null,
+                                "consumptionNotes": map1.get("15"),
+                                "consumptionDataType": 2,
+                                "otherUnit": null,
+                                "selectedForecastMap": map1.get("12"),
+                                "createdBy": null,
+                                "createdDate": null,
+                                "active": map1.get("16"),
+                            }
+                            planningUnitList.push(tempJson);
+                        } else {
+        
+                            let planningUnitobj1 = originalPlanningUnitList[indexVar];
+                            let tempJson = {
+                                "programPlanningUnitId": parseInt(map1.get("9")),
+                                "planningUnit": {
+                                    "id": parseInt(map1.get("1")),
+                                    "label": planningUnitObj.label,
+                                    "unit": planningUnitObj.unit,
+                                    "multiplier": planningUnitObj.multiplier,
+                                    "forecastingUnit": {
+                                        "id": planningUnitObj.forecastingUnit.id,
+                                        "label": planningUnitObj.forecastingUnit.label,
+                                        "unit": planningUnitObj.forecastingUnit.unit,
+                                        "productCategory": planningUnitObj.forecastingUnit.productCategory,
+                                        "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                                        "idString": "" + planningUnitObj.forecastingUnit.id
+                                    },
+                                    "idString": "" + parseInt(map1.get("1"))
+                                },
+                                "consuptionForecast": map1.get("2"),
+                                "treeForecast": map1.get("3"),
+                                // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
+                                // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
+                                "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
+                                // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
+                                "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                "procurementAgent": (procurementAgentObj == null ? null : {
+                                    "id": parseInt(map1.get("7")),
+                                    "label": procurementAgentObj.label,
+                                    "code": procurementAgentObj.code,
+                                    "idString": "" + parseInt(map1.get("7"))
+                                }),
+                                "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                "higherThenConsumptionThreshold": planningUnitobj1.higherThenConsumptionThreshold,
+                                "lowerThenConsumptionThreshold": planningUnitobj1.lowerThenConsumptionThreshold,
+                                // "consumptionNotes": planningUnitobj1.consumptionNotes,
+                                "consumptionNotes": map1.get("15"),
+                                "consumptionDataType": planningUnitobj1.consumptionDataType,
+                                "otherUnit": planningUnitobj1.otherUnit,
+                                "selectedForecastMap": map1.get("12"),
+                                "createdBy": planningUnitobj1.createdBy,
+                                "createdDate": planningUnitobj1.createdDate,
+                                "active": map1.get("16"),
+                            }
+                            planningUnitList.push(tempJson);
+        
+        
+                            indexVar = indexVar + 1;
+                        }
+        
+        
+                        // let tempJson = {
+                        //     "programPlanningUnitId": parseInt(map1.get("9")),
+                        //     "planningUnit": {
+                        //         "id": parseInt(map1.get("1")),
+                        //         "label": planningUnitObj.label,
+                        //         "forecastingUnit": {
+                        //             "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                        //             "label": planningUnitObj.forecastingUnit.label,
+                        //             "tracerCategory": {
+                        //                 "id": planningUnitObj.forecastingUnit.tracerCategory.id,
+                        //                 "label": planningUnitObj.forecastingUnit.tracerCategory.label,
+                        //                 "idString": planningUnitObj.forecastingUnit.tracerCategory.idString
+                        //             },
+                        //             "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                        //         },
+                        //         "idString": "" + parseInt(map1.get("1"))
+                        //     },
+                        //     "consuptionForecast": map1.get("2"),
+                        //     "treeForecast": map1.get("3"),
+                        //     "stock": map1.get("4"),
+                        //     "existingShipments": map1.get("5"),
+                        //     "monthsOfStock": map1.get("6"),
+                        //     "procurementAgent": (procurementAgentObj == null ? null : {
+                        //         "id": parseInt(map1.get("7")),
+                        //         "label": procurementAgentObj.label,
+                        //         "code": procurementAgentObj.code,
+                        //         "idString": "" + parseInt(map1.get("7"))
+                        //     }),
+                        //     "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        //     "selectedForecastMap":map1.get("12")
+                        // }
+        
+                        //logic for null PU Node
+                        if (map1.get("3") == false && map1.get("14") == true) {
+                            listOfDisablePuNode.push(parseInt(map1.get("1")));
+                        }
+        
+                        if (map1.get("16") == false && map1.get("17") == true) {
+                            listOfDisablePuNode.push(parseInt(map1.get("1")));
+                        }
+        
+        
+        
+                    }
+        
+                    console.log("Final-------------->1", planningUnitList);
+        
+                    programData.planningUnitList = planningUnitList;
+        
+        
+                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    program.programData = programData;
+        
+                    programs.push(program);
+        
+                    console.log("programs to update---1", programs);
+        
+                    var db1;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var transaction = db1.transaction(['datasetData'], 'readwrite');
+                        var programTransaction = transaction.objectStore('datasetData');
+                        programs.forEach(program => {
+                            var programRequest = programTransaction.put(program);
+                            console.log("---hurrey---");
+                        })
+                        transaction.oncomplete = function (event) {
+                            console.log("in side datasetDetails")
+                            db1 = e.target.result;
+                            var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                            var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                            var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                            datasetDetailsRequest.onsuccess = function (e) {
+                                var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                datasetDetailsRequestJson.changed = 1;
+                                var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                datasetDetailsRequest1.onsuccess = function (event) {
+                                }
+                            }
+                            // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
+                            // this.props.updateStepOneData("color", "green");
+                            // this.setState({
+                            //     message: i18n.t('static.mt.dataUpdateSuccess'),
+                            //     color: "green",
+                            // }, () => {
+                            //     this.props.hideSecondComponent();
+                            //     this.props.finishedStepThree();
+                            //     // this.buildJExcel();
+                            // });
+        
+                            this.setState({
+                                // loading: false,
+                                message: i18n.t('static.mt.dataUpdateSuccess'),
+                                color: "green",
+                                isChanged1: false,
+                                // allowAdd: false
+                            }, () => {
+                                listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
+                                if (listOfDisablePuNode.length > 0) {
+                                    this.disablePUNode(listOfDisablePuNode);
+                                    this.disablePUConsumptionData(listOfDisablePuNode);
+                                }
+        
+                                this.getDatasetList();
+                                this.hideSecondComponent();
+                                // this.filterData();
+                                // this.setProgramId();
+                            });
+                            console.log("Data update success1");
+                            // alert("success");
+        
+        
+                        }.bind(this);
+                        transaction.onerror = function (event) {
+                            this.setState({
+                                loading: false,
+                                // message: 'Error occured.',
+                                color: "red",
+                            }, () => {
+                                this.hideSecondComponent();
+                            });
+                            console.log("Data update errr");
+                        }.bind(this);
+                    }.bind(this);
+                });
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
                         }
                     }
-                    // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
-                    // this.props.updateStepOneData("color", "green");
-                    // this.setState({
-                    //     message: i18n.t('static.mt.dataUpdateSuccess'),
-                    //     color: "green",
-                    // }, () => {
-                    //     this.props.hideSecondComponent();
-                    //     this.props.finishedStepThree();
-                    //     // this.buildJExcel();
-                    // });
-
-                    this.setState({
-                        // loading: false,
-                        message: i18n.t('static.mt.dataUpdateSuccess'),
-                        color: "green",
-                        isChanged1: false,
-                        // allowAdd: false
-                    }, () => {
-                        listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
-                        if (listOfDisablePuNode.length > 0) {
-                            this.disablePUNode(listOfDisablePuNode);
-                            this.disablePUConsumptionData(listOfDisablePuNode);
-                        }
-
-                        this.getDatasetList();
-                        this.hideSecondComponent();
-                        // this.filterData();
-                        // this.setProgramId();
-                    });
-                    // console.log("Data update success1");
-                    // alert("success");
-
-
-                }.bind(this);
-                transaction.onerror = function (event) {
-                    this.setState({
-                        loading: false,
-                        // message: 'Error occured.',
-                        color: "red",
-                    }, () => {
-                        this.hideSecondComponent();
-                    });
-                    // console.log("Data update errr");
-                }.bind(this);
-            }.bind(this);
-
-
-
+                }
+            );
         }
     }
 
@@ -3094,30 +3204,10 @@ export default class PlanningUnitSetting extends Component {
                 versionId = versionId.replace(/[^\d]/g, '');
                 // console.log("programSplit-------->1", versionId);
                 let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == versionId)[0]
-
-                PlanningUnitService.getPlanningUnitForProductCategory(-1).then(response => {
-                    // console.log("RESP----->pu", response.data);
-
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-
-                    let tempList = [];
-                    if (listArray.length > 0) {
-                        for (var i = 0; i < listArray.length; i++) {
-                            var paJson = {
-                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].id),
-                                id: parseInt(listArray[i].id),
-                                label: listArray[i].label
-                            }
-                            tempList[i] = paJson
-                        }
-                    }
+                let planningUnitIds = this.state.tempPlanningUnitList.map(e => parseInt(e.id))
+                PlanningUnitService.getPlanningUnitByIds(planningUnitIds).then(response => {
                     this.setState({
-                        allPlanningUnitList: tempList,
+                        allPlanningUnitList: response.data,
                         originalPlanningUnitList: response.data,
                         planningUnitList: response.data,
                     }, () => {
@@ -3135,8 +3225,8 @@ export default class PlanningUnitSetting extends Component {
                         this.setState(
                             {
                                 rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
-                                startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate).startOf('month').format("YYYY"))),
-                                endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate).startOf('month').format("YYYY"))),
+                                startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
+                                endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
                                 beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
                                 forecastProgramId: parseInt(programId),
                                 forecastProgramVersionId: parseInt(versionId),
@@ -3363,8 +3453,8 @@ export default class PlanningUnitSetting extends Component {
                             </div>
                         </Col>}
 
-                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable leftAlignTablePlanningUnit" style={{ display: this.state.loading ? "none" : "block" }}>
-                            <div id="tableDiv">
+                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div style={{width: '100%'}} id="tableDiv">
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

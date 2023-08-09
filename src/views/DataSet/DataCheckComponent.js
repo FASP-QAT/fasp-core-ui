@@ -13,9 +13,11 @@ import AuthenticationService from "../Common/AuthenticationService";
 
 export function dataCheck(props, datasetJson) {
     var PgmTreeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
-
+console.log("Export datasetJson",datasetJson.consumptionExtrapolation);
     var treeScenarioNotes = [];
     var missingBranchesList = [];
+    var consumptionExtrapolationList = [];
+    consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
     var datasetRegionList = datasetJson.regionList;
     var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.active.toString() == "true");
     for (var tl = 0; tl < PgmTreeList.length; tl++) {
@@ -307,6 +309,7 @@ export function dataCheck(props, datasetJson) {
     props.updateState("treeScenarioList", treeScenarioList)
     props.updateState("datasetPlanningUnitNotes", datasetPlanningUnitNotes)
     props.updateState("loading", false)
+    props.updateState("consumptionExtrapolationList",consumptionExtrapolationList)
 }
 
 export function buildJxl1(props) {
@@ -1068,8 +1071,84 @@ export function exportPDF(props) {
 
 
     doc.setFont('helvetica', 'normal')
+    planningText = doc.splitTextToSize("b. " + i18n.t('static.forecastValidation.consumptionExtrapolationNotes'), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+        if (y > doc.internal.pageSize.height - 100) {
+            doc.addPage();
+            y = 100;
+
+        }
+        doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+        y = y + 10;
+    }
+    var height = doc.internal.pageSize.height;
+    var h1 = 50;
+    var startY = y + 10
+    var pages = Math.ceil(startY / height)
+    for (var j = 1; j < pages; j++) {
+        doc.addPage()
+    }
+    var startYtable = startY - ((height - h1) * (pages - 1))
+    var columns = [];
+    columns.push(i18n.t('static.dashboard.planningunitheader'));
+    columns.push(i18n.t('static.program.notes'));
+    var headers = [columns]
+    var dataArr2 = [];
+    var consumptionExtrapolationList = props.state.consumptionExtrapolationList;
+    (consumptionExtrapolationList.length >0 && consumptionExtrapolationList.map((item, i) => {
+            var flag=true;
+            if(item.notes!=undefined && item.notes!=null && item.notes!=''){
+            if(consumptionExtrapolationList.length==(i+1)){
+                 flag=false;
+                 dataArr2.push([
+                    getLabelText(item.planningUnit.label, props.state.lang),
+                    item.notes]) 
+             }
+             if(flag){
+                 if(consumptionExtrapolationList[i].planningUnit.id!=consumptionExtrapolationList[i+1].planningUnit.id){
+                    dataArr2.push([
+                        getLabelText(item.planningUnit.label, props.state.lang),
+                        item.notes])
+                 }
+             }
+            }
+    }))
+    var content1 = {
+        margin: { top: 100, bottom: 50 },
+        startY: startYtable,
+        head: headers,
+        body: dataArr2,
+        styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+    };
+
+    if (consumptionExtrapolationList.length >0) {
+        doc.autoTable(content1);// doc.addPage()
+        y = doc.lastAutoTable.finalY + 20
+        if (y + 100 > height) {
+            doc.addPage();
+            y = 100
+        }
+    } else {
+        planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noConsumptionExtrapolationNotesFound'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 3;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 100;
+
+            }
+            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+            y = y + 10;
+        }
+    }
+
+    doc.setFont('helvetica', 'normal')
     // y = 80;
-    planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.treeScenarios'), doc.internal.pageSize.width * 3 / 4);
+    planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.treeScenarios'), doc.internal.pageSize.width * 3 / 4);
     // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
     y = y + 10;
     for (var i = 0; i < planningText.length; i++) {
@@ -1137,7 +1216,7 @@ export function exportPDF(props) {
         }
     }
     doc.setFont('helvetica', 'normal')
-    planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.treeNodes'), doc.internal.pageSize.width * 3 / 4);
+    planningText = doc.splitTextToSize("d. " + i18n.t('static.commitTree.treeNodes'), doc.internal.pageSize.width * 3 / 4);
     // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
     y = y + 10;
     for (var i = 0; i < planningText.length; i++) {
@@ -1228,5 +1307,11 @@ export function missingBranchesClicked(treeId, props) {
 export function nodeWithPercentageChildrenClicked(treeId, scenarioId, props) {
     localStorage.setItem("sesDatasetId", props.state.programId);
     const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${props.state.programId}/${scenarioId}`, "_blank");
+    win.focus();
+}
+
+export function consumptionExtrapolationNotesClicked(planningUnitId, props) {
+    localStorage.setItem("sesDatasetId", props.state.programId);
+    const win = window.open("/#/extrapolation/extrapolateData/" + planningUnitId, "_blank");
     win.focus();
 }
