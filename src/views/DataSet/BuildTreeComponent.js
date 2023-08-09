@@ -919,7 +919,12 @@ export default class BuildTree extends Component {
             missingPUList: [],
             autoCalculate: localStorage.getItem('sesAutoCalculate') != "" && localStorage.getItem('sesAutoCalculate') != undefined ? (localStorage.getItem('sesAutoCalculate').toString() == "true" ? true : false) : true,
             hideActionButtons: false,
-            programDataListForPuCheck: []
+            programDataListForPuCheck: [],
+            calculatedTotalForModelingCalculator: [],
+            targetSelect: true,
+            firstMonthOfTarget: "",
+            yearsOfTarget: "",
+            actualOrTargetValueList: []
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
@@ -1059,7 +1064,9 @@ export default class BuildTree extends Component {
         this.autoCalculate = this.autoCalculate.bind(this);
         this.toggleTooltipAuto = this.toggleTooltipAuto.bind(this);
         this.buildModelingCalculatorJexcel = this.buildModelingCalculatorJexcel.bind(this);
-
+        this.loadedModelingCalculatorJexcel = this.loadedModelingCalculatorJexcel.bind(this);
+        this.changed3 = this.changed3.bind(this);
+        this.onChangeModelingCalculator = this.onChangeModelingCalculator.bind(this);
     }
 
     buildMissingPUJexcel() {
@@ -2909,8 +2916,6 @@ export default class BuildTree extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onchange: this.changed2,
-            // oneditionend: this.onedit,
-            // onselection: this.selected,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -3085,8 +3090,6 @@ export default class BuildTree extends Component {
                 //     }
                 // }
             }.bind(this),
-            // oneditionend: this.onedit,
-            // onselection: this.selected,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -3409,7 +3412,6 @@ export default class BuildTree extends Component {
                     // if (itemIndex1 != -1) {
                     for (var i = 0; i < tableJson.length; i++) {
                         var map1 = new Map(Object.entries(tableJson[i]));
-                        console.log("10 map---" + map1.get("10"));
                         if (parseInt(map1.get("12")) != 1) {
                             console.log("10 map true---");
 
@@ -3460,6 +3462,13 @@ export default class BuildTree extends Component {
                         if (this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
+                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
+                                firstMonthOfTarget: moment(moment(this.state.firstMonthOfTarget, "YYYY-MM-DD")).format("YYYY-MM"),
+                                yearsOfTarget: this.state.yearsOfTarget,
+                                actualOrTargetValueList: this.state.actualOrTargetValueList
+                            };
+                            console.log("scalingList===>11", (item.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator);
+
                             // }
                             if (this.state.lastRowDeleted == true) {
                                 (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
@@ -3489,7 +3498,10 @@ export default class BuildTree extends Component {
                                 lastRowDeleted: false,
                                 modelingChanged: false,
                                 // openAddNodeModal: false,
-                                activeTab1: new Array(2).fill('2')
+                                activeTab1: new Array(2).fill('2'),
+                                firstMonthOfTarget: "",
+                                yearsOfTarget: "",
+                                actualOrTargetValueList: []
                             }, () => {
                                 console.log("save tree data items 2>>>", this.state.items);
                                 this.calculateMOMData(0, 0);
@@ -3727,60 +3739,70 @@ export default class BuildTree extends Component {
         });
     }
     acceptValue() {
-        // console.log(">>>>", this.state.currentRowIndex);
-        var elInstance = this.state.modelingEl;
-        if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
-            // Linear % point
-            if (this.state.currentModelingType == 5) {
+        var cf = window.confirm(i18n.t("static.modelingCalculator.confirmAlert"));
+        if (cf == true) {
+            let { currentItemConfig } = this.state;
+            var json = this.state.modelingCalculatorEl.getJson(null, false);
+            var map1 = new Map(Object.entries(json[0]));
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = map1.get("9").toString().replaceAll(",", "");
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = map1.get("9").toString().replaceAll(",", "");
+            var count = this.state.modelingEl.getData().length;
+            for (var i = 0; i < count; i++) {
+                this.state.modelingEl.deleteRow(i);
+            }
+            var dataArr = []
 
-                elInstance.setValueFromCoords(4, this.state.currentRowIndex, 5, true);
-                if (this.state.currentTransferData == "") {
-                    elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange) < 0 ? -1 : 1, true);
+            const reversedList = [...json].reverse();
+            for (var i = 1; i < reversedList.length - 1; i++) {
+                var map = new Map(Object.entries(reversedList[i]));
+                var data = []
+                data[0] = "Monthly change for " + map.get("7") + " - " + map.get("8") + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
+                data[1] = moment("01 " + map.get("7"), "DD MMM YYYY").format("YYYY-MM-DD");
+                data[2] = moment("01 " + map.get("8"), "DD MMM YYYY").format("YYYY-MM-DD");
+                data[3] = '';
+                data[4] = this.state.currentModelingType;
+                data[5] = 1;
+                data[6] = this.state.currentModelingType != 2 ? parseFloat(map.get("3")).toFixed(4) : "";
+                data[7] = this.state.currentModelingType == 2 ? parseFloat(map.get("3")).toFixed(4) : "";
+                data[8] = cleanUp
+                data[9] = '';
+                data[10] = ''
+                data[11] = ''
+                data[12] = 0
+                data[13] = {
+                    firstMonthOfTarget: this.state.currentCalculatorStartDate,
+                    yearsOfTarget: this.state.yearsOfTarget,
+                    actualOrTargetValueList: this.state.actualOrTargetValueList
                 }
-                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
-                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange)) ? "" : parseFloat(this.state.currentCalculatedMomChange) < 0 ? parseFloat(this.state.currentCalculatedMomChange * -1).toFixed(4) : parseFloat(this.state.currentCalculatedMomChange), true);
-                elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                dataArr.push(map.get("1"))
+                this.state.modelingEl.insertRow(
+                    data, 0, 1
+                );
             }
+
+            this.setState({
+                currentItemConfig,
+                currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
+                isChanged: true,
+                showCalculatorFields: false
+            }, () => {
+                // to save data in tab 1
+                var json = {
+                    "year": map1.get("8").split(" ")[1],
+                    "month": moment(map1.get("8").split(" ")[0], "MMM").format("M")
+                }
+                document.getElementById("nodeValue").value = map1.get("9");
+                this.handleAMonthDissmis1(json)
+                this.handleAMonthChange1(map1.get("8").split(" ")[1], moment(map1.get("8").split(" ")[0], "MMM").format("M"))
+            }
+            );
         } else {
-            // Linear #
-            if (this.state.currentModelingType == 2) {
-                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "") {
-                    elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? -1 : 1, true);
-                }
-                var startDate = this.state.currentCalculatorStartDate;
-                var endDate = this.state.currentCalculatorStopDate;
-                var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
-                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
-                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", ""))) ? "" : parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "")) < 0 ? parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4)), true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
-            } else if (this.state.currentModelingType == 3) { //Linear %
-                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "") {
-                    elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
-                }
-                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
-                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth)) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
-                elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
-            } else if (this.state.currentModelingType == 4) { // Exponential %
-                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "") {
-                    elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
-                }
-                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
-                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.percentForOneMonth)) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
-                elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
-            }
+            this.setState({
+                firstMonthOfTarget: "",
+                yearsOfTarget: "",
+                actualOrTargetValueList: []
+            })
         }
-        this.setState({ showCalculatorFields: false });
 
     }
     calculateMomByEndValue(e) {
@@ -3791,9 +3813,7 @@ export default class BuildTree extends Component {
             currentTargetChangePercentage: '',
             percentForOneMonth: ''
         });
-        var startDate = this.state.currentCalculatorStartDate;
-        var endDate = this.state.currentCalculatorStopDate;
-        var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
+        var monthDifference = parseInt(this.state.yearsOfTarget * 12);
         console.log("month diff>>>", monthDifference);
         var momValue = '', percentForOneMonth = '';
         var currentEndValue = document.getElementById("currentEndValue").value;
@@ -3841,9 +3861,7 @@ export default class BuildTree extends Component {
             currentTargetChangeNumber: '',
             percentForOneMonth: ''
         });
-        var startDate = this.state.currentCalculatorStartDate;
-        var endDate = this.state.currentCalculatorStopDate;
-        var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
+        var monthDifference = parseInt(this.state.yearsOfTarget * 12);
         var currentTargetChangePercentage = document.getElementById("currentTargetChangePercentage").value;
         currentTargetChangePercentage = currentTargetChangePercentage != "" ? parseFloat(currentTargetChangePercentage) : ''
         console.log("currentTargetChangePercentage---", parseFloat(currentTargetChangePercentage));
@@ -3899,9 +3917,7 @@ export default class BuildTree extends Component {
             currentCalculatedMomChange: '',
             currentTargetChangePercentage: '',
         });
-        var startDate = this.state.currentCalculatorStartDate;
-        var endDate = this.state.currentCalculatorStopDate;
-        var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
+        var monthDifference = parseInt(this.state.yearsOfTarget * 12);
         var currentTargetChangeNumber = document.getElementById("currentTargetChangeNumber").value;
         var getValue = currentTargetChangeNumber.toString().replaceAll(",", "");
         // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
@@ -4079,7 +4095,6 @@ export default class BuildTree extends Component {
         var nodeTransferDataList = this.state.nodeTransferDataList;
         var dataArray = [];
         let count = 0;
-
         if (scalingList.length == 0) {
             data = [];
             data[0] = ''
@@ -4095,6 +4110,11 @@ export default class BuildTree extends Component {
             data[10] = ''
             data[11] = ''
             data[12] = 0
+            data[13] = {
+                firstMonthOfTarget: "",
+                yearsOfTarget: "",
+                actualOrTargetValueList: []
+            }
             dataArray[count] = data;
             count++;
         }
@@ -4102,8 +4122,6 @@ export default class BuildTree extends Component {
         if (scalingList.length > 0) {
             for (var j = 0; j < scalingList.length; j++) {
                 data = [];
-
-
                 data[0] = scalingList[j].notes
                 data[1] = scalingList[j].startDate
                 data[2] = scalingList[j].stopDate
@@ -4125,6 +4143,11 @@ export default class BuildTree extends Component {
                 data[10] = scalingList[j].nodeDataModelingId
                 data[11] = 0
                 data[12] = 0
+                data[13] = {
+                    firstMonthOfTarget: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.firstMonthOfTarget : moment(moment(this.state.currentScenario.annualTargetCalculator.firstMonthOfTarget, "YYYY-MM")).format("YYYY-MM-DD"),
+                    yearsOfTarget: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.yearsOfTarget : this.state.currentScenario.annualTargetCalculator.yearsOfTarget,
+                    actualOrTargetValueList: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.actualOrTargetValueList : this.state.currentScenario.annualTargetCalculator.actualOrTargetValueList
+                }
                 scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
                 dataArray[count] = data;
                 count++;
@@ -4153,13 +4176,19 @@ export default class BuildTree extends Component {
             data[10] = nodeTransferDataList[j].nodeDataModelingId
             data[11] = 0
             data[12] = 1
+            data[13] = {
+                firstMonthOfTarget: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.firstMonthOfTarget : moment(moment(this.state.currentScenario.annualTargetCalculator.firstMonthOfTarget, "YYYY-MM")).format("YYYY-MM-DD"),
+                yearsOfTarget: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.yearsOfTarget : this.state.currentScenario.annualTargetCalculator.yearsOfTarget,
+                actualOrTargetValueList: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.actualOrTargetValueList : this.state.currentScenario.annualTargetCalculator.actualOrTargetValueList
+            }
+
             scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
             dataArray[count] = data;
             count++;
         }
         this.setState({ scalingTotal }, () => {
         });
-        this.el = jexcel(document.getElementById("modelingJexcel"), '');
+        // this.el = jexcel(document.getElementById("modelingJexcel"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("modelingJexcel"), true);
 
@@ -4261,6 +4290,13 @@ export default class BuildTree extends Component {
                     // type: 'text',
                     // visible: false
                 },
+                {
+                    title: 'modelingCalculator',
+                    type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
+                }
 
             ],
             // text: {
@@ -4336,7 +4372,6 @@ export default class BuildTree extends Component {
 
                 }
             }.bind(this),
-            oneditionend: this.onedit,
             onselection: this.selected,
             copyCompatibility: true,
             allowExport: false,
@@ -4368,6 +4403,11 @@ export default class BuildTree extends Component {
                                 data[10] = ''
                                 data[11] = ''
                                 data[12] = 0
+                                data[13] = {
+                                    firstMonthOfTarget: "",
+                                    yearsOfTarget: "",
+                                    actualOrTargetValueList: []
+                                }
                                 obj.insertRow(data, 0, 1);
                             }.bind(this)
                         });
@@ -4393,6 +4433,11 @@ export default class BuildTree extends Component {
                                         data[10] = ''
                                         data[11] = ''
                                         data[12] = 0
+                                        data[13] = {
+                                            firstMonthOfTarget: "",
+                                            yearsOfTarget: "",
+                                            actualOrTargetValueList: []
+                                        }
                                         obj.insertRow(data, 0, 1);
                                         obj.deleteRow(parseInt(y) + 1);
                                         var col = ("C").concat(parseInt(0) + 1);
@@ -4415,12 +4460,6 @@ export default class BuildTree extends Component {
                         }
                     }
                 }
-
-                // Line
-                // items.push({ type: 'line' });
-
-
-
                 return items;
             }.bind(this)
 
@@ -4474,15 +4513,14 @@ export default class BuildTree extends Component {
                         currentCalculatorStopDate: '',
                         currentCalculatorStartValue: '',
                     }, () => {
-                        // console.log("x row data===>", this.el.getRowData(x));
+                        console.log("x row data===>", rowData[13]);
                         var startValue = this.getMomValueForDateRange(rowData[1]);
-                        console.log("***MOM final start value---", startValue)
                         this.setState({
                             currentRowIndex: x,
                             showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
                             currentModelingType: rowData[4],
                             currentTransferData: rowData[3],
-                            currentCalculatorStartDate: rowData[1],
+                            currentCalculatorStartDate: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget),
                             currentCalculatorStopDate: rowData[2],
                             currentCalculatorStartValue: startValue,
                             currentCalculatedMomChange: '',
@@ -4491,9 +4529,13 @@ export default class BuildTree extends Component {
                             currentTargetChangePercentage: '',
                             currentTargetChangePercentageEdit: false,
                             currentEndValue: '',
-                            currentEndValueEdit: false
+                            currentEndValueEdit: false,
+                            actualOrTargetValueList: rowData[13].actualOrTargetValueList.length != 0 && this.state.actualOrTargetValueList.length == 0 ? rowData[13].actualOrTargetValueList : this.state.actualOrTargetValueList,
+                            yearsOfTarget: rowData[13].yearsOfTarget == "" && this.state.yearsOfTarget == "" ? (moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1) : (rowData[13].yearsOfTarget != "" ? rowData[13].yearsOfTarget : this.state.yearsOfTarget),
+                            firstMonthOfTarget: rowData[13].firstMonthOfTarget == "" && this.state.firstMonthOfTarget == "" ? rowData[1] : (rowData[13].firstMonthOfTarget != "" ? rowData[13].firstMonthOfTarget : this.state.firstMonthOfTarget)
                         }, () => {
                             // this.calculateMOMData(0, 3);
+                            console.log("showCalculatorFields===", this.state.currentCalculatorStartDate)
                             if (this.state.showCalculatorFields) {
                                 this.buildModelingCalculatorJexcel();
                             }
@@ -4512,7 +4554,7 @@ export default class BuildTree extends Component {
                         }, () => {
                             // console.log("x row data===>", this.el.getRowData(x));
                             var startValue = this.getMomValueForDateRange(rowData[1]);
-                            console.log("***MOM final start value---", startValue)
+                            console.log("***MOM final start value--->>>", rowData[13])
                             this.setState({
                                 currentRowIndex: x,
                                 showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
@@ -4527,9 +4569,14 @@ export default class BuildTree extends Component {
                                 currentTargetChangePercentage: '',
                                 currentTargetChangePercentageEdit: false,
                                 currentEndValue: '',
-                                currentEndValueEdit: false
+                                currentEndValueEdit: false,
+                                actualOrTargetValueList: this.state.actualOrTargetValueList,
+                                yearsOfTarget: (moment(rowData[2]).diff(moment(rowData[1]), 'years') + 1),
+                                firstMonthOfTarget: rowData[2]
                             }, () => {
-                                // this.calculateMOMData(0, 3);
+                                if (this.state.showCalculatorFields) {
+                                    this.buildModelingCalculatorJexcel();
+                                }
                             });
                         })
                     } else {
@@ -4545,6 +4592,70 @@ export default class BuildTree extends Component {
             }
         }
     }.bind(this)
+
+    onChangeModelingCalculator = function (instance, cell, x, y, value) {
+        var z = -1;
+        var dataArr = [];
+        var dataArray1 = [];
+        var elInstance = instance.worksheets[0];
+        var data1 = elInstance.records;
+        let modelingType = document.getElementById("modelingType").value;
+        for (var i = 0; i < data1.length; i++) {
+            var data = data1[i]
+            if (z != data[i].y) {
+                var rowData = elInstance.getRowData(data[i].y);
+                if (data[i].y == 0) {
+                    elInstance.setValueFromCoords(9, 0, parseFloat(Number(rowData[1].toString().replaceAll(",", "")) / 12).toFixed(6), true);
+                }
+                if (data[i].y > 0) {
+                    var rowData1 = elInstance.getRowData(data[i].y - 1);
+                    var index = (elInstance).getValue(`B${parseInt(data[i].y) + 1}`, true);
+                    if (index !== "" || index != null || index != undefined) {
+                        var calculatedTotal = parseFloat(rowData1[9]).toFixed(4);
+                        var arr = [];
+                        var start = moment(moment(rowData[7], 'MMM YYYY'))
+                        var stop = moment(moment(rowData[8], 'MMM YYYY'))
+                        var count = 1;
+                        var calculatedTotal1 = parseFloat(rowData1[9]).toFixed(4);
+                        while (start.isSameOrBefore(stop)) {
+
+                            if (modelingType == "active1") {
+                                var monthlyChange = ((Math.pow(rowData[1] / rowData1[1], (1 / 12)) - 1) * 100);
+                                elInstance.setValueFromCoords(3, data[i].y, monthlyChange, true);//M32*(1+monthlyChange)
+                                calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
+                            } else {
+                                var monthlyChange = (((rowData[1] - rowData1[1]) / rowData1[1]) / 12 * 100);
+                                elInstance.setValueFromCoords(3, data[i].y, monthlyChange, true);//M32*(1+monthlyChange)
+                                var a = (1 + (parseFloat(monthlyChange).toFixed(6) / 100 * Number(count)));
+                                calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
+                            }
+                            var programJson = {
+                                date: moment(start.format('MMM YYYY')),
+                                calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
+                                startDate: moment(moment(rowData[0].split("-")[0], 'MMM YYYY')),
+                                stopDate: moment(moment(rowData[0].split("-")[1], 'MMM YYYY'))
+                            }
+                            arr.push(programJson)
+                            start.add(1, 'months');
+                            count++;
+                        }
+                        elInstance.setValueFromCoords(9, data[i].y, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);//M32*(1+monthlyChange)
+                        z = data[i].y;
+                        dataArray1 = dataArray1.concat(arr)
+                    }
+                }
+                dataArr.push(rowData[1]);
+            }
+        }
+        const arraySum = dataArray1.map(c => (c.date.year()))
+        const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
+
+        for (var i = 1; i < arraySum1.length - 1; i++) {
+            const abc = dataArray1.filter(c => c.date.year() == arraySum1[i]).map(c => Number(c.calculatedTotal))
+                .reduce((accumulator, currentItem) => accumulator + currentItem, 0);
+            elInstance.setValueFromCoords(4, i, Math.round(abc), true);
+        }
+    }.bind(this);
 
     changed1 = function (instance, cell, x, y, value) {
         if (this.state.isChanged != true) {
@@ -4902,6 +5013,11 @@ export default class BuildTree extends Component {
         data[10] = ''
         data[11] = 1
         data[12] = 0
+        data[13] = {
+            firstMonthOfTarget: "",
+            yearsOfTarget: "",
+            actualOrTargetValueList: []
+        }
         elInstance.insertRow(
             data, 0, 1
         );
@@ -7712,7 +7828,7 @@ export default class BuildTree extends Component {
     dataChange(event) {
         // alert("hi");
         var flag = false;
-        console.log("event---", event);
+        console.log("event===>", event);
         let { curTreeObj } = this.state;
         let { currentItemConfig } = this.state;
         let { treeTemplate } = this.state;
@@ -7806,17 +7922,18 @@ export default class BuildTree extends Component {
 
 
         if (event.target.name == "modelingType") {
-            if (event.target.id === "active1") {
-                this.state.currentModelingType = 4
+            console.log("event.target.id", event.target.id)
+            if (event.target.value == "active1") {
+                this.setState({ currentModelingType: 4 })
             }
-            else if (event.target.id === "active2") {
-                this.state.currentModelingType = 3
+            else if (event.target.value == "active2") {
+                this.setState({ currentModelingType: 3 })
             }
-            else if (event.target.id === "active3") {
-                this.state.currentModelingType = 2
+            else if (event.target.value == "active3") {
+                this.setState({ currentModelingType: 2 })
             }
             else {
-                this.state.currentModelingType = 5
+                this.setState({ currentModelingType: 5 })
             }
             if (!this.state.currentTargetChangeNumberEdit && this.state.currentModelingType != 2) {
                 console.log("inside if calculator radio button");
@@ -7825,7 +7942,21 @@ export default class BuildTree extends Component {
                     currentEndValueEdit: false
                 });
             }
+            this.buildModelingCalculatorJexcel();
+        }
 
+        if (event.target.name === "targetSelect") {
+            this.setState({
+                targetSelect: event.target.value == "target1" ? true : false
+            });
+        }
+
+        if (event.target.name === "targetYears") {
+            this.setState({
+                yearsOfTarget: event.target.value
+            }, () => {
+                this.buildModelingCalculatorJexcel();
+            });
         }
 
         if (event.target.name === "sharePlanningUnit") {
@@ -8233,6 +8364,13 @@ export default class BuildTree extends Component {
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
         if (addNode) {
             (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = data;
+            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator = {
+                firstMonthOfTarget: moment(moment(this.state.firstMonthOfTarget, "YYYY-MM-DD")).format("YYYY-MM"),
+                yearsOfTarget: this.state.yearsOfTarget,
+                actualOrTargetValueList: this.state.actualOrTargetValueList
+            };
+            console.log("scalingList===>4", (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].annualTargetCalculator)
+
         }
         if (itemConfig.context.payload.nodeType.id == 4) {
             var tracerCategoryId = newItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.tracerCategory.id;
@@ -8661,31 +8799,41 @@ export default class BuildTree extends Component {
     }
 
     buildModelingCalculatorJexcel() {
+        jexcel.destroy(document.getElementById("modelingCalculatorJexcel"), true);
+
         var dataArray = [];
-        let count = document.getElementById("targetYears").value;
-        // moment(this.state.currentCalculatorStopDate).diff(moment(this.state.currentCalculatorStartDate), 'years') + 2;
+        var actualOrTargetValueList = this.state.actualOrTargetValueList;
+        let count1 = this.state.yearsOfTarget;
+        var count = Number(Number(count1) + 1);
+        console.log("startdate==>", this.state.currentCalculatorStartDate)
+
         for (var j = 0; j <= count; j++) {
-            let startdate = moment(moment(this.state.currentCalculatorStartDate).subtract(1, "years").add(j, "years")).format("MMM YYYY")
+            let startdate = moment(moment(this.state.currentCalculatorStartDate, "YYYY-MM-DD").subtract(1, "years").add(j, "years")).format("MMM YYYY")
             let stopDate = moment(moment(startdate).add(11, "months")).format("MMM YYYY");
+            let modifyStartDate = moment(startdate, "MMM YYYY").subtract(7, "months").format("MMM YYYY");
+            let modifyStartDate1 = moment(modifyStartDate, "MMM YYYY").add(1, "months").format("MMM YYYY");
+            let modifyStopDate1 = moment(modifyStartDate1, "MMM YYYY").add(11, "months").format("MMM YYYY");
             var data = [];
-            data[0] = startdate + " - " + stopDate
-            data[1] = ""
-            data[2] = `=((B${parseInt(j) + 1}-B${parseInt(j)})/B${parseInt(j)}*100)`;//(D21-D20)/D20
-            data[3] = "19535"
-            data[4] = `=(D${parseInt(j) + 1}-B${parseInt(j) + 1})`;//F21-D21
-            data[5] = `=((D${parseInt(j) + 1}-B${parseInt(j) + 1})/B${parseInt(j) + 1}*100)`;//(F21-D21)/D21
+            data[0] = startdate + " - " + stopDate//year
+            data[1] = actualOrTargetValueList.length > 0 ? actualOrTargetValueList[j] : ""//Actual / Target
+            data[2] = `=IF(ISBLANK(B${parseInt(j)}),'',((B${parseInt(j) + 1}-B${parseInt(j)})/B${parseInt(j)})*100)`;//(D21-D20)/D20--Annual Change (%)
+            data[3] = "";
+            data[4] = "";
+            data[5] = `=IF(ISBLANK(B${parseInt(j) + 1}),'',(E${parseInt(j) + 1}-B${parseInt(j) + 1}))`;//F21-D21--Difference (Target vs Calculated, #)
+            data[6] = `=IF(ISBLANK(B${parseInt(j) + 1}),'',((E${parseInt(j) + 1}-B${parseInt(j) + 1})/B${parseInt(j) + 1}*100))`;//(F21-D21)/D21--Difference (Target vs Calculated, %)
+            data[7] = j == 0 ? "" : modifyStartDate1
+            data[8] = modifyStopDate1
+            console.log("dates==>", data);
             dataArray[j] = data;
         }
-        console.log("dates==>", dataArray);
 
-        jexcel.destroy(document.getElementById("modelingCalculatorJexcel"), true);
 
         var data = dataArray;
 
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [90, 160, 80, 80, 90, 90],
+            colWidths: [90, 160, 80, 80, 90, 90, 80, 80, 90, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -8693,21 +8841,27 @@ export default class BuildTree extends Component {
                     type: 'text',
                     width: '130'
 
-                },
+                },//A0
                 {
                     title: i18n.t('static.tree.actualOrTarget'),
                     type: 'numeric',
                     textEditor: true,
                     mask: '#,##0',
-                },
+                },//B1
                 {
                     title: i18n.t('static.tree.annualChangePer'),
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##0.00%',
-                    disabledMaskOnEdition: true
-                },
+                    disabledMaskOnEdition: false
+                },//C2
+                {
+                    title: 'Monthly Change Percentage',
+                    type: 'hidden',
+                    decimal: '.',
+                    mask: '#,##0.0000%',
+                },//D3
                 {
                     title: i18n.t('static.tree.calculatedTotal'),
                     type: 'numeric',
@@ -8715,7 +8869,7 @@ export default class BuildTree extends Component {
                     decimal: '.',
                     mask: '#,##0',
                     disabledMaskOnEdition: true
-                },
+                },//E4
 
                 {
                     title: i18n.t('static.tree.differenceTargetVsCalculatedNumber'),
@@ -8724,7 +8878,7 @@ export default class BuildTree extends Component {
                     decimal: '.',
                     mask: '#,##0',
                     disabledMaskOnEdition: true
-                },
+                },//F5
                 {
                     title: i18n.t('static.tree.differenceTargetVsCalculatedPer'),
                     type: 'numeric',
@@ -8732,46 +8886,33 @@ export default class BuildTree extends Component {
                     decimal: '.',
                     mask: '#,##0.00%',
                     disabledMaskOnEdition: true
-                },
+                },//G6,
+                {
+                    title: "Updated Start Date",
+                    type: 'hidden'
+                },//H7
+                {
+                    title: "Updated Stop Date",
+                    type: 'hidden'
+                },//I8
+                {
+                    title: "Calculated numbers (for Altius to check against when coding)",
+                    type: 'hidden'
+                }//J9
+
             ],
-            // text: {
-            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-            //     show: '',
-            //     entries: '',
-            // },
             editable: true,
             onload: this.loadedModelingCalculatorJexcel,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
+            oneditionend: this.oneditionend,
             columnSorting: true,
-            // tableOverflow: true,
             wordWrap: true,
+            // onchange: this.onChangeModelingCalculator,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: true,
-            onchange: this.changed3,
-            updateTable: function (el, cell, x, y, source, value, id) {
-                var instance = el;
-                if (y != null) {
-                    var cell = instance.getCell("C1");
-                    cell.classList.add('readonly');
-                    var cell = instance.getCell("D1");
-                    cell.classList.add('readonly');
-                    var cell = instance.getCell("E1");
-                    cell.classList.add('readonly');
-                    var cell = instance.getCell("F1");
-                    cell.classList.add('readonly');
-                    var cell = instance.getCell(("D").concat(parseInt(y) + 1));
-                    cell.classList.add('readonly');
-                    var cell = instance.getCell(("E").concat(parseInt(y) + 1));
-                    cell.classList.add('readonly');
-                    var cell = instance.getCell(("F").concat(parseInt(y) + 1));
-                    cell.classList.add('readonly');
-                }
-            }.bind(this),
-            oneditionend: this.onedit,
-            onselection: this.selected,
+            onpaste: this.changed3,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -8786,48 +8927,209 @@ export default class BuildTree extends Component {
         var modelingCalculatorEl = jexcel(document.getElementById("modelingCalculatorJexcel"), options);
         this.el = modelingCalculatorEl;
         this.setState({
-            modelingCalculatorEl: modelingCalculatorEl
+            modelingCalculatorEl: modelingCalculatorEl,
+            calculatedTotalForModelingCalculator: [],
         }, () => {
             var scalingMonth = { year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) };
             this.filterScalingDataByMonth(scalingMonth.year + "-" + scalingMonth.month + "-01");
-        }
-        );
+        });
     }
 
-    changed3 = function (instance, cell, x, y, value) {
+    oneditionend = function (instance, cell, x, y, value) {
+        if (x == 1) {
+
+            console.log("modelingCalculater after saving datasonal1", x, "==", y)
+            var elInstance = instance;
+            var dataArray1 = [];
+            let modelingType = document.getElementById("modelingType").value;
+            var rowData = elInstance.getRowData(y);
+            if (y == 0) {
+                elInstance.setValueFromCoords(9, 0, parseFloat(Number(rowData[1].toString().replaceAll(",", "")) / 12).toFixed(6), true);
+            }
+            if (y > 0) {
+                var rowData1 = elInstance.getRowData(y - 1);
+                var index = (elInstance).getValue(`B${parseInt(y) + 1}`, true);
+                if (index !== "" || index != null || index != undefined) {
+                    var calculatedTotal = parseFloat(rowData1[9]).toFixed(4);
+                    var arr = [];
+                    var start = moment(moment(rowData[7], 'MMM YYYY'))
+                    var stop = moment(moment(rowData[8], 'MMM YYYY'))
+                    var count = 1;
+                    var calculatedTotal1 = parseFloat(rowData1[9]).toFixed(4);
+                    while (start.isSameOrBefore(stop)) {
+
+                        if (modelingType == "active1") {
+                            var monthlyChange = ((Math.pow(rowData[1] / rowData1[1], (1 / 12)) - 1) * 100);
+                            elInstance.setValueFromCoords(3, y, monthlyChange, true);//M32*(1+monthlyChange)
+                            calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
+                        } else {
+                            var monthlyChange = (((rowData[1] - rowData1[1]) / rowData1[1]) / 12 * 100);
+                            elInstance.setValueFromCoords(3, y, monthlyChange, true);//M32*(1+monthlyChange)
+                            var a = (1 + (parseFloat(monthlyChange).toFixed(6) / 100 * Number(count)));
+                            console.log("dataArray1===>", calculatedTotal, "===", monthlyChange, "===", y, "==", count)
+
+                            calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
+
+                        }
+                        var programJson = {
+                            date: moment(start.format('MMM YYYY')),
+                            calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
+                            startDate: moment(moment(rowData[0].split("-")[0], 'MMM YYYY')),
+                            stopDate: moment(moment(rowData[0].split("-")[1], 'MMM YYYY'))
+                        }
+
+                        arr.push(programJson)
+                        start.add(1, 'months');
+                        count++;
+                    }
+
+                    elInstance.setValueFromCoords(9, y, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);//M32*(1+monthlyChange)
+                    dataArray1 = dataArray1.concat(arr)
+                }
+            }
+            const arraySum = dataArray1.map(c => (c.date.year()))
+            const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
+            for (var i = 1; i < arraySum1.length - 1; i++) {
+                const abc = dataArray1.filter(c => c.date.year() == arraySum1[i]).map(c => Number(c.calculatedTotal))
+                    .reduce((accumulator, currentItem) => accumulator + currentItem, 0);
+                instance.setValueFromCoords(4, y, Math.round(abc), true);
+            }
+        }
+    }
+
+    changed3 = function (instance, data) {
+        console.log("instance===>", instance, "===", data)
+        var z = -1;
+        var dataArr = [];
+
+        let modelingType = document.getElementById("modelingType").value;
+        for (var i = 0; i < data.length; i++) {
+
+            if (z != data[i].y && data[i].x == 1) {
+
+                var rowData = instance.getRowData(data[i].y);
+                console.log("modelingCalculater after saving datasonal2", rowData)
+
+                if (data[i].y == 0) {
+                    console.log("modelingCalculater after saving datasonal3", data[i].y)
+
+                    instance.setValueFromCoords(9, 0, parseFloat(Number(data[i].value.toString().replaceAll(",", "")) / 12).toFixed(6), true);
+                }
+                if (data[i].y > 0) {
+                    console.log("modelingCalculater after saving datasonal4", data[i].y)
+
+                    var rowData1 = instance.getRowData(data[i].y - 1);
+                    var index = (instance).getValue(`B${parseInt(data[i].y) + 1}`, true);
+                    if (index !== "" || index != null || index != undefined) {
+                        var calculatedTotal = parseFloat(rowData1[9]).toFixed(4);
+                        var arr = [];
+                        var start = moment(moment(rowData[7], 'MMM YYYY'))
+                        var stop = moment(moment(rowData[8], 'MMM YYYY'))
+                        var count = 1;
+                        var calculatedTotal1 = parseFloat(rowData1[9]).toFixed(4);
+                        console.log("modelingCalculater after saving data111", calculatedTotal, "===", calculatedTotal1)
+
+                        while (start.isSameOrBefore(stop)) {
+                            console.log("modelingCalculater after saving data12", modelingType)
+
+                            if (modelingType == "active1") {
+                                var monthlyChange = ((Math.pow(rowData[1] / rowData1[1], (1 / 12)) - 1) * 100);
+                                instance.setValueFromCoords(3, data[i].y, monthlyChange, true);//M32*(1+monthlyChange)
+                                calculatedTotal = parseFloat(calculatedTotal * (1 + parseFloat(monthlyChange).toFixed(6) / 100)).toFixed(4);
+                            } else {
+                                var monthlyChange = (((rowData[1] - rowData1[1]) / rowData1[1]) / 12 * 100);
+                                instance.setValueFromCoords(3, data[i].y, monthlyChange, true);//M32*(1+monthlyChange)
+                                var a = (1 + (parseFloat(monthlyChange).toFixed(6) / 100 * Number(count)));
+                                calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
+                            }
+                            var programJson = {
+                                date: moment(start.format('MMM YYYY')),
+                                calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
+                                startDate: moment(moment(rowData[0].split("-")[0], 'MMM YYYY')),
+                                stopDate: moment(moment(rowData[0].split("-")[1], 'MMM YYYY'))
+                            }
+                            console.log("modelingCalculater after saving data13", programJson)
+
+                            arr.push(programJson)
+                            start.add(1, 'months');
+                            count++;
+                        }
+
+                        this.setState({
+                            calculatedTotalForModelingCalculator: this.state.calculatedTotalForModelingCalculator.concat(arr),
+                        }, () => {
+                            instance.setValueFromCoords(9, data[i].y, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);//M32*(1+monthlyChange)
+                            z = data[i].y;
+                        })
+                    }
+                }
+                dataArr.push(rowData[1]);
+            }
+        }
+        console.log("modelingCalculater after saving data14", data)
+        console.log("dataArray1=2", this.state.calculatedTotalForModelingCalculator)
+
+        const arraySum = this.state.calculatedTotalForModelingCalculator
+            .map(c => (c.date.year()))
+        const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
+        for (var i = 1; i < arraySum1.length - 1; i++) {
+            const abc = this.state.calculatedTotalForModelingCalculator.filter(c => c.date.year() == arraySum1[i]).map(c => Number(c.calculatedTotal))
+                .reduce((accumulator, currentItem) => accumulator + currentItem, 0);
+            instance.setValueFromCoords(4, i, Math.round(abc), true);
+        }
+        this.setState({
+            actualOrTargetValueList: dataArr
+        });
 
     }.bind(this);
 
-    loadedModelingCalculatorJexcel = function (instance, cell, x, y, value) {
+    loadedModelingCalculatorJexcel = function (instance, cell, x, y, source, value, id) {
         jExcelLoadedFunction(instance);
-        // var asterisk = document.getElementsByClassName("resizable")[0];
         let count = document.getElementById("targetYears").value;
-
+        count = Number(Number(count) + 1);
         var elInstance = instance.worksheets[0];
-        console.log("elInstance", elInstance)
         elInstance.setValueFromCoords(2, 0, "", true)
         elInstance.setValueFromCoords(3, 0, "", true)
         elInstance.setValueFromCoords(4, 0, "", true)
         elInstance.setValueFromCoords(5, 0, "", true)
-        elInstance.setValueFromCoords(3, count, "", true)
+        elInstance.setValueFromCoords(6, 0, "", true)
+        elInstance.setValueFromCoords(7, 0, "", true)
+
         elInstance.setValueFromCoords(4, count, "", true)
         elInstance.setValueFromCoords(5, count, "", true)
-
-
+        elInstance.setValueFromCoords(6, count, "", true)
 
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[2].classList.add('InfoTr');
         tr.children[3].classList.add('InfoTr');
-        tr.children[4].classList.add('InfoTr');
         tr.children[5].classList.add('InfoTr');
         tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTr');
 
         tr.children[2].title = i18n.t('static.tooltip.actualOrTarget');
         tr.children[3].title = i18n.t('static.tooltip.annualChangePer');
-        tr.children[4].title = i18n.t('static.tooltip.calculatedTotal');
-        tr.children[5].title = i18n.t('static.tooltip.diffTargetVsCalculatedNo');
-        tr.children[6].title = i18n.t('static.tooltip.diffTargetVsCalculatedPer');
+        tr.children[5].title = i18n.t('static.tooltip.calculatedTotal');
+        tr.children[6].title = i18n.t('static.tooltip.diffTargetVsCalculatedNo');
+        tr.children[7].title = i18n.t('static.tooltip.diffTargetVsCalculatedPer');
+
+        var cell = elInstance.getCell("C1");
+        cell.classList.add('readonly');
+        var cell = elInstance.getCell("E1");
+        cell.classList.add('readonly');
+        var cell = elInstance.getCell("F1");
+        cell.classList.add('readonly');
+        var cell = elInstance.getCell("G1");
+        cell.classList.add('readonly');
+        var cell = elInstance.getCell(("E").concat(Number(Number(count) + 1)));
+        cell.classList.add('readonly');
+        var cell = elInstance.getCell(("F").concat(Number(Number(count) + 1)));
+        cell.classList.add('readonly');
+        var cell = elInstance.getCell(("G").concat(Number(Number(count) + 1)));
+        cell.classList.add('readonly');
+        if (this.state.actualOrTargetValueList.length > 0) {
+            this.onChangeModelingCalculator(instance, cell, x, y, value);
+        }
 
     }
 
@@ -10735,22 +11037,17 @@ export default class BuildTree extends Component {
                                                     <Label htmlFor="select">Target</Label>
 
                                                     <Input
-                                                        // valid={!errors.targetSelect}
-                                                        // invalid={touched.targetSelect && !!errors.targetSelect}
                                                         onChange={(e) => { this.dataChange(e); }}
                                                         bsSize="sm"
                                                         className="col-md-6"
-                                                        // onBlur={handleBlur}
                                                         type="select" name="targetSelect" id="targetSelect">
                                                         <option value="target1" selected={true}>{'Annual Target'}</option>
                                                         <option value="target2">{'Ending Value Target / Change'}</option>
                                                     </Input>
-                                                    {/* <FormFeedback className="red">{errors.targetSelect}</FormFeedback> */}
-
                                                 </div>}
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-12">
+                                        <FormGroup className="col-md-12" style={{ display: this.state.targetSelect ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.annualTargetLabel')}</Label>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
@@ -10761,7 +11058,10 @@ export default class BuildTree extends Component {
                                                 value={{ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
                                                 onChange={this.handleAMonthChange4}
-                                                onDismiss={this.handleAMonthDissmis4}
+                                                // onDismiss={this.handleAMonthDissmis4}
+                                                id="firstMonthOfTarget"
+                                                name="firstMonthOfTarget"
+
                                             >
                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
                                             </Picker>
@@ -10772,8 +11072,8 @@ export default class BuildTree extends Component {
                                                 id="targetYears"
                                                 name="targetYears"
                                                 bsSize="sm"
-                                                // onChange={this.buildModelingCalculatorJexcel()}
-                                                value={moment(this.state.currentCalculatorStopDate).diff(moment(this.state.currentCalculatorStartDate), 'years') + 2}>
+                                                onChange={(e) => { this.dataChange(e) }}
+                                                value={this.state.yearsOfTarget}>
                                             </Input>
                                         </FormGroup>
 
@@ -10789,17 +11089,15 @@ export default class BuildTree extends Component {
                                             });
                                         }}><i className="fa fa-times"></i> {i18n.t('static.common.close')}</Button>
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.acceptValue}><i className="fa fa-check"></i> {i18n.t('static.common.accept')}</Button>
-                                        {/* <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.calculateValues}><i className="fa fa-check"></i> {i18n.t('static.qpl.calculate')}</Button> */}
-
-
                                     </FormGroup>
                                     {/* </div> */}
                                 </fieldset>
                             </div>
                         }
 
-                    </div>
-                    {this.state.showMomData &&
+                    </div >
+                    {
+                        this.state.showMomData &&
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
@@ -10891,7 +11189,8 @@ export default class BuildTree extends Component {
                             </fieldset>
                         </div>
                     }
-                    {this.state.showMomDataPercent &&
+                    {
+                        this.state.showMomDataPercent &&
                         <div className="row pl-lg-2 pr-lg-2">
                             <fieldset className="scheduler-border">
                                 <legend className="scheduler-border">{i18n.t('static.tree.monthlyData')}:</legend>
@@ -10974,7 +11273,7 @@ export default class BuildTree extends Component {
                     {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button> */}
                     {/* </Form> */}
                     {/* )} /> */}
-                </TabPane>
+                </TabPane >
                 <TabPane tabId="3">
                     {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
                     {/* {this.state.currentItemConfig.context.payload.extrapolation && */}
@@ -11086,16 +11385,22 @@ export default class BuildTree extends Component {
         this.pickAMonth4.current.show()
     }
     handleAMonthChange4 = (year, month) => {
-        // console.log("value>>>", year);
-        // console.log("text>>>", month)
+        console.log("value>>>", year);
+        console.log("value>>>", month)
         var date = year + "-" + month + "-01";
         var currentCalculatorStartValue = this.getMomValueForDateRange(date);
         console.log("currentCalculatorStartValue---", currentCalculatorStartValue);
         console.log("month change currentEndValueEdit---", this.state.currentEndValueEdit);
         console.log("month change currentTargetChangePercentageEdit---", this.state.currentTargetChangePercentageEdit);
         console.log("month change currentTargetChangeNumberEdit---", this.state.currentTargetChangeNumberEdit);
+        this.setState({
+            currentCalculatorStartDate: date, currentCalculatorStartValue,
+            firstMonthOfTarget: "",
+            // yearsOfTarget: "",
+            actualOrTargetValueList: []
+        }, () => {
+            this.buildModelingCalculatorJexcel();
 
-        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
             if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
                 console.log("Inside if modeling calculator");
             } else {
@@ -11111,45 +11416,6 @@ export default class BuildTree extends Component {
         });
 
     }
-    handleAMonthDissmis4 = (value) => {
-        // console.log("dismiss>>", value);
-        // this.setState({ singleValue2: value, }, () => {
-        // this.fetchData();
-        // })
-
-    }
-
-
-    handleClickMonthBox5 = (e) => {
-        this.pickAMonth5.current.show()
-    }
-    handleAMonthChange5 = (year, month) => {
-        // console.log("value>>>", year);
-        // console.log("text>>>", month)
-        this.setState({ currentCalculatorStopDate: year + "-" + month + "-01" }, () => {
-            if (!this.state.currentEndValueEdit && !this.state.currentTargetChangePercentageEdit && !this.state.currentTargetChangeNumberEdit) {
-                console.log("Inside if modeling calculator");
-            } else {
-                console.log("Inside else modeling calculator");
-                if (!this.state.currentEndValueEdit) {
-                    this.calculateMomByEndValue();
-                } else if (!this.state.currentTargetChangePercentageEdit) {
-                    this.calculateMomByChangeInPercent();
-                } else if (!this.state.currentTargetChangeNumberEdit) {
-                    this.calculateMomByChangeInNumber();
-                }
-            }
-        });
-
-    }
-    handleAMonthDissmis5 = (value) => {
-        // console.log("dismiss>>", value);
-        // this.setState({ singleValue2: value, }, () => {
-        // this.fetchData();
-        // })
-
-    }
-
 
     updateTreeData(date) {
         var items = this.state.items;
