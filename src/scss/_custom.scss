@@ -12263,8 +12263,16 @@ and (max-width: 1366px)
 .shipmentDataEntryTable .jss>tbody>tr>td.readonly>input[type=checkbox], .jss>tbody>tr>td.readonly>input[type=radio] {
   pointer-events: none;
   opacity: unset!important;
-
 }
+
+@media screen and (min-width: 768px){
+.pickerRangeBox .month-picker > .rmp-container .rmp-popup.range {
+    width: 17rem !important;
+    padding: 0.6rem;
+    margin-left: -38px!important;
+}
+}
+
 .compareAndSelect.jtabs .jtabs-headers-container {
   display: flex!important;
   align-items: center;
