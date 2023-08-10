@@ -2675,12 +2675,12 @@ export default class PlanningUnitSetting extends Component {
                                     "unit": planningUnitObj.unit,
                                     "multiplier": planningUnitObj.multiplier,
                                     "forecastingUnit": {
-                                        "id": planningUnitObj.forecastingUnit.id,
+                                        "id": planningUnitObj.forecastingUnit.forecastingUnitId,
                                         "label": planningUnitObj.forecastingUnit.label,
                                         "unit": planningUnitObj.forecastingUnit.unit,
                                         "productCategory": planningUnitObj.forecastingUnit.productCategory,
                                         "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                                        "idString": "" + planningUnitObj.forecastingUnit.id
+                                        "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
                                     },
                                     "idString": "" + parseInt(map1.get("1"))
                                 },
@@ -2724,12 +2724,12 @@ export default class PlanningUnitSetting extends Component {
                                     "unit": planningUnitObj.unit,
                                     "multiplier": planningUnitObj.multiplier,
                                     "forecastingUnit": {
-                                        "id": planningUnitObj.forecastingUnit.id,
+                                        "id": planningUnitObj.forecastingUnit.forecastingUnitId,
                                         "label": planningUnitObj.forecastingUnit.label,
                                         "unit": planningUnitObj.forecastingUnit.unit,
                                         "productCategory": planningUnitObj.forecastingUnit.productCategory,
                                         "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
-                                        "idString": "" + planningUnitObj.forecastingUnit.id
+                                        "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
                                     },
                                     "idString": "" + parseInt(map1.get("1"))
                                 },
