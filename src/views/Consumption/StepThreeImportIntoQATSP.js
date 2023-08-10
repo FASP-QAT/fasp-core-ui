@@ -528,6 +528,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         let primaryConsumptionData = response.data;
                         // var count1 = 1;
                         for (let i = 0; i < primaryConsumptionData.length; i++) {
+                            let rem = 0;
                             for (let j = 0; j < primaryConsumptionData[i].monthlyForecastData.length; j++) {
                                 // for (let k = 0; k < selectedSupplyPlan.length; k++) {
                                 // for (let l = 0; l < supplyPlanRegionList.length; l++) {
@@ -539,14 +540,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     var diff = this.monthDiff(new Date(primaryConsumptionData[i].monthlyForecastData[j].month), new Date());
                                     var isOldDate = diff < (realm.forecastConsumptionMonthsInPast+1);
                                     var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId && c.multiplier == 1);
+                                    rem = rem + Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) % 1;
+                                    let temp_consumptionQty = Math.floor(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)
+                                    if(rem > 1){
+                                        temp_consumptionQty += 1;
+                                        rem -= 1;
+                                    }
                                     tempList.push({
                                         v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
                                         v2: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitDesc,//Supply plan planning unit name
                                         v3: regionFilter[0].supplyPlanRegionName,// Supply plan region name
                                         v4: moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("MMM-YY"), // Month
-                                        v5: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Math.round(Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)),//Forecasting module consumption qty
+                                        v5: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Number(Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)).toFixed(2),//Forecasting module consumption qty
                                         v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
-                                        v7: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)),// Multiplication
+                                        v7: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Number((Number(temp_consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)).toFixed(2),// Multiplication
                                         v8: checkConsumptionData.length > 0 ? checkConsumptionData[0].consumptionRcpuQty : "",//Supply plan module qty
                                         v9: checkConsumptionData.length > 0 ? true : false,// Check
                                         v10: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId,// Supply plan planning unit id
