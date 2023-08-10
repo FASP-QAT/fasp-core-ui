@@ -9106,7 +9106,7 @@ export default class CreateTreeTemplate extends Component {
                     // }))
                     if(this.state.toggleArray.includes(itemConfig.id)){
 
-                        var parentId = itemConfig.payload.parentNodeId;
+                        var parentId = itemConfig.payload.parentNodeId!=undefined?itemConfig.payload.parentNodeId:itemConfig.parent;
                         var parentNode = items.filter(e => e.id == parentId);
                         var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
                         if(parentNode[0].templateName ? parentNode[0].templateName == "contactTemplateMin" ? false : true : true){
