@@ -610,8 +610,10 @@ class ModelingValidation extends Component {
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                columns2.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
             columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns2.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k], type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
                 columns2.push({ title: nodeVal[k], type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
@@ -642,8 +644,8 @@ class ModelingValidation extends Component {
                             } else {
                             }
                         }
-                        data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
-                        total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
+                        data[k + 1] = calculatedValueTotal != "" ? Number(calculatedValueTotal).toFixed(2) : "";
+                        total += Number(calculatedValueTotal);
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
 
@@ -693,8 +695,8 @@ class ModelingValidation extends Component {
                             } else {
                             }
                         }
-                        data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
-                        total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
+                        data[k + 1] = calculatedValueTotal != "" ? Number(calculatedValueTotal).toFixed(2) : "";
+                        total += Number(calculatedValueTotal);
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
                     
@@ -739,8 +741,8 @@ class ModelingValidation extends Component {
                             } else {
                             }
                         }
-                        data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
-                        total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
+                        data[k + 1] = calculatedValueTotal != "" ? Number(calculatedValueTotal).toFixed(2) : "";
+                        total += Number(calculatedValueTotal);
                     }
                     data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
 
