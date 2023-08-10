@@ -1614,11 +1614,11 @@ class ForecastSummary extends Component {
                                                 }else{
                                                     totalForecast=null;
                                                 }
-                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast!=null ? Math.round(totalForecast) : "";
-                                                total += Number(filterForecastSelected != undefined ? Math.round(totalForecast) : 0);
+                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined && totalForecast!=null ? Number(totalForecast).toFixed(2) : "";
+                                                total += Number(filterForecastSelected != undefined ? Number(totalForecast).toFixed(2) : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
 
-                                                if ((filterForecastSelected != undefined ? Math.round(totalForecast) : "") != "") {
+                                                if ((filterForecastSelected != undefined ? Number(totalForecast).toFixed(2) : "") != "") {
                                                     selectedForecastQty = selectedForecastQty + 1;
                                                 }
                                             }

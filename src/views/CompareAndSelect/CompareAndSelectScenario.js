@@ -540,7 +540,7 @@ class CompareAndSelectScenario extends Component {
                 color: treeScenarioList[tsList].color,
                 tree: treeScenarioList[tsList].tree,
                 scenario: treeScenarioList[tsList].scenario,
-                totalForecast: treeScenarioList[tsList].readonly ? "" : Math.round(totalArray[tsList]),
+                totalForecast: treeScenarioList[tsList].readonly ? "" : Number(totalArray[tsList]).toFixed(2),
                 isLowest: min == actualDiff[tsList] ? 1 : 0,
                 forecastError: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[tsList] > 0 && actualDiff.length > 0 && actualDiff[tsList] > 0 && totalActual > 0 ? (((actualDiff[tsList]) / totalActual) * 100).toFixed(4) : "",
                 noOfMonths: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[tsList] != undefined ? countArray[tsList] + 1 : "",
@@ -623,7 +623,7 @@ class CompareAndSelectScenario extends Component {
                 data[1] = treeScenarioList1[j].checked;
                 data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
                 data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
-                data[4] = `${treeScenarioList1[j].readonly ? "" : Math.round(totalArray[j])}`
+                data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
                 data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 ? this.formatter((((actualDiff[j]) / totalActual) * 100).toFixed(4)) : ""
                 data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined ? countArray[j] + 1 : ""
                 data[7] = finalData[j].compareToConsumptionForecast
