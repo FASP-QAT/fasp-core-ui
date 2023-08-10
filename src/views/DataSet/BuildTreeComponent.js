@@ -1067,6 +1067,7 @@ export default class BuildTree extends Component {
         this.loadedModelingCalculatorJexcel = this.loadedModelingCalculatorJexcel.bind(this);
         this.changed3 = this.changed3.bind(this);
         this.onChangeModelingCalculator = this.onChangeModelingCalculator.bind(this);
+        this.oneditionend = this.oneditionend.bind(this);
     }
 
     buildMissingPUJexcel() {
@@ -8805,11 +8806,11 @@ export default class BuildTree extends Component {
         var actualOrTargetValueList = this.state.actualOrTargetValueList;
         let count1 = this.state.yearsOfTarget;
         var count = Number(Number(count1) + 1);
-        console.log("startdate==>", this.state.currentCalculatorStartDate)
+        // console.log("startdate==>", this.state.currentCalculatorStartDate)
 
         for (var j = 0; j <= count; j++) {
             let startdate = moment(moment(this.state.currentCalculatorStartDate, "YYYY-MM-DD").subtract(1, "years").add(j, "years")).format("MMM YYYY")
-            let stopDate = moment(moment(startdate).add(11, "months")).format("MMM YYYY");
+            let stopDate = moment(moment(startdate, "MMM YYYY").add(11, "months")).format("MMM YYYY");
             let modifyStartDate = moment(startdate, "MMM YYYY").subtract(7, "months").format("MMM YYYY");
             let modifyStartDate1 = moment(modifyStartDate, "MMM YYYY").add(1, "months").format("MMM YYYY");
             let modifyStopDate1 = moment(modifyStartDate1, "MMM YYYY").add(11, "months").format("MMM YYYY");
@@ -8905,7 +8906,7 @@ export default class BuildTree extends Component {
             onload: this.loadedModelingCalculatorJexcel,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
-            oneditionend: this.oneditionend,
+            onchange: this.oneditionend,
             columnSorting: true,
             wordWrap: true,
             // onchange: this.onChangeModelingCalculator,
@@ -8928,7 +8929,7 @@ export default class BuildTree extends Component {
         this.el = modelingCalculatorEl;
         this.setState({
             modelingCalculatorEl: modelingCalculatorEl,
-            calculatedTotalForModelingCalculator: [],
+            // calculatedTotalForModelingCalculator: [],
         }, () => {
             var scalingMonth = { year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) };
             this.filterScalingDataByMonth(scalingMonth.year + "-" + scalingMonth.month + "-01");
@@ -8936,11 +8937,12 @@ export default class BuildTree extends Component {
     }
 
     oneditionend = function (instance, cell, x, y, value) {
-        if (x == 1) {
+        var calculatedTotalForModelingCalculator = this.state.calculatedTotalForModelingCalculator;
+        var dataArray1 = [];
 
+        if (x == 1) {
             console.log("modelingCalculater after saving datasonal1", x, "==", y)
             var elInstance = instance;
-            var dataArray1 = [];
             let modelingType = document.getElementById("modelingType").value;
             var rowData = elInstance.getRowData(y);
             if (y == 0) {
@@ -8967,35 +8969,38 @@ export default class BuildTree extends Component {
                             elInstance.setValueFromCoords(3, y, monthlyChange, true);//M32*(1+monthlyChange)
                             var a = (1 + (parseFloat(monthlyChange).toFixed(6) / 100 * Number(count)));
                             console.log("dataArray1===>", calculatedTotal, "===", monthlyChange, "===", y, "==", count)
-
                             calculatedTotal1 = parseFloat(calculatedTotal * a).toFixed(4);
-
                         }
                         var programJson = {
-                            date: moment(start.format('MMM YYYY')),
+                            date: start,
                             calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
-                            startDate: moment(moment(rowData[0].split("-")[0], 'MMM YYYY')),
-                            stopDate: moment(moment(rowData[0].split("-")[1], 'MMM YYYY'))
                         }
-
                         arr.push(programJson)
                         start.add(1, 'months');
                         count++;
                     }
+                    this.setState({
+                        calculatedTotalForModelingCalculator: this.state.calculatedTotalForModelingCalculator.concat(arr),
+                    }, () => {
+                        console.log("arr==>", arr)
 
-                    elInstance.setValueFromCoords(9, y, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);//M32*(1+monthlyChange)
-                    dataArray1 = dataArray1.concat(arr)
+                        elInstance.setValueFromCoords(9, y, modelingType == "active1" ? calculatedTotal : arr[arr.length - 1].calculatedTotal, true);//M32*(1+monthlyChange)
+                    })
                 }
             }
-            const arraySum = dataArray1.map(c => (c.date.year()))
-            const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
-            for (var i = 1; i < arraySum1.length - 1; i++) {
-                const abc = dataArray1.filter(c => c.date.year() == arraySum1[i]).map(c => Number(c.calculatedTotal))
-                    .reduce((accumulator, currentItem) => accumulator + currentItem, 0);
-                instance.setValueFromCoords(4, y, Math.round(abc), true);
-            }
         }
-    }
+        console.log("arraySum1", this.state.calculatedTotalForModelingCalculator.map(c => c.date))
+
+        const arraySum = this.state.calculatedTotalForModelingCalculator.map(c => (moment(c.date, "MMM YYYY").format("YYYY")))
+        const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
+        // console.log("arraySum1", arraySum1)
+
+        for (var i = 0; i < arraySum1.length - 1; i++) {
+            const abc = this.state.calculatedTotalForModelingCalculator.filter(c => moment(c.date, "YYYY").format("YYYY") == arraySum1[i]).map(c => Number(c.calculatedTotal))
+                .reduce((accumulator, currentItem) => accumulator + currentItem, 0);
+            instance.setValueFromCoords(4, y, Math.round(abc), true);
+        }
+    }.bind(this);
 
     changed3 = function (instance, data) {
         console.log("instance===>", instance, "===", data)
@@ -9067,7 +9072,6 @@ export default class BuildTree extends Component {
             }
         }
         console.log("modelingCalculater after saving data14", data)
-        console.log("dataArray1=2", this.state.calculatedTotalForModelingCalculator)
 
         const arraySum = this.state.calculatedTotalForModelingCalculator
             .map(c => (c.date.year()))
@@ -11076,13 +11080,12 @@ export default class BuildTree extends Component {
                                                 value={this.state.yearsOfTarget}>
                                             </Input>
                                         </FormGroup>
-
-                                        <div className="col-md-12 pl-lg-0 pr-lg-0">
-                                            <div id="modelingCalculatorJexcel" className={"consumptionDataEntryTable RowClickable"}>
-                                            </div>
-                                        </div>
                                     </div>
                                     <FormGroup className="col-md-12">
+                                        <div className="calculatorimg calculatorTable consumptionDataEntryTable">
+                                            <div id="modelingCalculatorJexcel" className={"RowClickable ScalingTable"} >
+                                            </div>
+                                        </div>
                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                             this.setState({
                                                 showCalculatorFields: false
