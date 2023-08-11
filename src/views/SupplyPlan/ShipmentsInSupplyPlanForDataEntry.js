@@ -603,7 +603,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
 
                                                 data[15] = isEmergencyOrder;//P
                                                 data[16] = shipmentList[i].fundingSource.id;//Q
-                                                data[17] = shipmentList[i].budget.id;//R
+                                                data[17] = shipmentList[i].budget.id==0?"":shipmentList[i].budget.id;//R
                                                 data[18] = shipmentList[i].currency.currencyId;//S
                                                 data[19] = shipmentList[i].rate != undefined ? Number(shipmentList[i].rate).toFixed(2) : "";//T
                                                 data[20] = shipmentList[i].erpFlag.toString() == "true" ? Number(shipmentList[i].productCost).toFixed(2) : `=ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)`;//U
@@ -3854,7 +3854,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         if (rowData[1].toString() == "false" && rowData[0].toString() == "true" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != "") {
                             positiveValidation("M", y, elInstance);
                         } else {
-                            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                            if (rowData[1].toString() == "false" && rowData[0].toString() == "true"){
+                                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                            }
                         }
                     }
                     // }

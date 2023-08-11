@@ -3201,7 +3201,7 @@ export default class CreateTreeTemplate extends Component {
                 if (modelingTypeId == 3) {
                     var nodeDataMomListFilter = [];
                     if (map1.get("12") == 1) {
-                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => c.id == map1.get("3"))[0].payload.nodeDataMap[0])[0].nodeDataMomList;
+                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => map1.get("3")!=""?(c.payload.nodeDataMap[0])[0].nodeDataId == map1.get("3").split('_')[0]:(c.payload.nodeDataMap[0])[0].nodeDataId == map1.get("3"))[0].payload.nodeDataMap[0])[0].nodeDataMomList;
                         nodeDataMomListFilter = nodeDataMomListOfTransferNode.filter(c => c.month == startDate)
                     } else {
                         nodeDataMomListFilter = nodeDataMomList.filter(c => c.month == startDate)
@@ -3214,7 +3214,7 @@ export default class CreateTreeTemplate extends Component {
                 if (modelingTypeId == 4) {
                     var nodeDataMomListFilter = [];
                     if (map1.get("12") == 1) {
-                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => c.id == map1.get("3"))[0].payload.nodeDataMap[0])[0].nodeDataMomList;
+                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => map1.get("3")!=""?(c.payload.nodeDataMap[0])[0].nodeDataId == map1.get("3").split('_')[0]:(c.payload.nodeDataMap[0])[0].nodeDataId == map1.get("3"))[0].payload.nodeDataMap[0])[0].nodeDataMomList;
                         nodeDataMomListFilter = nodeDataMomListOfTransferNode.filter(c => c.month == scalingDate)
                     } else {
                         nodeDataMomListFilter = nodeDataMomList.filter(c => c.month == scalingDate)
@@ -9106,7 +9106,7 @@ export default class CreateTreeTemplate extends Component {
                     // }))
                     if(this.state.toggleArray.includes(itemConfig.id)){
 
-                        var parentId = itemConfig.payload.parentNodeId;
+                        var parentId = itemConfig.payload.parentNodeId!=undefined?itemConfig.payload.parentNodeId:itemConfig.parent;
                         var parentNode = items.filter(e => e.id == parentId);
                         var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
                         if(parentNode[0].templateName ? parentNode[0].templateName == "contactTemplateMin" ? false : true : true){
@@ -9864,7 +9864,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <Input type="text"
                                                         id="parentValue"
                                                         name="parentValue"
-                                                        readOnly={!this.state.editable}
+                                                        // readOnly={!this.state.editable}
                                                         bsSize="sm"
                                                         readOnly={true}
                                                         onChange={(e) => { this.dataChange(e) }}
