@@ -2835,7 +2835,7 @@ export default class ListTreeComponent extends Component {
 
     downloadClicked(treeId) {
         this.setState({ loading: true })
-
+        console.log("Compression logs -------> Start",Date())
         var programId = this.state.datasetId;
         var versionId = this.state.versionId;
         var checkboxesChecked = [];
@@ -2898,7 +2898,7 @@ export default class ListTreeComponent extends Component {
                             }, () => {
                                 // this.hideFirstComponent()
                                 this.props.history.push({ pathname: `/masterDataSyncForTree`, state: { "programIds": programIds, "treeId": treeId } })
-
+                                console.log("Compression logs -------> End",Date())
                             })
                         }.bind(this);
                         transaction.onerror = function (event) {

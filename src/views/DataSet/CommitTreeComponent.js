@@ -228,6 +228,7 @@ export default class CommitTreeComponent extends React.Component {
             loading: true,
             showCompare: false,
         }, () => {
+            console.log("Compression logs -------> Start",Date())
             if (programId != "" && programId != undefined && programId != null) {
                 var myResult = [];
                 myResult = this.state.programList;
@@ -296,6 +297,7 @@ export default class CommitTreeComponent extends React.Component {
                                 comparedLatestVersion: response.data[0].currentVersion.versionId
                             }, () => {
                                 dataCheck(this, programData[0].datasetJson)
+                                console.log("Compression logs -------> End",Date())
                             })
                         })
                 })
@@ -590,6 +592,7 @@ export default class CommitTreeComponent extends React.Component {
             alert(i18n.t("static.commitTree.noPUorFUMapping"));
         } else {
             this.setState({ showValidation: !this.state.showValidation }, () => {
+                console.log("Compression logs -------> Start time",Date())
                 this.setState({
                     loading: true,
                 }, () => {
@@ -708,6 +711,7 @@ export default class CommitTreeComponent extends React.Component {
                                             this.hideFirstComponent();
                                             // getLatestProgram also copy , use getAllDatasetData instead getAllProgramData
                                             this.redirectToDashbaord(response.data);
+                                            console.log("Compression logs -------> End time",Date())
                                         })
                                     } else {
                                         this.setState({
