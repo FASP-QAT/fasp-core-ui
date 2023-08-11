@@ -82,7 +82,7 @@ class UpdateExpiredPasswordComponent extends Component {
     }
 
     componentDidMount() {
-        console.log("Update expired password email id--->" + this.props.location.state.emailId)
+        // console.log("Update expired password email id--->" + this.props.location.state.emailId)
     }
     hideFirstComponent() {
         setTimeout(function () {
@@ -156,7 +156,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (isSiteOnline()) {
-                                                console.log("Update expired password email id on submit method--->" + this.props.location.state.emailId)
+                                                // console.log("Update expired password email id on submit method--->" + this.props.location.state.emailId)
                                                 UserService.updateExpiredPassword(this.props.location.state.emailId, values.oldPassword, values.newPassword)
                                                     .then(response => {
                                                         var decoded = jwt_decode(response.data.token);
@@ -184,7 +184,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                     //  message: error.message 
                                                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 }, () => {
-                                                                    console.log("inside412");
+                                                                    // console.log("inside412");
                                                                     document.getElementById('div1').style.display = 'block';
                                                                     this.hideFirstComponent();
                                                                 });
@@ -199,7 +199,7 @@ class UpdateExpiredPasswordComponent extends Component {
 
                                                                         this.setState({ message: error.response.data.messageCode },
                                                                             () => {
-                                                                                console.log("inside412");
+                                                                                // console.log("inside412");
                                                                                 document.getElementById('div1').style.display = 'block';
                                                                                 this.hideFirstComponent();
                                                                             });
@@ -208,7 +208,7 @@ class UpdateExpiredPasswordComponent extends Component {
 
                                                                         this.setState({ message: 'static.unkownError' },
                                                                             () => {
-                                                                                console.log("inside412");
+                                                                                // console.log("inside412");
                                                                                 document.getElementById('div1').style.display = 'block';
                                                                                 this.hideFirstComponent();
                                                                             });
@@ -222,7 +222,7 @@ class UpdateExpiredPasswordComponent extends Component {
 
                                                 this.setState({ message: 'static.common.onlinepasswordtext' },
                                                     () => {
-                                                        console.log("inside412");
+                                                        // console.log("inside412");
                                                         document.getElementById('div1').style.display = 'block';
                                                         this.hideFirstComponent();
                                                     });

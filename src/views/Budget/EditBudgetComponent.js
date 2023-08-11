@@ -12,10 +12,12 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
-import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX, API_URL } from '../../Constants.js';
+import { SPECIAL_CHARECTER_WITH_NUM, DATE_FORMAT_SM, DATE_PLACEHOLDER_TEXT, ALPHABET_NUMBER_REGEX, BUDGET_NAME_REGEX, API_URL, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import FundingSourceService from '../../api/FundingSourceService';
+import ProgramService from '../../api/ProgramService';
+import DropdownService from '../../api/DropdownService';
 
 
 const entityname = i18n.t('static.dashboard.budget');
@@ -24,6 +26,7 @@ let initialValues = {
     budgetAmt: '',
     budgetCode: '',
     fundingSourceId: '',
+    programId: []
 }
 
 const validationSchema = function (values) {
@@ -123,10 +126,12 @@ class EditBudgetComponent extends Component {
                 budgetAmt: '',
                 notes: '',
                 budgetCode: '',
+                programs:[]
 
             },
             message: '',
             lang: localStorage.getItem('lang'),
+            programs: [],
         }
 
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -145,6 +150,39 @@ class EditBudgetComponent extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
+        this.programChange = this.programChange.bind(this);
+    }
+
+    programChange(programId) {
+        var selectedArray = [];
+        for (var p = 0; p < programId.length; p++) {
+            selectedArray.push(programId[p].value);
+        }
+        if (selectedArray.includes("-1")) {
+            this.setState({ programId: [] });
+            var list = this.state.programs.filter(c => c.value != -1)
+            this.setState({ programId: list });
+            var programId = list;
+        } else {
+            this.setState({ programId: programId });
+            var programId = programId;
+        }
+
+        let { budget } = this.state;
+        // this.setState({ roleId });
+        var programIdArray = [];
+        for (var i = 0; i < programId.length; i++) {
+            programIdArray[i] = {
+                id: programId[i].value
+            }
+        }
+
+        budget.programs = programIdArray;
+
+        this.setState({
+            budget,
+        },
+            () => { });
     }
 
     _handleClickRangeBox(e) {
@@ -177,9 +215,9 @@ class EditBudgetComponent extends Component {
 
 
     addMonths(date, months) {
-        console.log("add months date 1---" + date);
+        // console.log("add months date 1---" + date);
         date.setMonth(date.getMonth() + months);
-        console.log("add months date 2---" + date);
+        // console.log("add months date 2---" + date);
         return date;
     }
 
@@ -206,11 +244,84 @@ class EditBudgetComponent extends Component {
     }
 
     componentDidMount() {
+        this.setState({ loading: true })
+        let realmId=AuthenticationService.getRealmId();
+        DropdownService.getProgramForDropdown(realmId,PROGRAM_TYPE_SUPPLY_PLAN)
+            .then(response => {
+                if (response.status == 200) {
+                    var programList = [];
+                    var responseData=response.data.filter(c=>c.active);
+                    for (var i = 0; i < responseData.length; i++) {
+                        programList[i + 1] = { value: responseData[i].id, label: getLabelText(responseData[i].label, this.state.lang) }
+                    }
+                    var listArray = programList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    listArray.unshift({ value: "-1", label: i18n.t("static.common.all") })
+
+                    this.setState({
+                        programs: listArray, loading: false
+                    })
+                }
+                else {
+
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("(response.data.startDate)--", new Date(response.data.startDate));
-                    console.log("Response data Test",response.data)
+                    // console.log("(response.data.startDate)--", new Date(response.data.startDate));
+                    // console.log("Response data Test",response.data)
                     // if (response.data.startDate != null && response.data.startDate != "") {
                     //     response.data.startDate = new Date(response.data.startDate);
                     // }
@@ -219,15 +330,20 @@ class EditBudgetComponent extends Component {
                     // }
                     // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                     // response.data.budgetAmt = getBudgetAmount;
-
+                    var proramListArray = [];
                     var startDate = moment(response.data.startDate).format("YYYY-MM-DD");
                     var stopDate = moment(response.data.stopDate).format("YYYY-MM-DD");
                     let budgetObj = response.data;
                     budgetObj.budgetAmt = (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                    console.log("AMT------>", (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
-                    console.log("Budget Obj Test",budgetObj)
+                    // console.log("AMT------>", (budgetObj.budgetAmt).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
+                    // console.log("Budget Obj Test",budgetObj)
+                    for (var i = 0; i < budgetObj.programs.length; i++) {
+                        if (budgetObj.programs[i].id != 0) {
+                            proramListArray[i] = { value: budgetObj.programs[i].id, label: getLabelText(budgetObj.programs[i].label, this.state.lang) }
+                        }
+                    }
                     this.setState({
-                        budget: budgetObj, loading: false,
+                        budget: budgetObj, loading: false,programId: proramListArray,
                         rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
                     });
                 }
@@ -390,7 +506,9 @@ class EditBudgetComponent extends Component {
         this.setState({
             budget
         },
-            () => { console.log(this.state) });
+            () => { 
+                // console.log(this.state) 
+            });
     };
 
     touchAll(setTouched, errors) {
@@ -399,6 +517,7 @@ class EditBudgetComponent extends Component {
             budgetAmt: true,
             budgetCode: true,
             fundingSourceId: true,
+            programId: true,
         });
         this.validateForm(errors)
     }
@@ -454,7 +573,8 @@ class EditBudgetComponent extends Component {
                                     budgetCode: this.state.budget.budgetCode,
                                     startDate: this.state.budget.startDate,
                                     stopDate: this.state.budget.stopDate,
-                                    fundingSourceId: this.state.budget.fundingSource.fundingSourceId
+                                    fundingSourceId: this.state.budget.fundingSource.fundingSourceId,
+                                    programs: this.state.budget.programs
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -473,6 +593,11 @@ class EditBudgetComponent extends Component {
 
                                     // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
                                     budget.stopDate = stopDate;
+                                    for (var i = 0; i < budget.programs.length; i++) {
+                                        if (budget.programs[i].id == 0) {
+                                            budget.programs = []
+                                        }
+                                    }
                                     // var startDate = moment(this.state.budget.startDate).format("YYYY-MM-DD");
                                     // budget.startDate = startDate;
 
@@ -483,9 +608,9 @@ class EditBudgetComponent extends Component {
 
                                     // var stopDateString = this.state.budget.stopDate.getFullYear() + "-" + ("0" + (this.state.budget.stopDate.getMonth() + 1)).slice(-2) + "-" + ("0" + this.state.budget.stopDate.getDate()).slice(-2);
                                     // budget.stopDate = new Date(stopDateString);
-                                    console.log("check----->1", budget.budgetAmt);
+                                    // console.log("check----->1", budget.budgetAmt);
                                     budget.budgetAmt = budget.budgetAmt.replace(/,/g, '');
-                                    console.log("check----->2", budget.budgetAmt);
+                                    // console.log("check----->2", budget.budgetAmt);
                                     BudgetService.editBudget(budget)
                                         .then(response => {
                                             if (response.status == "200") {
@@ -507,7 +632,7 @@ class EditBudgetComponent extends Component {
                                                         loading: false
                                                     });
                                                 } else {
-                                                    console.log("ERROR------->", error.response);
+                                                    // console.log("ERROR------->", error.response);
                                                     switch (error.response ? error.response.status : "") {
 
                                                         case 401:
@@ -567,24 +692,28 @@ class EditBudgetComponent extends Component {
                                         <Form onSubmit={handleSubmit} noValidate name='budgetForm' autocomplete="off">
                                             <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
 
-                                                <FormGroup>
-                                                    <Label htmlFor="programId">{i18n.t('static.budget.program')}<span class="red Reqasterisk">*</span></Label>
-
-                                                    <Input
-                                                        type="text"
+                                            <FormGroup className="Selectcontrol-bdrNone">
+                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
+                                                    <Select
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.programId && this.state.budget.programs.length != 0 },
+                                                            { 'is-invalid': (touched.programId && !!errors.programId) }
+                                                        )}
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("programId", e);
+                                                            this.programChange(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("programId", true)}
                                                         name="programId"
                                                         id="programId"
-                                                        bsSize="sm"
-                                                        readOnly
-                                                        valid={!errors.programId}
-                                                        invalid={touched.programId && !!errors.programId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                        onBlur={handleBlur}
-
-                                                        value={this.state.budget.program.code}
-                                                    >
-                                                    </Input>
-
+                                                        multi
+                                                        required
+                                                        // min={1}
+                                                        options={this.state.programs}
+                                                        value={this.state.programId}
+                                                    />
                                                     <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
@@ -807,7 +936,7 @@ class EditBudgetComponent extends Component {
     resetClicked() {
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
-                console.log("Response data Test",response.data)
+                // console.log("Response data Test",response.data)
 
                 // var getBudgetAmount = this.CommaFormatted(response.data.budgetAmt);
                 // response.data.budgetAmt = getBudgetAmount;

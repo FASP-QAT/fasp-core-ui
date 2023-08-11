@@ -221,7 +221,7 @@ export default class EditRealmTicketComponent extends Component {
                             this.state.realm.summary = summaryText_2;
                             this.state.realm.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.realm).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

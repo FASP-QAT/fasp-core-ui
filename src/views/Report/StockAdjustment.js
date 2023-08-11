@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, CardHeader, Form, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
+import { Card, CardHeader, Form, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col, Dropdown } from 'reactstrap';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import i18n from '../../i18n'
 import RegionService from "../../api/RegionService";
@@ -18,7 +18,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
+import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ProductService from '../../api/ProductService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
@@ -34,6 +34,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { faLeaf } from '@fortawesome/free-solid-svg-icons';
+import DropdownService from '../../api/DropdownService';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -87,11 +88,21 @@ class StockAdjustmentComponent extends Component {
     getPrograms = () => {
         if (isSiteOnline()) {
             // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
+            let realmId = AuthenticationService.getRealmId();
+
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    // console.log(JSON.stringify(response.data))
+                    var proList = []
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            programId: response.data[i].id,
+                            label: response.data[i].label,
+                            programCode: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
                     this.setState({
-                        programs: response.data, loading: false
+                        programs: proList, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -162,7 +173,7 @@ class StockAdjustmentComponent extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
             this.setState({ loading: false })
         }
@@ -196,13 +207,13 @@ class StockAdjustmentComponent extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        // console.log(programNameLabel)
+                        // // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -217,8 +228,8 @@ class StockAdjustmentComponent extends Component {
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = a.programCode.toLowerCase();
+                            b = b.programCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         programId: localStorage.getItem("sesProgramIdReport")
@@ -228,8 +239,8 @@ class StockAdjustmentComponent extends Component {
                 } else {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = a.programCode.toLowerCase();
+                            b = b.programCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     })
@@ -251,18 +262,70 @@ class StockAdjustmentComponent extends Component {
 
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
-            // console.log(program)
+            // // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
-                    this.setState({
-                        versions: []
-                    }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
-                    });
+                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                        .then(response => {
+                            // console.log("response===>", response.data)
+                            this.setState({
+                                versions: []
+                            }, () => {
+                                this.setState({
+                                    versions: response.data
+                                }, () => {
+                                    this.consolidatedVersionList(programId)
+                                });
+                            });
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    programs: [], loading: false
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+
+
+
+
+
 
 
                 } else {
@@ -322,7 +385,7 @@ class StockAdjustmentComponent extends Component {
 
                 }
 
-                // console.log(verList)
+                // // console.log(verList)
                 let versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
                 })
@@ -406,18 +469,18 @@ class StockAdjustmentComponent extends Component {
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
                             var proList = []
-                            // console.log(myResult)
+                            // // console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
-                                    proList[i] = myResult[i]
+                                    proList[i] = myResult[i].planningUnit
                                 }
                             }
                             var lang = this.state.lang;
                             this.setState({
                                 planningUnits: proList.sort(function (a, b) {
-                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }), message: ''
                             }, () => {
@@ -430,14 +493,19 @@ class StockAdjustmentComponent extends Component {
                 }
                 else {
                     // AuthenticationService.setupAxiosInterceptors();
+                    var programJson = {
+                        tracerCategoryIds: [],
+                        programIds: [programId]
+                    }
+                    // console.log('**', programJson)
 
                     //let productCategoryId = document.getElementById("productCategoryId").value;
-                    ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                        // console.log('**' + JSON.stringify(response.data))
+                    DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+                        // console.log('**', JSON.stringify(response.data))
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -586,13 +654,13 @@ class StockAdjustmentComponent extends Component {
         var A = [this.addDoubleQuoteToRowContent(headers)]
         this.state.data.map(ele => A.push(this.addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), ele.stockAdjustemntQty, ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
         for (var i = 0; i < A.length; i++) {
-            // console.log(A[i])
+            // // console.log(A[i])
             csvRow.push(A[i].join(","))
 
         }
 
         var csvString = csvRow.join("%0A")
-        // console.log('csvString' + csvString)
+        // // console.log('csvString' + csvString)
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
@@ -693,7 +761,7 @@ class StockAdjustmentComponent extends Component {
 
     buildJExcel() {
         let stockAdjustmentList = this.state.data;
-        // console.log("stockAdjustmentList---->", stockAdjustmentList);
+        // // console.log("stockAdjustmentList---->", stockAdjustmentList);
         let stockAdjustmentArray = [];
         let count = 0;
 
@@ -714,7 +782,7 @@ class StockAdjustmentComponent extends Component {
         //     data = [];
         //     stockAdjustmentArray[0] = data;
         // }
-        // console.log("stockAdjustmentArray---->", stockAdjustmentArray);
+        // // console.log("stockAdjustmentArray---->", stockAdjustmentArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -814,13 +882,13 @@ class StockAdjustmentComponent extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-        console.log("versionId----", versionId);
-        console.log("programId----", programId);
-        console.log("planningUnitIds---", planningUnitIds);
+        // console.log("versionId----", versionId);
+        // console.log("programId----", programId);
+        // console.log("planningUnitIds---", planningUnitIds);
 
 
         if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0) {
-            console.log("INSIDE IF-----------------");
+            // console.log("INSIDE IF-----------------");
             if (versionId.includes('Local')) {
                 startDate = this.state.rangeValue.from.year + '-' + String(this.state.rangeValue.from.month).padStart(2, '0') + '-01';
                 endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
@@ -846,7 +914,7 @@ class StockAdjustmentComponent extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    console.log("1----", program)
+                    // console.log("1----", program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -874,13 +942,13 @@ class StockAdjustmentComponent extends Component {
                                 var puResult = [];
                                 puResult = puRequest.result;
 
-                                console.log("2----", programRequest);
+                                // console.log("2----", programRequest);
                                 var generalProgramDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                                 var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                                 var generalProgramJson = JSON.parse(generalProgramData);
 
                                 var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                                console.log(startDate, endDate)
+                                // console.log(startDate, endDate)
                                 var data = []
                                 planningUnitIds.map(planningUnitId => {
                                     var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
@@ -900,7 +968,7 @@ class StockAdjustmentComponent extends Component {
                                         }
                                     }
                                     var inventoryList = ((programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && (c.adjustmentQty != 0 && c.adjustmentQty != null)));
-                                    console.log(inventoryList)
+                                    // console.log(inventoryList)
 
                                     inventoryList.map(ele => {
                                         var dataSource = dataSourceResult.filter(c => c.dataSourceId == ele.dataSource.id);
@@ -919,7 +987,7 @@ class StockAdjustmentComponent extends Component {
                                         data.push(json)
                                     })
                                 })
-                                console.log("inventory List--------->", data);;
+                                // console.log("inventory List--------->", data);;
                                 this.setState({
                                     data: data
                                     , message: ''
@@ -940,11 +1008,11 @@ class StockAdjustmentComponent extends Component {
                     planningUnitIds: planningUnitIds
                 }
                 // AuthenticationService.setupAxiosInterceptors();
-                console.log("inputJson---->", inputjson);
+                // console.log("inputJson---->", inputjson);
                 ReportService.stockAdjustmentList(inputjson)
                     .then(response => {
 
-                        console.log("RESP-------->", response.data);
+                        // console.log("RESP-------->", response.data);
                         this.setState({
                             data: response.data,
                             message: ''
@@ -1075,12 +1143,12 @@ class StockAdjustmentComponent extends Component {
         //     versionId: event.target.value
         // }, () => {
         //     if (this.state.data.length != 0) {
-        //         console.log("************1");
+        //         // console.log("************1");
         //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
         //         this.fetchData();
         //     } else {
-        //         console.log("************3", this.state.data);
-        //         console.log("************2");
+        //         // console.log("************3", this.state.data);
+        //         // console.log("************2");
         //         this.getPlanningUnit();
         //     }
         // })
@@ -1120,7 +1188,7 @@ class StockAdjustmentComponent extends Component {
             </span>
         );
         const { programs } = this.state
-        // console.log(programs)
+        // // console.log(programs)
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
@@ -1134,7 +1202,7 @@ class StockAdjustmentComponent extends Component {
         const { planningUnits } = this.state
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
 

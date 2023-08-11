@@ -3,7 +3,7 @@ import { API_URL } from '../Constants.js'
 
 class ProgramService {
     getProgramData(json) {
-        console.log("Json", json)
+        // console.log("Json", json)
         return axios.get(`${API_URL}/api/programData/programId/${json.programId}/versionId/${json.versionId}`, {
         });
     }
@@ -156,7 +156,7 @@ class ProgramService {
         );
     }
     checkNewerVersions(json) {
-        console.log("json----------------------------", json);
+        // console.log("json----------------------------", json);
         return axios.post(`${API_URL}/api/programData/checkNewerVersions/`, json, {}
         );
 
@@ -263,8 +263,16 @@ class ProgramService {
         return axios.post(`${API_URL}/api/dataset/versions/`, json, {});
     }
 
-    getProgramForDropDown(programTypeId) {
-        return axios.get(`${API_URL}/api/programForDropDown/programType/${programTypeId}`, {});
+    getProgramForDropDown(realmId, programTypeId) {
+        return axios.get(`${API_URL}/api/dropdown/program/realm/${realmId}/programType/${programTypeId}`, {});
+    }
+
+    getProgramListByRealmCountryIdList(realmCountryIds) {
+        return axios.post(`${API_URL}/api/program/realmCountryList`, realmCountryIds, {});
+    }
+
+    getProgramListByProductCategoryIdList(productCategoryIds) {
+        return axios.post(`${API_URL}/api/program/productCategoryList`, productCategoryIds, {});
     }
 }
 export default new ProgramService()

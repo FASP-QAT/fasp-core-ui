@@ -37,7 +37,7 @@ export default class PipelineProgramDataSource extends Component {
     }
 
     dropdownFilter = function (instance, cell, c, r, source) {
-        console.log('activeDataSourceList', this.state.activeDataSourceList)
+        // console.log('activeDataSourceList', this.state.activeDataSourceList)
         var mylist = [];
         // var value = (instance.jexcel.getJson(null, false)[r])[c - 1];
         var value = (this.state.mapDataSourceEl.getJson(null, false)[r])[c - 1];
@@ -134,8 +134,8 @@ export default class PipelineProgramDataSource extends Component {
                 for (var i = 0; i < json.length; i++) {
                     var map = new Map(Object.entries(json[i]));
                     var dataSourceValue = map.get("3");
-                    // console.log("currentvalues---", currentDataSource);
-                    // console.log("dataSourceValue-->", dataSourceValue);
+                    // // console.log("currentvalues---", currentDataSource);
+                    // // console.log("dataSourceValue-->", dataSourceValue);
                     if (dataSourceValue == currentDataSource && y != i) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
@@ -156,8 +156,8 @@ export default class PipelineProgramDataSource extends Component {
         var list = this.state.dataSourceList;
         var json = this.el.getJson(null, false);
         var dataSourceArray = []
-        console.log(json.length)
-        console.log(json)
+        // console.log(json.length)
+        // console.log(json)
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));
             var dataSourceId = map.get("3");
@@ -193,7 +193,7 @@ export default class PipelineProgramDataSource extends Component {
                 // productCategoryList = response.data;
                 for (var k = 0; k < (response.data).length; k++) {
                     //var spaceCount = response.data[k].sortOrder.split(".").length;
-                    // console.log("spaceCOunt--->", spaceCount);
+                    // // console.log("spaceCOunt--->", spaceCount);
                     // var indendent = "";
                     // for (var p = 1; p <= spaceCount - 1; p++) {
                     //     if (p == 1) {
@@ -202,7 +202,7 @@ export default class PipelineProgramDataSource extends Component {
                     //         indendent = indendent.concat("_");
                     //     }
                     // }
-                    // console.log("ind", indendent);
+                    // // console.log("ind", indendent);
                     var dataSourceTypeJson = {
                         name: (response.data[k].label.label_en),
                         id: response.data[k].dataSourceTypeId
@@ -218,7 +218,7 @@ export default class PipelineProgramDataSource extends Component {
                 DataSourceService.getAllDataSourceList()
                     .then(response => {
                         if (response.status == 200) {
-                            console.log("data source====>", response.data);
+                            // console.log("data source====>", response.data);
 
                             // dataSourceListQat = response.data
                             this.setState({ activeDataSourceList: response.data });
@@ -256,7 +256,7 @@ export default class PipelineProgramDataSource extends Component {
 
                                                 }
                                             } else {
-                                                console.log("datasource list length is 0.");
+                                                // console.log("datasource list length is 0.");
                                             }
 
                                             this.el = jexcel(document.getElementById("mapDataSource"), '');

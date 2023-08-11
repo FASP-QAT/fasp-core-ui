@@ -10,7 +10,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_INTEGER_REGEX, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX } from "../../Constants";
+import { JEXCEL_INTEGER_REGEX, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX,PROGRAM_TYPE_DATASET } from "../../Constants";
 import { MultiSelect } from 'react-multi-select-component';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
 import { Prompt } from 'react-router';
-import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
+import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked,consumptionExtrapolationNotesClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
@@ -26,6 +26,7 @@ import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettings
 import showguidanceFr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsFr.html'
 import showguidanceSp from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsSp.html'
 import showguidancePr from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsPr.html'
+import DropdownService from '../../api/DropdownService';
 import { resolve } from "path";
 const ref = React.createRef();
 const pickerLang = {
@@ -89,7 +90,9 @@ class VersionSettingsComponent extends Component {
             isChanged1: false,
             includeOnlySelectedForecasts: true,
             datasetPlanningUnitNotes: [],
-            dataList: []
+            dataList: [],
+            consumptionExtrapolationList:[],
+            consumptionExtrapolationNotes:''
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -105,6 +108,7 @@ class VersionSettingsComponent extends Component {
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.updateState = this.updateState.bind(this);
+        this.onchangepage=this.onchangepage.bind(this)
     }
 
     updateState(parameterName, value) {
@@ -188,7 +192,7 @@ class VersionSettingsComponent extends Component {
                 var col = ("N").concat(parseInt(y) + 1);
                 var reg = JEXCEL_INTEGER_REGEX;
                 var value = this.el.getValueFromCoords(13, y);
-                console.log("Value@@@", value)
+                // console.log("Value@@@", value)
                 if (value === "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -209,7 +213,7 @@ class VersionSettingsComponent extends Component {
                 var col = ("I").concat(parseInt(y) + 1);
                 var reg = /^[0-9]*[1-9][0-9]*$/;
                 var value = this.el.getValueFromCoords(8, y);
-                console.log("Value@@@", value)
+                // console.log("Value@@@", value)
                 if (value === "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -341,7 +345,7 @@ class VersionSettingsComponent extends Component {
             var col = ("I").concat(parseInt(y) + 1);
             var reg = /^[0-9]*[1-9][0-9]*$/;
             var value = this.el.getValueFromCoords(8, y);
-            console.log("Value@@@", value)
+            // console.log("Value@@@", value)
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -411,7 +415,7 @@ class VersionSettingsComponent extends Component {
         if (x == 8 && this.el.getValueFromCoords(17, y) == 0) {//forecastPeriodInMonth
             let startDate = this.el.getValueFromCoords(7, y);
             let month = this.el.getValueFromCoords(8, y);
-            console.log("startDate--------->", startDate);
+            // console.log("startDate--------->", startDate);
             if (startDate != null && month != null && month != "" && startDate != "") {
                 let newStartDate = new Date(startDate);
                 newStartDate.setMonth(newStartDate.getMonth() + (month - 1));
@@ -425,7 +429,7 @@ class VersionSettingsComponent extends Component {
 
 
         if ((x == 9 || x == 7) && this.el.getValueFromCoords(17, y) == 0) {//endDate
-            console.log("startDate--------->1111111");
+            // console.log("startDate--------->1111111");
             let startDate = this.el.getValueFromCoords(7, y);
             let endDate = this.el.getValueFromCoords(9, y);
 
@@ -527,10 +531,11 @@ class VersionSettingsComponent extends Component {
                 }
             }
         }
-
-        this.setState({
-            isChanged1: true,
-        });
+        if(!this.state.isChanged1){
+            this.setState({
+                isChanged1: true,
+            });
+        }   
 
 
 
@@ -549,131 +554,132 @@ class VersionSettingsComponent extends Component {
             }
             if (cont) {
                 this.setState({
-                   loading: true
-               })
-               var tableJson = this.el.getJson(null, false);
-               var programs = [];
-               var count = 0;
-               for (var i = 0; i < tableJson.length; i++) {
-                   var map1 = new Map(Object.entries(tableJson[i]));
-                   console.log("12 map---" + map1.get("12"))
-                   if (parseInt(map1.get("12")) === 1) {
-                       console.log("map1.get(11)---", map1.get("11"));
-                       console.log("map1.get(13)---", map1.get("13"));
-                       console.log("map1.get(7)---", map1.get("7"));
-                       console.log("map1.get(9)---", map1.get("9"));
-                       var notes = map1.get("4");
-                       var startDate = map1.get("7");
-                       var stopDate = map1.get("9");
-                       var id = map1.get("11");
-                       var noOfDaysInMonth = Number(map1.get("13"));
-                       console.log("start date ---", startDate);
-                       console.log("stop date ---", stopDate);
-                       console.log("noOfDaysInMonth ---", noOfDaysInMonth);
-                       var program = (this.state.datasetList.filter(x => x.id == id)[0]);
-                       var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                       var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                       programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
-                       programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
-                       programData.currentVersion.daysInMonth = noOfDaysInMonth;
-                       programData.currentVersion.notes = notes;
-   
-   
-                       programData.currentVersion.freightPerc = this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-                       programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-                       programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-   
-                       programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-                       program.programData = programData;
-                       // var db1;
-                       // getDatabase();
-                       // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                       // openRequest.onerror = function (event) {
-                       //     this.setState({
-                       //         message: i18n.t('static.program.errortext'),
-                       //         color: 'red'
-                       //     })
-                       //     this.hideFirstComponent()
-                       // }.bind(this);
-                       // openRequest.onsuccess = function (e) {
-                       //     db1 = e.target.result;
-                       //     var transaction = db1.transaction(['datasetData'], 'readwrite');
-                       //     var programTransaction = transaction.objectStore('datasetData');
-                       //     var programRequest = programTransaction.put(program);
-                       //     programRequest.onerror = function (e) {
-   
-                       //     }.bind(this);
-                       //     programRequest.onsuccess = function (e) {
-   
-                       //     }.bind(this);
-                       // }.bind(this);
-                       programs.push(program);
-                       count++;
-                   }
-               }
-               console.log("programs to update---", programs);
-               if (count > 0) {
-                   var db1;
-                   getDatabase();
-                   var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                   openRequest.onerror = function (event) {
-                       this.setState({
-                           message: i18n.t('static.program.errortext'),
-                           color: 'red'
-                       })
-                       this.hideFirstComponent()
-                   }.bind(this);
-                   openRequest.onsuccess = function (e) {
-                       db1 = e.target.result;
-                       var transaction = db1.transaction(['datasetData'], 'readwrite');
-                       var programTransaction = transaction.objectStore('datasetData');
-                       programs.forEach(program => {
-                           var programRequest = programTransaction.put(program);
-                           console.log("---hurrey---");
-                       })
-                       transaction.oncomplete = function (event) {
-                           console.log("in side datasetDetails")
-                           db1 = e.target.result;
-                           var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                           var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                           programs.forEach(program => {
-                            var datasetDetailsRequest = datasetDetailsTransaction.get(program.id);
-                            datasetDetailsRequest.onsuccess = function (e) {         
-                                var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                                datasetDetailsRequestJson.changed = 1;
-                                var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                                datasetDetailsRequest1.onsuccess = function (event) {                               
-                                    }}                         
-                            console.log("---hurrey---");
-                             })
-                        
-                           
+                    loading: true
+                })
+                var tableJson = this.el.getJson(null, false);
+                var programs = [];
+                var count = 0;
+                for (var i = 0; i < tableJson.length; i++) {
+                    var map1 = new Map(Object.entries(tableJson[i]));
+                    console.log("12 map---" + map1.get("12"))
+                    if (parseInt(map1.get("12")) === 1) {
+                        console.log("map1.get(11)---", map1.get("11"));
+                        console.log("map1.get(13)---", map1.get("13"));
+                        console.log("map1.get(7)---", map1.get("7"));
+                        console.log("map1.get(9)---", map1.get("9"));
+                        var notes = map1.get("4");
+                        var startDate = map1.get("7");
+                        var stopDate = map1.get("9");
+                        var id = map1.get("11");
+                        var noOfDaysInMonth = Number(map1.get("13"));
+                        console.log("start date ---", startDate);
+                        console.log("stop date ---", stopDate);
+                        console.log("noOfDaysInMonth ---", noOfDaysInMonth);
+                        var program = (this.state.datasetList.filter(x => x.id == id)[0]);
+                        var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
+                        programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
+                        programData.currentVersion.daysInMonth = noOfDaysInMonth;
+                        programData.currentVersion.notes = notes;
 
-                           
-                           this.setState({
-                               loading: false,
-                               message: i18n.t('static.mt.dataUpdateSuccess'),
-                               color: "green",
-                               isChanged: false
-                           }, () => {
-                               this.hideSecondComponent();
-                               // this.getOnLineDatasetsVersion();
-                           });
-                           console.log("Data update success");
-                       }.bind(this);
-                       transaction.onerror = function (event) {
-                           this.setState({
-                               loading: false,
-                               // message: 'Error occured.',
-                               color: "red",
-                           }, () => {
-                               this.hideSecondComponent();
-                           });
-                           console.log("Data update errr");
-                       }.bind(this);
-                   }.bind(this);
-               }
-           }
+
+                        programData.currentVersion.freightPerc = this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+                        programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+                        programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
+
+                        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                        program.programData = programData;
+                        // var db1;
+                        // getDatabase();
+                        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                        // openRequest.onerror = function (event) {
+                        //     this.setState({
+                        //         message: i18n.t('static.program.errortext'),
+                        //         color: 'red'
+                        //     })
+                        //     this.hideFirstComponent()
+                        // }.bind(this);
+                        // openRequest.onsuccess = function (e) {
+                        //     db1 = e.target.result;
+                        //     var transaction = db1.transaction(['datasetData'], 'readwrite');
+                        //     var programTransaction = transaction.objectStore('datasetData');
+                        //     var programRequest = programTransaction.put(program);
+                        //     programRequest.onerror = function (e) {
+
+                        //     }.bind(this);
+                        //     programRequest.onsuccess = function (e) {
+
+                        //     }.bind(this);
+                        // }.bind(this);
+                        programs.push(program);
+                        count++;
+                    }
+                }
+                console.log("programs to update---", programs);
+                if (count > 0) {
+                    var db1;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var transaction = db1.transaction(['datasetData'], 'readwrite');
+                        var programTransaction = transaction.objectStore('datasetData');
+                        programs.forEach(program => {
+                            var programRequest = programTransaction.put(program);
+                            console.log("---hurrey---");
+                        })
+                        transaction.oncomplete = function (event) {
+                            console.log("in side datasetDetails")
+                            db1 = e.target.result;
+                            var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                            var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                            programs.forEach(program => {
+                                var datasetDetailsRequest = datasetDetailsTransaction.get(program.id);
+                                datasetDetailsRequest.onsuccess = function (e) {
+                                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                                    datasetDetailsRequestJson.changed = 1;
+                                    var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                                    datasetDetailsRequest1.onsuccess = function (event) {
+                                    }
+                                }
+                                console.log("---hurrey---");
+                            })
+
+
+
+
+                            this.setState({
+                                loading: false,
+                                message: i18n.t('static.mt.dataUpdateSuccess'),
+                                color: "green",
+                                isChanged: false
+                            }, () => {
+                                this.hideSecondComponent();
+                                // this.getOnLineDatasetsVersion();
+                            });
+                            console.log("Data update success");
+                        }.bind(this);
+                        transaction.onerror = function (event) {
+                            this.setState({
+                                loading: false,
+                                // message: 'Error occured.',
+                                color: "red",
+                            }, () => {
+                                this.hideSecondComponent();
+                            });
+                            console.log("Data update errr");
+                        }.bind(this);
+                    }.bind(this);
+                }
+            }
         }
     }
 
@@ -686,8 +692,8 @@ class VersionSettingsComponent extends Component {
             }
         })
         versionSettingsListOffLine = versionSettingsList.filter(c => c.id)
-        console.log("versionSettingsListOffLine!!!!", versionSettingsListOffLine)
-        console.log("versionSettingsList!!!!", versionSettingsList)
+        // console.log("versionSettingsListOffLine!!!!", versionSettingsListOffLine)
+        // console.log("versionSettingsList!!!!", versionSettingsList)
         this.setState({
             versionSettingsList: versionSettingsListOffLine,
             datasetIds
@@ -735,7 +741,7 @@ class VersionSettingsComponent extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                console.log("myResult version type---", myResult)
+                // console.log("myResult version type---", myResult)
                 myResult = myResult.sort((a, b) => {
                     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -745,7 +751,7 @@ class VersionSettingsComponent extends Component {
                     versionTypeList: myResult
                 });
                 for (var i = 0; i < myResult.length; i++) {
-                    console.log("version type--->", myResult[i])
+                    // console.log("version type--->", myResult[i])
 
                 }
 
@@ -770,7 +776,7 @@ class VersionSettingsComponent extends Component {
                 var myResult = [];
                 var proList = [];
                 myResult = getRequest.result;
-                console.log("myResult--->", myResult)
+                // console.log("myResult--->", myResult)
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 var list = [];
@@ -785,7 +791,7 @@ class VersionSettingsComponent extends Component {
                     }
                 }
                 var proList = proList.concat(this.state.datasetList);
-                console.log("proList---", proList);
+                // console.log("proList---", proList);
 
                 proList = proList.sort(function (a, b) {
                     a = a.programCode.toLowerCase();
@@ -804,11 +810,11 @@ class VersionSettingsComponent extends Component {
 
 
                     }, () => {
-                        console.log("uniquePrograms", this.state.uniquePrograms)
-                        console.log("programValues", this.state.programValues)
-                        console.log("programValues.map(x => x.value).join(", ")", this.state.programValues.map(x => x.value).join(", "))
+                        // console.log("uniquePrograms", this.state.uniquePrograms)
+                        // console.log("programValues", this.state.programValues)
+                        // console.log("programValues.map(x => x.value).join(", ")", this.state.programValues.map(x => x.value).join(", "))
                         var programIds = this.state.programValues.map(x => x.value).join(", ");
-                        console.log("programIds", programIds)
+                        // console.log("programIds", programIds)
 
                         programIds = Array.from(new Set(programIds.split(','))).toString();
                         this.getDatasetById(programIds);
@@ -831,6 +837,7 @@ class VersionSettingsComponent extends Component {
         }.bind(this);
     }
     hideFirstComponent() {
+        document.getElementById('div1').style.display = 'block';
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 30000);
@@ -840,6 +847,7 @@ class VersionSettingsComponent extends Component {
     }
 
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
@@ -875,10 +883,13 @@ class VersionSettingsComponent extends Component {
             stopDate: stopDate
         }
         console.log("Input Json", inputjson)
+        this.setState({
+            loading: true
+        })
         ProgramService.getDatasetVersions(inputjson).then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
-                console.log("responseData------->", responseData);
+                // console.log("responseData------->", responseData);
                 for (var i = 0; i < responseData.length; i++) {
                     var data = [];
                     data[0] = responseData[i].program.id
@@ -909,12 +920,13 @@ class VersionSettingsComponent extends Component {
                     data[16] = responseData[i].forecastThresholdLowPerc
                     data[17] = 0;
                     data[18] = {};
-                    console.log("data---------->", data)
+                    // console.log("data---------->", data)
                     dataList1.push(data);
                 }
-                console.log("dataList1---------->", dataList1)
+                // console.log("dataList1---------->", dataList1)
                 this.setState({
-                    dataList: dataList1
+                    dataList: dataList1,
+                    loading: false
                 },
                     () => {
                         this.buildJExcel();
@@ -923,7 +935,8 @@ class VersionSettingsComponent extends Component {
         }).catch(
             error => {
                 this.setState({
-                    dataList: []
+                    dataList: [],
+                    loading: false
                 },
                     () => {
                         this.buildJExcel();
@@ -934,9 +947,61 @@ class VersionSettingsComponent extends Component {
         // }
     }
 
+    onchangepage(el, pageNo, oldPageNo) {
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        for (var y = start; y < jsonLength; y++) {
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+            var rowData = elInstance.getRowData(y);
+            if (rowData[10] == 1) {
+                var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+            } else {
+                var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+    }
 
     buildJExcel() {
-        console.log("buildJExcel dataList--->", this.state.dataList)
+        // console.log("buildJExcel dataList--->", this.state.dataList)
         let versionSettingsListUnSorted = this.state.versionSettingsList;
         let versionSettingsList = versionSettingsListUnSorted.sort(
             function (a, b) {
@@ -949,7 +1014,7 @@ class VersionSettingsComponent extends Component {
         let versionSettingsArray = [];
         let count = 0;
         var versionTypeId = document.getElementById('versionTypeId').value;
-        console.log("versionSettingsList-->", versionSettingsList)
+        // console.log("versionSettingsList-->", versionSettingsList)
         for (var j = 0; j < versionSettingsList.length; j++) {
             if (versionSettingsList[j].programData) {
                 var bytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
@@ -1058,24 +1123,24 @@ class VersionSettingsComponent extends Component {
         //     }
         // }
         var dataLists = this.state.dataList;
-        console.log("dataLists", dataLists)
-        console.log("dataLists length", dataLists.length)
+        // console.log("dataLists", dataLists)
+        // console.log("dataLists length", dataLists.length)
         for (var i = 0; i < this.state.dataList.length; i++) {
-            console.log("dataList----1009--->3");
+            // console.log("dataList----1009--->3");
 
             count = (versionSettingsArray.length);
             versionSettingsArray[count] = dataLists[i];
             count++;
         }
 
-        console.log("versionSettingsArray------->1", versionSettingsArray);
+        // console.log("versionSettingsArray------->1", versionSettingsArray);
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("tableDiv"), true);
         var json = [];
         var data = versionSettingsArray;
-        console.log("versionSettingsArray------->2", data);
+        // console.log("versionSettingsArray------->2", data);
         var options = {
             data: data,
             columnDrag: true,
@@ -1210,53 +1275,8 @@ class VersionSettingsComponent extends Component {
             parseFormulas: true,
             allowDeleteRow: false,
             onselection: this.selected,
-            updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el;
-                if (y != null) {
-                    //left align
-                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
-
-                    var rowData = elInstance.getRowData(y);
-                    if (rowData[10] == 1) {
-                        var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                        cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                    }
-                    else {
-                        var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                        cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                    }
-
-                }
-            }.bind(this),
             onchange: this.changed,
+            onchangepage: this.onchangepage,
             oneditionend: this.oneditionend,
             // oncreateeditor: this.oncreateeditor,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
@@ -1288,15 +1308,15 @@ class VersionSettingsComponent extends Component {
                         });
                     } else {
                         var programId = this.state.programId;
-                        console.log("programId------->", programId);
+                        // console.log("programId------->", programId);
                         items.push({
                             title: i18n.t('static.commitTree.showValidation'),
                             onclick: function () {
                                 DatasetService.getDatasetData(rowData[0], rowData[2]).then(response => {
                                     if (response.status == 200) {
                                         var responseData = response.data;
-                                        console.log("getDatasetData responseData------->", responseData);
-                                        console.log("rowData-->", rowData)
+                                        // console.log("getDatasetData responseData------->", responseData);
+                                        // console.log("rowData-->", rowData)
                                         this.setState({
                                             programName: rowData[1] + "~v" + rowData[2],
                                             programCode: rowData[1],
@@ -1378,6 +1398,59 @@ class VersionSettingsComponent extends Component {
         tr.children[16].title = i18n.t('static.tooltip.ForecastThresholdHigh');
         tr.children[17].title = i18n.t('static.tooltip.ForecastThresholdLow');
 
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+        if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        }
+        
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+        for (var y = 0; y < jsonLength; y++) {
+            var rowData = elInstance.getRowData(y);
+            if (rowData[10] == 1) {
+                var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+                cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                cell.classList.remove('readonly');
+            } else {
+                var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("J").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("N").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("O").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("P").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("Q").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+                cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+
     }
     oncreateeditor = function (el, cell, x, y) {
         if (x == 4) {
@@ -1387,16 +1460,19 @@ class VersionSettingsComponent extends Component {
     }
 
     componentDidMount() {
-        ProgramService.getDataSetList().then(response => {
+        // ProgramService.getDataSetList()
+        let realmId = AuthenticationService.getRealmId();
+        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+        .then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
-                console.log("getDataSetList**********responseData------->", responseData);
+                // console.log("getDataSetList**********responseData------->", responseData);
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
                     var json = {
-                        programId: responseData[rd].programId,
+                        programId: responseData[rd].id,
                         name: getLabelText(responseData[rd].label, this.state.lang),
-                        programCode: responseData[rd].programCode,
+                        programCode: responseData[rd].code,
                         isOnline: 1
                     }
                     datasetList.push(json);
@@ -1446,7 +1522,7 @@ class VersionSettingsComponent extends Component {
             programLabels: programIds.map(ele => ele.label)
         }, () => {
             var programIds = this.state.programValues.map(x => x.value).join(", ");
-            console.log("program------------->>>", programIds);
+            // console.log("program------------->>>", programIds);
             localStorage.setItem("sesForecastProgramIds", JSON.stringify(this.state.programValues));
             programIds = Array.from(new Set(programIds.split(','))).toString();
             this.getDatasetById(programIds);
@@ -1593,6 +1669,34 @@ class VersionSettingsComponent extends Component {
                 }
             }
         }, this) : <ul><span>{i18n.t('static.forecastValidation.noNodesHaveChildrenLessThanPerc')}</span><br /></ul>
+
+        //ConsumptionExtrapolationNotes
+        const { consumptionExtrapolationList } = this.state;
+       console.log("consumptionExtrapolationList----",consumptionExtrapolationList)
+        let consumptionExtrapolationNotes = (consumptionExtrapolationList.length > 0)? consumptionExtrapolationList.map((item, i) => {   
+           var flag=true;
+           if(item.notes!=undefined && item.notes!=null && item.notes!=''){
+           if(consumptionExtrapolationList.length==(i+1)){
+                flag=false;
+                return (
+                    <tr key={i} className="hoverTd" onClick={() => consumptionExtrapolationNotesClicked(item.planningUnit.id, this)}>
+                        <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                        <td>{item.notes}</td>
+                    </tr>
+                )    
+            }
+            if(flag){
+                if(consumptionExtrapolationList[i].planningUnit.id!=consumptionExtrapolationList[i+1].planningUnit.id){
+                    return (
+                        <tr key={i} className="hoverTd"  onClick={() => consumptionExtrapolationNotesClicked(item.planningUnit.id, this)}>
+                            <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                            <td>{item.notes}</td>
+                        </tr>
+                    )
+                }
+            }
+        }
+        }, this) : <span>&emsp;&emsp;&emsp;&ensp;{i18n.t('static.forecastValidation.noConsumptionExtrapolationNotesFound')}</span>;
 
         //Consumption Notes
         const { datasetPlanningUnitNotes } = this.state;
@@ -1751,15 +1855,16 @@ class VersionSettingsComponent extends Component {
                         <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                     </ModalHeader>
                     <div>
-                    <ModalBody className="ModalBodyPadding">
-                        <div dangerouslySetInnerHTML={ {__html:localStorage.getItem('lang') == 'en' ?
-                showguidanceEn :
-                localStorage.getItem('lang') == 'fr' ?
-                showguidanceFr :
-                  localStorage.getItem('lang') == 'sp' ?
-                  showguidanceSp :
-                  showguidancePr
-              } } />
+                        <ModalBody className="ModalBodyPadding">
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    showguidanceEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        showguidanceFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                            showguidanceSp :
+                                            showguidancePr
+                            }} />
                             {/* <div>
                                 <h3 className='ShowGuidanceHeading'>{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</h3>
                             </div>
@@ -1847,7 +1952,7 @@ class VersionSettingsComponent extends Component {
                             <ul>{consumption}</ul>
 
                             <span><b>3. {i18n.t('static.commitTree.treeForecast')}: </b>(<a href={"/#/dataSet/buildTree/tree/0/" + this.state.programId} target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
-                            <span>a. {this.state.includeOnlySelectedForecasts?i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree'):i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
+                            <span>a. {this.state.includeOnlySelectedForecasts ? i18n.t('static.commitTree.puThatDoesNotAppearOnSelectedForecastTree') : i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
                             <ul>{pu}</ul>
 
                             <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}:</span><br />
@@ -1873,7 +1978,22 @@ class VersionSettingsComponent extends Component {
                                     </Table>
                                 </div> : <span>{consumtionNotes}</span>}
                             </div><br />
-                            <span>b. {i18n.t('static.commitTree.treeScenarios')}:</span>
+                            <span>b. {i18n.t('static.forecastValidation.consumptionExtrapolationNotes')}:</span>
+                            <div className="mt-2">
+                                {(consumptionExtrapolationList.length > 0) ?
+                                    <div className="table-wrap table-responsive fixTableHead">
+                                        <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
+                                                    <th style={{ width: '80%' }}><b>{i18n.t('static.program.notes')}</b></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>{consumptionExtrapolationNotes}</tbody>
+                                        </Table>
+                                    </div> : <span>{consumptionExtrapolationNotes}</span>}
+                            </div><br />
+                            <span>c. {i18n.t('static.commitTree.treeScenarios')}:</span>
                             <div className="table-scroll">
                                 {treeScenarioNotes.length > 0 ? <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
@@ -1889,7 +2009,7 @@ class VersionSettingsComponent extends Component {
                                     </Table>
                                 </div> : <span>{scenarioNotes}</span>}
                             </div><br />
-                            <span>c. {i18n.t('static.commitTree.treeNodes')}:</span>
+                            <span>d. {i18n.t('static.commitTree.treeNodes')}:</span>
                             {/* <div className="table-scroll"> */}
                             <div className="">
                                 {treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0 ? <div className="table-wrap table-responsive fixTableHead">

@@ -17,6 +17,7 @@ import FundingSourceService from '../../api/FundingSourceService';
 import CurrencyService from '../../api/CurrencyService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import classNames from 'classnames';
+import Select from 'react-select';
 
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dashboard.budget"))
 let summaryText_2 = "Add Budget"
@@ -106,7 +107,7 @@ export default class BudgetTicketComponent extends Component {
             programs: [],
             fundingSources: [],
             currencies: [],
-            programId: '',
+            programId: [],
             fundingSourceId: '',
             currencyId: '',
             loading: true
@@ -118,6 +119,41 @@ export default class BudgetTicketComponent extends Component {
         this.currentDate = this.currentDate.bind(this);
         this.dataChangeDate = this.dataChangeDate.bind(this);
         this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
+        this.programChange=this.programChange.bind(this);
+    }
+
+    programChange(programId) {
+        let { budget } = this.state;
+        var selectedArray = [];
+        for (var p = 0; p < programId.length; p++) {
+            selectedArray.push(programId[p].value);
+        }
+        if (selectedArray.includes("-1")) {
+            this.setState({ programId: [] });
+            var list = this.state.programs.filter(c => c.value != -1)
+            this.setState({ programId: list });
+            var programId = list;
+            budget.programName = [...new Set(list.map(ele => ele.label))];
+        } else {
+            this.setState({ programId: programId });
+            budget.programName = [...new Set(programId.map(ele => ele.label))];
+            var programId = programId;
+        }
+
+        // this.setState({ roleId });
+        var programIdArray = [];
+        for (var i = 0; i < programId.length; i++) {
+            programIdArray[i] = {
+                id: programId[i].value
+            }
+        }
+
+        // budget.programs = programIdArray;
+
+        // this.setState({
+        //     programId:programIdArray,
+        // },
+        //     () => { });
     }
 
     dataChange(event) {
@@ -196,10 +232,14 @@ export default class BudgetTicketComponent extends Component {
             .then(response => {
                 if (response.status == 200) {
 
-                    var listArray = response.data;
+                    var programList = [{ value: "-1", label: i18n.t("static.common.all") }];
+                    for (var i = 0; i < response.data.length; i++) {
+                        programList[i + 1] = { value: response.data[i].programId, label: getLabelText(response.data[i].label, this.state.lang) }
+                    }
+                    var listArray = programList;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -394,7 +434,7 @@ export default class BudgetTicketComponent extends Component {
         budget.notes = '';
         this.setState({
             budget: budget,
-            programId: '',
+            programId: [],
             fundingSourceId: '',
             currencyId: ''
         },
@@ -433,18 +473,18 @@ export default class BudgetTicketComponent extends Component {
 
     render() {
 
-        const { programs } = this.state;
+        // const { programs } = this.state;
         const { fundingSources } = this.state;
         const { currencies } = this.state;
 
 
-        let programList = programs.length > 0 && programs.map((item, i) => {
-            return (
-                <option key={i} value={item.programId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-            )
-        }, this);
+        // let programList = programs.length > 0 && programs.map((item, i) => {
+        //     return (
+        //         <option key={i} value={item.programId}>
+        //             {getLabelText(item.label, this.state.lang)}
+        //         </option>
+        //     )
+        // }, this);
         let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
             return (
                 <option key={i} value={item.fundingSourceId}>
@@ -487,7 +527,7 @@ export default class BudgetTicketComponent extends Component {
                             this.state.budget.summary = summaryText_2;
                             this.state.budget.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.budget).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -579,23 +619,28 @@ export default class BudgetTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.summary}</FormFeedback>
                                     </FormGroup>
 
-                                    <FormGroup>
-                                        <Label htmlFor="programName">{i18n.t('static.budget.program')}<span className="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            type="select"
+                                    <FormGroup className="Selectcontrol-bdrNone">
+                                        <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
+                                        <Select
+                                            className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                { 'is-valid': !errors.programName && this.state.programId.length != 0 },
+                                                { 'is-invalid': (touched.programName && !!errors.programName) }
+                                            )}
+                                            bsSize="sm"
+                                            onChange={(e) => {
+                                                handleChange(e);
+                                                setFieldValue("programName", e);
+                                                this.programChange(e);
+                                            }}
+                                            onBlur={() => setFieldTouched("programName", true)}
                                             name="programName"
                                             id="programName"
-                                            bsSize="sm"
-                                            valid={!errors.programName && this.state.budget.programName != ''}
-                                            invalid={touched.programName && !!errors.programName}
-                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                            onBlur={handleBlur}
+                                            multi
                                             required
+                                            // min={1}
+                                            options={this.state.programs}
                                             value={this.state.programId}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {programList}
-                                        </Input>
+                                        />
                                         <FormFeedback className="red">{errors.programName}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>

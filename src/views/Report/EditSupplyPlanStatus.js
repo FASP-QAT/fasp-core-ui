@@ -42,6 +42,7 @@ import BudgetService from '../../api/BudgetService';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import CryptoJS from 'crypto-js'
 import { confirmAlert } from 'react-confirm-alert'; // Import
+import DropdownService from '../../api/DropdownService';
 
 const entityname = i18n.t('static.report.problem');
 
@@ -101,7 +102,7 @@ const validationSchema = function (values) {
 const validate = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
-        console.log('validationSchema' + JSON.stringify(validationSchema))
+        // console.log('validationSchema' + JSON.stringify(validationSchema))
 
         try {
             validationSchema.validateSync(values, { abortEarly: false })
@@ -537,14 +538,14 @@ class EditSupplyPlanStatus extends Component {
     }
 
     toggleTransView(problemTransList) {
-        console.log("====>", problemTransList);
+        // console.log("====>", problemTransList);
         this.setState({ transView: !this.state.transView, problemTransList: problemTransList }, () => {
             this.test();
         })
     }
 
     test() {
-        console.log("In test+++");
+        // console.log("In test+++");
         this.setState({
             test: 1
         }, () => {
@@ -607,7 +608,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState({
             monthCountShipments: monthCountShipments
         })
-        console.log("Mohit form submit 30")
+        // console.log("Mohit form submit 30")
         this.formSubmit(monthCountShipments)
     }
 
@@ -616,7 +617,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState({
             monthCountShipments: monthCountShipments
         })
-        console.log("Mohit form submit 31")
+        // console.log("Mohit form submit 31")
         this.formSubmit(monthCountShipments);
     }
 
@@ -704,12 +705,12 @@ class EditSupplyPlanStatus extends Component {
                         this.setState({
                             realmCountryPlanningUnitList: rcpuList
                         })
-                        console.log("++++Rcpu:List", rcpuList)
+                        // console.log("++++Rcpu:List", rcpuList)
 
 
                         var batchList = [];
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
-                        console.log("Shipment list=============>", shipmentList);
+                        // console.log("Shipment list=============>", shipmentList);
                         for (var sl = 0; sl < shipmentList.length; sl++) {
                             var bdl = shipmentList[sl].batchInfoList;
                             for (var bd = 0; bd < bdl.length; bd++) {
@@ -722,7 +723,7 @@ class EditSupplyPlanStatus extends Component {
                                 }
                             }
                         }
-                        console.log("Btach List============>", batchList);
+                        // console.log("Btach List============>", batchList);
                         var consumptionListUnFiltered = (programJson.consumptionList);
                         var consumptionList = consumptionListUnFiltered.filter(con =>
                             con.planningUnit.id == planningUnitId
@@ -748,8 +749,12 @@ class EditSupplyPlanStatus extends Component {
                                 })
                             }
                         })
-                    }).catch(error => { console.log("Error+++", error) });
-                }).catch(error => { console.log("Error+++", error) });
+                    }).catch(error => { 
+                        // console.log("Error+++", error) 
+                    });
+                }).catch(error => { 
+                    // console.log("Error+++", error) 
+                });
             }.bind(this)
         }.bind(this)
     }
@@ -838,7 +843,7 @@ class EditSupplyPlanStatus extends Component {
                         this.setState({
                             realmCountryPlanningUnitList: rcpuList
                         })
-                        console.log("++++Rcpu:List", rcpuList)
+                        // console.log("++++Rcpu:List", rcpuList)
 
                         var batchList = [];
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
@@ -887,8 +892,12 @@ class EditSupplyPlanStatus extends Component {
                                 })
                             }
                         })
-                    }).catch(error => { console.log("Error+++", error) });
-                }).catch(error => { console.log("Error+++", error) });
+                    }).catch(error => { 
+                        // console.log("Error+++", error) 
+                    });
+                }).catch(error => { 
+                    // console.log("Error+++", error) 
+                });
             }.bind(this)
         }.bind(this)
     }
@@ -1021,20 +1030,20 @@ class EditSupplyPlanStatus extends Component {
                                         fundingSourceList: fsList
                                     })
 
-                                    BudgetService.getBudgetList().then(response4 => {
+                                    DropdownService.getBudgetDropdownBasedOnProgram(this.props.match.params.programId).then(response4 => {
                                         var bList = [];
                                         response4.data.map(c => {
                                             bList.push({
-                                                name: c.budgetCode,
-                                                id: c.budgetId,
-                                                fundingSource: c.fundingSource,
-                                                currency: c.currency,
-                                                budgetAmt: c.budgetAmt,
-                                                active: c.active,
-                                                programId: c.program.id,
+                                                name: c.code,
+                                                id: c.id,
+                                                // fundingSource: c.fundingSource,
+                                                // currency: c.currency,
+                                                // budgetAmt: c.budgetAmt,
+                                                active: true,
+                                                // programs: c.programs,
                                                 label: c.label,
-                                                startDate: c.startDate,
-                                                stopDate: c.stopDate
+                                                // startDate: c.startDate,
+                                                // stopDate: c.stopDate
                                             })
                                         })
                                         this.setState({
@@ -1076,7 +1085,8 @@ class EditSupplyPlanStatus extends Component {
                                                 shipmentList = shipmentList.filter(c => 
                                                     (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
                                                     // && c.erpFlag == false 
-                                                    && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value
+                                                    // && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS 
+                                                    && c.planningUnit.id == document.getElementById("planningUnitId").value
                                                     // && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)
                                                 );
                                                 if (document.getElementById("addRowId") != null) {
@@ -1102,13 +1112,13 @@ class EditSupplyPlanStatus extends Component {
                                                     })
                                                 }
                                             })
-                                        }).catch(error => { console.log("Error+++", error) });
-                                    }).catch(error => { console.log("Error+++", error) });
-                                }).catch(error => { console.log("Error+++", error) });
-                            }).catch(error => { console.log("Error+++", error) });
-                        }).catch(error => { console.log("Error+++", error) });
-                    }).catch(error => { console.log("Error+++", error) });
-                }).catch(error => { console.log("Error+++", error) });
+                                        }).catch(error => {  });
+                                    }).catch(error => {  });
+                                }).catch(error => {  });
+                            }).catch(error => {  });
+                        }).catch(error => {  });
+                    }).catch(error => {  });
+                }).catch(error => { });
             }.bind(this)
         }.bind(this)
     }
@@ -1410,7 +1420,7 @@ class EditSupplyPlanStatus extends Component {
                 var maxForMonths = 0;
                 var realm = realmRequest.result;
                 var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
-                console.log("realm.minMosMaxGaurdrail", realm.minMosMaxGaurdrail);
+                // console.log("realm.minMosMaxGaurdrail", realm.minMosMaxGaurdrail);
                 var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
                 if (DEFAULT_MIN_MONTHS_OF_STOCK > programPlanningUnit.minMonthsOfStock) {
                     maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
@@ -1428,13 +1438,13 @@ class EditSupplyPlanStatus extends Component {
                     minForMonths = (maxForMonths + programPlanningUnit.reorderFrequencyInMonths);
                 }
                 var maxStockMoSQty = parseInt(minForMonths);
-                console.log("maxStockMoSQty-------->", maxStockMoSQty);
-                console.log("DEFAULT_MIN_MAX_MONTHS_OF_STOCK------------->", DEFAULT_MIN_MAX_MONTHS_OF_STOCK)
+                // console.log("maxStockMoSQty-------->", maxStockMoSQty);
+                // console.log("DEFAULT_MIN_MAX_MONTHS_OF_STOCK------------->", DEFAULT_MIN_MAX_MONTHS_OF_STOCK)
                 if (maxStockMoSQty < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
                     maxStockMoSQty = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
                 }
-                console.log("Min Stock MoS", minStockMoSQty);
-                console.log("Min Stock MoS", maxStockMoSQty);
+                // console.log("Min Stock MoS", minStockMoSQty);
+                // console.log("Min Stock MoS", maxStockMoSQty);
                 this.setState({
                     shelfLife: programPlanningUnit.shelfLife,
                     versionId: programJson.currentVersion.versionId,
@@ -1476,7 +1486,7 @@ class EditSupplyPlanStatus extends Component {
                     papuRequest.onsuccess = function (event) {
                         var papuResult = [];
                         papuResult = papuRequest.result;
-                        console.log("ProgramJson", programJson);
+                        // console.log("ProgramJson", programJson);
                         var supplyPlanData = [];
                         if (programJson.supplyPlan != undefined) {
                             supplyPlanData = (programJson.supplyPlan).filter(c => c.planningUnitId == planningUnitId);
@@ -2001,8 +2011,8 @@ class EditSupplyPlanStatus extends Component {
                                     var compare = (m[n].startDate >= currentMonth);
                                     // var stockInHand = jsonList[0].closingBalance;
                                     var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(this.state.distributionLeadTime, 'months').format("YYYY-MM"));
-                                    console.log("Spd1@@@@@@@@@@@", spd1)
-                                    console.log("Spd1@@@@@@@@@@@mn.startDate", m[n].startDate)
+                                    // console.log("Spd1@@@@@@@@@@@", spd1)
+                                    // console.log("Spd1@@@@@@@@@@@mn.startDate", m[n].startDate)
                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
@@ -2130,7 +2140,7 @@ class EditSupplyPlanStatus extends Component {
                                 consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
 
                                 var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
-                                console.log("project Inventory", projectedInventoryForRegion);
+                                // console.log("project Inventory", projectedInventoryForRegion);
                                 if (regionsReportingActualInventory.length != totalNoOfRegions) {
                                     totalActualQtyForRegion = i18n.t('static.supplyPlan.notAllRegionsHaveActualStock');
                                 }
@@ -2215,7 +2225,7 @@ class EditSupplyPlanStatus extends Component {
                             }
                         }
                         // console.log("supplyPlan", supplyPlan);
-                        console.log("consumptionTotalData", consumptionTotalData);
+                        // console.log("consumptionTotalData", consumptionTotalData);
                         this.setState({
                             openingBalanceArray: openingBalanceArray,
                             consumptionTotalData: consumptionTotalData,
@@ -2292,7 +2302,7 @@ class EditSupplyPlanStatus extends Component {
         // AuthenticationService.setupAxiosInterceptors();
 
         ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-            console.log('**' + JSON.stringify(response.data))
+            // console.log('**' + JSON.stringify(response.data))
             this.setState({
                 planningUnits: (response.data).sort(function (a, b) {
                     a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
@@ -2303,7 +2313,7 @@ class EditSupplyPlanStatus extends Component {
         })
             .catch(
                 error => {
-                    console.log("Error+++", error)
+                    // console.log("Error+++", error)
                     this.setState({
                         planningUnits: [],
                     })
@@ -2385,7 +2395,7 @@ class EditSupplyPlanStatus extends Component {
                         }
                     }
                 }
-                console.log('getDatasource', dataSourceListAll)
+                // console.log('getDatasource', dataSourceListAll)
                 this.setState({
                     dataSourceListAll: dataSourceListAll,
                 })
@@ -2400,7 +2410,7 @@ class EditSupplyPlanStatus extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
             .then(response => {
-                console.log("===========>", response.data)
+                // console.log("===========>", response.data)
                 let { program } = this.state
                 program = response.data
                 var regionList = []
@@ -2413,7 +2423,7 @@ class EditSupplyPlanStatus extends Component {
 
                 }
                 var hasRole = false;
-                console.log("AuthenticationService.getLoggedInUserRole()====>", AuthenticationService.getLoggedInUserRole());
+                // console.log("AuthenticationService.getLoggedInUserRole()====>", AuthenticationService.getLoggedInUserRole());
                 AuthenticationService.getLoggedInUserRole().map(c => {
                     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
                         hasRole = true;
@@ -2509,7 +2519,7 @@ class EditSupplyPlanStatus extends Component {
 
         // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getVersionStatusList().then(response => {
-            console.log('**' + JSON.stringify(response.data))
+            // console.log('**' + JSON.stringify(response.data))
             this.setState({
                 statuses: response.data,
             })
@@ -2560,7 +2570,7 @@ class EditSupplyPlanStatus extends Component {
             );
 
         ProgramService.getProblemStatusList().then(response => {
-            console.log('**' + JSON.stringify(response.data))
+            // console.log('**' + JSON.stringify(response.data))
             var myResult = (response.data)
             var proList = []
             for (var i = 0; i < myResult.length; i++) {
@@ -3814,7 +3824,7 @@ class EditSupplyPlanStatus extends Component {
             cont = true;
         }
         if (cont == true) {
-            console.log('***', event)
+            // console.log('***', event)
             var problemStatusIds = event
             problemStatusIds = problemStatusIds.sort(function (a, b) {
                 return parseInt(a.value) - parseInt(b.value);
@@ -3824,7 +3834,7 @@ class EditSupplyPlanStatus extends Component {
                 problemStatusLabels: problemStatusIds.map(ele => ele.label),
                 problemReportChanged: 0
             }, () => {
-                console.log("problemStatusValues===>", this.state.problemStatusValues);
+                // console.log("problemStatusValues===>", this.state.problemStatusValues);
                 this.fetchData()
             })
         }
@@ -3842,7 +3852,7 @@ class EditSupplyPlanStatus extends Component {
             cont = true;
         }
         if (cont == true) {
-            console.log('***', event)
+            // console.log('***', event)
             var problemReviewedIds = event
             problemReviewedIds = problemReviewedIds.sort(function (a, b) {
                 return parseInt(a.value) - parseInt(b.value);
@@ -3852,7 +3862,7 @@ class EditSupplyPlanStatus extends Component {
                 problemReviewedLabels: problemReviewedIds.map(ele => ele.label),
                 problemReportChanged: 0
             }, () => {
-                console.log("problemReviewedValues===>", this.state.problemReviewedValues);
+                // console.log("problemReviewedValues===>", this.state.problemReviewedValues);
                 this.fetchData()
             })
         }
@@ -3861,7 +3871,7 @@ class EditSupplyPlanStatus extends Component {
     getNote(row, lang) {
         var transList = row.problemTransList.filter(c => c.reviewed == false);
         if (transList.length == 0) {
-            console.log("this problem report id do not have trans+++", row.problemReportId);
+            // console.log("this problem report id do not have trans+++", row.problemReportId);
             return ""
         } else {
             var listLength = transList.length;
@@ -3897,14 +3907,14 @@ class EditSupplyPlanStatus extends Component {
 
             // let problemStatusId = ;
             let problemStatusIds = this.state.problemStatusValues.map(ele => (ele.value));
-            console.log("D-------------->Problem status Ids ------------------>", problemStatusIds)
+            // console.log("D-------------->Problem status Ids ------------------>", problemStatusIds)
             // let reviewedStatusId = document.getElementById('reviewedStatusId').value;
             let reviewedStatusId = this.state.problemReviewedValues.map(ele => (ele.value));
             var problemReportList = this.state.data;
             var problemReportFilterList = problemReportList;
             let problemTypeId = document.getElementById('problemTypeId').value;
             let problemCategoryId = document.getElementById('problemCategoryId').value;
-            console.log("problemReportList====>", problemReportList);
+            // console.log("problemReportList====>", problemReportList);
             if (problemStatusIds != []) {
                 var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
                 problemReportFilterList = problemReportFilterList.filter(c => (c.problemStatus.id == 4 ? moment(c.createdDate).format("YYYY-MM-DD") >= myStartDate : true) && problemStatusIds.includes(c.problemStatus.id));
@@ -3922,7 +3932,7 @@ class EditSupplyPlanStatus extends Component {
                 if (problemCategoryId != -1) {
                     problemReportFilterList = problemReportFilterList.filter(c => (c.problemCategory.id == problemCategoryId));
                 }
-                console.log("problemReportFilterList after filter------------->", problemReportFilterList)
+                // console.log("problemReportFilterList after filter------------->", problemReportFilterList)
                 this.setState({
                     problemList: problemReportFilterList,
                     message: ''
@@ -4007,7 +4017,7 @@ class EditSupplyPlanStatus extends Component {
     }.bind(this)
 
     buildProblemTransJexcel() {
-        console.log("In jexcel+++", this.state.problemTransList);
+        // console.log("In jexcel+++", this.state.problemTransList);
         var currentTrans = this.state.problemTransList.sort((function (a, b) {
             a = a.createdDate
             b = b.createdDate
@@ -4095,7 +4105,7 @@ class EditSupplyPlanStatus extends Component {
         // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.problemList;
         problemList = problemList;
-        console.log("problemList---->", problemList);
+        // console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
 
@@ -4451,7 +4461,7 @@ class EditSupplyPlanStatus extends Component {
                         title: i18n.t('static.problemContext.viewTrans'),
                         onclick: function () {
                             var myObj = obj.getRowData(y);
-                            console.log("my obj===>", myObj);
+                            // console.log("my obj===>", myObj);
                             this.toggleTransView(myObj[23]);
                         }.bind(this)
                     });
@@ -4529,7 +4539,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     addMannualProblem() {
-        console.log("-------------------addNewProblem--------------------");
+        // console.log("-------------------addNewProblem--------------------");
         this.getProblemCriticality();
         this.setState({
             isModalOpen: !this.state.isModalOpen,
@@ -4586,7 +4596,7 @@ class EditSupplyPlanStatus extends Component {
             .catch(
                 error => {
 
-                    console.log(error)
+                    // console.log(error)
                     if (error.message === "Network Error") {
                         this.setState({
                             // message: error.message 
@@ -5418,7 +5428,7 @@ class EditSupplyPlanStatus extends Component {
                                         }}
                                         validate={validateForAddingProblem(validationSchemaForAddingProblem)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                                            console.log("inside for prolem report changes if", this.state.problemReportChanged)
+                                            // console.log("inside for prolem report changes if", this.state.problemReportChanged)
 
                                             // if (!this.state.isSubmitClicked) {
                                             var criticalityId = (document.getElementById("modelCriticalityId").value)
@@ -5438,7 +5448,7 @@ class EditSupplyPlanStatus extends Component {
                                                             label: i18n.t('static.program.yes'),
                                                             onClick: () => {
                                                                 this.setState({ loading: true, isSubmitClicked: true }, () => {
-                                                                    console.log("criticalityId", criticalityId)
+                                                                    // console.log("criticalityId", criticalityId)
                                                                     this.submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession);
                                                                 })
                                                             }
@@ -5656,14 +5666,14 @@ class EditSupplyPlanStatus extends Component {
                                     //     isAllCheckForReviewed = false
                                     // }
                                 }
-                                console.log("D--------------->reviewedProblemList------------->", reviewedProblemList);
+                                // console.log("D--------------->reviewedProblemList------------->", reviewedProblemList);
                                 if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
 
-                                    console.log("reviewedProblemList===>", reviewedProblemList);
+                                    // console.log("reviewedProblemList===>", reviewedProblemList);
                                     ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
                                         .then(response => {
                                             if(this.state.program.currentVersion.versionStatus.id!=1){
-                                                console.log("messageCode", response)
+                                                // console.log("messageCode", response)
                                                 this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
                                             }else{
                                                 document.getElementById("submitButton").disabled = false;
@@ -5858,7 +5868,7 @@ class EditSupplyPlanStatus extends Component {
             ledgerForBatch: ledgerForBatch,
             loading: false
         })
-        console.log("ledgerForBatch+++", ledgerForBatch)
+        // console.log("ledgerForBatch+++", ledgerForBatch)
     }
 
     showShipmentWithBatch(batchNo, expiryDate) {
@@ -5932,7 +5942,7 @@ class EditSupplyPlanStatus extends Component {
     }
 
     updateState(parameterName, value) {
-        console.log("in update state")
+        // console.log("in update state")
         this.setState({
             [parameterName]: value
         })

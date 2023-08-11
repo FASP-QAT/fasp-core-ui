@@ -327,7 +327,7 @@ export function jExcelLoadedFunctionWithoutPagination(instance, number) {
 
 export function jExcelLoadedFunctionOnlyHideRow(instance) {
     var elInstance = instance.worksheets[0];
-    console.log("elisn===>", instance)
+    // console.log("elisn===>", instance)
     elInstance.hideIndex(0);
 }
 
@@ -473,8 +473,8 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             }
         }
     } else if (type == "dateWithInvalidDataEntry") {
-        console.log("Value$####", moment(value).format("YYYY-MM-DD"))
-        console.log("Condition###", moment(value).format("YYYY-MM") > moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM"));
+        // console.log("Value$####", moment(value).format("YYYY-MM-DD"))
+        // console.log("Condition###", moment(value).format("YYYY-MM") > moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM"));
         var col = (colName).concat(parseInt(rowNo) + 1);
         if (value == "") {
             elInstance.setStyle(col, "background-color", "transparent");
@@ -686,24 +686,14 @@ export function jExcelLoadedFunctionOldForCompareAndSelect(instance,number){
     }
     var obj = {};
     obj.options = {};
-    var elInstance = instance.jexcel;
+    var elInstance = instance.worksheets[0];
     elInstance.hideIndex(0);
-    var paginationOptions=document.getElementsByClassName('jexcel_pagination');
-    var num=0;
-    if(paginationOptions.length!=1){
-        num=1;
-    }
-    var pagignation = document.getElementsByClassName('jexcel_pagination')[num];
-    console.log("pagignation choosen Test123",pagignation)
-    console.log("Pagination Test123",document.getElementsByClassName('jexcel_pagination'));
+    var pagignation = document.getElementsByClassName('jss_pagination')[number];
     pagignation.classList.add('row');
-
-    var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
-    var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
-    try{
-    searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
-    }catch(error){}
-    document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
+    var searchContainer = document.getElementsByClassName('jss_search_container')[number];
+    var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
+    searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
+    document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
     // searchContainer.classList.add('TableCust');
     var clearBtn = document.createElement('button');
     clearBtn.type = "button";
@@ -714,7 +704,7 @@ export function jExcelLoadedFunctionOldForCompareAndSelect(instance,number){
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
     clearBtn.onclick = function () {
-        document.getElementsByClassName("jexcel_search")[number].value = "";
+        document.getElementsByClassName("jss_search")[number].value = "";
         elInstance.search('')
     };
     clearBtn.appendChild(clarText);
@@ -737,23 +727,31 @@ export function jExcelLoadedFunctionOldForCompareAndSelect(instance,number){
     // obj.pagination.appendChild(paginationPages);
     //  obj.pagination.appendChild(paginationUpdateContainer);
 
-    var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[num];
+    var jexcel_pagination = document.getElementsByClassName('jss_pagination')[number];
     jexcel_pagination.lastChild.classList.add('order-3');
     jexcel_pagination.firstChild.classList.add('order-2');
     jexcel_pagination.firstChild.classList.add('mr-auto');
     jexcel_pagination.firstChild.classList.add('pl-0');
     // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
     // document.getElementsByClassName('jexcel_pagination')[number].value = 25
-    var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
+    var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[number];
     pageSelect.options[3].innerHTML = "All";
 
-    pageSelect.addEventListener("change", () => paginationChange1(number));
+    pageSelect.addEventListener("change", () => paginationChange(number));
 
 
-    var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
+    var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[number];
     var filter = jexcel_filterFirstdiv.firstChild;
     filter.classList.add('order-1');
     filter.classList.add('pr-1');
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
+
+    var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
+    jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
+
+
+
+
+    // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }

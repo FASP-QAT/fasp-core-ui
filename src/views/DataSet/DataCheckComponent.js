@@ -13,9 +13,11 @@ import AuthenticationService from "../Common/AuthenticationService";
 
 export function dataCheck(props, datasetJson) {
     var PgmTreeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
-
+console.log("Export datasetJson",datasetJson.consumptionExtrapolation);
     var treeScenarioNotes = [];
     var missingBranchesList = [];
+    var consumptionExtrapolationList = [];
+    consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
     var datasetRegionList = datasetJson.regionList;
     var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.active.toString() == "true");
     for (var tl = 0; tl < PgmTreeList.length; tl++) {
@@ -25,8 +27,8 @@ export function dataCheck(props, datasetJson) {
             for (var dpu = 0; dpu < datasetPlanningUnit.length; dpu++) {
                 for (var drl = 0; drl < datasetRegionList.length; drl++) {
                     var regionId = datasetRegionList[drl].regionId;
-                    console.log("props.state.includeOnlySelectedForecasts@@@@@@@@@@@@", props.state.includeOnlySelectedForecasts);
-                    console.log("props.state.includeOnlySelectedForecasts 1@@@@@@@@@@@@", datasetPlanningUnit[dpu].selectedForecastMap);
+                    // console.log("props.state.includeOnlySelectedForecasts@@@@@@@@@@@@", props.state.includeOnlySelectedForecasts);
+                    // console.log("props.state.includeOnlySelectedForecasts 1@@@@@@@@@@@@", datasetPlanningUnit[dpu].selectedForecastMap);
                     if ((props.state.includeOnlySelectedForecasts && datasetPlanningUnit[dpu].selectedForecastMap != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId] != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].scenarioId == scenarioList[ndm].id && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeId == PgmTreeList[tl].treeId) || (!props.state.includeOnlySelectedForecasts)) {
                         if (treeScenarioNotes.findIndex(c => c.treeId == PgmTreeList[tl].treeId && c.scenarioId == scenarioList[ndm].id) == -1) {
                             treeScenarioNotes.push({
@@ -279,7 +281,7 @@ export function dataCheck(props, datasetJson) {
         }
         //No Forecast selected
         var selectedForecast = datasetPlanningUnit[dpu].selectedForecastMap;
-        console.log("selectedForecast$$$$%%%%", selectedForecast);
+        // console.log("selectedForecast$$$$%%%%", selectedForecast);
         var regionArray = [];
         for (var drl = 0; drl < datasetRegionList.length; drl++) {
             if (selectedForecast[datasetRegionList[drl].regionId] == undefined || (selectedForecast[datasetRegionList[drl].regionId].scenarioId == null && selectedForecast[datasetRegionList[drl].regionId].consumptionExtrapolationId == null)) {
@@ -307,12 +309,13 @@ export function dataCheck(props, datasetJson) {
     props.updateState("treeScenarioList", treeScenarioList)
     props.updateState("datasetPlanningUnitNotes", datasetPlanningUnitNotes)
     props.updateState("loading", false)
+    props.updateState("consumptionExtrapolationList",consumptionExtrapolationList)
 }
 
 export function buildJxl1(props) {
     props.updateState("loading", true)
     var treeScenarioList = props.state.treeScenarioList;
-    console.log("TreeScenarioList@@@", treeScenarioList)
+    // console.log("TreeScenarioList@@@", treeScenarioList)
     var treeScenarioListFilter = treeScenarioList;
     var treeScenarioListNotHaving100PerChild = [];
     for (var tsl = 0; tsl < treeScenarioListFilter.length; tsl++) {
@@ -373,7 +376,7 @@ export function buildJxl1(props) {
 export function buildJxl(props) {
     props.updateState("loading", true)
     var treeScenarioList = props.state.treeScenarioList;
-    console.log("TreeScenarioList@@@", treeScenarioList)
+    // console.log("TreeScenarioList@@@", treeScenarioList)
     var treeScenarioListFilter = treeScenarioList;
     var treeScenarioListNotHaving100PerChild = [];
     for (var tsl = 0; tsl < treeScenarioListFilter.length; tsl++) {
@@ -837,10 +840,10 @@ export function exportPDF(props) {
     }
 
     {
-        console.log("props.state.missingBranchesList@@@", props.state.missingBranchesList)
+        // console.log("props.state.missingBranchesList@@@", props.state.missingBranchesList)
         if (props.state.missingBranchesList.length > 0) {
             props.state.missingBranchesList.map((item, i) => {
-                console.log("In map 2nd time")
+                // console.log("In map 2nd time")
                 doc.setFont('helvetica', 'normal')
                 planningText = doc.splitTextToSize(getLabelText(item.treeLabel, props.state.lang), doc.internal.pageSize.width * 3 / 4);
                 // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
@@ -854,7 +857,7 @@ export function exportPDF(props) {
                     doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
                     y = y + 10;
                 }
-                console.log("item.flatList%%%", item.flatList)
+                // console.log("item.flatList%%%", item.flatList)
                 item.flatList.length > 0 && item.flatList.map((item1, j) => {
                     doc.setFont('helvetica', 'normal')
                     // if (item1.payload.nodeType.id == 4) {
@@ -1068,8 +1071,84 @@ export function exportPDF(props) {
 
 
     doc.setFont('helvetica', 'normal')
+    planningText = doc.splitTextToSize("b. " + i18n.t('static.forecastValidation.consumptionExtrapolationNotes'), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+        if (y > doc.internal.pageSize.height - 100) {
+            doc.addPage();
+            y = 100;
+
+        }
+        doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+        y = y + 10;
+    }
+    var height = doc.internal.pageSize.height;
+    var h1 = 50;
+    var startY = y + 10
+    var pages = Math.ceil(startY / height)
+    for (var j = 1; j < pages; j++) {
+        doc.addPage()
+    }
+    var startYtable = startY - ((height - h1) * (pages - 1))
+    var columns = [];
+    columns.push(i18n.t('static.dashboard.planningunitheader'));
+    columns.push(i18n.t('static.program.notes'));
+    var headers = [columns]
+    var dataArr2 = [];
+    var consumptionExtrapolationList = props.state.consumptionExtrapolationList;
+    (consumptionExtrapolationList.length >0 && consumptionExtrapolationList.map((item, i) => {
+            var flag=true;
+            if(item.notes!=undefined && item.notes!=null && item.notes!=''){
+            if(consumptionExtrapolationList.length==(i+1)){
+                 flag=false;
+                 dataArr2.push([
+                    getLabelText(item.planningUnit.label, props.state.lang),
+                    item.notes]) 
+             }
+             if(flag){
+                 if(consumptionExtrapolationList[i].planningUnit.id!=consumptionExtrapolationList[i+1].planningUnit.id){
+                    dataArr2.push([
+                        getLabelText(item.planningUnit.label, props.state.lang),
+                        item.notes])
+                 }
+             }
+            }
+    }))
+    var content1 = {
+        margin: { top: 100, bottom: 50 },
+        startY: startYtable,
+        head: headers,
+        body: dataArr2,
+        styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+    };
+
+    if (consumptionExtrapolationList.length >0) {
+        doc.autoTable(content1);// doc.addPage()
+        y = doc.lastAutoTable.finalY + 20
+        if (y + 100 > height) {
+            doc.addPage();
+            y = 100
+        }
+    } else {
+        planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noConsumptionExtrapolationNotesFound'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 3;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 100;
+
+            }
+            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+            y = y + 10;
+        }
+    }
+
+    doc.setFont('helvetica', 'normal')
     // y = 80;
-    planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.treeScenarios'), doc.internal.pageSize.width * 3 / 4);
+    planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.treeScenarios'), doc.internal.pageSize.width * 3 / 4);
     // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
     y = y + 10;
     for (var i = 0; i < planningText.length; i++) {
@@ -1137,7 +1216,7 @@ export function exportPDF(props) {
         }
     }
     doc.setFont('helvetica', 'normal')
-    planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.treeNodes'), doc.internal.pageSize.width * 3 / 4);
+    planningText = doc.splitTextToSize("d. " + i18n.t('static.commitTree.treeNodes'), doc.internal.pageSize.width * 3 / 4);
     // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
     y = y + 10;
     for (var i = 0; i < planningText.length; i++) {
@@ -1228,5 +1307,11 @@ export function missingBranchesClicked(treeId, props) {
 export function nodeWithPercentageChildrenClicked(treeId, scenarioId, props) {
     localStorage.setItem("sesDatasetId", props.state.programId);
     const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${props.state.programId}/${scenarioId}`, "_blank");
+    win.focus();
+}
+
+export function consumptionExtrapolationNotesClicked(planningUnitId, props) {
+    localStorage.setItem("sesDatasetId", props.state.programId);
+    const win = window.open("/#/extrapolation/extrapolateData/" + planningUnitId, "_blank");
     win.focus();
 }

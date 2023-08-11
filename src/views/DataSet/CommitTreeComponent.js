@@ -33,7 +33,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import { LOGO } from "../../CommonComponent/Logo";
 import { buildJxl1, dataCheck } from '../DataSet/DataCheckComponent.js';
 import { buildJxl } from '../DataSet/DataCheckComponent.js';
-import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
+import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked, consumptionExtrapolationNotesClicked } from '../DataSet/DataCheckComponent.js';
 
 const entityname = i18n.t('static.button.commit');
 const initialValues = {
@@ -102,7 +102,9 @@ export default class CommitTreeComponent extends React.Component {
             loading: true,
             treeScenarioListNotHaving100PerChild: [],
             includeOnlySelectedForecasts: true,
-            datasetPlanningUnitNotes: []
+            datasetPlanningUnitNotes: [],
+            consumptionExtrapolationList:[],
+            consumptionExtrapolationNotes:''
         }
         this.synchronize = this.synchronize.bind(this);
         this.updateState = this.updateState.bind(this);
@@ -219,7 +221,7 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     setProgramId(e) {
-        console.log("In set program Id@@@@@@@@@@@%%%%%%%%%%%%%")
+        // console.log("In set program Id@@@@@@@@@@@%%%%%%%%%%%%%")
         var programId = e.target.value;
         this.setState({
             loading: true,
@@ -265,7 +267,8 @@ export default class CommitTreeComponent extends React.Component {
                     programNameOriginal: getLabelText(programData[0].datasetJson.label, this.state.lang),
                     forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
                     forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
-                    notes: programData[0].datasetJson.currentVersion.notes
+                    notes: programData[0].datasetJson.currentVersion.notes,
+                    consumptionExtrapolationList:programData[0].datasetJson.consumptionExtrapolation
                 })
                 AuthenticationService.setupAxiosInterceptors();
                 ProgramService.getLatestVersionForProgram((programData[0].datasetJson.programId)).then(response1 => {
@@ -283,7 +286,7 @@ export default class CommitTreeComponent extends React.Component {
                     }
                     DatasetService.getAllDatasetData(programVersionJson)
                         .then(response => {
-                            console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
+                            // console.log("In response@@@@@@@@@@@%%%%%%%%%%%%%")
                             this.setState({
                                 programDataServer: response.data[0],
                                 programDataDownloaded: response.data.length > 1 ? response.data[1] : response.data[0],
@@ -309,9 +312,9 @@ export default class CommitTreeComponent extends React.Component {
 
 
     updateState(parameterName, value) {
-        console.log("In update state@@@@@@@@@@@%%%%%%%%%%%%%")
-        console.log("ParameterName$$$", parameterName)
-        console.log("Value$$$", value)
+        // console.log("In update state@@@@@@@@@@@%%%%%%%%%%%%%")
+        // console.log("ParameterName$$$", parameterName)
+        // console.log("Value$$$", value)
         this.setState({
             [parameterName]: value
         }, () => {
@@ -617,30 +620,30 @@ export default class CommitTreeComponent extends React.Component {
                                 var programJson = datasetJson;
                                 programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
                                 programJson.currentVersion.notes = document.getElementById("notes").value;;
-                                console.log("ProgramJson+++", programJson);
-                                console.log("this.state.comparedLatestVersion----", this.state.comparedLatestVersion);
+                                // console.log("ProgramJson+++", programJson);
+                                // console.log("this.state.comparedLatestVersion----", this.state.comparedLatestVersion);
                                 var treeList = programJson.treeList;
                                 for (var tl = 0; tl < treeList.length; tl++) {
                                     var tree = treeList[tl];
                                     var scenarioList = tree.scenarioList;
                                     var scenarioIdsSet = [...new Set(scenarioList.map(ele => Number(ele.id)))];
-                                    console.log("Scenario Ids Set Test@123", scenarioIdsSet);
+                                    // console.log("Scenario Ids Set Test@123", scenarioIdsSet);
                                     var completeFlatList = (tree.tree).flatList;
                                     for (let i = 0; i < completeFlatList.length; i++) {
                                         var node = completeFlatList[i];
                                         var scenarioKeys = Object.keys(node.payload.nodeDataMap);
                                         for (var sk = 0; sk < scenarioKeys.length; sk++) {
-                                            console.log("scenarioKeys[sk] Test@123", scenarioKeys[sk])
+                                            // console.log("scenarioKeys[sk] Test@123", scenarioKeys[sk])
                                             if (!(scenarioIdsSet.includes(Number(scenarioKeys[sk])))) {
                                                 delete node.payload.nodeDataMap[scenarioKeys[sk]];
                                             }
                                         }
                                     }
                                     for (var ndm = 0; ndm < scenarioList.length; ndm++) {
-                                        console.log("commit*** completeFlatList before---", completeFlatList);
+                                        // console.log("commit*** completeFlatList before---", completeFlatList);
                                         for (let i = 0; i < completeFlatList.length; i++) {
                                             var node = completeFlatList[i];
-                                            console.log("commit*** node before---", node);
+                                            // console.log("commit*** node before---", node);
                                             if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
@@ -660,24 +663,24 @@ export default class CommitTreeComponent extends React.Component {
                                                 }
                                             }
                                             node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList = nodeDataModelingListUpdated;
-                                            console.log("commit*** node after---", node);
+                                            // console.log("commit*** node after---", node);
                                             var findNodeIndex = completeFlatList.findIndex(n => n.id == node.id);
-                                            console.log("commit*** findNodeIndex1---", findNodeIndex);
+                                            // console.log("commit*** findNodeIndex1---", findNodeIndex);
                                             completeFlatList[findNodeIndex] = node;
-                                            console.log("commit*** completeFlatList after---", completeFlatList);
+                                            // console.log("commit*** completeFlatList after---", completeFlatList);
                                         }
                                     }
                                     tree.tree.flatList = completeFlatList;
-                                    console.log("commit*** tree---", tree);
+                                    // console.log("commit*** tree---", tree);
                                     var findTreeIndex = treeList.findIndex(n => n.treeId == tree.treeId);
-                                    console.log("commit*** findTreeIndex---", findTreeIndex);
+                                    // console.log("commit*** findTreeIndex---", findTreeIndex);
                                     treeList[findTreeIndex] = tree;
-                                    console.log("commit*** treeList---", treeList);
+                                    // console.log("commit*** treeList---", treeList);
                                 }
                                 var consumptionExtrapolationToUpdate = programJson.consumptionExtrapolation;
                                 for (var ce = 0; ce < consumptionExtrapolationToUpdate.length; ce++) {
                                     var cel = consumptionExtrapolationToUpdate[ce].extrapolationDataList;
-                                    console.log("Cel Test123", cel)
+                                    // console.log("Cel Test123", cel)
                                     for (var c = 0; c < cel.length; c++) {
                                         cel[c].amount = cel[c].amount < 0 ? 0 : cel[c].amount;
                                     }
@@ -685,7 +688,7 @@ export default class CommitTreeComponent extends React.Component {
                                 }
                                 programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
                                 programJson.treeList = treeList;
-                                console.log("commit*** final programJson---", programJson);
+                                // console.log("commit*** final programJson---", programJson);
 
                                 //create saveDatasetData in ProgramService
                                 DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
@@ -842,7 +845,7 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     render() {
-        console.log("In render@@@@@@@@@@@%%%%%%%%%%%%%", this.state.loading);
+        // console.log("In render@@@@@@@@@@@%%%%%%%%%%%%%", this.state.loading);
         const { programList } = this.state;
         let programs = programList.length > 0 && programList.map((item, i) => {
             return (
@@ -929,7 +932,35 @@ export default class CommitTreeComponent extends React.Component {
                 }
             }
         }, this) : <ul><span>{i18n.t('static.forecastValidation.noNodesHaveChildrenLessThanPerc')}</span><br /></ul>
-
+        //ConsumptionExtrapolationNotes
+        const { consumptionExtrapolationList } = this.state;
+       console.log("consumptionExtrapolationList----",consumptionExtrapolationList)
+        let consumptionExtrapolationNotes = (consumptionExtrapolationList.length > 0)? consumptionExtrapolationList.map((item, i) => {   
+           var flag=true;
+           console.log("notes--------------",item.notes)
+        if(item.notes!=undefined && item.notes!=null && item.notes!=''){
+           if(consumptionExtrapolationList.length==(i+1)){
+                flag=false;
+                return (
+                    <tr key={i} className="hoverTd" onClick={() => consumptionExtrapolationNotesClicked(item.planningUnit.id, this)}>
+                        <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                        <td>{item.notes}</td>
+                    </tr>
+                )    
+            }
+            if(flag){
+                if(consumptionExtrapolationList[i].planningUnit.id!=consumptionExtrapolationList[i+1].planningUnit.id){
+                    return (
+                        <tr key={i} className="hoverTd"  onClick={() => consumptionExtrapolationNotesClicked(item.planningUnit.id, this)}>
+                            <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                            <td>{item.notes}</td>
+                        </tr>
+                    )
+                }
+            }
+        }
+        }, this) : <span>&emsp;&emsp;&emsp;&ensp;{i18n.t('static.forecastValidation.noConsumptionExtrapolationNotesFound')}</span>;
+        
         //Consumption Notes
         const { datasetPlanningUnitNotes } = this.state;
         let consumtionNotes = (datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
@@ -1080,7 +1111,7 @@ export default class CommitTreeComponent extends React.Component {
                                         <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
                                         <div className='ForecastSummaryTable'>
                                             <div className="RemoveStriped commitversionTable CommitTableMarginTop consumptionDataEntryTable">
-                                                <div id="tableDiv" />
+                                                <div id="tableDiv" className="TableWidth100"/>
                                             </div>
                                         </div>
                                     </>
@@ -1249,7 +1280,22 @@ export default class CommitTreeComponent extends React.Component {
                                         </Table>
                                     </div> : <span>{consumtionNotes}</span>}
                             </div><br />
-                            <span>b. {i18n.t('static.commitTree.treeScenarios')}:</span>
+                            <span>b. {i18n.t('static.forecastValidation.consumptionExtrapolationNotes')}:</span>
+                            <div className="mt-2">
+                                {(consumptionExtrapolationList.length > 0) ?
+                                    <div className="table-wrap table-responsive fixTableHead">
+                                        <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
+                                                    <th style={{ width: '80%' }}><b>{i18n.t('static.program.notes')}</b></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>{consumptionExtrapolationNotes}</tbody>
+                                        </Table>
+                                    </div> : <span>{consumptionExtrapolationNotes}</span>}
+                            </div><br />
+                            <span>c. {i18n.t('static.commitTree.treeScenarios')}:</span>
                             <div className="">
                                 {treeScenarioNotes.length > 0 ? <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center  overflowhide main-table table-striped1" bordered size="sm" >
@@ -1265,7 +1311,7 @@ export default class CommitTreeComponent extends React.Component {
                                     </Table>
                                 </div> : <span>{scenarioNotes}</span>}
                             </div><br />
-                            <span>c. {i18n.t('static.commitTree.treeNodes')}:</span>
+                            <span>d. {i18n.t('static.commitTree.treeNodes')}:</span>
                             {/* <div className="table-scroll"> */}
                             <div className="mt-2">
                                 {treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0 ? <div className="table-wrap table-responsive fixTableHead">

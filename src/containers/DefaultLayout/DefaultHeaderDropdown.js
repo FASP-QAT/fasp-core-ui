@@ -81,7 +81,7 @@ class DefaultHeaderDropdown extends Component {
     this.props.history.push(`/ApplicationDashboard/`)
   }
   getLanguageList() {
-    console.log("Going to get languages for profile section")
+    // console.log("Going to get languages for profile section")
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -106,7 +106,7 @@ class DefaultHeaderDropdown extends Component {
       getRequest.onsuccess = function (event) {
         var languageList = [];
         languageList = getRequest.result;
-        console.log("my language list---", languageList);
+        // console.log("my language list---", languageList);
         this.setState({
           languageList
         });
@@ -116,19 +116,19 @@ class DefaultHeaderDropdown extends Component {
 
   }
   changeLanguage(lang) {
-    console.log("Going to change language---", lang)
+    // console.log("Going to change language---", lang)
     localStorage.setItem('lang', lang);
     localStorage.removeItem('lastLoggedInUsersLanguage');
     localStorage.setItem('lastLoggedInUsersLanguage', lang);
     AuthenticationService.updateUserLanguage(lang);
     if (isSiteOnline()) {
-      console.log("Going to change online")
+      // console.log("Going to change online")
       AuthenticationService.setupAxiosInterceptors();
       UserService.updateUserLanguage(lang)
         .then(response => {
-          console.log("Going to change language api success---", lang)
+          // console.log("Going to change language api success---", lang)
           i18n.changeLanguage(lang)
-          console.log("Going to change language reload location reload---")
+          // console.log("Going to change language reload location reload---")
 
           var url = window.location.href;
           if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
@@ -144,7 +144,7 @@ class DefaultHeaderDropdown extends Component {
           // window.location.reload();
         }).catch(
           error => {
-            console.log("Going to change language api error---", error)
+            // console.log("Going to change language api error---", error)
             if (error.message === "Network Error") {
               this.setState({
                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage"))
@@ -163,9 +163,9 @@ class DefaultHeaderDropdown extends Component {
           })
     }
     else {
-      console.log("Going to change language you are offline---")
+      // console.log("Going to change language you are offline---")
       i18n.changeLanguage(lang)
-      console.log("Going to change language reload location reload---")
+      // console.log("Going to change language reload location reload---")
       window.location.reload();
     }
     // console.log("Going to change language call changeLanguage function---")
@@ -274,7 +274,7 @@ class DefaultHeaderDropdown extends Component {
   //   );
   // }
   redirect(){
-    console.log("in redirect");
+    // console.log("in redirect");
     this.props.logout();
   }
 

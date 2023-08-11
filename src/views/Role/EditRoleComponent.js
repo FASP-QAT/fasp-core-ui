@@ -329,7 +329,7 @@ class EditRoleComponent extends Component {
                         role: response.data, loading: false
                     },
                         () => {
-                            console.log("ROLE****************> ", this.state.role)
+                            // console.log("ROLE****************> ", this.state.role)
                         });
                 } else {
                     this.setState({
@@ -403,7 +403,7 @@ class EditRoleComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log("INSUBMIT");
+                                    // console.log("INSUBMIT");
                                     this.setState({
                                         loading: true
                                     })

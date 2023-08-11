@@ -82,6 +82,7 @@ const ListRealmCountry = React.lazy(() => import('../../views/RealmCountry/ListR
 const AddRealmCountry = React.lazy(() => import('../../views/RealmCountry/AddRealmCountryComponent'));
 const RealmCountry = React.lazy(() => import('../../views/RealmCountry/RealmCountry'));
 const AddProgramIntegration = React.lazy(() => import('../../views/Integration/AddProgramIntegration'));
+const MapProcurementAgent = React.lazy(() => import('../../views/Program/MapProcurementAgent'));
 const ManualJsonTrigger = React.lazy(() => import('../../views/Integration/ManualJsonTrigger'));
 const AddCountrySpecificPrice = React.lazy(() => import('../../views/ProgramProduct/AddCountrySpecificPrice'));
 const ChangePassword = React.lazy(() => import('../../views/Pages/Login/ChangePasswordComponent'));
@@ -500,6 +501,8 @@ const routes = [
   { path: '/program/addManualIntegration', exact: true, name: 'static.integration.manualProgramIntegration', component: ManualJsonTrigger },
   { path: '/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
 
+  { path: '/program/mapProcurementAgent/:programId', exact: true, name: 'static.integration.programIntegration', component: MapProcurementAgent },
+
   { path: '/changePassword', exact: true, name: 'static.dashboard.changepassword', component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
   { path: '/logout/:message', exact: true, component: Logout },
@@ -737,6 +740,7 @@ const routes = [
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
 
   { path: '/extrapolation/extrapolateData', exact: true, name: 'static.dashboard.extrapolation', component: ExtrapolateData },
+  { path: '/extrapolation/extrapolateData/:planningUnitId', exact: true, name: 'static.dashboard.extrapolation', component: ExtrapolateData },
 
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
   { path: '/dataset/commitTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'static.commitProgram.commitProgram' }), component: CommitTree },
@@ -829,7 +833,7 @@ class DefaultLayout extends Component {
     // console.log('user is idle', e)
     const isTimedOut = this.state.isTimedOut
     if (isTimedOut) {
-      console.log("user timed out")
+      // console.log("user timed out")
       console.log("Test Logout @@@ Logged Out",this.state.timeout)
       localStorage.setItem("sessionTimedOut", 1);
       this.props.history.push('/logout/static.message.sessionExpired')
@@ -843,7 +847,7 @@ class DefaultLayout extends Component {
   }
 
   displayHeaderTitle = (name, url) => {
-    console.log("displayHeaderTitle activeTab ", this.state.activeTab)
+    // console.log("displayHeaderTitle activeTab ", this.state.activeTab)
 
     if (this.state.name !== name) {
       // if (url=="/ApplicationDashboard/fm/:id"){
@@ -861,7 +865,7 @@ class DefaultLayout extends Component {
         this.props.history.push(`/login/static.message.sessionChange`);
       }
       // var n=this.state.activeTab[0]==='1'?'Supply planning':'Forecasting'
-      console.log("P*** Call indexed db methods0---------------------------")
+      // console.log("P*** Call indexed db methods0---------------------------")
       this.getDatasetData();
       this.getProgramData();
       this.getNotificationCount();
@@ -878,7 +882,7 @@ class DefaultLayout extends Component {
 
   goOffline(e) {
     // localStorage.setItem("loginOnline", false);
-    console.log("window.location", window.location)
+    // console.log("window.location", window.location)
     // var url = window.location.href;
     // if ((url.indexOf("green/") > -1) || (url.indexOf("red/") > -1)) {
     //   // "The specific word exists";
@@ -899,7 +903,7 @@ class DefaultLayout extends Component {
   }
 
   logout(e){
-    console.log("inside customized logout function");
+    // console.log("inside customized logout function");
     this.props.history.push('/login/static.message.sessionExpired')
   }
 
@@ -924,7 +928,7 @@ class DefaultLayout extends Component {
     })
   }
   componentDidMount() {
-    console.log("timeout default layout component did mount---------------")
+    // console.log("timeout default layout component did mount---------------")
     // this.refs.programChangeChild.checkIfLocalProgramVersionChanged()
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     var bfunction = [];
@@ -1056,7 +1060,7 @@ class DefaultLayout extends Component {
       AuthenticationService.setupAxiosInterceptors();
       ManualTaggingService.getNotificationCount()
         .then(response => {
-          console.log("notification response===", response.data);
+          // console.log("notification response===", response.data);
           this.setState({
             notificationCount: response.data
           })
@@ -1070,7 +1074,7 @@ class DefaultLayout extends Component {
     }
   }
   getProgramData() {
-    console.log("P***get programs called");
+    // console.log("P***get programs called");
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1109,16 +1113,16 @@ class DefaultLayout extends Component {
         this.setState({
           programModified: programModified
         })
-        console.log("Program modified@@@", programModified);
+        // console.log("Program modified@@@", programModified);
         if (programModified == 1) {
-          console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+          // console.log("P***d---hurrey local version changed-------------------------------------------------------------");
           localStorage.setItem("sesLocalVersionChange", true);
           this.setState({ changeIcon: true });
-          console.log("P***d--------in if---------------")
+          // console.log("P***d--------in if---------------")
         } else {
           localStorage.setItem("sesLocalVersionChange", false);
           this.setState({ changeIcon: false });
-          console.log("P***d--------in else---------------")
+          // console.log("P***d--------in else---------------")
         }
         // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
         // this.setState({
@@ -1133,7 +1137,7 @@ class DefaultLayout extends Component {
   }
 
   getDatasetData() {
-    console.log("P***get programs called");
+    // console.log("P***get programs called");
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1161,15 +1165,15 @@ class DefaultLayout extends Component {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         var programDatasetChanged = 0;
-        console.log(" programDatasetChanged@@@!", programDatasetChanged);
-        console.log("myResult@@@!", myResult);
+        // console.log(" programDatasetChanged@@@!", programDatasetChanged);
+        // console.log("myResult@@@!", myResult);
 
         for (var i = 0; i < myResult.length; i++) {
-          console.log("userId@@@!", userId);
-          console.log("myResult[i].userId==userId@@@1", myResult[i].userId == userId);
+          // console.log("userId@@@!", userId);
+          // console.log("myResult[i].userId==userId@@@1", myResult[i].userId == userId);
 
           if (myResult[i].userId == userId) {
-            console.log("myResult[i].changed@@@!", myResult[i].changed);
+            // console.log("myResult[i].changed@@@!", myResult[i].changed);
 
             if (myResult[i].changed == 1) {
               programDatasetChanged = 1;
@@ -1180,16 +1184,16 @@ class DefaultLayout extends Component {
         this.setState({
           programDatasetChanged: programDatasetChanged
         })
-        console.log("Program modified Final@@@!", programDatasetChanged);
+        // console.log("Program modified Final@@@!", programDatasetChanged);
         if (programDatasetChanged == 1) {
-          console.log("P***d---hurrey local version changed-------------------------------------------------------------");
+          // console.log("P***d---hurrey local version changed-------------------------------------------------------------");
           localStorage.setItem("sesLocalVersionChange", true);
           this.setState({ fuChangeIcon: true });
-          console.log("P***d--------in if---------------")
+          // console.log("P***d--------in if---------------")
         } else {
           localStorage.setItem("sesLocalVersionChange", false);
           this.setState({ fuChangeIcon: false });
-          console.log("P***d--------in else---------------")
+          // console.log("P***d--------in else---------------")
         }
         // let finalmax = moment.max(proList.map(d => moment(d.lastModifiedDate)))
         // this.setState({
@@ -4167,17 +4171,17 @@ class DefaultLayout extends Component {
                                   }
                                 }
                               },
-                              {
-                                name: i18n.t('static.budgetHead.budget'),
-                                url: '/report/budgets',
-                                icon: 'fa fa-exchange',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
+                              // {
+                              //   name: i18n.t('static.budgetHead.budget'),
+                              //   url: '/report/budgets',
+                              //   icon: 'fa fa-exchange',
+                              //   attributes: {
+                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT') && this.state.activeTab == 2 ? false : true),
+                              //     onClick: e => {
+                              //       this.refreshPage();
+                              //     }
+                              //   }
+                              // },
                               {
                                 name: i18n.t('static.dashboard.supplierLeadTimes'),
                                 url: '/report/supplierLeadTimes',

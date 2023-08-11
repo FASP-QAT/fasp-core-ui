@@ -151,7 +151,7 @@ export default class OrganisationTypeListComponent extends Component {
             //     show: '',
             //     entries: '',
             // },
-            editable: true,
+            editable: false,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -247,7 +247,7 @@ export default class OrganisationTypeListComponent extends Component {
 
         OrganisationTypeService.getOrganisationTypeList()
             .then(response => {
-                console.log("response------->", response);
+                // console.log("response------->", response);
                 // this.setState({
                 //     organisationsType: response.data,
                 //     selSource: response.data

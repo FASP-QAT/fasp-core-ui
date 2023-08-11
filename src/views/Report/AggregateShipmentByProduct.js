@@ -236,7 +236,7 @@ class AggregateShipmentByProduct extends Component {
                 // new moment(ele.lastModifiedDate).format('MMM-DD-YYYY'), ele.notes
             ])));
         for (var i = 0; i < A.length; i++) {
-            console.log(A[i])
+            // console.log(A[i])
             csvRow.push(A[i].join(","))
 
         }
@@ -417,7 +417,7 @@ class AggregateShipmentByProduct extends Component {
         //         AuthenticationService.setupAxiosInterceptors();
         //         ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
         //             .then(response => {
-        //                 console.log(JSON.stringify(response.data));
+        //                 // console.log(JSON.stringify(response.data));
         //                 this.setState({
         //                     consumptions: response.data,
         //                     message: ''
@@ -510,11 +510,11 @@ class AggregateShipmentByProduct extends Component {
         //                             finalOfflineConsumption.push(json);
         //                         }
 
-        //                         // console.log("finalOfflineConsumption---", finalOfflineConsumption);
+        //                         // // console.log("finalOfflineConsumption---", finalOfflineConsumption);
 
         //                     }
         //                 }
-        //                 console.log("final consumption---", finalOfflineConsumption);
+        //                 // console.log("final consumption---", finalOfflineConsumption);
         //                 this.setState({
         //                     offlineConsumptionList: finalOfflineConsumption
         //                 });
@@ -541,7 +541,7 @@ class AggregateShipmentByProduct extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getProgramList()
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    // console.log(JSON.stringify(response.data))
                     this.setState({
                         programs: response.data
                     }, () => { this.consolidatedProgramList() })
@@ -614,7 +614,7 @@ class AggregateShipmentByProduct extends Component {
             // );
 
         } else {
-            console.log('offline')
+            // console.log('offline')
             this.consolidatedProgramList()
         }
     }
@@ -646,13 +646,13 @@ class AggregateShipmentByProduct extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
+                        // console.log(programNameLabel)
 
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
+                                // console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -675,7 +675,7 @@ class AggregateShipmentByProduct extends Component {
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            // console.log(program)
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     this.setState({
@@ -742,7 +742,7 @@ class AggregateShipmentByProduct extends Component {
 
                     }
                 }
-                console.log(verList)
+                // console.log(verList)
                 this.setState({
                     versions: verList.filter(function (x, i, a) {
                         return a.indexOf(x) === i;
@@ -779,7 +779,7 @@ class AggregateShipmentByProduct extends Component {
                         myResult = planningunitRequest.result;
                         var programId = (document.getElementById("programId").value).split("_")[0];
                         var proList = []
-                        console.log(myResult)
+                        // console.log(myResult)
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
 
@@ -801,7 +801,7 @@ class AggregateShipmentByProduct extends Component {
 
                 //let productCategoryId = document.getElementById("productCategoryId").value;
                 ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                    console.log('**' + JSON.stringify(response.data))
+                    // console.log('**' + JSON.stringify(response.data))
                     this.setState({
                         planningUnits: response.data, message: ''
                     }, () => {
@@ -908,7 +908,7 @@ class AggregateShipmentByProduct extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var program = `${programId}_v${version}_uId_${userId}`
                     var programDataOs = programDataTransaction.objectStore('programData');
-                    console.log(program)
+                    // console.log(program)
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
                         this.setState({
@@ -916,38 +916,38 @@ class AggregateShipmentByProduct extends Component {
                         })
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        console.log(programRequest)
+                        // console.log(programRequest)
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
                         var shipmentList = [];
                         var plannedShipmentFilteredList = [];
                         var outPutList = [];
-                        console.log("1----", programJson);
-                        console.log("2----", programJson.shipmentList);
-                        console.log("3----", planningUnitIds);
+                        // console.log("1----", programJson);
+                        // console.log("2----", programJson.shipmentList);
+                        // console.log("3----", planningUnitIds);
                         shipmentList = programJson.shipmentList;
 
                         var list = [];
                         list = shipmentList.filter(c => c.expectedDeliveryDate >= moment(startDate).format('YYYY-MM-DD') && c.expectedDeliveryDate <= moment(endDate).format('YYYY-MM-DD'));
-                        console.log("4----", list);
+                        // console.log("4----", list);
 
                         var planningUnitfilteredList = [];
                         for (var i = 0; i < planningUnitIds.length; i++) {
                             var l = list.filter(c => c.planningUnit.id == planningUnitIds[i]);
                             for (var j = 0; j < l.length; j++) {
-                                console.log("------status", l[j].shipmentStatus.id);
+                                // console.log("------status", l[j].shipmentStatus.id);
                                 planningUnitfilteredList.push(l[j]);
                             }
                         }
-                        console.log("5----", planningUnitfilteredList);
+                        // console.log("5----", planningUnitfilteredList);
 
                         if (plannedShipments == 1) {
                             plannedShipmentFilteredList = planningUnitfilteredList.filter(c => c.shipmentStatus.id != PLANNED_SHIPMENT_STATUS && c.shipmentStatus.id != DRAFT_SHIPMENT_STATUS && c.shipmentStatus.id != ON_HOLD_SHIPMENT_STATUS)
                         } else {
                             plannedShipmentFilteredList = planningUnitfilteredList;
                         }
-                        console.log("6----", plannedShipmentFilteredList);
+                        // console.log("6----", plannedShipmentFilteredList);
 
                         for (var i = 0; i < planningUnitIds.length; i++) {
                             var p = plannedShipmentFilteredList.filter(c => c.planningUnit.id == planningUnitIds[i]);
@@ -981,7 +981,7 @@ class AggregateShipmentByProduct extends Component {
                             }
                             outPutList.push(json);
                         }
-                        console.log("7----", outPutList);
+                        // console.log("7----", outPutList);
 
                         this.setState({ outPutList: outPutList });
 
@@ -1000,7 +1000,7 @@ class AggregateShipmentByProduct extends Component {
 
                 ReportService.AggregateShipmentByProduct(inputjson)
                     .then(response => {
-                        console.log("RESP------", response.data)
+                        // console.log("RESP------", response.data)
                         this.setState({
                             data: response.data
                         }, () => { this.consolidatedProgramList() })
@@ -1201,7 +1201,7 @@ class AggregateShipmentByProduct extends Component {
                 return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
 
             }, this);
-        console.log("planningUnits---", planningUnits);
+        // console.log("planningUnits---", planningUnits);
 
         let bar = "";
         if (isSiteOnline()) {
@@ -1227,7 +1227,7 @@ class AggregateShipmentByProduct extends Component {
                         data: this.state.consumptions.map((item, index) => (item.forcast))
                     }, {
                         label: i18n.t('static.report.actualConsumption'),
-                        backgroundColor: '#86CD99',
+                        backgroundColor: '#86cd99 !important',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',
@@ -1248,7 +1248,7 @@ class AggregateShipmentByProduct extends Component {
                 datasets: [
                     {
                         label: i18n.t('static.report.actualConsumption'),
-                        backgroundColor: '#86CD99',
+                        backgroundColor: '#86cd99 !important',
                         borderColor: 'rgba(179,181,198,1)',
                         pointBackgroundColor: 'rgba(179,181,198,1)',
                         pointBorderColor: '#fff',

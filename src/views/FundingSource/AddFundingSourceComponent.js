@@ -95,10 +95,10 @@ class AddFundingSourceComponent extends Component {
 
       if (fundingSourceValue.length >= 7) {//minus 2
         fundingSourceValue = fundingSourceValue.slice(0, 5);
-        console.log("DISPLAYNAME-BEF----->", fundingSourceValue);
+        // console.log("DISPLAYNAME-BEF----->", fundingSourceValue);
         FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
           .then(response => {
-            console.log("DISPLAYNAME-RESP----->", response);
+            // console.log("DISPLAYNAME-RESP----->", response);
             let { fundingSource } = this.state;
             fundingSource.fundingSourceCode = response.data;
             this.setState({
@@ -148,10 +148,10 @@ class AddFundingSourceComponent extends Component {
           );
 
       } else {// not need to minus
-        console.log("DISPLAYNAME-BEF-else----->", fundingSourceValue);
+        // console.log("DISPLAYNAME-BEF-else----->", fundingSourceValue);
         FundingSourceService.getFundingSourceDisplayName(realmId, fundingSourceValue)
           .then(response => {
-            console.log("DISPLAYNAME-RESP-else----->", response);
+            // console.log("DISPLAYNAME-RESP-else----->", response);
             let { fundingSource } = this.state;
             fundingSource.fundingSourceCode = response.data;
             this.setState({
@@ -372,10 +372,10 @@ class AddFundingSourceComponent extends Component {
                   this.setState({
                     loading: true
                   })
-                  console.log("Submit clicked");
+                  // console.log("Submit clicked");
                   FundingSourceService.addFundingSource(this.state.fundingSource)
                     .then(response => {
-                      console.log("Response->", response);
+                      // console.log("Response->", response);
                       if (response.status == 200) {
                         this.props.history.push(`/fundingSource/listFundingSource/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                       } else {

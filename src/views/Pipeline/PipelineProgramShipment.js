@@ -51,9 +51,9 @@ export default class PipelineProgramShipment extends Component {
     loaded() {
         var valid = true;
         var list = this.state.pipelineShipmentData;
-        console.log(list)
+        // console.log(list)
         var json = this.el.getJson(null, false);
-        console.log(json)
+        // console.log(json)
         for (var y = 0; y < json.length; y++) {
 
 
@@ -647,7 +647,7 @@ export default class PipelineProgramShipment extends Component {
                                             ProcurementAgentService.getProcurementAgentListAll()
                                                 .then(response => {
                                                     if (response.status == 200) {
-                                                        console.log(response.data)
+                                                        // console.log(response.data)
                                                         this.setState({
                                                             procurementAgentList: response.data.map(ele => ({
                                                                 name: getLabelText(ele.label, this.state.lang),
@@ -658,7 +658,7 @@ export default class PipelineProgramShipment extends Component {
                                                         ManufaturerService.getSupplierListAll()
                                                             .then(response => {
                                                                 if (response.status == 200) {
-                                                                    console.log(response.data)
+                                                                    // console.log(response.data)
                                                                     this.setState({
                                                                         supplierList: response.data.map(ele => ({
                                                                             name: getLabelText(ele.label, this.state.lang),
@@ -677,7 +677,7 @@ export default class PipelineProgramShipment extends Component {
                                                                                 PipelineService.getShipmentDataById(this.props.match.params.pipelineId)
                                                                                     .then(response => {
                                                                                         if (response.status == 200) {
-                                                                                            console.log("pipeline shipment data my console--->", response.data);
+                                                                                            // console.log("pipeline shipment data my console--->", response.data);
                                                                                             this.setState({
                                                                                                 pipelineShipmentData: response.data
                                                                                             }, () => { this.initialiseshipment() })
@@ -1019,7 +1019,7 @@ export default class PipelineProgramShipment extends Component {
     }
     initialiseshipment() {
         setTimeout('', 10000);
-        console.log('initialiseshipment' + JSON.stringify(this.state.pipelineShipmentData))
+        // console.log('initialiseshipment' + JSON.stringify(this.state.pipelineShipmentData))
         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
         // this.el.destroy();
         jexcel.destroy(document.getElementById("shipmenttableDiv"), true);
@@ -1214,7 +1214,7 @@ export default class PipelineProgramShipment extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[6]));
+            // console.log("RESP---------", parseFloat(rowData[6]));
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
         } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
@@ -1264,10 +1264,10 @@ export default class PipelineProgramShipment extends Component {
 
             "active": true
         }))
-        console.log(JSON.stringify(data))
+        // console.log(JSON.stringify(data))
         PipelineService.submitShipmentData(this.props.match.params.pipelineId, data)
             .then(response => {
-                console.log("==========>", response.data)
+                // console.log("==========>", response.data)
                 this.setState({
                     message: response.data.messageCode,
                     changedData: false,
@@ -1349,10 +1349,10 @@ export default class PipelineProgramShipment extends Component {
 
             "active": true
         }))
-        console.log(JSON.stringify(data))
+        // console.log(JSON.stringify(data))
         PipelineService.submitShipmentData(this.props.match.params.pipelineId, data)
             .then(response => {
-                console.log("==========>", response.data)
+                // console.log("==========>", response.data)
                 this.setState({
                     message: response.data.messageCode,
                     changedData: false,
@@ -1373,7 +1373,7 @@ export default class PipelineProgramShipment extends Component {
                 // } else {
                 PipelineService.submitProgram(this.props.match.params.pipelineId)
                     .then(response => {
-                        console.log(response.data.messageCode)
+                        // console.log(response.data.messageCode)
                         this.setState({
                             message: response.data.messageCode,
                             changedData: false, loading: false
@@ -1428,7 +1428,7 @@ export default class PipelineProgramShipment extends Component {
                     );
 
 
-                console.log('You have submitted the program');
+                // console.log('You have submitted the program');
                 // }
 
                 // }).catch(

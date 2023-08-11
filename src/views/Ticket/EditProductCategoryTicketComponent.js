@@ -212,9 +212,9 @@ export default class EditProductCategoryTicketComponent extends Component {
             PoroductCategoryService.getProductCategoryListByRealmId(realmId)
 
                 .then(response => {
-                    console.log("response product category list ====>", response.data);
+                    // console.log("response product category list ====>", response.data);
                     if (response.status == 200) {
-                        console.log("planningUnitCategories", response.data)
+                        // console.log("planningUnitCategories", response.data)
                         this.setState({
                             planningUnitCategories: response.data, loading: false
                         });
@@ -349,7 +349,7 @@ export default class EditProductCategoryTicketComponent extends Component {
                             this.state.planningUnitCategory.summary = summaryText_2;
                             this.state.planningUnitCategory.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.planningUnitCategory).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
+                                // console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({

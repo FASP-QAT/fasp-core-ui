@@ -98,7 +98,7 @@ export default class AddProduct extends Component {
         RealmServcie.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
-                    console.log(response.data);
+                    // console.log(response.data);
                     this.setState({
                         realmList: response.data
                     })
@@ -133,7 +133,7 @@ export default class AddProduct extends Component {
         UnitService.getUnitListAll()
             .then(response => {
                 if (response.status == 200) {
-                    console.log(response.data);
+                    // console.log(response.data);
                     this.setState({
                         unitList: response.data
                     })
@@ -171,7 +171,7 @@ export default class AddProduct extends Component {
         ProductService.getProdcutCategoryListByRealmId(event.target.value)
             .then(response => {
                 if (response.status == 200) {
-                    console.log(response.data);
+                    // console.log(response.data);
                     this.setState({
                         productCategoryList: response.data
                     })
@@ -227,7 +227,9 @@ export default class AddProduct extends Component {
         this.setState({
             product
         },
-            () => { console.log(product) });
+            () => { 
+                // console.log(product) 
+            });
     };
 
     touchAll(setTouched, errors) {
@@ -297,7 +299,7 @@ export default class AddProduct extends Component {
                                     ProductService.addProduct(this.state.product)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                console.log(response);
+                                                // console.log(response);
                                                 this.props.history.push(`/product/listProduct/` + i18n.t(response.data.message, { entityname }))
                                             } else {
                                                 this.setState({
@@ -323,7 +325,7 @@ export default class AddProduct extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
+                                                            // console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }

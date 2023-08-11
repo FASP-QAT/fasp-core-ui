@@ -653,7 +653,7 @@ export default class SupplyPlanComponent extends React.Component {
 
 
     componentDidMount() {
-        console.log("@@@@@@#################in component did mount@@@@@@@@@")
+        // // console.log("@@@@@@#################in component did mount@@@@@@@@@")
         var fields = document.getElementsByClassName("totalShipments1");
         for (var i = 0; i < fields.length; i++) {
             fields[i].style.display = "none";
@@ -694,12 +694,12 @@ export default class SupplyPlanComponent extends React.Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                console.log("MyResult+++", myResult)
+                // // console.log("MyResult+++", myResult)
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        console.log("In if")
+                        // // console.log("In if")
                         // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
@@ -758,7 +758,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                    console.log("List@@@@@@@@@@@", planningUnitDataList)
+                    // // console.log("List@@@@@@@@@@@", planningUnitDataList)
                     for (var i = 0; i < programJson.regionList.length; i++) {
                         var regionJson = {
                             // name: // programJson.regionList[i].regionId,
@@ -889,7 +889,7 @@ export default class SupplyPlanComponent extends React.Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var planningUnitName = this.props.items.planningUnitName;
         var planningUnitId = document.getElementById("planningUnitId").value;
-        console.log("this.state.planningUnitDataList+++", this.state.planningUnitDataList);
+        // // console.log("this.state.planningUnitDataList+++", this.state.planningUnitDataList);
         var planningUnitDataFilter = this.state.planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
         var programJsonForPlanningUnit = {};
         if (planningUnitDataFilter.length > 0) {
@@ -1566,8 +1566,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     var compare = (m[n].startDate >= currentMonth);
                                     // var stockInHand = jsonList[0].closingBalance;
                                     var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(this.state.distributionLeadTime, 'months').format("YYYY-MM"));
-                                    console.log("Spd1@@@@@@@@@@@", spd1)
-                                    console.log("Spd1@@@@@@@@@@@mn.startDate", m[n].startDate)
+                                    // // console.log("Spd1@@@@@@@@@@@", spd1)
+                                    // // console.log("Spd1@@@@@@@@@@@mn.startDate", m[n].startDate)
                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
@@ -2035,7 +2035,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountShipments: monthCountShipments
         })
-        console.log("Mohit form submit 30")
+        // // console.log("Mohit form submit 30")
         this.formSubmit(monthCountShipments)
     }
 
@@ -2044,7 +2044,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCountShipments: monthCountShipments
         })
-        console.log("Mohit form submit 31")
+        // // console.log("Mohit form submit 31")
         this.formSubmit(monthCountShipments);
     }
 
@@ -3609,7 +3609,7 @@ export default class SupplyPlanComponent extends React.Component {
             ledgerForBatch: ledgerForBatch,
             loading: false
         })
-        console.log("ledgerForBatch+++", ledgerForBatch)
+        // // console.log("ledgerForBatch+++", ledgerForBatch)
     }
 
     showShipmentWithBatch(batchNo, expiryDate) {
@@ -3686,7 +3686,8 @@ export default class SupplyPlanComponent extends React.Component {
             shipmentList = shipmentList.filter(c => 
                 (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate)
                 // && c.erpFlag == false 
-                && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value
+                // && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS 
+                && c.planningUnit.id == document.getElementById("planningUnitId").value
                 // && (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)
             );
             if (document.getElementById("addRowId") != null) {

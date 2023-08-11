@@ -23,7 +23,9 @@ let initialValues = {
     maxQplTolerance: '',
     actualConsumptionMonthsInPast: '',
     forecastConsumptionMonthsInPast: '',
-    inventoryMonthsInPast: ''
+    inventoryMonthsInPast: '',
+    minCountForMode: '',
+    minPercForMode: ''
 }
 
 const validationSchema = function (values) {
@@ -92,6 +94,17 @@ const validationSchema = function (values) {
             .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.validated.restrictionInventory'))
             .min(0, i18n.t('static.program.validvaluetext')),
+        minCountForMode: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.minCountForMode'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        minPercForMode: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .required(i18n.t('static.validated.minPercForMode'))
+            .min(0, i18n.t('static.program.validvaluetext')),
         /*   monthInPastForAmc: Yup.number()
                .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
            monthInFutureForAmc: Yup.number()
@@ -150,7 +163,9 @@ export default class UpdateDataSourceComponent extends Component {
                 maxQplTolerance: '',
                 actualConsumptionMonthsInPast: '',
                 forecastConsumptionMonthsInPast: '',
-                inventoryMonthsInPast: ''
+                inventoryMonthsInPast: '',
+                minCountForMode: '',
+                minPercForMode: ''
             },
             lang: localStorage.getItem('lang'),
             message: ''
@@ -210,6 +225,12 @@ export default class UpdateDataSourceComponent extends Component {
         if (event.target.name === "inventoryMonthsInPast") {
             realm.inventoryMonthsInPast = event.target.value
         }
+        if (event.target.name === "minCountForMode") {
+            realm.minCountForMode = event.target.value
+        }
+        if (event.target.name === "minPercForMode") {
+            realm.minPercForMode = event.target.value
+        }
         /* if (event.target.name === "monthInPastForAmc") {
              realm.monthInPastForAmc = event.target.value
          }
@@ -245,7 +266,9 @@ export default class UpdateDataSourceComponent extends Component {
             maxQplTolerance: true,
             actualConsumptionMonthsInPast: true,
             forecastConsumptionMonthsInPast: true,
-            inventoryMonthsInPast: true
+            inventoryMonthsInPast: true,
+            minCountForMode: true,
+            minPercForMode: true
         }
         )
         this.validateForm(errors)
@@ -269,7 +292,7 @@ export default class UpdateDataSourceComponent extends Component {
         // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
-                console.log("=====>", response.data);
+                // console.log("=====>", response.data);
                 this.setState({
                     realm: response.data, loading: false
                 });
@@ -364,6 +387,8 @@ export default class UpdateDataSourceComponent extends Component {
                                     actualConsumptionMonthsInPast: this.state.realm.actualConsumptionMonthsInPast,
                                     forecastConsumptionMonthsInPast: this.state.realm.forecastConsumptionMonthsInPast,
                                     inventoryMonthsInPast: this.state.realm.inventoryMonthsInPast,
+                                    minCountForMode: this.state.realm.minCountForMode,
+                                    minPercForMode: this.state.realm.minPercForMode
                                 }}
 
                                 validate={validate(validationSchema)}
@@ -372,7 +397,7 @@ export default class UpdateDataSourceComponent extends Component {
                                         loading: true
                                     })
                                     // AuthenticationService.setupAxiosInterceptors();
-                                    console.log("====>+++", this.state.realm);
+                                    // console.log("====>+++", this.state.realm);
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -612,6 +637,36 @@ export default class UpdateDataSourceComponent extends Component {
                                                         value={this.state.realm.inventoryMonthsInPast}
                                                         required />
                                                     <FormFeedback className="red">{errors.inventoryMonthsInPast}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="minCountForMode">{i18n.t('static.realm.minCountForMode')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        min="0"
+                                                        name="minCountForMode"
+                                                        id="minCountForMode"
+                                                        bsSize="sm"
+                                                        valid={!errors.minCountForMode && this.state.realm.minCountForMode != ''}
+                                                        invalid={touched.minCountForMode && !!errors.minCountForMode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.minCountForMode}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.minCountForMode}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="minPercForMode">{i18n.t('static.realm.minPercForMode')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        min="0"
+                                                        name="minPercForMode"
+                                                        id="minPercForMode"
+                                                        bsSize="sm"
+                                                        valid={!errors.minPercForMode && this.state.realm.minPercForMode != ''}
+                                                        invalid={touched.minPercForMode && !!errors.minPercForMode}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.minPercForMode}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.minPercForMode}</FormFeedback>
                                                 </FormGroup>
                                                 {/*    <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>

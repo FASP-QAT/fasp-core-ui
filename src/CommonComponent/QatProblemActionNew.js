@@ -204,8 +204,8 @@ export default class QatProblemActionNew extends Component {
                                             problemStatusList = problemStatusGetRequest.result;
                                             var openProblemStatusObj = problemStatusList.filter(c => c.id == 1)[0];
                                             var incomplianceProblemStatusObj = problemStatusList.filter(c => c.id == 4)[0];
-                                            console.log("openObj+++", openProblemStatusObj);
-                                            console.log("incomplianceObj+++", incomplianceProblemStatusObj);
+                                            // console.log("openObj+++", openProblemStatusObj);
+                                            // console.log("incomplianceObj+++", incomplianceProblemStatusObj);
                                             //  code for making problem status dynamic in problem object
 
                                             var maxForMonths = 0;
@@ -222,7 +222,7 @@ export default class QatProblemActionNew extends Component {
                                                     problemActionList = programList[pp].generalData.problemReportList;
                                                     problemActionIndex = programList[pp].generalData.problemReportList.length;
                                                     actionList = programList[pp].generalData.actionList;
-                                                    console.log("actionList+++", actionList);
+                                                    // console.log("actionList+++", actionList);
 
                                                     // ******* update logic for active inactive planning units===========================================================
                                                     planningUnitListAll.filter(
@@ -243,7 +243,7 @@ export default class QatProblemActionNew extends Component {
                                                         actionPlanningUnitIds.push(parseInt(actionObj.planningUnitId));
                                                     });
 
-                                                    console.log("actionPlanningUnitIds+++", actionPlanningUnitIds);
+                                                    // console.log("actionPlanningUnitIds+++", actionPlanningUnitIds);
 
                                                     //******New logic for QAT-638 to disable the problems if the region is removed or added form the program
                                                     var regionIdArray = [];
@@ -251,14 +251,14 @@ export default class QatProblemActionNew extends Component {
                                                     regionList.map(rm => {
                                                         regionIdArray.push(parseInt(rm.regionId));
                                                     });
-                                                    console.log("regionIdArray+++", regionIdArray);
+                                                    // console.log("regionIdArray+++", regionIdArray);
                                                     var problemReportIdForRegion = [];
                                                     problemActionList.filter(c =>
                                                         c.region != null && !regionIdArray.includes(parseInt(c.region.id)) && c.region.id != null && c.region.id != "" && c.problemReportId != 0 && c.region.id != 0).
                                                         map(m => {
                                                             problemReportIdForRegion.push(parseInt(m.problemReportId));
                                                         });
-                                                    console.log("problem reportId to mark region acive false+++", problemReportIdForRegion);
+                                                    // console.log("problem reportId to mark region acive false+++", problemReportIdForRegion);
                                                     for (var pal = 0; pal < problemActionList.length; pal++) {
                                                         if (problemReportIdForRegion.includes(parseInt(problemActionList[pal].problemReportId))) {
                                                             problemActionList[pal].regionActive = false;
@@ -348,7 +348,7 @@ export default class QatProblemActionNew extends Component {
                                                             filteredActionListForType.map(actionForTypeObj => {
                                                                 actionTypeIds.push(parseInt(actionForTypeObj.type));
                                                             });
-                                                            console.log("actionTypeIds+++", actionTypeIds);
+                                                            // console.log("actionTypeIds+++", actionTypeIds);
                                                             var typeProblemList = problemList;
                                                             if (!buildFullQPL && moment(qplLastModifiedDate).format("YYYY-MM") >= moment(curDate).format("YYYY-MM") && !(moment(planningUnitList[p].createdDate).format("YYYY-MM-DD") >= moment(qplLastModifiedDate).format("YYYY-MM-DD"))) {
                                                                 typeProblemList = problemList.filter(
@@ -361,7 +361,7 @@ export default class QatProblemActionNew extends Component {
                                                                         (moment(qplLastModifiedDate).format("YYYY-MM-DD") < moment(curDate).format("YYYY-MM-DD") && c.problem.shipmentTrigger)
                                                                 );
                                                             }
-                                                            console.log("typeProblemList+++", typeProblemList);
+                                                            // console.log("typeProblemList+++", typeProblemList);
                                                             for (var prob = 0; prob < typeProblemList.length; prob++) {
                                                                 // for (var prob = 0; prob < problemList.length; prob++) {
                                                                 // console.log("in problemlist for+++");
@@ -376,7 +376,7 @@ export default class QatProblemActionNew extends Component {
                                                                             var myStartDate = moment(curDate).subtract(numberOfMonths, 'months').startOf('month').format("YYYY-MM-DD");
                                                                             var myEndDate = moment(curDate).endOf('month').format("YYYY-MM-DD");
                                                                             var startDateForSixMonthRange = moment(curDate).subtract(numberOfMonthsData2, 'months').startOf('month').format("YYYY-MM-DD");
-                                                                            var endDateForSixMonthRange = moment(curDate).subtract(numberOfMonths + 1, 'months').startOf('month').format("YYYY-MM-DD")
+                                                                            var endDateForSixMonthRange = moment(curDate).subtract(numberOfMonths + 1, 'months').endOf('month').format("YYYY-MM-DD")
                                                                             // console.log("startDateForSixMonthRange+++", startDateForSixMonthRange, "endDateForSixMonthRange+++", endDateForSixMonthRange);
                                                                             var filteredConsumptionList = consumptionList.filter(c =>
                                                                                 moment(c.consumptionDate).format('YYYY-MM-DD') >= myStartDate
@@ -449,7 +449,7 @@ export default class QatProblemActionNew extends Component {
                                                                             var myStartDateInventory = moment(curDate).subtract(numberOfMonthsInventory, 'months').startOf('month').format("YYYY-MM-DD");
                                                                             var myEndDateInventory = moment(curDate).endOf('month').format("YYYY-MM-DD");
                                                                             var startDateForSixMonthRange = moment(curDate).subtract(numberOfMonthsInventoryData2, 'months').startOf('month').format("YYYY-MM-DD");
-                                                                            var endDateForSixMonthRange = moment(curDate).subtract(numberOfMonthsInventory + 1, 'months').startOf('month').format("YYYY-MM-DD")
+                                                                            var endDateForSixMonthRange = moment(curDate).subtract(numberOfMonthsInventory + 1, 'months').endOf('month').format("YYYY-MM-DD")
                                                                             var filterInventoryList = inventoryList.filter(c => moment(c.inventoryDate).format('YYYY-MM-DD') >= myStartDateInventory
                                                                                 && moment(c.inventoryDate).format('YYYY-MM-DD') <= myEndDateInventory
                                                                                 && c.active.toString() == "true"
@@ -532,7 +532,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 shipmentDetailsJson["shipmentQuantity"] = filteredShipmentList[s].shipmentQty;
                                                                                 shipmentDetailsJson["shipmentDate"] = filteredShipmentList[s].receivedDate == null || filteredShipmentList[s].receivedDate == "" ? filteredShipmentList[s].expectedDeliveryDate : filteredShipmentList[s].receivedDate;
                                                                                 // shipmentDetailsJson.push(itemShipment);
-                                                                                console.log("shipmentDetailsJson+++", shipmentDetailsJson)
+                                                                                // console.log("shipmentDetailsJson+++", shipmentDetailsJson)
 
                                                                                 shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
                                                                                 var indexShipment = 0;
@@ -635,6 +635,8 @@ export default class QatProblemActionNew extends Component {
                                                                                     var shippedToArrivedLeadTime = ""
                                                                                     if (filteredShipmentList[s].shipmentMode == "Air") {
                                                                                         shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                                                                    }else if (filteredShipmentList[s].shipmentMode == "Road") {
+                                                                                        shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByRoadLeadTime);
                                                                                     } else {
                                                                                         shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                                                                                     }
@@ -655,7 +657,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 shipmentDetailsJson["shipmentDate"] = filteredShipmentList[s].receivedDate == null || filteredShipmentList[s].receivedDate == "" ? filteredShipmentList[s].expectedDeliveryDate : filteredShipmentList[s].receivedDate;
                                                                                 shipmentDetailsJson["submittedDate"] = submittedDate;
                                                                                 // shipmentDetailsJson.push(itemShipment);
-                                                                                console.log("shipmentDetailsJson+++", shipmentDetailsJson)
+                                                                                // console.log("shipmentDetailsJson+++", shipmentDetailsJson)
 
                                                                                 if ((moment(submittedDate).add(parseInt(typeProblemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
                                                                                     shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
@@ -1257,7 +1259,7 @@ export default class QatProblemActionNew extends Component {
                                                                         break;
                                                                     case 29:
                                                                         if (planningUnitList[p].planBasedOn == 2) {
-                                                                            console.log("In case 29@@@@@@@@@@")
+                                                                            // console.log("In case 29@@@@@@@@@@")
                                                                             // console.log("planning unit***", planningUnitList[p].planningUnit.id);
                                                                             // console.log("problem***",typeProblemList[prob].problem.problemId);
                                                                             // console.log("data1***",typeProblemList[prob].data1,"data2***",typeProblemList[prob].data2);
@@ -1558,15 +1560,15 @@ export default class QatProblemActionNew extends Component {
                                                     // console.log("time taken by complete logic to execute+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                     // console.log("start time to set planning unit list the program data boject+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                     var problemTransaction = db1.transaction([objectStoreFromProps], 'readwrite');
-                                                    console.log("*****palash");
-                                                    console.log("problemTransaction+++", problemTransaction);
+                                                    // console.log("*****palash");
+                                                    // console.log("problemTransaction+++", problemTransaction);
                                                     var problemOs = problemTransaction.objectStore(objectStoreFromProps);
                                                     //previously we use to use this bcz we use to calculate for all program now we do it for one program at a time so we can remove filter from below line.
-                                                    console.log("time taken to get object store+++", problemOs);
-                                                    console.log("problemActionList***", problemActionList);
+                                                    // console.log("time taken to get object store+++", problemOs);
+                                                    // console.log("problemActionList***", problemActionList);
                                                     var paList = problemActionList.filter(c => c.program.id == programList[pp].generalData.programId)
                                                     programList[pp].generalData.problemReportList = paList;
-                                                    console.log("paList***", paList);
+                                                    // console.log("paList***", paList);
 
                                                     // after the logic for QPL is run accordign to the type and planning unit list we are clearing the action list and update the date on which QPL is calcukated
                                                     programList[pp].generalData.actionList = [];
@@ -1574,7 +1576,7 @@ export default class QatProblemActionNew extends Component {
 
                                                     var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
                                                     var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
-                                                    console.log("openCount***", openCount, "addressedCount***", addressedCount);
+                                                    // console.log("openCount***", openCount, "addressedCount***", addressedCount);
                                                     var programQPLDetailsJson = {
                                                         id: programRequestList[pp].id,
                                                         openCount: openCount,
@@ -1586,15 +1588,15 @@ export default class QatProblemActionNew extends Component {
                                                         programModified: programQPLDetailsGetRequest.result.programModified,
                                                         readonly: programQPLDetailsGetRequest.result.readonly
                                                     }
-                                                    console.log("open+++", openCount, "addressed+++", addressedCount);
-                                                    console.log("@@@ProgramQPLDetailsJson", programQPLDetailsJson);
+                                                    // console.log("open+++", openCount, "addressed+++", addressedCount);
+                                                    // console.log("@@@ProgramQPLDetailsJson", programQPLDetailsJson);
                                                     // programRequestList[pp].openCount=openCount;
                                                     // programRequestList[pp].addressedCount=addressedCount;
                                                     // console.log("time taken to set problemAction list in current program json+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                     programRequestList[pp].programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp].generalData), SECRET_KEY)).toString();
-                                                    console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
+                                                    // console.log("time taken to set complete encrypted program object with problem action list+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                                 } catch (err) {
-                                                    console.log("In error@@@*******", err)
+                                                    // console.log("In error@@@*******", err)
                                                     if (this.props.fetchData != undefined) {
                                                         if (this.props.page == "syncMasterData") {
                                                             this.props.fetchData(1, programId);
@@ -1617,7 +1619,7 @@ export default class QatProblemActionNew extends Component {
                                                 putRequest.onsuccess = function (event) {
                                                     var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                                    console.log("programQPLDetailsJson***", programQPLDetailsJson);
+                                                    // console.log("programQPLDetailsJson***", programQPLDetailsJson);
                                                     var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                     programQPLDetailsRequest.onsuccess = function (event) {
                                                         if (this.props.updateState != undefined) {
@@ -1634,7 +1636,7 @@ export default class QatProblemActionNew extends Component {
 
                                                     }.bind(this);
                                                 }.bind(this);
-                                                console.log("problemList for program***", problemActionList);
+                                                // console.log("problemList for program***", problemActionList);
                                                 // console.log("new logic ends+++", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"));
                                             }
                                         }.bind(this);

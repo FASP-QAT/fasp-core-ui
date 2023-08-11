@@ -948,7 +948,7 @@ export default class EditProcurementUnit extends Component {
         procurementUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     componentDidMount() {
-        console.log("this.props.match.params.procurementUnitId", this.props.match.params.procurementUnitId)
+        // console.log("this.props.match.params.procurementUnitId", this.props.match.params.procurementUnitId)
         ProcurementUnitService.getProcurementUnitById(this.props.match.params.procurementUnitId).then(response => {
             this.setState({
                 procurementUnit: response.data
@@ -1126,7 +1126,9 @@ export default class EditProcurementUnit extends Component {
         this.setState({
             procurementUnit
         },
-            () => { console.log("state-------------------", this.state.procurementUnit) });
+            () => { 
+                // console.log("state-------------------", this.state.procurementUnit) 
+            });
     }
     touchAll(setTouched, errors) {
         setTouched({

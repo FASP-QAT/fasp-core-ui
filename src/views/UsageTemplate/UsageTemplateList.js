@@ -36,6 +36,7 @@ import CryptoJS from 'crypto-js';
 import { Prompt } from 'react-router';
 import { SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, INTEGER_NO_REGEX, DECIMAL_NO_REGEX, API_URL } from "../../Constants";
 import { number } from "mathjs";
+import DropdownService from '../../api/DropdownService';
 
 let initialValues = {
     number1: "",
@@ -117,7 +118,10 @@ class usageTemplate extends Component {
             dimensionList: [],
             isChanged1: false,
             dataEl: '',
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            tempTracerCategoryId: '',
+            tracerCategoryLoading: true,
+            tempForecastingUnitList: []
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -186,14 +190,14 @@ class usageTemplate extends Component {
     }
 
     getForcastingUnitById(forecastingUnitId) {
-        console.log("forecastingUnitObj-----1 ", forecastingUnitId);
+        // console.log("forecastingUnitObj-----1 ", forecastingUnitId);
         ForecastingUnitService.getForcastingUnitById(forecastingUnitId).then(response => {
             if (response.status == 200) {
                 this.setState({
                     forecastingUnitObj: response.data, loading: false
                 },
                     () => {
-                        console.log("forecastingUnitObj-----", this.state.forecastingUnitObj);
+                        // console.log("forecastingUnitObj-----", this.state.forecastingUnitObj);
                     })
             }
             else {
@@ -254,7 +258,7 @@ class usageTemplate extends Component {
     getDataSet() {
         ProgramService.getDataSetList()
             .then(response => {
-                console.log("PROGRAM---------->", response.data)
+                // console.log("PROGRAM---------->", response.data)
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
@@ -356,10 +360,11 @@ class usageTemplate extends Component {
     }
 
     getTracerCategory() {
-        TracerCategoryService.getTracerCategoryListAll()
+        // TracerCategoryService.getTracerCategoryListAll()
+        DropdownService.getTracerCategoryDropdownList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("TracerCategory------->123", response.data);
+                    // console.log("TracerCategory------->123", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -372,9 +377,9 @@ class usageTemplate extends Component {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
                                 name: getLabelText(listArray[i].label, this.state.lang),
-                                id: parseInt(listArray[i].tracerCategoryId),
-                                active: listArray[i].active,
-                                healthAreaId: listArray[i].healthArea.id
+                                id: parseInt(listArray[i].id)
+                                // active: listArray[i].active,
+                                // healthAreaId: listArray[i].healthArea.id
                             }
                             tempList[i] = paJson
                         }
@@ -386,7 +391,7 @@ class usageTemplate extends Component {
                         // loading: false
                     },
                         () => {
-                            console.log("TracerCategory------->", this.state.tracerCategoryList)
+                            // console.log("TracerCategory------->", this.state.tracerCategoryList)
                             this.getDimensionList();
                         })
                 } else {
@@ -445,7 +450,7 @@ class usageTemplate extends Component {
         UnitService.getUnitListByDimensionId(5)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("getUnitListByDimensionId------->123", response.data);
+                    // console.log("getUnitListByDimensionId------->123", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = (a.unitCode).toUpperCase(); // ignore upper and lowercase
@@ -469,8 +474,9 @@ class usageTemplate extends Component {
                         dimensionList: tempList,
                     },
                         () => {
-                            console.log("dimensionList----------->", this.state.dimensionList);
+                            // console.log("dimensionList----------->", this.state.dimensionList);
                             this.getForecastingUnit();
+                            // this.getUnit();
                         })
                 } else {
                     this.setState({
@@ -525,8 +531,9 @@ class usageTemplate extends Component {
     }
 
     getForecastingUnit() {
-        ForecastingUnitService.getForecastingUnitListAll().then(response => {
-            console.log("response------->" + response.data);
+        let forecastingUnitIds = this.state.tempForecastingUnitList.map(e => e.id)
+        ForecastingUnitService.getForecastingUnitByIds(forecastingUnitIds).then(response => {
+            // console.log("response------->" + response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -608,12 +615,96 @@ class usageTemplate extends Component {
                 }
             }
         );
+
+        // ForecastingUnitService.getForecastingUnitListAll().then(response => {
+        //     // console.log("response------->" + response.data);
+        //     if (response.status == 200) {
+        //         var listArray = response.data;
+        //         listArray.sort((a, b) => {
+        //             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+        //             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+        //             return itemLabelA > itemLabelB ? 1 : -1;
+        //         });
+
+        //         let tempList = [];
+        //         if (listArray.length > 0) {
+        //             for (var i = 0; i < listArray.length; i++) {
+        //                 var paJson = {
+        //                     name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].forecastingUnitId),
+        //                     id: parseInt(listArray[i].forecastingUnitId),
+        //                     active: listArray[i].active,
+        //                     tracerCategoryId: listArray[i].tracerCategory.id,
+        //                     unit: listArray[i].unit
+        //                 }
+        //                 tempList[i] = paJson
+        //             }
+        //         }
+
+        //         this.setState({
+        //             forecastingUnitList: tempList,
+        //             // loading: false
+        //         },
+        //             () => {
+        //                 // this.getDataSet();
+        //                 this.getUnit();
+        //             })
+        //     } else {
+        //         this.setState({
+        //             message: response.data.messageCode, loading: false
+        //         },
+        //             () => {
+        //                 this.hideSecondComponent();
+        //             })
+        //     }
+
+
+        // }).catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({
+        //                 // message: 'static.unkownError',
+        //                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+        //                 loading: false
+        //             });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+
+        //                 case 401:
+        //                     this.props.history.push(`/login/static.message.sessionExpired`)
+        //                     break;
+        //                 case 403:
+        //                     this.props.history.push(`/accessDenied`)
+        //                     break;
+        //                 case 500:
+        //                 case 404:
+        //                 case 406:
+        //                     this.setState({
+        //                         message: error.response.data.messageCode,
+        //                         loading: false
+        //                     });
+        //                     break;
+        //                 case 412:
+        //                     this.setState({
+        //                         message: error.response.data.messageCode,
+        //                         loading: false
+        //                     });
+        //                     break;
+        //                 default:
+        //                     this.setState({
+        //                         message: 'static.unkownError',
+        //                         loading: false
+        //                     });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
 
     getUnit() {
         UnitService.getUnitListAll().then(response => {
-            console.log("response------->" + response.data);
+            // console.log("response------->" + response.data);
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -699,7 +790,7 @@ class usageTemplate extends Component {
 
     getUsagePeriod() {
         UsagePeriodService.getUsagePeriod().then(response => {
-            console.log("response------->" + JSON.stringify(response.data));
+            // console.log("response------->" + JSON.stringify(response.data));
             if (response.status == 200) {
                 var listArray = response.data;
                 // listArray.sort((a, b) => {
@@ -797,12 +888,16 @@ class usageTemplate extends Component {
         var papuList = this.state.selSource;
         var data = [];
         var papuDataArr = [];
-
+        let dropdownList = [];
         var count = 0;
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
 
                 data = [];
+                dropdownList.push({
+                    id: papuList[j].forecastingUnit.id,
+                    name : papuList[j].forecastingUnit.label.label_en + " | " + papuList[j].forecastingUnit.id,
+                });
                 data[0] = papuList[j].usageTemplateId
                 data[1] = (papuList[j].program == null ? -1 : papuList[j].program.id) //Type
                 data[2] = getLabelText(papuList[j].label, this.state.lang);//usage name
@@ -866,7 +961,11 @@ class usageTemplate extends Component {
                 count++;
             }
         }
-
+        if(dropdownList.length > 0){
+            dropdownList = [
+                ...new Map(dropdownList.map((item) => [item["id"], item])).values(),
+            ];
+        }
         if (papuDataArr.length == 0) {
             data = [];
             data[0] = 0;
@@ -906,7 +1005,7 @@ class usageTemplate extends Component {
         jexcel.destroy(document.getElementById("paputableDiv"), true);
         var json = [];
         var data = papuDataArr;
-        console.log("data-->", data)
+        // console.log("data-->", data)
         var options = {
             data: data,
             columnDrag: true,
@@ -942,10 +1041,32 @@ class usageTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.product.unit1'),
-                    type: 'autocomplete',
+                    type: 'dropdown',
                     width: '130',
-                    source: this.state.forecastingUnitList,
-                    filter: this.filterForecastingUnitBasedOnTracerCategory //4 E
+                    source: dropdownList,
+                    // filter: this.filterForecastingUnitBasedOnTracerCategory, //4 E
+                    options: {
+                        url: `${API_URL}/api/dropdown/forecastingUnit/autocomplete/filter/tracerCategory/searchText/language/tracerCategoryId`,
+                        autocomplete: true,
+                        remoteSearch: true,
+                        onbeforesearch: function(instance, request) {
+                            if(this.state.tracerCategoryLoading == false){
+                                request.method = 'GET';                                
+                                let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                request.beforeSend = (httpRequest) => {
+                                    httpRequest.setRequestHeader('Authorization', 'Bearer '+jwtToken);
+                                }
+                                const searchText = instance.search;
+                                const language = this.state.lang;
+                                const tracerCategoryId = this.state.tempTracerCategoryId;
+                                request.url = request.url.replace("searchText/language/tracerCategoryId", `${searchText}/${language}/${tracerCategoryId}`);
+
+                                return request;
+                            }
+                        }.bind(this),
+                    },
+                    filter: this.filterForecastingUnitList,
                 },
                 {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
@@ -1214,6 +1335,13 @@ class usageTemplate extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: true,
             onchange: this.changed,
+            oneditionstart: function (instance, cell, x, y, value) {
+                this.setState({ tracerCategoryLoading: true })
+                let tempId = data[y][3]
+                this.setState({ tempTracerCategoryId: tempId }, () => {
+                    this.setState({tracerCategoryLoading: false})
+                })
+            }.bind(this),
             // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
@@ -1225,7 +1353,7 @@ class usageTemplate extends Component {
                 let roleArray = this.state.roleArray;
                 var jsonLength;
                 jsonLength = json.length;
-                console.log("JsonLength", jsonLength)
+                // console.log("JsonLength", jsonLength)
 
                 for (var j = 0; j < jsonLength; j++) {
                     try {
@@ -1238,8 +1366,8 @@ class usageTemplate extends Component {
                         var typeId = rowData[6];
                         var oneTimeUsage = rowData[10];
 
-                        console.log("roleArray--------->1", j);
-                        console.log("roleArray--------->2", elInstance);
+                        // console.log("roleArray--------->1", j);
+                        // console.log("roleArray--------->2", elInstance);
                         if (typeId == 2) {
                             var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -1365,7 +1493,7 @@ class usageTemplate extends Component {
                 let roleArray = this.state.roleArray;
                 var jsonLength;
                 jsonLength = json.length;
-                console.log("JsonLength", jsonLength)
+                // console.log("JsonLength", jsonLength)
 
                 for (var j = 0; j < jsonLength; j++) {
                     try {
@@ -1378,8 +1506,8 @@ class usageTemplate extends Component {
                         var typeId = rowData[6];
                         var oneTimeUsage = rowData[10];
 
-                        console.log("roleArray--------->1", j);
-                        console.log("roleArray--------->2", elInstance);
+                        // console.log("roleArray--------->1", j);
+                        // console.log("roleArray--------->2", elInstance);
                         if (typeId == 2) {
                             var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
@@ -1543,12 +1671,12 @@ class usageTemplate extends Component {
                                     let value = this.el.getValueFromCoords(12, y);
                                     value = Number(value);
                                     let tempUsagePeriodList = [];
-                                    console.log("number---------------------->0", value);
-                                    console.log("number---------------------->0", typeof value);
+                                    // console.log("number---------------------->0", value);
+                                    // console.log("number---------------------->0", typeof value);
 
                                     if (typeof value === 'number') {
                                         //it's a number
-                                        console.log("number---------------------->1");
+                                        // console.log("number---------------------->1");
                                         let tempList = this.state.usagePeriodListLong;
 
                                         if (value == 0) {
@@ -1557,18 +1685,18 @@ class usageTemplate extends Component {
                                             let selectedPickerConvertTOMonth = tempList.filter(c => c.usagePeriodId == value)[0].convertToMonth;
 
                                             for (var i = 0; i < tempList.length; i++) {
-                                                console.log("number---------------------->1.1");
+                                                // console.log("number---------------------->1.1");
                                                 if (parseFloat(tempList[i].convertToMonth) <= parseFloat(selectedPickerConvertTOMonth)) {
                                                     tempUsagePeriodList.push(tempList[i]);
                                                 }
                                             }
-                                            console.log("number---------------------->2", tempUsagePeriodList);
+                                            // console.log("number---------------------->2", tempUsagePeriodList);
                                         }
 
 
                                     }
 
-                                    console.log("number---------------------->3");
+                                    // console.log("number---------------------->3");
 
 
 
@@ -1598,6 +1726,7 @@ class usageTemplate extends Component {
         dataEL = this.el
         this.setState({
             dataEl: dataEL,
+            tempForecastingUnitList: dropdownList,
             loading: false
         })
     }
@@ -2251,10 +2380,15 @@ class usageTemplate extends Component {
             }
             mylist = tempMyList;
         }
-        console.log("check---------------->3", mylist);
+        // console.log("check---------------->3", mylist);
         return mylist;
 
 
+    }.bind(this)
+
+    filterForecastingUnitList = function (instance, cell, c, r, source) {
+        var mylist = [];
+        return mylist;
     }.bind(this)
 
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
@@ -2345,7 +2479,7 @@ class usageTemplate extends Component {
         this.hideSecondComponent();
         UsageTemplateService.getUsageTemplateListAll().then(response => {
             if (response.status == 200) {
-                console.log("response.data---->", response.data)
+                // console.log("response.data---->", response.data)
                 // console.log("response.data---->", response.data.filter(c => c.usageTemplateId == 26));
 
                 // var listArray = response.data;
@@ -2545,15 +2679,15 @@ class usageTemplate extends Component {
     formSubmit = function () {
 
         var validation = this.checkValidation();
-        console.log("validation--------->", validation);
+        // console.log("validation--------->", validation);
         if (validation == true) {
             this.setState({ loading: true })
             var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("17 map---" + map1.get("17"))
+                // console.log("17 map---" + map1.get("17"))
                 if (parseInt(map1.get("17")) === 1) {
                     let json = {
                         usageTemplateId: parseInt(map1.get("0")),
@@ -2590,12 +2724,12 @@ class usageTemplate extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             UsageTemplateService.addUpdateUsageTemplateMapping(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         this.setState({
                             message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged1: false
@@ -2664,7 +2798,7 @@ class usageTemplate extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
 
@@ -2820,7 +2954,7 @@ class usageTemplate extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
 
-        console.log("instance===>", instance.worksheets[0])
+        // console.log("instance===>", instance.worksheets[0])
         // var asterisk = document.getElementsByClassName("resizable")[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -3227,9 +3361,9 @@ class usageTemplate extends Component {
                 VLookUp = usagePeriodObj.convertToMonth;
             }
 
-            console.log("Checked----------->1.1", v14);
-            console.log("Checked----------->2.1", VLookUp);
-            console.log("Checked----------->3.1", t14);
+            // console.log("Checked----------->1.1", v14);
+            // console.log("Checked----------->2.1", VLookUp);
+            // console.log("Checked----------->3.1", t14);
 
 
             let string = (selectedOneTimeUsageID ? o14 : v14 / VLookUp * t14);
@@ -3258,75 +3392,157 @@ class usageTemplate extends Component {
 
         if (x == 4 || x == 7 || x == 9 || x == 11 || x == 12 || x == 13 || x == 14 || x == 8) {
 
-            let unitIdValue = this.el.getValueFromCoords(8, y);
-            console.log("unitIdValue--------->", unitIdValue);
-            let unitName = '';
-            if (unitIdValue != 0) {
-                unitName = this.state.dimensionList.filter(c => c.id == unitIdValue)[0].name;
-            }
+            let forecastingUnitIds = this.state.tempForecastingUnitList.map(e => e.id)
+            ForecastingUnitService.getForecastingUnitByIds(forecastingUnitIds).then(response => {
+                // console.log("response------->" + response.data);
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
 
-            let unitName1 = '';
-            let obj = this.state.forecastingUnitList.filter(c => c.id == this.el.getValueFromCoords(4, y))[0];
-            if (obj != undefined && obj != null) {
-                // this.el.setValueFromCoords(12, y, obj.unit.id, true);
-                let unitId = obj.unit.id;
-                if (unitIdValue != 0) {
-                    unitName1 = this.state.unitList.filter(c => c.id == unitId)[0].name;
+                    let tempList = [];
+                    if (listArray.length > 0) {
+                        for (var i = 0; i < listArray.length; i++) {
+                            var paJson = {
+                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].forecastingUnitId),
+                                id: parseInt(listArray[i].forecastingUnitId),
+                                active: listArray[i].active,
+                                tracerCategoryId: listArray[i].tracerCategory.id,
+                                unit: listArray[i].unit
+                            }
+                            tempList[i] = paJson
+                        }
+                    }
+
+                    this.setState({
+                        forecastingUnitList: tempList,
+                        
+                    },
+                        () => {
+                            let unitIdValue = this.el.getValueFromCoords(8, y);
+                            // console.log("unitIdValue--------->", unitIdValue);
+                            let unitName = '';
+                            if (unitIdValue != 0) {
+                                unitName = this.state.dimensionList.filter(c => c.id == unitIdValue)[0].name;
+                            }
+
+                            let unitName1 = '';
+                            let obj = this.state.forecastingUnitList.filter(c => c.id == this.el.getValueFromCoords(4, y))[0];
+                            if (obj != undefined && obj != null) {
+                                // this.el.setValueFromCoords(12, y, obj.unit.id, true);
+                                let unitId = obj.unit.id;
+                                if (unitIdValue != 0) {
+                                    unitName1 = this.state.unitList.filter(c => c.id == unitId)[0].name;
+                                }
+                            }
+
+
+                            let string = 'Every ' + (this.el.getValue(`H${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`H${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '____' : unitName) + '(s) - requires ' + (this.el.getValue(`J${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`J${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '____' : unitName1 + "(s)");
+
+                            let q1 = '';
+                            // if (this.el.getValueFromCoords(10, y) == false) {
+                            //     q1 = 'time(s) per';
+                            // } else {
+                            //     q1 = '';
+                            // }
+                            // console.log("Test-1--", string)
+                            if (this.el.getValueFromCoords(10, y) == false) {
+                                if (this.el.getValueFromCoords(6, y) == 1) {
+                                    q1 = '';
+                                    if (!this.el.getValueFromCoords(10, y)) {
+                                        q1 = 'time(s) per';
+                                    }
+                                }
+                            } else {
+                                q1 = '';
+                            }
+                            // console.log("Test-2--", string)
+
+                            let t1 = ''
+                            if (this.el.getValueFromCoords(6, y) == 1 && !this.el.getValueFromCoords(10, y)) {
+                                t1 = 'for';
+                            } else {
+                                t1 = '';
+                            }
+
+
+
+
+
+                            // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
+
+                            if (!this.el.getValueFromCoords(10, y)) {//one time usage false
+                                if (this.el.getValueFromCoords(6, y) == 2) {
+                                    string += " Every " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
+                                } else {
+                                    string += " " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (q1 == '' ? '____' : q1) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
+                                }
+                                // console.log("Test-3--", string)
+                                if (this.el.getValueFromCoords(6, y) == 2) {
+                                    string += " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
+                                } else {
+                                    string += " " + (t1 == '' ? '____' : t1) + " " + (this.el.getValue(`N${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`N${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
+                                }
+                            }
+                            // console.log("Test-4--", string)
+
+
+                            this.el.setValueFromCoords(16, y, string, true);
+                        })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
-            }
 
 
-            let string = 'Every ' + (this.el.getValue(`H${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`H${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '____' : unitName) + '(s) - requires ' + (this.el.getValue(`J${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`J${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '____' : unitName1 + "(s)");
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
 
-            let q1 = '';
-            // if (this.el.getValueFromCoords(10, y) == false) {
-            //     q1 = 'time(s) per';
-            // } else {
-            //     q1 = '';
-            // }
-            console.log("Test-1--", string)
-            if (this.el.getValueFromCoords(10, y) == false) {
-                if (this.el.getValueFromCoords(6, y) == 1) {
-                    q1 = '';
-                    if (!this.el.getValueFromCoords(10, y)) {
-                        q1 = 'time(s) per';
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            } else {
-                q1 = '';
-            }
-            console.log("Test-2--", string)
-
-            let t1 = ''
-            if (this.el.getValueFromCoords(6, y) == 1 && !this.el.getValueFromCoords(10, y)) {
-                t1 = 'for';
-            } else {
-                t1 = '';
-            }
-
-
-
-
-
-            // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
-
-            if (!this.el.getValueFromCoords(10, y)) {//one time usage false
-                if (this.el.getValueFromCoords(6, y) == 2) {
-                    string += " Every " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
-                } else {
-                    string += " " + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (q1 == '' ? '____' : q1) + " " + (this.el.getValue(`M${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`M${parseInt(y) + 1}`, true));
-                }
-                console.log("Test-3--", string)
-                if (this.el.getValueFromCoords(6, y) == 2) {
-                    string += " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
-                } else {
-                    string += " " + (t1 == '' ? '____' : t1) + " " + (this.el.getValue(`N${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`N${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`O${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`O${parseInt(y) + 1}`, true));
-                }
-            }
-            console.log("Test-4--", string)
-
-
-            this.el.setValueFromCoords(16, y, string, true);
+            );
         }
 
         //-----------------------------------------------------------
@@ -3334,7 +3550,7 @@ class usageTemplate extends Component {
         // if (x != 24) {
         //     this.el.setValueFromCoords(24, y, 1, true);
         // }
-        console.log("LOG---------->2", x);
+        // console.log("LOG---------->2", x);
 
         if (x == 10 || x == 11 || x == 12 || x == 21) {
             this.el.setValueFromCoords(17, y, 1, true);
@@ -3344,7 +3560,7 @@ class usageTemplate extends Component {
 
         //Tracer Category
         if (x == 3) {
-            console.log("LOG---------->2", value);
+            // console.log("LOG---------->2", value);
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("D").concat(parseInt(y) + 1);
             this.el.setValueFromCoords(4, y, '', true);
@@ -3522,7 +3738,7 @@ class usageTemplate extends Component {
         //People Validation
         if (x == 8) {
             this.el.setValueFromCoords(24, y, 1, true);
-            console.log("LOG---------->3", value);
+            // console.log("LOG---------->3", value);
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
@@ -3666,8 +3882,8 @@ class usageTemplate extends Component {
         if (x == 13) {
             let onTimeUsage = this.el.getValueFromCoords(10, y);
             let typeId = this.el.getValueFromCoords(6, y);
-            console.log("onTimeUsage------>1", onTimeUsage);
-            console.log("onTimeUsage------>2", typeId);
+            // console.log("onTimeUsage------>1", onTimeUsage);
+            // console.log("onTimeUsage------>2", typeId);
             if (!onTimeUsage && typeId == 1) {
                 var col = ("N").concat(parseInt(y) + 1);
                 value = this.el.getValue(`N${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -4416,7 +4632,7 @@ class usageTemplate extends Component {
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(17, y);
             if (parseInt(value) == 1) {
@@ -4505,7 +4721,7 @@ class usageTemplate extends Component {
                 //Lag in month 
                 var col = ("F").concat(parseInt(y) + 1);
                 value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                console.log("LAG----------->", value);
+                // console.log("LAG----------->", value);
                 var reg = INTEGER_NO_REGEX;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");

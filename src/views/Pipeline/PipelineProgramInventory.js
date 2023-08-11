@@ -41,8 +41,8 @@ export default class PipelineProgramInventory extends Component {
         var realmCountryId = document.getElementById("realmCountryId").value;
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[c - 7];
-        console.log("==========>planningUnitValue", value);
-        console.log("========>", this.state.realmCountryPlanningUnitList);
+        // console.log("==========>planningUnitValue", value);
+        // console.log("========>", this.state.realmCountryPlanningUnitList);
         var puList = (this.state.realmCountryPlanningUnitList).filter(c => c.planningUnit.id == value && c.realmCountry.id == realmCountryId);
 
         for (var k = 0; k < puList.length; k++) {
@@ -53,7 +53,7 @@ export default class PipelineProgramInventory extends Component {
             mylist.push(realmCountryPlanningUnitJson);
         }
 
-        console.log("myList=====>", mylist);
+        // console.log("myList=====>", mylist);
         return mylist;
     }
 
@@ -337,9 +337,9 @@ export default class PipelineProgramInventory extends Component {
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));
             var dataSourceId = map.get("1");
-            // console.log("dataSourceId   iiiiiiiiiiiiiii->", dataSourceId)
+            // // console.log("dataSourceId   iiiiiiiiiiiiiii->", dataSourceId)
             if (dataSourceId != "" && !isNaN(parseInt(dataSourceId))) {
-                // console.log("in iffffffffffffffffffff");
+                // // console.log("in iffffffffffffffffffff");
                 dataSourceId = map.get("1");
             } else {
                 dataSourceId = list[i].dataSourceId;
@@ -371,7 +371,7 @@ export default class PipelineProgramInventory extends Component {
             var realmCountryPlanningUnitList = [];
 
             this.setState({ realmCountryPlanningUnitList: response.data });
-            console.log("realmCountryPlanningUnitId Inventory====>", response.data);
+            // console.log("realmCountryPlanningUnitId Inventory====>", response.data);
 
             for (var i = 0; i < response.data.length; i++) {
                 var rcpJson = {
@@ -385,7 +385,7 @@ export default class PipelineProgramInventory extends Component {
 
             // AuthenticationService.setupAxiosInterceptors();
             PipelineService.getQatTempProgramregion(this.props.pipelineId).then(response => {
-                // console.log("inventory region List +++++++++++++++ ----->", response.data);
+                // // console.log("inventory region List +++++++++++++++ ----->", response.data);
                 var regionList = [];
                 for (var i = 0; i < response.data.length; i++) {
                     var regionJson = {
@@ -399,7 +399,7 @@ export default class PipelineProgramInventory extends Component {
                 DataSourceService.getAllDataSourceList().then(response => {
                     var dataSourceList = [];
                     var dataSourceFilterList = response.data.filter(c => c.dataSourceType.id == INVENTORY_DATA_SOURCE_TYPE);
-                    console.log("inventory data source List ++++++++++++++++++----->", response.data);
+                    // console.log("inventory data source List ++++++++++++++++++----->", response.data);
                     // INVENTORY_DATA_SOURCE_TYPE
                     for (var j = 0; j < dataSourceFilterList.length; j++) {
                         var dataSourceJson = {
@@ -422,7 +422,7 @@ export default class PipelineProgramInventory extends Component {
 
                             // AuthenticationService.setupAxiosInterceptors();
                             PipelineService.getPipelineProgramInventory(this.props.pipelineId).then(response => {
-                                console.log("inventory List iiiiiiiiiiii----->", response.data);
+                                // console.log("inventory List iiiiiiiiiiii----->", response.data);
 
                                 var data = [];
                                 var inventoryDataArr = [];
@@ -769,7 +769,7 @@ export default class PipelineProgramInventory extends Component {
         var rowData = elInstance.getRowData(y);
 
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[4]));
+            // console.log("RESP---------", parseFloat(rowData[4]));
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
         } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
