@@ -7744,7 +7744,8 @@ label.arrow_label:before {
   border: none !important;
   background: none;
   padding-top: 1px;
-  margin-left: -2px;
+  // margin-left: -2px;
+  margin-left: 0px;
 }
 
 .TreeIconStyle i {
@@ -10516,4 +10517,14 @@ border-top: 1px solid #c8ced3 !important;
   pointer-events: none;
   opacity: unset!important;
 
+}
+
+.compareAndSelect.jtabs .jtabs-headers-container {
+  display: flex!important;
+  align-items: center;
+}
+.compareAndSelect.jtabs .jtabs-headers > div.jtabs-selected {
+  background-color: #e8e8e8;
+  color: #000;
+  display: none!important;
 }
