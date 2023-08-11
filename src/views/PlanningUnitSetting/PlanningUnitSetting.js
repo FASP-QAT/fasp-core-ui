@@ -2099,7 +2099,6 @@ export default class PlanningUnitSetting extends Component {
                         onbeforesearch: function(instance, request) {
                             if(this.state.sortOrderLoading == false){
                                 request.method = 'GET';
-                                this.dropdownList = []
                                 // request.data = { productCategorySortOrder: "", searchText: instance.search, language: "en" };
                                 let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                                 let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
