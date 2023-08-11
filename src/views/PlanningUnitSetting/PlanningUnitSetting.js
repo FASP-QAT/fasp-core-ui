@@ -645,7 +645,7 @@ export default class PlanningUnitSetting extends Component {
         this.setState({
                 tempPlanningUnitList: elInstance.getConfig().columns[1].source
         }, () => {
-            console.log("hello", this.state.tempPlanningUnitList)    
+            // console.log("hello", this.state.tempPlanningUnitList)    
         })
         var rowData = elInstance.getRowData(y);
         var reg = /^0[0-9].*$/; //any no start with 0;
@@ -2099,7 +2099,7 @@ export default class PlanningUnitSetting extends Component {
                         onbeforesearch: function(instance, request) {
                             if(this.state.sortOrderLoading == false){
                                 request.method = 'GET';
-                                
+                                this.dropdownList = []
                                 // request.data = { productCategorySortOrder: "", searchText: instance.search, language: "en" };
                                 let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                                 let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -2115,7 +2115,9 @@ export default class PlanningUnitSetting extends Component {
                             }
                         }.bind(this),
                     },
-                    filter: this.filterPlanningUnitList,
+                    filter: function() {
+                        this.dropdownList = [];
+                    },
                     width: '170',
                     // readOnly: true //1B
                 },
