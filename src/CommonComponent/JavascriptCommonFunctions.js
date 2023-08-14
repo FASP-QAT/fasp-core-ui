@@ -77,8 +77,10 @@ export function isSiteOnline() {
 
 export function decompressJson(str) {
   let value = typeof str !== "string" ? JSON.stringify(str) : str;
+  console.log("Compression logs -------> After Size",sizeOfJson(str))
   try {
       JSON.parse(value);
+      console.log("Compression logs -------> Before Size",sizeOfJson(value))
   } catch (e) {
       const compressedData = atob(str);
       const byteArray = new Uint8Array(compressedData.length);
@@ -87,6 +89,7 @@ export function decompressJson(str) {
       }
       const decompressedData = pako.inflate(byteArray, { to: 'string' });
       var json = JSON.parse(decompressedData);
+      console.log("Compression logs -------> Before Size",sizeOfJson(json))
       return json;
   }
   return str;
@@ -104,6 +107,7 @@ export function compressJson(str) {
         base64String += String.fromCharCode(compressedData[i]);
       }
       base64String = btoa(base64String);
+      console.log("Compression logs -------> After Size",sizeOfJson(base64String))
       return base64String;
 }
 
@@ -115,6 +119,7 @@ export function sizeOfJson(str) {
 }
 
 export function isCompress(str) {
+  console.log("Compression logs -------> Before Size",sizeOfJson(str))
   if(sizeOfJson(str) > COMPRESS_LIMIT_SIZE)
     return compressJson(str);
   return str

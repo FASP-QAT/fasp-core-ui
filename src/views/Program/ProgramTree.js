@@ -1069,6 +1069,7 @@ class Program extends Component {
             // var version = (checkboxesChecked[i]).versionId;
             if (isSiteOnline()) {
                 // AuthenticationService.setupAxiosInterceptors();
+                console.log("Compression logs -------> Start",Date())
                 console.log("Start Time Test@@@123",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                 ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
@@ -1365,6 +1366,7 @@ class Program extends Component {
                                                 // this.refs.programListChild.checkNewerVersions();
                                                 this.getPrograms();
                                                 this.getLocalPrograms();
+                                                console.log("Compression logs -------> End",Date())
                                                 console.log("End Time Test@@@123",moment(Date.now()).format("YYYY-MM-DD HH:mm:ss:SSS"))
                                                 this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.program.downloadsuccess'), state: { "programIds": programIds } })
                                             }.bind(this)
