@@ -530,7 +530,7 @@ class ForecastOutput extends Component {
         headers.push(i18n.t('static.consumption.forcast'));
         {
             this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
-                headers.push(moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+                headers.push(("\'").concat(moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE)))
             ))
         }
         {
