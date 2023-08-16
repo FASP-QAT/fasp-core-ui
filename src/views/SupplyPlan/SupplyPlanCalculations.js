@@ -980,7 +980,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (totalMonths == 0) {
                                         amc = null;
                                     } else {
-                                        amc = Math.round((Number(amcTotal) / Number(totalMonths)));
+                                        amc = Number((Number(amcTotal) / Number(totalMonths))).toFixed(8);
                                     }
 
 
@@ -1013,12 +1013,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var maxStock = 0;
                                     if (programPlanningUnitList[ppL].planBasedOn == 2) {
                                         minStock = programPlanningUnitList[ppL].minQty;
-                                        maxStock = Math.round(Number(Number(programPlanningUnitList[ppL].minQty) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths) * Number(amc)));
-                                        minStockMoSQty = Number(programPlanningUnitList[ppL].minQty) / Number(amc);
-                                        maxStockMoSQty = Number(Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths));
+                                        maxStock = Number(Number(programPlanningUnitList[ppL].minQty) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths) * Number(amc)).toFixed(8);
+                                        minStockMoSQty = Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)).toFixed(8);
+                                        maxStockMoSQty = Number(Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths)).toFixed(8);
                                     } else {
-                                        minStock = Number(amc) * Number(minStockMoSQty);
-                                        maxStock = Number(amc) * Number(maxStockMoSQty);
+                                        minStock = Number(Number(amc) * Number(minStockMoSQty)).toFixed(8);
+                                        maxStock = Number(Number(amc) * Number(maxStockMoSQty)).toFixed(8);
                                     }
 
                                     // Calculations of Closing balance
@@ -1061,7 +1061,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                     var mos = "";
                                     if (closingBalance != 0 && amc != 0 && amc != null) {
-                                        mos = Number(closingBalance / amc).toFixed(4);
+                                        mos = Number(closingBalance / amc).toFixed(8);
                                     } else if (amc == 0 || amc == null) {
                                         mos = null;
                                     } else {
@@ -1070,7 +1070,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
 
                                     var mosWps = "";
                                     if (closingBalanceWps != 0 && amc != 0 && amc != null) {
-                                        mosWps = Number(closingBalanceWps / amc).toFixed(4);
+                                        mosWps = Number(closingBalanceWps / amc).toFixed(8);
                                     } else if (amc == 0 || amc == null) {
                                         mosWps = null;
                                     } else {

@@ -241,6 +241,23 @@ export default class SupplyPlanComponent extends React.Component {
         this.setBudgetId = this.setBudgetId.bind(this);
         this.planShipment = this.planShipment.bind(this)
         this.pickAMonthSingle = React.createRef();
+        this.roundAMC=this.roundAMC.bind(this);
+    }
+
+    roundAMC(amc){
+        if(amc!=null){
+        if(Number(amc).toFixed(0)>=100){
+            return Number(amc).toFixed(0);
+        }else if(Number(amc).toFixed(1)>=10){
+            return Number(amc).toFixed(1);
+        }else if(Number(amc).toFixed(2)>=1){
+            return Number(amc).toFixed(2);
+        }else{
+            return Number(amc).toFixed(3);
+        }
+    }else{
+        return null;
+    }
     }
 
     addCommas(cell, row) {
@@ -3894,8 +3911,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                maxQtyArray.push(jsonList[0].maxStock)
-                                amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
+                                maxQtyArray.push(this.roundAMC(jsonList[0].maxStock))
+                                amcTotalData.push(jsonList[0].amc != null ? this.roundAMC(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -3915,7 +3932,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                     var compare = (m[n].startDate >= currentMonth);
                                     // var stockInHand = jsonList[0].closingBalance;
-                                    var amc = Math.round(Number(jsonList[0].amc));
+                                    var amc = Number(jsonList[0].amc);
                                     var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
                                     var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
@@ -3957,9 +3974,9 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (suggestShipment) {
                                         var suggestedOrd = 0;
                                         if (useMax) {
-                                            suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                            suggestedOrd = Number(Math.round(amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                         } else {
-                                            suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                            suggestedOrd = Number(Math.round(amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                         }
                                         if (suggestedOrd <= 0) {
                                             sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
@@ -3979,7 +3996,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     // console.log("Spd1@@@@@@@@@@@mn.startDate", m[n].startDate)
                                     var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
                                     var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2 + this.state.distributionLeadTime, 'months').format("YYYY-MM"));
-                                    var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+                                    var amc = spd1.length > 0 ? Number(spd1[0].amc) : 0;
                                     var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
                                     var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
                                     var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
@@ -4026,9 +4043,9 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (suggestShipment) {
                                         var suggestedOrd = 0;
                                         if (useMax) {
-                                            suggestedOrd = Number((Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
+                                            suggestedOrd = Number(Math.round(Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                         } else {
-                                            suggestedOrd = Number((Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
+                                            suggestedOrd = Number(Math.round(Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                         }
                                         if (suggestedOrd <= 0) {
                                             sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
@@ -4131,8 +4148,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     mos: jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos,
                                     minMos: minStockMoSQty,
                                     maxMos: maxStockMoSQty,
-                                    minQty: jsonList[0].minStock,
-                                    maxQty: jsonList[0].maxStock,
+                                    minQty: this.roundAMC(jsonList[0].minStock),
+                                    maxQty: this.roundAMC(jsonList[0].maxStock),
                                     planBasedOn: programPlanningUnit.planBasedOn
                                 }
                                 jsonArrForGraph.push(json);
@@ -5944,8 +5961,8 @@ export default class SupplyPlanComponent extends React.Component {
                                             inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                             totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                             monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                            maxQtyArray.push(jsonList[0].maxStock)
-                                            amcTotalData.push(jsonList[0].amc != null ? Math.round(Number(jsonList[0].amc)) : "");
+                                            maxQtyArray.push(this.roundAMC(jsonList[0].maxStock))
+                                            amcTotalData.push(jsonList[0].amc != null ? this.roundAMC(Number(jsonList[0].amc)) : "");
                                             minStockMoS.push(jsonList[0].minStockMoS)
                                             maxStockMoS.push(jsonList[0].maxStockMoS)
                                             unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
@@ -5963,7 +5980,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                 var compare = (m[n].startDate >= currentMonth);
                                                 // var stockInHand = jsonList[0].closingBalance;
-                                                var amc = Math.round(Number(jsonList[0].amc));
+                                                var amc = Number(jsonList[0].amc);
                                                 var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).format("YYYY-MM"));
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2, 'months').format("YYYY-MM"));
@@ -6005,9 +6022,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (suggestShipment) {
                                                     var suggestedOrd = 0;
                                                     if (useMax) {
-                                                        suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                                        suggestedOrd = Number(Math.round(amc * Number(maxStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                                     } else {
-                                                        suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
+                                                        suggestedOrd = Number(Math.round(amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                                     }
                                                     if (suggestedOrd <= 0) {
                                                         sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
@@ -6022,11 +6039,11 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                                                 var compare = (m[n].startDate >= currentMonth);
                                                 // var stockInHand = jsonList[0].closingBalance;
-                                                var amc = Math.round(Number(jsonList[0].amc));
+                                                var amc = Number(jsonList[0].amc);
                                                 var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(1 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(m[n].startDate).add(2 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
-                                                var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+                                                var amc = spd1.length > 0 ? Number(spd1[0].amc) : 0;
                                                 var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
                                                 var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
                                                 var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
@@ -6072,9 +6089,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (suggestShipment) {
                                                     var suggestedOrd = 0;
                                                     if (useMax) {
-                                                        suggestedOrd = Number((Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
+                                                        suggestedOrd = Number(Math.round(Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                                     } else {
-                                                        suggestedOrd = Number((Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
+                                                        suggestedOrd = Number(Math.round(Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                                     }
                                                     if (suggestedOrd <= 0) {
                                                         sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
@@ -6177,8 +6194,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                 mos: jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos,
                                                 minMos: minStockMoSQty,
                                                 maxMos: maxStockMoSQty,
-                                                minQty: jsonList[0].minStock,
-                                                maxQty: jsonList[0].maxStock,
+                                                minQty: this.roundAMC(jsonList[0].minStock),
+                                                maxQty: this.roundAMC(jsonList[0].maxStock),
                                                 planBasedOn: programPlanningUnit.planBasedOn
                                             }
                                             jsonArrForGraph.push(json);
@@ -6776,7 +6793,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var batchInfoList = programJson.batchInfoList;
                                                 // var stockInHand = jsonList[0].closingBalance;
                                                 var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).format("YYYY-MM"));
-                                                var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+                                                var amc = spd1.length > 0 ? Number(spd1[0].amc) : 0;
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2, 'months').format("YYYY-MM"));
                                                 var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
@@ -6809,9 +6826,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (suggestShipment) {
                                                     var suggestedOrd = 0;
                                                     if (useMax) {
-                                                        suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
+                                                        suggestedOrd = Number(Math.round(amc * Number(maxStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
                                                     } else {
-                                                        suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
+                                                        suggestedOrd = Number(Math.round(amc * Number(minStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
                                                     }
                                                 }
                                             } else {
@@ -6827,7 +6844,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 // var stockInHand = jsonList[0].closingBalance;
                                                 var spd0 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).format("YYYY-MM"));
                                                 var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
-                                                var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+                                                var amc = spd1.length > 0 ? Number(spd1[0].amc) : 0;
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
@@ -6869,9 +6886,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 if (suggestShipment) {
                                                     var suggestedOrd = 0;
                                                     if (useMax) {
-                                                        suggestedOrd = Number((Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
+                                                        suggestedOrd = Number(Math.round(Number(maxStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                                     } else {
-                                                        suggestedOrd = Number((Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
+                                                        suggestedOrd = Number(Math.round(Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                                     }
                                                 }
                                             }
