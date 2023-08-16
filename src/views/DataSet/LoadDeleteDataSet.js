@@ -1210,6 +1210,7 @@ class LoadDeleteDataSet extends Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onerror = function (event) {
         }.bind(this);
+        console.log("Compression logs -------> Start",Date())
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
@@ -1467,6 +1468,7 @@ class LoadDeleteDataSet extends Component {
                                                                 loading: false
                                                             }, () => {
                                                                 this.hideFirstComponent()
+                                                                console.log("Compression logs -------> End",Date())
                                                             })
                                                             // this.props.history.push(`/dashboard/`+'green/' + 'Dataset loaded successfully')
                                                             this.setState({ loading: false })

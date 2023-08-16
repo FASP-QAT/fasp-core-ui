@@ -4812,6 +4812,7 @@ export default class syncPage extends Component {
 
   synchronize() {
     // console.log("CommitLogs --- 1 inside synchronize function")
+    console.log("Compression logs -------> Start time",Date())
     this.setState({ loading: true });
     var checkValidations = true;
     if (checkValidations) {
@@ -5189,6 +5190,7 @@ export default class syncPage extends Component {
                     // console.log("CommitLogs --- 4 After 50% completed before redirect to dashboard")
                     this.hideFirstComponent();
                     this.redirectToDashbaord(response.data);
+                    console.log("Compression logs -------> End time",Date())
                   })
                   // }.bind(this)
                 } else {
