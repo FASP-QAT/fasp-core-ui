@@ -1355,6 +1355,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             items.push({
                                                                 title: i18n.t('static.common.deleterow'),
                                                                 onclick: function () {
+                                                                    this.props.updateState("shipmentChangedFlag", 1);
                                                                     obj.setValueFromCoords(33, y, false, true);
                                                                 }.bind(this)
                                                             });
