@@ -1779,7 +1779,7 @@ export default class ShipmentDetails extends React.Component {
                                                 var batchInfoList = programJson.batchInfoList;
                                                 // var stockInHand = jsonList[0].closingBalance;
                                                 var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).format("YYYY-MM"));
-                                                var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+                                                var amc = spd1.length > 0 ? Number(spd1[0].amc) : 0;
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2, 'months').format("YYYY-MM"));
                                                 var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
@@ -1812,9 +1812,9 @@ export default class ShipmentDetails extends React.Component {
                                                 if (suggestShipment) {
                                                     var suggestedOrd = 0;
                                                     if (useMax) {
-                                                        suggestedOrd = Number((amc * Number(maxStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
+                                                        suggestedOrd = Number(Math.round(amc * Number(maxStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
                                                     } else {
-                                                        suggestedOrd = Number((amc * Number(minStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
+                                                        suggestedOrd = Number(Math.round(amc * Number(minStockMoSQty)) - Number(spd1[0].closingBalance) + Number(spd1[0].unmetDemand));
                                                     }
                                                 }
                                             } else {
@@ -1830,7 +1830,7 @@ export default class ShipmentDetails extends React.Component {
                                                 // var stockInHand = jsonList[0].closingBalance;
                                                 var spd0 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).format("YYYY-MM"));
                                                 var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
-                                                var amc = spd1.length > 0 ? Math.round(Number(spd1[0].amc)) : 0;
+                                                var amc = spd1.length > 0 ? Number(spd1[0].amc) : 0;
                                                 var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(1 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(month).add(2 + programPlanningUnit.distributionLeadTime, 'months').format("YYYY-MM"));
                                                 var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
@@ -1871,9 +1871,9 @@ export default class ShipmentDetails extends React.Component {
                                                 if (suggestShipment) {
                                                     var suggestedOrd = 0;
                                                     if (useMax) {
-                                                        suggestedOrd = Number((Number(maxStockForMonth1)) - Number(spd0[0].closingBalance) + Number(spd0[0].unmetDemand));
+                                                        suggestedOrd = Number(Math.round(Number(maxStockForMonth1)) - Number(spd0[0].closingBalance) + Number(spd0[0].unmetDemand));
                                                     } else {
-                                                        suggestedOrd = Number((Number(minStockForMonth1)) - Number(spd0[0].closingBalance) + Number(spd0[0].unmetDemand));
+                                                        suggestedOrd = Number(Math.round(Number(minStockForMonth1)) - Number(spd0[0].closingBalance) + Number(spd0[0].unmetDemand));
                                                     }
                                                 }
                                             }
