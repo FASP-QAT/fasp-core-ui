@@ -1312,7 +1312,6 @@ fetchData(){
                                                 let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == conlist[cl].planningUnit.forecastingUnit.id)[0].convertToEu;
                                                 var selectPlanningObj =  this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId);
                                                 conlist[cl].consumptionQty = (Number(conlist[cl].consumptionQty) * Number(selectPlanningObj[0].multiplier)) * Number(convertToEu);
-                                                console.log("fetchData convertToEu",convertToEu)
                                             }
                                         }
                                         var noOfDays = moment(dt, "YYYY-MM").daysInMonth();
@@ -1348,18 +1347,12 @@ fetchData(){
                                         totalOfActualForRegionOfLastMonths+=consumptionAdjForStockOutId ? Number(adjustedActualConsumption) :Number(actualQty);
                                         totalDiffForRegionOfLastmonths+=consumptionAdjForStockOutId ? Math.abs(Number(adjustedActualConsumption) - Number(forecastQty)):Math.abs(Number(actualQty) - Number(forecastQty));
                                     }                                    
-                                    var errorPerc = totalOfActualForRegionOfLastMonths > 0 ? (totalDiffForRegionOfLastmonths/ totalOfActualForRegionOfLastMonths):"";
+                                    var errorPerc = totalOfActualForRegionOfLastMonths > 0 ? (totalDiffForRegionOfLastmonths/ totalOfActualForRegionOfLastMonths):null;
                                     regionTotalForecastQty =(regionTotalForecastQty==='' && currentForecastQty==='')?'': Number(regionTotalForecastQty) + Number(currentForecastQty);
-                                    console.log("fetchData currentActualQty--->", currentActualQty);
-                                    console.log("fetchData regionTotalActualQty---> Before", regionTotalActualQty);
-                                    console.log("fetchData currentActualQty---> Number(currentActualQty)", Number(currentActualQty));
-                                    console.log("fetchData regionTotalActualQty---> Number(regionTotalActualQty)", Number(regionTotalActualQty));
                                     regionTotalActualQty =(regionTotalActualQty==='' && currentActualQty==='')?'': Number(regionTotalActualQty) + Number(currentActualQty);
-                                    console.log("fetchData regionTotalActualQty---> After", regionTotalActualQty);
-       
-                                    regionTotalAdjustedActualQty =Number(regionTotalAdjustedActualQty) + Number(currentAdjustedActualConsumption);
-                                    totalOfActualForLast6months=Number(totalOfActualForLast6months) + Number(totalOfActualForRegionOfLastMonths);
-                                    totalDiffForLast6months=Number(totalDiffForLast6months) + Number(totalDiffForRegionOfLastmonths);
+                                    regionTotalAdjustedActualQty =(regionTotalAdjustedActualQty==='' && currentAdjustedActualConsumption==='')?'': Number(regionTotalAdjustedActualQty) + Number(currentAdjustedActualConsumption);
+                                    totalOfActualForLast6months=(totalOfActualForLast6months==='' && totalOfActualForRegionOfLastMonths==='')?'':Number(totalOfActualForLast6months) + Number(totalOfActualForRegionOfLastMonths);
+                                    totalDiffForLast6months=(totalDiffForLast6months==='' && totalDiffForRegionOfLastmonths==='')?'':Number(totalDiffForLast6months) + Number(totalDiffForRegionOfLastmonths);
                                    
                                     var region = { id: regionList[k].regionId, lable: regionList[k].label };
                                     regionData.push({
@@ -1378,8 +1371,6 @@ fetchData(){
                                 forecastQty: isNaN(regionTotalForecastQty)? null:regionTotalForecastQty,
                                 errorPerc: totalErrorPerc
                             });
-                            console.log("fetchData dataList--->", dataList);
-                                   
                             }
                         }
                         this.setState({
@@ -1545,12 +1536,12 @@ fetchData(){
                                                     totalOfActualForRegionOfLastMonths = Number(totalOfActualForRegionOfLastMonths) + consumptionAdjForStockOutId ? Number(adjustedActualConsumption) :Number(actualQty);
                                                     totalDiffForRegionOfLastmonths = Number(totalDiffForRegionOfLastmonths) + consumptionAdjForStockOutId ? Math.abs(Number(adjustedActualConsumption) - Number(forecastQty)):Math.abs(Number(actualQty) - Number(forecastQty));                         
                                                 }                
-                                                var errorPerc = totalDiffForRegionOfLastmonths/ totalOfActualForRegionOfLastMonths;
-                                                regionTotalForecastQty = Number(regionTotalForecastQty) + Number(currentForecastQty);
-                                                regionTotalActualQty = Number(regionTotalActualQty) + Number(currentActualQty);
-                                                regionTotalAdjustedActualQty = Number(regionTotalAdjustedActualQty) + Number(currentAdjustedActualConsumption);
-                                                totalDiffForLast6months = Number(totalDiffForLast6months) + Number(totalDiffForRegionOfLastmonths);
-                                                totalOfActualForLast6months = Number(totalOfActualForLast6months) + Number(totalOfActualForRegionOfLastMonths);
+                                                var errorPerc = totalOfActualForRegionOfLastMonths>0?totalDiffForRegionOfLastmonths/ totalOfActualForRegionOfLastMonths:null;
+                                                regionTotalForecastQty =(regionTotalForecastQty==='' && currentForecastQty==='')?'': Number(regionTotalForecastQty) + Number(currentForecastQty);
+                                                regionTotalActualQty = (regionTotalActualQty==='' && currentActualQty==='')?'': Number(regionTotalActualQty) + Number(currentActualQty);
+                                                regionTotalAdjustedActualQty = (regionTotalAdjustedActualQty==='' && currentAdjustedActualConsumption==='')?'': Number(regionTotalAdjustedActualQty) + Number(currentAdjustedActualConsumption);
+                                                totalDiffForLast6months = (totalDiffForLast6months==='' && totalDiffForRegionOfLastmonths==='')?'': Number(totalDiffForLast6months) + Number(totalDiffForRegionOfLastmonths);
+                                                totalOfActualForLast6months = (totalOfActualForLast6months==='' && totalOfActualForRegionOfLastMonths==='')?'': Number(totalOfActualForLast6months) + Number(totalOfActualForRegionOfLastMonths);
                                                 var region = { id: regionList[k].regionId, lable: regionList[k].label };
                                                 regionData.push({
                                                     region: region,
@@ -1559,8 +1550,6 @@ fetchData(){
                                                     daysOfStockOut: currentDayOfStockOut,
                                                     errorPerc: errorPerc
                                                 });
-                                                console.log("fetchData regionData",regionData);
-                                                console.log("fetchData regionTotalForecastQty",regionTotalForecastQty);
                                             }
                                             var totalErrorPerc = totalOfActualForLast6months > 0 ? (totalDiffForLast6months/ totalOfActualForLast6months):null;
                                             dataList.push({
@@ -1570,8 +1559,6 @@ fetchData(){
                                             forecastQty: isNaN(regionTotalForecastQty)? null:regionTotalForecastQty,
                                             errorPerc: totalErrorPerc
                                             })
-                                            console.log("fetchData dataList--->", dataList);
-                           
                                     }
                                 }
                                 this.setState({
@@ -1738,12 +1725,13 @@ fetchData(){
                 this.state.monthArray.map((item1, count) => {
                     let errorData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
                     let errorDataRegionData=(errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));  
-                    totalErrorRegion += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : errorDataRegionData[0].errorPerc*100:0;
-                    totalErrorRegionCount += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : 1:0;
-                    datacsv.push(errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc == null || errorDataRegionData[0].errorPerc === '') ? '' :  this.PercentageFormatter(errorDataRegionData[0].errorPerc*100):"No Actual data")
+                    totalErrorRegion += errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : errorDataRegionData[0].errorPerc*100:0;
+                    totalErrorRegionCount += errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : 1:0;
+                    datacsv.push((errorDataRegionData[0].actualQty==='')? errorDataRegionData[0].forecastQty===''?"No months in this period contain both forecast and actual consumption".replaceAll(' ', '%20'):"No Actual Data".replaceAll(' ', '%20'): errorDataRegionData[0].actualQty >= 0 ?((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? '': this.PercentageFormatter(errorDataRegionData[0].errorPerc)):"No Actual Data".replaceAll(' ', '%20'))
+                    // datacsv.push(errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc == null || errorDataRegionData[0].errorPerc === '') ? '' :  this.PercentageFormatter(errorDataRegionData[0].errorPerc*100):"No Actual data")
                 })
             }
-            datacsv.push(this.PercentageFormatter(totalErrorRegion / totalErrorRegionCount));
+            datacsv.push(totalErrorRegionCount>0?this.PercentageFormatter(totalErrorRegion / totalErrorRegionCount):0);
             A.push(this.addDoubleQuoteToRowContent(datacsv))
 // Region Actual        
             this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{ 
@@ -1760,7 +1748,7 @@ fetchData(){
                     datacsv.push((isNaN(auDataRegionData[0].actualQty) || auDataRegionData[0].actualQty == null || auDataRegionData[0].actualQty === '') ? '' : Number(auDataRegionData[0].actualQty).toFixed(2))
                 })
             }
-            datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
+            datacsv.push(totalRegionCount>0?Number(totalRegion / totalRegionCount).toFixed(2):0);
             A.push(this.addDoubleQuoteToRowContent(datacsv))
         });        
 
@@ -1779,7 +1767,7 @@ fetchData(){
                     datacsv.push((isNaN(fuDataRegionData[0].forecastQty) || fuDataRegionData[0].forecastQty == null || fuDataRegionData[0].forecastQty === '') ? '' : Number(fuDataRegionData[0].forecastQty).toFixed(2))
                 })
             }
-            datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
+            datacsv.push(totalRegionCount>0?Number(totalRegion / totalRegionCount).toFixed(2):0);
             A.push(this.addDoubleQuoteToRowContent(datacsv))
         }); 
 
@@ -1799,7 +1787,7 @@ fetchData(){
                     datacsv.push((isNaN(daysOfStockOutDataRegionData[0].daysOfStockOut)|| daysOfStockOutDataRegionData[0].daysOfStockOut == null || daysOfStockOutDataRegionData[0].daysOfStockOut === '') ? '' : Number(daysOfStockOutDataRegionData[0].daysOfStockOut).toFixed(2))
                 })
             }
-            datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
+            datacsv.push(totalRegionCount>0?Number(totalRegion / totalRegionCount).toFixed(2):0);
             A.push(this.addDoubleQuoteToRowContent(datacsv))
         }); 
         
@@ -1818,7 +1806,7 @@ fetchData(){
                     datacsv.push(Number(((isNaN(differenceRegionData[0].actualQty)|| differenceRegionData[0].actualQty == null || differenceRegionData[0].actualQty === '') ? 0 :differenceRegionData[0].actualQty)-((isNaN(differenceRegionData[0].forecastQty) || differenceRegionData[0].forecastQty == null || differenceRegionData[0].forecastQty === '') ? 0 :differenceRegionData[0].forecastQty)).toFixed(2))
                 })
             }
-            datacsv.push(Number(totalRegion / totalRegionCount).toFixed(2));
+            datacsv.push(totalRegionCount>0?Number(totalRegion / totalRegionCount).toFixed(2):0);
             A.push(this.addDoubleQuoteToRowContent(datacsv))
         });
         });
@@ -1830,9 +1818,10 @@ fetchData(){
             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
             totalError += data[0].actualQty > 0 ? (isNaN(data[0].errorPerc)|| data[0].errorPerc == null || data[0].errorPerc === '') ? 0 : parseFloat(data[0].errorPerc*100):0;
             countError += data[0].actualQty > 0 ? 1 : 0;
-            datacsv.push(data[0].actualQty > 0 ? (isNaN(data[0].errorPerc)|| data[0].errorPerc == null || data[0].errorPerc === '') ? '' : this.PercentageFormatter(data[0].errorPerc*100):"No Actual data")
+            datacsv.push(data[0].actualQty===''? data[0].forecastQty===''?"No months in this period contain both forecast and actual consumption".replaceAll(' ', '%20'):"No Actual Data".replaceAll(' ', '%20'): data[0].actualQty>= 0? (isNaN(data[0].errorPerc) || data[0].errorPerc===''||data[0].errorPerc==null) ? '' : this.PercentageFormatter(data[0].errorPerc*100):"No Actual Data".replaceAll(' ', '%20'))
+            // datacsv.push(data[0].actualQty > 0 ? (isNaN(data[0].errorPerc)|| data[0].errorPerc == null || data[0].errorPerc === '') ? '' : this.PercentageFormatter(data[0].errorPerc*100):"No Actual data")
         })
-        datacsv.push(this.PercentageFormatter(totalError / countError));
+        datacsv.push(countError>0?this.PercentageFormatter(totalError / countError):0);
         A.push(this.addDoubleQuoteToRowContent(datacsv))
 
 //Total Actual        
@@ -1844,7 +1833,7 @@ fetchData(){
             countActual += 1;
             datacsv.push((isNaN(data[0].actualQty)|| data[0].actualQty == null || data[0].actualQty === '') ? '' : Number(data[0].actualQty).toFixed(2))
         })
-        datacsv.push(Number(totalActual / countActual).toFixed(2));
+        datacsv.push(countActual>0?Number(totalActual / countActual).toFixed(2):0);
         A.push(this.addDoubleQuoteToRowContent(datacsv))
 
 //Total Forecast         
@@ -1856,7 +1845,7 @@ fetchData(){
             countForcaste += 1;
             datacsv.push((isNaN(data[0].forecastQty)|| data[0].forecastQty == null || data[0].forecastQty === '') ? 0 : Number(data[0].forecastQty).toFixed(2))
         })
-        datacsv.push(Number(totalForcaste / countForcaste).toFixed(2));
+        datacsv.push(countForcaste>0?Number(totalForcaste / countForcaste).toFixed(2):0);
         A.push(this.addDoubleQuoteToRowContent(datacsv))
 
 //Total Difference        
@@ -1868,7 +1857,7 @@ fetchData(){
             countDifference += 1;
             datacsv.push(Number(((isNaN(data[0].actualQty)|| data[0].actualQty == null || data[0].actualQty === '') ? 0 :  data[0].actualQty) -((isNaN(data[0].forecastQty)||data[0].forecastQty == null || data[0].forecastQty === '') ? 0 : data[0].forecastQty)).toFixed(2))
         })
-        datacsv.push(Number(totalDifference / countDifference).toFixed(2));
+        datacsv.push(countDifference>0?Number(totalDifference / countDifference).toFixed(2):0);
         A.push(this.addDoubleQuoteToRowContent(datacsv))
 
         for (var i = 0; i < A.length; i++) {
@@ -1960,10 +1949,8 @@ fetchData(){
                     })
                     }
                 }
-
             }
         }
-
         const unit = "pt";
         const size = "A4"; // Use A1, A2, A3 or A4
         const orientation = "landscape"; // portrait or landscape
@@ -1981,10 +1968,13 @@ fetchData(){
         var height = doc.internal.pageSize.height;
         var h1 = 100;
         var aspectwidth1 = (width - h1);
-
         // doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
         doc.addImage(canvasImg, 'png', 10, 280, 825, 220, 'CANVAS');
-
+        doc.addPage();
+        doc.text("! = No months in this period contain both forecast and actual consumption", doc.internal.pageSize.width / 8 , 100,{
+            align: 'left',
+            })
+    
         //table start
         const headers = [];
 
@@ -2010,14 +2000,14 @@ fetchData(){
                     this.state.monthArray.map((item1, count) => {
                         let errorData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
                         let errorDataRegionData=(errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));  
-                        totalRegion += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : errorDataRegionData[0].errorPerc*100:0;
-                        totalRegionCount += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : 1:0;
-                        A.push(errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null)? "" :this.PercentageFormatter(errorDataRegionData[0].errorPerc*100):"No Actual Data")
+                        totalRegion += errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : errorDataRegionData[0].errorPerc*100:0;
+                        totalRegionCount += errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : 1:0;
+                        A.push(errorDataRegionData[0].actualQty==='' ? errorDataRegionData[0].forecastQty===''?"!":"No Actual Data": errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null)? "" :this.PercentageFormatter(errorDataRegionData[0].errorPerc*100):"No Actual Data")
                     })
                 }
                 console.log("totalRegion----",totalRegion)
                 console.log("totalRegionCount----",totalRegionCount)
-                A.push((totalRegion / totalRegionCount)==NaN? 0 : this.PercentageFormatter(totalRegion / totalRegionCount))
+                A.push(totalRegionCount>0 ? this.PercentageFormatter(totalRegion / totalRegionCount):0)
         data.push(A);
 // Region Actual
         A = [];
@@ -2035,7 +2025,7 @@ fetchData(){
                         A.push((isNaN(auDataRegionData[0].actualQty) || auDataRegionData[0].actualQty == null || auDataRegionData[0].actualQty === '') ? '' : Number(auDataRegionData[0].actualQty).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
                         })
                 }
-                A.push(((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push(totalRegionCount>0?((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0)
             })
         data.push(A);
         }
@@ -2056,7 +2046,7 @@ fetchData(){
                         A.push((isNaN(fuDataRegionData[0].forecastQty) || fuDataRegionData[0].forecastQty===''|| fuDataRegionData[0].forecastQty==null) ? '' : Number(fuDataRegionData[0].forecastQty).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                     })
                 }
-                A.push(((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push(totalRegionCount>0?((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0)
             })
         }
         data.push(A);
@@ -2079,7 +2069,7 @@ fetchData(){
                             totalRegionCount += 1;
                             })
                         }
-                        A.push(((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                        A.push(totalRegionCount>0?((totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0)
                     })
                 }
                 data.push(A);
@@ -2101,7 +2091,7 @@ fetchData(){
                         A.push(Number(((isNaN(differenceRegionData[0].actualQty)|| differenceRegionData[0].actualQty == null || differenceRegionData[0].actualQty === '') ? 0 :differenceRegionData[0].actualQty)-((isNaN(differenceRegionData[0].forecastQty) || differenceRegionData[0].forecastQty == null || differenceRegionData[0].forecastQty === '') ? 0 :differenceRegionData[0].forecastQty)).toFixed(2))
                     })
                 }
-                A.push((Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                A.push(totalRegionCount>0?(Number(totalRegion / totalRegionCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0)
             })
             data.push(A);
         }
@@ -2117,11 +2107,11 @@ fetchData(){
             var countError = 0;
             this.state.monthArray.map((item1, count) => {
                 var datavalue = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                totalError += datavalue[0].actualQty > 0 ? (isNaN(datavalue[0].errorPerc) || datavalue[0].errorPerc == null || datavalue[0].errorPerc === '') ? 0 : datavalue[0].errorPerc*100 : 0;
-                countError += datavalue[0].actualQty > 0 ? 1 : 0;
-                A.push(datavalue[0].actualQty > 0 ? (isNaN(datavalue[0].errorPerc) || datavalue[0].errorPerc == null || datavalue[0].errorPerc === '') ? '' : this.PercentageFormatter(datavalue[0].errorPerc*100):"No Actual Data")
+                totalError += datavalue[0].actualQty >= 0 ? (isNaN(datavalue[0].errorPerc) || datavalue[0].errorPerc == null || datavalue[0].errorPerc === '') ? 0 : datavalue[0].errorPerc*100 : 0;
+                countError += datavalue[0].actualQty >= 0 ? 1 : 0;
+                A.push(datavalue[0].actualQty===''?datavalue[0].forecastQty===''?"!":"No Actual Data":datavalue[0].actualQty> 0 ? (isNaN(datavalue[0].errorPerc) || datavalue[0].errorPerc == null || datavalue[0].errorPerc === '') ? '' : this.PercentageFormatter(datavalue[0].errorPerc*100):"No Actual Data")
             })
-            A.push(this.PercentageFormatter(totalError / countError))
+            A.push(countError>0?this.PercentageFormatter(totalError / countError):0)
         }
         data.push(A);
 
@@ -2137,7 +2127,7 @@ fetchData(){
                 countActal += 1;
                 A.push((isNaN(datavalue[0].actualQty) || datavalue[0].actualQty == null || datavalue[0].actualQty === '') ? '' : Number(datavalue[0].actualQty).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
-            A.push(((totalActal / countActal).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+            A.push(countActal>0?(totalActal / countActal).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0)
         }
         data.push(A);
 
@@ -2153,7 +2143,7 @@ fetchData(){
                 countForecast += 1;
                 A.push((isNaN(datavalue[0].forecastQty) || datavalue[0].forecastQty == null || datavalue[0].forecastQty === '') ? '' : Number(datavalue[0].forecastQty).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
-            A.push(((totalForecast / countForecast).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+            A.push(countForecast>0?((totalForecast / countForecast).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0)
         }
         data.push(A);
 
@@ -2170,13 +2160,13 @@ fetchData(){
                 A.push((((isNaN(datavalue[0].actualQty) || datavalue[0].actualQty == null || datavalue[0].actualQty === '') ? 0 : datavalue[0].actualQty) - 
                        ((isNaN(datavalue[0].forecastQty) || datavalue[0].forecastQty == null || datavalue[0].forecastQty === '') ? 0 : datavalue[0].forecastQty)).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
             })
-            A.push(((totalDiff / countDiff).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+            A.push(countDiff>0?((totalDiff / countDiff).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0)
         }
         data.push(A);
         let flag =false;
         let content = {
             margin: { top: 80, bottom: 50 },
-            startY: height,
+            startY: 120,
             head: header,
             body: data,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
@@ -2823,9 +2813,9 @@ fetchData(){
                                                                     {this.state.monthArray.map((item1, count) => {
                                                                     let errorData = this.state.dataList.filter(c => (moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM")));
                                                                     let errorDataRegionData=(errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));  
-                                                                        regionErrorTotal += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : errorDataRegionData[0].errorPerc:0;
-                                                                        regionErrorTotalCount += errorDataRegionData[0].actualQty > 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : 1:0;
-                                                                        return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{errorDataRegionData[0].actualQty > 0 ?(isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? '': this.PercentageFormatter(errorDataRegionData[0].errorPerc):"No Actual Data"}</b></td>)              
+                                                                        regionErrorTotal += errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : errorDataRegionData[0].errorPerc:0;
+                                                                        regionErrorTotalCount += errorDataRegionData[0].actualQty >= 0 ? (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? 0 : 1:0;
+                                                                        return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{(errorDataRegionData[0].actualQty==='')? errorDataRegionData[0].forecastQty===''?"No months in this period contain both forecast and actual consumption":"No Actual Data": errorDataRegionData[0].actualQty >= 0 ?((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc===''||errorDataRegionData[0].errorPerc==null) ? '': this.PercentageFormatter(errorDataRegionData[0].errorPerc)):"No Actual Data"}</b></td>)              
                                                                     })}
                                                                     <td className="sticky-col first-col clone hoverTd" align="left"><b>{regionErrorTotalCount>0 ? this.PercentageFormatter(regionErrorTotal / regionErrorTotalCount):0}</b></td>
                                                                     </tr>
@@ -2843,7 +2833,7 @@ fetchData(){
                                                                     regionActualTotalCount += 1;
                                                                     return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(isNaN(auDataRegionData[0].actualQty) || auDataRegionData[0].actualQty==='' || auDataRegionData[0].actualQty==null) ?'': (Number(auDataRegionData[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)    
                                                                     })}          
-                                                                <td className="sticky-col first-col clone text-left">{(Number(regionActualTotal / regionActualTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                <td className="sticky-col first-col clone text-left">{regionActualTotalCount>0?(Number(regionActualTotal / regionActualTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0}</td>
                                                             </tr>)})}
                                                             {/* Forecast */}    
                                                             {this.state.regions.filter(arr => arr.regionId == r.value).map(r1=>{
@@ -2860,7 +2850,7 @@ fetchData(){
                                                                         console.log("fetchData fuDataRegionData[0].forecastQty ",fuDataRegionData[0].forecastQty)
                                                                         return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(isNaN(fuDataRegionData[0].forecastQty) || fuDataRegionData[0].forecastQty===''|| fuDataRegionData[0].forecastQty==null) ? '' : (Number(fuDataRegionData[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)    
                                                                     })}
-                                                                    <td className="sticky-col first-col clone text-left">{(Number(regionForecastTotal / regionForecastTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td className="sticky-col first-col clone text-left">{regionForecastTotalCount>0?(Number(regionForecastTotal / regionForecastTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0}</td>
                                                                 </tr>
                                                                 )
                                                             })}
@@ -2879,7 +2869,7 @@ fetchData(){
                                                                         return (<td><NumberFormat displayType={'text'} thousandSeparator={true} />{(isNaN(daysOfStockOutDataRegionData[0].daysOfStockOut)||daysOfStockOutDataRegionData[0].daysOfStockOut===''||daysOfStockOutDataRegionData[0].daysOfStockOut==null) ? '' : (Number(daysOfStockOutDataRegionData[0].daysOfStockOut).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                     })}
                                                                     
-                                                                    <td className="sticky-col first-col clone text-left">{(Number(regionDaysOfStockOutTotal / regionDaysOfStockOutTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td className="sticky-col first-col clone text-left">{regionDaysOfStockOutTotalCount>0?(Number(regionDaysOfStockOutTotal / regionDaysOfStockOutTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0}</td>
                                                                 </tr>)
                                                             })}
                                                         {/* Difference */}        
@@ -2896,7 +2886,7 @@ fetchData(){
                                                                         regionDifferenceTotalCount += 1;
                                                                         return (<td style={{ color: ((isNaN(differenceRegionData[0].actualQty) ? 0 : differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)) < 0 ? 'red' : 'black' }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(Number((isNaN(differenceRegionData[0].actualQty) ? 0 : differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)                                                     
                                                                     })}
-                                                                    <td className="sticky-col first-col clone text-left" style={{ color: (regionDifferenceTotal / regionDifferenceTotalCount) < 0 ? 'red' : 'black' }}>{(Number(regionDifferenceTotal / regionDifferenceTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                    <td className="sticky-col first-col clone text-left" style={{ color: (regionDifferenceTotal / regionDifferenceTotalCount) < 0 ? 'red' : 'black' }}>{regionDifferenceTotalCount>0?(Number(regionDifferenceTotal / regionDifferenceTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0}</td>
                                                                 </tr>)
                                                             })}
                                                     </>)
@@ -2909,9 +2899,9 @@ fetchData(){
                                                             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                             totalError += data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc===''||data[0].errorPerc==null) ? 0 : data[0].errorPerc*100:0;
                                                             countError += data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc===''||data[0].errorPerc==null) ? 0 : 1:0;                                         
-                                                            return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].actualQty > 0? (isNaN(data[0].errorPerc) || data[0].errorPerc===''||data[0].errorPerc==null) ? '' : this.PercentageFormatter(data[0].errorPerc*100):"No Actual Data"}</b></td>)
+                                                            return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} />{data[0].actualQty===''? data[0].forecastQty===''?"No months in this period contain both forecast and actual consumption":"No Actual Data": data[0].actualQty>= 0? (isNaN(data[0].errorPerc) || data[0].errorPerc===''||data[0].errorPerc==null) ? '' : this.PercentageFormatter(data[0].errorPerc*100):"No Actual Data"}</b></td>)
                                                         })}
-                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>{this.PercentageFormatter(totalError / countError)}</b></td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>{countError>0?this.PercentageFormatter(totalError / countError):0}</b></td>
                                                 </tr>
                                                 {/* Actual */}
                                                 <tr className="hoverTd">
@@ -2921,15 +2911,9 @@ fetchData(){
                                                             var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                             totalActual += (isNaN(data[0].actualQty) || data[0].actualQty==='' || data[0].actualQty==null) ? 0 : Number(data[0].actualQty);
                                                             countActual += 1;
-                                                            console.log("test  || data[0].actualQty",data[0].actualQty)
-                                                            console.log("test (isNaN(data[0].actualQty)",isNaN(data[0].actualQty))
-                                                            console.log("test  || Number(data[0].actualQty)==",Number(data[0].actualQty)==="")
-                                                            console.log("test  || data[0].actualQty==null",data[0].actualQty==null)
-                                                            console.log("test  || data[0].actualQty >= 0",data[0].actualQty >= 0)
-                                                            
                                                             return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} /> {(isNaN(data[0].actualQty) || data[0].actualQty==='' || data[0].actualQty==null) ? '' :(Number(data[0].actualQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
                                                         })}
-                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalActual / countActual).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>{countActual>0?(Number(totalActual / countActual).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0}</b></td>
                                                 </tr>
                                                 {/* Forecast */}    
                                                 <tr className="hoverTd">
@@ -2941,7 +2925,7 @@ fetchData(){
                                                             countForcaste += 1;
                                                             return (<td><b><NumberFormat displayType={'text'} thousandSeparator={true} /> {(isNaN(data[0].forecastQty) || data[0].forecastQty===''|| data[0].forecastQty==null) ? '' : (Number(data[0].forecastQty).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>)
                                                         })}
-                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>{(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                        <td className="sticky-col first-col clone hoverTd" align="left"><b>{countForcaste>0?(Number(totalForcaste / countForcaste).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):0}</b></td>
                                                 </tr>     
                                                 {/* Difference */}        
                                                 <tr className="hoverTd">
