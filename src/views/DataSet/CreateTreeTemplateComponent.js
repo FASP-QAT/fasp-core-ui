@@ -2069,6 +2069,10 @@ export default class CreateTreeTemplate extends Component {
                     }
                 }
                 tree.flatList = items;
+                tree.lastModifiedBy.userId=AuthenticationService.getLoggedInUserId();
+                tree.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                tree.createdBy.userId=AuthenticationService.getLoggedInUserId();
+                tree.createdDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                 console.log("TempTreeId Test@123",this.state.tempTreeId)
                 var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);
                 console.log("Tree Test@123",tree)
