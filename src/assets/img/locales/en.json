@@ -3176,5 +3176,12 @@
     "static.budget.budgetNoteForCommitingLocalVersion":"This report uses the latest versions of supply plans. Please commit local supply plans to see shipments tagged to budgets reflected here.",
     "static.report.stockoutConsumptionAdjustment":"Stockout Consumption Adjustment",
     "static.report.stockoutConsumptionAdjustmentFormula":"Actual consumption/ (total days in month - stocked out days) * total days in month",
-    "static.modelingValidation.fiscalYear": "Fiscal Year"
+    "static.modelingValidation.fiscalYear": "Fiscal Year",
+    "static.report.forecastErrorMonthlyFormulaNew1":"Forecast Error is calculated using the Weighted Absolute Percentage Error (WAPE). WAPE is used over MAPE (Mean Absolute Percentage Error) as it can account for when consumption is intermittent or low.",
+    "static.report.forecastErrorMonthlyFormulaNew2":"The above formula is the example for the 6 month window.",
+    "static.report.forecastErrorMonthlyFormulaNew3":"If “Show consumption adjusted for stock out?” is checked, then the error is calculated using the Adjusted Actual (Consumption) instead of Actual (Consumption).",
+    "static.report.forecastErrorMonthlyFormulaNew3a":"Adjusted Actual = Actual consumption/ (total days in month - stocked out days) * total days in month",
+    "static.report.forecastErrorMonthlyFormulaNew3b":"QAT automatically calculates the total days in the month based on the calendar",
+    "static.report.forecastErrorMonthlyFormulaNew4":"If there are multiple regions, QAT adds up all actual consumption (or adjusted actual consumption) from all regions, and all the forecasted consumption from all regions for a given month before using the above formula.",
+    "static.report.forecastErrorMonthlyFormulaNew5":"If Y-axis is in Equivalency Unit, then QAT adds up all actual consumption (or adjusted actual consumption) from all selected forecasting or planning units, and all the forecasted consumption from all selected forecasting or planning units for a given month before using the above formula."
 }
