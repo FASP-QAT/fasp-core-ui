@@ -55,7 +55,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             regionLabels: [],
             viewById: 1,
             planningUnitId: "",
+            planningUnitIds: [],
             forecastingUnitId: "",
+            forecastingUnitIds: [],
             equivalencyUnitId: "",
             consumptionData: [],
             equivalencyUnitList: [],
@@ -110,7 +112,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             versionId: '',
             versions: [],
             planningUnits: [],
+            planningUnitIds: [],
             forecastingUnits: [],
+            forecastingUnitIds: [],
             matricsList: [],
             regions: [],
             regionValues: [],
@@ -493,10 +497,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
     setPlanningUnit(e) {
         console.log("In setPlanningUnit")
-        var planningUnitId = document.getElementById("planningUnitId");
-        var selectedText = planningUnitId.options[planningUnitId.selectedIndex].text;
+        var selectedText = e.map(item => item.label);
         this.setState({
-            planningUnitId: e.target.value,
+            planningUnitIds: e,
             planningUnitLabel: selectedText,
             show: false,
             dataList: [],
@@ -904,10 +907,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
     setForecastingUnit(e) {
         // var forecastingUnitId = e.target.value;
-        var forecastingUnitId = document.getElementById("forecastingUnitId");
-        var selectedText = forecastingUnitId.options[forecastingUnitId.selectedIndex].text;
+        var selectedText = e.map(item => item.label);
         this.setState({
-            forecastingUnitId: e.target.value,
+            forecastingUnitIds: e,
             forecastingUnitLabel: selectedText,
             dataList: [],
             consumptionAdjForStockOutId:false
@@ -1167,9 +1169,11 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.setState({
             yaxisEquUnit: yaxisEquUnit,
             planningUnits: [],
+            planningUnitIds: [],
             planningUnitValues: [],
             planningUnitLabels: [],
             foreastingUnits: [],
+            forecastingUnitIds: [],
             foreastingUnitValues: [],
             foreastingUnitLabels: [],
             dataList: [],
@@ -1201,15 +1205,17 @@ fetchData(){
     var dataList = [];
     let equivalencyUnitId = -1;
     let planningUnitId = -1;
+    let planningUnitIds = []
     let forecastingUnitId = -1;
+    let forecastingUnitIds = [];
     var FilterEquivalencyUnit="";
     equivalencyUnitId = document.getElementById("yaxisEquUnit").value;
     if(equivalencyUnitId>0){
         FilterEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnitId == equivalencyUnitId);
     }
-    planningUnitId = document.getElementById("planningUnitId").value
-    forecastingUnitId = document.getElementById("forecastingUnitId").value;
-    if (programId > 0 && (planningUnitId > 0 || forecastingUnitId > 0) && versionId != 0) {
+    planningUnitIds = this.state.planningUnitIds.map(item => item.value);
+    forecastingUnitIds = this.state.forecastingUnitIds.map(item => item.value);
+    if (programId > 0 && (planningUnitIds.length > 0 || forecastingUnitIds.length > 0) && versionId != 0) {
         if (versionId.includes('Local')) {
             this.setState({ loading: true })
             var db1;
@@ -1587,7 +1593,7 @@ fetchData(){
             var inputjson = {
                 programId: programId,
                 versionId: versionId, // Can be -1 for the latest Program
-                unitId: viewById == 1 ? planningUnitId : forecastingUnitId, // PU or FU based on viewBy
+                unitIds: viewById == 1 ? planningUnitIds : forecastingUnitIds, // PU or FU based on viewBy
                 startDate: startDate,
                 stopDate: stopDate,
                 viewBy:  viewById, // 1 for PU and 2 for FU
@@ -2479,6 +2485,14 @@ fetchData(){
             };
         }
 
+        let puList = planningUnits.length > 0 && planningUnits.map((item, i) => {
+            return ({ label: getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id, value: item.planningUnit.id })
+        }, this);
+
+        let fuList = forecastingUnits.length > 0 && forecastingUnits.map((item, i) => {
+            return ({ label: getLabelText(item.label, this.state.lang) + " | " + item.id, value: item.id })
+        }, this);
+
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -2663,7 +2677,7 @@ fetchData(){
                                                 </FormGroup>
                                                 <FormGroup id="forecastingUnitDiv" style={{ display: "none" }}>
                                                 <div className="controls">
-                                                    <InputGroup>
+                                                    {/* <InputGroup>
                                                         <Input
                                                             type="select"
                                                             name="forecastingUnitId"
@@ -2683,12 +2697,20 @@ fetchData(){
                                                                     )
                                                                 }, this)}
                                                         </Input>
-                                                    </InputGroup>
+                                                    </InputGroup> */}
+                                                    <MultiSelect
+                                                        bsSize="sm"
+                                                        name="forecastingUnitId"
+                                                        id="forecastingUnitId"
+                                                        value={this.state.forecastingUnitIds}
+                                                        onChange={(e) => { this.setForecastingUnit(e); }}
+                                                        options={fuList && fuList.length > 0 ? fuList : []}
+                                                    />
                                                 </div>
                                             </FormGroup>
                                             <FormGroup id="planningUnitDiv">
                                                 <div className="controls">
-                                                    <InputGroup>
+                                                    {/* <InputGroup>
                                                         <Input
                                                             type="select"
                                                             name="planningUnitId"
@@ -2709,7 +2731,15 @@ fetchData(){
                                                                     )
                                                                 }, this)}
                                                         </Input>
-                                                    </InputGroup>
+                                                    </InputGroup> */}
+                                                    <MultiSelect
+                                                        bsSize="sm"
+                                                        name="planningUnitId"
+                                                        id="planningUnitId"
+                                                        value={this.state.planningUnitIds}
+                                                        onChange={(e) => { this.setPlanningUnit(e); }}
+                                                        options={puList && puList.length > 0 ? puList : []}
+                                                    />
                                                 </div>
                                             </FormGroup>
                                             </FormGroup>
