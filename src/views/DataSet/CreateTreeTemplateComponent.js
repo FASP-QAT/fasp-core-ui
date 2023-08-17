@@ -865,7 +865,8 @@ export default class CreateTreeTemplate extends Component {
             datasetListJexcelForCreateTree: {},
             treeTemplateForCreateTree: {},
             toggleArray: [],
-            collapseState: false
+            collapseState: false,
+            isCalculateClicked: false
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -1507,7 +1508,13 @@ export default class CreateTreeTemplate extends Component {
                 }
 
             }
-
+            if (monthList.length > 0) {
+                var minDate = monthList[0];
+                var maxDate = JSON.parse(JSON.stringify(monthList)).sort((a, b) => b.id - a.id)[0].id;
+                this.setState({
+                    minDate, maxDate
+                })
+            }
             this.setState({
                 monthListForModelingCalculator: monthList, monthList, monthId
             }, () => {
@@ -2696,62 +2703,66 @@ export default class CreateTreeTemplate extends Component {
         });
     }
     acceptValue() {
-        var cf = window.confirm(i18n.t("static.modelingCalculator.confirmAlert"));
-        if (cf == true) {
-            let { currentItemConfig } = this.state;
-            var json = this.state.modelingCalculatorEl.getJson(null, false);
-            var map1 = new Map(Object.entries(json[0]));
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = map1.get("9").toString().replaceAll(",", "");
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = map1.get("9").toString().replaceAll(",", "");
-            var count = this.state.modelingEl.getData().length;
-            for (var i = 0; i < count; i++) {
-                this.state.modelingEl.deleteRow(i);
-            }
-            var dataArr = []
-            const reversedList = [...json].reverse();
-            for (var i = 1; i < reversedList.length - 1; i++) {
-                var map = new Map(Object.entries(reversedList[i]));
-                var data = []
-                data[0] = "Monthly change for " + map.get("7") + " - " + map.get("8") + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
-                data[1] = map.get("7");
-                data[2] = map.get("8");
-                data[3] = '';
-                data[4] = this.state.currentModelingType;
-                data[5] = 1;
-                data[6] = this.state.currentModelingType != 2 ? parseFloat(map.get("3")).toFixed(4) : "";
-                data[7] = this.state.currentModelingType == 2 ? parseFloat(map.get("3")).toFixed(4) : "";
-                data[8] = cleanUp
-                data[9] = '';
-                data[10] = ''
-                data[11] = ''
-                data[12] = 0
-                data[13] = {
-                    firstMonthOfTarget: this.state.firstMonthOfTarget,
-                    yearsOfTarget: this.state.yearsOfTarget,
-                    actualOrTargetValueList: this.state.actualOrTargetValueList
+        if (this.state.isCalculateClicked) {
+            var cf = window.confirm(i18n.t("static.modelingCalculator.confirmAlert"));
+            if (cf == true) {
+                let { currentItemConfig } = this.state;
+                var json = this.state.modelingCalculatorEl.getJson(null, false);
+                var map1 = new Map(Object.entries(json[0]));
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = map1.get("9").toString().replaceAll(",", "");
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = map1.get("9").toString().replaceAll(",", "");
+                var count = this.state.modelingEl.getData().length;
+                for (var i = 0; i < count; i++) {
+                    this.state.modelingEl.deleteRow(i);
                 }
-                this.state.modelingEl.insertRow(
-                    data, 0, 1
+                var dataArr = []
+                const reversedList = [...json].reverse();
+                for (var i = 1; i < reversedList.length - 1; i++) {
+                    var map = new Map(Object.entries(reversedList[i]));
+                    var data = []
+                    data[0] = "Monthly change for " + map.get("7") + " to " + map.get("8") + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
+                    data[1] = map.get("7");
+                    data[2] = map.get("8");
+                    data[3] = '';
+                    data[4] = this.state.currentModelingType;
+                    data[5] = 1;
+                    data[6] = this.state.currentModelingType != 2 ? parseFloat(map.get("3")).toFixed(4) : "";
+                    data[7] = this.state.currentModelingType == 2 ? parseFloat(map.get("3")).toFixed(4) : "";
+                    data[8] = cleanUp
+                    data[9] = '';
+                    data[10] = ''
+                    data[11] = ''
+                    data[12] = 0
+                    data[13] = {
+                        firstMonthOfTarget: this.state.firstMonthOfTarget,
+                        yearsOfTarget: this.state.yearsOfTarget,
+                        actualOrTargetValueList: this.state.actualOrTargetValueList
+                    }
+                    this.state.modelingEl.insertRow(
+                        data, 0, 1
+                    );
+                }
+                console.log("data[13]==>", this.state.currentCalculatorStartDate, "===", this.state.yearsOfTarget, "===", this.state.actualOrTargetValueList)
+                this.setState({
+                    currentItemConfig,
+                    currentScenario: (currentItemConfig.context.payload.nodeDataMap[0])[0],
+                    isChanged: true,
+                    showCalculatorFields: false,
+                }, () => {
+                    // to save data in tab 1
+                    document.getElementById("nodeValue").value = map1.get("9");
+                    this.calculateParentValueFromMOM(map1.get("8"))
+                }
                 );
+            } else {
+                this.setState({
+                    firstMonthOfTarget: "",
+                    yearsOfTarget: "",
+                    actualOrTargetValueList: []
+                })
             }
-            console.log("data[13]==>", this.state.currentCalculatorStartDate, "===", this.state.yearsOfTarget, "===", this.state.actualOrTargetValueList)
-            this.setState({
-                currentItemConfig,
-                currentScenario: (currentItemConfig.context.payload.nodeDataMap[0])[0],
-                isChanged: true,
-                showCalculatorFields: false,
-            }, () => {
-                // to save data in tab 1
-                document.getElementById("nodeValue").value = map1.get("9");
-                this.calculateParentValueFromMOM(map1.get("8"))
-            }
-            );
         } else {
-            this.setState({
-                firstMonthOfTarget: "",
-                yearsOfTarget: "",
-                actualOrTargetValueList: []
-            })
+            window.confirm("Please click on calculate button to calculate the modeling calculations");
         }
 
     }
@@ -8290,7 +8301,7 @@ export default class CreateTreeTemplate extends Component {
                     // }))
                     if (this.state.toggleArray.includes(itemConfig.id)) {
 
-                        var parentId = itemConfig.payload.parentNodeId!=undefined?itemConfig.payload.parentNodeId:itemConfig.parent;
+                        var parentId = itemConfig.payload.parentNodeId != undefined ? itemConfig.payload.parentNodeId : itemConfig.parent;
                         var parentNode = items.filter(e => e.id == parentId);
                         var tempToggleArray = this.state.toggleArray.filter((e) => e != itemConfig.id)
                         if (parentNode[0].templateName ? parentNode[0].templateName == "contactTemplateMin" ? false : true : true) {
@@ -8565,15 +8576,15 @@ export default class CreateTreeTemplate extends Component {
                 },//G6,
                 {
                     title: "Updated Start Date",
-                    type: 'text'
+                    type: 'hidden'
                 },//H7
                 {
                     title: "Updated Stop Date",
-                    type: 'text'
+                    type: 'hidden'
                 },//I8
                 {
                     title: "Calculated numbers (for Altius to check against when coding)",
-                    type: 'text'
+                    type: 'hidden'
                 }//J9
 
             ],
@@ -8677,6 +8688,9 @@ export default class CreateTreeTemplate extends Component {
     }
 
     changed3() {
+        this.setState({
+            isCalculateClicked: true
+        });
         var elInstance = this.state.modelingCalculatorEl;
         var dataArr = elInstance.records;
         var dataArray = [];
@@ -8731,9 +8745,8 @@ export default class CreateTreeTemplate extends Component {
             dataArray[j] = rowData[1].v;
         }
         const arraySum = dataArrayTotal
-        console.log("arraySum===",arraySum)
 
-        for (var i = 6; i <= arraySum.length - 1; i = (i + 12)) {
+        for (var i = 6; i < arraySum.length - 12; i = (i + 12)) {
             var abc = 0;
             for (var j = i; j <= (i + 11); j++) {
                 if (arraySum[j] != undefined) {
