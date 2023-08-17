@@ -652,7 +652,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     }
                                     if (countOfI >= lag) {
                                         var percentageOfEndValue = (lag == 0 ? endValue : nodeDataList[countOfI - lag].endValue);
-                                        calculatedMmdValue = Math.round((noOfFus * percentageOfEndValue / 100) / fuPerPu);
+                                        calculatedMmdValue = Number((noOfFus * percentageOfEndValue / 100) / fuPerPu);
                                     } else {
                                         calculatedMmdValue = 0;
                                     }
