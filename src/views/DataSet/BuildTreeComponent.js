@@ -2081,6 +2081,14 @@ export default class BuildTree extends Component {
                 curTreeObj.tree.flatList = items;
                 console.log("inside if cu tree obj---", curTreeObj);
             }
+            curTreeObj.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+            if(curTreeObj.lastModifiedBy!=undefined){
+                curTreeObj.lastModifiedBy.userId=AuthenticationService.getLoggedInUserId();
+            }else{
+                curTreeObj.lastModifiedBy={
+                    "userId":AuthenticationService.getLoggedInUserId()
+                }
+            }
             console.log("inside if cur tree obj out---", curTreeObj);
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
             console.log("cur tree findTreeIndex---", findTreeIndex);

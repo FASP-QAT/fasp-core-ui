@@ -2002,6 +2002,10 @@ export default class ListTreeTemplate extends Component {
                         }
                     }
                     tree.flatList = items;
+                    tree.lastModifiedBy.userId=AuthenticationService.getLoggedInUserId();
+                    tree.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                    tree.createdBy.userId=AuthenticationService.getLoggedInUserId();
+                    tree.createdDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);
                     // console.log("findTreeIndex---", findTreeIndex);
                     treeList[findTreeIndex] = tree;
