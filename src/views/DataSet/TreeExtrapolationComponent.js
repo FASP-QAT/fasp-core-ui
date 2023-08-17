@@ -554,7 +554,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     var map1 = new Map(Object.entries(tableJson[i]));
                     var json = {
                         month: map1.get("0"),
-                        amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
+                        amount: map1.get("1") != "" || map1.get("1") == 0 ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
                         reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                         manualChange: map1.get("10").toString().replaceAll(",", ""),
                         adjustedActuals: (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)) != "" ? (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", "")

@@ -2415,6 +2415,8 @@ class ForecastSummary extends Component {
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        programData.code=programData.programCode;
+                        programData.id=programData.programId;
                         // console.log(programNameLabel)
 
                         var f = 0
@@ -3515,9 +3517,9 @@ class ForecastSummary extends Component {
                                             </div> */}
                                             <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
-                                                    <div className='table-responsive'>
-                                                        <div className='table-scroll1'>
-                                                            <Table className="table-bordered table-bordered1 text-center mt-2">
+                                                    <div className='table-scroll mt-2 tablesticky'>
+                                                        <div className='table-wrap table-responsive fixTableHeadSupplyPlan'>
+                                                            <Table className="table-bordered table-bordered1 text-center">
                                                                 {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
                                                                 <thead>

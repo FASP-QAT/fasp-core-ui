@@ -353,7 +353,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         var height = doc.internal.pageSize.height;
         var h1 = 50;
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], this.formatter(ele[3]), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? this.roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : this.formatterDouble(ele[5]), isNaN(ele[6]) || ele[6] == undefined ? '' : this.formatterDouble(ele[6]), isNaN(ele[7]) || ele[7] == null ? '' : this.formatter(ele[7]), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
+        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], this.formatter(ele[3]), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? this.roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : this.formatterDouble(ele[5]), isNaN(ele[6]) || ele[6] == undefined ? '' : this.formatterDouble(ele[6]), isNaN(ele[7]) || ele[7] == null ? '' : this.formatterAMC(ele[7]), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
 
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -801,6 +801,40 @@ class StockStatusAcrossPlanningUnits extends Component {
         })
     }
 
+    roundAMC(amc){
+        if(amc!=null){
+        if(Number(amc).toFixed(0)>=100){
+            return Number(amc).toFixed(0);
+        }else if(Number(amc).toFixed(1)>=10){
+            return Number(amc).toFixed(1);
+        }else if(Number(amc).toFixed(2)>=1){
+            return Number(amc).toFixed(2);
+        }else{
+            return Number(amc).toFixed(3);
+        }
+      }else{
+        return null;
+      }
+    }
+
+    formatterAMC(value){
+        if (value != null) {
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+          }
+          else {
+            return ''
+          }
+    }
+
     buildJExcel() {
         let dataStockStatus = this.state.data;
         // // console.log("dataStockStatus---->", dataStockStatus);
@@ -849,7 +883,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             data[4] = dataStockStatus[j].planBasedOn == 1 ? dataStockStatus[j].mos != null ? this.roundN(dataStockStatus[j].mos) : i18n.t("static.supplyPlanFormula.na") : "-";
             data[5] = (dataStockStatus[j].minMos);
             data[6] = (dataStockStatus[j].maxMos);
-            data[7] = this.round(dataStockStatus[j].amc);
+            data[7] = this.roundAMC(dataStockStatus[j].amc);
             data[8] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('YYYY-MM-DD') : null);
             data[9] = dataStockStatus[j].planningUnit.id
 
@@ -905,7 +939,7 @@ class StockStatusAcrossPlanningUnits extends Component {
 
                 {
                     title: i18n.t('static.report.amc'),
-                    type: 'numeric', mask: '#,##',
+                    type: 'numeric', mask: '#,##.000', decimal: '.',
                 },
                 {
                     title: i18n.t('static.supplyPlan.lastinventorydt'),

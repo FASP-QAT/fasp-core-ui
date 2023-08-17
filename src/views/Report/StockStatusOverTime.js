@@ -168,6 +168,23 @@ class StockStatusOverTime extends Component {
         this.fetchData = this.fetchData.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
+        this.roundAMC=this.roundAMC.bind(this);
+    }
+
+    roundAMC(amc){
+        if(amc!=null){
+        if(Number(amc).toFixed(0)>=100){
+            return Number(amc).toFixed(0);
+        }else if(Number(amc).toFixed(1)>=10){
+            return Number(amc).toFixed(1);
+        }else if(Number(amc).toFixed(2)>=1){
+            return Number(amc).toFixed(2);
+        }else{
+            return Number(amc).toFixed(3);
+        }
+      }else{
+        return null;
+      }
     }
 
     makeText = m => {
@@ -1333,7 +1350,7 @@ class StockStatusOverTime extends Component {
         var A = [this.addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), ((i18n.t('static.report.noofmonth')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.mos')])]
 
 
-        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.amc != null ? this.formatAmc(elt.amc) : "", elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
+        this.state.matricsList.map(elt => A.push(this.addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.amc != null ? this.roundAMC(elt.amc) : "", elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
 
 
         for (var i = 0; i < A.length; i++) {
@@ -1464,7 +1481,7 @@ class StockStatusOverTime extends Component {
         const headers = [[i18n.t('static.common.month'), i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.amc'), i18n.t('static.report.noofmonth'), i18n.t('static.report.mos')]];
 
         const data = [];
-        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.formatAmc(elt.amc)), elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
+        this.state.matricsList.map(elt => data.push([this.dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), this.formatter(elt.stock), this.formatter(elt.consumptionQty), this.formatter(this.roundAMC(elt.amc)), elt.amcMonthCount, elt.mos != null ? this.roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1871,7 +1888,7 @@ class StockStatusOverTime extends Component {
                                                                 {this.formatter(item.consumptionQty)}
                                                             </td>
                                                             <td>
-                                                                {this.formatter(this.formatAmc(item.amc))}
+                                                                {this.formatter(this.roundAMC(item.amc))}
                                                             </td>
                                                             <td>
                                                                 {this.formatter(item.amcMonthCount)}
