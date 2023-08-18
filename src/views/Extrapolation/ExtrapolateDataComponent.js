@@ -1783,7 +1783,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 console.log("ActualConsumptionList@@@@@@@@@@@@@", actualConsumptionList)
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
-                    extrapolationNotes:extrapolationNotes,
+                    extrapolationNotes:(extrapolationNotes=="" || extrapolationNotes==undefined || extrapolationNotes==null)?"":extrapolationNotes,
                     startDate: startDate1,
                     stopDate: endDate1,
                     rangeValue1: rangeValue2,
@@ -1837,7 +1837,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         minDate: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) },
                         maxDate: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) },
                         showDate: true,
-                        actualConsumptionList: actualConsumptionList
+                        actualConsumptionList: actualConsumptionList,
+                        extrapolationNotes:""
                     }, () => {
                         this.getDateDifference()
                     })
@@ -1853,7 +1854,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         dataEl: "",
                         loading: false,
                         noDataMessage: i18n.t('static.extrapolate.noDataFound'),
-                        actualConsumptionList: actualConsumptionList
+                        actualConsumptionList: actualConsumptionList,
+                        extrapolationNotes:""
                     }, () => {
                         this.getDateDifference()
                     })
@@ -3839,7 +3841,7 @@ export default class ExtrapolateDataComponent extends React.Component {
 
 
 
-                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                                    
                                                         
                                                     <div className="pt-lg-2 col-md-12">
                                                         <Input
@@ -3857,7 +3859,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                         </Label>
                                                     </div>
-                                                        
+                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>    
                                                         
                                                         <div>
                                                             <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel1} target="Popover61" trigger="hover" toggle={this.toggleConfidenceLevel1}>
@@ -4181,6 +4183,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 <b>{i18n.t('static.extrapolation.seasonality')}</b>
                                                             </Label>
                                                         </div> */}
+                                                        </div>
+                                                        </div>
                                                         <FormGroup className="pl-lg-5">
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1 mt-lg-4 pb-1 pt-2" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && 
@@ -4191,8 +4195,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         }
                                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
                                             </FormGroup>
-                                                    </div>
-                                        </div>
 
                                         {/* </div> */}
                                         {/* <div className="col-md-12">
