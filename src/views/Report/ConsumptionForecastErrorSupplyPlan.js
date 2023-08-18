@@ -1387,26 +1387,50 @@ fetchData(){
                         dataList_arr.push(dataList);
                         consumptionAdjForStockOutId_arr.push(consumptionAdjForStockOutId);
                         yaxisEquUnit_arr.push(equivalencyUnitId);
-                        console.log("Hello",monthArray)
-                        for(let ii = 0; ii < monthArray.length; ii++){
-                            let temp_forecastQty = 0;
-                            for(let ij = 0; ij < dataList_arr[0]; ij++){
-                                if(monthArray[ii].date == dataList_arr[0][ij].month){
-                                    temp_forecastQty += dataList_arr[0][ij].forecastQty;
-                                } 
+                        if(arr == planningUnitIds.length - 1){
+                            for(let ii = 0; ii < monthArray.length; ii++){
+                                var regionData = [];
+                                var temp_forecastQty = 0;
+                                var temp_actualQty = '';
+                                var temp_list = dataList_arr[0].filter(e => e.month == monthArray[ii].date);
+                                var temp_regionData = temp_list.map(e => e.regionData)
+                                temp_regionData = [].concat.apply([], temp_regionData);
+                                for(let ij = 0; ij < regionList.length; ij++){
+                                    var region = { id: regionList[ij].regionId, label: regionList[ij].label };
+                                    var temp = temp_regionData.filter(e => e.region.id == region.id);
+                                    var temp_forecastQty1 = temp.reduce((sum, e) => sum + Number(e.forecastQty), 0);
+                                    var temp_actualQty1 = temp.reduce((sum, e) => sum + Number(e.actualQty), 0);
+                                    regionData.push({
+                                        region: region,
+                                        forecastQty: temp_forecastQty1,
+                                        actualQty: temp_actualQty1
+                                    });
+                                }
+                            
+                                for(let ij = 0; ij < dataList_arr[0].length; ij++){
+                                    if(monthArray[ii].date == dataList_arr[0][ij].month){
+                                        temp_forecastQty += Number(dataList_arr[0][ij].forecastQty);
+                                        if(dataList_arr[0][ij].actualQty == ''){
+                                            temp_actualQty = temp_actualQty;
+                                        }else{
+                                            temp_actualQty = Number(temp_actualQty) + Number(dataList_arr[0][ij].actualQty); 
+                                        }
+                                    } 
+                                }
+                                dataByMonth.push({
+                                    month: monthArray[ii].date,
+                                    forecastQty: temp_forecastQty,
+                                    actualQty: temp_actualQty,
+                                    regionData: regionData
+                                })
                             }
-                            dataByMonth.push({
-                                month: monthArray[ii],
-                                forecastQty: temp_forecastQty
+                            this.setState({
+                                monthArray: monthArray,
+                                dataList: dataByMonth,
+                                consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                                yaxisEquUnit:equivalencyUnitId
                             })
                         }
-                        console.log("Hello", dataByMonth)
-                        this.setState({
-                            monthArray: monthArray,
-                            dataList: dataList_arr[0],
-                            consumptionAdjForStockOutId: consumptionAdjForStockOutId,
-                            yaxisEquUnit:equivalencyUnitId
-                        })
                     }.bind(this);   
                 }.bind(this);
                 }
