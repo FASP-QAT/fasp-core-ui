@@ -2676,6 +2676,14 @@ export default class CreateTreeTemplate extends Component {
                 for (var i = 0; i < count; i++) {
                     this.state.modelingEl.deleteRow(i);
                 }
+                var startOptions = this.state.modelingEl.getProperty(1);
+                startOptions.source = this.state.monthList;
+                this.state.modelingEl.setProperty(1, startOptions);
+
+                var stopOptions = this.state.modelingEl.getProperty(2);
+                stopOptions.source = this.state.monthList;
+                this.state.modelingEl.setProperty(2, stopOptions);
+
                 var dataArr = []
                 const reversedList = [...json].reverse();
                 for (var i = 1; i < reversedList.length - 1; i++) {
@@ -2703,7 +2711,6 @@ export default class CreateTreeTemplate extends Component {
                         data, 0, 1
                     );
                 }
-                console.log("data[13]==>", this.state.currentCalculatorStartDate, "===", this.state.yearsOfTarget, "===", this.state.actualOrTargetValueList)
                 this.setState({
                     currentItemConfig,
                     currentScenario: (currentItemConfig.context.payload.nodeDataMap[0])[0],
@@ -4498,8 +4505,7 @@ export default class CreateTreeTemplate extends Component {
                         }, () => {
                             // this.calculateMOMData(0, 3);
                             if (this.state.showCalculatorFields) {
-                                treeTemplate.monthsInPast = (12 - this.state.currentCalculatorStartDate);
-                                treeTemplate.monthsInFuture = (6 + this.state.currentCalculatorStopDate);
+                                treeTemplate.monthsInFuture = (6 + Number(this.state.treeTemplate.monthsInFuture));
                                 this.generateMonthList();
                             }
                         });
@@ -4538,8 +4544,8 @@ export default class CreateTreeTemplate extends Component {
                                 console.log("showCalculatorFields===", this.state.treeTemplate.monthsInPast)
 
                                 if (this.state.showCalculatorFields) {
-                                    treeTemplate.monthsInPast = (12 - this.state.currentCalculatorStartDate);
-                                    treeTemplate.monthsInFuture = (6 + this.state.currentCalculatorStopDate);
+                                    treeTemplate.monthsInPast = (12 - Number(this.state.currentCalculatorStartDate));
+                                    treeTemplate.monthsInFuture = (6 + Number(this.state.currentCalculatorStopDate));
                                     this.generateMonthList();
                                 }
                             });
@@ -7570,7 +7576,7 @@ export default class CreateTreeTemplate extends Component {
                 yearsOfTarget: event.target.value
             }, () => {
                 if (this.state.yearsOfTarget != "") {
-                    treeTemplate.monthsInFuture = ((this.state.yearsOfTarget + 2) * 12);
+                    treeTemplate.monthsInFuture = ((Number(this.state.yearsOfTarget) + 2) * 12);
                     this.generateMonthList();
                 }
             });
@@ -8458,14 +8464,10 @@ export default class CreateTreeTemplate extends Component {
         count = Number(Number(count) + 1);
         var srt = this.state.currentCalculatorStartDate == 1 ? (this.state.currentCalculatorStartDate + 1) : this.state.currentCalculatorStartDate
         for (var j = 0; j <= count; j++) {
-            var startdate = monthListForModelingCalculator.filter(c => c.id == ((srt - 12) + (j * 12)))[0].name;
-            console.log("treeTemplate.monthsInPast", srt, "===", monthListForModelingCalculator, "===", this.state.currentCalculatorStartDate)
-
-            var stopDate = monthListForModelingCalculator.filter(c => c.id == ((srt - 1) + (j * 12)))[0].name;
-
-            let modifyStartDate1 = monthListForModelingCalculator.filter(c => c.id == ((srt - 7) + (j * 12)))[0].id;
-            let modifyStopDate1 = monthListForModelingCalculator.filter(c => c.id == ((srt + 4) + (j * 12)))[0].id;
-            console.log("dates==>1", startdate, "===", monthListForModelingCalculator, "===", modifyStartDate1, "===", modifyStopDate1);
+            var startdate = monthListForModelingCalculator.filter(c => c.id == ((Number(srt) - 12) + (j * 12)))[0].name;
+            var stopDate = monthListForModelingCalculator.filter(c => c.id == ((Number(srt) - 1) + (j * 12)))[0].name;
+            var modifyStartDate1 = monthListForModelingCalculator.filter(c => c.id == ((Number(srt) - 7) + (j * 12)))[0].id;
+            var modifyStopDate1 = monthListForModelingCalculator.filter(c => c.id == ((Number(srt) + 4) + (j * 12)))[0].id;
 
             var data = [];
             data[0] = startdate + " to " + stopDate//year
