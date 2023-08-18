@@ -964,9 +964,11 @@ export default class CommitTreeComponent extends React.Component {
                                     planningUnitList.push({ id: mergedPlanningUnitList[pul].planningUnit.id, name: getLabelText(mergedPlanningUnitList[pul].planningUnit.label, this.state.lang) });
                                 }
                                 if (!(mergedPlanningUnitList[pul].price === "" || mergedPlanningUnitList[pul].price == null || mergedPlanningUnitList[pul].price == undefined) ? "" : (mergedPlanningUnitList[pul].procurementAgent == null || mergedPlanningUnitList[pul].procurementAgent == undefined)) {
+                                    if(mergedPlanningUnitList[pul].procurementAgent!=null && mergedPlanningUnitList[pul].procurementAgent!="" && mergedPlanningUnitList[pul].procurementAgent!=undefined && mergedPlanningUnitList[pul].procurementAgent.id!=null && mergedPlanningUnitList[pul].procurementAgent.id!=undefined && mergedPlanningUnitList[pul].procurementAgent.id!=""){
                                     if (procurementAgentList.findIndex(c => c.id == mergedPlanningUnitList[pul].procurementAgent.id) == -1) {
                                         procurementAgentList.push({ id: mergedPlanningUnitList[pul].procurementAgent.id, name: getLabelText(mergedPlanningUnitList[pul].procurementAgent.label, this.state.lang) });
                                     }
+                                }
                                 }
                                 data = [];
                                 data[0] = mergedPlanningUnitList[pul].planningUnit.forecastingUnit.productCategory.id;
