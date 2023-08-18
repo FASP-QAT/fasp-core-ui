@@ -3189,5 +3189,20 @@
     "static.commitVersion.localV":"Local v",
     "static.commitVersion.serverV":"Server v",
     "static.commitVersion.exculdeConsumptionTooltip":"If checked, this product will not appear in Server v{{serverVersionId}} for this region",
-    "static.commitVersion.exculdeTreeTooltip":"If checked, this tree will not appear in Server v{{serverVersionId}}"
+    "static.commitVersion.exculdeTreeTooltip":"If checked, this tree will not appear in Server v{{serverVersionId}}",
+    "static.tree.firstMonthOfTarget": "First Month of Target",
+    "static.tree.annualTargetLabel": "This calculator is reaching annual targets (sum across 12 months) and is generally appropriate for products are discrete, rather than continuous.  QAT uses your targets and the change between your targets to generate a monthly % change. Using this calculator provides a dynamic rather than stairstep forecast. Note that will always be minor differences in the final annual total and your target. However, the difference will be small if your targets change at a similar rate from year to year. See show guidance for more detail on the calculation.",
+    "static.tree.targetYears": "How many years of targets?",
+    "static.tree.actualOrTarget": "Actual / Target",
+    "static.tree.annualChangePer": "Annual Change (%)",
+    "static.tree.calculatedTotal": "Calculated Total",
+    "static.tree.differenceTargetVsCalculatedNumber": "Difference (Target vs Calculated, #)",
+    "static.tree.differenceTargetVsCalculatedPer": "Difference (Target vs Calculated, %)",
+    "static.tooltip.actualOrTarget": "Sum of 12 months. You must provide the total for one year before the first target, and 1 year after after the last target.",
+    "static.tooltip.annualChangePer": "Change from previous year. Annual Change (%) = (Annual Target - Previous Year Actual or Target) / (Previous Year Actual or Target)",
+    "static.tooltip.calculatedTotal": "Starting with your ... See more in show guidance.",
+    "static.tooltip.diffTargetVsCalculatedNo": "Difference = Calculated Total - Target. This difference will be large if the annual change varies significantly between years",
+    "static.tooltip.diffTargetVsCalculatedPer": "(Calculated Total - Target) / Target. This difference will be large if the annual change varies significantly between years",
+    "static.modelingCalculator.confirmAlert": "Do you want to replace the existing table ?"
+    
 }

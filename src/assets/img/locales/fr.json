@@ -3057,5 +3057,19 @@
     "static.forecastValidation.consumptionExtrapolationNotes":"Remarques sur l`extrapolation de la consommation",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
     "static.mt.roNoAndPrimeLineNo": "RO - Ligne principale Non",
-    "static.extrapolation.confirmmsg":"Cliquez d'abord sur 'Extrapoler' ou vous perdrez vos paramètres mis à jour. Toute modification de vos notes sera enregistrée"
+    "static.extrapolation.confirmmsg":"Cliquez d'abord sur 'Extrapoler' ou vous perdrez vos paramètres mis à jour. Toute modification de vos notes sera enregistrée",
+    "static.tree.firstMonthOfTarget": "Premier mois de cible",
+    "static.tree.annualTargetLabel": "Ce calculateur atteint les objectifs annuels (somme sur 12 mois) et est généralement approprié pour les produits discrets plutôt que continus. QAT utilise vos objectifs et le changement entre vos objectifs pour générer un % de changement mensuel. L`utilisation de ce calculateur fournit une prévision dynamique plutôt qu`en escalier. Notez qu`il y aura toujours des différences mineures entre le total annuel final et votre objectif. Cependant, la différence sera minime si vos objectifs changent à un rythme similaire d`une année à l`autre. Voir les instructions du spectacle pour plus de détails sur le calcul.",
+    "static.tree.targetYears": "Combien d`années d`objectifs ?",
+    "static.tree.actualOrTarget": "Réel / Cible",
+    "static.tree.annualChangePer": "Variation annuelle (%)",
+    "static.tree.calculatedTotal": "Total calculé",
+    "static.tree.differenceTargetVsCalculatedNumber": "Différence (cible vs calculée, #)",
+    "static.tree.differenceTargetVsCalculatedPer": "Différence (cible vs calculée, %)",
+    "static.tooltip.actualOrTarget": "Somme de 12 mois. Vous devez fournir le total pour un an avant le premier objectif et 1 an après le dernier objectif.",
+    "static.tooltip.annualChangePer": "Changement par rapport à l`année précédente. Variation annuelle (%) = (Cible annuelle - Réel ou cible de l`année précédente) / (Réel ou cible de l`année précédente)",
+    "static.tooltip.calculatedTotal": "Starting with your ... See more in show guidance.",
+    "static.tooltip.diffTargetVsCalculatedNo": "Différence = Total calculé - Cible. Cette différence sera importante si la variation annuelle varie considérablement d`une année à l`autre",
+    "static.tooltip.diffTargetVsCalculatedPer": "(Total calculé - Cible) / Cible. Cette différence sera importante si la variation annuelle varie considérablement d`une année à l`autre",
+    "static.modelingCalculator.confirmAlert": "Vous souhaitez remplacer la table existante ?"
 }
