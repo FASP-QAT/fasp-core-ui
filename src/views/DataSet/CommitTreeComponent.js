@@ -134,6 +134,11 @@ export default class CommitTreeComponent extends React.Component {
             conflictsCountConsumption: 0,
             conflictsCountTree: 0,
             conflictsCountSelectedForecast: 0,
+            versionSettingsInstance:"",
+            planningUnitsInstance:"",
+            consumptionInstance:"",
+            treeInstance:"",
+            selectedForecastInstance:""
 
         }
         this.synchronize = this.synchronize.bind(this);
@@ -710,9 +715,44 @@ export default class CommitTreeComponent extends React.Component {
     setProgramId(e) {
         // console.log("In set program Id@@@@@@@@@@@%%%%%%%%%%%%%")
         var programId = e.target.value;
+        if (this.state.versionSettingsInstance != "" && this.state.versionSettingsInstance != undefined) {
+            // this.state.mergedConsumptionJexcel.destroy();
+            jexcel.destroy(document.getElementById("versionSettingsDiv"), true);
+
+        }
+        if (this.state.planningUnitsInstance != "" && this.state.planningUnitsInstance != undefined) {
+            // this.state.mergedConsumptionJexcel.destroy();
+            jexcel.destroy(document.getElementById("planningUnitDiv"), true);
+
+        }
+        if (this.state.consumptionInstance != "" && this.state.consumptionInstance != undefined) {
+            // this.state.mergedConsumptionJexcel.destroy();
+            jexcel.destroy(document.getElementById("consumptionDiv"), true);
+
+        }
+        if (this.state.treeInstance != "" && this.state.treeInstance != undefined) {
+            // this.state.mergedConsumptionJexcel.destroy();
+            jexcel.destroy(document.getElementById("treeDiv"), true);
+
+        }
+        if (this.state.selectedForecastInstance != "" && this.state.selectedForecastInstance != undefined) {
+            // this.state.mergedConsumptionJexcel.destroy();
+            jexcel.destroy(document.getElementById("selectedForecastDiv"), true);
+
+        }
         this.setState({
             loading: true,
             showCompare: false,
+            conflictsCountVersionSettings:0,
+            conflictsCountPlanningUnits:0,
+            conflictsCountConsumption:0,
+            conflictsCountTree:0,
+            conflictsCountSelectedForecast:0,
+            versionSettingsInstance:"",
+            planningUnitsInstance:"",
+            consumptionInstance:"",
+            treeInstance:"",
+            selectedForecastInstance:""
         }, () => {
             if (programId != "" && programId != undefined && programId != null) {
                 var myResult = [];
@@ -1950,31 +1990,6 @@ export default class CommitTreeComponent extends React.Component {
                 // }.bind(this)
                 // }.bind(this)
             } else {
-                if (this.state.versionSettingsInstance != "" && this.state.versionSettingsInstance != undefined) {
-                    // this.state.mergedConsumptionJexcel.destroy();
-                    jexcel.destroy(document.getElementById("versionSettingsDiv"), true);
-
-                }
-                if (this.state.planningUnitsInstance != "" && this.state.planningUnitsInstance != undefined) {
-                    // this.state.mergedConsumptionJexcel.destroy();
-                    jexcel.destroy(document.getElementById("planningUnitDiv"), true);
-
-                }
-                if (this.state.consumptionInstance != "" && this.state.consumptionInstance != undefined) {
-                    // this.state.mergedConsumptionJexcel.destroy();
-                    jexcel.destroy(document.getElementById("consumptionDiv"), true);
-
-                }
-                if (this.state.treeInstance != "" && this.state.treeInstance != undefined) {
-                    // this.state.mergedConsumptionJexcel.destroy();
-                    jexcel.destroy(document.getElementById("treeDiv"), true);
-
-                }
-                if (this.state.selectedForecastInstance != "" && this.state.selectedForecastInstance != undefined) {
-                    // this.state.mergedConsumptionJexcel.destroy();
-                    jexcel.destroy(document.getElementById("selectedForecastDiv"), true);
-
-                }
 
                 this.setState({
                     loading: false,
