@@ -324,6 +324,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[15] = index;
                             data[16] = 0;
                             data[17] = 0;
+                            data[18] = inventoryList[j].inventoryId;
                             inventoryDataArr[j] = data;
                         }
                         var regionList = this.props.items.regionList;
@@ -356,6 +357,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[15] = -1;
                             data[16] = 1;
                             data[17] = 0;
+                            data[18] = 0;
                             inventoryDataArr[0] = data;
                         }
                         this.setState({
@@ -399,6 +401,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 {
                                     type: 'text',
                                     // title: i18n.t('static.supplyPlan.isChanged'), 
+                                    // width: 0, 
+                                    readOnly: true, visible: false, autoCasting: false
+                                },
+                                {
+                                    type: 'text',
+                                    // width: 0, 
+                                    // width: 0, 
                                     // width: 0, 
                                     readOnly: true, visible: false, autoCasting: false
                                 },
@@ -770,6 +779,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[15] = -1;
         data[16] = 1;
         data[17] = 0;
+        data[18] = 0;
         obj.insertRow(data);
         if (this.props.inventoryPage == "inventoryDataEntry") {
             var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -863,10 +873,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 cell1.classList.add('readonly');
             }
             if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                if (rowData[18] > 0) {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
                     cell.classList.add('readonly');
                 }
+            }
                 if (rowData[12] == false) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
@@ -917,10 +929,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 cell1.classList.add('readonly');
             }
             if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                if (rowData[18] > 0) {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
                     cell.classList.add('readonly');
                 }
+            }
                 if (rowData[12] == false) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
@@ -987,10 +1001,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 cell1.classList.add('readonly');
             }
             if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                if (rowData[18] > 0) {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                     cell.classList.add('readonly');
                 }
+            }
             } else {
                 if (rowData[12] == false) {
                     for (var c = 0; c < colArr.length; c++) {

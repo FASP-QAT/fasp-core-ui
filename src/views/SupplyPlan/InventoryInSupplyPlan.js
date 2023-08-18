@@ -315,6 +315,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[14] = index;
                         data[15] = 0;
                         data[16] = 0;
+                        data[17] = inventoryList[j].inventoryId;
                         inventoryDataArr[j] = data;
                     }
                     var regionList = this.props.items.regionList;
@@ -346,6 +347,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[14] = -1;
                         data[15] = 1;
                         data[16] = 0;
+                        data[17] = 0;
                         inventoryDataArr[0] = data;
                     }
                     this.setState({
@@ -388,6 +390,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             {
                                 type: 'text',
                                 // title: i18n.t('static.supplyPlan.isChanged'), 
+                                // width: 0, 
+                                readOnly: true, visible: false, autoCasting: false
+                            },
+                            {
+                                type: 'text',
+                                // width: 0, 
+                                // width: 0, 
                                 // width: 0, 
                                 readOnly: true, visible: false, autoCasting: false
                             },
@@ -757,6 +766,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[14] = -1;
         data[15] = 1;
         data[16] = 0;
+        data[17] = 0;
         obj.insertRow(data);
         if (this.props.inventoryPage == "inventoryDataEntry") {
             var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -843,9 +853,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var lastEditableDate = moment(Date.now()).subtract(this.state.realm.inventoryMonthsInPast + 1, 'months').format("YYYY-MM-DD");
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
             if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                if (rowData[17] > 0) {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
                     cell.classList.add('readonly');
+                }
                 }
                 if (rowData[11] == false) {
                     for (var c = 0; c < colArr.length; c++) {
@@ -892,9 +904,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var lastEditableDate = moment(Date.now()).subtract(this.state.realm.inventoryMonthsInPast + 1, 'months').format("YYYY-MM-DD");
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
             if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                if (rowData[17] > 0) {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
                     cell.classList.add('readonly');
+                }
                 }
                 if (rowData[11] == false) {
                     for (var c = 0; c < colArr.length; c++) {
@@ -945,9 +959,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var lastEditableDate = moment(Date.now()).subtract(this.state.realm.inventoryMonthsInPast + 1, 'months').format("YYYY-MM-DD");
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
             if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                if (rowData[17] > 0) {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                     cell.classList.add('readonly');
+                }
                 }
             } else {
                 if (rowData[11] == false) {
