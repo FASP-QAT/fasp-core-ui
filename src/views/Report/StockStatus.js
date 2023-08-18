@@ -1,24 +1,51 @@
-import React, { Component } from 'react';
-import { Bar } from 'react-chartjs-2';
+import React, { Component, lazy, Suspense, DatePicker } from 'react';
+import { Bar, Line, Pie } from 'react-chartjs-2';
+import { Link } from 'react-router-dom';
 import {
+  Badge,
   Button,
+  ButtonDropdown,
+  ButtonGroup,
+  ButtonToolbar,
   Card,
   CardBody,
+  // CardFooter,
+  CardHeader,
+  CardTitle,
   Col,
-  Table, FormGroup, Input, InputGroup, Label, Form, Modal, ModalBody, ModalFooter, ModalHeader
+  Widgets,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Progress,
+  Pagination,
+  PaginationItem,
+  PaginationLink,
+  Row,
+  CardColumns,
+  Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import i18n from '../../i18n'
+import Pdf from "react-to-pdf"
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
+import PlanningUnitService from '../../api/PlanningUnitService';
+import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
+import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js'
+import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, API_URL, DATE_FORMAT_CAP_FOUR_DIGITS } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
+import actualIcon from '../../assets/img/actual.png';
 import csvicon from '../../assets/img/csv.png'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -27,13 +54,24 @@ import ReportService from '../../api/ReportService'
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { MultiSelect } from "react-multi-select-component";
-import DropdownService from '../../api/DropdownService';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 
 const entityname1 = i18n.t('static.dashboard.stockstatus')
 
+const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
+// const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 const ref = React.createRef();
+
+const brandPrimary = getStyle('--primary')
+const brandSuccess = getStyle('--success')
+const brandInfo = getStyle('--info')
+const brandWarning = getStyle('--warning')
+const brandDanger = getStyle('--danger')
+
+
+
+
 
 //Random Numbers
 function random(min, max) {
@@ -54,6 +92,8 @@ const pickerLang = {
   months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   from: 'From', to: 'To',
 }
+
+
 
 class StockStatus extends Component {
   constructor(props) {
@@ -284,7 +324,7 @@ class StockStatus extends Component {
           csvRow.push("")
         }
         csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"')
-        var ppu = this.state.planningUnits.filter(c => c.id == item.planningUnit.id)[0];
+        var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
         csvRow.push('"' + (i18n.t('static.supplyPlan.amcPastOrFuture').replaceAll(' ', '%20') + ' : ' + (ppu.monthsInPastForAmc) + "/" + (ppu.monthsInFutureForAmc) + '"'))
         if (item.data.length > 0 && item.data[0].planBasedOn == 1) {
           csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))
@@ -323,18 +363,18 @@ class StockStatus extends Component {
               item1.primeLineNo == null &&
               item1.roNo == null &&
               item1.roPrimeLineNo == null
-              ? " | N/A"
-              : (item1.roNo == null && item1.roPrimeLineNo == null
-                ? ""
-                : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
-              (item1.orderNo == null && item1.primeLineNo == null
-                ? ""
-                : item1.orderNo == null
-                  ? ""
-                  : " | " + item1.orderNo) +
-              (item1.primeLineNo == null
-                ? ""
-                : "-" + item1.primeLineNo))
+                ? " | N/A"
+                : (item1.roNo == null && item1.roPrimeLineNo == null
+                    ? ""
+                    : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+                  (item1.orderNo == null && item1.primeLineNo == null
+                    ? ""
+                    : item1.orderNo == null
+                    ? ""
+                    : " | " + item1.orderNo) +
+                  (item1.primeLineNo == null
+                    ? ""
+                    : "-" + item1.primeLineNo))
           )
         }).join(' \n')).replaceAll(' ', '%20')
           , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? this.roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? this.roundN(ele.mos) : this.roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
@@ -756,7 +796,7 @@ class StockStatus extends Component {
         }
         doc.setFontSize(8)
         doc.setTextColor("#002f6c");
-        var ppu1 = this.state.planningUnits.filter(c => c.id == item.planningUnit.id)[0];
+        var ppu1 = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
 
         doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
           align: 'left'
@@ -850,16 +890,16 @@ class StockStatus extends Component {
                 item1.primeLineNo == null &&
                 item1.roNo == null &&
                 item1.roPrimeLineNo == null
-                ? " | N/A"
-                : (item1.roNo == null && item1.roPrimeLineNo == null
-                  ? ""
-                  : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
-                (item1.orderNo == null && item1.primeLineNo == null
-                  ? ""
-                  : item1.orderNo == null
-                    ? ""
-                    : " | " + item1.orderNo) +
-                (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
+                  ? " | N/A"
+                  : (item1.roNo == null && item1.roPrimeLineNo == null
+                      ? ""
+                      : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+                    (item1.orderNo == null && item1.primeLineNo == null
+                      ? ""
+                      : item1.orderNo == null
+                      ? ""
+                      : " | " + item1.orderNo) +
+                    (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
           }).join(' \n')
             , this.formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment), ele.expiredStock != 0 ? this.formatter(ele.expiredStock) : '', this.formatter(ele.closingBalance), this.formatter(this.roundAMC(ele.amc)), ele.planBasedOn == 1 ? this.formatter(this.roundN(ele.mos)) : this.formatter(this.roundAMC(ele.maxStock)), ele.unmetDemand != 0 ? this.formatter(ele.unmetDemand) : '']);
 
@@ -1053,7 +1093,7 @@ class StockStatus extends Component {
             }
           }
         })
-        var ppu = this.state.planningUnits.filter(c => c.id == item.planningUnit.id)[0];
+        var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
         // pageArray.push({ "startPage": lastPage, "endPage": doc.internal.getCurrentPageInfo().pageNumber, "planningUnit": getLabelText(item.planningUnit.label, this.state.lang), "min": item.data[0].minMos, "max": item.data[0].maxMos, amcPast: ppu.monthsInPastForAmc, amcFuture: ppu.monthsInFutureForAmc, minStock: ppu.minQty, distributionLeadTime: ppu.distributionLeadTime, planBasedOn: ppu.planBasedOn });
         // lastPage = doc.internal.getCurrentPageInfo().pageNumber;
         /*  var y = doc.lastAutoTable.finalY + 20
@@ -1177,7 +1217,7 @@ class StockStatus extends Component {
             var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
             var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
             var generalProgramJson = JSON.parse(generalProgramData);
-            var pu = (this.state.planningUnits.filter(c => c.id == planningUnitId))[0]
+            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
 
 
@@ -1729,7 +1769,7 @@ class StockStatus extends Component {
                   // }
                   // sortedPlanningUnitData = sortedPlanningUnitData.concat(this.state.planningUnitIdsExport.filter(c => c.value != document.getElementById("planningUnitId").value));
                   sortedPlanningUnitData.map(pu => {
-                    var puFiltered = this.state.planningUnits.filter(c => c.id == pu.value)[0]
+                    var puFiltered = this.state.planningUnits.filter(c => c.planningUnit.id == pu.value)[0]
                     var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == pu.value);
                     var programJson = {}
                     if (planningUnitDataIndex != -1) {
@@ -2813,21 +2853,11 @@ class StockStatus extends Component {
   getPrograms = () => {
     if (isSiteOnline()) {
       // AuthenticationService.setupAxiosInterceptors();
-      let realmId = AuthenticationService.getRealmId();
-      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+      ProgramService.getProgramList()
         .then(response => {
           // console.log(JSON.stringify(response.data))
-          var proList = [];
-          for (var i = 0; i < response.data.length; i++) {
-            var programJson = {
-              programId: response.data[i].id,
-              label: response.data[i].label,
-              programCode: response.data[i].code,
-            };
-            proList[i] = programJson;
-          }
           this.setState({
-            programs: proList, message: '',
+            programs: response.data, message: '',
             loading: false
           }, () => { this.consolidatedProgramList() })
         }).catch(
@@ -3010,64 +3040,11 @@ class StockStatus extends Component {
           this.setState({
             versions: []
           }, () => {
-            DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
-              .then(response => {
-                // console.log("response===>", response.data)
-                this.setState({
-                  versions: []
-                }, () => {
-                  this.setState({
-                    versions: (response.data.filter(function (x, i, a) {
-                      return a.indexOf(x) === i;
-                    }))
-                  }, () => {
-                    this.consolidatedVersionList(programId)
-                  });
-                });
-              }).catch(
-                error => {
-                  this.setState({
-                    programs: [], loading: false
-                  })
-                  if (error.message === "Network Error") {
-                    this.setState({
-                      // message: 'static.unkownError',
-                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                      loading: false
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
-
-                      case 401:
-                        this.props.history.push(`/login/static.message.sessionExpired`)
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`)
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                          loading: false
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                          loading: false
-                        });
-                        break;
-                      default:
-                        this.setState({
-                          message: 'static.unkownError',
-                          loading: false
-                        });
-                        break;
-                    }
-                  }
-                }
-              );
+            this.setState({
+              versions: program[0].versionList.filter(function (x, i, a) {
+                return a.indexOf(x) === i;
+              })
+            }, () => { this.consolidatedVersionList(programId) });
           });
 
 
@@ -3221,22 +3198,22 @@ class StockStatus extends Component {
               for (var i = 0; i < myResult.length; i++) {
                 if (myResult[i].program.id == programId && myResult[i].active == true) {
 
-                  proList[i] = myResult[i].planningUnit
+                  proList[i] = myResult[i]
                 }
               }
               var planningUnitsMulti = [];
               proList.sort(function (a, b) {
-                a = getLabelText(a.label, lang).toLowerCase();
-                b = getLabelText(b.label, lang).toLowerCase();
+                a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                b = getLabelText(b.planningUnit.label, lang).toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }).map(item => {
-                planningUnitsMulti.push({ value: item.id, label: getLabelText(item.label, this.state.lang) })
+                planningUnitsMulti.push({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) })
               })
               var lang = this.state.lang;
               this.setState({
                 planningUnits: proList.sort(function (a, b) {
-                  a = getLabelText(a.label, lang).toLowerCase();
-                  b = getLabelText(b.label, lang).toLowerCase();
+                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
                   return a < b ? -1 : a > b ? 1 : 0;
                 }), planningUnitsMulti: planningUnitsMulti, message: ''
               }, () => {
@@ -3249,20 +3226,17 @@ class StockStatus extends Component {
         }
         else {
           // AuthenticationService.setupAxiosInterceptors();
-          var programJson = {
-            tracerCategoryIds: [],
-            programIds: [programId]
-          }
-          DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
+
+          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
             // console.log('**' + JSON.stringify(response.data))
             var listArray = response.data;
             var planningUnitsMulti = []
             listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
               return itemLabelA > itemLabelB ? 1 : -1;
             }).map(item => {
-              planningUnitsMulti.push({ value: item.id, label: getLabelText(item.label, this.state.lang) })
+              planningUnitsMulti.push({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) })
             });
             this.setState({
               planningUnits: listArray,
@@ -3393,8 +3367,8 @@ class StockStatus extends Component {
     let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
         return (
-          <option key={i} value={item.id}>
-            {getLabelText(item.label, this.state.lang)}
+          <option key={i} value={item.planningUnit.id}>
+            {getLabelText(item.planningUnit.label, this.state.lang)}
           </option>
         )
       }, this);
@@ -4004,7 +3978,7 @@ class StockStatus extends Component {
 
     const { rangeValue } = this.state
 
-    var ppu = (this.state.planningUnits.filter(c => c.id == document.getElementById("planningUnitId").value)[0])
+    var ppu = (this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0])
 
 
     return (
@@ -4153,7 +4127,7 @@ class StockStatus extends Component {
 
 
                   </div>
-                  {this.state.show && this.state.stockStatusList.length > 0 && ppu != undefined &&
+                  {this.state.show && this.state.stockStatusList.length > 0 && ppu!=undefined &&
                     <>
                       <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                         <ul className="legendcommitversion list-group">
@@ -4255,24 +4229,27 @@ class StockStatus extends Component {
                                   item.primeLineNo == null &&
                                   item.roNo == null &&
                                   item.roPrimeLineNo == null
-                                  ? " | N/A"
-                                  : `${item.roNo == null &&
-                                    item.roPrimeLineNo == null
-                                    ? ""
-                                    : " | " +
-                                    item.roNo +
-                                    "-" +
-                                    item.roPrimeLineNo
-                                  }   ${item.orderNo == null &&
-                                    item.primeLineNo == null
-                                    ? ""
-                                    : item.orderNo == null
-                                      ? ""
-                                      : " | " + item.orderNo
-                                  }   ${item.primeLineNo == null
-                                    ? ""
-                                    : "-" + item.primeLineNo
-                                  }`}</td></tr>)
+                                    ? " | N/A"
+                                    : `${
+                                        item.roNo == null &&
+                                        item.roPrimeLineNo == null
+                                          ? ""
+                                          : " | " +
+                                            item.roNo +
+                                            "-" +
+                                            item.roPrimeLineNo
+                                      }   ${
+                                        item.orderNo == null &&
+                                        item.primeLineNo == null
+                                          ? ""
+                                          : item.orderNo == null
+                                          ? ""
+                                          : " | " + item.orderNo
+                                      }   ${
+                                        item.primeLineNo == null
+                                          ? ""
+                                          : "-" + item.primeLineNo
+                                      }`}</td></tr>)
                                 //return (<tr><td>{item.shipmentQty}</td><td>{item.fundingSource.label.label_en}</td><td>{item.shipmentStatus.label.label_en}</td></tr>)
                               })}</table>
                             </td>
