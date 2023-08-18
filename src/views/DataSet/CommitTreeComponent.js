@@ -964,9 +964,11 @@ export default class CommitTreeComponent extends React.Component {
                                     planningUnitList.push({ id: mergedPlanningUnitList[pul].planningUnit.id, name: getLabelText(mergedPlanningUnitList[pul].planningUnit.label, this.state.lang) });
                                 }
                                 if (!(mergedPlanningUnitList[pul].price === "" || mergedPlanningUnitList[pul].price == null || mergedPlanningUnitList[pul].price == undefined) ? "" : (mergedPlanningUnitList[pul].procurementAgent == null || mergedPlanningUnitList[pul].procurementAgent == undefined)) {
+                                    if(mergedPlanningUnitList[pul].procurementAgent!=null && mergedPlanningUnitList[pul].procurementAgent!="" && mergedPlanningUnitList[pul].procurementAgent!=undefined && mergedPlanningUnitList[pul].procurementAgent.id!=null && mergedPlanningUnitList[pul].procurementAgent.id!=undefined && mergedPlanningUnitList[pul].procurementAgent.id!=""){
                                     if (procurementAgentList.findIndex(c => c.id == mergedPlanningUnitList[pul].procurementAgent.id) == -1) {
                                         procurementAgentList.push({ id: mergedPlanningUnitList[pul].procurementAgent.id, name: getLabelText(mergedPlanningUnitList[pul].procurementAgent.label, this.state.lang) });
                                     }
+                                }
                                 }
                                 data = [];
                                 data[0] = mergedPlanningUnitList[pul].planningUnit.forecastingUnit.productCategory.id;
@@ -1213,6 +1215,7 @@ export default class CommitTreeComponent extends React.Component {
                                     data[8] = serverModifiedDate != "" ? moment(serverModifiedDate).format("YYYY-MM-DD HH:mm:ss") : "";
                                     data[9] = downloadedModifiedDate != "" ? moment(downloadedModifiedDate).format("YYYY-MM-DD HH:mm:ss") : "";
                                     data[10] = mergedPlanningUnitList[pul].planningUnit.id
+                                    data[11] = mergedRegionList[rl].regionId;
                                     mergedConsumptionListArray.push(data);
                                 }
                             }
@@ -1254,6 +1257,9 @@ export default class CommitTreeComponent extends React.Component {
                                         title: 'Exclude',
                                         type: 'checkbox',
                                         // readOnly: true //16Q
+                                    },
+                                    {
+                                        type: 'hidden'
                                     },
                                     {
                                         type: 'hidden'
@@ -2016,10 +2022,10 @@ export default class CommitTreeComponent extends React.Component {
             console.log("Consumption Json Test@123", consumptionJson)
             for (var c = 0; c < consumptionJson.length; c++) {
                 if (consumptionJson[c][6] == 3) {
-                    programDataJson.actualConsumptionList = programDataJson.actualConsumptionList.filter(item => item.planningUnit.id != consumptionJson[c][10]);
-                    programDataJson.actualConsumptionList = programDataJson.actualConsumptionList.concat(programDataServer.actualConsumptionList.filter(item => item.planningUnit.id == consumptionJson[c][10]));
-                    programDataJson.consumptionExtrapolation = programDataJson.consumptionExtrapolation.filter(item => item.planningUnit.id != consumptionJson[c][10]);
-                    programDataJson.consumptionExtrapolation = programDataJson.consumptionExtrapolation.concat(programDataServer.consumptionExtrapolation.filter(item => item.planningUnit.id == consumptionJson[c][10]));
+                    programDataJson.actualConsumptionList = programDataJson.actualConsumptionList.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11]));
+                    programDataJson.actualConsumptionList = programDataJson.actualConsumptionList.concat(programDataServer.actualConsumptionList.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11])));
+                    programDataJson.consumptionExtrapolation = programDataJson.consumptionExtrapolation.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11]));
+                    programDataJson.consumptionExtrapolation = programDataJson.consumptionExtrapolation.concat(programDataServer.consumptionExtrapolation.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11])));
                 }
             }
 
