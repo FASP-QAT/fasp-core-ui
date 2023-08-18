@@ -3183,5 +3183,11 @@
     "static.report.forecastErrorMonthlyFormulaNew3a":"Adjusted Actual = Actual consumption/ (total days in month - stocked out days) * total days in month",
     "static.report.forecastErrorMonthlyFormulaNew3b":"QAT automatically calculates the total days in the month based on the calendar",
     "static.report.forecastErrorMonthlyFormulaNew4":"If there are multiple regions, QAT adds up all actual consumption (or adjusted actual consumption) from all regions, and all the forecasted consumption from all regions for a given month before using the above formula.",
-    "static.report.forecastErrorMonthlyFormulaNew5":"If Y-axis is in Equivalency Unit, then QAT adds up all actual consumption (or adjusted actual consumption) from all selected forecasting or planning units, and all the forecasted consumption from all selected forecasting or planning units for a given month before using the above formula."
+    "static.report.forecastErrorMonthlyFormulaNew5":"If Y-axis is in Equivalency Unit, then QAT adds up all actual consumption (or adjusted actual consumption) from all selected forecasting or planning units, and all the forecasted consumption from all selected forecasting or planning units for a given month before using the above formula.",
+    "static.commitVersion.goTo":"Go to",
+    "static.commitVersion.updatePUSettings":"Update Planning Unit Settings",
+    "static.commitVersion.localV":"Local v",
+    "static.commitVersion.serverV":"Server v",
+    "static.commitVersion.exculdeConsumptionTooltip":"If checked, this product will not appear in Server v{{serverVersionId}} for this region",
+    "static.commitVersion.exculdeTreeTooltip":"If checked, this tree will not appear in Server v{{serverVersionId}}"
 }
