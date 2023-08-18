@@ -340,6 +340,10 @@ export default class ListTreeComponent extends Component {
                         }
                     }
                     tree.flatList = items;
+                    tree.lastModifiedBy.userId=AuthenticationService.getLoggedInUserId();
+                    tree.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                    tree.createdBy.userId=AuthenticationService.getLoggedInUserId();
+                    tree.createdDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);
                     // console.log("findTreeIndex---", findTreeIndex);
                     treeList[findTreeIndex] = tree;
@@ -1532,7 +1536,11 @@ export default class ListTreeComponent extends Component {
                         "label_sp": null,
                         "label_fr": null,
                         "label_pr": null
-                    }
+                    };
+                    treeObj.lastModifiedBy.userId=AuthenticationService.getLoggedInUserId();
+                    treeObj.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
+                    treeObj.createdBy.userId=AuthenticationService.getLoggedInUserId();
+                    treeObj.createdDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
 
                     treeList.push(treeObj);
                     break;
@@ -1602,6 +1610,14 @@ export default class ListTreeComponent extends Component {
                     notes: this.state.notes,
                     regionList: this.state.regionList,
                     levelList: treeTemplate.levelList,
+                    lastModifiedBy:{
+                        userId:AuthenticationService.getLoggedInUserId()
+                    },
+                    lastModifiedDate:moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss"),
+                    createdBy:{
+                        userId:AuthenticationService.getLoggedInUserId()
+                    },
+                    createdDate:moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss"),
                     scenarioList: [{
                         id: 1,
                         label: {
@@ -1702,6 +1718,14 @@ export default class ListTreeComponent extends Component {
                             label: {}
                         }
                     }],
+                    lastModifiedBy:{
+                        userId:AuthenticationService.getLoggedInUserId()
+                    },
+                    lastModifiedDate:moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss"),
+                    createdBy:{
+                        userId:AuthenticationService.getLoggedInUserId()
+                    },
+                    createdDate:moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss"),
                     tree: {
                         flatList: [{
                             id: 1,
@@ -1770,6 +1794,10 @@ export default class ListTreeComponent extends Component {
                 "label_fr": null,
                 "label_pr": null
             }
+            treeObj.lastModifiedBy.userId=AuthenticationService.getLoggedInUserId();
+            treeObj.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+            treeObj.createdBy.userId=AuthenticationService.getLoggedInUserId();
+            treeObj.createdDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
 
             treeList.push(treeObj);
             // break;
