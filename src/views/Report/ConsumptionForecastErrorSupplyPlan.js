@@ -1209,19 +1209,28 @@ fetchData(){
     let forecastingUnitId = -1;
     let forecastingUnitIds = [];
     var FilterEquivalencyUnit="";
+    const dataByMonth = [];
     equivalencyUnitId = document.getElementById("yaxisEquUnit").value;
     if(equivalencyUnitId>0){
         FilterEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnitId == equivalencyUnitId);
     }
-    planningUnitIds = this.state.planningUnitIds.map(item => item.value);
-    forecastingUnitIds = this.state.forecastingUnitIds.map(item => item.value);
+    planningUnitIds = this.state.planningUnitIds.map(item => item.value.toString());
+    forecastingUnitIds = this.state.forecastingUnitIds.map(item => item.value.toString());
     if (programId > 0 && (planningUnitIds.length > 0 || forecastingUnitIds.length > 0) && versionId != 0) {
         if (versionId.includes('Local')) {
             this.setState({ loading: true })
             var db1;
             getDatabase();
             // View by planningUnit
-            if (planningUnitId > 0){
+            if (planningUnitIds.length > 0){
+
+                var monthArray_arr = [];
+                var dataList_arr = [];
+                var consumptionAdjForStockOutId_arr = [];
+                var yaxisEquUnit_arr = [];
+
+                for(let arr=0; arr < planningUnitIds.length; arr++){
+                var dataList = [];
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
                     this.setState({
@@ -1244,7 +1253,7 @@ fetchData(){
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
+                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIds[arr]);
                         var programJson = {};
                         if (planningUnitDataFilter.length > 0) {
                             var planningUnitData = planningUnitDataFilter[0]
@@ -1256,7 +1265,7 @@ fetchData(){
                                 consumptionList: []
                             }
                         }
-                        var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                        var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitIds[arr] && c.active == true);
                         var monthstartfrom = this.state.rangeValue.from.month
                         var monthArray = [];
                         var monthstartfrom = this.state.rangeValue.from.month;
@@ -1310,7 +1319,7 @@ fetchData(){
                                         if (equivalencyUnitId != -1) {
                                             for (var cl = 0; cl < conlist.length; cl++) {
                                                 let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == conlist[cl].planningUnit.forecastingUnit.id)[0].convertToEu;
-                                                var selectPlanningObj =  this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId);
+                                                var selectPlanningObj =  this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitIds[arr]);
                                                 conlist[cl].consumptionQty = (Number(conlist[cl].consumptionQty) * Number(selectPlanningObj[0].multiplier)) * Number(convertToEu);
                                             }
                                         }
@@ -1373,14 +1382,43 @@ fetchData(){
                             });
                             }
                         }
+                        
+                        monthArray_arr.push(monthArray);
+                        dataList_arr.push(dataList);
+                        consumptionAdjForStockOutId_arr.push(consumptionAdjForStockOutId);
+                        yaxisEquUnit_arr.push(equivalencyUnitId);
+                        console.log("Hello",monthArray)
+                        for(let ii = 0; ii < monthArray.length; ii++){
+                            let temp_forecastQty = 0;
+                            for(let ij = 0; ij < dataList_arr[0]; ij++){
+                                if(monthArray[ii].date == dataList_arr[0][ij].month){
+                                    temp_forecastQty += dataList_arr[0][ij].forecastQty;
+                                } 
+                            }
+                            dataByMonth.push({
+                                month: monthArray[ii],
+                                forecastQty: temp_forecastQty
+                            })
+                        }
+                        console.log("Hello", dataByMonth)
                         this.setState({
                             monthArray: monthArray,
-                            dataList: dataList,
+                            dataList: dataList_arr[0],
                             consumptionAdjForStockOutId: consumptionAdjForStockOutId,
                             yaxisEquUnit:equivalencyUnitId
                         })
                     }.bind(this);   
-                }.bind(this);                                         
+                }.bind(this);
+                }
+                
+                
+                      
+                // this.setState({
+                //     monthArray: monthArray,
+                //     dataList: dataList,
+                //     consumptionAdjForStockOutId: consumptionAdjForStockOutId,
+                //     yaxisEquUnit:equivalencyUnitId
+                // })                             
             } // View by forecastingUnit
             else if(forecastingUnitId > 0){
                 var planningUnitIdList;
