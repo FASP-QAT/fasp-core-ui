@@ -10,6 +10,8 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
 import Picker from 'react-month-picker'
+import { DatePicker } from "antd";
+import "antd/dist/antd.css";
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP, TITLE_FONT, DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS } from '../../Constants.js'
 import moment from "moment";
@@ -30,6 +32,7 @@ import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
 import AuthenticationService from '../Common/AuthenticationService';
 
+const { RangePicker } = DatePicker;
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -68,7 +71,8 @@ class ModelingValidation extends Component {
             nodeDataModelingList: [],
             loading: false,
             monthList: [],
-            show: false
+            show: true,
+            xAxisDisplayBy: 1
         };
         this.toggleLevelFeild = this.toggleLevelFeild.bind(this);
         this.setDatasetId = this.setDatasetId.bind(this);
@@ -79,6 +83,7 @@ class ModelingValidation extends Component {
         this.getDatasetData = this.getDatasetData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleYearRangeChange = this.handleYearRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.toggledata = this.toggledata.bind(this)
     }
@@ -106,6 +111,44 @@ class ModelingValidation extends Component {
         var displayBy = e.target.value;
         this.setState({
             displayBy: displayBy,
+            loading: false
+        }, () => {
+            this.getData()
+        })
+    }
+
+    setXAxisDisplayBy(e) {
+        this.setState({ loading: true })
+        let displayBy = e.target.value;
+        let val;
+        if(displayBy == 1){
+            val = this.state.rangeValue;
+        }else if(displayBy == 2){
+            val = {
+                from : {
+                    year : this.state.rangeValue.from.year,
+                    month : 1,
+                },
+                to : {
+                    year : this.state.rangeValue.to.year,
+                    month : 12,
+                }
+            }
+        }else{
+            val = {
+                from : {
+                    year : this.state.rangeValue.from.year,
+                    month : (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12,
+                },
+                to : {
+                    year : this.state.rangeValue.to.year,
+                    month : (Number(displayBy) + 3) % 12 == 0 ? 12 : (Number(displayBy) + 3) % 12 ,
+                }
+            }
+        }
+        this.setState({
+            xAxisDisplayBy: displayBy,
+            rangeValue: val,
             loading: false
         }, () => {
             this.getData()
@@ -142,6 +185,7 @@ class ModelingValidation extends Component {
                 scenarioId: "",
                 levelList: [],
                 dataEl: "",
+                dataEl2: "",
                 levelId: "",
                 levelUnit: "",
                 nodeList: [],
@@ -157,6 +201,10 @@ class ModelingValidation extends Component {
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
 
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
+
             this.setState({
                 versionId: versionId,
                 datasetData: {},
@@ -166,6 +214,7 @@ class ModelingValidation extends Component {
                 scenarioId: "",
                 levelList: [],
                 dataEl: "",
+                dataEl2: "",
                 levelId: "",
                 levelUnit: "",
                 nodeList: [],
@@ -238,6 +287,10 @@ class ModelingValidation extends Component {
                     // this.el.destroy();
                     jexcel.destroy(document.getElementById("tableDiv"), true);
 
+                    this.el = jexcel(document.getElementById("tableDiv2"), '');
+                    // this.el.destroy();
+                    jexcel.destroy(document.getElementById("tableDiv2"), true);
+
                     this.setState({
                         datasetData: {},
                         treeList: [],
@@ -246,6 +299,7 @@ class ModelingValidation extends Component {
                         scenarioId: "",
                         levelList: [],
                         dataEl: "",
+                        dataEl2: "",
                         levelId: "",
                         levelUnit: "",
                         nodeList: [],
@@ -261,6 +315,10 @@ class ModelingValidation extends Component {
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
 
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
+
             this.setState({
                 datasetData: {},
                 treeList: [],
@@ -275,6 +333,7 @@ class ModelingValidation extends Component {
                 nodeIdArr: [],
                 nodeLabelArr: [],
                 dataEl: "",
+                dataEl2: "",  
                 loading: false
             })
         }
@@ -330,12 +389,17 @@ class ModelingValidation extends Component {
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
 
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
+
             this.setState({
                 treeId: treeId,
                 scenarioList: [],
                 scenarioId: "",
                 levelList: [],
                 dataEl: "",
+                dataEl2: "",
                 levelId: "",
                 levelUnit: "",
                 nodeList: [],
@@ -407,11 +471,16 @@ class ModelingValidation extends Component {
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
 
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
+
             this.setState({
                 scenarioList: [],
                 scenarioId: "",
                 levelList: [],
                 dataEl: "",
+                dataEl2: "",
                 levelId: "",
                 levelUnit: "",
                 nodeList: [],
@@ -439,10 +508,15 @@ class ModelingValidation extends Component {
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
 
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
+
             this.setState({
                 scenarioId: scenarioId,
                 loading: false,
-                dataEl: ""
+                dataEl: "",
+                dataEl2: ""
             })
         }
     }
@@ -466,6 +540,10 @@ class ModelingValidation extends Component {
             this.el = jexcel(document.getElementById("tableDiv"), '');
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
+            
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
 
             this.setState({
                 datasetId: datasetId,
@@ -473,6 +551,7 @@ class ModelingValidation extends Component {
                 scenarioId: "",
                 levelList: [],
                 dataEl: "",
+                dataEl2: "",
                 levelId: "",
                 levelUnit: "",
                 nodeList: [],
@@ -501,9 +580,20 @@ class ModelingValidation extends Component {
             // var nodeDataModelingList = datasetData.nodeDataModelingList;
             var nodeIdArr = this.state.nodeIdArr;
             var rangeValue = this.state.rangeValue;
+            let startDate;
+            let stopDate;
+            if(this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9){
+                startDate = rangeValue.from.year - 1  + '-' + rangeValue.from.month + '-01';
+                stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            }else if(this.state.xAxisDisplayBy > 8){
+                startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                stopDate = rangeValue.to.year + 1 + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            }else{
+                startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            }
             var displayBy = this.state.displayBy;
-            let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-            let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            
             // var nodeDataModelingListFilter = nodeDataModelingList.filter(c => nodeIdArr.includes(c.id) && c.scenarioId == this.state.scenarioId && moment(c.month).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
             // var monthList = [...new Set(nodeDataModelingListFilter.map(ele => (ele.month)))];
             var monthList = [];
@@ -513,76 +603,189 @@ class ModelingValidation extends Component {
                 monthList.push(curDate)
             }
             let columns = [];
-            columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
+            let columns2 = [];
+
+            columns.push({ title: this.state.xAxisDisplayBy == 1 ? i18n.t('static.inventoryDate.inventoryReport') : this.state.xAxisDisplayBy == 2 ? i18n.t('static.modelingValidation.calendarYear') : i18n.t('static.modelingValidation.fiscalYear'), type: 'calendar', options: { format: this.state.xAxisDisplayBy == 1 ? JEXCEL_MONTH_PICKER_FORMAT : "YYYY", type: 'year-month-picker' } });
+            columns2.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format:  JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             for (var k = 0; k < nodeVal.length; k++) {
                 if (this.state.levelId != -2) {
                     columns.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                    columns2.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
                 } else {
                     columns.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##' : '#,##.00 %', decimal: '.' });
+                    columns2.push({ title: nodeVal[k], type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##' : '#,##.00 %', decimal: '.' });
                 }
             }
             if (this.state.levelId != -2) {
                 columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+                columns2.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             } else {
                 columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##' : '#,## %' });
+                columns2.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##' : '#,## %' });
             }
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k], type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                columns2.push({ title: nodeVal[k], type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
             columns.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns2.push({ title: i18n.t('static.supplyPlan.total'), type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             var data = [];
             var dataArr = [];
+            var dataArr2 = [];
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             // console.log("flatList###", flatList)
-            for (var j = 0; j < monthList.length; j++) {
-                data = [];
-                data[0] = moment(monthList[j]).format("YYYY-MM-DD");
-                // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
-                var total = 0;
-                var totalPer = 0;
-                for (var k = 0; k < nodeVal.length; k++) {
-                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
-                    var calculatedValueTotal = 0;
-                    for (var fl = 0; fl < flatListFiltered.length; fl++) {
-                        var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                        var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
-                        var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
-                        if (cvList.length > 0) {
-                            calculatedValueTotal += (checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue);
-                        } else {
+            if(this.state.xAxisDisplayBy == 1){
+                for (var j = 0; j < monthList.length; j++) {
+                    data = [];
+                    data[0] = moment(monthList[j]).format("YYYY-MM-DD");
+                    // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                    var total = 0;
+                    var totalPer = 0;
+                    for (var k = 0; k < nodeVal.length; k++) {
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
+                        var calculatedValueTotal = 0;
+                        for (var fl = 0; fl < flatListFiltered.length; fl++) {
+                            var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                            var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
+                            var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
+                            if (cvList.length > 0) {
+                                calculatedValueTotal += (checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue);
+                            } else {
+                            }
                         }
+                        data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
+                        total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
                     }
-                    data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
-                    total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
-                }
-                data[nodeVal.length + 1] = Number(total).toFixed(2);
+                    data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
 
-                for (var k = 0; k < nodeVal.length; k++) {
-                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
-                    var calculatedValueTotal = 0;
-                    for (var fl = 0; fl < flatListFiltered.length; fl++) {
-                        var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                        var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
-                        var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
-                        if (cvList.length > 0) {
-                            calculatedValueTotal += checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue;
-                        } else {
+                    for (var k = 0; k < nodeVal.length; k++) {
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                        var calculatedValueTotal = 0;
+                        for (var fl = 0; fl < flatListFiltered.length; fl++) {
+                            var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                            var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
+                            var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
+                            if (cvList.length > 0) {
+                                calculatedValueTotal += checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue;
+                            } else {
+                            }
                         }
+                        var val = ""
+                        if (calculatedValueTotal != "") {
+                            val = (Number(calculatedValueTotal) / Number(total)) * 100;
+                        }
+                        data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
+                        totalPer += calculatedValueTotal != "" ? val : 0;
                     }
-                    var val = ""
-                    if (calculatedValueTotal != "") {
-                        val = (Number(calculatedValueTotal) / Number(total)) * 100;
-                    }
-                    data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
-                    totalPer += calculatedValueTotal != "" ? val : 0;
+                    data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
+                    dataArr.push(data);
                 }
-                data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
-                dataArr.push(data);
+            }else{
+                let mL = this.state.xAxisDisplayBy == 9 ? monthList.length-12 : monthList.length; 
+                for (var j = 0; j < mL; j+=12) {
+                    data = [];
+                    if(this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9){
+                        data[0] = moment(monthList[j]).add(12, "months").format("YYYY-MM-DD");
+                    }else{
+                        data[0] = moment(monthList[j]).format("YYYY-MM-DD");
+                    }
+                    // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                    var total = 0;
+                    var totalPer = 0;
+                    for (var k = 0; k < nodeVal.length; k++) {
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
+                        var calculatedValueTotal = 0;
+                        for (var fl = 0; fl < flatListFiltered.length; fl++) {
+                            var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                            var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
+                            var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).isBetween(moment(monthList[j]), moment(monthList[j]).add(12, "months"), null, '[)')) : [];
+                            if (cvList.length > 0) {
+                                calculatedValueTotal += (checkIfPuNode == 5 ? cvList.reduce((accumulator, currentValue) => currentValue.calculatedMmdValue == "" ? accumulator : accumulator + currentValue.calculatedMmdValue, 0) : cvList.reduce((accumulator, currentValue) => currentValue.calculatedValue == "" ? accumulator : accumulator + currentValue.calculatedValue, 0));
+                            } else {
+                            }
+                        }
+                        data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
+                        total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
+                    }
+                    data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
+                    
+                    for (var k = 0; k < nodeVal.length; k++) {
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                        var calculatedValueTotal = 0;
+                        for (var fl = 0; fl < flatListFiltered.length; fl++) {
+                            var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                            var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
+                            var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).isBetween(moment(monthList[j]), moment(monthList[j]).add(12, "months"), null, '[)')) : [];
+                            if (cvList.length > 0) {
+                                calculatedValueTotal += checkIfPuNode == 5 ? cvList.reduce((accumulator, currentValue) => currentValue.calculatedMmdValue == "" ? accumulator : accumulator + currentValue.calculatedMmdValue, 0) : cvList.reduce((accumulator, currentValue) => currentValue.calculatedValue == "" ? accumulator : accumulator + currentValue.calculatedValue, 0);
+                            } else {
+                            }
+                        }
+                        var val = ""
+                        if (calculatedValueTotal != "") {
+                            val = (Number(calculatedValueTotal) / Number(total)) * 100;
+                        }
+                        data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
+                        totalPer += calculatedValueTotal != "" ? val : 0;
+                    }
+                    data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
+                    dataArr.push(data);
+                }
+
+                for (var j = 0; j < monthList.length; j++) {
+                    data = [];
+                    data[0] = moment(monthList[j]).format("YYYY-MM-DD");
+                    // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                    var total = 0;
+                    var totalPer = 0;
+                    for (var k = 0; k < nodeVal.length; k++) {
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
+                        var calculatedValueTotal = 0;
+                        for (var fl = 0; fl < flatListFiltered.length; fl++) {
+                            var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                            var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
+                            var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
+                            if (cvList.length > 0) {
+                                calculatedValueTotal += (checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue);
+                            } else {
+                            }
+                        }
+                        data[k + 1] = calculatedValueTotal != "" ? (this.state.levelId != -2 ? Number(calculatedValueTotal).toFixed(2) : Math.round(calculatedValueTotal)) : "";
+                        total += (this.state.levelId != -2 ? Number(calculatedValueTotal) : Math.round(calculatedValueTotal));
+                    }
+                    data[nodeVal.length + 1] = Number(total) == 0 ? "" : Number(total).toFixed(2);
+
+                    for (var k = 0; k < nodeVal.length; k++) {
+                        var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                        var calculatedValueTotal = 0;
+                        for (var fl = 0; fl < flatListFiltered.length; fl++) {
+                            var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                            var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
+                            var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
+                            if (cvList.length > 0) {
+                                calculatedValueTotal += checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue;
+                            } else {
+                            }
+                        }
+                        var val = ""
+                        if (calculatedValueTotal != "") {
+                            val = (Number(calculatedValueTotal) / Number(total)) * 100;
+                        }
+                        data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
+                        totalPer += calculatedValueTotal != "" ? val : 0;
+                    }
+                    data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
+                    dataArr2.push(data);
+                }
             }
             this.el = jexcel(document.getElementById("tableDiv"), '');
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
+
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
 
             var json = [];
             var options = {
@@ -622,23 +825,67 @@ class ModelingValidation extends Component {
             var dataEl = jexcel(document.getElementById("tableDiv"), options);
             this.el = dataEl;
 
+            var options2 = {
+                data: dataArr2,
+                columnDrag: true,
+                // colWidths: [0, 150, 150, 150, 100, 100, 100],
+                colHeaderClasses: ["Reqasterisk"],
+                columns: columns2,
+                // text: {
+                //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                //     show: '',
+                //     entries: '',
+                // },
+                onload: this.loaded,
+                pagination: false,
+                search: false,
+                defaultColWidth: 120,
+                columnSorting: false,
+                // tableOverflow: true,
+                // tableWidth: "100%",
+                editable: false,
+                wordWrap: true,
+                allowInsertColumn: false,
+                allowManualInsertColumn: false,
+                allowDeleteRow: false,
+                copyCompatibility: true,
+                allowExport: false,
+                paginationOptions: JEXCEL_PAGINATION_OPTION,
+                position: 'top',
+                filters: true,
+                license: JEXCEL_PRO_KEY,
+                contextMenu: function (obj, x, y, e) {
+                    return [];
+                }.bind(this),
+            };
+            var dataEl2 = jexcel(document.getElementById("tableDiv2"), options2);
+            this.el = dataEl2;
+
             this.setState({
                 nodeDataModelingList: [{}],
                 monthList: monthList,
                 dataEl: dataEl,
+                dataEl2: dataEl2,
                 loading: false,
-                show: false,
-                columns: columns
+                show: true,
+                columns: columns,
+                columns2: columns2
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
+            
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
 
             this.setState({
                 nodeDataModelingList: [],
                 loading: false,
-                dataEl: ""
+                dataEl: "",
+                dataEl2: ""
             })
         }
     }
@@ -765,6 +1012,10 @@ class ModelingValidation extends Component {
             // this.el.destroy();
             jexcel.destroy(document.getElementById("tableDiv"), true);
 
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            // this.el.destroy();
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
+
             this.setState({
                 versionList: [],
                 versionId: "",
@@ -775,6 +1026,7 @@ class ModelingValidation extends Component {
                 scenarioId: "",
                 levelList: [],
                 dataEl: "",
+                dataEl2: "",
                 levelId: "",
                 levelUnit: "",
                 nodeList: [],
@@ -909,6 +1161,35 @@ class ModelingValidation extends Component {
 
     handleRangeChange(value, text, listIndex) {
 
+    }
+    handleYearRangeChange(value) {
+        let val;
+        if(this.state.xAxisDisplayBy == 2){
+            val = {
+                from : {
+                    year : value[0].year(),
+                    month: 1,
+                },
+                to : {
+                    year : value[1].year(),
+                    month : 12,
+                }
+            }
+        }else{
+            val = {
+                from : {
+                    year : value[0].year(),
+                    month: this.state.rangeValue.from.month,
+                },
+                to : {
+                    year : value[1].year(),
+                    month : this.state.rangeValue.to.month,
+                }
+            }
+        }
+        this.setState({ rangeValue: val }, () => {
+            this.getData()
+        })
     }
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
@@ -1069,33 +1350,7 @@ class ModelingValidation extends Component {
             y = y + 10;
         }
 
-        planningText = doc.splitTextToSize(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-
-        planningText = doc.splitTextToSize(i18n.t('static.common.level') + ' : ' + document.getElementById("levelId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-
-        planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value, doc.internal.pageSize.width * 3 / 4);
+        planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.levelUnit1') + ' : ' + document.getElementById("levelId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
@@ -1121,8 +1376,49 @@ class ModelingValidation extends Component {
             y = y + 10;
         }
 
+        planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.xAxisDisplay') + ' : ' + document.getElementById("xAxisDisplayBy").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
-        doc.text(i18n.t('static.modelingValidation.displayBy') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        let rVFrom = this.state.xAxisDisplayBy == 1 ? this.makeText(this.state.rangeValue.from) : this.state.rangeValue.from.year;
+        let rVTo = this.state.xAxisDisplayBy == 1 ? this.makeText(this.state.rangeValue.to) : this.state.rangeValue.to.year;
+        planningText = doc.splitTextToSize(i18n.t('static.report.dateRange') + ' : ' + rVFrom + ' ~ ' + rVTo, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        // planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value, doc.internal.pageSize.width * 3 / 4);
+        // // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        // y = y + 10;
+        // for (var i = 0; i < planningText.length; i++) {
+        //     if (y > doc.internal.pageSize.height - 100) {
+        //         doc.addPage();
+        //         y = 80;
+
+        //     }
+        //     doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+        //     y = y + 10;
+        // }
+
+
+        y = y + 10;
+        doc.text(i18n.t('static.modelingValidation.yAxisDisplay') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
             align: 'left'
         })
         y = y + 10;
@@ -1167,7 +1463,10 @@ class ModelingValidation extends Component {
                             dataArr.push(this.formatter(ele[idx]));
                         }
                     } else if (item.type == 'calendar') {
-                        dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+                        if(this.state.xAxisDisplayBy == 1)
+                            dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+                        else
+                            dataArr.push(moment(ele[idx]).format("YYYY"));
                     } else {
                         dataArr.push(ele[idx]);
                     }
@@ -1190,6 +1489,44 @@ class ModelingValidation extends Component {
 
         //doc.text(title, marginLeft, 40);
         doc.autoTable(content);
+
+        if(this.state.xAxisDisplayBy > 1){
+            var columns2 = [];
+            this.state.columns2.filter(c => c.type != 'hidden').map((item, idx) => { columns2.push(item.title) });
+            var dataArr = [];
+            var dataArr1 = [];
+            this.state.dataEl2.getJson(null, false).map(ele => {
+                dataArr = [];
+                this.state.columns2.map((item, idx) => {
+                    if (item.type != 'hidden') {
+                        if (item.type == 'numeric') {
+                            if (item.mask != undefined && item.mask.toString().includes("%")) {
+                                dataArr.push(this.formatter(ele[idx]) + " %");
+                            } else {
+                                dataArr.push(this.formatter(ele[idx]));
+                            }
+                        } else if (item.type == 'calendar') {
+                            dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+                        } else {
+                            dataArr.push(ele[idx]);
+                        }
+                    }
+
+                })
+                dataArr1.push(dataArr);
+            })
+            const data2 = dataArr1;
+            // doc.addPage()
+            let content2 = {
+                margin: { top: 80, bottom: 50 },
+                startY: 40 + doc.autoTable.previous.finalY,
+                head: [columns2],
+                body: data2,
+                styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" }
+
+            };
+            doc.autoTable(content2);
+        }
         addHeaders(doc)
         addFooters(doc)
         doc.save(this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.modelingValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
@@ -1222,16 +1559,22 @@ class ModelingValidation extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.level') + ' : ' + document.getElementById("levelId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
+        csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit1')  + ' : ' + document.getElementById("levelId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         this.state.nodeLabelArr.map(ele =>
             csvRow.push('"' + (i18n.t('static.common.node')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20').replaceAll('#', '%23') + '"'))
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.modelingValidation.displayBy') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
+        csvRow.push('"' + (i18n.t('static.modelingValidation.xAxisDisplay') + ' : ' + document.getElementById("xAxisDisplayBy").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        let rVFrom = this.state.xAxisDisplayBy == 1 ? this.makeText(this.state.rangeValue.from) : this.state.rangeValue.from.year;
+        let rVTo = this.state.xAxisDisplayBy == 1 ? this.makeText(this.state.rangeValue.to) : this.state.rangeValue.to.year;
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + rVFrom + ' ~ ' + rVTo).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        
+        // csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
+        // csvRow.push('')
+        
+        csvRow.push('"' + (i18n.t('static.modelingValidation.yAxisDisplay') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
 
 
@@ -1259,7 +1602,10 @@ class ModelingValidation extends Component {
                     if (item.mask != undefined && item.mask.toString().includes("%")) {
                         B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                     } else if (item.type == 'calendar') {
-                        B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
+                        if(this.state.xAxisDisplayBy == 1)
+                            B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
+                        else
+                            B.push(moment(ele[idx]).format("YYYY").toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                     } else {
                         B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                     }
@@ -1271,6 +1617,38 @@ class ModelingValidation extends Component {
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
+        }
+
+        csvRow.push('')
+        if(this.state.xAxisDisplayBy > 1){
+            const headers2 = [];
+            this.state.columns2.filter(c => c.type != 'hidden').map((item, idx) => { headers2[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
+
+            var A = [this.addDoubleQuoteToRowContent(headers2)];
+            var B = []
+            this.state.dataEl2.getJson(null, false).map(ele => {
+                B = [];
+                this.state.columns2.map((item, idx) => {
+                    if (item.type != 'hidden') {
+                        if (item.mask != undefined && item.mask.toString().includes("%")) {
+                            B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
+                        } else if (item.type == 'calendar') {
+                            if(this.state.xAxisDisplayBy == 1)
+                                B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
+                            else
+                                B.push(moment(ele[idx]).format("YYYY").toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
+                        } else {
+                            B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
+                        }
+                    }
+                })
+                A.push(this.addDoubleQuoteToRowContent(B));
+            })
+
+
+            for (var i = 0; i < A.length; i++) {
+                csvRow.push(A[i].join(","))
+            }
         }
         var csvString = csvRow.join("%0A")
         var a = document.createElement("a")
@@ -1327,6 +1705,11 @@ class ModelingValidation extends Component {
                                 var month = xAxis1.split('-')[0];
                                 return month;
                             }
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: this.state.xAxisDisplayBy == 2 ? i18n.t('static.modelingValidation.calendarYear') : this.state.xAxisDisplayBy == 1 ? "" : i18n.t('static.modelingValidation.fiscalYear'),
+                            fontColor: 'black'
                         }
                     },
                     {
@@ -1434,12 +1817,33 @@ class ModelingValidation extends Component {
         //     }
         // }
         if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
-            bar = {
-
-                labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))],
-                datasets: datasetListForGraph
-
-            };
+            if(this.state.xAxisDisplayBy == 1){
+                bar = {
+                    labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))],
+                    datasets: datasetListForGraph
+                };
+            }else{
+                if(this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9){
+                    let arr = [...new Set(this.state.monthList.map(ele => moment(ele).add(12, 'months').format("YYYY")))];
+                    arr.pop();
+                    bar = {
+                        labels: arr,
+                        datasets: datasetListForGraph
+                    };
+                }else if(this.state.xAxisDisplayBy > 8){
+                    let arr = [...new Set(this.state.monthList.map(ele => moment(ele).format("YYYY")))];
+                    arr.pop();
+                    bar = {
+                        labels: arr,
+                        datasets: datasetListForGraph
+                    };
+                }else{
+                    bar = {
+                        labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("YYYY")))],
+                        datasets: datasetListForGraph
+                    };
+                }
+            }
         }
 
 
@@ -1501,9 +1905,11 @@ class ModelingValidation extends Component {
         let levels = levelList.length > 0
             && levelList.map((item, i) => {
                 if (item != -1 && item != -2) {
+                    var levelListFilter = this.state.treeListFiltered.levelList != undefined ? this.state.treeListFiltered.levelList.filter(c => c.levelNo == item)[0] : undefined;
+                    let levelUnit = levelListFilter != undefined && levelListFilter.unit != null ? " (" + getLabelText(levelListFilter.unit.label, this.state.lang) + ")" : "";
                     return (
                         <option key={i} value={item}>
-                            {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) : i18n.t("static.common.level") + " " + item}
+                            {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) + levelUnit : i18n.t("static.common.level") + " " + item }
                         </option>
                     )
                 } else {
@@ -1639,31 +2045,13 @@ class ModelingValidation extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
-
-                                                    <Picker
-                                                        ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={rangeValue}
-                                                        lang={pickerLang}
-                                                        key={JSON.stringify(rangeValue)}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
-                                                        onDismiss={this.handleRangeDissmis}
-                                                    >
-                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                    </Picker>
-                                                </div>
-                                            </FormGroup>
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpenLevelFeild} target="Popover5" trigger="hover" toggle={this.toggleLevelFeild}>
                                                     <PopoverBody>{i18n.t('static.Tooltip.levelModelingValdation')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.level')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.toggleLevelFeild} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.levelUnit1')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.toggleLevelFeild} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -1682,7 +2070,7 @@ class ModelingValidation extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
+                                            {/* <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.levelUnit')}</Label>
                                                 <div className="controls">
                                                     <InputGroup>
@@ -1697,7 +2085,7 @@ class ModelingValidation extends Component {
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
-                                            </FormGroup>
+                                            </FormGroup> */}
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.node')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1716,7 +2104,89 @@ class ModelingValidation extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.xAxisDisplay')}</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="xAxisDisplayBy"
+                                                            id="xAxisDisplayBy"
+                                                            bsSize="sm"
+                                                            value={this.state.xAxisDisplayBy}
+                                                            onChange={(e) => { this.setXAxisDisplayBy(e); }}
+                                                        >
+                                                            <option value="1">{i18n.t('static.ManageTree.Month')}</option>
+                                                            <option value="2">{i18n.t('static.modelingValidation.calendarYear')}</option>
+                                                            <option value="3">{i18n.t('static.modelingValidation.fyJul')}</option>
+                                                            <option value="4">{i18n.t('static.modelingValidation.fyAug')}</option>
+                                                            <option value="5">{i18n.t('static.modelingValidation.fySep')}</option>
+                                                            <option value="6">{i18n.t('static.modelingValidation.fyOct')}</option>
+                                                            <option value="7">{i18n.t('static.modelingValidation.fyNov')}</option>
+                                                            <option value="8">{i18n.t('static.modelingValidation.fyDec')}</option>
+                                                            <option value="9">{i18n.t('static.modelingValidation.fyJan')}</option>
+                                                            <option value="10">{i18n.t('static.modelingValidation.fyFeb')}</option>
+                                                            <option value="11">{i18n.t('static.modelingValidation.fyMar')}</option>
+                                                            <option value="12">{i18n.t('static.modelingValidation.fyApr')}</option>
+                                                            <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
+                                                            <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3 pickerRangeBox">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            ref="pickRange"
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            value={rangeValue}
+                                                            lang={pickerLang}
+                                                            key={JSON.stringify(rangeValue)}
+                                                            //theme="light"
+                                                            onChange={this.handleRangeChange}
+                                                            onDismiss={this.handleRangeDissmis}
+                                                        >
+                                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                        </Picker>
+                                                    </div>
+                                                )}
+                                                {(this.state.xAxisDisplayBy == 2) && (
+                                                    <div className="controls box">
+                                                        <RangePicker
+                                                            picker="year"
+                                                            allowClear={false}
+                                                            id="date"
+                                                            name="date"
+                                                            //  style={{ width: '450px', marginLeft:'20px'}}
+                                                            onChange={this.handleYearRangeChange}
+                                                            value={[
+                                                                moment(rangeValue.from.year.toString()),
+                                                                moment(rangeValue.to.year.toString()),
+                                                            ]}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {(this.state.xAxisDisplayBy != 1 && this.state.xAxisDisplayBy != 2) && (
+                                                    <div className="controls box">
+                                                        <RangePicker
+                                                            picker="year"
+                                                            allowClear={false}
+                                                            id="date"
+                                                            name="date"
+                                                            //  style={{ width: '450px', marginLeft:'20px'}}
+                                                            onChange={this.handleYearRangeChange}
+                                                            value={[
+                                                                moment(rangeValue.from.year.toString()),
+                                                                moment(rangeValue.to.year.toString()),
+                                                            ]}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.yAxisDisplay')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -1767,11 +2237,24 @@ class ModelingValidation extends Component {
 
                                     {/* {this.state.show && */}
                                     <div className="row">
-                                        <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin">
+                                        <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
 
                                             {/* // <div className="table-scroll">
                                                     // <div className="table-wrap table-responsive"> */}
                                             <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                            </div>
+                                            {/* // </div>
+                                                // </div> */}
+
+                                        </div>
+                                    </div>
+
+                                    <div className="row displayBlock">
+                                        <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin">
+
+                                            {/* // <div className="table-scroll">
+                                                    // <div className="table-wrap table-responsive"> */}
+                                            <div id="tableDiv2" className="jexcelremoveReadonlybackground consumptionDataEntryTable TableWidth100" style={{ display: this.state.show && !this.state.loading && this.state.xAxisDisplayBy > 1 ? "block" : "none" }}>
                                             </div>
                                             {/* // </div>
                                                 // </div> */}

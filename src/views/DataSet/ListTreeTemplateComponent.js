@@ -741,6 +741,7 @@ export default class ListTreeTemplate extends Component {
                 {
                     title: i18n.t('static.listTreeTemp.templateName'),
                     type: 'text',
+                    width:200
                     // readOnly: true
                 },
                 {
@@ -750,12 +751,12 @@ export default class ListTreeTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.program.monthsInPast'),
-                    type: 'text',
+                    type: 'hidden',
                     // readOnly: true
                 },
                 {
                     title: i18n.t('static.program.monthsInFuture'),
-                    type: 'text',
+                    type: 'hidden',
                     // readOnly: true
                 },
                 {
@@ -766,7 +767,7 @@ export default class ListTreeTemplate extends Component {
                 {
                     title: i18n.t('static.ManageTree.Notes'),
                     type: 'text',
-                    width:250
+                    width:400
                     // readOnly: true
                 },
                 {
@@ -1263,9 +1264,9 @@ export default class ListTreeTemplate extends Component {
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         {/* <div id="loader" className="center"></div> */}
-                        <div className=" pl-0" style={{marginTop:"-20px"}}>
-                            <div className="row">
-                                <FormGroup className="col-md-3">
+                        <div className="pl-0">
+                            <div className="SelectdivTree d-flex">
+                                <FormGroup className="col-md-3 pl-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -1286,8 +1287,8 @@ export default class ListTreeTemplate extends Component {
                                 </FormGroup>
                             </div>
                         </div>
-                        <div className="col-md-10 pl-0">{"Left click on any tree template to preview. Right click to create tree from template (only available for templates starting from aggregation or number nodes)."}</div>
-                        <div className="TreeTemplateTable consumptionDataEntryTable treeTemplateSearchMarginTop">
+                        <div className="col-md-10 pl-0" style={{marginTop:'31px'}}>{"Left click on any tree template to preview. Right click to create tree from template (only available for templates starting from aggregation or number nodes)."}</div>
+                        <div className="TreeTemplateTable consumptionDataEntryTable treeTemplateSearchMarginTop1">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>

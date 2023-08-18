@@ -1630,8 +1630,8 @@ class ShipmentSummery extends Component {
           this.setState(
             {
               programs: proList.sort(function (a, b) {
-                a = getLabelText(a.label, lang).toLowerCase();
-                b = getLabelText(b.label, lang).toLowerCase();
+                a = a.programCode.toLowerCase();
+                b = b.programCode.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }),
               programId: localStorage.getItem("sesProgramIdReport"),
@@ -1644,8 +1644,8 @@ class ShipmentSummery extends Component {
         } else {
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             }),
           });
@@ -3614,7 +3614,7 @@ class ShipmentSummery extends Component {
                               document
                                 .getElementById("versionId")
                                 .value.includes("Local")
-                              ? "jexcelremoveReadonlybackground RowClickable"
+                              ? "jexcelremoveReadonlybackground RowClickable TableWidth100"
                               : "jexcelremoveReadonlybackground"
                           }
                         ></div>

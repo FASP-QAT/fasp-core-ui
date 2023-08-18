@@ -1402,8 +1402,9 @@ class ListBudgetComponent extends Component {
         <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
-          <div className="Card-header-addicon">
+          <div className="Card-header-addicon BudgetPlusIcon" style={{marginTop:'13px'}}>
             {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}{' '}</strong> */}
+            <span className="pl-0">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
             <div className="card-header-actions">
               <div className="card-header-action">
                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}

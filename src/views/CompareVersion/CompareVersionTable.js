@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import i18n from '../../i18n'
 import { DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID, TITLE_FONT } from '../../Constants';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import getLabelText from '../../CommonComponent/getLabelText'
 import {
@@ -314,8 +314,12 @@ export default class CompareVersion extends Component {
     }
 
     componentDidMount() {
-        // console.log("DatasetData+++", this.props.datasetData);
-        // console.log("DatasetData1+++", this.props.datasetData1);
+
+        let target = document.getElementById('tableDiv');
+        target.classList.add("removeOddColor")
+        console.log("target", target);
+        console.log("DatasetData+++", this.props.datasetData);
+        console.log("DatasetData1+++", this.props.datasetData1);
         this.props.updateState("loading", true);
         var datasetData = this.props.datasetData;// local working copy
         var datasetData1 = this.props.datasetData1;//server latest version
@@ -630,8 +634,9 @@ export default class CompareVersion extends Component {
                 dataArray.push(data);
             }
         }
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el = jexcel(document.getElementById("tableDiv"), '');
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
 
         var options = {
             data: dataArray,
@@ -639,20 +644,20 @@ export default class CompareVersion extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: columns,
             nestedHeaders: nestedHeaders,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
-            allowManualInsertColumn: false,
+            allowManualInseditabertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
             oneditionend: this.onedit,
@@ -661,9 +666,9 @@ export default class CompareVersion extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            editable: false,
+            // editable: false,
             license: JEXCEL_PRO_KEY,
-            editable: false,
+            // editable: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 // //Resolve conflicts
@@ -735,20 +740,20 @@ export default class CompareVersion extends Component {
                     type: 'text',
                 }
             ],
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             pagination: false,
             search: false,
             columnSorting: false,
-            tableOverflow: false,
+            // tableOverflow: false,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            tableOverflow: false,
+            // tableOverflow: false,
             editable: false,
             filters: false,
             license: JEXCEL_PRO_KEY,
@@ -767,8 +772,8 @@ export default class CompareVersion extends Component {
     }
 
     loadedResolveConflicts = function (instance) {
-        jExcelLoadedFunctionOnlyHideRowOld(instance);
-        var elInstance = instance.jexcel;
+        jExcelLoadedFunctionOnlyHideRow(instance);
+        var elInstance = instance.worksheets[0];
         var jsonData = elInstance.getJson();
         var colArr = ['A', 'B', 'C', 'D', 'E']
         for (var j = 0; j < 8; j++) {
@@ -781,8 +786,8 @@ export default class CompareVersion extends Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col1, "background-color", "transparent");
                 } else {
-                    elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-                    elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR);
+                    elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
+                    elInstance.setStyle(col1, "background-color", LATEST_VERSION_COLOUR, true);
                 }
             }
         }
@@ -808,9 +813,9 @@ export default class CompareVersion extends Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionOld(instance);
+        jExcelLoadedFunction(instance);
         if (this.props.page == "commit") {
-            var elInstance = instance.jexcel;
+            var elInstance = instance.worksheets[0];
             var json = elInstance.getJson(null, false);
 
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
@@ -832,33 +837,33 @@ export default class CompareVersion extends Component {
                         } else if (server == downloaded) {
                             var col = (colArr[startPt]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                         } else {
                             //yellow color
                             var col = (colArr[0]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[1]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[2]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[3]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[4]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[5]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[6]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             var col = (colArr[7]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+                            elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR, true);
                             // elInstance.setValueFromCoords(11, r, 2, true);
                         }
                     }
@@ -867,10 +872,11 @@ export default class CompareVersion extends Component {
             }
         }
         else {
-            var asterisk = document.getElementsByClassName("resizable")[0];
-            // var tr = asterisk.firstChild;
-            var tr = asterisk.firstChild.nextSibling;
-            // console.log("asterisk", asterisk.firstChild.nextSibling)
+            // var asterisk = document.getElementsByClassName("resizable")[0];
+            var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+            var tr = asterisk.firstChild;
+            // var tr = asterisk.firstChild.nextSibling;
+            console.log("asterisk", asterisk.firstChild)
 
             tr.children[3].classList.add('InfoTr');
             tr.children[4].classList.add('InfoTr');
@@ -885,6 +891,11 @@ export default class CompareVersion extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <div>
                 {/* Resolve conflicts modal */}

@@ -2968,8 +2968,8 @@ class StockStatus extends Component {
           // console.log("*****1");
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             }),
             programId: proList[0].programId
@@ -2981,8 +2981,8 @@ class StockStatus extends Component {
           // console.log("*****2");
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             }),
             programId: localStorage.getItem("sesProgramIdReport")
@@ -2993,8 +2993,8 @@ class StockStatus extends Component {
           // console.log("*****3");
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             })
           })

@@ -33,7 +33,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import { LOGO } from "../../CommonComponent/Logo";
 import { buildJxl1, dataCheck } from '../DataSet/DataCheckComponent.js';
 import { buildJxl } from '../DataSet/DataCheckComponent.js';
-import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
+import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked, consumptionExtrapolationNotesClicked } from '../DataSet/DataCheckComponent.js';
 
 const entityname = i18n.t('static.button.commit');
 const initialValues = {
@@ -102,7 +102,9 @@ export default class CommitTreeComponent extends React.Component {
             loading: true,
             treeScenarioListNotHaving100PerChild: [],
             includeOnlySelectedForecasts: true,
-            datasetPlanningUnitNotes: []
+            datasetPlanningUnitNotes: [],
+            consumptionExtrapolationList:[],
+            consumptionExtrapolationNotes:''
         }
         this.synchronize = this.synchronize.bind(this);
         this.updateState = this.updateState.bind(this);
@@ -265,7 +267,8 @@ export default class CommitTreeComponent extends React.Component {
                     programNameOriginal: getLabelText(programData[0].datasetJson.label, this.state.lang),
                     forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
                     forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
-                    notes: programData[0].datasetJson.currentVersion.notes
+                    notes: programData[0].datasetJson.currentVersion.notes,
+                    consumptionExtrapolationList:programData[0].datasetJson.consumptionExtrapolation
                 })
                 AuthenticationService.setupAxiosInterceptors();
                 ProgramService.getLatestVersionForProgram((programData[0].datasetJson.programId)).then(response1 => {
@@ -929,7 +932,35 @@ export default class CommitTreeComponent extends React.Component {
                 }
             }
         }, this) : <ul><span>{i18n.t('static.forecastValidation.noNodesHaveChildrenLessThanPerc')}</span><br /></ul>
-
+        //ConsumptionExtrapolationNotes
+        const { consumptionExtrapolationList } = this.state;
+       console.log("consumptionExtrapolationList----",consumptionExtrapolationList)
+        let consumptionExtrapolationNotes = (consumptionExtrapolationList.length > 0)? consumptionExtrapolationList.map((item, i) => {   
+           var flag=true;
+           console.log("notes--------------",item.notes)
+        if(item.notes!=undefined && item.notes!=null && item.notes!=''){
+           if(consumptionExtrapolationList.length==(i+1)){
+                flag=false;
+                return (
+                    <tr key={i} className="hoverTd" onClick={() => consumptionExtrapolationNotesClicked(item.planningUnit.id, this)}>
+                        <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                        <td>{item.notes}</td>
+                    </tr>
+                )    
+            }
+            if(flag){
+                if(consumptionExtrapolationList[i].planningUnit.id!=consumptionExtrapolationList[i+1].planningUnit.id){
+                    return (
+                        <tr key={i} className="hoverTd"  onClick={() => consumptionExtrapolationNotesClicked(item.planningUnit.id, this)}>
+                            <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                            <td>{item.notes}</td>
+                        </tr>
+                    )
+                }
+            }
+        }
+        }, this) : <span>&emsp;&emsp;&emsp;&ensp;{i18n.t('static.forecastValidation.noConsumptionExtrapolationNotesFound')}</span>;
+        
         //Consumption Notes
         const { datasetPlanningUnitNotes } = this.state;
         let consumtionNotes = (datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
@@ -1080,7 +1111,7 @@ export default class CommitTreeComponent extends React.Component {
                                         <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
                                         <div className='ForecastSummaryTable'>
                                             <div className="RemoveStriped commitversionTable CommitTableMarginTop consumptionDataEntryTable">
-                                                <div id="tableDiv" />
+                                                <div id="tableDiv" className="TableWidth100"/>
                                             </div>
                                         </div>
                                     </>
@@ -1249,7 +1280,22 @@ export default class CommitTreeComponent extends React.Component {
                                         </Table>
                                     </div> : <span>{consumtionNotes}</span>}
                             </div><br />
-                            <span>b. {i18n.t('static.commitTree.treeScenarios')}:</span>
+                            <span>b. {i18n.t('static.forecastValidation.consumptionExtrapolationNotes')}:</span>
+                            <div className="mt-2">
+                                {(consumptionExtrapolationList.length > 0) ?
+                                    <div className="table-wrap table-responsive fixTableHead">
+                                        <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
+                                                    <th style={{ width: '80%' }}><b>{i18n.t('static.program.notes')}</b></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>{consumptionExtrapolationNotes}</tbody>
+                                        </Table>
+                                    </div> : <span>{consumptionExtrapolationNotes}</span>}
+                            </div><br />
+                            <span>c. {i18n.t('static.commitTree.treeScenarios')}:</span>
                             <div className="">
                                 {treeScenarioNotes.length > 0 ? <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center  overflowhide main-table table-striped1" bordered size="sm" >
@@ -1265,7 +1311,7 @@ export default class CommitTreeComponent extends React.Component {
                                     </Table>
                                 </div> : <span>{scenarioNotes}</span>}
                             </div><br />
-                            <span>c. {i18n.t('static.commitTree.treeNodes')}:</span>
+                            <span>d. {i18n.t('static.commitTree.treeNodes')}:</span>
                             {/* <div className="table-scroll"> */}
                             <div className="mt-2">
                                 {treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0 ? <div className="table-wrap table-responsive fixTableHead">

@@ -626,7 +626,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
 
                                                 data[15] = isEmergencyOrder;//P
                                                 data[16] = shipmentList[i].fundingSource.id;//Q
-                                                data[17] = shipmentList[i].budget.id;//R
+                                                data[17] = shipmentList[i].budget.id==0?"":shipmentList[i].budget.id;//R
                                                 data[18] = shipmentList[i].currency.currencyId;//S
                                                 data[19] = shipmentList[i].rate != undefined ? Number(shipmentList[i].rate).toFixed(2) : "";//T
                                                 data[20] = shipmentList[i].erpFlag.toString() == "true" ? Number(shipmentList[i].productCost).toFixed(2) : `=ROUND(O${parseInt(i) + 1}*T${parseInt(i) + 1},2)`;//U
@@ -3653,6 +3653,14 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         valid = false;
                         elInstance.setValueFromCoords(34, y, 1, true);
                     }
+                }else if(value == PLANNED_SHIPMENT_STATUS && elInstance.getValueFromCoords(17, y, true)!="SELECT" && elInstance.getValueFromCoords(17, y, true)!="Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined"){
+                    var budget =  elInstance.getValueFromCoords(17, y, true)!="SELECT" && elInstance.getValueFromCoords(17, y, true)!="Select"?elInstance.getValueFromCoords(17, y, true):"";
+                    var validation = checkValidtion("text", "R", y, budget, elInstance);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setComments(("R").concat(parseInt(y) + 1),i18n.t("static.shipment.selectValidBudget"))
+                        elInstance.setValueFromCoords(34, y, 1, true);
+                    }
                 }
 
                 if (rowData[1] == false && rowData[0].toString() == "true") {
@@ -3714,7 +3722,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         if (rowData[1].toString() == "false" && rowData[0].toString() == "true" && elInstance.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll("\,", "") != "") {
                             positiveValidation("M", y, elInstance);
                         } else {
-                            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                            if (rowData[1].toString() == "false" && rowData[0].toString() == "true"){
+                                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                            }
                         }
                     }
                     // }

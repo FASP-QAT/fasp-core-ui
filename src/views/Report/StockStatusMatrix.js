@@ -223,11 +223,11 @@ export default class StockStatusMatrix extends React.Component {
                   var tcList = [];
                   flList.filter(function (item) {
                     var i = tcList.findIndex(
-                      (x) => x.tracerCategoryId == item.tracerCategory.id
+                      (x) => x.id == item.tracerCategory.id
                     );
                     if (i <= -1 && item.tracerCategory.id != 0) {
                       tcList.push({
-                        tracerCategoryId: item.tracerCategory.id,
+                        id: item.tracerCategory.id,
                         label: item.tracerCategory.label,
                       });
                     }
@@ -1288,8 +1288,8 @@ export default class StockStatusMatrix extends React.Component {
           this.setState(
             {
               programs: proList.sort(function (a, b) {
-                a = getLabelText(a.label, lang).toLowerCase();
-                b = getLabelText(b.label, lang).toLowerCase();
+                a = a.programCode.toLowerCase();
+                b = b.programCode.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }),
               programId: localStorage.getItem("sesProgramIdReport"),
@@ -1302,8 +1302,8 @@ export default class StockStatusMatrix extends React.Component {
         } else {
           this.setState({
             programs: proList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
+              a = a.programCode.toLowerCase();
+              b = b.programCode.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             }),
           });
@@ -3189,7 +3189,7 @@ export default class StockStatusMatrix extends React.Component {
                                   item.label,
                                   this.state.lang
                                 ),
-                                value: item.tracerCategoryId,
+                                value: item.id,
                               };
                             }, this)
                           : []
