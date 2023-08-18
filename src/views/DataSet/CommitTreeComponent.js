@@ -2759,6 +2759,12 @@ export default class CommitTreeComponent extends React.Component {
                                 // console.log("ProgramJson+++", programJson);
                                 // console.log("this.state.comparedLatestVersion----", this.state.comparedLatestVersion);
                                 var treeList = programJson.treeList;
+                                var treeJson=this.state.treeInstance.getJson(null,false);
+                                for(var tj=0;tj<treeJson.length;tj++){
+                                    if(this.state.treeInstance.getCell(("D").concat(parseInt(tj) + 1)).firstChild.checked.toString()=="true"){
+                                        treeList=treeList.filter(c=>c.treeAnchorId>0?c.treeAnchorId!=treeJson[tj][4]:c.tempTreeAnchorId!=treeJson[tj][5]);
+                                    }
+                                }
                                 for (var tl = 0; tl < treeList.length; tl++) {
                                     var tree = treeList[tl];
                                     var scenarioList = tree.scenarioList;
@@ -2823,8 +2829,17 @@ export default class CommitTreeComponent extends React.Component {
                                     consumptionExtrapolationToUpdate[ce].extrapolationDataList = cel;
                                 }
                                 programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
+
+                                var consumptionJson=this.state.consumptionInstance.getJson(null,false);
+                                for(var c=0;c<consumptionJson.length;c++){
+                                    if(this.state.consumptionInstance.getCell(("F").concat(parseInt(c) + 1)).firstChild.checked.toString()=="true"){
+                                        programJson.actualConsumptionList = programJson.actualConsumptionList.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11]));
+                                        programJson.consumptionExtrapolation = programJson.consumptionExtrapolation.filter(item => (item.planningUnit.id != consumptionJson[c][10]) || (item.planningUnit.id == consumptionJson[c][10] && item.region.id != consumptionJson[c][11]));
+                                    }
+                                }
+
                                 programJson.treeList = treeList;
-                                // console.log("commit*** final programJson---", programJson)
+                                console.log("commit*** final programJson---", programJson)
                                 const compressedData = isCompress(programJson);
                                 //create saveDatasetData in ProgramService
                                 DatasetService.saveDatasetData(compressedData, this.state.comparedLatestVersion).then(response => {
@@ -3400,7 +3415,7 @@ export default class CommitTreeComponent extends React.Component {
                                                         <div className="col-md-12">
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
                                                             {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
-                                                            {this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>}
+                                                            {this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined && this.state.conflictsCountVersionSettings==0 && this.state.conflictsCountPlanningUnits==0 && this.state.conflictsCountConsumption==0 && this.state.conflictsCountTree==0 && this.state.conflictsCountSelectedForecast==0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>}
                                                         </div>
                                                     </div>
                                                 </Form>
