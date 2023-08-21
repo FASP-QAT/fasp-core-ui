@@ -12315,3 +12315,12 @@ and (max-width: 1366px)
 .tablesticky .table thead tr th {
   top: 0px!important;
 }
+.PeginationBottom .jss_pagination_dropdown{
+  position: absolute;
+    bottom: 6px;
+    left: 0px;
+}
+
+.PeginationBottom .jss_pagination{
+  margin-left: 48px;
+}
