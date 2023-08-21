@@ -3418,7 +3418,7 @@ class ForecastOutput extends Component {
                         {
                             var value = item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"));
                             if (value.length > 0) {
-                                consumptionValue.push(value[0].consumptionQty)
+                                consumptionValue.push(value[0].consumptionQty.toFixed(2))
                             } else {
                                 // consumptionValue.push("");
                             }
