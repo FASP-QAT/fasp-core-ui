@@ -15,6 +15,7 @@ import mos from '../../assets/img/Month0fstock-Formula.png';
 import costOfinventory from '../../assets/img/Cost-Of-Inventory.png';
 import Inventoryturns from '../../assets/img/Inventory Turns.png';
 import forcasterror from '../../assets/img/ForecastError-Formula.png';
+import forcasterrorWAPE from '../../assets/img/WAPE-ForecastError-Formula.png';
 import shipmentcost from '../../assets/img/Shipment-cost-formula.png';
 import adjustedConsumption from '../../assets/img/AdjustedConsumption.png';
 import suggestedShipmentplan1 from '../../assets/img/suggestedShipmentplan1.png';
@@ -973,16 +974,17 @@ class SupplyPlanFormulas extends Component {
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.report.wapeFormula")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
-                  <img className="formula-img-mr img-fluid" src={forcasterror} /><br></br>
-                  <p>{"1) " + i18n.t('static.report.forecastErrorMonthlyFormula1')}</p>
-                  <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormula2')}</p>
-                  <p>{"3) " + i18n.t('static.report.forecastErrorMonthlyFormula3')}</p>
-                  <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormula4')}</p>
-                  <p>{i18n.t("static.report.wapeFormulaNote")}</p>
-                </ListGroupItemText>
-                <ListGroupItemHeading className="formulasheading">{i18n.t("static.report.stockoutConsumptionAdjustment")}</ListGroupItemHeading>
-                <ListGroupItemText className="formulastext">
-                  <p>{i18n.t('static.report.stockoutConsumptionAdjustmentFormula')}</p>
+                  <img className="formula-img-mr img-fluid" src={forcasterrorWAPE} /><br></br>
+                  <p>{"1) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew1')}</p>
+                  <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormula1') + i18n.t('static.report.forecastErrorMonthlyFormulaNew2')}</p>
+                  <p>{"3) " + i18n.t('static.report.forecastErrorMonthlyFormula2')}</p>
+                  <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormula3')}</p>
+                  <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormula4')}</p>
+                  <p>{"6) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew3')}</p>
+                  <p>{"a) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew3a')}</p>
+                  <p>{"b) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew3b')}</p>
+                  <p>{"7) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew4')}</p>
+                  <p>{"8) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew5')}</p>
                 </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>

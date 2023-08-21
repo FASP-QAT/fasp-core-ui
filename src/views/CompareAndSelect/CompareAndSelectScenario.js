@@ -608,7 +608,7 @@ class CompareAndSelectScenario extends Component {
                 data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
                 data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
                 data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
-                data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 ? this.formatter((((actualDiff[j]) / totalActual) * 100).toFixed(4)) : ""
+                data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 ? this.formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2)) : ""
                 data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined ? countArray[j] + 1 : ""
                 data[7] = finalData[j].compareToConsumptionForecast
                 data[8] = finalData[j].id
@@ -660,7 +660,7 @@ class CompareAndSelectScenario extends Component {
                         type: 'numeric',
                         title: i18n.t('static.compareAndSelect.totalForecast'),
                         readOnly: true,
-                        mask: '#,##',
+                        mask: '#,##0.00', decimal: '.',
                         width: 100
                     },
                     {
