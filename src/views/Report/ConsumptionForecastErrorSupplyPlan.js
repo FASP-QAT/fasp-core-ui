@@ -1343,26 +1343,26 @@ fetchData(){
                                         }
                                         if (consumptionForecastQty.length >= 0) {
                                             for (var con = 0; con < consumptionForecastQty.length; con++) {
-                                                forecastQty = Number(forecastQty) + Number(consumptionForecastQty[con].consumptionQty);
+                                                forecastQty = (forecastQty==='' && consumptionForecastQty[con].consumptionQty ==='')?'': Number(forecastQty) + Number(consumptionForecastQty[con].consumptionQty);
                                             }
                                         }
                                         if (consumptionActualQty.length >= 0) {
                                             for (var con = 0; con < consumptionActualQty.length; con++) {
-                                                actualQty = Number(actualQty) + Number(consumptionActualQty[con].consumptionQty);
-                                                adjustedActualConsumption = Number(adjustedActualConsumption) + consumptionAdjForStockOutId ? Number(consumptionActualQty[con].consumptionQty) / (noOfDays - Number(consumptionActualQty[con].dayOfStockOut)) * noOfDays:null;
-                                                daysOfStockOut = Number(daysOfStockOut) + Number(consumptionActualQty[con].dayOfStockOut);
+                                                actualQty = (actualQty==='' && consumptionActualQty[con].consumptionQty==='')?'': (Number(actualQty) + Number(consumptionActualQty[con].consumptionQty));
+                                                adjustedActualConsumption = (adjustedActualConsumption==='' && consumptionActualQty[con].consumptionQty==='') ?'': (Number(adjustedActualConsumption) + (consumptionAdjForStockOutId ? Number(consumptionActualQty[con].consumptionQty) / (noOfDays - Number(consumptionActualQty[con].dayOfStockOut)) * noOfDays:null));
+                                                daysOfStockOut = (daysOfStockOut===''&&consumptionActualQty[con].dayOfStockOut==='')?'': (Number(daysOfStockOut) + Number(consumptionActualQty[con].dayOfStockOut));
                                             }
                                         }
-                                        totalOfActualForRegionOfLastMonths+=consumptionAdjForStockOutId ? Number(adjustedActualConsumption) :Number(actualQty);
-                                        totalDiffForRegionOfLastmonths+=consumptionAdjForStockOutId ? Math.abs(Number(adjustedActualConsumption) - Number(forecastQty)):Math.abs(Number(actualQty) - Number(forecastQty));
+                                        totalOfActualForRegionOfLastMonths = (totalOfActualForRegionOfLastMonths===''?'':Number(totalOfActualForRegionOfLastMonths)) + (actualQty===''?'':(consumptionAdjForStockOutId ? Number(adjustedActualConsumption) :Number(actualQty)));
+                                        totalDiffForRegionOfLastmonths = (totalDiffForRegionOfLastmonths===''?'':Number(totalDiffForRegionOfLastmonths)) + (actualQty===''?'':(consumptionAdjForStockOutId ? Math.abs(Number(adjustedActualConsumption) - Number(forecastQty)):Math.abs(Number(actualQty) - Number(forecastQty))));
                                     }                                    
-                                    var errorPerc = totalOfActualForRegionOfLastMonths > 0 ? (totalDiffForRegionOfLastmonths/ totalOfActualForRegionOfLastMonths):null;
-                                    regionTotalForecastQty =(regionTotalForecastQty==='' && currentForecastQty==='')?'': Number(regionTotalForecastQty) + Number(currentForecastQty);
-                                    regionTotalActualQty =(regionTotalActualQty==='' && currentActualQty==='')?'': Number(regionTotalActualQty) + Number(currentActualQty);
-                                    regionTotalAdjustedActualQty =(regionTotalAdjustedActualQty==='' && currentAdjustedActualConsumption==='')?'': Number(regionTotalAdjustedActualQty) + Number(currentAdjustedActualConsumption);
-                                    totalOfActualForLast6months=(totalOfActualForLast6months==='' && totalOfActualForRegionOfLastMonths==='')?'':Number(totalOfActualForLast6months) + Number(totalOfActualForRegionOfLastMonths);
-                                    totalDiffForLast6months=(totalDiffForLast6months==='' && totalDiffForRegionOfLastmonths==='')?'':Number(totalDiffForLast6months) + Number(totalDiffForRegionOfLastmonths);
-                                   
+                                    var errorPerc = totalOfActualForRegionOfLastMonths===''?'':(totalOfActualForRegionOfLastMonths > 0 ? (totalDiffForRegionOfLastmonths/ totalOfActualForRegionOfLastMonths):0);
+                                    regionTotalForecastQty =(regionTotalForecastQty==='' && currentForecastQty==='')?'': (Number(regionTotalForecastQty) + Number(currentForecastQty));
+                                    regionTotalActualQty =(regionTotalActualQty==='' && currentActualQty==='')?'': (Number(regionTotalActualQty) + Number(currentActualQty));
+                                    regionTotalAdjustedActualQty =(regionTotalAdjustedActualQty==='' && currentAdjustedActualConsumption==='')?'': (Number(regionTotalAdjustedActualQty) + Number(currentAdjustedActualConsumption));
+                                    totalOfActualForLast6months=(totalOfActualForLast6months==='' && totalOfActualForRegionOfLastMonths==='')?'': (Number(totalOfActualForLast6months) + Number(totalOfActualForRegionOfLastMonths));
+                                    totalDiffForLast6months=(totalDiffForLast6months==='' && totalDiffForRegionOfLastmonths==='')?'':(Number(totalDiffForLast6months) + Number(totalDiffForRegionOfLastmonths));
+
                                     var region = { id: regionList[k].regionId, lable: regionList[k].label };
                                     regionData.push({
                                         region: region,
@@ -1378,7 +1378,9 @@ fetchData(){
                                 regionData: regionData,
                                 actualQty: consumptionAdjForStockOutId ? isNaN(regionTotalAdjustedActualQty) ? null:regionTotalAdjustedActualQty :isNaN(regionTotalActualQty)?null:regionTotalActualQty,
                                 forecastQty: isNaN(regionTotalForecastQty)? null:regionTotalForecastQty,
-                                errorPerc: totalErrorPerc
+                                errorPerc: totalErrorPerc,
+                                totalOfActualForLast6months: totalOfActualForLast6months,
+                                totalDiffForLast6months: totalDiffForLast6months
                             });
                             }
                         }
@@ -1392,6 +1394,8 @@ fetchData(){
                                 var regionData = [];
                                 var temp_forecastQty = 0;
                                 var temp_actualQty = '';
+                                var temp_totalOfActualForLast6months = 0;
+                                var temp_totalDiffForLast6months = 0;
                                 var temp_list = dataList_arr[0].filter(e => e.month == monthArray[ii].date);
                                 var temp_regionData = temp_list.map(e => e.regionData)
                                 temp_regionData = [].concat.apply([], temp_regionData);
@@ -1403,7 +1407,7 @@ fetchData(){
                                     regionData.push({
                                         region: region,
                                         forecastQty: temp_forecastQty1,
-                                        actualQty: temp_actualQty1
+                                        actualQty: temp_actualQty1,
                                     });
                                 }
                             
@@ -1415,13 +1419,16 @@ fetchData(){
                                         }else{
                                             temp_actualQty = Number(temp_actualQty) + Number(dataList_arr[0][ij].actualQty); 
                                         }
+                                        temp_totalOfActualForLast6months += Number(dataList_arr[0][ij].totalOfActualForLast6months); 
+                                        temp_totalDiffForLast6months += Number(dataList_arr[0][ij].totalDiffForLast6months);
                                     } 
                                 }
                                 dataByMonth.push({
                                     month: monthArray[ii].date,
                                     forecastQty: temp_forecastQty,
                                     actualQty: temp_actualQty,
-                                    regionData: regionData
+                                    regionData: regionData,
+                                    errorPerc: temp_totalOfActualForLast6months > 0 ? (temp_totalDiffForLast6months / temp_totalOfActualForLast6months) : null
                                 })
                             }
                             this.setState({
@@ -1595,8 +1602,8 @@ fetchData(){
                                                             daysOfStockOut = Number(daysOfStockOut) + Number(consumptionActualQty[con].dayOfStockOut);
                                                         }
                                                     }
-                                                    totalOfActualForRegionOfLastMonths = Number(totalOfActualForRegionOfLastMonths) + consumptionAdjForStockOutId ? Number(adjustedActualConsumption) :Number(actualQty);
-                                                    totalDiffForRegionOfLastmonths = Number(totalDiffForRegionOfLastmonths) + consumptionAdjForStockOutId ? Math.abs(Number(adjustedActualConsumption) - Number(forecastQty)):Math.abs(Number(actualQty) - Number(forecastQty));                         
+                                                    totalOfActualForRegionOfLastMonths = Number(totalOfActualForRegionOfLastMonths) + (consumptionAdjForStockOutId ? Number(adjustedActualConsumption) :Number(actualQty));
+                                                    totalDiffForRegionOfLastmonths = Number(totalDiffForRegionOfLastmonths) + (consumptionAdjForStockOutId ? Math.abs(Number(adjustedActualConsumption) - Number(forecastQty)):Math.abs(Number(actualQty) - Number(forecastQty)));                         
                                                 }                
                                                 var errorPerc = totalOfActualForRegionOfLastMonths>0?totalDiffForRegionOfLastmonths/ totalOfActualForRegionOfLastMonths:null;
                                                 regionTotalForecastQty =(regionTotalForecastQty==='' && currentForecastQty==='')?'': Number(regionTotalForecastQty) + Number(currentForecastQty);
